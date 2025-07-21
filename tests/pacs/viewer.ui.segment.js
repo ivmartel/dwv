@@ -220,8 +220,6 @@ export class SegmentationUI {
         }
       );
 
-      image.recalculateLabels();
-
       this.#watching[dataId] = true;
     } else {
       console.log('Already watching data', dataId);
