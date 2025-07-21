@@ -620,6 +620,7 @@ function setup() {
     }
 
     // clear data table
+    dataTable.unRegisterViewListeners();
     dataTable.clearDataTable();
 
     // set config (deletes previous layers)
@@ -629,6 +630,9 @@ function setup() {
     for (let i = 0; i < dataIds.length; ++i) {
       _app.render(dataIds[i]);
     }
+
+    // listen to view changes
+    dataTable.registerViewListeners();
 
     // show crosshair depending on layout
     if (layout === 'mpr') {

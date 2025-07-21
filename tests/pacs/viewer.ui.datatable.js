@@ -38,10 +38,37 @@ export class DataTableUI {
   #app;
 
   /**
+   * @type {boolean}
+   */
+  #registeredViewListeners = false;
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
+  }
+
+  /**
+   * Register view change listeners.
+   */
+  registerViewListeners() {
+    if (!this.#registeredViewListeners) {
+      this.#app.addEventListener('wlchange', this.#onWLChange);
+      this.#app.addEventListener('opacitychange', this.#onOpacityChange);
+      this.#registeredViewListeners = true;
+    }
+  }
+
+  /**
+   * Unregister view change listeners.
+   */
+  unRegisterViewListeners() {
+    if (this.#registeredViewListeners) {
+      this.#app.removeEventListener('wlchange', this.#onWLChange);
+      this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
+      this.#registeredViewListeners = false;
+    }
   }
 
   /**
@@ -61,20 +88,11 @@ export class DataTableUI {
     });
 
     // control listeners (pause during load)
-    let registered = false;
     this.#app.addEventListener('loadstart', (/*event*/) => {
-      if (registered) {
-        this.#app.removeEventListener('wlchange', this.#onWLChange);
-        this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
-        registered = false;
-      }
+      this.unRegisterViewListeners();
     });
     this.#app.addEventListener('loadend', (/*event*/) => {
-      if (!registered) {
-        this.#app.addEventListener('wlchange', this.#onWLChange);
-        this.#app.addEventListener('opacitychange', this.#onOpacityChange);
-        registered = true;
-      }
+      this.registerViewListeners();
     });
   };
 
