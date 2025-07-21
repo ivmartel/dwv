@@ -295,7 +295,7 @@ export class DataController {
     }
     // propagate annotation group events
     if (typeof data.annotationGroup !== 'undefined') {
-      for (const eventName of imageEventNames) {
+      for (const eventName of annotationGroupEventNames) {
         data.annotationGroup.addEventListener(
           eventName, this.#getFireEvent(dataId));
       }
