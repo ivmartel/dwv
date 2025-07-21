@@ -1805,6 +1805,8 @@ export class Image {
       return;
     }
 
+    this.#fireEvent({type: 'imageresamplingstart'});
+
     this.#resampled = false;
     this.#buffer = this.#rawBuffer;
     this.#geometry = this.#rawGeometry;
