@@ -33,7 +33,9 @@ const ML_PER_MM = 0.001; // ml/mm^3
 export const imageEventNames = [
   'imagecontentchange',
   'imagegeometrychange',
+  'imageresamplingstart',
   'imageresampled',
+  'labelingstart',
   'labelschanged'
 ];
 
@@ -1726,6 +1728,8 @@ export class Image {
       };
     }
 
+    this.#fireEvent({type: 'labelingstart'});
+
     this.#labelingThread.run(this.#buffer, this.#geometry.getSize());
   }
 
@@ -1767,6 +1771,8 @@ export class Image {
     const source = this.#resampled && this.#rawBuffer && this.#rawGeometry
       ? {buffer: this.#rawBuffer, geometry: this.#rawGeometry}
       : {buffer: this.#buffer, geometry: this.#geometry};
+
+    this.#fireEvent({type: 'imageresamplingstart'});
 
     const resampled = this.#resamplingThread.run(
       source.buffer,
