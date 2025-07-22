@@ -11,18 +11,18 @@ import {
 } from '../../src/image/resamplingThread.js';
 
 /**
- * Tests for the 'image/LabelingFilter.js' file.
+ * Tests for the 'image/ResamplingFilter.js' file.
  */
 
 /* global QUnit */
 QUnit.module('image');
 
 /**
- * Tests for {@link LabelingFilter}.
+ * Tests for {@link ResamplingFilter}.
  *
- * @function module:tests/image~LabelingFilter-class
+ * @function module:tests/image~ResamplingFilter-class
  */
-QUnit.test('LabelingFilter class', function (assert) {
+QUnit.test('ResamplingFilter class', function (assert) {
   /* eslint-disable @stylistic/js/array-element-newline */
   const resamplingFilter = new ResamplingFilter();
 
