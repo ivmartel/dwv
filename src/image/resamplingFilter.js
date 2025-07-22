@@ -1,6 +1,17 @@
 
 import {Matrix33, BIG_EPSILON} from '../math/matrix.js';
 
+function get0(values) {
+  return values[0];
+};
+function get1(values) {
+  return values[1];
+};
+function getWeightFunc(weight) {
+  return (values) =>
+    (values[1] * weight) + (values[0] * (1 - weight));
+}
+
 export class ResamplingFilter {
   /**
    * Simple bilinear sampling function.
@@ -25,15 +36,39 @@ export class ResamplingFilter {
       Math.abs(point[2] - q0Index[2])
     ];
 
+
+    let getYMean = getWeightFunc(weights[2]);
+    if (q0Index[2] < 0) {
+      getYMean = get1;
+    } else if (q0Index[2] + 1 >= size[2]) {
+      getYMean = get0;
+    }
+
+    let getXMean = getWeightFunc(weights[1]);
+    if (q0Index[1] < 0) {
+      getXMean = get1;
+    } else if (q0Index[1] + 1 >= size[1]) {
+      getXMean = get0;
+    }
+
+    let getMean = getWeightFunc(weights[0]);
+    if (q0Index[0] < 0) {
+      getMean = get1;
+    } else if (q0Index[0] + 1 >= size[0]) {
+      getMean = get0;
+    }
+
+    let xIndex, yIndex, zIndex;
     const xMeans = [0.0, 0.0];
+    let yMeans, zValues;
     for (let x = 0; x < 2; x++) {
-      const xIndex = q0Index[0] + x;
-      const yMeans = [0.0, 0.0];
+      xIndex = q0Index[0] + x;
+      yMeans = [0.0, 0.0];
       for (let y = 0; y < 2; y++) {
-        const yIndex = q0Index[1] + y;
-        const zValues = [0.0, 0.0];
+        yIndex = q0Index[1] + y;
+        zValues = [0.0, 0.0];
         for (let z = 0; z < 2; z++) {
-          const zIndex = q0Index[2] + z;
+          zIndex = q0Index[2] + z;
 
           if (
             zIndex < 0 ||
@@ -49,41 +84,12 @@ export class ResamplingFilter {
             zValues[z] = buffer[sampleOffset];
           }
         }
-
-        if (
-          q0Index[2] < 0
-        ) {
-          yMeans[y] = zValues[1];
-        } else if (q0Index[2] + 1 >= size[2]) {
-          yMeans[y] = zValues[0];
-        } else {
-          yMeans[y] = (zValues[1] * weights[2]) +
-                      (zValues[0] * (1 - weights[2]));
-        }
+        yMeans[y] = getYMean(zValues, weights);
       }
-
-      if (
-        q0Index[1] < 0
-      ) {
-        xMeans[x] = yMeans[1];
-      } else if (q0Index[1] + 1 >= size[1]) {
-        xMeans[x] = yMeans[0];
-      } else {
-        xMeans[x] = (yMeans[1] * weights[1]) +
-                  (yMeans[0] * (1 - weights[1]));
-      }
+      xMeans[x] = getXMean(yMeans, weights);
     }
 
-    if (
-      q0Index[0] < 0
-    ) {
-      return xMeans[1];
-    } else if (q0Index[0] + 1 >= size[0]) {
-      return xMeans[0];
-    } else {
-      return (xMeans[1] * weights[0]) +
-          (xMeans[0] * (1 - weights[0]));
-    }
+    return getMean(xMeans, weights);
   }
 
   /**
@@ -140,10 +146,10 @@ export class ResamplingFilter {
     const sourceIndexPoint = new Float64Array(3);
 
     for (let x = 0; x < targetSize[0]; x++) {
+      centeredIndexPoint[0] = (x - halfTargetSize[0]) * targetSpacing[0];
       for (let y = 0; y < targetSize[1]; y++) {
+        centeredIndexPoint[1] = (y - halfTargetSize[1]) * targetSpacing[1];
         for (let z = 0; z < targetSize[2]; z++) {
-          centeredIndexPoint[0] = (x - halfTargetSize[0]) * targetSpacing[0];
-          centeredIndexPoint[1] = (y - halfTargetSize[1]) * targetSpacing[1];
           centeredIndexPoint[2] = (z - halfTargetSize[2]) * targetSpacing[2];
 
           relativeMatrix.multiplyTypedArray3D(
