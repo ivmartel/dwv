@@ -520,11 +520,13 @@ function setup() {
     const image = _app.getImage(dataId);
     const geometry = image.getGeometry();
 
+    const angle = (Math.PI / 180) * 20;
+
     /* eslint-disable @stylistic/js/array-element-newline */
     const rotation = new Matrix33([
       1, 0, 0,
-      0, Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1),
-      0, Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1)
+      0, Math.cos(angle), -Math.sin(angle),
+      0, Math.sin(angle), Math.cos(angle)
     ]);
     /* eslint-enable @stylistic/js/array-element-newline */
 
@@ -543,11 +545,13 @@ function setup() {
     const image = _app.getImage(dataId);
     const geometry = image.getGeometry();
 
+    const angle = (Math.PI / 180) * 20;
+
     /* eslint-disable @stylistic/js/array-element-newline */
     const rotation = new Matrix33([
-      Math.cos(Math.PI * 0.1), 0, -Math.sin(Math.PI * 0.1),
+      Math.cos(angle), 0, -Math.sin(angle),
       0, 1, 0,
-      Math.sin(Math.PI * 0.1), 0, Math.cos(Math.PI * 0.1)
+      Math.sin(angle), 0, Math.cos(angle)
     ]);
     /* eslint-enable @stylistic/js/array-element-newline */
 
@@ -566,10 +570,12 @@ function setup() {
     const image = _app.getImage(dataId);
     const geometry = image.getGeometry();
 
+    const angle = (Math.PI / 180) * 20;
+
     /* eslint-disable @stylistic/js/array-element-newline */
     const rotation = new Matrix33([
-      Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1), 0,
-      Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1), 0,
+      Math.cos(angle), -Math.sin(angle), 0,
+      Math.sin(angle), Math.cos(angle), 0,
       0, 0, 1
     ]);
     /* eslint-enable @stylistic/js/array-element-newline */
