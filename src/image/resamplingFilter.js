@@ -1,12 +1,30 @@
 
 import {Matrix33, BIG_EPSILON} from '../math/matrix.js';
 
+/**
+ * Get the first value of an array.
+ *
+ * @param {number[]} values The input array.
+ * @returns {number} The first value.
+ */
 function get0(values) {
   return values[0];
 };
+/**
+ * Get the second value of an array.
+ *
+ * @param {number[]} values The input array.
+ * @returns {number} The second value.
+ */
 function get1(values) {
   return values[1];
 };
+/**
+ * Get a weighting func.
+ *
+ * @param {number} weight The weight.
+ * @returns {Function} The weight function.
+ */
 function getWeightFunc(weight) {
   return (values) =>
     (values[1] * weight) + (values[0] * (1 - weight));
@@ -24,72 +42,61 @@ export class ResamplingFilter {
    * @returns {number} The sampled value.
    */
   #bilinearSample(buffer, unitVectors, size, point) {
-    const q0Index = [
-      Math.floor(point[0]),
-      Math.floor(point[1]),
-      Math.floor(point[2])
-    ];
+    const q0IndexX = Math.floor(point[0]);
+    const q0IndexY = Math.floor(point[1]);
+    const q0IndexZ = Math.floor(point[2]);
 
-    const weights = [
-      Math.abs(point[0] - q0Index[0]),
-      Math.abs(point[1] - q0Index[1]),
-      Math.abs(point[2] - q0Index[2])
-    ];
+    const wx = Math.abs(point[0] - q0IndexX);
+    const wy = Math.abs(point[1] - q0IndexY);
+    const wz = Math.abs(point[2] - q0IndexZ);
 
-
-    let getYMean = getWeightFunc(weights[2]);
-    if (q0Index[2] < 0) {
+    let getYMean = getWeightFunc(wz);
+    if (q0IndexZ < 0) {
       getYMean = get1;
-    } else if (q0Index[2] + 1 >= size[2]) {
+    } else if (q0IndexZ + 1 >= size[2]) {
       getYMean = get0;
     }
 
-    let getXMean = getWeightFunc(weights[1]);
-    if (q0Index[1] < 0) {
+    let getXMean = getWeightFunc(wy);
+    if (q0IndexY < 0) {
       getXMean = get1;
-    } else if (q0Index[1] + 1 >= size[1]) {
+    } else if (q0IndexY + 1 >= size[1]) {
       getXMean = get0;
     }
 
-    let getMean = getWeightFunc(weights[0]);
-    if (q0Index[0] < 0) {
+    let getMean = getWeightFunc(wx);
+    if (q0IndexX < 0) {
       getMean = get1;
-    } else if (q0Index[0] + 1 >= size[0]) {
+    } else if (q0IndexX + 1 >= size[0]) {
       getMean = get0;
     }
 
-    let xIndex, yIndex, zIndex;
+    let zIndex;
+    let offX, offXY;
     const xMeans = [0.0, 0.0];
     let yMeans, zValues;
     for (let x = 0; x < 2; x++) {
-      xIndex = q0Index[0] + x;
+      offX = (q0IndexX + x) * unitVectors[0];
       yMeans = [0.0, 0.0];
       for (let y = 0; y < 2; y++) {
-        yIndex = q0Index[1] + y;
+        offXY = offX + (q0IndexY + y) * unitVectors[1];
         zValues = [0.0, 0.0];
         for (let z = 0; z < 2; z++) {
-          zIndex = q0Index[2] + z;
-
+          zIndex = q0IndexZ + z;
           if (
-            zIndex < 0 ||
-            zIndex >= size[2]
+            zIndex >= 0 && zIndex < size[2]
           ) {
-            zValues[z] = 0;
+            zValues[z] = buffer[offXY + zIndex * unitVectors[2]];
           } else {
-            const sampleOffset =
-              (xIndex * unitVectors[0]) +
-              (yIndex * unitVectors[1]) +
-              (zIndex * unitVectors[2]);
-
-            zValues[z] = buffer[sampleOffset];
+            zValues[z] = 0;
           }
         }
-        yMeans[y] = getYMean(zValues, weights);
+        yMeans[y] = getYMean(zValues);
       }
-      xMeans[x] = getXMean(yMeans, weights);
+      xMeans[x] = getXMean(yMeans);
     }
 
-    return getMean(xMeans, weights);
+    return getMean(xMeans);
   }
 
   /**
@@ -100,11 +107,7 @@ export class ResamplingFilter {
    */
   #snapRound(value) {
     const rounded = Math.round(value);
-    if (Math.abs(value - rounded) < BIG_EPSILON) {
-      return rounded;
-    } else {
-      return value;
-    }
+    return Math.abs(value - rounded) < BIG_EPSILON ? rounded : value;
   }
 
   /**
@@ -141,14 +144,17 @@ export class ResamplingFilter {
       (sourceSize[2] - 1) / 2.0
     ];
 
-    const centeredIndexPoint = new Float64Array(3);
-    const rotIndexPoint = new Float64Array(3);
-    const sourceIndexPoint = new Float64Array(3);
+    const centeredIndexPoint = new Array(3);
+    const rotIndexPoint = new Array(3);
 
+    let sx, sy, sz;
+    let targetOffX, targetOffXY, targetOffset;
     for (let x = 0; x < targetSize[0]; x++) {
       centeredIndexPoint[0] = (x - halfTargetSize[0]) * targetSpacing[0];
+      targetOffX = targetUnitVectors[0] * x;
       for (let y = 0; y < targetSize[1]; y++) {
         centeredIndexPoint[1] = (y - halfTargetSize[1]) * targetSpacing[1];
+        targetOffXY = targetOffX + targetUnitVectors[1] * y;
         for (let z = 0; z < targetSize[2]; z++) {
           centeredIndexPoint[2] = (z - halfTargetSize[2]) * targetSpacing[2];
 
@@ -156,28 +162,22 @@ export class ResamplingFilter {
             centeredIndexPoint, rotIndexPoint
           );
 
-          sourceIndexPoint[0] = this.#snapRound(
+          sx = this.#snapRound(
             (rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0]
           );
-          sourceIndexPoint[1] = this.#snapRound(
+          sy = this.#snapRound(
             (rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1]
           );
-          sourceIndexPoint[2] = this.#snapRound(
+          sz = this.#snapRound(
             (rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2]
           );
 
-          if (!(
-            sourceIndexPoint[0] < 0 ||
-            sourceIndexPoint[0] >= sourceSize[0] ||
-            sourceIndexPoint[1] < 0 ||
-            sourceIndexPoint[1] >= sourceSize[1] ||
-            sourceIndexPoint[2] < 0 ||
-            sourceIndexPoint[2] >= sourceSize[2]
-          )) {
-            const targetOffset =
-              (targetUnitVectors[0] * x) +
-              (targetUnitVectors[1] * y) +
-              (targetUnitVectors[2] * z);
+          if (
+            sx >= 0 && sx < sourceSize[0] &&
+            sy >= 0 && sy < sourceSize[1] &&
+            sz >= 0 && sz < sourceSize[2]
+          ) {
+            targetOffset = targetOffXY + targetUnitVectors[2] * z;
 
             if (interpolate) {
               // Bilinear
@@ -185,16 +185,16 @@ export class ResamplingFilter {
                 workerMessage.sourceImageBuffer,
                 sourceUnitVectors,
                 sourceSize,
-                sourceIndexPoint
+                [sx, sy, sz]
               );
               workerMessage.targetImageBuffer[targetOffset] = sample;
 
             } else {
               // Nearest Neighbor
               const inOffset =
-                (sourceUnitVectors[0] * Math.round(sourceIndexPoint[0])) +
-                (sourceUnitVectors[1] * Math.round(sourceIndexPoint[1])) +
-                (sourceUnitVectors[2] * Math.round(sourceIndexPoint[2]));
+                (sourceUnitVectors[0] * Math.round(sx)) +
+                (sourceUnitVectors[1] * Math.round(sy)) +
+                (sourceUnitVectors[2] * Math.round(sz));
 
               workerMessage.targetImageBuffer[targetOffset] =
                 workerMessage.sourceImageBuffer[inOffset];
