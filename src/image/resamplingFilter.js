@@ -50,12 +50,12 @@ export class ResamplingFilter {
     const z0ok = z0 >= 0 && z0 < size[2];
     const z1ok = z1 >= 0 && z1 < size[2];
     const v000 = (x0ok && y0ok && z0ok) ? buffer[off000] : 0;
-    const v001 = (x0ok && y1ok && z1ok) ? buffer[off001] : 0;
-    const v010 = (x0ok && y0ok && z0ok) ? buffer[off010] : 0;
+    const v001 = (x0ok && y0ok && z1ok) ? buffer[off001] : 0;
+    const v010 = (x0ok && y1ok && z0ok) ? buffer[off010] : 0;
     const v011 = (x0ok && y1ok && z1ok) ? buffer[off011] : 0;
     const v100 = (x1ok && y0ok && z0ok) ? buffer[off100] : 0;
-    const v101 = (x1ok && y1ok && z1ok) ? buffer[off101] : 0;
-    const v110 = (x1ok && y0ok && z0ok) ? buffer[off110] : 0;
+    const v101 = (x1ok && y0ok && z1ok) ? buffer[off101] : 0;
+    const v110 = (x1ok && y1ok && z0ok) ? buffer[off110] : 0;
     const v111 = (x1ok && y1ok && z1ok) ? buffer[off111] : 0;
 
     // interpolation weights
