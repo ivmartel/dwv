@@ -77,7 +77,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
     false
   );
 
-  resamplingFilter.calculateResample(imgEvent0);
+  resamplingFilter.run(imgEvent0);
 
   const expectedSize0 = new Size([3, 2, 3]);
   const expectedSpacing0 = new Spacing([1, 3, 2]);
@@ -147,7 +147,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
     false
   );
 
-  resamplingFilter.calculateResample(imgEvent1);
+  resamplingFilter.run(imgEvent1);
 
   const expectedSize1 = new Size([2, 3, 3]);
   const expectedSpacing1 = new Spacing([3, 2, 1]);
@@ -218,7 +218,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
     false
   );
 
-  resamplingFilter.calculateResample(imgEvent2);
+  resamplingFilter.run(imgEvent2);
 
   const expectedSize2 = new Size([3, 3, 2]);
   const expectedSpacing2 = new Spacing([2, 1, 3]);

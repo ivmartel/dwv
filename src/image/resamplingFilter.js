@@ -103,7 +103,7 @@ export class ResamplingFilter {
    *
    * @param {object} workerMessage The worker message.
    */
-  calculateResample(workerMessage) {
+  run(workerMessage) {
     const sourceSize = workerMessage.sourceSize;
     const targetSize = workerMessage.targetSize;
     const sourceUnitVectors = workerMessage.sourceUnitVectors;
