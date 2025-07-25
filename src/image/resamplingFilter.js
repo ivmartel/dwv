@@ -136,8 +136,8 @@ export class ResamplingFilter {
 
     const centeredIndexPoint = new Array(3);
     const rotIndexPoint = new Array(3);
+    const point = new Array(3);
 
-    let sx, sy, sz;
     let targetOffX, targetOffXY, targetOffset;
     for (let x = 0; x < targetSize[0]; x++) {
       centeredIndexPoint[0] = (x - halfTargetSize[0]) * targetSpacing[0];
@@ -152,27 +152,27 @@ export class ResamplingFilter {
             centeredIndexPoint, rotIndexPoint
           );
 
-          sx = this.#snapRound(
+          point[0] = this.#snapRound(
             (rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0]
           );
-          sy = this.#snapRound(
+          point[1] = this.#snapRound(
             (rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1]
           );
-          sz = this.#snapRound(
+          point[2] = this.#snapRound(
             (rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2]
           );
 
           if (
-            sx >= 0 && sx < sourceSize[0] &&
-            sy >= 0 && sy < sourceSize[1] &&
-            sz >= 0 && sz < sourceSize[2]
+            point[0] >= 0 && point[0] < sourceSize[0] &&
+            point[1] >= 0 && point[1] < sourceSize[1] &&
+            point[2] >= 0 && point[2] < sourceSize[2]
           ) {
             targetOffset = targetOffXY + targetUnitVectors[2] * z;
 
             if (interpolate) {
               // Bilinear
               const sample = this.#bilinearSample(
-                [sx, sy, sz],
+                point,
                 sourceImageBuffer,
                 sourceSize,
                 sourceUnitVectors
@@ -182,9 +182,9 @@ export class ResamplingFilter {
             } else {
               // Nearest Neighbor
               const inOffset =
-                (sourceUnitVectors[0] * Math.round(sx)) +
-                (sourceUnitVectors[1] * Math.round(sy)) +
-                (sourceUnitVectors[2] * Math.round(sz));
+                (sourceUnitVectors[0] * Math.round(point[0])) +
+                (sourceUnitVectors[1] * Math.round(point[1])) +
+                (sourceUnitVectors[2] * Math.round(point[2]));
 
               workerMessage.targetImageBuffer[targetOffset] =
                 workerMessage.sourceImageBuffer[inOffset];
