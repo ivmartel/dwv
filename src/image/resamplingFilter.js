@@ -3,53 +3,36 @@ import {Matrix33, BIG_EPSILON} from '../math/matrix.js';
 
 export class ResamplingFilter {
   /**
-   * The buffer to sample.
-   *
-   * @type {TypedArray}
-   */
-  #buffer;
-  /**
-   * The buffer size.
-   *
-   * @type {number[]}
-   */
-  #size;
-  /**
-   * The buffer offset space unit vectors.
-   *
-   * @type {number[]}
-   */
-  #unitVectors;
-
-  /**
    * Simple bilinear sampling function.
    *
-   * @param {number} px The index space point X coordinate.
-   * @param {number} py The index space point Y coordinate.
-   * @param {number} pz The index space point Z coordinate.
+   * @param {TypedArray} buffer The buffer to sample.
+   * @param {number[]} unitVectors The buffer offset space unit vectors.
+   * @param {number[]} size The buffer size.
+   * @param {number[]} point The index space point to sample.
+   *
    * @returns {number} The sampled value.
    */
-  #bilinearSample(px, py, pz) {
+  #bilinearSample(buffer, unitVectors, size, point) {
     // base point
-    const q0x = Math.floor(px);
-    const q0y = Math.floor(py);
-    const q0z = Math.floor(pz);
+    const q0x = Math.floor(point[0]);
+    const q0y = Math.floor(point[1]);
+    const q0z = Math.floor(point[2]);
 
     // bounding points indices
     const x0 = q0x < 0 ? 0 : q0x;
-    const x1 = q0x + 1 >= this.#size[0] ? q0x : q0x + 1;
+    const x1 = q0x + 1 >= size[0] ? q0x : q0x + 1;
     const y0 = q0y < 0 ? 0 : q0y;
-    const y1 = q0y + 1 >= this.#size[1] ? q0y : q0y + 1;
+    const y1 = q0y + 1 >= size[1] ? q0y : q0y + 1;
     const z0 = q0z < 0 ? 0 : q0z;
-    const z1 = q0z + 1 >= this.#size[2] ? q0z : q0z + 1;
+    const z1 = q0z + 1 >= size[2] ? q0z : q0z + 1;
 
     // bounding points offsets
-    const x0v = x0 * this.#unitVectors[0];
-    const x1v = x1 * this.#unitVectors[0];
-    const y0v = y0 * this.#unitVectors[1];
-    const y1v = y1 * this.#unitVectors[1];
-    const z0v = z0 * this.#unitVectors[2];
-    const z1v = z1 * this.#unitVectors[2];
+    const x0v = x0 * unitVectors[0];
+    const x1v = x1 * unitVectors[0];
+    const y0v = y0 * unitVectors[1];
+    const y1v = y1 * unitVectors[1];
+    const z0v = z0 * unitVectors[2];
+    const z1v = z1 * unitVectors[2];
     const off000 = x0v + y0v + z0v;
     const off001 = x0v + y0v + z1v;
     const off010 = x0v + y1v + z0v;
@@ -60,25 +43,25 @@ export class ResamplingFilter {
     const off111 = x1v + y1v + z1v;
 
     // bounding points values
-    const x0ok = x0 >= 0 && x0 < this.#size[0];
-    const x1ok = x1 >= 0 && x1 < this.#size[0];
-    const y0ok = y0 >= 0 && y0 < this.#size[1];
-    const y1ok = y1 >= 0 && y1 < this.#size[1];
-    const z0ok = z0 >= 0 && z0 < this.#size[2];
-    const z1ok = z1 >= 0 && z1 < this.#size[2];
-    const v000 = (x0ok && y0ok && z0ok) ? this.#buffer[off000] : 0;
-    const v001 = (x0ok && y0ok && z1ok) ? this.#buffer[off001] : 0;
-    const v010 = (x0ok && y1ok && z0ok) ? this.#buffer[off010] : 0;
-    const v011 = (x0ok && y1ok && z1ok) ? this.#buffer[off011] : 0;
-    const v100 = (x1ok && y0ok && z0ok) ? this.#buffer[off100] : 0;
-    const v101 = (x1ok && y0ok && z1ok) ? this.#buffer[off101] : 0;
-    const v110 = (x1ok && y1ok && z0ok) ? this.#buffer[off110] : 0;
-    const v111 = (x1ok && y1ok && z1ok) ? this.#buffer[off111] : 0;
+    const x0ok = x0 >= 0 && x0 < size[0];
+    const x1ok = x1 >= 0 && x1 < size[0];
+    const y0ok = y0 >= 0 && y0 < size[1];
+    const y1ok = y1 >= 0 && y1 < size[1];
+    const z0ok = z0 >= 0 && z0 < size[2];
+    const z1ok = z1 >= 0 && z1 < size[2];
+    const v000 = (x0ok && y0ok && z0ok) ? buffer[off000] : 0;
+    const v001 = (x0ok && y0ok && z1ok) ? buffer[off001] : 0;
+    const v010 = (x0ok && y1ok && z0ok) ? buffer[off010] : 0;
+    const v011 = (x0ok && y1ok && z1ok) ? buffer[off011] : 0;
+    const v100 = (x1ok && y0ok && z0ok) ? buffer[off100] : 0;
+    const v101 = (x1ok && y0ok && z1ok) ? buffer[off101] : 0;
+    const v110 = (x1ok && y1ok && z0ok) ? buffer[off110] : 0;
+    const v111 = (x1ok && y1ok && z1ok) ? buffer[off111] : 0;
 
     // interpolation weights
-    const wx0 = Math.abs(px - q0x);
-    const wy0 = Math.abs(py - q0y);
-    const wz0 = Math.abs(pz - q0z);
+    const wx0 = Math.abs(point[0] - q0x);
+    const wy0 = Math.abs(point[1] - q0y);
+    const wz0 = Math.abs(point[2] - q0z);
     const wx1 = 1 - wx0;
     const wy1 = 1 - wy0;
     const wz1 = 1 - wz0;
@@ -94,14 +77,8 @@ export class ResamplingFilter {
 
     // weighted sum
     return (
-      v000 * w000 +
-      v001 * w001 +
-      v010 * w010 +
-      v011 * w011 +
-      v100 * w100 +
-      v101 * w101 +
-      v110 * w110 +
-      v111 * w111
+      v000 * w000 + v001 * w001 + v010 * w010 + v011 * w011 +
+      v100 * w100 + v101 * w101 + v110 * w110 + v111 * w111
     );
   }
 
@@ -128,11 +105,6 @@ export class ResamplingFilter {
     const targetUnitVectors = workerMessage.targetUnitVectors;
     const sourceSpacing = workerMessage.sourceSpacing;
     const targetSpacing = workerMessage.targetSpacing;
-
-    // set local vars
-    this.#buffer = workerMessage.sourceImageBuffer;
-    this.#size = workerMessage.sourceSize;
-    this.#unitVectors = sourceUnitVectors;
 
     const interpolate = workerMessage.interpolate;
 
@@ -192,8 +164,14 @@ export class ResamplingFilter {
 
             if (interpolate) {
               // Bilinear
-              workerMessage.targetImageBuffer[targetOffset] =
-                this.#bilinearSample(sx, sy, sz);
+              const sample = this.#bilinearSample(
+                workerMessage.sourceImageBuffer,
+                sourceUnitVectors,
+                sourceSize,
+                [sx, sy, sz]
+              );
+              workerMessage.targetImageBuffer[targetOffset] = sample;
+
             } else {
               // Nearest Neighbor
               const inOffset =
