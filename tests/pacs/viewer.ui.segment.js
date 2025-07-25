@@ -21,6 +21,11 @@ import {
   getRootFromHtmlId
 } from './viewer.ui.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 // global vars
 const _colours = [
   {r: 255, g: 0, b: 0},
@@ -176,8 +181,11 @@ function splitSegmentHtmlId(segmentId) {
  */
 export class SegmentationUI {
 
-  #watching = {};
-
+  /**
+   * The associated application.
+   *
+   * @type {App}
+   */
   #app;
 
   /**
@@ -188,49 +196,46 @@ export class SegmentationUI {
   }
 
   /**
-   * Watch a data for changes.
-   *
-   * @param {string} dataId The data ID.
-   */
-  #watchData(dataId) {
-    if (!this.#watching[dataId]) {
-      const maskData = this.#app.getData(dataId);
-      if (!maskData) {
-        throw new Error(
-          'No data to watch for dataId: ' + dataId
-        );
-      }
-      const image = maskData.image;
-
-      // Watch for labels change
-      image.addEventListener(
-        'labelschanged',
-        (event) => {
-          const segmentation =
-            _segmentations.find(
-              (seg) => {
-                return seg.dataId === dataId;
-              }
-            );
-
-          if (typeof segmentation !== 'undefined') {
-            segmentation.labels = event.labels;
-            this.#updateLabelsSpan(segmentation);
-          }
-        }
-      );
-
-      this.#watching[dataId] = true;
-    } else {
-      console.log('Already watching data', dataId);
-    }
-  }
-
-  /**
    * Bind app to ui.
    */
   registerListeners() {
     this.#app.addEventListener('dataadd', this.#onDataAdd);
+    this.#app.addEventListener('labelschanged', this.#onLabelsChanged);
+  };
+
+  /**
+   * Calculate mask labels.
+   *
+   * @param {number} dataId The data id.
+   */
+  #calculateLabels(dataId) {
+    const maskData = this.#app.getData(dataId);
+    if (!maskData) {
+      throw new Error(
+        'No data to calculate labels for dataId: ' + dataId
+      );
+    }
+    const image = maskData.image;
+    image.recalculateLabels();
+  }
+
+  /**
+   * Handle a labels changed event.
+   *
+   * @param {object} event The change event.
+   */
+  #onLabelsChanged = (event) => {
+    const segmentation =
+      _segmentations.find(
+        (seg) => {
+          return seg.dataId === event.dataid;
+        }
+      );
+
+    if (typeof segmentation !== 'undefined') {
+      segmentation.labels = event.labels;
+      this.#updateLabelsSpan(segmentation);
+    }
   };
 
   /**
@@ -288,7 +293,6 @@ export class SegmentationUI {
             selectedSegmentNumber: segmentNumber,
             viewHelper: new MaskSegmentViewHelper()
           };
-          this.#watchData(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
@@ -300,7 +304,6 @@ export class SegmentationUI {
           // segmentation created with add segmentation
           if (typeof segmentation.dataId === 'undefined') {
             segmentation.dataId = dataId;
-            this.#watchData(dataId);
             for (const segment of segmentation.segments) {
               segHelper.addSegment(segment);
             }
@@ -319,7 +322,8 @@ export class SegmentationUI {
             segments: imgMeta.custom.segments,
             viewHelper: new MaskSegmentViewHelper()
           };
-          this.#watchData(dataId);
+          // calculate labels
+          this.#calculateLabels(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
@@ -632,7 +636,8 @@ export class SegmentationUI {
       segmentSpan.remove();
     }
 
-    this.#watchData(segmentation.dataId);
+    // update labels
+    this.#calculateLabels(segmentation.dataId);
 
     // select first segment
     const spanChildren = spanParent.childNodes;
