@@ -208,6 +208,12 @@ export class DataController {
    */
   setImage(dataId, image) {
     this.#dataList[dataId].image = image;
+
+    // propagate image events
+    for (const eventName of imageEventNames) {
+      image.addEventListener(eventName, this.#getFireEvent(dataId));
+    }
+
     /**
      * Data image set event.
      *
@@ -222,10 +228,6 @@ export class DataController {
       value: [image],
       dataid: dataId
     });
-    // propagate image events
-    for (const eventName of imageEventNames) {
-      image.addEventListener(eventName, this.#getFireEvent(dataId));
-    }
   }
 
   /**
@@ -275,18 +277,6 @@ export class DataController {
       );
     }
 
-    /**
-     * Data add event.
-     *
-     * @event DataController#dataadd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} dataid The data id.
-     */
-    this.#fireEvent({
-      type: 'dataadd',
-      dataid: dataId
-    });
     // propagate image events
     if (typeof data.image !== 'undefined') {
       for (const eventName of imageEventNames) {
@@ -300,6 +290,19 @@ export class DataController {
           eventName, this.#getFireEvent(dataId));
       }
     }
+
+    /**
+     * Data add event.
+     *
+     * @event DataController#dataadd
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} dataid The data id.
+     */
+    this.#fireEvent({
+      type: 'dataadd',
+      dataid: dataId
+    });
   }
 
   /**
