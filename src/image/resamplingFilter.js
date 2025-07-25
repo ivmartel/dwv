@@ -5,14 +5,13 @@ export class ResamplingFilter {
   /**
    * Simple bilinear sampling function.
    *
-   * @param {TypedArray} buffer The buffer to sample.
-   * @param {number[]} unitVectors The buffer offset space unit vectors.
-   * @param {number[]} size The buffer size.
    * @param {number[]} point The index space point to sample.
-   *
+   * @param {TypedArray} buffer The buffer to sample.
+   * @param {number[]} size The buffer size.
+   * @param {number[]} unitVectors The buffer offset space unit vectors.
    * @returns {number} The sampled value.
    */
-  #bilinearSample(buffer, unitVectors, size, point) {
+  #bilinearSample(point, buffer, size, unitVectors) {
     // base point
     const q0x = Math.floor(point[0]);
     const q0y = Math.floor(point[1]);
@@ -77,8 +76,14 @@ export class ResamplingFilter {
 
     // weighted sum
     return (
-      v000 * w000 + v001 * w001 + v010 * w010 + v011 * w011 +
-      v100 * w100 + v101 * w101 + v110 * w110 + v111 * w111
+      v000 * w000 +
+      v001 * w001 +
+      v010 * w010 +
+      v011 * w011 +
+      v100 * w100 +
+      v101 * w101 +
+      v110 * w110 +
+      v111 * w111
     );
   }
 
@@ -105,6 +110,8 @@ export class ResamplingFilter {
     const targetUnitVectors = workerMessage.targetUnitVectors;
     const sourceSpacing = workerMessage.sourceSpacing;
     const targetSpacing = workerMessage.targetSpacing;
+
+    const sourceImageBuffer = workerMessage.sourceImageBuffer;
 
     const interpolate = workerMessage.interpolate;
 
@@ -165,10 +172,10 @@ export class ResamplingFilter {
             if (interpolate) {
               // Bilinear
               const sample = this.#bilinearSample(
-                workerMessage.sourceImageBuffer,
-                sourceUnitVectors,
+                [sx, sy, sz],
+                sourceImageBuffer,
                 sourceSize,
-                [sx, sy, sz]
+                sourceUnitVectors
               );
               workerMessage.targetImageBuffer[targetOffset] = sample;
 
