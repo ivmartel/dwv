@@ -12,7 +12,7 @@ import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
 import {Matrix33} from '../../src/math/matrix.js';
 
-import {Layout} from './viewer.ui.js';
+import {LayoutProtocol} from './viewer.ui.js';
 import {DataTableUI} from './viewer.ui.datatable.js';
 import {setupRenderTests} from './viewer.rendertest.js';
 import {AnnotationUI} from './viewer.ui.annot.js';
@@ -64,8 +64,9 @@ function selectOdd(id) {
   return parseInt(id, 10) % 2 !== 0;
 }
 
+// single div
 const layoutConfig0 = {
-  id: 'one',
+  id: '1*1',
   displaySets: [
     {
       divId: 'layerGroup0',
@@ -73,8 +74,9 @@ const layoutConfig0 = {
     }
   ]
 };
+// one line, two columns
 const layoutConfig1 = {
-  id: 'side',
+  id: '1*2',
   displaySets: [
     {
       divId: 'layerGroup0',
@@ -86,6 +88,7 @@ const layoutConfig1 = {
     }
   ]
 };
+// MPR
 const layoutConfig2 = {
   id: 'mpr',
   displaySets: [
@@ -108,12 +111,12 @@ const layoutConfig2 = {
 };
 
 /**
- * @type {Layout[]}
+ * @type {LayoutProtocol[]}
  */
 const _layouts = [];
-_layouts.push(new Layout(layoutConfig0));
-_layouts.push(new Layout(layoutConfig1));
-_layouts.push(new Layout(layoutConfig2));
+_layouts.push(new LayoutProtocol(layoutConfig0));
+_layouts.push(new LayoutProtocol(layoutConfig1));
+_layouts.push(new LayoutProtocol(layoutConfig2));
 
 let _selectedLayoutIndex = 0;
 
@@ -811,7 +814,7 @@ function getSlider(layerGroupDivId) {
 /**
  * Init sliders: show them and set max.
  *
- * @param {Layout} layout The current layout.
+ * @param {LayoutProtocol} layout The current layout.
  */
 function initSliders(layout) {
   for (const divId of layout.getLayerGroupDivIds()) {
@@ -849,7 +852,7 @@ function initSlider(layerGroupId) {
 /**
  * Update sliders: set the slider value to the current scroll index.
  *
- * @param {Layout} layout The current layout.
+ * @param {LayoutProtocol} layout The current layout.
  */
 function updateSliders(layout) {
   for (const divId of layout.getLayerGroupDivIds()) {
@@ -882,7 +885,7 @@ function addLayerGroupDiv(id) {
 /**
  * Add Layer Groups divs.
  *
- * @param {Layout} layout The current layout.
+ * @param {LayoutProtocol} layout The current layout.
  */
 function addLayerGroupsDivs(layout) {
   // clean up

@@ -1,14 +1,12 @@
-import {Orientation} from '../../src/math/orientation.js';
-
 // doc imports
 /* eslint-disable no-unused-vars */
 import {ViewConfig} from '../../src/app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * Layout class.
+ * Layout protocol class.
  */
-export class Layout {
+export class LayoutProtocol {
   /**
    * @type {string}
    */
@@ -83,6 +81,9 @@ export class Layout {
   getViewConfigsByDataId(dataId) {
     const sets =
       this.#displaySets.filter((elem) => elem.dataSelector(dataId));
+    if (sets.length === 0) {
+      console.warn('Data not selected for display: ' + dataId);
+    }
     const res = [];
     for (const set of sets) {
       res.push(this.#displaySetToViewConfig(set));
@@ -104,27 +105,6 @@ export class Layout {
     return res;
   }
 }
-
-/**
- * Get a full view for a given div id.
- *
- * @param {string} layout The layout.
- * @param {string} divId The div id.
- * @returns {object} The config.
- */
-export function getViewConfig(layout, divId) {
-  const config = {divId: divId};
-  if (layout === 'mpr') {
-    if (divId === 'layerGroup0') {
-      config.orientation = Orientation.Axial;
-    } else if (divId === 'layerGroup1') {
-      config.orientation = Orientation.Coronal;
-    } else if (divId === 'layerGroup2') {
-      config.orientation = Orientation.Sagittal;
-    }
-  }
-  return config;
-};
 
 /**
  * Get a HTML id from a prefix and root part.

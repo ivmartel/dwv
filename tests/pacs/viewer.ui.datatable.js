@@ -7,7 +7,7 @@ import {getControlDiv} from './viewer.ui.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../../src/app/application.js';
-import {Layout} from './viewer.ui.js';
+import {LayoutProtocol} from './viewer.ui.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -76,7 +76,7 @@ export class DataTableUI {
   /**
    * Bind layer add to ui.
    *
-   * @param {Layout} layout The layout.
+   * @param {LayoutProtocol} layout The layout.
    */
   registerLayerAddListeners(layout) {
     // add data row on layer creation
@@ -270,7 +270,7 @@ export class DataTableUI {
    * Add a data row.
    *
    * @param {string} dataId The data id.
-   * @param {Layout} layout The layout.
+   * @param {LayoutProtocol} layout The layout.
    */
   #addDataRow(dataId, layout) {
     const image = this.#app.getData(dataId).image;
