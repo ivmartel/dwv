@@ -174,8 +174,7 @@ function viewerSetup() {
   const dataLoadProgress = [];
 
   // add layer groups div
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  addLayerGroupsDiv(numberOfLayerGroups);
+  addLayerGroupsDivs(_layouts[_selectedLayoutIndex]);
 
   // tools
   _tools = {
@@ -275,7 +274,7 @@ function viewerSetup() {
     }
     // update sliders with new data info
     // (has to be after full load)
-    initSliders();
+    initSliders(_layouts[_selectedLayoutIndex]);
     // add post-load listeners
     addPostLoadListeners();
     // log meta data
@@ -329,7 +328,7 @@ function viewerSetup() {
       span.innerHTML = text;
     }
     // update sliders' value
-    updateSliders();
+    updateSliders(_layouts[_selectedLayoutIndex]);
   });
 
   _app.addEventListener('filterrun', function (event) {
@@ -581,20 +580,6 @@ function mergeConfigs(config, configToMerge) {
 }
 
 /**
- * Get the number of layer groups according to layout.
- *
- * @returns {number} The number.
- */
-function getNumberOfLayerGroups() {
-  let number;
-  const layout = _layouts[_selectedLayoutIndex];
-  if (typeof layout !== 'undefined') {
-    number = layout.getNumberOfLayerGroups();
-  }
-  return number;
-}
-
-/**
  * Setup.
  */
 function setup() {
@@ -738,16 +723,14 @@ function setup() {
     } else {
       _selectedLayoutIndex = layoutIndex;
     }
+    const selectedLayout = _layouts[_selectedLayoutIndex];
 
     // add layer groups div
-    const numberOfLayerGroups = getNumberOfLayerGroups();
-    addLayerGroupsDiv(numberOfLayerGroups);
-
-    const selecteLayout = _layouts[_selectedLayoutIndex];
+    addLayerGroupsDivs(selectedLayout);
 
     // get configs
     const dataIds = _app.getDataIds();
-    const dataViewConfigs = selecteLayout.getDataViewConfigs(dataIds);
+    const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
 
     // merge app configs for possible extras (like window level)
     mergeAppConfig(dataViewConfigs);
@@ -758,7 +741,7 @@ function setup() {
 
     // update layout for data table
     dataTable.unRegisterLayerAddListeners();
-    dataTable.registerLayerAddListeners(selecteLayout);
+    dataTable.registerLayerAddListeners(selectedLayout);
 
     // set config (deletes previous layers)
     _app.setDataViewConfigs(dataViewConfigs);
@@ -827,11 +810,12 @@ function getSlider(layerGroupDivId) {
 
 /**
  * Init sliders: show them and set max.
+ *
+ * @param {Layout} layout The current layout.
  */
-function initSliders() {
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  for (let i = 0; i < numberOfLayerGroups; ++i) {
-    initSlider('layerGroup' + i);
+function initSliders(layout) {
+  for (const divId of layout.getLayerGroupDivIds()) {
+    initSlider(divId);
   }
 }
 
@@ -864,14 +848,14 @@ function initSlider(layerGroupId) {
 
 /**
  * Update sliders: set the slider value to the current scroll index.
+ *
+ * @param {Layout} layout The current layout.
  */
-function updateSliders() {
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  for (let i = 0; i < numberOfLayerGroups; ++i) {
-    const lgId = 'layerGroup' + i;
-    const slider = document.getElementById(lgId + '-slider');
+function updateSliders(layout) {
+  for (const divId of layout.getLayerGroupDivIds()) {
+    const slider = document.getElementById(divId + '-slider');
     if (slider) {
-      const lg = _app.getLayerGroupByDivId(lgId);
+      const lg = _app.getLayerGroupByDivId(divId);
       if (typeof lg !== 'undefined') {
         const ph = lg.getPositionHelper();
         slider.value = ph.getCurrentPositionScrollValue();
@@ -896,18 +880,19 @@ function addLayerGroupDiv(id) {
 }
 
 /**
- * Add Layer Groups div.
+ * Add Layer Groups divs.
+ *
+ * @param {Layout} layout The current layout.
  */
-function addLayerGroupsDiv() {
+function addLayerGroupsDivs(layout) {
   // clean up
   const dwvDiv = document.getElementById('dwv');
   if (dwvDiv) {
     dwvDiv.innerHTML = '';
   }
   // add div
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  for (let i = 0; i < numberOfLayerGroups; ++i) {
-    addLayerGroupDiv('layerGroup' + i);
+  for (const divId of layout.getLayerGroupDivIds()) {
+    addLayerGroupDiv(divId);
   }
 }
 

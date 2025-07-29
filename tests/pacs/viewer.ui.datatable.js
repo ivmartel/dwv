@@ -2,10 +2,7 @@ import {Orientation} from '../../src/math/orientation.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
 import {luts} from '../../src/image/luts.js';
 
-import {
-  getLayerGroupDivIds,
-  getControlDiv
-} from './viewer.ui.js';
+import {getControlDiv} from './viewer.ui.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -282,7 +279,7 @@ export class DataTableUI {
     const isMonochrome = dataIsImage && image.isMonochrome();
 
     const dataViewConfigs = this.#app.getDataViewConfigs();
-    const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
+    const allLayerGroupDivIds = layout.getLayerGroupDivIds();
 
     const table = this.#getLayersTable(allLayerGroupDivIds.length);
     const body = table.tBodies[0];

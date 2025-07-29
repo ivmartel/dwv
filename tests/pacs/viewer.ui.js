@@ -6,27 +6,6 @@ import {ViewConfig} from '../../src/app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * Get the layer groups div ids from the data view configs.
- *
- * @param {object} dataViewConfigs The configs.
- * @returns {string[]} The list of ids.
- */
-export function getLayerGroupDivIds(dataViewConfigs) {
-  const divIds = [];
-  const keys = Object.keys(dataViewConfigs);
-  for (let i = 0; i < keys.length; ++i) {
-    const dataViewConfig = dataViewConfigs[keys[i]];
-    for (let j = 0; j < dataViewConfig.length; ++j) {
-      const divId = dataViewConfig[j].divId;
-      if (!divIds.includes(divId)) {
-        divIds.push(divId);
-      }
-    }
-  }
-  return divIds;
-};
-
-/**
  * Layout class.
  */
 export class Layout {
@@ -64,6 +43,22 @@ export class Layout {
    */
   getNumberOfLayerGroups() {
     return this.#viewConfigs.length;
+  }
+
+  /**
+   * Get the layer groups div ids from this layout.
+   *
+   * @returns {string[]} The ids.
+   */
+  getLayerGroupDivIds() {
+    const ids = [];
+    for (const config of this.#viewConfigs) {
+      const id = config.divId;
+      if (!ids.includes(id)) {
+        ids.push(id);
+      }
+    }
+    return ids;
   }
 
   /**
