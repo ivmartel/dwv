@@ -4,13 +4,13 @@ import {luts} from '../../src/image/luts.js';
 
 import {
   getLayerGroupDivIds,
-  getViewConfig,
   getControlDiv
 } from './viewer.ui.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../../src/app/application.js';
+import {Layout} from './viewer.ui.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -43,6 +43,11 @@ export class DataTableUI {
   #registeredViewListeners = false;
 
   /**
+   * @type {Function}
+   */
+  #layerAddListener;
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
@@ -72,21 +77,34 @@ export class DataTableUI {
   }
 
   /**
-   * Bind app to ui.
+   * Bind layer add to ui.
    *
-   * @param {string} layout The layout.
+   * @param {Layout} layout The layout.
    */
-  registerListeners(layout) {
+  registerLayerAddListeners(layout) {
     // add data row on layer creation
-    this.#app.addEventListener('viewlayeradd', (event) => {
+    this.#layerAddListener = (event) => {
       this.#clearDataTableRow(event.dataid);
       this.#addDataRow(event.dataid, layout);
-    });
-    this.#app.addEventListener('drawlayeradd', (event) => {
-      this.#clearDataTableRow(event.dataid);
-      this.#addDataRow(event.dataid, layout);
-    });
+    };
 
+    this.#app.addEventListener('viewlayeradd', this.#layerAddListener);
+    this.#app.addEventListener('drawlayeradd', this.#layerAddListener);
+  }
+
+  /**
+   * Unbind layer add from ui.
+   */
+  unRegisterLayerAddListeners() {
+    this.#app.removeEventListener('viewlayeradd', this.#layerAddListener);
+    this.#app.removeEventListener('drawlayeradd', this.#layerAddListener);
+    this.#layerAddListener = undefined;
+  }
+
+  /**
+   * Bind app to ui.
+   */
+  registerListeners() {
     // control listeners (pause during load)
     this.#app.addEventListener('loadstart', (/*event*/) => {
       this.unRegisterViewListeners();
@@ -255,7 +273,7 @@ export class DataTableUI {
    * Add a data row.
    *
    * @param {string} dataId The data id.
-   * @param {string} layout The layout.
+   * @param {Layout} layout The layout.
    */
   #addDataRow(dataId, layout) {
     const image = this.#app.getData(dataId).image;
@@ -316,7 +334,8 @@ export class DataTableUI {
       button.appendChild(document.createTextNode('+'));
       button.onclick = () => {
         // update app
-        this.#app.addDataViewConfig(dataId, getViewConfig(layout, divId));
+        const config = layout.getViewConfigsByDivId(divId);
+        this.#app.addDataViewConfig(dataId, config);
         // update html
         const parent = button.parentElement;
         if (parent) {
@@ -363,7 +382,7 @@ export class DataTableUI {
       button.appendChild(document.createTextNode(letter));
       button.onclick = () => {
         // update app
-        const config = getViewConfig(layout, divId);
+        const config = layout.getViewConfigsByDivId(divId);
         config.orientation = orientation;
         this.#app.updateDataViewConfig(dataId, divId, config);
       };

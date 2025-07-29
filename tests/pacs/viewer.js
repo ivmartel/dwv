@@ -12,16 +12,18 @@ import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
 import {Matrix33} from '../../src/math/matrix.js';
 
-import {
-  getViewConfig,
-  getLayerGroupDivIds
-} from './viewer.ui.js';
+import {Layout} from './viewer.ui.js';
 import {DataTableUI} from './viewer.ui.datatable.js';
 import {setupRenderTests} from './viewer.rendertest.js';
 import {AnnotationUI} from './viewer.ui.annot.js';
 import {SegmentationUI} from './viewer.ui.segment.js';
 import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewConfig} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
 
 // global vars
 
@@ -32,7 +34,88 @@ let _app;
 
 let _tools;
 const _toolFeaturesUI = {};
-let _layout = 'one';
+
+// layout related
+
+/**
+ * Select all: returns true.
+ *
+ * @returns {boolean} True if selected.
+ */
+function selectAll(/*id*/) {
+  return true;
+}
+/**
+ * Select event ids.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+function selectEven(id) {
+  return parseInt(id, 10) % 2 === 0;
+}
+/**
+ * Select odd ids.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+function selectOdd(id) {
+  return parseInt(id, 10) % 2 !== 0;
+}
+
+const layoutConfig0 = {
+  id: 'one',
+  viewConfigs: [
+    {
+      divId: 'layerGroup0',
+      dataSelector: selectAll,
+    }
+  ]
+};
+const layoutConfig1 = {
+  id: 'side',
+  viewConfigs: [
+    {
+      divId: 'layerGroup0',
+      dataSelector: selectEven,
+    },
+    {
+      divId: 'layerGroup1',
+      dataSelector: selectOdd,
+    }
+  ]
+};
+const layoutConfig2 = {
+  id: 'mpr',
+  viewConfigs: [
+    {
+      divId: 'layerGroup0',
+      orientation: 'axial',
+      dataSelector: selectAll,
+    },
+    {
+      divId: 'layerGroup1',
+      orientation: 'coronal',
+      dataSelector: selectAll,
+    },
+    {
+      divId: 'layerGroup2',
+      orientation: 'sagittal',
+      dataSelector: selectAll,
+    }
+  ]
+};
+
+/**
+ * @type {Layout[]}
+ */
+const _layouts = [];
+_layouts.push(new Layout(layoutConfig0));
+_layouts.push(new Layout(layoutConfig1));
+_layouts.push(new Layout(layoutConfig2));
+
+let _selectedLayoutIndex = 0;
 
 /**
  * Setup simple dwv app.
@@ -83,7 +166,7 @@ function viewerSetup() {
   // };
 
   // stage options
-  let viewOnFirstLoadItem = true;
+  const viewOnFirstLoadItem = true;
 
   // load counters
   let numberOfDataToLoad = 0;
@@ -93,11 +176,6 @@ function viewerSetup() {
   // add layer groups div
   const numberOfLayerGroups = getNumberOfLayerGroups();
   addLayerGroupsDiv(numberOfLayerGroups);
-
-  // special MPR
-  if (_layout === 'mpr') {
-    viewOnFirstLoadItem = false;
-  }
 
   // tools
   _tools = {
@@ -466,18 +544,52 @@ function removePostLoadListeners() {
 }
 
 /**
+ * Merge with first app config.
+ *
+ * @param {Object<string, ViewConfig[]>} dataViewConfigs A list
+ *   of data view configs.
+ */
+function mergeAppConfig(dataViewConfigs) {
+  for (const dataId in dataViewConfigs) {
+    const configs = dataViewConfigs[dataId];
+    const appConfigs = _app.getViewConfigs(dataId);
+    if (appConfigs.length !== 0) {
+      // use first as base
+      for (const config of configs) {
+        mergeConfigs(config, appConfigs[0]);
+      }
+    }
+  }
+}
+
+/**
+ * Merge a data config into the first input one.
+ * Copies all but the divId and orientation property.
+ *
+ * @param {ViewConfig} config The config where to merge.
+ * @param {ViewConfig} configToMerge The config to merge.
+ * @returns {ViewConfig} The updated config.
+ */
+function mergeConfigs(config, configToMerge) {
+  for (const key in configToMerge) {
+    if (key !== 'divId' &&
+      key !== 'orientation') {
+      config[key] = configToMerge[key];
+    }
+  }
+  return config;
+}
+
+/**
  * Get the number of layer groups according to layout.
  *
- * @returns {nunmber} The number.
+ * @returns {number} The number.
  */
 function getNumberOfLayerGroups() {
   let number;
-  if (_layout === 'one') {
-    number = 1;
-  } else if (_layout === 'side') {
-    number = 2;
-  } else if (_layout === 'mpr') {
-    number = 3;
+  const layout = _layouts[_selectedLayoutIndex];
+  if (typeof layout !== 'undefined') {
+    number = layout.getNumberOfLayerGroups();
   }
   return number;
 }
@@ -490,7 +602,8 @@ function setup() {
   viewerSetup();
 
   const dataTable = new DataTableUI(_app);
-  dataTable.registerListeners(_layout);
+  dataTable.registerListeners();
+  dataTable.registerLayerAddListeners(_layouts[_selectedLayoutIndex]);
 
   const positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function (event) {
@@ -588,15 +701,12 @@ function setup() {
   const rotateMatchButton = document.getElementById('rotate-match');
   rotateMatchButton.disabled = true;
   rotateMatchButton.addEventListener('click', function () {
-    const lg0 = _app.getLayerGroupByDivId('layerGroup0');
-    const vl0 = lg0.getBaseViewLayer();
-    const dataId0 = vl0.getDataId();
-
-    const lg1 = _app.getLayerGroupByDivId('layerGroup1');
-    const vl1 = lg1.getBaseViewLayer();
-    const dataId1 = vl1.getDataId();
-
-    _app.resampleMatch(dataId0, dataId1);
+    const dataIds = _app.getDataIds();
+    if (dataIds.length < 2) {
+      console.log('Not enough datas to match geometries');
+    }
+    // resample match data 0 and 1
+    _app.resampleMatch(dataIds[0], dataIds[1]);
   });
 
   const rotateResetButton = document.getElementById('rotate-reset');
@@ -611,40 +721,47 @@ function setup() {
 
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.disabled = true;
+  for (const layout of _layouts) {
+    const option = document.createElement('option');
+    option.value = layout.getId();
+    option.appendChild(document.createTextNode(layout.getId()));
+    changeLayoutSelect.appendChild(option);
+  }
   changeLayoutSelect.addEventListener('change', function (event) {
     const selectElement = event.target;
-    const layout = selectElement.value;
-    if (layout !== 'one' &&
-      layout !== 'side' &&
-      layout !== 'mpr') {
-      throw new Error('Unknown layout: ' + layout);
+    const layoutId = selectElement.value;
+    const layoutIndex = _layouts.findIndex(
+      (elem) => elem.getId() === layoutId
+    );
+    if (layoutIndex === -1) {
+      throw new Error('Unknown layout: ' + layoutId);
+    } else {
+      _selectedLayoutIndex = layoutIndex;
     }
-    _layout = layout;
 
     // add layer groups div
     const numberOfLayerGroups = getNumberOfLayerGroups();
     addLayerGroupsDiv(numberOfLayerGroups);
 
+    const selecteLayout = _layouts[_selectedLayoutIndex];
+
     // get configs
-    let configs;
     const dataIds = _app.getDataIds();
-    if (layout === 'one') {
-      configs = getOnebyOneDataViewConfig(dataIds);
-    } else if (layout === 'side') {
-      configs = getOnebyTwoDataViewConfig(dataIds);
-    } else if (layout === 'mpr') {
-      configs = getMPRDataViewConfig(dataIds);
-    }
-    if (typeof configs === 'undefined') {
-      return;
-    }
+    const dataViewConfigs = selecteLayout.getDataViewConfigs(dataIds);
+
+    // merge app configs for possible extras (like window level)
+    mergeAppConfig(dataViewConfigs);
 
     // clear data table
     dataTable.unRegisterViewListeners();
     dataTable.clearDataTable();
 
+    // update layout for data table
+    dataTable.unRegisterLayerAddListeners();
+    dataTable.registerLayerAddListeners(selecteLayout);
+
     // set config (deletes previous layers)
-    _app.setDataViewConfigs(configs);
+    _app.setDataViewConfigs(dataViewConfigs);
 
     // render data (creates layers)
     for (let i = 0; i < dataIds.length; ++i) {
@@ -653,20 +770,6 @@ function setup() {
 
     // listen to view changes
     dataTable.registerViewListeners();
-
-    // show crosshair depending on layout
-    if (layout === 'mpr') {
-      const divIds = getLayerGroupDivIds(configs);
-      for (const divId of divIds) {
-        _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
-      }
-    }
-
-    if (layout === 'side') {
-      rotateMatchButton.style = 'visibility: visible;';
-    } else {
-      rotateMatchButton.style = 'visibility: collapse;';
-    }
 
     // need to set tool after config change
     setAppTool();
@@ -814,157 +917,10 @@ function addLayerGroupsDiv() {
  * @param {string} dataId The data ID.
  */
 function addDataViewConfig(dataId) {
-  const dataIds = [dataId];
-  let configs;
-  if (_layout === 'one') {
-    configs = getOnebyOneDataViewConfig(dataIds);
-  } else if (_layout === 'side') {
-    configs = getOnebyTwoDataViewConfig(dataIds);
-  } else if (_layout === 'mpr') {
-    configs = getMPRDataViewConfig(dataIds);
+  const configs = _layouts[_selectedLayoutIndex].getViewConfigsByDataId(dataId);
+  for (const config of configs) {
+    _app.addDataViewConfig(dataId, config);
   }
-  const viewConfigs = configs[dataId];
-  for (let i = 0; i < viewConfigs.length; ++i) {
-    _app.addDataViewConfig(dataId, viewConfigs[i]);
-  }
-}
-
-/**
- * Merge a data config into the first input one.
- * Copies all but the divId and orientation property.
- *
- * @param {object} config The config where to merge.
- * @param {object} configToMerge The config to merge.
- * @returns {object} The updated config.
- */
-function mergeConfigs(config, configToMerge) {
-  for (const key in configToMerge) {
-    if (key !== 'divId' &&
-      key !== 'orientation') {
-      config[key] = configToMerge[key];
-    }
-  }
-  return config;
-}
-
-/**
- * Get the first view config for a data id.
- *
- * @param {string} dataId The data id.
- * @returns {object} The view config.
- */
-function getAppViewConfig(dataId) {
-  let res;
-  const appConfigs = _app.getViewConfigs(dataId);
-  if (appConfigs.length !== 0) {
-    res = appConfigs[0];
-  }
-  return res;
-}
-
-/**
- * Get the orientation of the first view config for a div id.
- *
- * @param {string} divId The div id.
- * @returns {object} The orientation.
- */
-function getAppViewConfigOrientation(divId) {
-  let orientation;
-  const appDataViewConfigs = _app.getDataViewConfigs();
-  let appDivIdConfig;
-  for (const key in appDataViewConfigs) {
-    const dataViewConfigs = appDataViewConfigs[key];
-    appDivIdConfig = dataViewConfigs.find(function (item) {
-      return item.divId === divId;
-    });
-    if (typeof appDivIdConfig !== 'undefined') {
-      orientation = appDivIdConfig.orientation;
-      break;
-    }
-  }
-  return orientation;
-}
-
-/**
- * Create 1*1 view config(s).
- *
- * @param {Array} dataIds The list of dataIds.
- * @returns {object} The view config.
- */
-function getOnebyOneDataViewConfig(dataIds) {
-  const orientation = getAppViewConfigOrientation('layerGroup0');
-  const configs = {};
-  for (const dataId of dataIds) {
-    const newConfig = getViewConfig('one', 'layerGroup0');
-    // merge possibly existing app config with the new one to
-    // keed window level for example
-    const appConfig = getAppViewConfig(dataId);
-    if (typeof appConfig !== 'undefined') {
-      mergeConfigs(newConfig, appConfig);
-    }
-    // if available use first orientation for all
-    if (typeof orientation !== 'undefined') {
-      newConfig.orientation = orientation;
-    }
-    // store
-    configs[dataId] = [newConfig];
-  }
-  return configs;
-}
-
-/**
- * Create 1*2 view config(s): even data ids will go
- * in one layer group and odds in the other one.
- *
- * @param {Array} dataIds The list of dataIds.
- * @returns {object} The view config.
- */
-function getOnebyTwoDataViewConfig(dataIds) {
-  const configs = {};
-  for (let i = 0; i < dataIds.length; ++i) {
-    const dataId = dataIds[i];
-    let newConfig;
-    if (dataId % 2 === 0) {
-      newConfig = getViewConfig('side', 'layerGroup0');
-    } else {
-      newConfig = getViewConfig('side', 'layerGroup1');
-    }
-    // merge possibly existing app config with the new one to
-    // keed window level for example
-    const appConfig = getAppViewConfig(dataId);
-    if (typeof appConfig !== 'undefined') {
-      mergeConfigs(newConfig, appConfig);
-    }
-    // store
-    configs[dataIds[i]] = [newConfig];
-  }
-  return configs;
-}
-
-/**
- * Get MPR view config(s).
- *
- * @param {Array} dataIds The list of dataIds.
- * @returns {object} The view config.
- */
-function getMPRDataViewConfig(dataIds) {
-  const configs = {};
-  for (const dataId of dataIds) {
-    const newConfig0 = getViewConfig('mpr', 'layerGroup0');
-    const newConfig1 = getViewConfig('mpr', 'layerGroup1');
-    const newConfig2 = getViewConfig('mpr', 'layerGroup2');
-    // merge possibly existing app config with the new one to
-    // keed window level for example
-    const appConfig = getAppViewConfig(dataId);
-    if (typeof appConfig !== 'undefined') {
-      mergeConfigs(newConfig0, appConfig);
-      mergeConfigs(newConfig1, appConfig);
-      mergeConfigs(newConfig2, appConfig);
-    }
-    // store
-    configs[dataId] = [newConfig0, newConfig1, newConfig2];
-  }
-  return configs;
 }
 
 /**

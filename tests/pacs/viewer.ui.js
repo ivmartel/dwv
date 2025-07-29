@@ -1,5 +1,10 @@
 import {Orientation} from '../../src/math/orientation.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewConfig} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the layer groups div ids from the data view configs.
  *
@@ -20,6 +25,85 @@ export function getLayerGroupDivIds(dataViewConfigs) {
   }
   return divIds;
 };
+
+/**
+ * Layout class.
+ */
+export class Layout {
+  /**
+   * @type {string}
+   */
+  #id;
+  /**
+   * @type {ViewConfig[]}
+   */
+  #viewConfigs;
+
+  /**
+   * @param {object} config As
+   *   {id, viewConfigs: [{divId, dataId, orientation}]}.
+   */
+  constructor(config) {
+    this.#id = config.id;
+    this.#viewConfigs = config.viewConfigs;
+  }
+
+  /**
+   * Get the layout id.
+   *
+   * @returns {string} The id.
+   */
+  getId() {
+    return this.#id;
+  }
+
+  /**
+   * Get the number of layer groups.
+   *
+   * @returns {number} The number.
+   */
+  getNumberOfLayerGroups() {
+    return this.#viewConfigs.length;
+  }
+
+  /**
+   * Get the first view config for the given div id.
+   *
+   * @param {string} divId The div id.
+   * @returns {ViewConfig} The config.
+   */
+  getViewConfigsByDivId(divId) {
+    return this.#viewConfigs.find((elem) => elem.divId === divId);
+  }
+
+  /**
+   * Get the view configs for the given data id.
+   *
+   * @param {string} dataId The data id.
+   * @returns {ViewConfig[]} The configs.
+   */
+  getViewConfigsByDataId(dataId) {
+    return this.#viewConfigs.filter((elem) => elem.dataSelector(dataId));
+  }
+
+  /**
+   * Get the data view configs for the given data ids.
+   *
+   * @param {string[]} dataIds The data id.
+   * @returns {Object<string, ViewConfig[]>} The configs.
+   */
+  getDataViewConfigs(dataIds) {
+    const res = {};
+    for (const dataId of dataIds) {
+      const configs = this.getViewConfigsByDataId(dataId);
+      for (const config of configs) {
+        delete config.dataSelector;
+      }
+      res[dataId] = configs;
+    }
+    return res;
+  }
+}
 
 /**
  * Get a full view for a given div id.
