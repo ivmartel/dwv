@@ -140,8 +140,10 @@ export class AnnotationGroup {
    * Add a new annotation.
    *
    * @param {Annotation} annotation The annotation to add.
+   * @param {boolean} [propagate] Whether the event propagates
+   *   outside of dwv or not, defaults to true.
    */
-  add(annotation) {
+  add(annotation, propagate) {
     this.#list.push(annotation);
     /**
      * Annotation add event.
@@ -153,7 +155,8 @@ export class AnnotationGroup {
      */
     this.#fireEvent({
       type: 'annotationadd',
-      data: annotation
+      data: annotation,
+      propagate: propagate
     });
   }
 
@@ -162,7 +165,7 @@ export class AnnotationGroup {
    *
    * @param {Annotation} annotation The annotation to update.
    * @param {string[]} [propKeys] Optional properties that got updated.
-   * @param {boolean} [propagate] Whether the update event propagates
+   * @param {boolean} [propagate] Whether the event propagates
    *   outside of dwv or not, defaults to true.
    */
   update(annotation, propKeys, propagate) {
@@ -200,8 +203,10 @@ export class AnnotationGroup {
    * Remove an annotation.
    *
    * @param {string} uid The UID of the annotation to remove.
+   * @param {boolean} [propagate] Whether the event propagates
+   *   outside of dwv or not, defaults to true.
    */
-  remove(uid) {
+  remove(uid, propagate) {
     const index = this.#list.findIndex(
       (item) => item.trackingUid === uid);
     if (index !== -1) {
@@ -217,7 +222,8 @@ export class AnnotationGroup {
        */
       this.#fireEvent({
         type: 'annotationremove',
-        data: annotation
+        data: annotation,
+        propagate: propagate
       });
     } else {
       logger.warn('Cannot find annotation to remove');
