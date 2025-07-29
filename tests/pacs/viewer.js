@@ -66,7 +66,7 @@ function selectOdd(id) {
 
 const layoutConfig0 = {
   id: 'one',
-  viewConfigs: [
+  displaySets: [
     {
       divId: 'layerGroup0',
       dataSelector: selectAll,
@@ -75,7 +75,7 @@ const layoutConfig0 = {
 };
 const layoutConfig1 = {
   id: 'side',
-  viewConfigs: [
+  displaySets: [
     {
       divId: 'layerGroup0',
       dataSelector: selectEven,
@@ -88,7 +88,7 @@ const layoutConfig1 = {
 };
 const layoutConfig2 = {
   id: 'mpr',
-  viewConfigs: [
+  displaySets: [
     {
       divId: 'layerGroup0',
       orientation: 'axial',
@@ -240,7 +240,7 @@ function viewerSetup() {
       removePostLoadListeners();
     }
     // add new data view config
-    addDataViewConfig(event.dataid);
+    addNewDataViewConfig(event.dataid);
   });
   const sumReducer = function (sum, value) {
     return sum + value;
@@ -901,7 +901,7 @@ function addLayerGroupsDivs(layout) {
  *
  * @param {string} dataId The data ID.
  */
-function addDataViewConfig(dataId) {
+function addNewDataViewConfig(dataId) {
   const configs = _layouts[_selectedLayoutIndex].getViewConfigsByDataId(dataId);
   for (const config of configs) {
     _app.addDataViewConfig(dataId, config);

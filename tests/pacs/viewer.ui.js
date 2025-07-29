@@ -14,17 +14,17 @@ export class Layout {
    */
   #id;
   /**
-   * @type {ViewConfig[]}
+   * @type {object[]}
    */
-  #viewConfigs;
+  #displaySets;
 
   /**
    * @param {object} config As
-   *   {id, viewConfigs: [{divId, dataId, orientation}]}.
+   *   {id, displaySets: [{divId, dataSelector, orientation}]}.
    */
   constructor(config) {
     this.#id = config.id;
-    this.#viewConfigs = config.viewConfigs;
+    this.#displaySets = config.displaySets;
   }
 
   /**
@@ -37,23 +37,14 @@ export class Layout {
   }
 
   /**
-   * Get the number of layer groups.
-   *
-   * @returns {number} The number.
-   */
-  getNumberOfLayerGroups() {
-    return this.#viewConfigs.length;
-  }
-
-  /**
    * Get the layer groups div ids from this layout.
    *
    * @returns {string[]} The ids.
    */
   getLayerGroupDivIds() {
     const ids = [];
-    for (const config of this.#viewConfigs) {
-      const id = config.divId;
+    for (const set of this.#displaySets) {
+      const id = set.divId;
       if (!ids.includes(id)) {
         ids.push(id);
       }
@@ -62,39 +53,53 @@ export class Layout {
   }
 
   /**
+   * Convert a display set into a view config.
+   *
+   * @param {object} set The display set.
+   * @returns {ViewConfig} The view config.
+   */
+  #displaySetToViewConfig(set) {
+    const config = new ViewConfig(set.divId);
+    config.orientation = set.orientation;
+    return config;
+  }
+  /**
    * Get the first view config for the given div id.
    *
    * @param {string} divId The div id.
    * @returns {ViewConfig} The config.
    */
   getViewConfigsByDivId(divId) {
-    return this.#viewConfigs.find((elem) => elem.divId === divId);
+    const set = this.#displaySets.find((elem) => elem.divId === divId);
+    return this.#displaySetToViewConfig(set);
   }
 
   /**
    * Get the view configs for the given data id.
    *
    * @param {string} dataId The data id.
-   * @returns {ViewConfig[]} The configs.
+   * @returns {ViewConfig[]} The view configs.
    */
   getViewConfigsByDataId(dataId) {
-    return this.#viewConfigs.filter((elem) => elem.dataSelector(dataId));
+    const sets =
+      this.#displaySets.filter((elem) => elem.dataSelector(dataId));
+    const res = [];
+    for (const set of sets) {
+      res.push(this.#displaySetToViewConfig(set));
+    }
+    return res;
   }
 
   /**
    * Get the data view configs for the given data ids.
    *
    * @param {string[]} dataIds The data id.
-   * @returns {Object<string, ViewConfig[]>} The configs.
+   * @returns {Object<string, ViewConfig[]>} The data view configs.
    */
   getDataViewConfigs(dataIds) {
     const res = {};
     for (const dataId of dataIds) {
-      const configs = this.getViewConfigsByDataId(dataId);
-      for (const config of configs) {
-        delete config.dataSelector;
-      }
-      res[dataId] = configs;
+      res[dataId] = this.getViewConfigsByDataId(dataId);
     }
     return res;
   }
