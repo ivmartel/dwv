@@ -240,14 +240,16 @@ export declare class AnnotationGroup {
      * Add a new annotation.
      *
      * @param {Annotation} annotation The annotation to add.
+     * @param {boolean} [propagate] Whether the event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    add(annotation: Annotation): void;
+    add(annotation: Annotation, propagate?: boolean): void;
     /**
      * Update an existing annotation.
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
-     * @param {boolean} [propagate] Whether the update event propagates
+     * @param {boolean} [propagate] Whether the event propagates
      *   outside of dwv or not, defaults to true.
      */
     update(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
@@ -255,8 +257,10 @@ export declare class AnnotationGroup {
      * Remove an annotation.
      *
      * @param {string} uid The UID of the annotation to remove.
+     * @param {boolean} [propagate] Whether the event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    remove(uid: string): void;
+    remove(uid: string, propagate?: boolean): void;
     /**
      * Set the associated view controller.
      *
@@ -396,12 +400,13 @@ export declare class AnnotationGroupFactory {
  * Main application class.
  *
  * @example
+ * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * app.init(options);
  * // load dicom data
  * app.loadURLs([
@@ -592,12 +597,13 @@ export declare class App {
      *
      * @param {AppOptions} opt The application options.
      * @example
+     * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
      * // create the dwv app
-     * const app = new dwv.App();
+     * const app = new App();
      * // initialise
-     * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+     * const viewConfig0 = new ViewConfig('layerGroup0');
      * const viewConfigs = {'*': [viewConfig0]};
-     * const options = new dwv.AppOptions(viewConfigs);
+     * const options = new AppOptions(viewConfigs);
      * options.viewOnFirstLoadItem = false;
      * app.init(options);
      * // render button
@@ -829,6 +835,27 @@ export declare class App {
      * @param {number} ty The translation along Y.
      */
     translate(tx: number, ty: number): void;
+    /**
+     * Resample one image to match the orientation of another.
+     *
+     * @param {string} dataIdTarget The target image id to resample.
+     * @param {string} dataIdSource The source image id to copy the
+     *  orientation from.
+     */
+    resampleMatch(dataIdTarget: string, dataIdSource: string): void;
+    /**
+     * Resample an image to match an arbitrary orientation.
+     *
+     * @param {string} dataIdTarget The target image id to resample.
+     * @param {Matrix33} orientation The orientation to resample to.
+     */
+    resample(dataIdTarget: string, orientation: Matrix33): void;
+    /**
+     * Revert an image back to its original orientation.
+     *
+     * @param {string} dataIdTarget The target image id to revert.
+     */
+    revertResample(dataIdTarget: string): void;
     /**
      * Set the active view layer (of the active layer group) opacity.
      *
@@ -1476,16 +1503,29 @@ export declare class DicomData {
      * @type {any|undefined}
      */
     buffer: any | undefined;
+    /**
+     * Set the image complete flag (for image data).
+     *
+     * @param {boolean} flag True if the image is complete.
+     */
+    setComplete(flag: boolean): void;
+    /**
+     * Get the image complete flag (for image data).
+     *
+     * @returns {boolean|undefined} True if the image is complete.
+     */
+    getComplete(): boolean | undefined;
 }
 
 /**
  * DicomParser class.
  *
  * @example
+ * import {DicomParser} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // setup the dicom parser
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // get the dicom tags
@@ -1611,6 +1651,7 @@ export declare class DicomSRContent {
  * DICOM writer.
  *
  * @example
+ * import {DicomParser, DicomWriter} from '//esm.sh/dwv';
  * // add link to html
  * const link = document.createElement("a");
  * link.appendChild(document.createTextNode("download"));
@@ -1618,10 +1659,10 @@ export declare class DicomSRContent {
  * div.appendChild(link);
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   const parser = new dwv.DicomParser();
+ *   const parser = new DicomParser();
  *   parser.parse(event.target.response);
  *   // create writer
- *   const writer = new dwv.DicomWriter();
+ *   const writer = new DicomWriter();
  *   // get buffer using default rules
  *   const dicomBuffer = writer.getBuffer(parser.getDicomElements());
  *   // create blob
@@ -2276,6 +2317,11 @@ export declare class Geometry {
      */
     getSize(viewOrientation?: Matrix33): Size;
     /**
+     * Calculate slice spacing from origins and replace current
+     *   if needed.
+     */
+    updateSliceSpacing(): void;
+    /**
      * Get the object spacing.
      * Warning: the spacing comes as stored in DICOM, meaning that it could
      * be oriented.
@@ -2306,10 +2352,10 @@ export declare class Geometry {
      * magic...
      *
      * @param {Point3D} point The point to evaluate.
-     * @param {number} time Optional time index.
+     * @param {number} [time] Optional time index.
      * @returns {number} The slice index.
      */
-    getSliceIndex(point: Point3D, time: number): number;
+    getSliceIndex(point: Point3D, time?: number): number;
     /**
      * Append an origin to the geometry.
      *
@@ -2613,13 +2659,14 @@ export declare namespace i18n {
  * - planar configuration (default RGBRGB...).
  *
  * @example
+ * import {DicomParser, createImage} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
@@ -2650,6 +2697,18 @@ declare class Image_2 {
      * @param {string[]} [imageUids] An array of Uids indexed to slice number.
      */
     constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: string[]);
+    /**
+     * Set the image complete flag.
+     *
+     * @param {boolean} flag True if the data is complete.
+     */
+    setComplete(flag: boolean): void;
+    /**
+     * Get the image complete flag.
+     *
+     * @returns {boolean} True if the data is complete.
+     */
+    getComplete(): boolean;
     /**
      * Get the image UID at a given index.
      *
@@ -3039,6 +3098,25 @@ declare class Image_2 {
      * Recalculate labels.
      */
     recalculateLabels(): void;
+    /**
+     * Return if this image has been resampled.
+     *
+     * @returns {boolean} If the image has been resampled.
+     */
+    isResampled(): boolean;
+    /**
+     * Resample this image to a new orientation.
+     *
+     * @param {Matrix33} orientation The orientation to resample to.
+     * @param {boolean|undefined} interpolated Default true, if true use bilinear
+     *  sampling, otherwise use nearest neighbor.
+     * @param {Point|undefined} centerOfRotation World space center of rotation.
+     */
+    resample(orientation: Matrix33, interpolated?: boolean | undefined, centerOfRotation?: Point | undefined): void;
+    /**
+     * Revert a resampled image to its original state.
+     */
+    revert(): void;
     #private;
 }
 export { Image_2 as Image }
@@ -3431,6 +3509,14 @@ export declare class LayerGroup {
      * @returns {boolean} True if one view layer can be scrolled.
      */
     canScroll(): boolean;
+    /**
+     * Returns whether or not a layer group should have its zoom/pan/etc
+     * synced to other views. Used for things like Secondary Capture where
+     * there is no meaningful real-world scale.
+     *
+     * @returns {boolean} Whether to sync the zoom/pan.
+     */
+    shouldBind(): boolean;
     /**
      * Does one of the view layer have more than one slice in the
      *   given dimension.
@@ -3857,6 +3943,19 @@ export declare class Matrix33 {
      */
     multiplyArray3D(array3D: number[]): number[];
     /**
+     * Multiply this matrix by a 3D typed array.
+     *
+     * @typedef {(
+         *   Uint8Array | Int8Array |
+         *   Uint16Array | Int16Array |
+         *   Uint32Array | Int32Array
+         * )} TypedArray
+     *
+     * @param {TypedArray} sourceArray The input 3D array.
+     * @param {TypedArray} outArray The array to write to.
+     */
+    multiplyTypedArray3D(sourceArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, outArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
+    /**
      * Multiply this matrix by a 3D vector.
      *
      * @param {Vector3D} vector3D The input 3D vector.
@@ -3903,6 +4002,12 @@ export declare class Matrix33 {
      * @returns {number} The index of the absolute maximum of the last column.
      */
     getThirdColMajorDirection(): number;
+    /**
+     * Get the values of the matrix as an array.
+     *
+     * @returns {number[]} The matrix.
+     */
+    getValues(): number[];
     #private;
 }
 
@@ -5214,6 +5319,7 @@ export declare class ToolConfig {
  * the default ones.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, toolList} from '//esm.sh/dwv';
  * // custom tool
  * class AlertTool {
  *   mousedown() {alert('AlertTool mousedown');}
@@ -5221,13 +5327,13 @@ export declare class ToolConfig {
  *   activate() {}
  * }
  * // pass it to dwv tool list
- * dwv.toolList['Alert'] = AlertTool;
+ * toolList['Alert'] = AlertTool;
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * options.tools = {Alert: {}};
  * app.init(options);
  * // activate tool
@@ -5250,6 +5356,8 @@ export declare const toolList: {
  * the default ones.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, toolOptions, ROI, Point2D}
+ *   from '//esm.sh/dwv';
  * // custom factory
  * class LoveFactory {
  *   getName() {return 'love';}
@@ -5259,10 +5367,10 @@ export declare const toolList: {
  *   setAnnotationMathShape(annotation, points) {
  *     const px = points[0].getX();
  *     const py = points[0].getY();
- *     annotation.mathShape = new dwv.ROI([
- *       new dwv.Point2D(px+15,py), new dwv.Point2D(px+10,py-10),
- *       new dwv.Point2D(px,py), new dwv.Point2D(px-10,py-10),
- *       new dwv.Point2D(px-15,py), new dwv.Point2D(px,py+20)
+ *     annotation.mathShape = new ROI([
+ *       new Point2D(px+15,py), new Point2D(px+10,py-10),
+ *       new Point2D(px,py), new Point2D(px-10,py-10),
+ *       new Point2D(px-15,py), new Point2D(px,py+20)
  *     ]);
  *     annotation.getFactory = function () {return new LoveFactory();}
  *   }
@@ -5289,13 +5397,13 @@ export declare const toolList: {
  *   }
  * }
  * // pass it to dwv option list
- * dwv.toolOptions['draw'] = {LoveFactory};
+ * toolOptions['draw'] = {LoveFactory};
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * options.tools = {Draw: {options: ['Love']}};
  * app.init(options);
  * // activate tool
@@ -5400,15 +5508,16 @@ export declare class Vector3D {
  * (either directly or with helper methods).
  *
  * @example
+ * import {DicomParser, createImage, createView} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = dwv.createView(dicomParser.getDicomElements(), image);
+ *   const view = createView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;
@@ -5420,7 +5529,7 @@ export declare class Vector3D {
  *   ctx.putImageData(imageData, 0, 0);
  *   // update html
  *   const div = document.getElementById('dwv');
- *   div.appendChild(canvas);;
+ *   div.appendChild(canvas);
  * };
  * // DICOM file request
  * const request = new XMLHttpRequest();
@@ -5753,6 +5862,10 @@ export declare class ViewController {
      */
     getPlaneHelper(): PlaneHelper;
     /**
+     * Update the plane helper if there is a change in the image geometry.
+     */
+    updatePlaneHelper(): void;
+    /**
      * Check is the associated image is a mask.
      *
      * @returns {boolean} True if the associated image is a mask.
@@ -5994,6 +6107,12 @@ export declare class ViewController {
      */
     getImageSize(): Size;
     /**
+     * Get the oriented image spacing.
+     *
+     * @returns {Spacing} The spacing.
+     */
+    getImageSpacing(): Spacing;
+    /**
      * Is the data size larger than one in the given dimension?
      *
      * @param {number} dim The dimension.
@@ -6229,6 +6348,13 @@ export declare class ViewLayer {
      * @function
      */
     onimagegeometrychange: (event: object) => void;
+    /**
+     * Handle an image resampled event.
+     *
+     * @param {object} event The event.
+     * @function
+     */
+    onimageresampled: (event: object) => void;
     /**
      * Get the id of the layer.
      *

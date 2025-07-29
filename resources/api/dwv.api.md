@@ -47,7 +47,7 @@ export class Annotation {
 // @public
 export class AnnotationGroup {
     constructor(list?: Annotation[]);
-    add(annotation: Annotation): void;
+    add(annotation: Annotation, propagate?: boolean): void;
     addEventListener(type: string, callback: Function): void;
     find(uid: string): Annotation | undefined;
     getColour(): string;
@@ -59,7 +59,7 @@ export class AnnotationGroup {
     getMetaValue(key: string): string | object | undefined;
     hasMeta(key: string): boolean;
     isEditable(): boolean;
-    remove(uid: string): void;
+    remove(uid: string, propagate?: boolean): void;
     removeEventListener(type: string, callback: Function): void;
     setColour(colour: string): void;
     setEditable(flag: boolean): void;
@@ -153,6 +153,8 @@ export class App {
     removeEventListener(type: string, callback: Function): void;
     removeFromUndoStack: (name: string) => boolean;
     render(dataId: string, viewConfigs?: ViewConfig[]): void;
+    resample(dataIdTarget: string, orientation: Matrix33): void;
+    resampleMatch(dataIdTarget: string, dataIdSource: string): void;
     reset(): void;
     resetDisplay(): void;
     // @deprecated
@@ -160,6 +162,7 @@ export class App {
     resetViews(): void;
     resetZoom(): void;
     resetZoomPan(): void;
+    revertResample(dataIdTarget: string): void;
     setActiveLayerGroup(index: number): void;
     // @deprecated
     setColourMap(name: string): void;
@@ -323,10 +326,12 @@ export class DicomData {
     });
     annotationGroup: AnnotationGroup | undefined;
     buffer: any | undefined;
+    getComplete(): boolean | undefined;
     image: Image_2 | undefined;
     meta: {
         [x: string]: DataElement;
     };
+    setComplete(flag: boolean): void;
 }
 
 // @public
@@ -473,7 +478,7 @@ export class Geometry {
     getRange(): Point[];
     getRealSpacing(): Spacing;
     getSize(viewOrientation?: Matrix33): Size;
-    getSliceIndex(point: Point3D, time: number): number;
+    getSliceIndex(point: Point3D, time?: number): number;
     getSpacing(viewOrientation?: Matrix33): Spacing;
     hasSlicesAtTime(time: number): boolean;
     includesOrigin(point3D: Point3D, tol?: number): boolean;
@@ -482,6 +487,7 @@ export class Geometry {
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
     pointToWorld(point: Point3D): Point3D;
     toString(): string;
+    updateSliceSpacing(): void;
     worldToIndex(point: Point): Index;
     worldToPoint(point: Point): Point3D;
 }
@@ -583,6 +589,7 @@ class Image_2 {
     convolute2D(weights: number[]): Image_2;
     convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
+    getComplete(): boolean;
     getDataRange(): NumberRange;
     getGeometry(): Geometry;
     getHistogram(): any[];
@@ -610,11 +617,15 @@ class Image_2 {
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
     isMonochrome(): boolean;
+    isResampled(): boolean;
     recalculateLabels(): void;
     removeEventListener(type: string, callback: Function): void;
+    resample(orientation: Matrix33, interpolated?: boolean | undefined, centerOfRotation?: Point | undefined): void;
+    revert(): void;
     setAtOffsets(offsets: number[], value: number | RGB): void;
     setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
     setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
+    setComplete(flag: boolean): void;
     setMeta(rhs: {
         [x: string]: any;
     }): void;
@@ -705,6 +716,7 @@ export class LayerGroup {
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
     setShowCrosshair(flag: boolean): void;
+    shouldBind(): boolean;
     showTooltip(point: Point2D): void;
     someViewLayer(callbackFn: Function): boolean;
     updateLayersToPositionChange: (event: object) => void;
@@ -806,11 +818,13 @@ export class Matrix33 {
     getInverse(): Matrix33 | undefined;
     getRowAbsMax(row: number): object;
     getThirdColMajorDirection(): number;
+    getValues(): number[];
     isSimilar(rhs: Matrix33, tol?: number): boolean;
     multiply(rhs: Matrix33): Matrix33;
     multiplyArray3D(array3D: number[]): number[];
     multiplyIndex3D(index3D: Index): Index;
     multiplyPoint3D(point3D: Point3D): Point3D;
+    multiplyTypedArray3D(sourceArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, outArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
 }
@@ -1194,6 +1208,7 @@ export class ViewController {
     getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
+    getImageSpacing(): Spacing;
     getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     getImageWorldSize(): Scalar2D;
     getIndexFromPosition(point: Point): Index;
@@ -1236,6 +1251,7 @@ export class ViewController {
     setWindowLevelPresetById(id: number): void;
     stop(): void;
     unbindImageAndLayer(viewLayer: ViewLayer): void;
+    updatePlaneHelper(): void;
 }
 
 // @public
@@ -1271,6 +1287,7 @@ export class ViewLayer {
     isVisible(): boolean;
     onimagecontentchange: (event: object) => void;
     onimagegeometrychange: (event: object) => void;
+    onimageresampled: (event: object) => void;
     onimageset: (event: object) => void;
     planePosToDisplay(point2D: Point2D): Point2D;
     removeEventListener(type: string, callback: Function): void;
