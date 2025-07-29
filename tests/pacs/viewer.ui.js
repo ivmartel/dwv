@@ -1,7 +1,4 @@
-// doc imports
-/* eslint-disable no-unused-vars */
 import {ViewConfig} from '../../src/app/application.js';
-/* eslint-enable no-unused-vars */
 
 /**
  * Layout protocol class.
