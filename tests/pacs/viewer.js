@@ -63,6 +63,26 @@ function selectEven(id) {
 function selectOdd(id) {
   return parseInt(id, 10) % 2 !== 0;
 }
+/**
+ * Select CT modality data.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+// function selectCT(id) {
+//   const modality = _app.getMetaData(id)['00080060'].value[0];
+//   return modality === 'CT';
+// }
+/**
+ * Select PET modality data.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+// function selectPET(id) {
+//   const modality = _app.getMetaData(id)['00080060'].value[0];
+//   return modality === 'PT';
+// }
 
 // single div
 const layoutConfig0 = {
@@ -242,8 +262,6 @@ function viewerSetup() {
     if (_app.getDataIds().length !== 0) {
       removePostLoadListeners();
     }
-    // add new data view config
-    addNewDataViewConfig(event.dataid);
   });
   const sumReducer = function (sum, value) {
     return sum + value;
@@ -262,6 +280,10 @@ function viewerSetup() {
     if (typeof event.warn !== 'undefined') {
       console.warn('load-warn', event.warn);
     }
+  });
+  _app.addEventListener('dataadd', function (event) {
+    // add new data view config for compatible data
+    addNewDataViewConfig(event.dataid);
   });
   _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data-' + event.dataid);
