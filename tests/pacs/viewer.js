@@ -720,7 +720,7 @@ function addLayerGroupsDivs(layout) {
 function addNewDataViewConfig(dataId) {
   const configs = _layouts[_selectedLayoutIndex].getViewConfigsByDataId(dataId);
   for (const config of configs) {
-    _app.addDataViewConfig(dataId, config);
+    _app.addDataViewConfig(dataId, config, false);
   }
 }
 
