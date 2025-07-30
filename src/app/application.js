@@ -1004,8 +1004,13 @@ export class App {
    *
    * @param {string} dataId The data id.
    * @param {ViewConfig} config The view configuration.
+   * @param {boolean} [doRender] Render data after configuration
+   *   add. Defaults to true.
    */
-  addDataViewConfig(dataId, config) {
+  addDataViewConfig(dataId, config, doRender) {
+    if (typeof doRender === 'undefined') {
+      doRender = true;
+    }
     // add to list
     const configs = this.#options.dataViewConfigs;
     if (typeof configs[dataId] === 'undefined') {
@@ -1028,7 +1033,8 @@ export class App {
     }
 
     // render (will create layers)
-    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+    if (typeof this.#dataController.get(dataId) !== 'undefined' &&
+      doRender) {
       this.render(dataId, [config]);
     }
   }
