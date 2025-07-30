@@ -98,7 +98,7 @@ export class App {
     abortLoad(dataId: string): void;
     addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
     addData(data: DicomData): string;
-    addDataViewConfig(dataId: string, config: ViewConfig): void;
+    addDataViewConfig(dataId: string, config: ViewConfig, doRender?: boolean): void;
     addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
     addToUndoStack: (cmd: object) => void;

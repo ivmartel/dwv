@@ -787,8 +787,10 @@ export declare class App {
      *
      * @param {string} dataId The data id.
      * @param {ViewConfig} config The view configuration.
+     * @param {boolean} [doRender] Render data after configuration
+     *   add. Defaults to true.
      */
-    addDataViewConfig(dataId: string, config: ViewConfig): void;
+    addDataViewConfig(dataId: string, config: ViewConfig, doRender?: boolean): void;
     /**
      * Remove a data view config.
      * Removes the associated layer if found, removes
