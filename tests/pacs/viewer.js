@@ -195,6 +195,7 @@ function viewerSetup() {
   let numberOfDataToLoad = 0;
   let numberOfLoadendData = 0;
   const dataLoadProgress = [];
+  let firstRender = true;
 
   // tools
   _tools = {
@@ -242,7 +243,7 @@ function viewerSetup() {
   });
   _app.addEventListener('loadstart', function (event) {
     console.log('%c----------------', 'color: teal;');
-    console.log('load source', event.source);
+    console.log('load source data:' + event.dataid, event.source);
     // timer
     console.time('load-data-' + event.dataid);
     // update load counters
@@ -290,6 +291,8 @@ function viewerSetup() {
     window.removeEventListener('keydown', abortShortcut);
   });
   _app.addEventListener('load', function (event) {
+    // log meta data
+    logMetaData(event.dataid, event.loadtype);
     // render if not done yet
     if (!viewOnFirstLoadItem) {
       _app.render(event.dataid);
@@ -299,38 +302,34 @@ function viewerSetup() {
     initSliders(_layouts[_selectedLayoutIndex]);
     // add post-load listeners
     addPostLoadListeners();
-    // log meta data
-    logMetaData(event.dataid, event.loadtype);
   });
 
   // update UI at first render of first data
   const onRenderEnd = function (/*event*/) {
-    if (_app.getDataIds().length === 1) {
+    if (firstRender) {
       // set app tool
       setAppTool();
-      // update html
-      const toolsFieldset = document.getElementById('tools');
-      toolsFieldset.disabled = false;
-      const changeLayoutSelect = document.getElementById('changelayout');
-      changeLayoutSelect.disabled = false;
-      const resetViewsButton = document.getElementById('resetviews');
-      resetViewsButton.disabled = false;
-      const smoothingChk = document.getElementById('changesmoothing');
-      smoothingChk.disabled = false;
-
-      const rotateXButton = document.getElementById('rotate-x');
-      rotateXButton.disabled = false;
-      const rotateYButton = document.getElementById('rotate-y');
-      rotateYButton.disabled = false;
-      const rotateZButton = document.getElementById('rotate-z');
-      rotateZButton.disabled = false;
-      const rotateMatchButton = document.getElementById('rotate-match');
-      rotateMatchButton.disabled = false;
-      const rotateResetButton = document.getElementById('rotate-reset');
-      rotateResetButton.disabled = false;
-
+      // enable html
+      const elementIds = [
+        'tools',
+        'changelayout',
+        'resetviews',
+        'changesmoothing',
+        'rotate-x',
+        'rotate-y',
+        'rotate-z',
+        'rotate-match',
+        'rotate-reset'
+      ];
+      for (const elementId of elementIds) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.disabled = false;
+        }
+      }
       // remove handler
       _app.removeEventListener('renderend', onRenderEnd);
+      firstRender = false;
     }
   };
   // add handler (will be removed at first success)
@@ -512,9 +511,9 @@ function logMetaData(dataId, loadType) {
 
   // log tags for data with transfer syntax (dicom)
   if (typeof meta['00020010'] !== 'undefined') {
-    console.log('metadata', getAsSimpleElements(meta));
+    console.log('metadata data:' + dataId, getAsSimpleElements(meta));
   } else {
-    console.log('metadata', meta);
+    console.log('metadata data:' + dataId, meta);
   }
 
   // get modality
@@ -773,8 +772,12 @@ function setupLayoutLine(dataTable) {
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.disabled = true;
   for (const layout of _layouts) {
+    const layoutId = layout.getId();
     const option = document.createElement('option');
-    option.value = layout.getId();
+    option.value = layoutId;
+    if (layoutId === _layouts[_selectedLayoutIndex].getId()) {
+      option.selected = true;
+    }
     option.appendChild(document.createTextNode(layout.getId()));
     changeLayoutSelect.appendChild(option);
   }
