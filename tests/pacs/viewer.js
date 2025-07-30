@@ -196,9 +196,6 @@ function viewerSetup() {
   let numberOfLoadendData = 0;
   const dataLoadProgress = [];
 
-  // add layer groups div
-  addLayerGroupsDivs(_layouts[_selectedLayoutIndex]);
-
   // tools
   _tools = {
     Scroll: {},
@@ -605,211 +602,6 @@ function mergeConfigs(config, configToMerge) {
 }
 
 /**
- * Setup.
- */
-function setup() {
-  // setup
-  viewerSetup();
-
-  const dataTable = new DataTableUI(_app);
-  dataTable.registerListeners();
-  dataTable.registerLayerAddListeners(_layouts[_selectedLayoutIndex]);
-
-  const positionInput = document.getElementById('position');
-  positionInput.addEventListener('change', function (event) {
-    const vls = _app.getViewLayersByDataId('0');
-    const vc = vls[0].getViewController();
-    const element = event.target;
-    const values = element.value.split(',');
-    vc.setCurrentPosition(new Point([
-      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
-    ])
-    );
-  });
-
-  const resetViewsButton = document.getElementById('resetviews');
-  resetViewsButton.disabled = true;
-  resetViewsButton.addEventListener('click', function () {
-    _app.resetZoomPan();
-  });
-
-  const rotateXButton = document.getElementById('rotate-x');
-  rotateXButton.disabled = true;
-  rotateXButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    const image = _app.getImage(dataId);
-    const geometry = image.getGeometry();
-
-    const angle = (Math.PI / 180) * 20;
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new Matrix33([
-      1, 0, 0,
-      0, Math.cos(angle), -Math.sin(angle),
-      0, Math.sin(angle), Math.cos(angle)
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-
-    const newOrientation = rotation.multiply(geometry.getOrientation());
-
-    _app.resample(dataId, newOrientation);
-  });
-
-  const rotateYButton = document.getElementById('rotate-y');
-  rotateYButton.disabled = true;
-  rotateYButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    const image = _app.getImage(dataId);
-    const geometry = image.getGeometry();
-
-    const angle = (Math.PI / 180) * 20;
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new Matrix33([
-      Math.cos(angle), 0, -Math.sin(angle),
-      0, 1, 0,
-      Math.sin(angle), 0, Math.cos(angle)
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-
-    const newOrientation = rotation.multiply(geometry.getOrientation());
-
-    _app.resample(dataId, newOrientation);
-  });
-
-  const rotateZButton = document.getElementById('rotate-z');
-  rotateZButton.disabled = true;
-  rotateZButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    const image = _app.getImage(dataId);
-    const geometry = image.getGeometry();
-
-    const angle = (Math.PI / 180) * 20;
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new Matrix33([
-      Math.cos(angle), -Math.sin(angle), 0,
-      Math.sin(angle), Math.cos(angle), 0,
-      0, 0, 1
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-
-    const newOrientation = rotation.multiply(geometry.getOrientation());
-
-    _app.resample(dataId, newOrientation);
-  });
-
-  const rotateMatchButton = document.getElementById('rotate-match');
-  rotateMatchButton.disabled = true;
-  rotateMatchButton.addEventListener('click', function () {
-    const dataIds = _app.getDataIds();
-    if (dataIds.length < 2) {
-      console.log('Not enough datas to match geometries');
-    }
-    // resample match data 0 and 1
-    _app.resampleMatch(dataIds[0], dataIds[1]);
-  });
-
-  const rotateResetButton = document.getElementById('rotate-reset');
-  rotateResetButton.disabled = true;
-  rotateResetButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    _app.revertResample(dataId);
-  });
-
-  const changeLayoutSelect = document.getElementById('changelayout');
-  changeLayoutSelect.disabled = true;
-  for (const layout of _layouts) {
-    const option = document.createElement('option');
-    option.value = layout.getId();
-    option.appendChild(document.createTextNode(layout.getId()));
-    changeLayoutSelect.appendChild(option);
-  }
-  changeLayoutSelect.addEventListener('change', function (event) {
-    const selectElement = event.target;
-    const layoutId = selectElement.value;
-    const layoutIndex = _layouts.findIndex(
-      (elem) => elem.getId() === layoutId
-    );
-    if (layoutIndex === -1) {
-      throw new Error('Unknown layout: ' + layoutId);
-    } else {
-      _selectedLayoutIndex = layoutIndex;
-    }
-    const selectedLayout = _layouts[_selectedLayoutIndex];
-
-    // add layer groups div
-    addLayerGroupsDivs(selectedLayout);
-
-    // get configs
-    const dataIds = _app.getDataIds();
-    const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
-
-    // merge app configs for possible extras (like window level)
-    mergeAppConfig(dataViewConfigs);
-
-    // clear data table
-    dataTable.unRegisterViewListeners();
-    dataTable.clearDataTable();
-
-    // update layout for data table
-    dataTable.unRegisterLayerAddListeners();
-    dataTable.registerLayerAddListeners(selectedLayout);
-
-    // set config (deletes previous layers)
-    _app.setDataViewConfigs(dataViewConfigs);
-
-    // render data (creates layers)
-    for (let i = 0; i < dataIds.length; ++i) {
-      _app.render(dataIds[i]);
-    }
-
-    // listen to view changes
-    dataTable.registerViewListeners();
-
-    // need to set tool after config change
-    setAppTool();
-  });
-
-  const smoothingChk = document.getElementById('changesmoothing');
-  smoothingChk.checked = false;
-  smoothingChk.disabled = true;
-  smoothingChk.addEventListener('change', function (event) {
-    const inputElement = event.target;
-    _app.setImageSmoothing(inputElement.checked);
-  });
-
-  // setup
-  setupBindersCheckboxes();
-  setupToolsCheckboxes();
-  setupRenderTests(_app);
-  setupAbout();
-
-  // bind app to input files
-  const fileinput = document.getElementById('fileinput');
-  fileinput.addEventListener('change', function (event) {
-    const files = event.target.files;
-    if (files.length !== 0) {
-      _app.loadFiles(files);
-    } else {
-      throw new Error('No files to load');
-    }
-  });
-}
-
-/**
  * Get the slider for a given layer group.
  *
  * @param {number} layerGroupDivId The div id.
@@ -931,6 +723,215 @@ function addNewDataViewConfig(dataId) {
   for (const config of configs) {
     _app.addDataViewConfig(dataId, config);
   }
+}
+
+/**
+ * Setup file line.
+ */
+function setupFileLine() {
+  // bind app to input files
+  const fileinput = document.getElementById('fileinput');
+  fileinput.addEventListener('change', function (event) {
+    const files = event.target.files;
+    if (files.length !== 0) {
+      _app.loadFiles(files);
+    } else {
+      throw new Error('No files to load');
+    }
+  });
+}
+
+/**
+ * Setup position line.
+ */
+function setupPositionLine() {
+  const positionInput = document.getElementById('position');
+  positionInput.addEventListener('change', function (event) {
+    const vls = _app.getViewLayersByDataId('0');
+    const vc = vls[0].getViewController();
+    const element = event.target;
+    const values = element.value.split(',');
+    vc.setCurrentPosition(new Point([
+      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
+    ])
+    );
+  });
+}
+
+/**
+ * Setup layout line.
+ *
+ * @param {DataTableUI} dataTable The associated data table.
+ */
+function setupLayoutLine(dataTable) {
+  const resetViewsButton = document.getElementById('resetviews');
+  resetViewsButton.disabled = true;
+  resetViewsButton.addEventListener('click', function () {
+    _app.resetZoomPan();
+  });
+
+  const changeLayoutSelect = document.getElementById('changelayout');
+  changeLayoutSelect.disabled = true;
+  for (const layout of _layouts) {
+    const option = document.createElement('option');
+    option.value = layout.getId();
+    option.appendChild(document.createTextNode(layout.getId()));
+    changeLayoutSelect.appendChild(option);
+  }
+  changeLayoutSelect.addEventListener('change', function (event) {
+    const selectElement = event.target;
+    const layoutId = selectElement.value;
+    const layoutIndex = _layouts.findIndex(
+      (elem) => elem.getId() === layoutId
+    );
+    if (layoutIndex === -1) {
+      throw new Error('Unknown layout: ' + layoutId);
+    } else {
+      _selectedLayoutIndex = layoutIndex;
+    }
+    const selectedLayout = _layouts[_selectedLayoutIndex];
+
+    // add layer groups div
+    addLayerGroupsDivs(selectedLayout);
+
+    // get configs
+    const dataIds = _app.getDataIds();
+    const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
+
+    // merge app configs for possible extras (like window level)
+    mergeAppConfig(dataViewConfigs);
+
+    // clear data table
+    dataTable.unRegisterViewListeners();
+    dataTable.clearDataTable();
+
+    // update layout for data table
+    dataTable.unRegisterLayerAddListeners();
+    dataTable.registerLayerAddListeners(selectedLayout);
+
+    // set config (deletes previous layers)
+    _app.setDataViewConfigs(dataViewConfigs);
+
+    // render data (creates layers)
+    for (let i = 0; i < dataIds.length; ++i) {
+      _app.render(dataIds[i]);
+    }
+
+    // listen to view changes
+    dataTable.registerViewListeners();
+
+    // need to set tool after config change
+    setAppTool();
+  });
+
+  const smoothingChk = document.getElementById('changesmoothing');
+  smoothingChk.checked = false;
+  smoothingChk.disabled = true;
+  smoothingChk.addEventListener('change', function (event) {
+    const inputElement = event.target;
+    _app.setImageSmoothing(inputElement.checked);
+  });
+}
+
+/**
+ * Setup rotate line.
+ */
+function setupRotateLine() {
+  const rotateXButton = document.getElementById('rotate-x');
+  rotateXButton.disabled = true;
+  rotateXButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const angle = (Math.PI / 180) * 20;
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      1, 0, 0,
+      0, Math.cos(angle), -Math.sin(angle),
+      0, Math.sin(angle), Math.cos(angle)
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateYButton = document.getElementById('rotate-y');
+  rotateYButton.disabled = true;
+  rotateYButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const angle = (Math.PI / 180) * 20;
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      Math.cos(angle), 0, -Math.sin(angle),
+      0, 1, 0,
+      Math.sin(angle), 0, Math.cos(angle)
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateZButton = document.getElementById('rotate-z');
+  rotateZButton.disabled = true;
+  rotateZButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const angle = (Math.PI / 180) * 20;
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      Math.cos(angle), -Math.sin(angle), 0,
+      Math.sin(angle), Math.cos(angle), 0,
+      0, 0, 1
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateMatchButton = document.getElementById('rotate-match');
+  rotateMatchButton.disabled = true;
+  rotateMatchButton.addEventListener('click', function () {
+    const dataIds = _app.getDataIds();
+    if (dataIds.length < 2) {
+      console.log('Not enough datas to match geometries');
+    }
+    // resample match data 0 and 1
+    _app.resampleMatch(dataIds[0], dataIds[1]);
+  });
+
+  const rotateResetButton = document.getElementById('rotate-reset');
+  rotateResetButton.disabled = true;
+  rotateResetButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    _app.revertResample(dataId);
+  });
 }
 
 /**
@@ -1242,6 +1243,32 @@ function setupAbout() {
 }
 
 // ---------------------------------------------
+
+/**
+ * Main setup.
+ */
+function setup() {
+  // add layer groups div
+  addLayerGroupsDivs(_layouts[_selectedLayoutIndex]);
+
+  // viewer setup: creates app
+  viewerSetup();
+
+  // data table
+  const dataTable = new DataTableUI(_app);
+  dataTable.registerListeners();
+  dataTable.registerLayerAddListeners(_layouts[_selectedLayoutIndex]);
+
+  // setup
+  setupFileLine();
+  setupPositionLine();
+  setupLayoutLine(dataTable);
+  setupRotateLine();
+  setupBindersCheckboxes();
+  setupToolsCheckboxes();
+  setupRenderTests(_app);
+  setupAbout();
+}
 
 // launch
 setup();
