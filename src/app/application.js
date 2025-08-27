@@ -1193,6 +1193,39 @@ export class App {
   }
 
   /**
+   * Check if a data can be rendered in a provided layer group.
+   * If the layer group contains data, only similar orientation
+   * are permited.
+   *
+   * @param {string} dataId The id of the data to check.
+   * @param {LayerGroup} layerGroup The layer group where to render.
+   * @returns {boolean} True if the data can be rendered.
+   */
+  #canRenderData(dataId, layerGroup) {
+    let res = false;
+    const baseViewLayer = layerGroup.getBaseViewLayer();
+    if (typeof baseViewLayer !== 'undefined') {
+      // render is possible if new data has similar geometry
+      // than base
+      const baseData = this.#dataController.get(baseViewLayer.getDataId());
+      const baseImage = baseData.image;
+      const newData = this.#dataController.get(dataId);
+      const newImage = newData.image;
+      if (typeof baseImage !== 'undefined' &&
+        typeof newImage !== 'undefined'
+      ) {
+        const baseOrientation = baseImage.getGeometry().getOrientation();
+        const newOrientation = newImage.getGeometry().getOrientation();
+        res = newOrientation.isSimilar(baseOrientation);
+      }
+    } else {
+      // no base view -> can render
+      res = true;
+    }
+    return res;
+  }
+
+  /**
    * Render the current data.
    *
    * @param {string} dataId The data id to render.
@@ -1202,11 +1235,13 @@ export class App {
     if (typeof dataId === 'undefined' || dataId === null) {
       throw new Error('Cannot render without data id');
     }
+    const data = this.getData(dataId);
+
     // guess data type
-    const isImage =
-      typeof this.getData(dataId).image !== 'undefined';
-    const isMeasurement =
-      typeof this.getData(dataId).annotationGroup !== 'undefined';
+    const isImage = typeof data !== 'undefined' &&
+      typeof data.image !== 'undefined';
+    const isMeasurement = typeof data !== 'undefined' &&
+      typeof data.annotationGroup !== 'undefined';
 
     // create layer groups if not done yet
     // (create all to allow for ratio sync)
@@ -1235,18 +1270,26 @@ export class App {
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
       }
+      // check compatibility
+      if (isImage && !this.#canRenderData(dataId, layerGroup)) {
+        // fire render error
+        this.#fireEvent({
+          type: 'error',
+          error: new Error('Render error: incompatible geometries'),
+          dataid: dataId
+        });
+        continue;
+      }
       // create layer if needed
       // warn: needs a loaded DOM
-      if (typeof this.#dataController.get(dataId) !== 'undefined') {
-        if (isImage &&
-          layerGroup.getViewLayersByDataId(dataId).length === 0
-        ) {
-          this.#addViewLayer(dataId, config);
-        } else if (isMeasurement &&
-          layerGroup.getDrawLayersByDataId(dataId).length === 0
-        ) {
-          this.addDrawLayer(dataId, config);
-        }
+      if (isImage &&
+        layerGroup.getViewLayersByDataId(dataId).length === 0
+      ) {
+        this.#addViewLayer(dataId, config);
+      } else if (isMeasurement &&
+        layerGroup.getDrawLayersByDataId(dataId).length === 0
+      ) {
+        this.addDrawLayer(dataId, config);
       }
       // draw
       layerGroup.draw();

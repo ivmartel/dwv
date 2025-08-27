@@ -238,8 +238,13 @@ function viewerSetup() {
   // bind events
   _app.addEventListener('error', function (event) {
     console.error('load error', event, event.error);
+    const message = event.error.message;
+    const isRenderError = typeof message !== 'undefined' &&
+      message.startsWith('Render error');
     // abort load
-    _app.abortLoad(event.dataid);
+    if (!isRenderError) {
+      _app.abortLoad(event.dataid);
+    }
   });
   _app.addEventListener('loadstart', function (event) {
     console.log('%c----------------', 'color: teal;');
