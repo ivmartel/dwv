@@ -58,7 +58,7 @@
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "^5.0.1",
     "qunit": "^2.24.1",
-    "typescript": "5.6.3",
+    "typescript": "5.9.2",
     "webpack": "^5.100.1",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2",
