@@ -1195,7 +1195,7 @@ export class App {
   /**
    * Check if a data can be rendered in a provided layer group.
    * If the layer group contains data, only similar orientation
-   * are permited.
+   * are permited. If not, returns true.
    *
    * @param {string} dataId The id of the data to check.
    * @param {LayerGroup} layerGroup The layer group where to render.
@@ -1205,8 +1205,8 @@ export class App {
     let res = false;
     const baseViewLayer = layerGroup.getBaseViewLayer();
     if (typeof baseViewLayer !== 'undefined') {
-      // render is possible if new data has similar geometry
-      // than base
+      // base view exists: render is possible if overlay data
+      // has similar geometry than base
       const baseData = this.#dataController.get(baseViewLayer.getDataId());
       const baseImage = baseData.image;
       const newData = this.#dataController.get(dataId);
@@ -1219,7 +1219,7 @@ export class App {
         res = newOrientation.isSimilar(baseOrientation);
       }
     } else {
-      // no base view -> can render
+      // no base view: can render
       res = true;
     }
     return res;
@@ -1275,7 +1275,7 @@ export class App {
         // fire render error
         this.#fireEvent({
           type: 'error',
-          error: new Error('Render error: incompatible geometries'),
+          error: new Error('Render error: incompatible geometries for overlay'),
           dataid: dataId
         });
         continue;
