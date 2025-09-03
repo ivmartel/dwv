@@ -78,7 +78,7 @@ export class Geometry {
     this.#spacing = spacing;
     if (typeof time !== 'undefined') {
       this.#initialTime = time;
-      this.#timeOrigins[time] = origins;
+      this.#timeOrigins[time] = origins.slice();
     }
     // check input orientation
     if (typeof orientation !== 'undefined') {
