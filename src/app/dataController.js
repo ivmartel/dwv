@@ -3,6 +3,7 @@ import {mergeObjects} from '../utils/operator.js';
 import {MaskFactory} from '../image/maskFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
+import {getTagTime} from '../dicom/dicomDate.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -407,7 +408,6 @@ export class DataController {
     }
 
     // update meta data
-    // TODO add time support
     let idKey = '';
     if (typeof data.meta['00020010'] !== 'undefined') {
       // dicom case, use 'InstanceNumber'
@@ -415,11 +415,20 @@ export class DataController {
     } else {
       idKey = 'imageUid';
     }
+    // possible time suffix
+    let suffix = '';
+    const timeTag = getTagTime(data.meta);
+    if (typeof timeTag !== 'undefined') {
+      suffix = '-' + timeTag;
+    }
+    // merge
     dataToUpdate.meta = mergeObjects(
       dataToUpdate.meta,
       data.meta,
       idKey,
-      'value');
+      'value',
+      suffix
+    );
 
     /**
      * Data udpate event.
