@@ -585,12 +585,19 @@ export class Stage {
    * @param {object} binder The layer binder.
    */
   #removeEventListeners(index, binder) {
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      if (i !== index && this.#layerGroups[i].shouldBind()) {
-        this.#layerGroups[index].removeEventListener(
-          binder.getEventType(),
-          this.#getBinderCallback(binder, i)
-        );
+    if (!this.#callbackStore) {
+      return;
+    }
+    for (const key in this.#callbackStore) {
+      if (parseInt(key, 10) !== index) {
+        for (const binderObj of this.#callbackStore[key]) {
+          if (binderObj.binder.getEventType() === binder.getEventType()) {
+            this.#layerGroups[index].removeEventListener(
+              binder.getEventType(),
+              binderObj.callback
+            );
+          }
+        }
       }
     }
   }
