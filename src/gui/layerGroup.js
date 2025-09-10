@@ -999,9 +999,21 @@ export class LayerGroup {
       return;
     }
 
+    const SOPClassUID = baseLayer.getViewController().getSopClassUid();
+
+    const disableCrosshair =
+      // Secondary Capture
+      SOPClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
+
+    if (disableCrosshair) {
+      logger.warn('Not enabling crosshair for secondary capture');
+      return;
+    }
+
     const vc = baseLayer.getViewController();
     const planePos = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(planePos);
+
 
     // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
