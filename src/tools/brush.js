@@ -1109,7 +1109,7 @@ export class Brush extends EventTarget {
       layerDetails.groupDivId
     );
     if (typeof layerGroup === 'undefined') {
-      throw new Error('No layergroup to check black list');
+      throw new Error('No layergroup to check for view layer');
     }
     const layer = layerGroup.getActiveLayer();
     if (layer instanceof ViewLayer) {
