@@ -999,13 +999,8 @@ export class LayerGroup {
       return;
     }
 
-    const SOPClassUID = baseLayer.getViewController().getSopClassUid();
-
-    const disableCrosshair =
-      // Secondary Capture
-      SOPClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
-
-    if (disableCrosshair) {
+    // no crosshair for secondary capture
+    if (this.#isViewLayerSecondaryCapture(baseLayer)) {
       logger.warn('Not enabling crosshair for secondary capture');
       return;
     }
@@ -1123,6 +1118,22 @@ export class LayerGroup {
   }
 
   /**
+   * Check if the SOP class UID of the data of a view layer is
+   * secondary capture.
+   *
+   * @param {ViewLayer} layer The layer to check.
+   * @returns {boolean} True if secondary capture.
+   */
+  #isViewLayerSecondaryCapture(layer) {
+    let res = false;
+    const sopClassUID = layer.getViewController().getSopClassUid();
+    if (typeof sopClassUID !== 'undefined') {
+      res = sopClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
+    }
+    return res;
+  }
+
+  /**
    * Returns whether or not a layer group should have its zoom/pan/etc
    * synced to other views. Used for things like Secondary Capture where
    * there is no meaningful real-world scale.
@@ -1131,21 +1142,11 @@ export class LayerGroup {
    */
   shouldBind() {
     const baseLayer = this.getBaseViewLayer();
-    if (!baseLayer) {
+    if (typeof baseLayer === 'undefined') {
       return false;
     }
-
-    const SOPClassUID = baseLayer.getViewController().getSopClassUid();
-    if (typeof SOPClassUID === 'undefined' || SOPClassUID === null) {
-      // We don't know what it is, assume it is a normal scan
-      return true;
-    }
-
-    const dontSync =
-      // Secondary Capture
-      SOPClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
-
-    return !dontSync;
+    const isSC = this.#isViewLayerSecondaryCapture(baseLayer);
+    return !isSC;
   }
 
   /**
