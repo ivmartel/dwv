@@ -497,7 +497,6 @@ export class Stage {
    */
   unbindLayerGroups() {
     if (this.#layerGroups.length === 0 ||
-      this.#layerGroups.length === 1 ||
       this.#binders.length === 0 ||
       !this.#callbackStore) {
       return;
