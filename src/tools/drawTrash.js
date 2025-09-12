@@ -109,9 +109,9 @@ export class DrawTrash {
    */
   isOverTrash(eventPosition) {
     const trashHalfWidth =
-      this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
+        this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
     const trashHalfHeight =
-      this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
+        this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
     return Math.abs(eventPosition.x - this.#trash.x()) < trashHalfWidth &&
         Math.abs(eventPosition.y - this.#trash.y()) < trashHalfHeight;
   }
