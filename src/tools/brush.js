@@ -1097,26 +1097,26 @@ export class Brush extends EventTarget {
   }
 
 
-    /**
+  /**
    * Determines if the active layer is a View layer.
    *
    * @param {MouseEvent} event The mouse down event.
    * @returns {boolean} True if the active layer is a View layer.
    */
-    #activeLayerIsViewLayer(event) {
-      const layerDetails = getLayerDetailsFromEvent(event);
-      const layerGroup = this.#app.getLayerGroupByDivId(
-        layerDetails.groupDivId
-      );
-      if (typeof layerGroup === 'undefined') {
-        throw new Error('No layergroup to check black list');
-      }
-      const layer = layerGroup.getActiveLayer();
-      if (layer instanceof ViewLayer) {
-        return true;
-      }
-      return false;
+  #activeLayerIsViewLayer(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(
+      layerDetails.groupDivId
+    );
+    if (typeof layerGroup === 'undefined') {
+      throw new Error('No layergroup to check black list');
     }
+    const layer = layerGroup.getActiveLayer();
+    if (layer instanceof ViewLayer) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Chack if the base image is resampled.
@@ -1143,7 +1143,9 @@ export class Brush extends EventTarget {
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
-    if (!this.#activeLayerIsViewLayer(event) || this.#isInBlackList(event) || this.#isResampled(event)) {
+    if (!this.#activeLayerIsViewLayer(event) ||
+      this.#isInBlackList(event) ||
+      this.#isResampled(event)) {
       return;
     }
     if (typeof this.#selectedSegmentNumber === 'undefined') {
