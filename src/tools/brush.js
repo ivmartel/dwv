@@ -1096,7 +1096,6 @@ export class Brush extends EventTarget {
     return false;
   }
 
-
   /**
    * Determines if the active layer is a View layer.
    *
