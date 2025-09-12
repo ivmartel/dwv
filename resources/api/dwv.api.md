@@ -1293,7 +1293,7 @@ export class ViewLayer {
     removeEventListener(type: string, callback: Function): void;
     removeFromDOM(): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
-    setCurrentPosition(position: Point, _index: Index): boolean;
+    setCurrentPosition(position: Point, _index?: Index): boolean;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;

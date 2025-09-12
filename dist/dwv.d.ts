@@ -6542,10 +6542,10 @@ export declare class ViewLayer {
      * Set the current position.
      *
      * @param {Point} position The new position.
-     * @param {Index} _index The new index.
+     * @param {Index} [_index] The new index (not used).
      * @returns {boolean} True if the position was updated.
      */
-    setCurrentPosition(position: Point, _index: Index): boolean;
+    setCurrentPosition(position: Point, _index?: Index): boolean;
     /**
      * Clear the context.
      */
