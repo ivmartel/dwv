@@ -321,7 +321,7 @@ export class View {
     if (this.#currentPresetName &&
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName].perslice !==
-        'undefined' &&
+      'undefined' &&
       this.#windowPresets[this.#currentPresetName].perslice === true &&
       // TODO: we currently can't handle per-slice wl on resampled images
       !this.#image.isResampled()) {

@@ -388,7 +388,7 @@ export class ViewLayer {
         // size/spacing changed, recalculate base offset
         // in case origin changed
         if (typeof this.#layerGroupOrigin !== 'undefined' &&
-            typeof this.#layerGroupOrigin0 !== 'undefined') {
+          typeof this.#layerGroupOrigin0 !== 'undefined') {
           const origin0 = this.#viewController.getOrigin();
           const scrollOffset = this.#layerGroupOrigin0.minus(origin0);
           const origin = this.#viewController.getOrigin(

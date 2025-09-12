@@ -136,11 +136,11 @@ export class SquarePixGenerator {
           for (let k = 0; k < nSlices; ++k) {
             const center = new Index([
               halfSizeZoneI + ni * this.#sizeZoneI +
-                incr[0] * (k - halfNSlices),
+              incr[0] * (k - halfNSlices),
               halfSizeZoneJ + nj * this.#sizeZoneJ +
-                incr[1] * (k - halfNSlices),
+              incr[1] * (k - halfNSlices),
               halfSizeZoneK + nk * this.#sizeZoneK +
-                incr[2] * (k - halfNSlices)
+              incr[2] * (k - halfNSlices)
             ]);
             let newIndices;
             if (config.shape === 'rectangle') {

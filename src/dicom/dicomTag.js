@@ -116,8 +116,8 @@ export class Tag {
   isWithVR() {
     return !(this.#group === 'FFFE' &&
       (this.#element === 'E000' ||
-      this.#element === 'E00D' ||
-      this.#element === 'E0DD')
+        this.#element === 'E00D' ||
+        this.#element === 'E0DD')
     );
   }
 
@@ -142,7 +142,7 @@ export class Tag {
     let info;
     if (typeof dictionary[this.#group] !== 'undefined' &&
       typeof dictionary[this.#group][this.#element] !==
-        'undefined') {
+      'undefined') {
       info = dictionary[this.#group][this.#element];
     }
     return info;

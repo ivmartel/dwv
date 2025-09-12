@@ -39,6 +39,8 @@ export default [
       // force 2 space indent (default: 4)
       // https://eslint.style/rules/js/indent
       '@stylistic/js/indent': ['error', 2],
+      // https://eslint.style/rules/js/indent-binary-ops
+      '@stylistic/js/indent-binary-ops': ['error', 2],
       // force single quotes (default 'double')
       // https://eslint.style/rules/js/quotes
       '@stylistic/js/quotes': ['error', 'single'],

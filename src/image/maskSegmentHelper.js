@@ -138,7 +138,7 @@ export class MaskSegmentHelper {
     } else {
       logger.warn(
         'Not adding segment, it is allready in the segments list: ' +
-          segment.number);
+        segment.number);
     }
   }
 
@@ -154,7 +154,7 @@ export class MaskSegmentHelper {
     } else {
       logger.warn(
         'Cannot remove segment, it is not in the segments list: ' +
-          segmentNumber);
+        segmentNumber);
     }
   }
 
@@ -170,7 +170,7 @@ export class MaskSegmentHelper {
     } else {
       logger.warn(
         'Cannot update segment, it is not in the segments list: ' +
-          segment.number);
+        segment.number);
     }
   }
 

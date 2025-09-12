@@ -301,7 +301,7 @@ function compare(jsonTags, dicomElements, name, comparator) {
       }
       const sqValue = jsonTags[tagName].value;
       if (typeof sqValue === 'undefined' ||
-      sqValue === null) {
+        sqValue === null) {
         continue;
       }
       // supposing same order of subkeys and indices...

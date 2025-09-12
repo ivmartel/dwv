@@ -214,14 +214,14 @@ function getElementAsString(tag, dicomElement, prefix) {
       line += dicomElement.value.length;
       line += ')';
     } else if (isOtherVR ||
-        dicomElement.vr === 'pi' ||
-        dicomElement.vr === 'UL' ||
-        dicomElement.vr === 'US' ||
-        dicomElement.vr === 'SL' ||
-        dicomElement.vr === 'SS' ||
-        dicomElement.vr === 'FL' ||
-        dicomElement.vr === 'FD' ||
-        dicomElement.vr === 'AT') {
+      dicomElement.vr === 'pi' ||
+      dicomElement.vr === 'UL' ||
+      dicomElement.vr === 'US' ||
+      dicomElement.vr === 'SL' ||
+      dicomElement.vr === 'SS' ||
+      dicomElement.vr === 'FL' ||
+      dicomElement.vr === 'FD' ||
+      dicomElement.vr === 'AT') {
       // 'O'ther array, limited display length
       line += ' ';
       line += getElementValueAsString(tag, dicomElement, false);

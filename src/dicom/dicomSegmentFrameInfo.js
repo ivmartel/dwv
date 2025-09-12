@@ -279,15 +279,15 @@ export function isEqualSegmentFrameInfo(dsfi1, dsfi2) {
     const derivationImage2 = dsfi2.derivationImages[i];
     isEqual = isEqual &&
       derivationImage1.sourceImages.length ===
-        derivationImage2.sourceImages.length;
+      derivationImage2.sourceImages.length;
     for (let j = 0; j < derivationImage1.length; ++j) {
       const sourceImage1 = derivationImage1.sourceImages[j];
       const sourceImage2 = derivationImage2.sourceImages[j];
       isEqual = isEqual &&
         sourceImage1.referencedSOPClassUID ===
-          sourceImage2.referencedSOPClassUID &&
+        sourceImage2.referencedSOPClassUID &&
         sourceImage1.referencedSOPInstanceUID ===
-          sourceImage2.referencedSOPInstanceUID;
+        sourceImage2.referencedSOPInstanceUID;
     }
   }
 

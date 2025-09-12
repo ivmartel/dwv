@@ -43,7 +43,7 @@ export class MaskSegmentViewHelper {
     } else {
       logger.warn(
         'Not hidding segment, it is allready in the hidden list: ' +
-          segmentNumber);
+        segmentNumber);
     }
   }
 
@@ -59,7 +59,7 @@ export class MaskSegmentViewHelper {
     } else {
       logger.warn(
         'Cannot remove segment, it is not in the hidden list: ' +
-          segmentNumber);
+        segmentNumber);
     }
   }
 

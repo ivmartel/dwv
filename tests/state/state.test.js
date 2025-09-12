@@ -118,7 +118,7 @@ function checkDrawings(drawings, details, version, type, assert) {
 
   // second level: position groups
   if (drawings.children.length === 5 &&
-        (type === 'ruler_multi-slice' || type === 'line_multi-slice')) {
+    (type === 'ruler_multi-slice' || type === 'line_multi-slice')) {
     checkRulerDrawings(drawings.children, details, version, assert);
   } else if (drawings.children.length === 1) {
 

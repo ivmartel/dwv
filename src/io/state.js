@@ -401,7 +401,7 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
           };
           textExpr = '{length}';
         } else if (drawGroup.name() === 'ellipse-group' ||
-                    drawGroup.name() === 'rectangle-group') {
+          drawGroup.name() === 'rectangle-group') {
           quant = {
             surface: {
               value: parseFloat(textExpr.substring(0, txtLen - 3)),
@@ -410,7 +410,7 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
           };
           textExpr = '{surface}';
         } else if (drawGroup.name() === 'protractor-group' ||
-                    drawGroup.name() === 'rectangle-group') {
+          drawGroup.name() === 'rectangle-group') {
           quant = {
             angle: {
               value: parseFloat(textExpr.substring(0, txtLen - 1)),

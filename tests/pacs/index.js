@@ -34,8 +34,8 @@ const _dataDicom = [
     uri: {
       type: 'dwvtest',
       file: '?file=bbmri-53323851.dcm&file=bbmri-53323707.dcm' +
-      '&file=bbmri-53323563.dcm&file=bbmri-53323419.dcm' +
-      '&file=bbmri-53323275.dcm&file=bbmri-53323131.dcm',
+        '&file=bbmri-53323563.dcm&file=bbmri-53323419.dcm' +
+        '&file=bbmri-53323275.dcm&file=bbmri-53323131.dcm',
       args: '&dwvReplaceMode=void'
     },
     img: 'babymri.png',

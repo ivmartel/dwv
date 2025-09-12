@@ -88,7 +88,7 @@ export class LabelingFilter {
     // faster to use a seperate worker object per segmentation, at the
     // cost of extra memory.
     if (typeof this.#lastKnownTotalSize === 'undefined' ||
-        this.#lastKnownTotalSize !== totalSize) {
+      this.#lastKnownTotalSize !== totalSize) {
       // The size of the image has changed, we need to reinitialize everything.
       this.#lastKnownTotalSize = totalSize;
 

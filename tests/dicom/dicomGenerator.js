@@ -115,8 +115,8 @@ export function generatePixelDataFromJSONTags(
       samplesPerPixel);
   }
   if ((samplesPerPixel === 1 && !(photometricInterpretation === 'MONOCHROME1' ||
-        photometricInterpretation === 'MONOCHROME2')) ||
-        (samplesPerPixel === 3 && photometricInterpretation !== 'RGB')) {
+    photometricInterpretation === 'MONOCHROME2')) ||
+    (samplesPerPixel === 3 && photometricInterpretation !== 'RGB')) {
     throw new Error(
       'Unsupported PhotometricInterpretation for pixel generation: ' +
       photometricInterpretation + ' with SamplesPerPixel: ' + samplesPerPixel);

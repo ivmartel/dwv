@@ -68,8 +68,8 @@ export class BucketQueue {
 
     while (node !== null &&
       !(node.next !== null &&
-      item.x === node.next.x &&
-      item.y === node.next.y)) {
+        item.x === node.next.x &&
+        item.y === node.next.y)) {
       node = node.next;
     }
 

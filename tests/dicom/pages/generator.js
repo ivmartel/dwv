@@ -287,14 +287,14 @@ function onInputImageFiles(event) {
           let message;
           if (this.width !== _images[0].width) {
             message = 'Image width mismatch between input files: ' +
-                this.width + ' != ' + _images[0].width;
+              this.width + ' != ' + _images[0].width;
             console.error(message);
             alert(message);
             return;
           }
           if (this.height !== _images[0].height) {
             message = 'Image height mismatch between input files: ' +
-                this.height + ' != ' + _images[0].height;
+              this.height + ' != ' + _images[0].height;
             console.error(message);
             alert(message);
             return;

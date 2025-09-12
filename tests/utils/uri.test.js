@@ -400,7 +400,7 @@ QUnit.test('Decode Manifest - #DWV-REQ-IO-02-006 Load Data Manifest URL',
     // theoretical test decode result
     const middle = '?requestType=WADO&contentType=application/dicom&';
     const theoLinkRoot = wadoUrl + middle + '&studyUID=' + studyInstanceUID +
-          '&seriesUID=' + seriesInstanceUID0;
+      '&seriesUID=' + seriesInstanceUID0;
     const theoLink = [theoLinkRoot + '&objectUID=' + sOPInstanceUID00,
       theoLinkRoot + '&objectUID=' + sOPInstanceUID01];
 

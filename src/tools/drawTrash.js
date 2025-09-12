@@ -113,7 +113,7 @@ export class DrawTrash {
     const trashHalfHeight =
         this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
     return Math.abs(eventPosition.x - this.#trash.x()) < trashHalfWidth &&
-        Math.abs(eventPosition.y - this.#trash.y()) < trashHalfHeight;
+      Math.abs(eventPosition.y - this.#trash.y()) < trashHalfHeight;
   }
 
 }

@@ -252,9 +252,9 @@ export function decodeManifest(manifest, nslices) {
   for (let i = 0; i < max; ++i) {
     const sopInstanceUID = instanceList[i].getAttribute('SOPInstanceUID');
     const link = rootURL +
-        '&studyUID=' + studyUID +
-        '&seriesUID=' + seriesUID +
-        '&objectUID=' + sopInstanceUID;
+      '&studyUID=' + studyUID +
+      '&seriesUID=' + seriesUID +
+      '&objectUID=' + sopInstanceUID;
     result.push(link);
   }
   // return

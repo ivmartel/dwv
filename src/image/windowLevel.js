@@ -28,7 +28,7 @@ export function validateWindowLevel(
   let minWindowWidth = 1;
   if (typeof voiLutFunctionName !== 'undefined' &&
     (voiLutFunctionName === VoiLutFunctionNames.linear_exact ||
-    voiLutFunctionName === VoiLutFunctionNames.sigmoid)) {
+      voiLutFunctionName === VoiLutFunctionNames.sigmoid)) {
     minWindowWidth = 0;
   }
 

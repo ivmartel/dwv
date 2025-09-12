@@ -1368,7 +1368,7 @@ export class App {
 
         const meta = data.image.getMeta();
         if (meta.Modality === 'SEG' &&
-            meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+          meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
           this.#dataController.stash(dataIds[i]);
         }
       }
@@ -1407,7 +1407,7 @@ export class App {
 
       const meta = data.image.getMeta();
       if (meta.Modality === 'SEG' &&
-          meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+        meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
         this.#dataController.unstash(dataIds[i]);
       }
     }
