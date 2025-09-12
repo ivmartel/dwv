@@ -371,12 +371,12 @@ export class ViewLayer {
       const vcSpacing = this.#viewController.getImageSpacing().get2D();
 
       const sizeChanged =
-          this.#baseSize.x !== vcSize.x ||
-          this.#baseSize.y !== vcSize.y;
+        this.#baseSize.x !== vcSize.x ||
+        this.#baseSize.y !== vcSize.y;
 
       const spacingChanged =
-          this.#baseSpacing.x !== vcSpacing.x ||
-          this.#baseSpacing.y !== vcSpacing.y;
+        this.#baseSpacing.x !== vcSpacing.x ||
+        this.#baseSpacing.y !== vcSpacing.y;
 
       if (spacingChanged) {
         this.#viewController.updatePlaneHelper();
