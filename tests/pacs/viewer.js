@@ -284,8 +284,8 @@ function viewerSetup() {
       console.warn('load-warn', event.warn);
     }
   });
-  _app.addEventListener('dataadd', function (event) {
-    // add new data view config for compatible data
+  _app.addEventListener('loadstart', function (event) {
+    // add new data view config for new data
     addNewDataViewConfig(event.dataid);
   });
   _app.addEventListener('loadend', function (event) {
