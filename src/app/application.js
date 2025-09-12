@@ -591,7 +591,9 @@ export class App {
     if (typeof this.#options.dataViewConfigs === 'undefined') {
       this.#options.dataViewConfigs = {};
     }
-    if (typeof this.#options.rootDocument === 'undefined') {
+    if (typeof this.#options.rootDocument === 'undefined' &&
+      typeof document !== 'undefined'
+    ) {
       this.#options.rootDocument = document;
     }
 
