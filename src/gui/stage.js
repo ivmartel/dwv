@@ -456,13 +456,10 @@ export class Stage {
         }
       }
     }
-    // exit if no ratio
-    if (typeof minRatio === 'undefined') {
-      return;
-    }
     // apply min ratio to layers
     for (let j = 0; j < this.#layerGroups.length; ++j) {
       if (hasRatio.includes(j) && this.#layerGroups[j].shouldBind()) {
+        // minRatio has been set since hasRatio include j
         this.#layerGroups[j].fitToContainer(minRatio);
       } else {
         const ratio = this.#layerGroups[j].getDivToWorldSizeRatio();
