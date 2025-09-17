@@ -7,6 +7,7 @@ import {
 import {safeGet, safeGetAll} from './dataElement.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
 import {Spacing} from '../image/spacing.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -32,7 +33,10 @@ const TagKeys = {
   Units: '00541001',
   ImageOrientationPatient: '00200037',
   PhotometricInterpretation: '00280004',
-  SamplesPerPixel: '00280002'
+  SamplesPerPixel: '00280002',
+  PixelMeasuresSequence: '00289110',
+  SharedFunctionalGroupsSequence: '52009229',
+  PerFrameFunctionalGroupsSequence: '52009230'
 };
 
 /**
@@ -54,6 +58,45 @@ export function getImage2DSize(elements) {
 }
 
 /**
+ * Get the 2D spacing values.
+ *
+ * @param {Object<string, DataElement>} elements The dicom element.
+ * @param {string} tagKey The tag key.
+ * @returns {number[]|undefined} The values if present.
+ */
+function get2DSpacingValues(elements, tagKey) {
+  let res;
+  const values = safeGetAll(elements, tagKey);
+  if (typeof values !== 'undefined' &&
+    values.length === 2) {
+    // dicom spacing order: [row, column]
+    res = [
+      parseFloat(values[1]),
+      parseFloat(values[0])
+    ];
+  }
+  return res;
+}
+
+/**
+ * Get the 2D spacing values from a functional group.
+ *
+ * @param {Object<string, DataElement>} funcGroupElements The dicom elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
+  let res;
+  // Pixel Measures Sequence
+  const pixelMeasuresSeq =
+    safeGetAll(funcGroupElements, TagKeys.PixelMeasuresSequence);
+  if (typeof pixelMeasuresSeq !== 'undefined') {
+    // should be only one
+    res = get2DSpacingValues(pixelMeasuresSeq[0], TagKeys.PixelSpacing);
+  }
+  return res;
+}
+
+/**
  * Get the pixel spacing from the different spacing tags.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
@@ -63,22 +106,52 @@ export function getImage2DSize(elements) {
 export function getPixelSpacing(elements) {
   let res;
 
-  const tags = [
-    'PixelSpacing',
-    'ImagerPixelSpacing',
-    'NominalScannedPixelSpacing',
-    'PixelAspectRatio'
-  ];
-  for (const tag of tags) {
-    const spacing = safeGetAll(elements, TagKeys[tag]);
-    if (typeof spacing !== 'undefined' &&
-      spacing.length === 2) {
-      // dicom spacing order: [row, column]
-      res = [
-        parseFloat(spacing[1]),
-        parseFloat(spacing[0])
-      ];
-      break;
+  // main tag
+  res = get2DSpacingValues(elements, TagKeys.PixelSpacing);
+
+  // projection related
+  // TODO: include magnification
+  if (typeof res === 'undefined') {
+    res = get2DSpacingValues(elements, TagKeys.ImagerPixelSpacing);
+    if (typeof res !== 'undefined') {
+      logger.warn('Got pixel spacing from ImagerPixelSpacing tag');
+    }
+  }
+  if (typeof res === 'undefined') {
+    res = get2DSpacingValues(elements, TagKeys.NominalScannedPixelSpacing);
+    if (typeof res !== 'undefined') {
+      logger.warn('Got pixel spacing from NominalScannedPixelSpacing tag');
+    }
+  }
+
+  // SharedFunctionalGroupsSequence (multi-frame)
+  if (typeof res === 'undefined') {
+    const sharedFunctionalGroupsSeq =
+      safeGetAll(elements, TagKeys.SharedFunctionalGroupsSequence);
+    if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
+      // should be only one
+      const funcGroup = sharedFunctionalGroupsSeq[0];
+      res = get2DSpacingValuesFromFuncGroup(funcGroup);
+    }
+  }
+
+  // PerFrameFunctionalGroupsSequence (multi-frame)
+  if (typeof res === 'undefined') {
+    const perFrameFunctionalGroupsSeq =
+      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+    if (typeof perFrameFunctionalGroupsSeq !== 'undefined') {
+      // take first one
+      // TODO: use proper frame
+      const funcGroup = perFrameFunctionalGroupsSeq[0];
+      res = get2DSpacingValuesFromFuncGroup(funcGroup);
+    }
+  }
+
+  // last chance
+  if (typeof res === 'undefined') {
+    res = get2DSpacingValues(elements, TagKeys.PixelAspectRatio);
+    if (typeof res !== 'undefined') {
+      logger.warn('Got pixel spacing from PixelAspectRatio tag');
     }
   }
 
@@ -93,17 +166,10 @@ export function getPixelSpacing(elements) {
  */
 export function getSpacingFromMeasure(dataElements) {
   // Pixel Spacing
-  const pixelSpacing = safeGetAll(dataElements, TagKeys.PixelSpacing);
-  if (typeof pixelSpacing === 'undefined' ||
-    pixelSpacing.length !== 2
-  ) {
+  const spacingValues = get2DSpacingValues(dataElements, TagKeys.PixelSpacing);
+  if (typeof spacingValues === 'undefined') {
     return undefined;
   }
-  // spacing order: [row, column]
-  const spacingValues = [
-    parseFloat(pixelSpacing[1]),
-    parseFloat(pixelSpacing[0]),
-  ];
   // Spacing Between Slices
   const sbs = safeGet(dataElements, TagKeys.SpacingBetweenSlices);
   if (typeof sbs !== 'undefined') {
