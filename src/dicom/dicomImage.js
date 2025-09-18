@@ -130,13 +130,19 @@ function getProjection2DSpacingValues(elements) {
       logger.warn('Got pixel spacing from raw ImagerPixelSpacing tag');
     }
   }
+}
 
+/**
+ * Get the pixel spacing for secondary capture data.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function getSecondaryCapture2DSpacingValues(elements) {
   // NominalScannedPixelSpacing
-  if (typeof res === 'undefined') {
-    res = get2DSpacingValues(elements, TagKeys.NominalScannedPixelSpacing);
-    if (typeof res !== 'undefined') {
-      logger.warn('Got pixel spacing from NominalScannedPixelSpacing tag');
-    }
+  const res = get2DSpacingValues(elements, TagKeys.NominalScannedPixelSpacing);
+  if (typeof res !== 'undefined') {
+    logger.warn('Got pixel spacing from NominalScannedPixelSpacing tag');
   }
 
   return res;
@@ -191,6 +197,11 @@ export function getPixelSpacing(elements) {
   // projection related
   if (typeof res === 'undefined') {
     res = getProjection2DSpacingValues(elements);
+  }
+
+  // secondary capture (before multi-frame case)
+  if (typeof res === 'undefined') {
+    res = getSecondaryCapture2DSpacingValues(elements);
   }
 
   // multi-frame case (spacing in functional group)
