@@ -209,15 +209,17 @@ export function getPixelSpacing(elements) {
     res = getMultiFrame2DSpacingValues(elements);
   }
 
-  // last chance
-  if (typeof res === 'undefined') {
-    res = get2DSpacingValues(elements, TagKeys.PixelAspectRatio);
-    if (typeof res !== 'undefined') {
-      logger.warn('Got pixel spacing from PixelAspectRatio tag');
-    }
-  }
-
   return res;
+}
+
+/**
+ * Get the pixel aspect ratio.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+export function getPixelAspectRatio(elements) {
+  return get2DSpacingValues(elements, TagKeys.PixelAspectRatio);
 }
 
 /**

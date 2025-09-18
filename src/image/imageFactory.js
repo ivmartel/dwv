@@ -9,6 +9,7 @@ import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
   getPixelSpacing,
+  getPixelAspectRatio,
   getTagPixelUnit,
   getOrientationMatrix,
   getPhotometricInterpretation,
@@ -341,6 +342,13 @@ export class ImageFactory {
     const spacing2D = getPixelSpacing(dataElements);
     if (typeof spacing2D !== 'undefined') {
       spacingValues = [spacing2D[0], spacing2D[1], 1];
+    } else {
+      // try pixel aspect ratio
+      const ratio = getPixelAspectRatio(dataElements);
+      if (typeof ratio !== 'undefined') {
+        spacingValues = [ratio[0], ratio[1], 1];
+        logger.warn('Use pixel aspect ratio as spacing');
+      }
     }
     const spacing = new Spacing(spacingValues);
 
