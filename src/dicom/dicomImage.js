@@ -97,6 +97,61 @@ function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
 }
 
 /**
+ * Get the pixel spacing for projection data.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function getProjection2DSpacingValues(elements) {
+  // TODO: include magnification
+  let res = get2DSpacingValues(elements, TagKeys.ImagerPixelSpacing);
+  if (typeof res !== 'undefined') {
+    logger.warn('Got pixel spacing from ImagerPixelSpacing tag');
+  }
+  if (typeof res === 'undefined') {
+    res = get2DSpacingValues(elements, TagKeys.NominalScannedPixelSpacing);
+    if (typeof res !== 'undefined') {
+      logger.warn('Got pixel spacing from NominalScannedPixelSpacing tag');
+    }
+  }
+
+  return res;
+}
+
+/**
+ * Get the pixel spacing for multi-frame data.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function getMultiFrame2DSpacingValues(elements) {
+  let res;
+
+  // SharedFunctionalGroupsSequence (multi-frame)
+  const sharedFunctionalGroupsSeq =
+    safeGetAll(elements, TagKeys.SharedFunctionalGroupsSequence);
+  if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
+    // should be only one
+    const funcGroup = sharedFunctionalGroupsSeq[0];
+    res = get2DSpacingValuesFromFuncGroup(funcGroup);
+  }
+
+  // PerFrameFunctionalGroupsSequence (multi-frame)
+  if (typeof res === 'undefined') {
+    const perFrameFunctionalGroupsSeq =
+      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+    if (typeof perFrameFunctionalGroupsSeq !== 'undefined') {
+      // take first one
+      // TODO: use proper frame
+      const funcGroup = perFrameFunctionalGroupsSeq[0];
+      res = get2DSpacingValuesFromFuncGroup(funcGroup);
+    }
+  }
+
+  return res;
+}
+
+/**
  * Get the pixel spacing from the different spacing tags.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
@@ -110,41 +165,13 @@ export function getPixelSpacing(elements) {
   res = get2DSpacingValues(elements, TagKeys.PixelSpacing);
 
   // projection related
-  // TODO: include magnification
   if (typeof res === 'undefined') {
-    res = get2DSpacingValues(elements, TagKeys.ImagerPixelSpacing);
-    if (typeof res !== 'undefined') {
-      logger.warn('Got pixel spacing from ImagerPixelSpacing tag');
-    }
-  }
-  if (typeof res === 'undefined') {
-    res = get2DSpacingValues(elements, TagKeys.NominalScannedPixelSpacing);
-    if (typeof res !== 'undefined') {
-      logger.warn('Got pixel spacing from NominalScannedPixelSpacing tag');
-    }
+    res = getProjection2DSpacingValues(elements);
   }
 
-  // SharedFunctionalGroupsSequence (multi-frame)
+  // multi-frame case (spacing in functional group)
   if (typeof res === 'undefined') {
-    const sharedFunctionalGroupsSeq =
-      safeGetAll(elements, TagKeys.SharedFunctionalGroupsSequence);
-    if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
-      // should be only one
-      const funcGroup = sharedFunctionalGroupsSeq[0];
-      res = get2DSpacingValuesFromFuncGroup(funcGroup);
-    }
-  }
-
-  // PerFrameFunctionalGroupsSequence (multi-frame)
-  if (typeof res === 'undefined') {
-    const perFrameFunctionalGroupsSeq =
-      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
-    if (typeof perFrameFunctionalGroupsSeq !== 'undefined') {
-      // take first one
-      // TODO: use proper frame
-      const funcGroup = perFrameFunctionalGroupsSeq[0];
-      res = get2DSpacingValuesFromFuncGroup(funcGroup);
-    }
+    res = getMultiFrame2DSpacingValues(elements);
   }
 
   // last chance
