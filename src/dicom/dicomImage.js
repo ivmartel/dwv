@@ -130,6 +130,7 @@ function getProjection2DSpacingValues(elements) {
       logger.warn('Got pixel spacing from raw ImagerPixelSpacing tag');
     }
   }
+  return res;
 }
 
 /**
