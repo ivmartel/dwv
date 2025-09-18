@@ -27,6 +27,9 @@ const TagKeys = {
   PixelSpacing: '00280030',
   ImagerPixelSpacing: '00181164',
   NominalScannedPixelSpacing: '00182010',
+  DistanceSourceToDetector: '00181110',
+  DistanceSourceToPatient: '00181111',
+  EstimatedRadiographicMagnificationFactor: '00181114',
   PixelAspectRatio: '00280034',
   SpacingBetweenSlices: '00180088',
   RescaleType: '00281054',
@@ -103,11 +106,32 @@ function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
  * @returns {number[]|undefined} The values if present.
  */
 function getProjection2DSpacingValues(elements) {
-  // TODO: include magnification
+  // ImagerPixelSpacing
   let res = get2DSpacingValues(elements, TagKeys.ImagerPixelSpacing);
   if (typeof res !== 'undefined') {
-    logger.warn('Got pixel spacing from ImagerPixelSpacing tag');
+    let factor;
+    const magnification = parseFloat(
+      safeGet(elements, TagKeys.EstimatedRadiographicMagnificationFactor));
+    if (!isNaN(magnification)) {
+      factor = magnification;
+    } else {
+      const d0 = parseFloat(
+        safeGet(elements, TagKeys.DistanceSourceToDetector));
+      const d1 = parseFloat(
+        safeGet(elements, TagKeys.DistanceSourceToPatient));
+      if (!isNaN(d0) && !isNaN(d1) && d1 !== 0) {
+        factor = d0 / d1;
+      }
+    }
+    if (typeof factor !== 'undefined') {
+      res = res.map((value) => value / factor);
+      logger.warn('Got pixel spacing from corrected ImagerPixelSpacing tag');
+    } else {
+      logger.warn('Got pixel spacing from raw ImagerPixelSpacing tag');
+    }
   }
+
+  // NominalScannedPixelSpacing
   if (typeof res === 'undefined') {
     res = get2DSpacingValues(elements, TagKeys.NominalScannedPixelSpacing);
     if (typeof res !== 'undefined') {
