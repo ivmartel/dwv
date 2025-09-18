@@ -189,26 +189,21 @@ function getMultiFrame2DSpacingValues(elements) {
  *   undefined if not present.
  */
 export function getPixelSpacing(elements) {
-  let res;
-
   // main tag
-  res = get2DSpacingValues(elements, TagKeys.PixelSpacing);
-
+  let res = get2DSpacingValues(elements, TagKeys.PixelSpacing);
   // projection related
   if (typeof res === 'undefined') {
     res = getProjection2DSpacingValues(elements);
   }
-
   // secondary capture (before multi-frame case)
   if (typeof res === 'undefined') {
     res = getSecondaryCapture2DSpacingValues(elements);
   }
-
   // multi-frame case (spacing in functional group)
   if (typeof res === 'undefined') {
     res = getMultiFrame2DSpacingValues(elements);
   }
-
+  // return
   return res;
 }
 
