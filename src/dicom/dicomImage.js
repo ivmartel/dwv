@@ -145,7 +145,6 @@ function getSecondaryCapture2DSpacingValues(elements) {
   if (typeof res !== 'undefined') {
     logger.warn('Got pixel spacing from NominalScannedPixelSpacing tag');
   }
-
   return res;
 }
 
