@@ -192,6 +192,7 @@ export function getPixelSpacing(elements) {
   // main tag
   let res = get2DSpacingValues(elements, TagKeys.PixelSpacing);
   // projection related
+  // TODO: use SOPClassUID filter?
   if (typeof res === 'undefined') {
     res = getProjection2DSpacingValues(elements);
   }
