@@ -751,7 +751,7 @@ export class Brush extends EventTarget {
         {
           dimIndex: [1, 1],
           refSegmentNumber: 1,
-          imagePosPat: tags.ImageOrientationPatient,
+          imagePosPat: sourceGeometry.getOrigins()[imgK].getValues(),
           derivationImages: [
             {
               sourceImages: referencedSOPs
