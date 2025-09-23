@@ -766,7 +766,7 @@ export class Brush extends EventTarget {
 
     this.#mask = this.#createMaskImage(
       sourceGeometry,
-      sourceGeometry.getOrigins()[imgK],
+      sourceGeometry.indexToWorld(index).get3D(),
       firstSliceMeta
     );
 
