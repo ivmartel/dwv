@@ -8,7 +8,8 @@ self.addEventListener('message', function (event) {
 
   const filter = new LabelingFilter();
   self.postMessage({
-    labels: filter.run(event.data)
+    labels: filter.run(event.data),
+    buffer: event.data.imageBuffer
   });
 
 }, false);

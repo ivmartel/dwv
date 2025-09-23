@@ -1725,6 +1725,9 @@ export class Image {
           type: 'labelschanged',
           labels: labelsSorted
         });
+
+        this.#buffer = event.data.buffer;
+        this.#fireEvent({type: 'imagecontentchange'});
       };
     }
 

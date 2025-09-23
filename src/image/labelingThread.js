@@ -108,7 +108,7 @@ export class LabelingThread {
    * this is meant to be overridden.
    *
    * @param {object} _event The work item event fired when a labeling
-   *   calculation is completed. Event.data should contain a 'lebels' item.
+   *   calculation is completed. Event.data should contain a 'labels' item.
    */
   ondone(_event) {}
 }
