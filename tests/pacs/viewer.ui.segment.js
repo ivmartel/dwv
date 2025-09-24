@@ -878,6 +878,19 @@ export class SegmentationUI {
           res += ', ';
         }
         res += label.volume.toPrecision(4) + i18n.t(label.unit);
+        if (typeof label.diameters !== 'undefined') {
+          res += ' (';
+          res +=
+            label.diameters.major.diameter.toPrecision(4) +
+            i18n.t(label.diameterUnit);
+          res += ', ';
+          res +=
+            label.diameters.minor.diameter.toPrecision(4) +
+            i18n.t(label.diameterUnit);
+          res += ', ';
+          res += label.height.toPrecision(4) + i18n.t(label.diameterUnit);
+          res += ')';
+        }
       }
     }
     res += ']';

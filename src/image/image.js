@@ -1712,6 +1712,8 @@ export class Image {
             new Index(label.centroidIndex));
           label.volume = label.count * pixelVolume;
           label.unit = volumeUnit;
+          // diameters should be already in the correct units
+          label.diameterUnit = lengthUnit;
         }
         // sort
         const labelsSorted =
@@ -1733,7 +1735,7 @@ export class Image {
 
     this.#fireEvent({type: 'labelingstart'});
 
-    this.#labelingThread.run(this.#buffer, this.#geometry.getSize());
+    this.#labelingThread.run(this.#buffer, this.#geometry);
   }
 
   /**

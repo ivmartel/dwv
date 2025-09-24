@@ -1,3 +1,8 @@
+import {LabelingDebug} from './labelingDebug.js';
+
+// Set this to true to show the debug contour and diameter display
+const DIAMETER_DEBUG = false;
+
 /**
  * Filter for calculating labels.
  *
@@ -235,10 +240,10 @@ export class LabelingFilter {
 
             // Border check
             if (
-              xValue != thisValue || 
-              yValue != thisValue ||
-              xValuep != thisValue || 
-              yValuep != thisValue 
+              xValue !== thisValue ||
+              yValue !== thisValue ||
+              xValuep !== thisValue ||
+              yValuep !== thisValue
             ) {
               this.#borders[(unitVectors[2] * z) + borderOffset] = thisOffset;
               borderOffset++;
@@ -274,17 +279,19 @@ export class LabelingFilter {
   }
 
   /**
-   * Quantify labels: count items and calculate centroid.
+   * Quantify labels: count items, calculate centroid, and calculate height.
    *
-   * @param {TypedArray} buffer The image buffer to regenerate the labels for.
+   * @param {TypedArray} buffer The image buffer to quantify the labels for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
+   * @param {number[]} spacing The pixel spacing of the image.
    *
-   * @returns {object[]} The list of quantified labels.
+   * @returns {object} The dictionary of quantified labels.
    */
   #quantifyLabels(
     buffer,
     unitVectors,
+    spacing
   ) {
     const detailledInfos = {};
 
@@ -300,37 +307,53 @@ export class LabelingFilter {
           detailledInfos[labelValue] = {
             id: buffer[o],
             sum: index,
-            count: 1
+            count: 1,
+            maxZ: index[2],
+            minZ: index[2]
           };
         } else {
           info.sum[0] += index[0];
           info.sum[1] += index[1];
           info.sum[2] += index[2];
           info.count++;
+          info.maxZ = Math.max(info.maxZ, index[2]);
+          info.minZ = Math.min(info.minZ, index[2]);
         }
       }
     }
 
-    const labelsInfo =
-      Object.values(detailledInfos).map(
-        (detailledInfo) => {
-          const index = Array(detailledInfo.sum.length).fill(0);
-          for (let d = 0; d < detailledInfo.sum.length; d++) {
-            index[d] = detailledInfo.sum[d] / detailledInfo.count;
-          }
+    const labelsInfo = {};
 
-          return {
-            id: detailledInfo.id,
-            centroidIndex: index,
-            count: detailledInfo.count
-          };
-        }
-      );
+    for (const [label, detailledInfo] of Object.entries(detailledInfos)) {
+      const index = Array(detailledInfo.sum.length).fill(0);
+      for (let d = 0; d < detailledInfo.sum.length; d++) {
+        index[d] = detailledInfo.sum[d] / detailledInfo.count;
+      }
+
+      labelsInfo[label] = {
+        id: detailledInfo.id,
+        centroidIndex: index,
+        count: detailledInfo.count,
+        height: (detailledInfo.maxZ - detailledInfo.minZ + 1) * spacing[2]
+      };
+    }
 
     return labelsInfo;
   }
 
-  #convertToXYUnits(sliceOffset, unitVectors) {
+  /**
+   * Convert a slice local offset value to a slice local world coordinate.
+   *
+   * @param {number} sliceOffset Offset relative to the offset at the
+   * start of the slice.
+   * @param {number []} unitVectors The unit vectors for index to offset
+   *  conversion.
+   * @param {number []} spacing The pixel spacing of the image.
+   *
+   * @returns {object} Point on the slice, scaled.
+   *  (object with the structure {x, y}).
+   */
+  #sliceOffsetToSliceWorld(sliceOffset, unitVectors, spacing) {
     let x = 0;
     let y = 0;
     if (unitVectors[0] > unitVectors[1]) {
@@ -341,23 +364,58 @@ export class LabelingFilter {
       y = Math.floor(sliceOffset / unitVectors[1]);
     }
 
-    return {x,y};
+    x = x * spacing[0];
+    y = y * spacing[1];
+
+    return {x, y};
   }
 
+  /**
+   * Calculated the length of a 2D line segment.
+   * Points should be in slice world space.
+   *
+   * @param {object} p1 The first endpoint of the line segment.
+   *  (object with the structure {x, y}).
+   * @param {object} p2 The second endpoint of the line segment.
+   *
+   * @returns {number} Length of the line segment relative to the X axis.
+   */
   #calculateDistance(p1, p2) {
     const xD = Math.abs(p1.x - p2.x);
     const yD = Math.abs(p1.y - p2.y);
     return Math.sqrt((xD * xD) + (yD * yD));
   }
 
+  /**
+   * Calculated the angle of a 2D line segment.
+   * Points should be in slice world space.
+   *
+   * @param {object} p1 The first endpoint of the line segment.
+   *  (object with the structure {x, y}).
+   * @param {object} p2 The second endpoint of the line segment.
+   *
+   * @returns {number} Angle of the line segment relative to the X axis.
+   */
   #calculateAngle(p1, p2) {
-    return Math.atan((p2.y - p1.y)/(p2.x - p1.x));
+    return Math.atan((p2.y - p1.y) / (p2.x - p1.x));
   }
 
+  /**
+   * Calculate the major and minor (perpendicular) diameters of each segment.
+   *
+   * @param {TypedArray} buffer The image buffer to calculate diameters for.
+   * @param {number[]} unitVectors The unit vectors for index to offset
+   *  conversion.
+   * @param {number[]} sizes The image dimensions.
+   * @param {number[]} spacing The pixel spacing of the image.
+   *
+   * @returns {object} The dictionary of calculated diameters.
+   */
   #calculateDiameters(
     buffer,
     unitVectors,
     sizes,
+    spacing
   ) {
     const maxDiameters = {};
 
@@ -365,8 +423,9 @@ export class LabelingFilter {
     for (let z = 0; z < sizes[2]; z++) {
       const zOffset = unitVectors[2] * z;
 
-      // TODO: It would be more efficient to calculate the convex hull, use rotating calipers
-      // to get antipodal points, and then calculate the major diameter from those.
+      // TODO: It would be more efficient to calculate the convex hull, use
+      // rotating calipers to get antipodal points, and then calculate the
+      // major diameter from those.
       // For now the naive way is fast enough for an initial implementation.
 
       let borderOffset1 = 0;
@@ -374,33 +433,42 @@ export class LabelingFilter {
         const offset1 = this.#borders[zOffset + borderOffset1];
         const label1 = this.#find(this.#labels[offset1]);
         const sliceOffset1 = offset1 - zOffset;
-        const slicePosition1 = this.#convertToXYUnits(sliceOffset1, unitVectors);
+        const slicePosition1 =
+          this.#sliceOffsetToSliceWorld(sliceOffset1, unitVectors, spacing);
 
         let borderOffset2 = 0;
         while (this.#borders[zOffset + borderOffset2] > 0) {
           const offset2 = this.#borders[zOffset + borderOffset2];
-          if(offset1 != offset2){
+          if (offset1 !== offset2) {
             const label2 = this.#find(this.#labels[offset2]);
 
             if (label1 === label2) {
               const sliceOffset2 = offset2 - zOffset;
-              const slicePosition2 = this.#convertToXYUnits(sliceOffset2, unitVectors);
+              const slicePosition2 =
+                this.#sliceOffsetToSliceWorld(
+                  sliceOffset2,
+                  unitVectors,
+                  spacing
+                );
 
-              const distance = this.#calculateDistance(slicePosition1, slicePosition2);
+              const distance =
+                this.#calculateDistance(slicePosition1, slicePosition2);
 
               const maxDiameter = maxDiameters[label1];
               if (
                 typeof maxDiameter === 'undefined' ||
-                maxDiameter.diameter < distance
+                maxDiameter.major.diameter < distance
               ) {
                 maxDiameters[label1] = {
                   id: buffer[offset1],
-                  diameter: distance,
-                  point1: slicePosition1,
-                  point2: slicePosition2,
-                  offset1: offset1,
-                  offset2: offset2,
-                  z: z
+                  major: {
+                    diameter: distance,
+                    point1: slicePosition1,
+                    point2: slicePosition2,
+                    offset1: offset1,
+                    offset2: offset2,
+                  },
+                  zIndex: z
                 };
               }
             }
@@ -409,18 +477,20 @@ export class LabelingFilter {
           borderOffset2++;
         }
 
-        borderOffset1 ++;
+        borderOffset1++;
       }
     }
 
     // Get the minor (perpendicular) diameter
     for (const [label, diameter] of Object.entries(maxDiameters)) {
-      const zOffset = unitVectors[2] * diameter.z;
-      const diameterAngle = this.#calculateAngle(diameter.point1, diameter.point2);
+      const zOffset = unitVectors[2] * diameter.zIndex;
+      const diameterAngle =
+        this.#calculateAngle(diameter.major.point1, diameter.major.point2);
 
-      // TODO: This could also be made faster by using a modified antipodal point algorithm
-      // that uses perpedicularity to the initial diameter instead of parallel tangents (we
-      // can't use the convex hull for this one, so the normal algorithm doesn't work)
+      // TODO: This could also be made faster by using a modified antipodal
+      // point algorithm that uses perpedicularity to the initial diameter
+      // instead of parallel tangents (we can't use the convex hull for this
+      // one, so the normal algorithm doesn't work).
       // For now the naive way is fast enough for an initial implementation.
 
       let borderOffset1 = 0;
@@ -428,37 +498,52 @@ export class LabelingFilter {
         const offset1 = this.#borders[zOffset + borderOffset1];
         const label1 = this.#find(this.#labels[offset1]);
 
-        if (label1 != label){
-          borderOffset1 ++;
+        if (label1.toString() !== label) {
+          borderOffset1++;
           continue;
         }
 
         const sliceOffset1 = offset1 - zOffset;
-        const slicePosition1 = this.#convertToXYUnits(sliceOffset1, unitVectors);
+        const slicePosition1 =
+          this.#sliceOffsetToSliceWorld(sliceOffset1, unitVectors, spacing);
 
         let borderOffset2 = 0;
         while (this.#borders[zOffset + borderOffset2] > 0) {
           const offset2 = this.#borders[zOffset + borderOffset2];
-          if(offset1 != offset2){
+          if (offset1 !== offset2) {
             const label2 = this.#find(this.#labels[offset2]);
-            if (label2 == label && label1 === label2) {
+            if (label2.toString() === label && label1 === label2) {
               const sliceOffset2 = offset2 - zOffset;
-              const slicePosition2 = this.#convertToXYUnits(sliceOffset2, unitVectors);
+              const slicePosition2 =
+                this.#sliceOffsetToSliceWorld(
+                  sliceOffset2,
+                  unitVectors,
+                  spacing
+                );
 
               // Check angle for perpendicularity
-              const angle = this.#calculateAngle(slicePosition1, slicePosition2);
+              const angle =
+                this.#calculateAngle(slicePosition1, slicePosition2);
 
               const angleDifference = Math.abs(angle - diameterAngle);
-              if ( angleDifference > (Math.PI/2) - 0.1 && Math.abs(angle - diameterAngle) < (Math.PI/2) + 0.1) {
-                const distance = this.#calculateDistance(slicePosition1, slicePosition2);
+              if (
+                angleDifference > (Math.PI / 2) - 0.1 &&
+                Math.abs(angle - diameterAngle) < (Math.PI / 2) + 0.1
+              ) {
+                const distance =
+                  this.#calculateDistance(slicePosition1, slicePosition2);
 
                 if (
-                  typeof diameter.perpDiameter === 'undefined' ||
-                  diameter.perpDiameter < distance
+                  typeof diameter.minor === 'undefined' ||
+                  diameter.minor.diameter < distance
                 ) {
-                  diameter.perpDiameter = distance;
-                  diameter.perpPoint1 = slicePosition1;
-                  diameter.perpPoint2 = slicePosition2;
+                  diameter.minor = {
+                    diameter: distance,
+                    point1: slicePosition1,
+                    point2: slicePosition2,
+                    offset1: offset1,
+                    offset2: offset2
+                  };
                 }
               }
             }
@@ -467,72 +552,11 @@ export class LabelingFilter {
           borderOffset2++;
         }
 
-        borderOffset1 ++;
-      } 
-    }
-
-    return Object.values(maxDiameters);
-  }
-
-  // TEMP
-  #plotPoints(imageBuffer, unitVectors, p0, p1, z) {
-    const plotLineLow = function(x0, y0, x1, y1, z) {
-      let dx = x1 - x0;
-      let dy = (y0 < y1) ? y1 - y0 : y0 - y1;
-      let D = 2*dy - dx;
-      let y = y0;
-      const yi = (y0 < y1) ? 1 : -1;
-
-      for (let x = x0; x <= x1; x++) {
-        const offset = 
-          (unitVectors[0] * x) +
-          (unitVectors[1] * y) +
-          (unitVectors[2] * z);
-        imageBuffer[offset] = imageBuffer[offset] + 128;
-
-        if (D>0) {
-          y = y + yi;
-          D = D - 2*dx;
-        }
-        D = D + 2*dy;
+        borderOffset1++;
       }
     }
 
-    const plotLineHigh = function(x0, y0, x1, y1, z) {
-      let dx = (x0 < x1) ? x1 - x0 : x0 - x1;
-      let dy = y1 - y0;
-      let D = 2*dx - dy;
-      let x = x0;
-      const xi = (x0 < x1) ? 1 : -1;
-
-      for (let y = y0; y <= y1; y++) {
-        const offset = 
-          (unitVectors[0] * x) +
-          (unitVectors[1] * y) +
-          (unitVectors[2] * z);
-        imageBuffer[offset] = imageBuffer[offset] + 128;
-
-        if (D>0) {
-          x = x + xi;
-          D = D - 2*dy;
-        }
-        D = D + 2*dx;
-      }
-    }
-
-    if (Math.abs(p1.y - p0.y) < Math.abs(p1.x - p0.x)) {
-      if (p0.x < p1.x) {
-        plotLineLow(p0.x, p0.y, p1.x, p1.y, z);
-      } else {
-        plotLineLow(p1.x, p1.y, p0.x, p0.y, z);
-      }
-    } else {
-      if (p0.y < p1.y) {
-        plotLineHigh(p0.x, p0.y, p1.x, p1.y, z);
-      } else {
-        plotLineHigh(p1.x, p1.y, p0.x, p0.y, z);
-      }
-    }
+    return maxDiameters;
   }
 
   /**
@@ -545,13 +569,16 @@ export class LabelingFilter {
     const imageBuffer = data.imageBuffer;
     const unitVectors = data.unitVectors;
     const sizes = data.sizes;
+    const spacing = data.spacing;
     const totalSize = data.totalSize;
 
-    //TEMP
-    for (let i = 0; i < imageBuffer.length; i++) {
-      if (imageBuffer[i] >= 128)
-        imageBuffer[i] = imageBuffer[i] - 128;
+    // This is temporary until a proper method of displaying them is implmented
+    // ------
+    const debug = new LabelingDebug();
+    if (DIAMETER_DEBUG) {
+      debug.cleanBuffer(imageBuffer);
     }
+    // ------
 
     // generate labels
     this.#regenerateLabels(
@@ -565,6 +592,7 @@ export class LabelingFilter {
     const labelsInfo = this.#quantifyLabels(
       imageBuffer,
       unitVectors,
+      spacing
     );
 
     // calculate diameters
@@ -572,42 +600,35 @@ export class LabelingFilter {
       imageBuffer,
       unitVectors,
       sizes,
-    )
+      spacing
+    );
 
-    //TEMP
-    console.log(">>>> POKE Diameter", maxDiameters[0]);
-    console.log(">>>> POKE Unit vectors", unitVectors);
-    for (let z = 0; z < sizes[2]; z++) {
-      let borderOffset = 0;
-      console.log(">>>> POKE border1", this.#borders[(unitVectors[2] * z)]);
-      while (this.#borders[(unitVectors[2] * z) + borderOffset] > 0) {
-        const offset = this.#borders[(unitVectors[2] * z) + borderOffset];
-        if (imageBuffer[offset] > 0) {
-          imageBuffer[offset] = imageBuffer[offset] + 128;
+    // This is temporary until a proper method of displaying them is implmented
+    // ------
+    if (DIAMETER_DEBUG) {
+      debug.drawDebugLines(
+        imageBuffer,
+        unitVectors,
+        sizes,
+        spacing,
+        this.#borders,
+        maxDiameters
+      );
+    }
+    // ------
+
+    // merge calculations
+    const mergedLabelsInfo =
+      Object.entries(labelsInfo).map(
+        ([label, labelInfo]) => {
+          if (typeof maxDiameters[label] !== 'undefined') {
+            labelInfo.diameters = maxDiameters[label];
+          }
+
+          return labelInfo;
         }
-        borderOffset++;
-      }
-    }
-    for (let d = 0; d < maxDiameters.length; d++) {
-      this.#plotPoints(
-        imageBuffer, 
-        unitVectors, 
-        maxDiameters[d].point1,
-        maxDiameters[d].point2,
-        maxDiameters[d].z
       );
 
-      if (typeof maxDiameters[d].perpDiameter !== "undefined") {
-        this.#plotPoints(
-        imageBuffer, 
-        unitVectors, 
-        maxDiameters[d].perpPoint1,
-        maxDiameters[d].perpPoint2,
-        maxDiameters[d].z
-      );
-      }
-    }
-
-    return labelsInfo;
+    return mergedLabelsInfo;
   }
 } // class labelingFilter
