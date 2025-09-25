@@ -252,7 +252,7 @@ export class LabelingFilter {
         }
       }
 
-      this.#borders[(unitVectors[2] * z) + borderOffset] = 0;
+      this.#borders[(unitVectors[2] * z) + borderOffset] = -1;
 
     }
   }
@@ -429,7 +429,7 @@ export class LabelingFilter {
       // For now the naive way is fast enough for an initial implementation.
 
       let borderOffset1 = 0;
-      while (this.#borders[zOffset + borderOffset1] > 0) {
+      while (this.#borders[zOffset + borderOffset1] >= 0) {
         const offset1 = this.#borders[zOffset + borderOffset1];
         const label1 = this.#find(this.#labels[offset1]);
         const sliceOffset1 = offset1 - zOffset;
@@ -437,7 +437,7 @@ export class LabelingFilter {
           this.#sliceOffsetToSliceWorld(sliceOffset1, unitVectors, spacing);
 
         let borderOffset2 = 0;
-        while (this.#borders[zOffset + borderOffset2] > 0) {
+        while (this.#borders[zOffset + borderOffset2] >= 0) {
           const offset2 = this.#borders[zOffset + borderOffset2];
           if (offset1 !== offset2) {
             const label2 = this.#find(this.#labels[offset2]);
@@ -494,7 +494,7 @@ export class LabelingFilter {
       // For now the naive way is fast enough for an initial implementation.
 
       let borderOffset1 = 0;
-      while (this.#borders[zOffset + borderOffset1] > 0) {
+      while (this.#borders[zOffset + borderOffset1] >= 0) {
         const offset1 = this.#borders[zOffset + borderOffset1];
         const label1 = this.#find(this.#labels[offset1]);
 
@@ -508,7 +508,7 @@ export class LabelingFilter {
           this.#sliceOffsetToSliceWorld(sliceOffset1, unitVectors, spacing);
 
         let borderOffset2 = 0;
-        while (this.#borders[zOffset + borderOffset2] > 0) {
+        while (this.#borders[zOffset + borderOffset2] >= 0) {
           const offset2 = this.#borders[zOffset + borderOffset2];
           if (offset1 !== offset2) {
             const label2 = this.#find(this.#labels[offset2]);
