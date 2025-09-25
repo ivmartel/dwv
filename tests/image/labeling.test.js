@@ -21,12 +21,12 @@ QUnit.test('LabelingFilter class', function (assert) {
   const labelingFilter = new LabelingFilter();
 
   // Unused, only needed to construct the geometry
-  const imgOrigins = new Point3D(0,0,0);
-  const imgSpacing = new Spacing([1,1,1]);
+  const imgOrigins = new Point3D(0, 0, 0);
+  const imgSpacing = new Spacing([1, 1, 1]);
 
   // Basic labels
   const imgSize0 = new Size([3, 3, 2]);
-  const imgGeometry0 = 
+  const imgGeometry0 =
     new Geometry(
       imgOrigins,
       imgSize0,
@@ -75,7 +75,7 @@ QUnit.test('LabelingFilter class', function (assert) {
 
   // Touching labels of different ids
   const imgSize1 = new Size([3, 3, 2]);
-  const imgGeometry1 = 
+  const imgGeometry1 =
     new Geometry(
       imgOrigins,
       imgSize1,
