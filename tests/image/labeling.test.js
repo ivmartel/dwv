@@ -1,4 +1,7 @@
+import {Point3D} from '../../src/math/point.js';
 import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
 import {LabelingFilter} from '../../src/image/labelingFilter.js';
 import {generateWorkerMessage} from '../../src/image/labelingThread.js';
 
@@ -17,8 +20,19 @@ QUnit.module('image');
 QUnit.test('LabelingFilter class', function (assert) {
   const labelingFilter = new LabelingFilter();
 
+  // Unused, only needed to construct the geometry
+  const imgOrigins = new Point3D(0,0,0);
+  const imgSpacing = new Spacing([1,1,1]);
+
   // Basic labels
   const imgSize0 = new Size([3, 3, 2]);
+  const imgGeometry0 = 
+    new Geometry(
+      imgOrigins,
+      imgSize0,
+      imgSpacing
+    );
+
   /* eslint-disable @stylistic/js/array-element-newline */
   const imgBuffer0 = new Uint8Array([
     0, 0, 0,
@@ -30,7 +44,7 @@ QUnit.test('LabelingFilter class', function (assert) {
   ]);
   /* eslint-enable @stylistic/js/array-element-newline */
 
-  const imgEvent0 = generateWorkerMessage(imgBuffer0, imgSize0);
+  const imgEvent0 = generateWorkerMessage(imgBuffer0, imgGeometry0);
   const labels0 = labelingFilter.run(imgEvent0);
 
   assert.notStrictEqual(
@@ -61,6 +75,12 @@ QUnit.test('LabelingFilter class', function (assert) {
 
   // Touching labels of different ids
   const imgSize1 = new Size([3, 3, 2]);
+  const imgGeometry1 = 
+    new Geometry(
+      imgOrigins,
+      imgSize1,
+      imgSpacing
+    );
   /* eslint-disable @stylistic/js/array-element-newline */
   const imgBuffer1 = new Uint8Array([
     2, 2, 2,
@@ -72,7 +92,7 @@ QUnit.test('LabelingFilter class', function (assert) {
   ]);
   /* eslint-enable @stylistic/js/array-element-newline */
 
-  const imgEvent1 = generateWorkerMessage(imgBuffer1, imgSize1);
+  const imgEvent1 = generateWorkerMessage(imgBuffer1, imgGeometry1);
   const labels1 = labelingFilter.run(imgEvent1);
 
   assert.notStrictEqual(
