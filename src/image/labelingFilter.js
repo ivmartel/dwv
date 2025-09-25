@@ -304,10 +304,13 @@ export class LabelingFilter {
         const index = this.#offsetToIndex(o, unitVectors);
         const info = detailledInfos[labelValue];
         if (typeof info === 'undefined') {
+          const sliceCounts = {};
+          sliceCounts[index[2]] = 1;
           detailledInfos[labelValue] = {
             id: buffer[o],
             sum: index,
             count: 1,
+            sliceCounts: sliceCounts,
             maxZ: index[2],
             minZ: index[2]
           };
@@ -316,6 +319,11 @@ export class LabelingFilter {
           info.sum[1] += index[1];
           info.sum[2] += index[2];
           info.count++;
+          if (typeof info.sliceCounts[index[2]] !== 'undefined') {
+            info.sliceCounts[index[2]]++;
+          } else {
+            info.sliceCounts[index[2]] = 1;
+          }
           info.maxZ = Math.max(info.maxZ, index[2]);
           info.minZ = Math.min(info.minZ, index[2]);
         }
@@ -330,10 +338,32 @@ export class LabelingFilter {
         index[d] = detailledInfo.sum[d] / detailledInfo.count;
       }
 
+      const sliceCounts = Object.entries(detailledInfo.sliceCounts);
+      const largestSliceZ = (() => {
+        if (sliceCounts.length > 1) {
+          const largest =
+            sliceCounts
+              .reduce((
+                [largestSlice, largestCount],
+                [currentSlice, currentCount]
+              ) => {
+                if (currentCount > largestCount) {
+                  return [currentSlice, currentCount];
+                } else {
+                  return [largestSlice, largestCount];
+                }
+              })[0];
+          return Number(largest);
+        } else {
+          return Number(sliceCounts[0][0]);
+        }
+      })();
+
       labelsInfo[label] = {
         id: detailledInfo.id,
         centroidIndex: index,
         count: detailledInfo.count,
+        largestSliceZ: largestSliceZ,
         height: (detailledInfo.maxZ - detailledInfo.minZ + 1) * spacing[2]
       };
     }
@@ -408,6 +438,7 @@ export class LabelingFilter {
    *  conversion.
    * @param {number[]} sizes The image dimensions.
    * @param {number[]} spacing The pixel spacing of the image.
+   * @param {object} labelInfos The quantified labelInfos of the segments.
    *
    * @returns {object} The dictionary of calculated diameters.
    */
@@ -415,7 +446,8 @@ export class LabelingFilter {
     buffer,
     unitVectors,
     sizes,
-    spacing
+    spacing,
+    labelInfos
   ) {
     const maxDiameters = {};
 
@@ -432,49 +464,57 @@ export class LabelingFilter {
       while (this.#borders[zOffset + borderOffset1] >= 0) {
         const offset1 = this.#borders[zOffset + borderOffset1];
         const label1 = this.#find(this.#labels[offset1]);
-        const sliceOffset1 = offset1 - zOffset;
-        const slicePosition1 =
-          this.#sliceOffsetToSliceWorld(sliceOffset1, unitVectors, spacing);
 
-        let borderOffset2 = 0;
-        while (this.#borders[zOffset + borderOffset2] >= 0) {
-          const offset2 = this.#borders[zOffset + borderOffset2];
-          if (offset1 !== offset2) {
-            const label2 = this.#find(this.#labels[offset2]);
+        // We only care about the diameter of the largest slice,
+        // we can skip everything else.
+        if (
+          typeof labelInfos[label1] !== 'undefined' &&
+          labelInfos[label1].largestSliceZ === z
+        ) {
+          const sliceOffset1 = offset1 - zOffset;
+          const slicePosition1 =
+            this.#sliceOffsetToSliceWorld(sliceOffset1, unitVectors, spacing);
 
-            if (label1 === label2) {
-              const sliceOffset2 = offset2 - zOffset;
-              const slicePosition2 =
-                this.#sliceOffsetToSliceWorld(
-                  sliceOffset2,
-                  unitVectors,
-                  spacing
-                );
+          let borderOffset2 = 0;
+          while (this.#borders[zOffset + borderOffset2] >= 0) {
+            const offset2 = this.#borders[zOffset + borderOffset2];
+            if (offset1 !== offset2) {
+              const label2 = this.#find(this.#labels[offset2]);
 
-              const distance =
-                this.#calculateDistance(slicePosition1, slicePosition2);
+              if (label1 === label2) {
+                const sliceOffset2 = offset2 - zOffset;
+                const slicePosition2 =
+                  this.#sliceOffsetToSliceWorld(
+                    sliceOffset2,
+                    unitVectors,
+                    spacing
+                  );
 
-              const maxDiameter = maxDiameters[label1];
-              if (
-                typeof maxDiameter === 'undefined' ||
-                maxDiameter.major.diameter < distance
-              ) {
-                maxDiameters[label1] = {
-                  id: buffer[offset1],
-                  major: {
-                    diameter: distance,
-                    point1: slicePosition1,
-                    point2: slicePosition2,
-                    offset1: offset1,
-                    offset2: offset2,
-                  },
-                  zIndex: z
-                };
+                const distance =
+                  this.#calculateDistance(slicePosition1, slicePosition2);
+
+                const maxDiameter = maxDiameters[label1];
+                if (
+                  typeof maxDiameter === 'undefined' ||
+                  maxDiameter.major.diameter < distance
+                ) {
+                  maxDiameters[label1] = {
+                    id: buffer[offset1],
+                    major: {
+                      diameter: distance,
+                      point1: slicePosition1,
+                      point2: slicePosition2,
+                      offset1: offset1,
+                      offset2: offset2,
+                    },
+                    zIndex: z
+                  };
+                }
               }
             }
-          }
 
-          borderOffset2++;
+            borderOffset2++;
+          }
         }
 
         borderOffset1++;
@@ -600,7 +640,8 @@ export class LabelingFilter {
       imageBuffer,
       unitVectors,
       sizes,
-      spacing
+      spacing,
+      labelsInfo
     );
 
     // This is temporary until a proper method of displaying them is implmented
