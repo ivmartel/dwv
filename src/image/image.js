@@ -21,6 +21,7 @@ import {DataElement} from '../dicom/dataElement.js';
 import {RGB} from '../utils/colour.js';
 import {ColourMap} from './luts.js';
 import {Point} from '../math/point.js';
+import { ContourThread } from './contourThread.js';
 /* eslint-enable no-unused-vars */
 
 const ML_PER_MM = 0.001; // ml/mm^3
@@ -202,6 +203,14 @@ export class Image {
   #buffer;
 
   /**
+   * Data overlay buffer.
+   * If there is no data overlay this is null.
+   *
+   * @type {TypedArray?}
+   */
+  #overlayBuffer;
+
+  /**
    * Whether the image has been resampled or not.
    *
    * @type {boolean}
@@ -320,6 +329,13 @@ export class Image {
    * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
+
+  /**
+   * The contours thread.
+   * 
+   * @type {ContourThread}
+   */
+  #contourThread;
 
   /**
    * The labeling thread.
@@ -1725,6 +1741,24 @@ export class Image {
       );
     }
     return newImage;
+  }
+
+  /**
+   * Regenerate contours overlay
+   */
+  regenerateContours() {
+    if (this.#contourThread === null) {
+      this.#contourThread = new ContourThread();
+
+      this.#contourThread.ondone = (event) => {
+        this.#overlayBuffer = event.contour;
+        this.#fireEvent({type: 'contourchanged'});
+      }
+    }
+
+    this.#fireEvent({type: 'contourstart'});
+
+    this.#contourThread.run(this.#buffer, this.#geometry);
   }
 
   /**
