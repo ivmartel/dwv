@@ -21,7 +21,6 @@ import {DataElement} from '../dicom/dataElement.js';
 import {RGB} from '../utils/colour.js';
 import {ColourMap} from './luts.js';
 import {Point} from '../math/point.js';
-import { ContourThread } from './contourThread.js';
 /* eslint-enable no-unused-vars */
 
 const ML_PER_MM = 0.001; // ml/mm^3
@@ -203,12 +202,12 @@ export class Image {
   #buffer;
 
   /**
-   * Data overlay buffer.
-   * If there is no data overlay this is null.
+   * Data contour buffer.
+   * If there is no data contour this is null.
    *
    * @type {TypedArray?}
    */
-  #overlayBuffer;
+  #contourBuffer;
 
   /**
    * Whether the image has been resampled or not.
@@ -331,13 +330,6 @@ export class Image {
   #listenerHandler = new ListenerHandler();
 
   /**
-   * The contours thread.
-   * 
-   * @type {ContourThread}
-   */
-  #contourThread;
-
-  /**
    * The labeling thread.
    *
    * @type {LabelingThread}
@@ -369,6 +361,7 @@ export class Image {
     this.#resampled = false;
     this.#rawGeometry = null;
     this.#rawBuffer = null;
+    this.#contourBuffer = null;
     this.#imageUids = imageUids;
     this.#labelingThread = null;
     this.#resamplingThread = null;
@@ -901,6 +894,14 @@ export class Image {
     }
     // put old in new
     this.#buffer.set(tmpBuffer);
+
+    // realloc the contour buffer (if it exists)
+    if (this.#contourBuffer !== null) {
+      tmpBuffer = this.#contourBuffer;
+      this.#contourBuffer = new Uint16Array(this.#buffer.length);
+      this.#contourBuffer.set(tmpBuffer);
+    }
+
     // clean
     tmpBuffer = null;
   }
@@ -1285,6 +1286,9 @@ export class Image {
         }
         // write update value
         this.#buffer[offset] = value;
+        if (this.#contourBuffer !== null) {
+          this.#contourBuffer[offset] = 0;
+        }
       }
       originalValuesLists.push(originalValues);
     }
@@ -1323,6 +1327,9 @@ export class Image {
       while (!ival.done) {
         const offset = offsets[ival.index];
         this.#buffer[offset] = ival.value;
+        if (this.#contourBuffer !== null) {
+          this.#contourBuffer[offset] = 0;
+        }
         ival = iterator.next();
       }
     }
@@ -1744,21 +1751,191 @@ export class Image {
   }
 
   /**
-   * Regenerate contours overlay
+   * Initialize the contour buffer.
+   * Should be called on every segmentation image, or any image where
+   * contour rendering needs to be supported.
    */
-  regenerateContours() {
-    if (this.#contourThread === null) {
-      this.#contourThread = new ContourThread();
+  initializeContour() {
+    this.#contourBuffer = new Uint16Array(this.#buffer.length);
+  }
 
-      this.#contourThread.ondone = (event) => {
-        this.#overlayBuffer = event.contour;
-        this.#fireEvent({type: 'contourchanged'});
+  /**
+   * Get whether or not the contour buffer has been initialized.
+   *
+   * @returns {boolean} True if buffer has been initialized.
+   */
+  countourIsInitialized() {
+    return this.#contourBuffer !== null;
+  }
+
+  /**
+   * Move cursor a step in the X direction to check for border pixels.
+   *
+   * @param {number} distance Accumulated distance travelled.
+   * @param {number} index Current cursor index before moving.
+   * @param {number} direction Offset to move cursor.
+   * @param {number} checkValue Initial pixel value.
+   * @param {(()=>number)[]} queue Ordered queue of locations to check.
+   * @returns {()=>number} A function that returns the distance to the nearest
+   *  border pixel or 0.
+   */
+  #recursiveDistanceCheckX(distance, index, direction, checkValue, queue) {
+    return () => {
+      const newIndex = index + direction;
+      const newDistance = distance + 1;
+
+      if (
+        newIndex >= this.#buffer.length ||
+        newIndex < 0
+      ) {
+        return distance;
+      }
+
+      if (this.#buffer[newIndex] !== checkValue) {
+        return newDistance;
+      } else {
+        queue.push(this.#recursiveDistanceCheckX(
+          newDistance,
+          newIndex,
+          direction,
+          checkValue,
+          queue
+        ));
+
+        return 0;
+      }
+    };
+  }
+
+  /**
+   * Move cursor a step in the Y direction to check for border pixels.
+   * Also spawns two new cursors checking in the X directions to either side.
+   *
+   * @param {number} distance Accumulated distance travelled.
+   * @param {number} index Current cursor index before moving.
+   * @param {number} direction Offset to move cursor.
+   * @param {number} checkValue Initial pixel value.
+   * @param {(()=>number)[]} queue Ordered queue of locations to check.
+   * @returns {()=>number} A function that returns the distance to the nearest
+   *  border pixel or 0.
+   */
+  #recursiveDistanceCheckY(distance, index, direction, checkValue, queue) {
+    return () => {
+      const newIndex = index + direction;
+      const newDistance = distance + 1;
+
+      if (
+        newIndex >= this.#buffer.length ||
+        newIndex < 0
+      ) {
+        return distance;
+      }
+
+      if (this.#buffer[newIndex] !== checkValue) {
+        return newDistance;
+      } else {
+        const size = this.#geometry.getSize();
+        const xDimSize = size.getDimSize(0);
+
+        queue.push(this.#recursiveDistanceCheckX(
+          newDistance,
+          newIndex,
+          xDimSize,
+          checkValue,
+          queue
+        ));
+
+        queue.push(this.#recursiveDistanceCheckX(
+          newDistance,
+          newIndex,
+          -xDimSize,
+          checkValue,
+          queue
+        ));
+
+        queue.push(this.#recursiveDistanceCheckY(
+          newDistance,
+          newIndex,
+          direction,
+          checkValue,
+          queue
+        ));
+
+        return 0;
+      }
+    };
+  }
+
+  /**
+   * Calculate the distance to the nearest border pixel.
+   * (or return the cached distance).
+   *
+   * @param {number} index Index/offset of the pixel to check.
+   * @returns {number} The distance to the nearest border pixel or 0.
+   */
+  getContourDistance(index) {
+    if (this.#contourBuffer === null) {
+      // Contour not enabled
+      return 0;
+    }
+
+    const bufferedDistance = this.#contourBuffer[index];
+    if (bufferedDistance > 0) {
+      return bufferedDistance;
+    }
+
+    const checkValue = this.#buffer[index];
+    const operationQueue = [];
+
+    const size = this.#geometry.getSize();
+    const yDimSize = size.getDimSize(1);
+    const xDimSize = size.getDimSize(0);
+
+    operationQueue.push(this.#recursiveDistanceCheckY(
+      0,
+      index,
+      yDimSize,
+      checkValue,
+      operationQueue
+    ));
+
+    operationQueue.push(this.#recursiveDistanceCheckX(
+      0,
+      index,
+      xDimSize,
+      checkValue,
+      operationQueue
+    ));
+
+    operationQueue.push(this.#recursiveDistanceCheckX(
+      0,
+      index,
+      -xDimSize,
+      checkValue,
+      operationQueue
+    ));
+
+    operationQueue.push(this.#recursiveDistanceCheckY(
+      0,
+      index,
+      -yDimSize,
+      checkValue,
+      operationQueue
+    ));
+
+    while (operationQueue.length > 0) {
+      const operation = operationQueue.shift();
+      const distanceCheck = operation();
+
+      if (distanceCheck > 0) {
+        // Return the first valid distance we find
+        this.#contourBuffer[index] = distanceCheck;
+        return distanceCheck;
       }
     }
 
-    this.#fireEvent({type: 'contourstart'});
-
-    this.#contourThread.run(this.#buffer, this.#geometry);
+    // Something has gone wrong
+    return Infinity;
   }
 
   /**
