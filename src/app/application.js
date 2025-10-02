@@ -835,20 +835,8 @@ export class App {
    */
   loadFromUri = (uri, options) => {
     const query = getUriQuery(uri);
-
-    // load end callback: loads the state.
-    const onLoadEnd = (/*event*/) => {
-      this.removeEventListener('loadend', onLoadEnd);
-      this.loadURLs([query.state]);
-    };
-
     // check query
     if (query && typeof query.input !== 'undefined') {
-      // optional display state
-      if (typeof query.state !== 'undefined') {
-        // queue after main data load
-        this.addEventListener('loadend', onLoadEnd);
-      }
       // load base image
       decodeQuery(query, this.loadURLs, options);
     }
