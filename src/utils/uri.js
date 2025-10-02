@@ -76,16 +76,50 @@ export function getUriQuery(uri) {
  * @param {object} query The query part to the input URI.
  * @param {Function} callback The function to call with the decoded file urls.
  * @param {object} options Optional url request options.
+ * @deprecated Since v0.36, please use specialised
+ *   getURLsFromKeyValueUri and app.loadURLS or
+ *   handleURLsFromWeasisXMLManifest.
  */
 export function decodeQuery(query, callback, options) {
   // manifest
   if (query.type && query.type === 'manifest') {
-    decodeManifestQuery(query, callback);
+    decodeWeasisXMLManifest(query.input, query.nslices, callback);
   } else {
     // default case: encoded URI with base and key/value pairs
     callback(
       decodeKeyValueUri(query.input, query.dwvReplaceMode),
       options);
+  }
+}
+
+/**
+ * Get a list of URLs from a uri containing key-value pairs as in:
+ * `[dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)`.
+ *
+ * @param {string} uri The input URI.
+ * @returns {string[]|undefined} The list of URLs.
+ */
+export function getURLsFromKeyValueUri(uri) {
+  let urls;
+  const query = getUriQuery(uri);
+  if (query && typeof query.input !== 'undefined') {
+    urls = decodeKeyValueUri(query.input, query.dwvReplaceMode);
+  }
+  return urls;
+}
+
+/**
+ * Handle (ie call callback) with the list of urls contained in
+ *   a WEASIS XML manifest provided via a uri as in:
+ *   `[dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest`.
+ *
+ * @param {string} uri The input URI.
+ * @param {Function} callback The function to call with the decoded file urls.
+ */
+export function handleURLsFromWeasisXMLManifest(uri, callback) {
+  const query = getUriQuery(uri);
+  if (query && typeof query.input !== 'undefined') {
+    decodeWeasisXMLManifest(query.input, query.nslices, callback);
   }
 }
 
@@ -170,20 +204,20 @@ export function decodeKeyValueUri(uri, replaceMode) {
 }
 
 /**
- * Decode a manifest query.
+ * Decode a WEASIS XML manifest.
  *
  * @external XMLHttpRequest
- * @param {object} query The manifest query: {input, nslices},
- * with input the input URI and nslices the number of slices.
- * @param {Function} callback The function to call with the decoded urls.
+ * @param {string} manifestUri The manifest uri.
+ * @param {number} nslices The number of slices.
+ * @param {Function} callback The function to call with the WADO urls.
  */
-function decodeManifestQuery(query, callback) {
+export function decodeWeasisXMLManifest(manifestUri, nslices, callback) {
   let uri = '';
-  if (query.input[0] === '/') {
+  if (manifestUri[0] === '/') {
     uri = window.location.protocol + '//' + window.location.host;
   }
   // TODO: needs to be decoded (decodeURIComponent?
-  uri += query.input;
+  uri += manifestUri;
 
   /**
    * Handle error.
@@ -201,7 +235,7 @@ function decodeManifestQuery(query, callback) {
    * @param {object} event The load event.
    */
   function onLoad(event) {
-    callback(decodeManifest(event.target.responseXML, query.nslices));
+    callback(parseWeasisXMLManifest(event.target.responseXML, nslices));
   }
 
   const request = new XMLHttpRequest();
@@ -213,13 +247,14 @@ function decodeManifestQuery(query, callback) {
 }
 
 /**
- * Decode an XML manifest.
+ * Parse a WEASIS XML manifest.
+ * See: {@link https://weasis.org/en/basics/customize/integration/#build-an-xml-manifest}.
  *
- * @param {object} manifest The manifest to decode.
+ * @param {XMLDocument} manifest The manifest to decode.
  * @param {number} nslices The number of slices to load.
- * @returns {string[]} The decoded manifest.
+ * @returns {string[]} A list of WADO urls.
  */
-export function decodeManifest(manifest, nslices) {
+export function parseWeasisXMLManifest(manifest, nslices) {
   const result = [];
   // wado url
   const wadoElement = manifest.getElementsByTagName('wado_query');

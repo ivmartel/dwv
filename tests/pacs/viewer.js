@@ -11,6 +11,7 @@ import {getSRContent} from '../../src/dicom/dicomSRContent.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
 import {Matrix33} from '../../src/math/matrix.js';
+import {getURLsFromKeyValueUri} from '../../src/utils/uri.js';
 
 import {LayoutProtocol} from './viewer.ui.js';
 import {DataTableUI} from './viewer.ui.datatable.js';
@@ -500,8 +501,11 @@ function viewerSetup() {
       document.cookie = 'access_token=';
     }
   }
-  // load from window location
-  _app.loadFromUri(window.location.href, uriOptions);
+  // optional load from window location
+  const urls = getURLsFromKeyValueUri(window.location.href);
+  if (typeof urls !== 'undefined') {
+    _app.loadURLs(urls, uriOptions);
+  }
 }
 
 /**

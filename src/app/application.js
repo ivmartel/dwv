@@ -831,6 +831,8 @@ export class App {
    *
    * @param {string} uri The input uri, for example: 'window.location.href'.
    * @param {object} [options] Optional url request options.
+   * @deprecated Since v0.36, please extract the file list and
+   *   pass it to loadURLs. State from uri is no longer supported.
    * @function
    */
   loadFromUri = (uri, options) => {

@@ -3,7 +3,7 @@ import {
   splitUri,
   getUriQuery,
   decodeKeyValueUri,
-  decodeManifest
+  parseWeasisXMLManifest
 } from '../../src/utils/uri.js';
 
 /**
@@ -334,11 +334,11 @@ QUnit.test('getURIQuery - #DWV-REQ-IO-02-005 Window location URL scheme',
 );
 
 /**
- * Tests for {@link decodeManifest}.
+ * Tests for {@link parseWeasisXMLManifest}.
  *
- * @function module:tests/utils~decode-manifest
+ * @function module:tests/utils~parse-weasis-xml-manifest
  */
-QUnit.test('Decode Manifest - #DWV-REQ-IO-02-006 Load Data Manifest URL',
+QUnit.test('Parse Manifest - #DWV-REQ-IO-02-006 Load Data Manifest URL',
   function (assert) {
     // test values
     const wadoUrl = 'http://my.pacs.org:8089/wado';
@@ -396,7 +396,7 @@ QUnit.test('Decode Manifest - #DWV-REQ-IO-02-006 Load Data Manifest URL',
     doc.documentElement.appendChild(patient);
 
     // decode (only reads first series)
-    const res = decodeManifest(doc, 2);
+    const res = parseWeasisXMLManifest(doc, 2);
     // theoretical test decode result
     const middle = '?requestType=WADO&contentType=application/dicom&';
     const theoLinkRoot = wadoUrl + middle + '&studyUID=' + studyInstanceUID +

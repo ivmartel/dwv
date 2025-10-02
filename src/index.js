@@ -124,6 +124,10 @@ import {buildMultipart} from './utils/array.js';
 import {logger} from './utils/logger.js';
 import {i18n} from './utils/i18n.js';
 import {
+  getURLsFromKeyValueUri,
+  handleURLsFromWeasisXMLManifest
+} from './utils/uri.js';
+import {
   RGB,
   rgbToHex,
   hexToRgb,
@@ -222,6 +226,8 @@ export {
   hasDicomPrefix,
   precisionRound,
   buildMultipart,
+  getURLsFromKeyValueUri,
+  handleURLsFromWeasisXMLManifest,
   labToUintLab,
   srgbToCielab,
   isEqualRgb,
