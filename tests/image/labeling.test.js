@@ -45,7 +45,8 @@ QUnit.test('LabelingFilter class', function (assert) {
   /* eslint-enable @stylistic/js/array-element-newline */
 
   const imgEvent0 = generateWorkerMessage(imgBuffer0, imgGeometry0);
-  const labels0 = labelingFilter.run(imgEvent0);
+  const labelEvent0 = labelingFilter.run(imgEvent0);
+  const labels0 = labelEvent0.labels;
 
   assert.notStrictEqual(
     typeof labels0,
@@ -93,7 +94,8 @@ QUnit.test('LabelingFilter class', function (assert) {
   /* eslint-enable @stylistic/js/array-element-newline */
 
   const imgEvent1 = generateWorkerMessage(imgBuffer1, imgGeometry1);
-  const labels1 = labelingFilter.run(imgEvent1);
+  const labelEvent1 = labelingFilter.run(imgEvent1);
+  const labels1 = labelEvent1.labels;
 
   assert.notStrictEqual(
     typeof labels1,

@@ -641,7 +641,9 @@ export class LabelingFilter {
 
             // These are in weird units and aren't helpful to pass back
             delete diameters.major.line;
-            delete diameters.minor.line;
+            if (diameters.minor) {
+              delete diameters.minor.line;
+            }
 
             labelInfo.diameters = diameters;
           }
