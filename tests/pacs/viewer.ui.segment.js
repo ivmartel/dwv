@@ -24,7 +24,21 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../../src/app/application.js';
+/**
+ * @typedef {import('../../src/image/image.js').Label} Label
+ */
 /* eslint-enable no-unused-vars */
+
+/**
+ * Segmentation type.
+ *
+ * @typedef Segmentation
+ * @property {number} dataId The segmentation data ID.
+ * @property {Label[]} labels The segmentation labels.
+ * @property {boolean} hasNewSegments If the segmentation is new.
+ * @property {object[]} segments The segmentation segments.
+ * @property {MaskSegmentViewHelper} viewHelper A view helper.
+ */
 
 // global vars
 const _colours = [
@@ -53,6 +67,7 @@ const _colours = [
 // colour array to pick from
 let _coloursPick = _colours.slice();
 // segmentation
+/** @type {Segmentation[]} */
 const _segmentations = [];
 
 /**
@@ -877,18 +892,18 @@ export class SegmentationUI {
         if (res !== start) {
           res += ', ';
         }
-        res += label.volume.toPrecision(4) + i18n.t(label.unit);
+        res += label.volume.value.toPrecision(4) + i18n.t(label.volume.unit);
         if (typeof label.diameters !== 'undefined') {
           res += ' (';
           res +=
-            label.diameters.major.diameter.toPrecision(4) +
-            i18n.t(label.diameterUnit);
+            label.diameters.major.diameter.value.toPrecision(4) +
+            i18n.t(label.diameters.major.diameter.unit);
           res += ', ';
           res +=
-            label.diameters.minor.diameter.toPrecision(4) +
-            i18n.t(label.diameterUnit);
+            label.diameters.minor.diameter.value.toPrecision(4) +
+            i18n.t(label.diameters.minor.diameter.unit);
           res += ', ';
-          res += label.height.toPrecision(4) + i18n.t(label.diameterUnit);
+          res += label.height.value.toPrecision(4) + i18n.t(label.height.unit);
           res += ')';
         }
       }

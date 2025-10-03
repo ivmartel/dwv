@@ -1,4 +1,6 @@
 import {LabelingDebug} from './labelingDebug.js';
+import {Point2D} from '../math/point.js';
+import {Line} from '../math/line.js';
 
 // Set this to true to show the debug contour and diameter display
 const DIAMETER_DEBUG = false;
@@ -380,8 +382,7 @@ export class LabelingFilter {
    *  conversion.
    * @param {number []} spacing The pixel spacing of the image.
    *
-   * @returns {object} Point on the slice, scaled.
-   *  (object with the structure {x, y}).
+   * @returns {Point2D} Point on the slice, scaled.
    */
   #sliceOffsetToSliceWorld(sliceOffset, unitVectors, spacing) {
     let x = 0;
@@ -397,37 +398,7 @@ export class LabelingFilter {
     x = x * spacing[0];
     y = y * spacing[1];
 
-    return {x, y};
-  }
-
-  /**
-   * Calculated the length of a 2D line segment.
-   * Points should be in slice world space.
-   *
-   * @param {object} p1 The first endpoint of the line segment.
-   *  (object with the structure {x, y}).
-   * @param {object} p2 The second endpoint of the line segment.
-   *
-   * @returns {number} Length of the line segment relative to the X axis.
-   */
-  #calculateDistance(p1, p2) {
-    const xD = Math.abs(p1.x - p2.x);
-    const yD = Math.abs(p1.y - p2.y);
-    return Math.sqrt((xD * xD) + (yD * yD));
-  }
-
-  /**
-   * Calculated the angle of a 2D line segment.
-   * Points should be in slice world space.
-   *
-   * @param {object} p1 The first endpoint of the line segment.
-   *  (object with the structure {x, y}).
-   * @param {object} p2 The second endpoint of the line segment.
-   *
-   * @returns {number} Angle of the line segment relative to the X axis.
-   */
-  #calculateAngle(p1, p2) {
-    return Math.atan((p2.y - p1.y) / (p2.x - p1.x));
+    return new Point2D(x, y);
   }
 
   /**
@@ -490,8 +461,8 @@ export class LabelingFilter {
                     spacing
                   );
 
-                const distance =
-                  this.#calculateDistance(slicePosition1, slicePosition2);
+                const sliceLine = new Line(slicePosition1, slicePosition2);
+                const distance = sliceLine.getLength();
 
                 const maxDiameter = maxDiameters[label1];
                 if (
@@ -502,8 +473,7 @@ export class LabelingFilter {
                     id: buffer[offset1],
                     major: {
                       diameter: distance,
-                      point1: slicePosition1,
-                      point2: slicePosition2,
+                      line: sliceLine,
                       offset1: offset1,
                       offset2: offset2,
                     },
@@ -524,8 +494,8 @@ export class LabelingFilter {
     // Get the minor (perpendicular) diameter
     for (const [label, diameter] of Object.entries(maxDiameters)) {
       const zOffset = unitVectors[2] * diameter.zIndex;
-      const diameterAngle =
-        this.#calculateAngle(diameter.major.point1, diameter.major.point2);
+      const diameterLine = diameter.major.line;
+      const diameterAngle = diameterLine.getInclination();
 
       // TODO: This could also be made faster by using a modified antipodal
       // point algorithm that uses perpedicularity to the initial diameter
@@ -562,16 +532,15 @@ export class LabelingFilter {
                 );
 
               // Check angle for perpendicularity
-              const angle =
-                this.#calculateAngle(slicePosition1, slicePosition2);
+              const sliceLine = new Line(slicePosition1, slicePosition2);
+              const angle = sliceLine.getInclination();
 
               const angleDifference = Math.abs(angle - diameterAngle);
               if (
-                angleDifference > (Math.PI / 2) - 0.1 &&
-                Math.abs(angle - diameterAngle) < (Math.PI / 2) + 0.1
+                angleDifference > 89.5 &&
+                angleDifference < 90.5
               ) {
-                const distance =
-                  this.#calculateDistance(slicePosition1, slicePosition2);
+                const distance = sliceLine.getLength();
 
                 if (
                   typeof diameter.minor === 'undefined' ||
@@ -579,8 +548,7 @@ export class LabelingFilter {
                 ) {
                   diameter.minor = {
                     diameter: distance,
-                    point1: slicePosition1,
-                    point2: slicePosition2,
+                    line: sliceLine,
                     offset1: offset1,
                     offset2: offset2
                   };
@@ -612,7 +580,8 @@ export class LabelingFilter {
     const spacing = data.spacing;
     const totalSize = data.totalSize;
 
-    // This is temporary until a proper method of displaying them is implmented
+    //TODO: This is temporary until a proper method of displaying
+    // them is implmented.
     // ------
     const debug = new LabelingDebug();
     if (DIAMETER_DEBUG) {
@@ -644,7 +613,8 @@ export class LabelingFilter {
       labelsInfo
     );
 
-    // This is temporary until a proper method of displaying them is implmented
+    //TODO: This is temporary until a proper method of displaying
+    // them is implmented.
     // ------
     if (DIAMETER_DEBUG) {
       debug.drawDebugLines(
@@ -663,13 +633,35 @@ export class LabelingFilter {
       Object.entries(labelsInfo).map(
         ([label, labelInfo]) => {
           if (typeof maxDiameters[label] !== 'undefined') {
-            labelInfo.diameters = maxDiameters[label];
+            const diameters = maxDiameters[label];
+
+            // Duplicate information
+            delete diameters.id;
+            delete diameters.zIndex;
+
+            // These are in weird units and aren't helpful to pass back
+            delete diameters.major.line;
+            delete diameters.minor.line;
+
+            labelInfo.diameters = diameters;
           }
 
           return labelInfo;
         }
       );
 
-    return mergedLabelsInfo;
+    const returnEvent = {
+      labels: mergedLabelsInfo,
+    };
+
+    //TODO: This is temporary until a proper method of displaying
+    // them is implmented.
+    // ------
+    if (DIAMETER_DEBUG) {
+      returnEvent.buffer = imageBuffer;
+    }
+    // ------
+
+    return returnEvent;
   }
 } // class labelingFilter

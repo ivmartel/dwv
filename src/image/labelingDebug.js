@@ -1,3 +1,10 @@
+import {Point2D} from '../math/point.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Line} from '../math/line.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Helper for the LabelingFilter, provides a debug display for diameters and
  * contours.
@@ -22,8 +29,7 @@ export class LabelingDebug {
   /**
    * Convert a slice local world coordinate to a slice local offset value.
    *
-   * @param {object} point Point on the slice, scaled.
-   *  (object with the structure {x, y}).
+   * @param {Point2D} point Point on the slice, scaled.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
@@ -32,8 +38,8 @@ export class LabelingDebug {
    */
   #sliceWorldToSliceOffset(point, unitVectors, spacing) {
     const offset =
-      (unitVectors[0] * Math.round(point.x / spacing[0])) +
-      (unitVectors[1] * Math.round(point.y / spacing[1]));
+      (unitVectors[0] * Math.round(point.getX() / spacing[0])) +
+      (unitVectors[1] * Math.round(point.getY() / spacing[1]));
 
     return offset;
   }
@@ -46,22 +52,21 @@ export class LabelingDebug {
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
-   * @param {number} x0 The x of the first endpoint of the line segment.
-   * @param {number} y0 The y of the first endpoint of the line segment.
-   * @param {number} x1 The x of the second endpoint of the line segment.
-   * @param {number} y1 The y of the second endpoint of the line segment.
+   * @param {Line} line The line segment to plot.
    * @param {number} z The slice index.
    */
-  #plotLineLow(imageBuffer, unitVectors, spacing, x0, y0, x1, y1, z) {
-    const dx = x1 - x0;
-    const dy = (y0 < y1) ? y1 - y0 : y0 - y1;
+  #plotLineLow(imageBuffer, unitVectors, spacing, line, z) {
+    const p0 = line.getBegin();
+    const p1 = line.getEnd();
+    const dx = line.getDeltaX();
+    const dy = Math.abs(line.getDeltaY());
     let D = 2 * dy - dx;
-    let y = y0;
-    const yi = (y0 < y1) ? 1 : -1;
+    let y = p0.getY();
+    const yi = (p0.getY() < p1.getY()) ? 1 : -1;
 
-    for (let x = x0; x <= x1; x++) {
+    for (let x = p0.getX(); x <= p1.getX(); x++) {
       const sliceOffset =
-        this.#sliceWorldToSliceOffset({x, y}, unitVectors, spacing);
+        this.#sliceWorldToSliceOffset(new Point2D(x, y), unitVectors, spacing);
       const offset = sliceOffset + (unitVectors[2] * z);
       imageBuffer[offset] = imageBuffer[offset] + 128;
 
@@ -81,22 +86,21 @@ export class LabelingDebug {
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
-   * @param {number} x0 The x of the first endpoint of the line segment.
-   * @param {number} y0 The y of the first endpoint of the line segment.
-   * @param {number} x1 The x of the second endpoint of the line segment.
-   * @param {number} y1 The y of the second endpoint of the line segment.
+   * @param {Line} line The line segment to plot.
    * @param {number} z The slice index.
    */
-  #plotLineHigh(imageBuffer, unitVectors, spacing, x0, y0, x1, y1, z) {
-    const dx = (x0 < x1) ? x1 - x0 : x0 - x1;
-    const dy = y1 - y0;
+  #plotLineHigh(imageBuffer, unitVectors, spacing, line, z) {
+    const p0 = line.getBegin();
+    const p1 = line.getEnd();
+    const dx = Math.abs(line.getDeltaX());
+    const dy = line.getDeltaY();
     let D = 2 * dx - dy;
-    let x = x0;
-    const xi = (x0 < x1) ? 1 : -1;
+    let x = p0.getX();
+    const xi = (p0.getX() < p1.getX()) ? 1 : -1;
 
-    for (let y = y0; y <= y1; y++) {
+    for (let y = p0.getY(); y <= p1.getY(); y++) {
       const sliceOffset =
-        this.#sliceWorldToSliceOffset({x, y}, unitVectors, spacing);
+        this.#sliceWorldToSliceOffset(new Point2D(x, y), unitVectors, spacing);
       const offset = sliceOffset + (unitVectors[2] * z);
       imageBuffer[offset] = imageBuffer[offset] + 128;
 
@@ -116,22 +120,19 @@ export class LabelingDebug {
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
-   * @param {object} p0 The first endpoint of the line segment.
-   *  (object with the structure {x, y}).
-   * @param {object} p1 The second endpoint of the line segment.
+   * @param {Line} line The line segment to plot.
    * @param {number} z The slice index.
    */
-  #plotPoints(imageBuffer, unitVectors, spacing, p0, p1, z) {
-    if (Math.abs(p1.y - p0.y) < Math.abs(p1.x - p0.x)) {
-      if (p0.x < p1.x) {
+  #plotPoints(imageBuffer, unitVectors, spacing, line, z) {
+    const p0 = line.getBegin();
+    const p1 = line.getEnd();
+    if (Math.abs(line.getDeltaY()) < Math.abs(line.getDeltaX())) {
+      if (p0.getX() < p1.getX()) {
         this.#plotLineLow(
           imageBuffer,
           unitVectors,
           spacing,
-          p0.x,
-          p0.y,
-          p1.x,
-          p1.y,
+          line,
           z
         );
       } else {
@@ -139,23 +140,17 @@ export class LabelingDebug {
           imageBuffer,
           unitVectors,
           spacing,
-          p1.x,
-          p1.y,
-          p0.x,
-          p0.y,
+          line.getFlipped(),
           z
         );
       }
     } else {
-      if (p0.y < p1.y) {
+      if (p0.getY() < p1.getY()) {
         this.#plotLineHigh(
           imageBuffer,
           unitVectors,
           spacing,
-          p0.x,
-          p0.y,
-          p1.x,
-          p1.y,
+          line,
           z
         );
       } else {
@@ -163,10 +158,7 @@ export class LabelingDebug {
           imageBuffer,
           unitVectors,
           spacing,
-          p1.x,
-          p1.y,
-          p0.x,
-          p0.y,
+          line.getFlipped(),
           z
         );
       }
@@ -209,8 +201,7 @@ export class LabelingDebug {
         imageBuffer,
         unitVectors,
         spacing,
-        diameter.major.point1,
-        diameter.major.point2,
+        diameter.major.line,
         diameter.zIndex
       );
 
@@ -219,8 +210,7 @@ export class LabelingDebug {
           imageBuffer,
           unitVectors,
           spacing,
-          diameter.minor.point1,
-          diameter.minor.point2,
+          diameter.minor.line,
           diameter.zIndex
         );
       }
