@@ -57,7 +57,7 @@ const _data = [
     'pixel-vr': 'OX',
   },
   {
-    fileroot: 'gdcm-US-RGB-8-esopecho',
+    fileroot: 'gdcm-US-RGB-8-epicard',
     origin: 'GDCM',
     path: 'US-RGB-8-epicard.dcm',
     't-syntax': '1.2.840.10008.1.2.2',
