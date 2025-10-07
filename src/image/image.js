@@ -1820,7 +1820,7 @@ export class Image {
         newIndex < 0 ||
         borderCheck.get(dim) === 0 ||
         borderCheck.get(dim) === size.get(dim) - 1 ||
-        newDistance == 255
+        newDistance === 255
       ) {
         return newDistance;
       }
@@ -1879,7 +1879,7 @@ export class Image {
         newIndex < 0 ||
         borderCheck.get(yDim) === 0 ||
         borderCheck.get(yDim) === size.get(yDim) - 1 ||
-        newDistance == 255
+        newDistance === 255
       ) {
         return newDistance;
       }
