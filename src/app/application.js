@@ -2120,8 +2120,13 @@ export class App {
           // ideally getContourDistance would be passed in by an
           // iterator, but that would require a large change to a
           // lot of components for this one edge case.
+          const contourDistance =
+            data.image.getContourDistance(
+              index,
+              view.getOrientation()
+            );
           if (
-            data.image.getContourDistance(index) <= view.getContourThickness()
+            contourDistance <= view.getContourThickness()
           ) {
             return 0xff;
           } else {
