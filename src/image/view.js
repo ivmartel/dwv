@@ -283,7 +283,7 @@ export class View {
   /**
    * Get the thickness of the contour in pixels.
    *
-   * @returns {number} The contour thickness (integer >= 1).
+   * @returns {number} The contour thickness (integer >= 0).
    */
   getContourThickness() {
     return this.#contourThickness;
@@ -294,7 +294,7 @@ export class View {
    * This only has an effect on segmentation views, or any other alpha
    * function that makes use of it.
    *
-   * @param {number} thickness The contour thickness (integer >= 1).
+   * @param {number} thickness The contour thickness (integer >= 0).
    */
   setContourThickness(thickness) {
     if (thickness < 0) {

@@ -621,7 +621,7 @@ export class DataTableUI {
       cell.appendChild(getControlDiv(
         contourThicknessId,
         'contour thickness',
-        1, 10,
+        0, 10,
         initialLayer.getContourThickness(),
         onChangeContourThickness,
         1
