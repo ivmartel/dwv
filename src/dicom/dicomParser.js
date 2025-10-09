@@ -451,7 +451,7 @@ function guessTransferSyntax(firstDataElement) {
   if (group !== oEightGroupBigEndian &&
     group !== oEightGroupLittleEndian) {
     throw new Error(
-      'Not a valid DICOM file (no magic DICM word found' +
+      'Not a valid DICOM file (invalid DICM word found' +
       ' and first element not in 0008 group)'
     );
   }
@@ -1260,7 +1260,8 @@ export class DicomParser {
       syntax = dataElement.value[0];
 
     } else {
-      logger.warn('No DICM prefix, trying to guess tansfer syntax.');
+      logger.warn('Invalid DICM prefix (' + magicword +
+        '), trying to guess tansfer syntax.');
       // read first element
       dataElement = this.#readDataElement(dataReader, 0, false);
       // guess transfer syntax
