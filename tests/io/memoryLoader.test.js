@@ -4,7 +4,7 @@ import {b64urlToArrayBuffer} from '../dicom/utils.js';
 import bbmri53323131 from '../data/bbmri-53323131.dcm';
 import bbmri53323275 from '../data/bbmri-53323275.dcm';
 import dwvTestSimple from '../data/dwv-test-simple.dcm';
-import dwvTestNoNumberRows from '../data/dwv-test_no-number-rows.dcm';
+import dwvTestBadPrefix from '../data/dwv-test_bad-prefix.dcm';
 import multiframeTest1 from '../data/multiframe-test1.dcm';
 import bbmriZip from '../data/bbmri.zip';
 import dwvTestBadZip from '../data/dwv-test_bad.zip';
@@ -70,14 +70,14 @@ function checkLoad(assert, id, data, nData, nDataOk) {
         prefix + 'Received at least one progress.');
     }
     assert.equal(loadItemDates.length, nDataOk,
-      prefix + 'Received ' + nDataOk + ' load item.');
+      prefix + 'Received loaditem.');
     const nLoad = nDataError === 0 ? 1 : 0;
     assert.equal(loadDates.length, nLoad,
-      prefix + 'Received ' + nLoad + ' load.');
+      prefix + 'Received load.');
     assert.equal(errorDates.length, nDataError,
-      prefix + 'Received ' + nDataError + ' error(s).');
+      prefix + 'Received error(s).');
     assert.equal(abortDates.length, 0,
-      prefix + 'Received 0 abort(s).');
+      prefix + 'Received abort(s).');
 
     // check start/end sequence
     const loadStartDate = loadStartDates[0];
@@ -185,15 +185,15 @@ QUnit.test(
     // const nDataOk2 = 1;
     // checkLoad(assert, '2', data2, nData2, nDataOk2);
 
-    // #3: 2 dicom, 1 bad (no rows, error in loader)
+    // #3: 2 dicom, 1 bad (bad prefix, error in loader)
     const data3 = [
       {
         data: b64urlToArrayBuffer(dwvTestSimple),
         filename: 'dwv-test-simple.dcm'
       },
       {
-        data: b64urlToArrayBuffer(dwvTestNoNumberRows),
-        filename: 'dwv-test_no-number-rows.dcm',
+        data: b64urlToArrayBuffer(dwvTestBadPrefix),
+        filename: 'dwv-test_bad-prefix.dcm',
       }
     ];
     const nData3 = data3.length;
