@@ -346,6 +346,25 @@ export function isAnyPixelDataTag(tag) {
 }
 
 /**
+ * Get the dicom data element for the pixel data (can be regular,
+ * float or double data).
+ *
+ * @param {Object<string, DataElement>} elements The data elements.
+ * @returns {DataElement|undefined} The pixel data element.
+ */
+export function getAnyPixelDataElement(elements) {
+  const keys = getAllPixelDataTagKeys();
+  let res;
+  for (const key of keys) {
+    if (typeof elements[key] !== 'undefined') {
+      res = elements[key];
+      break;
+    }
+  }
+  return res;
+}
+
+/**
  * Check if an input data elements contains a pixel data element.
  *
  * @param {Object<string, DataElement>} elements Data elements.
@@ -353,15 +372,7 @@ export function isAnyPixelDataTag(tag) {
  *   pixel data tags.
  */
 export function hasAnyPixelDataElement(elements) {
-  const keys = getAllPixelDataTagKeys();
-  let found = false;
-  for (const key of keys) {
-    if (typeof elements[key] !== 'undefined') {
-      found = true;
-      break;
-    }
-  }
-  return found;
+  return typeof getAnyPixelDataElement(elements) !== 'undefined';
 }
 
 /**
