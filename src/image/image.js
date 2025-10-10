@@ -11,6 +11,7 @@ import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
+import {MAX_CONTOUR_SIZE} from './view.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1825,6 +1826,10 @@ export class Image {
         return newDistance;
       }
 
+      if (newDistance > MAX_CONTOUR_SIZE) {
+        return 255;
+      }
+
       if (this.#buffer[newIndex] !== checkValue) {
         return newDistance;
       } else {
@@ -1882,6 +1887,10 @@ export class Image {
         newDistance === 255
       ) {
         return newDistance;
+      }
+
+      if (newDistance > MAX_CONTOUR_SIZE) {
+        return 255;
       }
 
       if (this.#buffer[newIndex] !== checkValue) {
@@ -1994,7 +2003,16 @@ export class Image {
       operationQueue
     ));
 
+    let opCount = 0;
+    // Enough to check every square up to MAX_CONTOUR_SIZE
+    const maxOps = Math.pow(MAX_CONTOUR_SIZE, 2);
     while (operationQueue.length > 0) {
+      opCount++;
+      if (opCount > maxOps) {
+        this.#contourBuffer[contourIndex] = 255;
+        return 255;
+      }
+
       const operation = operationQueue.shift();
       const distanceCheck = operation();
 

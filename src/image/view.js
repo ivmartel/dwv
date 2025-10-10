@@ -29,6 +29,8 @@ import {
 import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
+export const MAX_CONTOUR_SIZE = 10;
+
 /**
  * List of view event names.
  *
@@ -283,7 +285,7 @@ export class View {
   /**
    * Get the thickness of the contour in pixels.
    *
-   * @returns {number} The contour thickness (integer >= 0).
+   * @returns {number} The contour thickness (0 <= integer <= MAX_CONTOUR_SIZE).
    */
   getContourThickness() {
     return this.#contourThickness;
@@ -294,11 +296,14 @@ export class View {
    * This only has an effect on segmentation views, or any other alpha
    * function that makes use of it.
    *
-   * @param {number} thickness The contour thickness (integer >= 0).
+   * @param {number} thickness The contour thickness
+   *  (0 <= integer <= MAX_CONTOUR_SIZE).
    */
   setContourThickness(thickness) {
     if (thickness < 0) {
       this.#contourThickness = 0;
+    } else if (thickness > MAX_CONTOUR_SIZE) {
+      this.#contourThickness = MAX_CONTOUR_SIZE;
     } else {
       this.#contourThickness = thickness;
     }
