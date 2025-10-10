@@ -26,6 +26,49 @@ import {Point} from '../math/point.js';
 const ML_PER_MM = 0.001; // ml/mm^3
 
 /**
+ * Unit value.
+ *
+ * @typedef UnitValue
+ * @property {number} value The value.
+ * @property {string} unit The unit of the value.
+ */
+
+/**
+ * Diameter type.
+ *
+ * @typedef Diameter
+ * @property {UnitValue} diameter The scaled diameter value.
+ * @property {number} offset1 The offset of the pixel at the start
+ *  of the line used to calculate this diameter.
+ * @property {number} offset2 The offset of the pixel at the end
+ *  of the line used to calculate this diameter.
+ */
+
+/**
+ * Diameters type.
+ *
+ * @typedef Diameters
+ * @property {Diameter} major The major (longest) diameter of the segment.
+ * @property {Diameter} minor The minor (longest perpendicular to the major)
+ *  diameter of the segment.
+ */
+
+/**
+ * Label type.
+ *
+ * @typedef Label
+ * @property {Point} centroid The world coordinates of the centroid.
+ * @property {number[]} centroidIndex The closest voxel Index to the centroid.
+ * @property {UnitValue} volume The volume of the labeled segment.
+ * @property {number} count The voxel count of the labeled segment.
+ * @property {Diameters} diameters The diameters of the segment.
+ * @property {UnitValue} height The scaled height of the segment.
+ * @property {number} id The segment label id.
+ * @property {number} largestSliceZ The Z index of the largest slice of the
+ *  segment.
+ */
+
+/**
  * List of image event names.
  *
  * @type {string[]}
@@ -1710,10 +1753,26 @@ export class Image {
         for (const label of labels) {
           label.centroid = this.#geometry.indexToWorld(
             new Index(label.centroidIndex));
-          label.volume = label.count * pixelVolume;
-          label.unit = volumeUnit;
+          label.volume = {
+            value: label.count * pixelVolume,
+            unit: volumeUnit
+          };
+          // diameters should be already in the correct units
+          label.diameters.major.diameter = {
+            value: label.diameters.major.diameter,
+            unit: lengthUnit
+          };
+          label.diameters.minor.diameter = {
+            value: label.diameters.minor.diameter,
+            unit: lengthUnit
+          };
+          label.height = {
+            value: label.height,
+            unit: lengthUnit
+          };
         }
         // sort
+        /** @type {Label[]} */
         const labelsSorted =
           labels.sort((v1, v2) => {
             return v2.volume - v1.volume;
@@ -1725,12 +1784,21 @@ export class Image {
           type: 'labelschanged',
           labels: labelsSorted
         });
+
+        //TODO: This is temporary until a proper method of displaying
+        // diameters is implmented.
+        // ------
+        if (event.data.buffer) {
+          this.#buffer = event.data.buffer;
+          this.#fireEvent({type: 'imagecontentchange'});
+        }
+        // ------
       };
     }
 
     this.#fireEvent({type: 'labelingstart'});
 
-    this.#labelingThread.run(this.#buffer, this.#geometry.getSize());
+    this.#labelingThread.run(this.#buffer, this.#geometry);
   }
 
   /**

@@ -172,6 +172,15 @@ export class Line {
   }
 
   /**
+   * Get a new line with the start and end flipped.
+   *
+   * @returns {Line} The new flipped line.
+   */
+  getFlipped() {
+    return new Line(this.#end, this.#begin);
+  }
+
+  /**
    * Quantify a line according to view information.
    *
    * @param {ViewController} viewController The associated view controller.

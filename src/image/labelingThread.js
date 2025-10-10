@@ -2,7 +2,7 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Size} from './size.js';
+import {Geometry} from './geometry.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -19,11 +19,14 @@ import {Size} from './size.js';
  * Generate a worker message to send to the labeling worker.
  *
  * @param {TypedArray} imageBuffer The buffer to label.
- * @param {Size} imageSize The image size.
+ * @param {Geometry} imageGeometry The image geometry.
  *
  * @returns {object} The message to send to the worker.
  */
-export function generateWorkerMessage(imageBuffer, imageSize) {
+export function generateWorkerMessage(imageBuffer, imageGeometry) {
+  const imageSize = imageGeometry.getSize();
+  const imageSpacing = imageGeometry.getSpacing();
+
   // We can't pass these metadata objects directly, so we will just
   // pull out what we need and pass that.
   const ndims = imageSize.length();
@@ -45,6 +48,7 @@ export function generateWorkerMessage(imageBuffer, imageSize) {
     imageBuffer: imageBuffer,
     unitVectors: unitVectors,
     sizes: sizes,
+    spacing: imageSpacing.getValues(),
     totalSize: totalSize
   };
 }
@@ -87,15 +91,15 @@ export class LabelingThread {
    * Trigger a labels recalculation.
    *
    * @param {TypedArray} imageBuffer The buffer to label.
-   * @param {Size} size The image size.
+   * @param {Geometry} geometry The image geometry.
    */
-  run(imageBuffer, size) {
+  run(imageBuffer, geometry) {
     // We can't just pass in an Image or we would get a circular dependency
 
     this.#threadPool.onworkitem = this.ondone;
 
     const workerTask = new LabelingWorkerTask(
-      generateWorkerMessage(imageBuffer, size),
+      generateWorkerMessage(imageBuffer, geometry),
       {}
     );
 
@@ -108,7 +112,7 @@ export class LabelingThread {
    * this is meant to be overridden.
    *
    * @param {object} _event The work item event fired when a labeling
-   *   calculation is completed. Event.data should contain a 'lebels' item.
+   *   calculation is completed. Event.data should contain a 'labels' item.
    */
   ondone(_event) {}
 }
