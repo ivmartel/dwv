@@ -1854,6 +1854,31 @@ export class App {
       eventMetaData = 'state';
     }
 
+    const isFirstLoadItem = event.isfirstitem;
+
+    if (event.loadtype === 'image') {
+      try {
+        if (isFirstLoadItem) {
+          this.#dataController.add(event.dataid, event.data);
+        } else {
+          this.#dataController.update(event.dataid, event.data);
+        }
+      } catch (error) {
+        this.#onloaderror({
+          dataid: event.dataid,
+          error: error,
+          source: event.source
+        });
+        this.#onloadend({
+          dataid: event.dataid,
+          source: event.source
+        });
+        return;
+      }
+    } else if (event.loadtype === 'state') {
+      this.applyJsonState(event.data, event.dataid);
+    }
+
     /**
      * Load item event: fired when an item has been successfully loaded.
      *
@@ -1874,18 +1899,6 @@ export class App {
       isfirstitem: event.isfirstitem,
       warn: event.warn
     });
-
-    const isFirstLoadItem = event.isfirstitem;
-
-    if (event.loadtype === 'image') {
-      if (isFirstLoadItem) {
-        this.#dataController.add(event.dataid, event.data);
-      } else {
-        this.#dataController.update(event.dataid, event.data);
-      }
-    } else if (event.loadtype === 'state') {
-      this.applyJsonState(event.data, event.dataid);
-    }
 
     // update overlay data if present
     if (typeof this.#overlayDatas !== 'undefined' &&

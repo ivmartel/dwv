@@ -1,9 +1,13 @@
 import {ListenerHandler} from '../utils/listen.js';
 import {mergeObjects} from '../utils/operator.js';
 import {MaskFactory} from '../image/maskFactory.js';
+import {ImageFactory} from '../image/imageFactory.js';
+import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
+import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {getTagTime} from '../dicom/dicomDate.js';
+import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -11,6 +15,15 @@ import {Image} from '../image/image.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  Modality: '00080060',
+  SeriesInstanceUID: '0020000E',
+  ReferencedSeriesSequence: '00081115'
+};
 
 /**
  * List of data event names.
@@ -54,6 +67,20 @@ export class DicomData {
    * @type {any|undefined}
    */
   buffer;
+
+  /**
+   * Number of files/urls associated to the data.
+   *
+   * @type {number}
+   */
+  numberOfFiles;
+
+  /**
+   * List of data creation warning.
+   *
+   * @type {string[]}
+   */
+  warn = [];
 
   /**
    * @param {Object<string, DataElement>} meta The DICOM meta data.
@@ -232,6 +259,72 @@ export class DataController {
   }
 
   /**
+   * Interpret dicom data and create its 'content': image in
+   * most cases, annotationGroup for dicom SR.
+   *
+   * @param {DicomData} data The dicom data.
+   */
+  #setDataContent(data) {
+    const modality = safeGet(data.meta, TagKeys.Modality);
+
+    let factory;
+    if (hasAnyPixelDataElement(data.meta)) {
+      if (modality === 'SEG') {
+      // DICOM seg case
+      // find the reference data to allow for geometry creation
+        let referencedSeriesUID;
+        const refSeriesSq =
+          safeGetAll(data.meta, TagKeys.ReferencedSeriesSequence);
+        if (typeof refSeriesSq !== 'undefined') {
+          referencedSeriesUID =
+            safeGet(refSeriesSq[0], TagKeys.SeriesInstanceUID);
+        }
+        if (typeof referencedSeriesUID === 'undefined') {
+          throw new Error('Cannot create mask image: ' +
+            'the DICOM seg does not have a referenced series UID');
+        }
+        // get the reference data id
+        const refDataId = this.getDataIdFromSeriesUid(referencedSeriesUID);
+        if (typeof refDataId === 'undefined') {
+          throw new Error('Cannot create mask image: ' +
+            'the DICOM seg referenced series is not loaded');
+        }
+        // create image
+        factory = new MaskFactory();
+        if (typeof factory.checkElements(data.meta) === 'undefined') {
+          data.image = factory.create(
+            data.meta,
+            data.buffer,
+            this.#dataList[refDataId].image
+          );
+        }
+      } else {
+        // image case
+        factory = new ImageFactory();
+        if (typeof factory.checkElements(data.meta) === 'undefined') {
+          data.image = factory.create(
+            data.meta,
+            data.buffer,
+            data.numberOfFiles
+          );
+        }
+      }
+    } else if (modality === 'SR') {
+      // annotation case
+      factory = new AnnotationGroupFactory();
+      if (typeof factory.checkElements(data.meta) === 'undefined') {
+        data.annotationGroup = factory.create(data.meta);
+      }
+    }
+
+    // add warnings if present
+    if (typeof factory !== 'undefined' &&
+      typeof factory.getWarning() !== 'undefined') {
+      data.warn.push(factory.getWarning());
+    }
+  }
+
+  /**
    * Add a new data.
    *
    * @param {string} dataId The data id.
@@ -244,39 +337,8 @@ export class DataController {
     // store the new image
     this.#dataList[dataId] = data;
 
-    let modality;
-    if (typeof data.meta['00080060'] !== 'undefined') {
-      modality = data.meta['00080060'].value[0];
-    }
-
-    // DICOM seg case
-    // find the reference data to allow for geometry creation
-    if (modality === 'SEG' &&
-      typeof data.image === 'undefined') {
-      // get referencedSeriesUID from meta
-      let referencedSeriesUID;
-      const refSeriesSq = data.meta['00081115'];
-      if (typeof refSeriesSq !== 'undefined') {
-        referencedSeriesUID = refSeriesSq.value[0]['0020000E'].value[0];
-      }
-      if (typeof referencedSeriesUID === 'undefined') {
-        throw new Error('Cannot create mask image: ' +
-          'the DICOM seg does not have a referenced series UID');
-      }
-      // get the reference data id
-      const refDataId = this.getDataIdFromSeriesUid(referencedSeriesUID);
-      if (typeof refDataId === 'undefined') {
-        throw new Error('Cannot create mask image: ' +
-          'the DICOM seg referenced series is not loaded');
-      }
-      // create image
-      const maskFactory = new MaskFactory();
-      data.image = maskFactory.create(
-        data.meta,
-        data.buffer,
-        this.#dataList[refDataId].image
-      );
-    }
+    // create the data content
+    this.#setDataContent(data);
 
     // propagate image events
     if (typeof data.image !== 'undefined') {
@@ -399,6 +461,9 @@ export class DataController {
       throw new Error('Cannot find data to update: ' + dataId);
     }
     const dataToUpdate = this.#dataList[dataId];
+
+    // create the data content
+    this.#setDataContent(data);
 
     // add slice to current image
     if (typeof dataToUpdate.image !== 'undefined' &&
