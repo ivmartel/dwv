@@ -8,6 +8,7 @@ import {Geometry} from '../../src/image/geometry.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 import {Image} from '../../src/image/image.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
+import {Matrix33} from '../../src/math/matrix.js';
 
 /**
  * Tests for the 'image/image.js' file.
@@ -566,4 +567,96 @@ QUnit.test('hasValues getOffsets', function (assert) {
   const off01 = image0.getOffsets(1);
   assert.ok(arrayEquals(off00, theoOffset0), 'Image offsets 0');
   assert.ok(arrayEquals(off01, theoOffset1), 'Image offsets 1');
+});
+
+/**
+ * Tests for {@link Image} getContourDistance.
+ *
+ * @function module:tests/image~image-getContourDistance
+ */
+QUnit.test('Image getContourDistance', function (assert) {
+
+  const imgOrigins = new Point3D(0, 0, 0);
+  const imgSpacing = new Spacing([1, 1, 1]);
+  const imgSize0 = new Size([6, 6, 3]);
+  const imgGeometry0 =
+    new Geometry(
+      imgOrigins,
+      imgSize0,
+      imgSpacing
+    );
+  /* eslint-disable @stylistic/js/array-element-newline */
+  const imgBuffer0 = new Uint8Array([
+    0, 0, 0, 0, 0, 0,
+    0, 0, 1, 0, 1, 0,
+    0, 0, 1, 0, 1, 0,
+    0, 0, 0, 0, 1, 0,
+    0, 0, 0, 0, 1, 0,
+    0, 0, 0, 0, 0, 0,
+
+    0, 0, 0, 0, 0, 0,
+    1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 0,
+
+    0, 0, 0, 0, 0, 0,
+    0, 1, 1, 1, 1, 0,
+    0, 1, 1, 1, 1, 0,
+    0, 0, 0, 1, 1, 0,
+    0, 0, 0, 1, 1, 0,
+    0, 0, 0, 0, 0, 0,
+  ]);
+  /* eslint-enable @stylistic/js/array-element-newline */
+
+  const image0 = new Image(imgGeometry0, imgBuffer0);
+
+  image0.initializeContour();
+
+  /* eslint-disable @stylistic/js/array-element-newline */
+  const o00 = [
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+  ];
+  /* eslint-enable @stylistic/js/array-element-newline */
+  const orientation00 = new Matrix33(o00);
+
+  const distance00 = image0.getContourDistance(57, orientation00);
+  assert.equal(
+    distance00,
+    2,
+    'Expected distance from contour 0'
+  );
+
+  const distance01 = image0.getContourDistance(52, orientation00);
+  assert.equal(
+    distance01,
+    1,
+    'Expected distance from contour 1'
+  );
+
+  /* eslint-disable @stylistic/js/array-element-newline */
+  const o01 = [
+    1, 0, 0,
+    0, 0, 1,
+    0, 1, 0,
+  ];
+  /* eslint-enable @stylistic/js/array-element-newline */
+  const orientation01 = new Matrix33(o01);
+
+  const distance02 = image0.getContourDistance(52, orientation01);
+  assert.equal(
+    distance02,
+    1,
+    'Expected distance from contour 2'
+  );
+
+  const distance03 = image0.getContourDistance(50, orientation01);
+  assert.equal(
+    distance03,
+    1,
+    'Expected distance from contour 3'
+  );
 });
