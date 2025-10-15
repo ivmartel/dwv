@@ -472,9 +472,6 @@ export class ImageFactory {
     meta.BitsStored = safeGetLocal(TagKeys.BitsStored);
     meta.HighBit = safeGetLocal(TagKeys.HighBit);
 
-    meta.ImageOrientationPatient =
-      safeGetAllLocal(TagKeys.ImageOrientationPatient);
-
     // meta tags
     const metaKeys = Object.keys(MetaTagKeys);
     for (const key of metaKeys) {

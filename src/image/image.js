@@ -925,9 +925,7 @@ export class Image {
       if (
         key === 'windowPresets' ||
         key === 'numberOfFiles' ||
-        key === 'custom' ||
-        // This was already checked with #geometry.getOrientation()
-        key === 'ImageOrientationPatient'
+        key === 'custom'
       ) {
         continue;
       }
