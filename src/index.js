@@ -135,6 +135,7 @@ import {
   labToUintLab,
   srgbToCielab
 } from './utils/colour.js';
+import {BooleanResult} from './utils/result.js';
 
 export {
   AppOptions,
@@ -194,6 +195,7 @@ export {
   ScrollWheel,
   NumberRange,
   DicomSRContent,
+  BooleanResult,
   logger,
   custom,
   luts,
