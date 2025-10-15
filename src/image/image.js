@@ -11,6 +11,7 @@ import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
+import {BooleanResult} from '../utils/result.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -890,35 +891,34 @@ export class Image {
   }
 
   /**
-   * Append a slice to the image.
+   * Check if another image can be appended to this one.
    *
-   * @param {Image} rhs The slice to append.
-   * @fires Image#imagegeometrychange
+   * @param {Image} rhs The image to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the image can be appended.
    */
-  appendSlice(rhs) {
+  canAppend(rhs) {
     // check input
     if (rhs === null) {
-      throw new Error('Cannot append null slice');
+      return {
+        success: false,
+        message: 'Cannot append null slice'
+      };
     }
-    const rhsSize = rhs.getGeometry().getSize();
-    let size = this.#geometry.getSize();
-    if (rhsSize.get(2) !== 1) {
-      throw new Error('Cannot append more than one slice');
+
+    // check geometry
+    const geoCanAppend = this.#geometry.canAppend(rhs.getGeometry());
+    if (!geoCanAppend.success) {
+      return geoCanAppend;
     }
-    if (size.get(0) !== rhsSize.get(0)) {
-      throw new Error('Cannot append a slice with different number of columns');
-    }
-    if (size.get(1) !== rhsSize.get(1)) {
-      throw new Error('Cannot append a slice with different number of rows');
-    }
-    if (!this.#geometry.getOrientation().isSimilar(
-      rhs.getGeometry().getOrientation(), REAL_WORLD_EPSILON)) {
-      throw new Error('Cannot append a slice with different orientation');
-    }
+
     if (this.#photometricInterpretation !==
       rhs.getPhotometricInterpretation()) {
-      throw new Error(
-        'Cannot append a slice with different photometric interpretation');
+      return {
+        success: false,
+        message:
+          'Cannot append a slice with different photometric interpretation'
+      };
     }
     // all meta should be equal
     for (const key in this.#meta) {
@@ -933,9 +933,29 @@ export class Image {
       }
 
       if (this.#meta[key] !== rhs.getMeta()[key]) {
-        throw new Error('Cannot append a slice with different ' + key +
-          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
+        const message = 'Cannot append a slice with different ' + key +
+          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key];
+        return {
+          success: false,
+          message
+        };
       }
+    }
+
+    return new BooleanResult(true);
+  }
+
+  /**
+   * Append a slice to the image.
+   *
+   * @param {Image} rhs The slice to append.
+   * @fires Image#imagegeometrychange
+   */
+  appendSlice(rhs) {
+    // check if possible
+    const canAppend = this.canAppend(rhs);
+    if (!canAppend.success) {
+      throw new Error(canAppend.message);
     }
 
     // update ranges
@@ -951,6 +971,8 @@ export class Image {
       min: Math.min(rhsResRange.min, resRange.min),
       max: Math.max(rhsResRange.max, resRange.max),
     };
+
+    let size = this.getGeometry().getSize();
 
     // possible time
     const timeId = rhs.getGeometry().getInitialTime();

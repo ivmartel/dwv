@@ -11,6 +11,7 @@ import {precisionRound} from '../utils/string.js';
 import {logger} from '../utils/logger.js';
 import {Size} from './size.js';
 import {Spacing} from './spacing.js';
+import {BooleanResult} from '../utils/result.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -315,6 +316,45 @@ export class Geometry {
       ? closestOriginIndex + 1 : closestOriginIndex;
 
     return sliceIndex;
+  }
+
+  /**
+   * Check if another geometry is compatible with this one, ie that
+   * slices with these geometries can be merged into one volume.
+   *
+   * @param {Geometry} rhs The geometry to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the geometry is compatible.
+   */
+  canAppend(rhs) {
+    const rhsSize = rhs.getSize();
+    if (rhsSize.get(2) !== 1) {
+      return {
+        success: false,
+        message: 'Cannot append more than one slice'
+      };
+    }
+    const size = this.getSize();
+    if (size.get(0) !== rhsSize.get(0)) {
+      return {
+        success: false,
+        message: 'Cannot append a slice with different number of columns'
+      };
+    }
+    if (size.get(1) !== rhsSize.get(1)) {
+      return {
+        success: false,
+        message: 'Cannot append a slice with different number of rows'
+      };
+    }
+    if (!this.getOrientation().isSimilar(
+      rhs.getOrientation(), REAL_WORLD_EPSILON)) {
+      return {
+        success: false,
+        message: 'Cannot append a slice with different orientation'
+      };
+    }
+    return new BooleanResult(true);
   }
 
   /**
