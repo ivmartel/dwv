@@ -12,11 +12,7 @@ import {logger} from '../utils/logger.js';
 import {Size} from './size.js';
 import {Spacing} from './spacing.js';
 import {BooleanResult} from '../utils/result.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix.js';
-/* eslint-enable no-unused-vars */
 
 /**
  * 2D/3D Geometry class.
