@@ -567,3 +567,48 @@ QUnit.test('hasValues getOffsets', function (assert) {
   assert.ok(arrayEquals(off00, theoOffset0), 'Image offsets 0');
   assert.ok(arrayEquals(off01, theoOffset1), 'Image offsets 1');
 });
+
+/**
+ * Tests for {@link Image} clone.
+ *
+ * @function module:tests/image~clone
+ */
+QUnit.test('clone', function (assert) {
+  const size00 = 3;
+  const imgSize00 = new Size([size00, size00, 1]);
+  const imgSpacing00 = new Spacing([1, 1, 1]);
+  const imgOrigin00 = new Point3D(0, 0, 0);
+  const imgGeometry00 = new Geometry([imgOrigin00], imgSize00, imgSpacing00);
+  const buffer00 = [];
+  buffer00[0] = 1;
+  for (let i0 = 1; i0 < 2 * size00; ++i0) {
+    buffer00[i0] = 0;
+  }
+  for (let i1 = 2 * size00; i1 < size00 * size00; ++i1) {
+    buffer00[i1] = 1;
+  }
+
+  // original image
+  const image0 = new Image(imgGeometry00, buffer00);
+  // clone image
+  const image1 = image0.clone();
+
+  // retrieve geometries
+  const geometry0 = image0.getGeometry();
+  const geometry1 = image1.getGeometry();
+
+  // test size #0
+  assert.ok(geometry0.getSize().equals(imgSize00), 'Image size #0');
+  assert.ok(geometry1.getSize().equals(imgSize00), 'Clone image size #0');
+
+  // append origin, will increase size
+  geometry1.appendOrigin(new Point3D(0, 0, 1));
+  // new theoretical size
+  const theoSize1 = new Size([size00, size00, imgSize00.get(2) + 1]);
+
+  // test size #1
+  assert.ok(geometry0.getSize().equals(imgSize00),
+    'Image size #1');
+  assert.ok(geometry1.getSize().equals(theoSize1),
+    'Clone image size #1');
+});

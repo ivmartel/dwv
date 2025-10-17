@@ -850,7 +850,8 @@ export class Image {
     // clone the image buffer
     const clonedBuffer = this.#buffer.slice(0);
     // create the image copy
-    const copy = new Image(this.getGeometry(), clonedBuffer, this.#imageUids);
+    const copy = new Image(
+      this.getGeometry().clone(), clonedBuffer, this.#imageUids);
     // copy the RSI(s)
     if (this.isConstantRSI()) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());

@@ -88,6 +88,21 @@ export class Geometry {
   }
 
   /**
+   * Clone the geometry.
+   *
+   * @returns {Geometry} A clone of this geometry.
+   */
+  clone() {
+    return new Geometry(
+      this.#origins.slice(),
+      new Size(this.#size.getValues()),
+      new Spacing(this.#spacing.getValues()),
+      new Matrix33(this.#orientation.getValues()),
+      this.#initialTime
+    );
+  }
+
+  /**
    * Get the time value that was passed at construction.
    *
    * @returns {number} The time value.
