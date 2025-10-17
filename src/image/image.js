@@ -864,7 +864,7 @@ export class Image {
     // copy extras
     copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
     copy.setPlanarConfiguration(this.getPlanarConfiguration());
-    copy.setMeta(this.getMeta());
+    copy.setMeta(structuredClone(this.getMeta()));
     // return
     return copy;
   }

@@ -590,6 +590,8 @@ QUnit.test('clone', function (assert) {
 
   // original image
   const image0 = new Image(imgGeometry00, buffer00);
+  const modality0 = 'MR';
+  image0.getMeta().Modality = modality0;
   // clone image
   const image1 = image0.clone();
 
@@ -607,8 +609,18 @@ QUnit.test('clone', function (assert) {
   const theoSize1 = new Size([size00, size00, imgSize00.get(2) + 1]);
 
   // test size #1
-  assert.ok(geometry0.getSize().equals(imgSize00),
-    'Image size #1');
-  assert.ok(geometry1.getSize().equals(theoSize1),
-    'Clone image size #1');
+  assert.ok(geometry0.getSize().equals(imgSize00), 'Image size #1');
+  assert.ok(geometry1.getSize().equals(theoSize1), 'Clone image size #1');
+
+  // test modality #0
+  assert.equal(image0.getMeta().Modality, modality0, 'Image modality #0');
+  assert.equal(image1.getMeta().Modality, modality0, 'Clone image modality #0');
+
+  // change cloned image modality
+  const modality1 = 'CT';
+  image1.getMeta().Modality = modality1;
+
+  // test modality #1
+  assert.equal(image0.getMeta().Modality, modality0, 'Image modality #1');
+  assert.equal(image1.getMeta().Modality, modality1, 'Clone image modality #1');
 });
