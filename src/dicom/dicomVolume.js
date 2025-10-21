@@ -1,5 +1,10 @@
 import {custom} from '../app/custom.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from '../dicom/dataElement.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the volume id from a list of tags. Defaults
  *   returns undefined.
