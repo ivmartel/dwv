@@ -143,6 +143,7 @@ export class App {
     // @deprecated
     initWLDisplay(): void;
     loadFiles: (files: File[]) => string;
+    // @deprecated
     loadFromUri: (uri: string, options?: object) => void;
     loadImageObject: (data: any[]) => string;
     loadURLs: (urls: string[], options?: object) => string;
@@ -203,6 +204,13 @@ export class AppOptions {
         [x: string]: ToolConfig;
     } | undefined;
     viewOnFirstLoadItem: boolean | undefined;
+}
+
+// @public
+export class BooleanResult {
+    constructor(success: boolean);
+    message: string | undefined;
+    success: boolean;
 }
 
 // @public
@@ -279,7 +287,9 @@ export namespace custom {
     let // (undocumented)
     openRoiDialog: any;
     let // (undocumented)
-    getTagTime: any;
+    getVolumeIdTagValue: any;
+    let // (undocumented)
+    getPostLoadVolumeIdTagValue: any;
     let // (undocumented)
     getTagPixelUnit: any;
 }
@@ -325,13 +335,17 @@ export class DicomData {
         [x: string]: DataElement;
     });
     annotationGroup: AnnotationGroup | undefined;
+    appendData(data: DicomData): void;
     buffer: any | undefined;
     getComplete(): boolean | undefined;
+    hasDuplicateOrigin(): boolean;
     image: Image_2 | undefined;
     meta: {
         [x: string]: DataElement;
     };
+    numberOfFiles: number;
     setComplete(flag: boolean): void;
+    warn: string[];
 }
 
 // @public
@@ -464,10 +478,16 @@ export class Ellipse {
 }
 
 // @public
+export function equalWl(wl0: WindowLevel, wl1: WindowLevel): boolean;
+
+// @public
 export class Geometry {
     constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     appendFrame(origin: Point3D, time: number): void;
     appendOrigin(origin: Point3D, index: number, time?: number): void;
+    canAppend(rhs: Geometry): BooleanResult;
+    canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
+    clone(): Geometry;
     equals(rhs: Geometry): boolean;
     getCurrentNumberOfSlicesBeforeTime(time: number): number | undefined;
     getCurrentTotalNumberOfSlices(): number;
@@ -486,6 +506,7 @@ export class Geometry {
     isInBounds(point: Point): boolean;
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
     pointToWorld(point: Point3D): Point3D;
+    setInitialTime(time: number): void;
     toString(): string;
     updateSliceSpacing(): void;
     worldToIndex(point: Point): Index;
@@ -559,6 +580,12 @@ export function getTypedArray(bitsAllocated: number, pixelRepresentation: number
 export function getUID(tagName: string): string;
 
 // @public
+export function getURLsFromKeyValueUri(uri: string): string[] | undefined;
+
+// @public
+export function handleURLsFromWeasisXMLManifest(uri: string, callback: Function): void;
+
+// @public
 export function hasDicomPrefix(buffer: ArrayBuffer): boolean;
 
 // @public
@@ -579,6 +606,7 @@ class Image_2 {
     calculateDataRange(): object;
     calculateHistogram(): object;
     calculateRescaledDataRange(): object;
+    canAppend(rhs: Image_2): BooleanResult;
     canQuantify(): boolean;
     canScroll(viewOrientation: Matrix33): boolean;
     // @deprecated
@@ -588,8 +616,10 @@ class Image_2 {
     containsImageUids(uids: string[]): boolean;
     convolute2D(weights: number[]): Image_2;
     convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
+    countourIsInitialized(): boolean;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
     getComplete(): boolean;
+    getContourDistance(index: number, viewOrientation: Matrix33): number;
     getDataRange(): NumberRange;
     getGeometry(): Geometry;
     getHistogram(): any[];
@@ -614,6 +644,7 @@ class Image_2 {
     getValueAtOffset(offset: number): number;
     hasValues(values: any[]): boolean[];
     includesImageUid(uid: string): boolean;
+    initializeContour(): void;
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
     isMonochrome(): boolean;
@@ -1140,10 +1171,12 @@ export class View {
     generateImageData(data: ImageData, index: Index): void;
     getAlphaFunction(): (value: number[] | number, index: number) => number;
     getColourMap(): string;
+    getContourThickness(): number;
     getCurrentImageUid(): string;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
     getCurrentWindowPresetName(): string;
+    getFillOpacity(): number;
     getImage(): Image_2;
     getOrientation(): Matrix33;
     getOrigin(position?: Point): Point3D;
@@ -1161,8 +1194,10 @@ export class View {
     removeEventListener(type: string, callback: Function): void;
     setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setColourMap(name: string): void;
+    setContourThickness(thickness: number): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(position: Point, silent?: boolean): boolean;
+    setFillOpacity(opacity: number): void;
     setImage(inImage: Image_2): void;
     setInitialIndex(): void;
     setOrientation(mat33: Matrix33): void;
@@ -1198,6 +1233,7 @@ export class ViewController {
     generateImageData(array: ImageData, index?: Index): void;
     get2DSpacing(): Scalar2D;
     getColourMap(): string;
+    getContourThickness(): number;
     getCurrentImageUid(): string;
     getCurrentIndex(): Index;
     getCurrentIndexScrollValue(): number;
@@ -1205,6 +1241,7 @@ export class ViewController {
     getCurrentPosition(): Point;
     getCurrentScrollPosition(): number;
     getCurrentWindowPresetName(): string;
+    getFillOpacity(): number;
     getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
@@ -1242,8 +1279,10 @@ export class ViewController {
     resetPosition(): void;
     resetWindowLevel(): void;
     setColourMap(name: string): void;
+    setContourThickness(thickness: number): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
+    setFillOpacity(opacity: number): void;
     setImage(img: Image_2): void;
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setWindowLevel(wl: WindowLevel): void;
@@ -1275,7 +1314,9 @@ export class ViewLayer {
     flipScaleZ(): void;
     getAbsoluteZoomOffset(): Scalar2D;
     getBaseSize(): Scalar2D;
+    getContourThickness(): number;
     getDataId(): string;
+    getFillOpacity(): number;
     getId(): string;
     getImageData(): object;
     getImageWorldSize(): Scalar2D;
@@ -1293,7 +1334,9 @@ export class ViewLayer {
     removeEventListener(type: string, callback: Function): void;
     removeFromDOM(): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
+    setContourThickness(thickness: number): void;
     setCurrentPosition(position: Point, _index?: Index): boolean;
+    setFillOpacity(opacity: number): void;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
@@ -1307,7 +1350,6 @@ export class ViewLayer {
 export class WindowLevel {
     constructor(center: number, width: number);
     center: number;
-    equals(rhs: WindowLevel): boolean;
     width: number;
 }
 

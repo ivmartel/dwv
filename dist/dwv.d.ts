@@ -697,6 +697,8 @@ export declare class App {
      *
      * @param {string} uri The input uri, for example: 'window.location.href'.
      * @param {object} [options] Optional url request options.
+     * @deprecated Since v0.36, please extract the file list and
+     *   pass it to loadURLs. State from uri is no longer supported.
      * @function
      */
     loadFromUri: (uri: string, options?: object) => void;
@@ -1080,6 +1082,24 @@ export declare class AppOptions {
 }
 
 /**
+ * Class to store a boolean result and a message.
+ */
+export declare class BooleanResult {
+    /**
+     * @param {boolean} success The success flag.
+     */
+    constructor(success: boolean);
+    /**
+     * @type {boolean}
+     */
+    success: boolean;
+    /**
+     * @type {string|undefined}
+     */
+    message: string | undefined;
+}
+
+/**
  * Build a multipart message.
  *
  * Ref:
@@ -1310,7 +1330,8 @@ export declare namespace custom {
         };
     };
     let openRoiDialog: any;
-    let getTagTime: any;
+    let getVolumeIdTagValue: any;
+    let getPostLoadVolumeIdTagValue: any;
     let getTagPixelUnit: any;
 }
 
@@ -1506,17 +1527,42 @@ export declare class DicomData {
      */
     buffer: any | undefined;
     /**
-     * Set the image complete flag (for image data).
+     * Number of files/urls associated to the data.
      *
-     * @param {boolean} flag True if the image is complete.
+     * @type {number}
      */
-    setComplete(flag: boolean): void;
+    numberOfFiles: number;
+    /**
+     * List of data creation warning.
+     *
+     * @type {string[]}
+     */
+    warn: string[];
     /**
      * Get the image complete flag (for image data).
      *
      * @returns {boolean|undefined} True if the image is complete.
      */
     getComplete(): boolean | undefined;
+    /**
+     * Set the image complete flag (for image data).
+     *
+     * @param {boolean} flag True if the image is complete.
+     */
+    setComplete(flag: boolean): void;
+    /**
+     * Get the duplicate origin flag.
+     *
+     * @returns {boolean} The flag.
+     */
+    hasDuplicateOrigin(): boolean;
+    /**
+     * Append slice and update meta data.
+     *
+     * @param {DicomData} data The data to append.
+     */
+    appendData(data: DicomData): void;
+    #private;
 }
 
 /**
@@ -2246,6 +2292,15 @@ export declare class Ellipse {
 }
 
 /**
+ * Check for window level equality.
+ *
+ * @param {WindowLevel} wl0 The first window level.
+ * @param {WindowLevel} wl1 The second window level.
+ * @returns {boolean} True if both objects are equal.
+ */
+export declare function equalWl(wl0: WindowLevel, wl1: WindowLevel): boolean;
+
+/**
  * 2D/3D Geometry class.
  */
 export declare class Geometry {
@@ -2259,11 +2314,23 @@ export declare class Geometry {
      */
     constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     /**
+     * Clone the geometry.
+     *
+     * @returns {Geometry} A clone of this geometry.
+     */
+    clone(): Geometry;
+    /**
      * Get the time value that was passed at construction.
      *
      * @returns {number} The time value.
      */
     getInitialTime(): number;
+    /**
+     * Set the initial time.
+     *
+     * @param {number} time The new time.
+     */
+    setInitialTime(time: number): void;
     /**
      * Get the total number of slices.
      * Can be different from what is stored in the size object
@@ -2358,6 +2425,24 @@ export declare class Geometry {
      * @returns {number} The slice index.
      */
     getSliceIndex(point: Point3D, time?: number): number;
+    /**
+     * Check if another geometry is compatible with this one, ie that
+     * slices with these geometries can be merged into one volume.
+     *
+     * @param {Geometry} rhs The geometry to check.
+     * @returns {BooleanResult} Result with success set to true if
+     *   the geometry is compatible.
+     */
+    canAppend(rhs: Geometry): BooleanResult;
+    /**
+     * Check if an origin can be appended to this geometry.
+     *
+     * @param {Point3D} origin The origin to append.
+     * @param {number} [time] Optional time index.
+     * @returns {BooleanResult} Result with success set to true if
+     *   the origin is compatible.
+     */
+    canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
     /**
      * Append an origin to the geometry.
      *
@@ -2623,6 +2708,25 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
  * @returns {string} The corresponding UID.
  */
 export declare function getUID(tagName: string): string;
+
+/**
+ * Get a list of URLs from a uri containing key-value pairs as in:
+ * `[dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)`.
+ *
+ * @param {string} uri The input URI.
+ * @returns {string[]|undefined} The list of URLs.
+ */
+export declare function getURLsFromKeyValueUri(uri: string): string[] | undefined;
+
+/**
+ * Handle (ie call callback) with the list of urls contained in
+ *   a WEASIS XML manifest provided via a uri as in:
+ *   `[dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest`.
+ *
+ * @param {string} uri The input URI.
+ * @param {Function} callback The function to call with the decoded file urls.
+ */
+export declare function handleURLsFromWeasisXMLManifest(uri: string, callback: Function): void;
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
@@ -2910,6 +3014,14 @@ declare class Image_2 {
      */
     clone(): Image_2;
     /**
+     * Check if another image can be appended to this one.
+     *
+     * @param {Image} rhs The image to check.
+     * @returns {BooleanResult} Result with success set to true if
+     *   the image can be appended.
+     */
+    canAppend(rhs: Image_2): BooleanResult;
+    /**
      * Append a slice to the image.
      *
      * @param {Image} rhs The slice to append.
@@ -3096,6 +3208,27 @@ declare class Image_2 {
      * Note: Uses the raw buffer values.
      */
     compose(rhs: Image_2, operator: Function): Image_2;
+    /**
+     * Initialize the contour buffer.
+     * Should be called on every segmentation image, or any image where
+     * contour rendering needs to be supported.
+     */
+    initializeContour(): void;
+    /**
+     * Get whether or not the contour buffer has been initialized.
+     *
+     * @returns {boolean} True if buffer has been initialized.
+     */
+    countourIsInitialized(): boolean;
+    /**
+     * Calculate the distance to the nearest border pixel.
+     * (or return the cached distance).
+     *
+     * @param {number} index Index/offset of the pixel to check.
+     * @param {Matrix33} viewOrientation The orientation of the view.
+     * @returns {number} The distance to the nearest border pixel or 0.
+     */
+    getContourDistance(index: number, viewOrientation: Matrix33): number;
     /**
      * Recalculate labels.
      */
@@ -5571,6 +5704,35 @@ export declare class View {
      */
     setOrientation(mat33: Matrix33): void;
     /**
+     * Get the fill opacity relative to the global opacity.
+     *
+     * @returns {number} The fill opacity (between 0 and 1).
+     */
+    getFillOpacity(): number;
+    /**
+     * Set the fill opacity relative to the global opacity.
+     * This only has an effect on segmentation views, or any other alpha
+     * function that makes use of it.
+     *
+     * @param {number} opacity The fill opacity (between 0 and 1).
+     */
+    setFillOpacity(opacity: number): void;
+    /**
+     * Get the thickness of the contour in pixels.
+     *
+     * @returns {number} The contour thickness (0 <= integer <= MAX_CONTOUR_SIZE).
+     */
+    getContourThickness(): number;
+    /**
+     * Set the thickness of the contour in pixels.
+     * This only has an effect on segmentation views, or any other alpha
+     * function that makes use of it.
+     *
+     * @param {number} thickness The contour thickness
+     *  (0 <= integer <= MAX_CONTOUR_SIZE).
+     */
+    setContourThickness(thickness: number): void;
+    /**
      * Initialise the view: set initial index.
      */
     init(): void;
@@ -6255,6 +6417,34 @@ export declare class ViewController {
      */
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     /**
+     * Get the fill opacity relative to the global opacity.
+     *
+     * @returns {number} The fill opacity (between 0 and 1).
+     */
+    getFillOpacity(): number;
+    /**
+     * Set the fill opacity relative to the global opacity.
+     * This only has an effect on segmentation views, or any other alpha
+     * function that makes use of it.
+     *
+     * @param {number} opacity The fill opacity (between 0 and 1).
+     */
+    setFillOpacity(opacity: number): void;
+    /**
+     * Get the thickness of the contour in pixels.
+     *
+     * @returns {number} The contour thickness (integer >= 1).
+     */
+    getContourThickness(): number;
+    /**
+     * Set the thickness of the contour in pixels.
+     * This only has an effect on segmentation views, or any other alpha
+     * function that makes use of it.
+     *
+     * @param {number} thickness The contour thickness (integer >= 1).
+     */
+    setContourThickness(thickness: number): void;
+    /**
      * Bind the view image to the provided layer.
      *
      * @param {ViewLayer} viewLayer The layer to bind.
@@ -6391,6 +6581,34 @@ export declare class ViewLayer {
      * @param {number} alpha The opacity ([0:1] range).
      */
     setOpacity(alpha: number): void;
+    /**
+     * Get the fill opacity relative to the global opacity.
+     *
+     * @returns {number} The fill opacity (between 0 and 1).
+     */
+    getFillOpacity(): number;
+    /**
+     * Set the fill opacity relative to the global opacity.
+     * This only has an effect on segmentation views, or any other alpha
+     * function that makes use of it.
+     *
+     * @param {number} opacity The fill opacity (between 0 and 1).
+     */
+    setFillOpacity(opacity: number): void;
+    /**
+     * Get the thickness of the contour in pixels.
+     *
+     * @returns {number} The contour thickness (integer >= 1).
+     */
+    getContourThickness(): number;
+    /**
+     * Set the thickness of the contour in pixels.
+     * This only has an effect on segmentation views, or any other alpha
+     * function that makes use of it.
+     *
+     * @param {number} thickness The contour thickness (integer >= 1).
+     */
+    setContourThickness(thickness: number): void;
     /**
      * Add a flip offset along the layer X axis.
      */
@@ -6574,13 +6792,6 @@ export declare class WindowLevel {
      * @type {number}
      */
     width: number;
-    /**
-     * Check for equality.
-     *
-     * @param {WindowLevel} rhs The other object to compare to.
-     * @returns {boolean} True if both objects are equal.
-     */
-    equals(rhs: WindowLevel): boolean;
 }
 
 /**
