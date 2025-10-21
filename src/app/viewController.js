@@ -370,7 +370,20 @@ export class ViewController {
    * @param {Image} img The associated image.
    */
   setImage(img) {
+    // geometries to check
+    const geometry0 = this.#view.getImage().getGeometry();
+    const geometry1 = img.getGeometry();
+
     this.#view.setImage(img);
+
+    // update if geometry changes
+    if (!geometry0.equals(geometry1)) {
+      // set the initial index (and indirectly the position)
+      this.#view.setInitialIndex();
+      // update helpers
+      this.updatePlaneHelper();
+      this.#positionHelper = new PositionHelper(this.#view);
+    }
   }
 
   /**

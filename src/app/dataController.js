@@ -6,7 +6,10 @@ import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
-import {getTagTime} from '../dicom/dicomDate.js';
+import {
+  getVolumeIdTagValue,
+  getPostLoadVolumeIdTagValue
+} from '../dicom/dicomVolume.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 
 // doc imports
@@ -36,6 +39,34 @@ export const dataEventNames = [
   'dataimageset',
   'dataupdate'
 ];
+
+/**
+ * Merge meta datas.
+ *
+ * @param {Object<string, DataElement>} meta0 The first data to merge.
+ * @param {Object<string, DataElement>} meta1 The second data to merge.
+ * @param {string} meta1Id A meta1 specific id.
+ * @returns {Object<string, DataElement>} The merged data.
+ */
+function mergeMeta(meta0, meta1, meta1Id) {
+  // update meta data
+  let idKey = '';
+  if (typeof meta1['00020010'] !== 'undefined') {
+    // dicom case, use 'InstanceNumber'
+    idKey = '00200013';
+  } else {
+    idKey = 'imageUid';
+  }
+  // possible time suffix
+  // merge
+  return mergeObjects(
+    meta0,
+    meta1,
+    idKey,
+    'value',
+    meta1Id
+  );
+}
 
 /**
  * DICOM data: meta and possible image.
@@ -83,10 +114,32 @@ export class DicomData {
   warn = [];
 
   /**
+   * Duplicate origin flag. If true, the image slice append
+   * will be blocked. Use a DicomSliceDataList to create the
+   * full image.
+   *
+   * @type {boolean}
+   */
+  #hasDuplicateOrigin = false;
+
+  /**
    * @param {Object<string, DataElement>} meta The DICOM meta data.
    */
   constructor(meta) {
     this.meta = meta;
+  }
+
+  /**
+   * Get the image complete flag (for image data).
+   *
+   * @returns {boolean|undefined} True if the image is complete.
+   */
+  getComplete() {
+    let res;
+    if (typeof this.image !== 'undefined') {
+      res = this.image.getComplete();
+    }
+    return res;
   }
 
   /**
@@ -101,15 +154,270 @@ export class DicomData {
   }
 
   /**
-   * Get the image complete flag (for image data).
+   * Get the duplicate origin flag.
    *
-   * @returns {boolean|undefined} True if the image is complete.
+   * @returns {boolean} The flag.
    */
-  getComplete() {
-    let res;
-    if (typeof this.image !== 'undefined') {
-      res = this.image.getComplete();
+  hasDuplicateOrigin() {
+    return this.#hasDuplicateOrigin;
+  }
+
+  /**
+   * Append slice and update meta data.
+   *
+   * @param {DicomData} data The data to append.
+   */
+  appendData(data) {
+    // only process if no duplicate origins were found
+    // if there was, then the image must be created when
+    // the load finishes via a DicomSliceDataList.buildImage
+    if (!this.#hasDuplicateOrigin) {
+      // append slice to current image
+      if (typeof this.image !== 'undefined' &&
+        typeof data.image !== 'undefined'
+      ) {
+        this.#appendSlice(data.image);
+      }
+
+      this.#mergeMeta(data.meta);
     }
+  }
+
+  /**
+   * Append a slice image to this image.
+   *
+   * @param {Image} image The image to append.
+   */
+  #appendSlice(image) {
+    // check if append is possible
+    const geom0 = this.image.getGeometry();
+    const geom1 = image.getGeometry();
+    const canAppend = geom0.canAppendOrigin(
+      geom1.getOrigin(), geom1.getInitialTime());
+
+    // store result if not possible to stop future appends
+    if (!canAppend.success) {
+      this.#hasDuplicateOrigin = true;
+    }
+
+    // append if possible
+    if (!this.#hasDuplicateOrigin) {
+      this.image.appendSlice(image);
+    }
+  }
+
+  /**
+   * Merge meta data to this meta.
+   *
+   * @param {Object<string, DataElement>} meta The data to merge.
+   */
+  #mergeMeta(meta) {
+    const meta1IdNum = getVolumeIdTagValue(meta);
+    let meta1Id;
+    if (typeof meta1IdNum !== 'undefined') {
+      meta1Id = meta1IdNum.toString();
+    }
+    this.meta = mergeMeta(this.meta, meta, meta1Id);
+  }
+}
+
+/**
+ * DICOM data: meta and possible image.
+ */
+export class DicomSliceDataList {
+
+  /**
+   * @type {DicomData[]|undefined}
+   */
+  #list = [];
+
+  /**
+   * Add a clone of the input data to the local list.
+   *
+   * @param {DicomData} data The data to clone and add.
+   */
+  addClone(data) {
+    const clone = new DicomData(structuredClone(data.meta));
+    clone.image = data.image.clone();
+    this.add(clone);
+  }
+
+  /**
+   * Add data to the local list.
+   *
+   * @param {DicomData} data The data to add.
+   */
+  add(data) {
+    this.#list.push(data);
+  }
+
+  /**
+   * Build a data from the stored slice data.
+   *
+   * @returns {{image, meta}} The result data.
+   */
+  buildData() {
+    // get and check the number of volumes
+    const numberOfVolumes = this.#getNumberOfVolumes();
+    if (typeof numberOfVolumes === 'undefined') {
+      throw new Error('Non constant number of volumes');
+    }
+    if (numberOfVolumes === 0) {
+      throw new Error('Duplicate origins but no volumes');
+    }
+    if (numberOfVolumes === 1) {
+      throw new Error('Duplicate origins but just one volume');
+    }
+
+    // get indices per volumes
+    const volsIndices = this.#getVolumesIndices(
+      numberOfVolumes, getPostLoadVolumeIdTagValue);
+
+    if (typeof volsIndices === 'undefined') {
+      throw new Error('Cannot create image for multi-volume');
+    }
+
+    // reset times and append slice
+    let image;
+    let meta;
+    for (let i = 0; i < volsIndices.length; ++i) {
+      const indices = volsIndices[i];
+      // meta
+      // TODO fix slow when in indices loop
+      const sliceMeta = this.#list[indices[0]].meta;
+      if (typeof meta === 'undefined') {
+        meta = sliceMeta;
+      } else {
+        const sliceMetaId = i + ':' +
+          getPostLoadVolumeIdTagValue(sliceMeta);
+        meta = mergeMeta(
+          meta, sliceMeta, sliceMetaId);
+      }
+      // image
+      for (const index of indices) {
+        const sliceImage = this.#list[index].image;
+        sliceImage.getGeometry().setInitialTime(i);
+        if (typeof image === 'undefined') {
+          image = sliceImage;
+        } else {
+          image.appendSlice(sliceImage);
+        }
+      }
+    }
+    return {image, meta};
+  }
+
+  /**
+   * Get the list of indices per volume.
+   *
+   * @param {number} numberOfVolumes The number of expected volumes.
+   * @param {Function} volumeIndexGetter A function to get the volume index from
+   *   meta data.
+   * @returns {number[][]|undefined} List of indices per volume or
+   *   undefined if something went wrong.
+   */
+  #getVolumesIndices(numberOfVolumes, volumeIndexGetter) {
+    const originList = this.#getOriginList();
+    const volumesIndices = [];
+    let mainIndices;
+    for (const item of originList) {
+      const indices = [];
+      for (const index of item.indices) {
+        const relData = this.#list[index];
+        const volumeIndex = volumeIndexGetter(relData.meta);
+        if (indices.includes(volumeIndex)) {
+          // duplicate volume index
+          return;
+        } else {
+          indices.push(volumeIndex);
+          // zero based volume index
+          let volIndex = indices.length - 1;
+          if (typeof mainIndices !== 'undefined') {
+            volIndex = mainIndices.indexOf(volumeIndex);
+          }
+          // add data index to volume indices
+          if (typeof volumesIndices[volIndex] === 'undefined') {
+            volumesIndices[volIndex] = [];
+          }
+          volumesIndices[volIndex].push(index);
+        }
+      }
+      if (indices.length !== numberOfVolumes) {
+        // too many indices
+        return;
+      }
+      // store main indices at first round
+      if (typeof mainIndices === 'undefined') {
+        mainIndices = indices.slice();
+      }
+    }
+
+    // check same size
+    const numberOfSlices = originList.length;
+    for (const list of volumesIndices) {
+      if (list.length !== numberOfSlices) {
+        // wrong number of slices
+        return;
+      }
+    }
+
+    return volumesIndices;
+  }
+
+  /**
+   * Get the number of volumes of a data.
+   *
+   * @returns {number|undefined} The number of volumes or
+   *   undefined if non constant.
+   */
+  #getNumberOfVolumes() {
+    const originList = this.#getOriginList();
+    if (originList.length === 0) {
+      return 0;
+    }
+    const count = originList[0].count;
+    // check if constant count
+    for (const item of originList) {
+      if (item.count !== count) {
+        // non constant number of origins
+        return;
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Get the list of origins and thein occurences.
+   *
+   * @returns {{pos, indices, count}[]} A list of origins and
+   *   their number of occurences.
+   */
+  #getOriginList() {
+    // equal callback
+    const getEqualPosCallback = function (pos) {
+      return function (element) {
+        return element.pos.equals(pos);
+      };
+    };
+
+    const res = [];
+    for (let i = 0; i < this.#list.length; ++i) {
+      const relData = this.#list[i];
+      const origin = relData.image.getGeometry().getOrigin();
+      const findCallback = getEqualPosCallback(origin);
+      const found = res.find(findCallback);
+      if (typeof found === 'undefined') {
+        res.push({
+          pos: origin,
+          indices: [i],
+          count: 1
+        });
+      } else {
+        ++found.count;
+        found.indices.push(i);
+      }
+    }
+
     return res;
   }
 }
@@ -125,6 +433,14 @@ export class DataController {
    * @type {Object<string, DicomData>}
    */
   #dataList = {};
+
+  /**
+   * Temporary slice list for data with duplicate origin
+   * that needs to be created once the load is finished.
+   *
+   * @type {DicomSliceDataList}
+   */
+  #tmpSliceList;
 
   /**
    * List of DICOM data.
@@ -340,6 +656,16 @@ export class DataController {
     // create the data content
     this.#setDataContent(data);
 
+    // store data for possible load finish processing
+    if (typeof data.numberOfFiles !== 'undefined' &&
+      data.numberOfFiles > 1) {
+      this.#tmpSliceList = new DicomSliceDataList();
+      // add first data as clone since this data
+      // is the base for future appends with no
+      // duplicate origin
+      this.#tmpSliceList.addClone(data);
+    }
+
     // propagate image events
     if (typeof data.image !== 'undefined') {
       for (const eventName of imageEventNames) {
@@ -465,35 +791,16 @@ export class DataController {
     // create the data content
     this.#setDataContent(data);
 
-    // add slice to current image
-    if (typeof dataToUpdate.image !== 'undefined' &&
-      typeof data.image !== 'undefined'
-    ) {
-      dataToUpdate.image.appendSlice(data.image);
+    // store data for possible end processing
+    if (typeof this.#tmpSliceList !== 'undefined') {
+      this.#tmpSliceList.add(data);
     }
 
-    // update meta data
-    let idKey = '';
-    if (typeof data.meta['00020010'] !== 'undefined') {
-      // dicom case, use 'InstanceNumber'
-      idKey = '00200013';
-    } else {
-      idKey = 'imageUid';
+    // append data if no duplicate origin
+    // (if has duplicates, data will be created in markDataAsComplete)
+    if (!dataToUpdate.hasDuplicateOrigin()) {
+      dataToUpdate.appendData(data);
     }
-    // possible time suffix
-    let suffix = '';
-    const timeTag = getTagTime(data.meta);
-    if (typeof timeTag !== 'undefined') {
-      suffix = '-' + timeTag;
-    }
-    // merge
-    dataToUpdate.meta = mergeObjects(
-      dataToUpdate.meta,
-      data.meta,
-      idKey,
-      'value',
-      suffix
-    );
 
     /**
      * Data udpate event.
@@ -513,12 +820,34 @@ export class DataController {
    * Mark a data a complete (fully loaded).
    *
    * @param {string} dataId The data id.
+   * @returns {{imageHasChanged}} An object with an imageHasChanged property.
    */
   markDataAsComplete(dataId) {
-    if (typeof this.#dataList[dataId] === 'undefined') {
+    const data = this.#dataList[dataId];
+    if (typeof data === 'undefined') {
       throw new Error('Cannot find data to mark as complete: ' + dataId);
     }
-    this.#dataList[dataId].setComplete(true);
+
+    const res = {imageHasChanged: false};
+
+    // data with duplicate origin case: build image
+    // from final slice list
+    if (typeof this.#tmpSliceList !== 'undefined' &&
+      data.hasDuplicateOrigin()
+    ) {
+      const data = this.#tmpSliceList.buildData();
+      this.setImage(dataId, data.image);
+      this.meta = data.meta;
+      // reset tmp var
+      this.#tmpSliceList = undefined;
+      // mark image as changed
+      res.imageHasChanged = true;
+    }
+
+    // mark image as complete
+    data.setComplete(true);
+
+    return res;
   }
 
   /**

@@ -36,7 +36,7 @@ const TagKeys = {
  * the image buffer if pixel data is present. Buffer is decoded if needed,
  * only necessary tags for decompression are checked.
  */
-export class DicomBufferToView {
+export class DicomBufferToData {
 
   /**
    * Converter options.

@@ -174,8 +174,8 @@ function viewerSetup() {
   //   }
   // };
 
-  // // example private logic for time value retrieval
-  // custom.getTagTime = function (elements) {
+  // // example private logic for volume id value retrieval
+  // custom.getVolumeIdTagValue = function (elements) {
   //   let value;
   //   const element = elements['ABCD0123'];
   //   if (typeof element !== 'undefined') {

@@ -2,7 +2,7 @@ import {startsWith, getFileExtension} from '../utils/string.js';
 import {getUrlFromUri} from '../utils/uri.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
-import {DicomBufferToView} from '../image/dicomBufferToView.js';
+import {DicomBufferToData} from '../image/dicomBufferToData.js';
 
 /**
  * DICOM data loader.
@@ -42,10 +42,10 @@ export class DicomDataLoader {
   }
 
   /**
-   * DICOM buffer to View (asynchronous).
+   * DICOM buffer to Data (asynchronous).
    *
    */
-  #db2v = new DicomBufferToView();
+  #db2d = new DicomBufferToData();
 
   /**
    * Load data.
@@ -55,32 +55,32 @@ export class DicomDataLoader {
    * @param {number} index The data index.
    */
   load(buffer, origin, index) {
-    // setup db2v ony once
+    // setup db2d ony once
     if (!this.#isLoading) {
       // pass options
-      this.#db2v.setOptions(this.#options);
+      this.#db2d.setOptions(this.#options);
       // connect handlers
-      this.#db2v.onloadstart = this.onloadstart;
-      this.#db2v.onprogress = this.onprogress;
-      this.#db2v.onloaditem = this.onloaditem;
-      this.#db2v.onload = this.onload;
-      this.#db2v.onloadend = (event) => {
+      this.#db2d.onloadstart = this.onloadstart;
+      this.#db2d.onprogress = this.onprogress;
+      this.#db2d.onloaditem = this.onloaditem;
+      this.#db2d.onload = this.onload;
+      this.#db2d.onloadend = (event) => {
         // reset loading flag
         this.#isLoading = false;
         // call listeners
         this.onloadend(event);
       };
-      this.#db2v.onerror = (event) => {
+      this.#db2d.onerror = (event) => {
         event.source = origin;
         this.onerror(event);
       };
-      this.#db2v.onabort = this.onabort;
+      this.#db2d.onabort = this.onabort;
     }
 
     // set loading flag
     this.#isLoading = true;
     // convert
-    this.#db2v.convert(buffer, origin, index);
+    this.#db2d.convert(buffer, origin, index);
   }
 
   /**
@@ -89,8 +89,8 @@ export class DicomDataLoader {
   abort() {
     // reset loading flag
     this.#isLoading = false;
-    // abort conversion, will trigger db2v.onabort
-    this.#db2v.abort();
+    // abort conversion, will trigger db2d.onabort
+    this.#db2d.abort();
   }
 
   /**

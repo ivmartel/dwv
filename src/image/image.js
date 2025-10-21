@@ -12,6 +12,8 @@ import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
 import {MAX_CONTOUR_SIZE} from './view.js';
+import {BooleanResult} from '../utils/result.js';
+import {equalWl} from './windowLevel.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -859,7 +861,8 @@ export class Image {
     // clone the image buffer
     const clonedBuffer = this.#buffer.slice(0);
     // create the image copy
-    const copy = new Image(this.getGeometry(), clonedBuffer, this.#imageUids);
+    const copy = new Image(
+      this.getGeometry().clone(), clonedBuffer, this.#imageUids);
     // copy the RSI(s)
     if (this.isConstantRSI()) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
@@ -872,7 +875,7 @@ export class Image {
     // copy extras
     copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
     copy.setPlanarConfiguration(this.getPlanarConfiguration());
-    copy.setMeta(this.getMeta());
+    copy.setMeta(structuredClone(this.getMeta()));
     // return
     return copy;
   }
@@ -913,52 +916,69 @@ export class Image {
   }
 
   /**
-   * Append a slice to the image.
+   * Check if another image can be appended to this one.
    *
-   * @param {Image} rhs The slice to append.
-   * @fires Image#imagegeometrychange
+   * @param {Image} rhs The image to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the image can be appended.
    */
-  appendSlice(rhs) {
+  canAppend(rhs) {
     // check input
     if (rhs === null) {
-      throw new Error('Cannot append null slice');
+      return {
+        success: false,
+        message: 'Cannot append null slice'
+      };
     }
-    const rhsSize = rhs.getGeometry().getSize();
-    let size = this.#geometry.getSize();
-    if (rhsSize.get(2) !== 1) {
-      throw new Error('Cannot append more than one slice');
+
+    // check geometry
+    const geoCanAppend = this.#geometry.canAppend(rhs.getGeometry());
+    if (!geoCanAppend.success) {
+      return geoCanAppend;
     }
-    if (size.get(0) !== rhsSize.get(0)) {
-      throw new Error('Cannot append a slice with different number of columns');
-    }
-    if (size.get(1) !== rhsSize.get(1)) {
-      throw new Error('Cannot append a slice with different number of rows');
-    }
-    if (!this.#geometry.getOrientation().isSimilar(
-      rhs.getGeometry().getOrientation(), REAL_WORLD_EPSILON)) {
-      throw new Error('Cannot append a slice with different orientation');
-    }
+
     if (this.#photometricInterpretation !==
       rhs.getPhotometricInterpretation()) {
-      throw new Error(
-        'Cannot append a slice with different photometric interpretation');
+      return {
+        success: false,
+        message:
+          'Cannot append a slice with different photometric interpretation'
+      };
     }
     // all meta should be equal
     for (const key in this.#meta) {
       if (
         key === 'windowPresets' ||
         key === 'numberOfFiles' ||
-        key === 'custom' ||
-        // This was already checked with #geometry.getOrientation()
-        key === 'ImageOrientationPatient'
+        key === 'custom'
       ) {
         continue;
       }
 
       if (this.#meta[key] !== rhs.getMeta()[key]) {
-        throw new Error('Cannot append a slice with different ' + key +
-          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
+        const message = 'Cannot append a slice with different ' + key +
+          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key];
+        return {
+          success: false,
+          message
+        };
       }
+    }
+
+    return new BooleanResult(true);
+  }
+
+  /**
+   * Append a slice to the image.
+   *
+   * @param {Image} rhs The slice to append.
+   * @fires Image#imagegeometrychange
+   */
+  appendSlice(rhs) {
+    // check if possible
+    const canAppend = this.canAppend(rhs);
+    if (!canAppend.success) {
+      throw new Error(canAppend.message);
     }
 
     // update ranges
@@ -974,6 +994,8 @@ export class Image {
       min: Math.min(rhsResRange.min, resRange.min),
       max: Math.max(rhsResRange.max, resRange.max),
     };
+
+    let size = this.getGeometry().getSize();
 
     // possible time
     const timeId = rhs.getGeometry().getInitialTime();
@@ -1074,7 +1096,7 @@ export class Image {
           if (typeof windowPreset.perslice === 'undefined' ||
             windowPreset.perslice === false) {
             // if different preset.wl, mark it as perslice
-            if (!windowPreset.wl[0].equals(rhsPreset.wl[0])) {
+            if (!equalWl(windowPreset.wl[0], rhsPreset.wl[0])) {
               windowPreset.perslice = true;
               // fill wl array with copy of wl[0]
               // (loop on number of images minus the existing one)
