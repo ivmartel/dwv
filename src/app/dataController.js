@@ -6,7 +6,7 @@ import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
-import {getTagTime} from '../dicom/dicomDate.js';
+import {getVolumeIdTagValue} from '../dicom/dicomVolume.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 
 // doc imports
@@ -482,7 +482,7 @@ export class DataController {
     }
     // possible time suffix
     let suffix = '';
-    const timeTag = getTagTime(data.meta);
+    const timeTag = getVolumeIdTagValue(data.meta);
     if (typeof timeTag !== 'undefined') {
       suffix = '-' + timeTag;
     }

@@ -1,4 +1,3 @@
-import {custom} from '../app/custom.js';
 import {DataElement} from './dataElement.js';
 
 /**
@@ -9,21 +8,6 @@ import {DataElement} from './dataElement.js';
  */
 function padZeroTwoDigit(str) {
   return ('0' + str).slice(-2);
-}
-
-/**
- * Get the time from a list of tags. Defaults
- *   returns undefined.
- *
- * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {number|undefined} The time value if available.
- */
-export function getTagTime(elements) {
-  if (typeof custom.getTagTime !== 'undefined') {
-    return custom.getTagTime(elements);
-  } else {
-    return;
-  }
 }
 
 /**

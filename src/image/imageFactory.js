@@ -17,7 +17,7 @@ import {
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
-import {getTagTime} from '../dicom/dicomDate.js';
+import {getVolumeIdTagValue} from '../dicom/dicomVolume.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
@@ -370,7 +370,7 @@ export class ImageFactory {
     // geometry
     const origin = new Point3D(
       slicePosition[0], slicePosition[1], slicePosition[2]);
-    const time = getTagTime(dataElements);
+    const time = getVolumeIdTagValue(dataElements);
     const geometry = new Geometry(
       [origin], size, spacing, orientationMatrix, time);
 
