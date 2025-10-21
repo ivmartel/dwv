@@ -19,3 +19,18 @@ export function getVolumeIdTagValue(elements) {
     return;
   }
 }
+
+/**
+ * Get the volume id from a list of tags parsed after the load finishes.
+ * Defaults returns undefined.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number|undefined} The id value if available.
+ */
+export function getPostLoadVolumeIdTagValue(elements) {
+  if (typeof custom.getPostLoadVolumeIdTagValue !== 'undefined') {
+    return custom.getPostLoadVolumeIdTagValue(elements);
+  } else {
+    return;
+  }
+}

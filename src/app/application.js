@@ -1921,7 +1921,14 @@ export class App {
    */
   #onload = (event) => {
     // mark data as complete
-    this.#dataController.markDataAsComplete(event.dataid);
+    const res = this.#dataController.markDataAsComplete(event.dataid);
+
+    // render if image has changed
+    if (this.#options.viewOnFirstLoadItem &&
+      typeof res.imageHasChanged !== 'undefined' &&
+      res.imageHasChanged) {
+      this.render(event.dataid);
+    }
 
     /**
      * Load event: fired when a load finishes successfully.

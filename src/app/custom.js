@@ -44,6 +44,14 @@ export const custom = {
   getVolumeIdTagValue: undefined,
 
   /**
+   * Get the volume id from a list of dicom tags parsed after load finishes.
+   *
+   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @returns {number|undefined} The id value if available.
+   */
+  getPostLoadVolumeIdTagValue: undefined,
+
+  /**
    * Get the pixel data unit from a list of dicom tags.
    * Not used for PET data with SUV values.
    *
