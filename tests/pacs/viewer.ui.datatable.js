@@ -575,6 +575,59 @@ export class DataTableUI {
     cell.appendChild(getControlDiv(opacityId, 'opacity',
       0, 1, initialLayer.getOpacity(), onChangeOpacity, floatPrecision));
 
+    if (
+      initialLayer.getViewController &&
+      initialLayer.getViewController().getModality() === 'SEG'
+    ) {
+      const fillOpacityId = 'fill-opacity-' + dataId;
+      // callback
+      const onChangeFillOpacity = (value) => {
+        // update selected layers
+        const lgIds = getSelectedLayerGroupIds();
+        for (let i = 0; i < lgIds.length; ++i) {
+          const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+          const layer = lg.getActiveLayer();
+          if (typeof layer !== 'undefined') {
+            layer.setFillOpacity(value);
+            layer.draw();
+          }
+        }
+      };
+      // add controls
+      cell.appendChild(getControlDiv(
+        fillOpacityId,
+        'fill opacity',
+        0, 1,
+        initialLayer.getFillOpacity(),
+        onChangeFillOpacity,
+        floatPrecision
+      ));
+
+      const contourThicknessId = 'contour-thickness-' + dataId;
+      // callback
+      const onChangeContourThickness = (value) => {
+        // update selected layers
+        const lgIds = getSelectedLayerGroupIds();
+        for (let i = 0; i < lgIds.length; ++i) {
+          const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+          const layer = lg.getActiveLayer();
+          if (typeof layer !== 'undefined') {
+            layer.setContourThickness(value);
+            layer.draw();
+          }
+        }
+      };
+      // add controls
+      cell.appendChild(getControlDiv(
+        contourThicknessId,
+        'contour thickness',
+        0, 10,
+        initialLayer.getContourThickness(),
+        onChangeContourThickness,
+        1
+      ));
+    }
+
     // cell: alpha range
     cell = row.insertCell();
     const minId = 'value-min-' + dataId;

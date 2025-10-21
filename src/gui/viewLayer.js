@@ -496,6 +496,46 @@ export class ViewLayer {
   }
 
   /**
+   * Get the fill opacity relative to the global opacity.
+   *
+   * @returns {number} The fill opacity (between 0 and 1).
+   */
+  getFillOpacity() {
+    return this.#viewController.getFillOpacity();
+  }
+
+  /**
+   * Set the fill opacity relative to the global opacity.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} opacity The fill opacity (between 0 and 1).
+   */
+  setFillOpacity(opacity) {
+    this.#viewController.setFillOpacity(opacity);
+  }
+
+  /**
+   * Get the thickness of the contour in pixels.
+   *
+   * @returns {number} The contour thickness (integer >= 1).
+   */
+  getContourThickness() {
+    return this.#viewController.getContourThickness();
+  }
+
+  /**
+   * Set the thickness of the contour in pixels.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} thickness The contour thickness (integer >= 1).
+   */
+  setContourThickness(thickness) {
+    this.#viewController.setContourThickness(thickness);
+  }
+
+  /**
    * Add a flip offset along the layer X axis.
    */
   addFlipOffsetX() {

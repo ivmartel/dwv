@@ -2117,12 +2117,28 @@ export class App {
 
     // make pixel of value 0 transparent for segmentation
     // (assuming RGB data)
-    if (data.image.getMeta().Modality === 'SEG') {
-      view.setAlphaFunction(function (value /*, index*/) {
+    const isSegmentationLayer = data.image.getMeta().Modality === 'SEG';
+    if (isSegmentationLayer) {
+      data.image.initializeContour();
+      view.setAlphaFunction(function (value, index) {
         if (value === 0) {
           return 0;
         } else {
-          return 0xff;
+          // ideally getContourDistance would be passed in by an
+          // iterator, but that would require a large change to a
+          // lot of components for this one edge case.
+          const contourDistance =
+            data.image.getContourDistance(
+              index,
+              view.getOrientation()
+            );
+          if (
+            contourDistance <= view.getContourThickness()
+          ) {
+            return 0xff;
+          } else {
+            return 0xff * view.getFillOpacity();
+          }
         }
       });
     }
@@ -2137,7 +2153,12 @@ export class App {
       opacity = viewConfig.opacity;
     } else {
       if (!isBaseLayer) {
-        opacity = 0.5;
+        if (isSegmentationLayer) {
+          // Assuming contours are enabled be default
+          opacity = 0.8;
+        } else {
+          opacity = 0.5;
+        }
       }
     }
 

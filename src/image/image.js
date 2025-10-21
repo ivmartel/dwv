@@ -11,6 +11,7 @@ import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
+import {MAX_CONTOUR_SIZE} from './view.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
 
@@ -204,6 +205,14 @@ export class Image {
   #buffer;
 
   /**
+   * Data contour buffer.
+   * If there is no data contour this is null.
+   *
+   * @type {Uint8Array?}
+   */
+  #contourBuffer;
+
+  /**
    * Whether the image has been resampled or not.
    *
    * @type {boolean}
@@ -355,6 +364,7 @@ export class Image {
     this.#resampled = false;
     this.#rawGeometry = null;
     this.#rawBuffer = null;
+    this.#contourBuffer = null;
     this.#imageUids = imageUids;
     this.#labelingThread = null;
     this.#resamplingThread = null;
@@ -888,7 +898,20 @@ export class Image {
     }
     // put old in new
     this.#buffer.set(tmpBuffer);
+
     // clean
+    tmpBuffer = null;
+  }
+
+  /**
+   * Re-allocate buffer memory to an input size.
+   *
+   * @param {number} size The new size.
+   */
+  #reallocContour(size) {
+    let tmpBuffer = this.#contourBuffer;
+    this.#contourBuffer = new Uint8Array(size);
+    this.#contourBuffer.set(tmpBuffer);
     tmpBuffer = null;
   }
 
@@ -1002,6 +1025,11 @@ export class Image {
     const fullBufferSize = sliceSize * this.#meta.numberOfFiles;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
+
+      if (this.#contourBuffer !== null) {
+        const contourSize = size.getDimSize(2) * 3 * this.#meta.numberOfFiles;
+        this.#reallocContour(contourSize);
+      }
     }
 
     // slice index
@@ -1015,14 +1043,24 @@ export class Image {
     }
     // offset of the input slice
     const indexOffset = fullSliceIndex * sliceSize;
-    const maxOffset =
-      this.#geometry.getCurrentTotalNumberOfSlices() * sliceSize;
+    const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
+    const maxOffset = totalSlices * sliceSize;
     // move content if needed
     if (indexOffset < maxOffset) {
       this.#buffer.set(
         this.#buffer.subarray(indexOffset, maxOffset),
         indexOffset + sliceSize
       );
+
+      if (this.#contourBuffer !== null) {
+        const contourSliceSize = size.getDimSize(2) * 3;
+        const contourIndexOffset = fullSliceIndex * contourSliceSize;
+        const contourMaxOffset = totalSlices * contourSliceSize;
+        this.#contourBuffer.set(
+          this.#contourBuffer.subarray(contourIndexOffset, contourMaxOffset),
+          contourIndexOffset + contourSliceSize
+        );
+      }
     }
     // add new slice content
     this.#buffer.set(rhs.getBuffer(), indexOffset);
@@ -1107,6 +1145,11 @@ export class Image {
     const fullBufferSize = frameSize * this.#meta.numberOfFiles;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
+
+      if (this.#contourBuffer !== null) {
+        const contourSize = size.getDimSize(2) * 3 * this.#meta.numberOfFiles;
+        this.#reallocContour(contourSize);
+      }
     }
     // check index
     if (frameIndex >= this.#meta.numberOfFiles) {
@@ -1291,6 +1334,11 @@ export class Image {
         }
         // write update value
         this.#buffer[offset] = value;
+        if (this.#contourBuffer !== null) {
+          this.#contourBuffer[offset * 3] = 0;
+          this.#contourBuffer[(offset * 3) + 1] = 0;
+          this.#contourBuffer[(offset * 3) + 2] = 0;
+        }
       }
       originalValuesLists.push(originalValues);
     }
@@ -1329,6 +1377,9 @@ export class Image {
       while (!ival.done) {
         const offset = offsets[ival.index];
         this.#buffer[offset] = ival.value;
+        if (this.#contourBuffer !== null) {
+          this.#contourBuffer[offset] = 0;
+        }
         ival = iterator.next();
       }
     }
@@ -1747,6 +1798,255 @@ export class Image {
       );
     }
     return newImage;
+  }
+
+  /**
+   * Initialize the contour buffer.
+   * Should be called on every segmentation image, or any image where
+   * contour rendering needs to be supported.
+   */
+  initializeContour() {
+    this.#contourBuffer = new Uint8Array(this.#buffer.length * 3);
+  }
+
+  /**
+   * Get whether or not the contour buffer has been initialized.
+   *
+   * @returns {boolean} True if buffer has been initialized.
+   */
+  countourIsInitialized() {
+    return this.#contourBuffer !== null;
+  }
+
+  /**
+   * Move cursor a step in the X direction to check for border pixels.
+   *
+   * @param {number} distance Accumulated distance travelled.
+   * @param {number} index Current cursor index before moving.
+   * @param {number} direction Offset to move cursor.
+   * @param {number} dim The index of the current dimension.
+   * @param {number} checkValue Initial pixel value.
+   * @param {(()=>number)[]} queue Ordered queue of locations to check.
+   * @returns {()=>number} A function that returns the distance to the nearest
+   *  border pixel or 0.
+   */
+  #recursiveDistanceCheckX(distance, index, direction, dim, checkValue, queue) {
+    return () => {
+      const newIndex = index + direction;
+      const newDistance = distance + 1;
+
+      const size = this.#geometry.getSize();
+      const borderCheck = size.offsetToIndex(newIndex);
+
+      if (
+        newIndex >= this.#buffer.length ||
+        newIndex < 0 ||
+        borderCheck.get(dim) === 0 ||
+        borderCheck.get(dim) === size.get(dim) - 1 ||
+        newDistance === 255
+      ) {
+        return newDistance;
+      }
+
+      if (newDistance > MAX_CONTOUR_SIZE) {
+        return 255;
+      }
+
+      if (this.#buffer[newIndex] !== checkValue) {
+        return newDistance;
+      } else {
+        queue.push(this.#recursiveDistanceCheckX(
+          newDistance,
+          newIndex,
+          direction,
+          dim,
+          checkValue,
+          queue
+        ));
+
+        return 0;
+      }
+    };
+  }
+
+  /**
+   * Move cursor a step in the Y direction to check for border pixels.
+   * Also spawns two new cursors checking in the X directions to either side.
+   *
+   * @param {number} distance Accumulated distance travelled.
+   * @param {number} index Current cursor index before moving.
+   * @param {number} yDirection Offset to move cursor.
+   * @param {number} xDirection Offset to move cursor.
+   * @param {number} yDim The index of the y dimension.
+   * @param {number} xDim The index of the x dimension.
+   * @param {number} checkValue Initial pixel value.
+   * @param {(()=>number)[]} queue Ordered queue of locations to check.
+   * @returns {()=>number} A function that returns the distance to the nearest
+   *  border pixel or 0.
+   */
+  #recursiveDistanceCheckY(
+    distance,
+    index,
+    yDirection,
+    xDirection,
+    yDim,
+    xDim,
+    checkValue,
+    queue
+  ) {
+    return () => {
+      const newIndex = index + yDirection;
+      const newDistance = distance + 1;
+
+      const size = this.#geometry.getSize();
+      const borderCheck = size.offsetToIndex(newIndex);
+
+      if (
+        newIndex >= this.#buffer.length ||
+        newIndex < 0 ||
+        borderCheck.get(yDim) === 0 ||
+        borderCheck.get(yDim) === size.get(yDim) - 1 ||
+        newDistance === 255
+      ) {
+        return newDistance;
+      }
+
+      if (newDistance > MAX_CONTOUR_SIZE) {
+        return 255;
+      }
+
+      if (this.#buffer[newIndex] !== checkValue) {
+        return newDistance;
+      } else {
+        queue.push(this.#recursiveDistanceCheckX(
+          newDistance,
+          newIndex,
+          xDirection,
+          xDim,
+          checkValue,
+          queue
+        ));
+
+        queue.push(this.#recursiveDistanceCheckX(
+          newDistance,
+          newIndex,
+          -xDirection,
+          xDim,
+          checkValue,
+          queue
+        ));
+
+        queue.push(this.#recursiveDistanceCheckY(
+          newDistance,
+          newIndex,
+          yDirection,
+          xDirection,
+          yDim,
+          xDim,
+          checkValue,
+          queue
+        ));
+
+        return 0;
+      }
+    };
+  }
+
+  /**
+   * Calculate the distance to the nearest border pixel.
+   * (or return the cached distance).
+   *
+   * @param {number} index Index/offset of the pixel to check.
+   * @param {Matrix33} viewOrientation The orientation of the view.
+   * @returns {number} The distance to the nearest border pixel or 0.
+   */
+  getContourDistance(index, viewOrientation) {
+    if (this.#contourBuffer === null) {
+      // Contour not enabled
+      return 0;
+    }
+
+    const orientationIndex = viewOrientation.getThirdColMajorDirection();
+
+    const xDim = (orientationIndex + 1) % 3;
+    const yDim = (orientationIndex + 2) % 3;
+
+    const contourIndex = index * 3 + orientationIndex;
+
+    const bufferedDistance = this.#contourBuffer[contourIndex];
+    if (bufferedDistance > 0) {
+      return bufferedDistance;
+    }
+
+    const checkValue = this.#buffer[index];
+    const operationQueue = [];
+
+    const size = this.#geometry.getSize();
+    const yDimSize = size.getDimSize(yDim);
+    const xDimSize = size.getDimSize(xDim);
+
+    operationQueue.push(this.#recursiveDistanceCheckY(
+      0,
+      index,
+      yDimSize,
+      xDimSize,
+      yDim,
+      xDim,
+      checkValue,
+      operationQueue
+    ));
+
+    operationQueue.push(this.#recursiveDistanceCheckX(
+      0,
+      index,
+      xDimSize,
+      xDim,
+      checkValue,
+      operationQueue
+    ));
+
+    operationQueue.push(this.#recursiveDistanceCheckX(
+      0,
+      index,
+      -xDimSize,
+      xDim,
+      checkValue,
+      operationQueue
+    ));
+
+    operationQueue.push(this.#recursiveDistanceCheckY(
+      0,
+      index,
+      -yDimSize,
+      xDimSize,
+      yDim,
+      xDim,
+      checkValue,
+      operationQueue
+    ));
+
+    let opCount = 0;
+    // Enough to check every square up to MAX_CONTOUR_SIZE
+    const maxOps = Math.pow(MAX_CONTOUR_SIZE, 2);
+    while (operationQueue.length > 0) {
+      opCount++;
+      if (opCount > maxOps) {
+        this.#contourBuffer[contourIndex] = 255;
+        return 255;
+      }
+
+      const operation = operationQueue.shift();
+      const distanceCheck = operation();
+
+      if (distanceCheck > 0) {
+        // Return the first valid distance we find
+        this.#contourBuffer[contourIndex] = distanceCheck;
+        return distanceCheck;
+      }
+    }
+
+    // Something has gone wrong
+    return Infinity;
   }
 
   /**

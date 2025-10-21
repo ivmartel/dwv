@@ -30,6 +30,8 @@ import {
 import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
+export const MAX_CONTOUR_SIZE = 10;
+
 /**
  * List of view event names.
  *
@@ -162,6 +164,24 @@ export class View {
   #orientation;
 
   /**
+   * The ill (non-contour) opacity relative to global opacity.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @type {number}
+   */
+  #fillOpacity = 0.33;
+
+  /**
+   * The thickness of the contour in pixels.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @type {number}
+   */
+  #contourThickness = 1;
+
+  /**
    * Listener handler.
    *
    * @type {ListenerHandler}
@@ -222,6 +242,84 @@ export class View {
    */
   setOrientation(mat33) {
     this.#orientation = mat33;
+  }
+
+  /**
+   * Get the fill opacity relative to the global opacity.
+   *
+   * @returns {number} The fill opacity (between 0 and 1).
+   */
+  getFillOpacity() {
+    return this.#fillOpacity;
+  }
+
+  /**
+   * Set the fill opacity relative to the global opacity.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} opacity The fill opacity (between 0 and 1).
+   */
+  setFillOpacity(opacity) {
+    // Clamp to 0,1
+    if (opacity > 1) {
+      this.#fillOpacity = 1;
+    } else if (opacity < 0) {
+      this.#fillOpacity = 0;
+    } else {
+      this.#fillOpacity = opacity;
+    }
+
+    // We can treat this like an alpha function update.
+    /**
+     * Alpha func change event.
+     *
+     * @event View#alphafuncchange
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    this.#fireEvent({
+      type: 'alphafuncchange'
+    });
+  }
+
+  /**
+   * Get the thickness of the contour in pixels.
+   *
+   * @returns {number} The contour thickness (0 <= integer <= MAX_CONTOUR_SIZE).
+   */
+  getContourThickness() {
+    return this.#contourThickness;
+  }
+
+  /**
+   * Set the thickness of the contour in pixels.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} thickness The contour thickness
+   *  (0 <= integer <= MAX_CONTOUR_SIZE).
+   */
+  setContourThickness(thickness) {
+    if (thickness < 0) {
+      this.#contourThickness = 0;
+    } else if (thickness > MAX_CONTOUR_SIZE) {
+      this.#contourThickness = MAX_CONTOUR_SIZE;
+    } else {
+      this.#contourThickness = thickness;
+    }
+
+    // We can treat this like an alpha function update.
+    /**
+     * Alpha func change event.
+     *
+     * @event View#alphafuncchange
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    this.#fireEvent({
+      type: 'alphafuncchange'
+    });
   }
 
   /**
