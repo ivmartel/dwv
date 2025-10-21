@@ -12,6 +12,7 @@ import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
 import {BooleanResult} from '../utils/result.js';
+import {equalWl} from './windowLevel.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1057,7 +1058,7 @@ export class Image {
           if (typeof windowPreset.perslice === 'undefined' ||
             windowPreset.perslice === false) {
             // if different preset.wl, mark it as perslice
-            if (!windowPreset.wl[0].equals(rhsPreset.wl[0])) {
+            if (!equalWl(windowPreset.wl[0], rhsPreset.wl[0])) {
               windowPreset.perslice = true;
               // fill wl array with copy of wl[0]
               // (loop on number of images minus the existing one)

@@ -83,7 +83,10 @@ import {
   luts
 } from './image/luts.js';
 import {RescaleSlopeAndIntercept} from './image/rsi.js';
-import {WindowLevel} from './image/windowLevel.js';
+import {
+  equalWl,
+  WindowLevel
+} from './image/windowLevel.js';
 import {
   MaskFactory,
   getDefaultDicomSegJson
@@ -207,6 +210,7 @@ export {
   createImage,
   createMaskImage,
   createView,
+  equalWl,
   getDwvVersion,
   getDefaultDicomSegJson,
   getUID,

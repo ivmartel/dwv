@@ -4,8 +4,9 @@ import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
 import {VoiLut} from './voiLut.js';
 import {
-  validateWindowLevel,
-  WindowLevel
+  WindowLevel,
+  equalWl,
+  validateWindowLevel
 } from './windowLevel.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
 import {generateImageDataPaletteColor} from './viewPaletteColor.js';
@@ -381,7 +382,7 @@ export class View {
       voiLutWl = voiLut.getWindowLevel();
     }
     if (typeof voiLut === 'undefined' ||
-      !this.#currentWl.equals(voiLutWl)) {
+      !equalWl(this.#currentWl, voiLutWl)) {
       // set lut window level
       const voiLut = new VoiLut(
         this.#currentWl,
@@ -754,7 +755,7 @@ export class View {
     );
 
     // check if new wl
-    const isNewWl = !wlBound.equals(this.#currentWl);
+    const isNewWl = !equalWl(wlBound, this.#currentWl);
     // check if new name
     const isNewName = this.#currentPresetName !== name;
 

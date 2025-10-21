@@ -1,6 +1,51 @@
 import {VoiLutFunctionNames} from './voiLut.js';
 
 /**
+ * Window and Level also known as window width and center.
+ */
+export class WindowLevel {
+  /**
+   * The window center.
+   *
+   * @type {number}
+   */
+  center;
+
+  /**
+   * The window width.
+   *
+   * @type {number}
+   */
+  width;
+
+  /**
+   * @param {number} center The window center.
+   * @param {number} width The window width.
+   */
+  constructor(center, width) {
+    this.center = center;
+    this.width = width;
+  }
+
+} // WindowLevel class
+
+/**
+ * Check for window level equality.
+ *
+ * @param {WindowLevel} wl0 The first window level.
+ * @param {WindowLevel} wl1 The second window level.
+ * @returns {boolean} True if both objects are equal.
+ */
+export function equalWl(wl0, wl1) {
+  return wl0 !== null &&
+    typeof wl0 !== 'undefined' &&
+    wl1 !== null &&
+    typeof wl1 !== 'undefined' &&
+    wl0.center === wl1.center &&
+    wl0.width === wl1.width;
+}
+
+/**
  * Validate and constrain an input window level.
  *
  * @param {WindowLevel} wl The window level to validate.
@@ -38,45 +83,3 @@ export function validateWindowLevel(
 
   return new WindowLevel(centerBound, widthBound);
 }
-
-/**
- * Window and Level also known as window width and center.
- */
-export class WindowLevel {
-  /**
-   * The window center.
-   *
-   * @type {number}
-   */
-  center;
-
-  /**
-   * The window width.
-   *
-   * @type {number}
-   */
-  width;
-
-  /**
-   * @param {number} center The window center.
-   * @param {number} width The window width.
-   */
-  constructor(center, width) {
-    this.center = center;
-    this.width = width;
-  }
-
-  /**
-   * Check for equality.
-   *
-   * @param {WindowLevel} rhs The other object to compare to.
-   * @returns {boolean} True if both objects are equal.
-   */
-  equals(rhs) {
-    return rhs !== null &&
-      typeof rhs !== 'undefined' &&
-      this.center === rhs.center &&
-      this.width === rhs.width;
-  }
-
-} // WindowLevel class
