@@ -108,6 +108,19 @@ export class Geometry {
   }
 
   /**
+   * Set the initial time.
+   *
+   * @param {number} time The new time.
+   */
+  setInitialTime(time) {
+    if (typeof this.#timeOrigins[this.#initialTime] !== 'undefined') {
+      delete this.#timeOrigins[this.#initialTime];
+    }
+    this.#initialTime = time;
+    this.#timeOrigins[time] = this.#origins.slice();
+  }
+
+  /**
    * Get the total number of slices.
    * Can be different from what is stored in the size object
    *  during a volume with time points creation process.
