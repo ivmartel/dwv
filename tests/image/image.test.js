@@ -660,8 +660,8 @@ QUnit.test('Image getContourDistance', function (assert) {
     'Expected distance from contour 3'
   );
 });
- 
-/** 
+
+/**
  * Tests for {@link Image} clone.
  *
  * @function module:tests/image~clone
