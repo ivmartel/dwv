@@ -6,6 +6,7 @@ import {
 import {logger} from '../../src/utils/logger.js';
 import {i18n} from '../../src/utils/i18n.js';
 import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
+import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {MaskFactory} from '../../src/image/maskFactory.js';
 import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
@@ -834,9 +835,15 @@ export class SegmentationUI {
     if (typeof maskData === 'undefined') {
       throw new Error('Cannot save without mask image');
     }
-    // TODO: find better way...
-    const sourceId = dataId - 1;
-    const sourceData = this.#app.getData(sourceId.toString());
+    const refSeriesUID = getReferencedSeriesUID(maskData.meta);
+    if (typeof refSeriesUID === 'undefined') {
+      throw new Error('Cannot save without referenced UID');
+    }
+    const sourceId = this.#app.getDataIdFromSeriesUid(refSeriesUID);
+    if (typeof sourceId === 'undefined') {
+      throw new Error('Cannot save without referenced ID');
+    }
+    const sourceData = this.#app.getData(sourceId);
     if (typeof sourceData === 'undefined') {
       throw new Error('Cannot save without source image');
     }
