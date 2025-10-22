@@ -174,4 +174,71 @@ export class MaskSegmentHelper {
     }
   }
 
+  /**
+   * An Dictionary containing the count of overlapping voxels of a single
+   * segment with a set of different segments.
+   * The key is the segment number of the overlapping segment in the set.
+   * The value is the overlapping voxel count.
+   *
+   * @typedef {Object.<number, number>} OverlapCount
+   */
+
+  /**
+   * An Dictionary containing the count of overlapping voxels between two
+   * sets of segments.
+   * The key is the segment number of a segment in the first set.
+   * The value is a Dictionary of all of the segments in the second set
+   * that overlap with the key segment.
+   *
+   * @typedef {Object.<number, OverlapCount>} Overlap
+   */
+
+  /**
+   * Find the overlap for each segment between two segmentation masks.
+   * It is assumed these images have the same orientation.
+   *
+   * @param {Image} compare The segmentation image to find overlap with.
+   * @returns {Overlap} The overlapping voxel counts. First level is the
+   *  segments from this image, second level is the compare image segments.
+   */
+  findOverlap(compare) {
+    // Find the overlapping slices
+    const thisGeometry = this.#mask.getGeometry();
+    const thisSize = thisGeometry.getSize();
+    const compareGeometry = compare.getGeometry();
+    const compareSize = compareGeometry.getSize();
+
+    /**
+     * @type {Overlap}
+     */
+    const overlap = {};
+
+    const thisTotalSize = thisSize.getTotalSize();
+    for (let i = 0; i < thisTotalSize; i++) {
+      const thisValue = this.#mask.getValueAtOffset(i);
+      if (thisValue !== 0) {
+        const thisIndex = thisSize.offsetToIndex(i);
+        const thisWorld = thisGeometry.indexToWorld(thisIndex);
+        const compareIndex = compareGeometry.worldToIndex(thisWorld);
+        const compareOffset = compareSize.indexToOffset(compareIndex);
+        const compareValue = compare.getValueAtOffset(compareOffset);
+
+        if (typeof compareValue !== 'undefined' && compareValue !== 0) {
+          if (typeof overlap[thisValue] !== 'undefined') {
+            if (typeof overlap[thisValue][compareValue] !== 'undefined') {
+              overlap[thisValue][compareValue] += 1;
+            } else {
+              overlap[thisValue][compareValue] = 1;
+            }
+          } else {
+            overlap[thisValue] = {};
+            overlap[thisValue][compareValue] = 1;
+          }
+        }
+      }
+    }
+
+    return overlap;
+  }
+
 } // class MaskSegmentHelper
