@@ -361,6 +361,16 @@ export class App {
   }
 
   /**
+   * Get the first data id with the given SeriesInstanceUID.
+   *
+   * @param {string} uid The SeriesInstanceUID.
+   * @returns {string} The data id.
+   */
+  getDataIdFromSeriesUid(uid) {
+    return this.#dataController.getDataIdFromSeriesUid(uid);
+  }
+
+  /**
    * Can the data (of the active view of the active layer) be scrolled?
    *
    * @returns {boolean} True if the data has a third dimension greater than one.

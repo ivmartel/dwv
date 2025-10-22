@@ -22,6 +22,8 @@ const TagKeys = {
   TransferSyntax: '00020010',
   SOPClassUID: '00080016',
   Modality: '00080060',
+  ReferencedSeriesSequence: '00081115',
+  SeriesInstanceUID: '0020000E',
   Rows: '00280010',
   Columns: '00280011',
   PixelSpacing: '00280030',
@@ -386,4 +388,20 @@ export function isSecondatyCapture(SOPClassUID) {
   const pattern = /^1\.2\.840\.10008\.5\.1\.4\.1\.1\.7/;
   return typeof SOPClassUID !== 'undefined' &&
     pattern.test(SOPClassUID);
+}
+
+/**
+ * Get the referenced series UID from the data elements.
+ *
+ * @param {Object<string, DataElement>} dataElements The data elements.
+ * @returns {string|undefined} The referenced series UID.
+ */
+export function getReferencedSeriesUID(dataElements) {
+  let res;
+  const refSeriesSq =
+    safeGetAll(dataElements, TagKeys.ReferencedSeriesSequence);
+  if (typeof refSeriesSq !== 'undefined') {
+    res = safeGet(refSeriesSq[0], TagKeys.SeriesInstanceUID);
+  }
+  return res;
 }

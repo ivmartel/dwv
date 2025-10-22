@@ -5,12 +5,13 @@ import {ImageFactory} from '../image/imageFactory.js';
 import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
-import {safeGet, safeGetAll} from '../dicom/dataElement.js';
+import {safeGet} from '../dicom/dataElement.js';
 import {
   getVolumeIdTagValue,
   getPostLoadVolumeIdTagValue
 } from '../dicom/dicomVolume.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
+import {getReferencedSeriesUID} from '../dicom/dicomImage.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -23,9 +24,7 @@ import {AnnotationGroup} from '../image/annotationGroup.js';
  * Related DICOM tag keys.
  */
 const TagKeys = {
-  Modality: '00080060',
-  SeriesInstanceUID: '0020000E',
-  ReferencedSeriesSequence: '00081115'
+  Modality: '00080060'
 };
 
 /**
@@ -586,15 +585,9 @@ export class DataController {
     let factory;
     if (hasAnyPixelDataElement(data.meta)) {
       if (modality === 'SEG') {
-      // DICOM seg case
-      // find the reference data to allow for geometry creation
-        let referencedSeriesUID;
-        const refSeriesSq =
-          safeGetAll(data.meta, TagKeys.ReferencedSeriesSequence);
-        if (typeof refSeriesSq !== 'undefined') {
-          referencedSeriesUID =
-            safeGet(refSeriesSq[0], TagKeys.SeriesInstanceUID);
-        }
+        // DICOM seg case
+        // find the referenced data to allow for geometry creation
+        const referencedSeriesUID = getReferencedSeriesUID(data.meta);
         if (typeof referencedSeriesUID === 'undefined') {
           throw new Error('Cannot create mask image: ' +
             'the DICOM seg does not have a referenced series UID');

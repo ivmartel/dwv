@@ -47,6 +47,7 @@ import {
   DicomCode,
   getSegmentationCode
 } from './dicom/dicomCode.js';
+import {getReferencedSeriesUID} from './dicom/dicomImage.js';
 import {
   DicomSRContent,
   getSRContent,
@@ -229,6 +230,7 @@ export {
   getTouchPoints,
   getSRContent,
   getDicomSRContentItem,
+  getReferencedSeriesUID,
   hasDicomPrefix,
   precisionRound,
   buildMultipart,
