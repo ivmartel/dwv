@@ -2080,13 +2080,29 @@ export class Image {
             unit: volumeUnit
           };
           // diameters should be already in the correct units
-          label.diameters.major.diameter = {
-            value: label.diameters.major.diameter,
-            unit: lengthUnit
-          };
-          label.diameters.minor.diameter = {
-            value: label.diameters.minor.diameter,
-            unit: lengthUnit
+          let majorDiameter;
+          let minorDiameter;
+          if (typeof label.diameters !== 'undefined') {
+            if (typeof label.diameters.major !== 'undefined') {
+              majorDiameter = label.diameters.major.diameter;
+            }
+            if (typeof label.diameters.minor !== 'undefined') {
+              minorDiameter = label.diameters.minor.diameter;
+            }
+          }
+          label.diameters = {
+            major: {
+              diameter: {
+                value: majorDiameter,
+                unit: lengthUnit
+              }
+            },
+            minor: {
+              diameter: {
+                value: minorDiameter,
+                unit: lengthUnit
+              }
+            }
           };
           label.height = {
             value: label.height,

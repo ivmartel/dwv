@@ -902,15 +902,26 @@ export class SegmentationUI {
         res += label.volume.value.toPrecision(4) + i18n.t(label.volume.unit);
         if (typeof label.diameters !== 'undefined') {
           res += ' (';
-          res +=
-            label.diameters.major.diameter.value.toPrecision(4) +
-            i18n.t(label.diameters.major.diameter.unit);
+          if (typeof label.diameters.major.diameter.value !== 'undefined') {
+            res += label.diameters.major.diameter.value.toPrecision(4) +
+              i18n.t(label.diameters.major.diameter.unit);
+          } else {
+            res += 'undefined';
+          }
           res += ', ';
-          res +=
-            label.diameters.minor.diameter.value.toPrecision(4) +
-            i18n.t(label.diameters.minor.diameter.unit);
+          if (typeof label.diameters.minor.diameter.value !== 'undefined') {
+            res += label.diameters.minor.diameter.value.toPrecision(4) +
+              i18n.t(label.diameters.minor.diameter.unit);
+          } else {
+            res += 'undefined';
+          }
           res += ', ';
-          res += label.height.value.toPrecision(4) + i18n.t(label.height.unit);
+          if (typeof label.height !== 'undefined') {
+            res += label.height.value.toPrecision(4) +
+              i18n.t(label.height.unit);
+          } else {
+            res += 'undefined';
+          }
           res += ')';
         }
       }
