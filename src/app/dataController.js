@@ -646,17 +646,21 @@ export class DataController {
     // store the new image
     this.#dataList[dataId] = data;
 
-    // create the data content
-    this.#setDataContent(data);
-
-    // store data for possible load finish processing
-    if (typeof data.numberOfFiles !== 'undefined' &&
-      data.numberOfFiles > 1) {
-      this.#tmpSliceList = new DicomSliceDataList();
-      // add first data as clone since this data
-      // is the base for future appends with no
-      // duplicate origin
-      this.#tmpSliceList.addClone(data);
+    // create the data content if not present
+    if (typeof data.image === 'undefined' &&
+      typeof data.annotationGroup === 'undefined') {
+      // create content
+      this.#setDataContent(data);
+      // store data for possible processing at complete time
+      // (see markDataAsComplete)
+      if (typeof data.numberOfFiles !== 'undefined' &&
+        data.numberOfFiles > 1) {
+        this.#tmpSliceList = new DicomSliceDataList();
+        // add first data as clone since this data
+        // is the base for future appends with no
+        // duplicate origin
+        this.#tmpSliceList.addClone(data);
+      }
     }
 
     // propagate image events
@@ -784,7 +788,8 @@ export class DataController {
     // create the data content
     this.#setDataContent(data);
 
-    // store data for possible end processing
+    // store data for possible processing at complete time
+    // (see markDataAsComplete)
     if (typeof this.#tmpSliceList !== 'undefined') {
       this.#tmpSliceList.add(data);
     }
@@ -828,9 +833,11 @@ export class DataController {
     if (typeof this.#tmpSliceList !== 'undefined' &&
       data.hasDuplicateOrigin()
     ) {
-      const data = this.#tmpSliceList.buildData();
-      this.setImage(dataId, data.image);
-      this.meta = data.meta;
+      const finalData = this.#tmpSliceList.buildData();
+      // set image: sends dataimageset event
+      this.setImage(dataId, finalData.image);
+      // set meta
+      data.meta = finalData.meta;
       // reset tmp var
       this.#tmpSliceList = undefined;
       // mark image as changed
