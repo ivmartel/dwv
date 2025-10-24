@@ -318,36 +318,40 @@ export class DicomSliceDataList {
   #getVolumesIndices(numberOfVolumes, volumeIndexGetter) {
     const originList = this.#getOriginList();
     const volumesIndices = [];
-    let mainIndices;
+    const volIndexValues = [];
     for (const item of originList) {
-      const indices = [];
+      // build volume index list
+      if (volIndexValues.length === 0) {
+        for (const index of item.indices) {
+          const relData = this.#list[index];
+          const volumeIndex = volumeIndexGetter(relData.meta);
+          if (volIndexValues.includes(volumeIndex)) {
+            // duplicate volume index
+            return;
+          } else {
+            volIndexValues.push(volumeIndex);
+          }
+        }
+        if (volIndexValues.length !== numberOfVolumes) {
+          // too many indices
+          return;
+        }
+        volIndexValues.sort();
+      }
+      // add indices to volume indices
       for (const index of item.indices) {
         const relData = this.#list[index];
         const volumeIndex = volumeIndexGetter(relData.meta);
-        if (indices.includes(volumeIndex)) {
-          // duplicate volume index
+        const volIndex = volIndexValues.indexOf(volumeIndex);
+        if (volIndex === -1) {
+          // unknown index
           return;
-        } else {
-          indices.push(volumeIndex);
-          // zero based volume index
-          let volIndex = indices.length - 1;
-          if (typeof mainIndices !== 'undefined') {
-            volIndex = mainIndices.indexOf(volumeIndex);
-          }
-          // add data index to volume indices
-          if (typeof volumesIndices[volIndex] === 'undefined') {
-            volumesIndices[volIndex] = [];
-          }
-          volumesIndices[volIndex].push(index);
         }
-      }
-      if (indices.length !== numberOfVolumes) {
-        // too many indices
-        return;
-      }
-      // store main indices at first round
-      if (typeof mainIndices === 'undefined') {
-        mainIndices = indices.slice();
+        // add data index to volume indices
+        if (typeof volumesIndices[volIndex] === 'undefined') {
+          volumesIndices[volIndex] = [];
+        }
+        volumesIndices[volIndex].push(index);
       }
     }
 
