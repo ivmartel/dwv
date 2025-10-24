@@ -437,9 +437,9 @@ export class DataController {
    * Temporary slice list for data with duplicate origin
    * that needs to be created once the load is finished.
    *
-   * @type {DicomSliceDataList}
+   * @type {Object<string, DicomSliceDataList>}
    */
-  #tmpSliceList;
+  #tmpSliceList = {};
 
   /**
    * List of DICOM data.
@@ -655,11 +655,11 @@ export class DataController {
       // (see markDataAsComplete)
       if (typeof data.numberOfFiles !== 'undefined' &&
         data.numberOfFiles > 1) {
-        this.#tmpSliceList = new DicomSliceDataList();
+        this.#tmpSliceList[dataId] = new DicomSliceDataList();
         // add first data as clone since this data
         // is the base for future appends with no
         // duplicate origin
-        this.#tmpSliceList.addClone(data);
+        this.#tmpSliceList[dataId].addClone(data);
       }
     }
 
@@ -790,8 +790,8 @@ export class DataController {
 
     // store data for possible processing at complete time
     // (see markDataAsComplete)
-    if (typeof this.#tmpSliceList !== 'undefined') {
-      this.#tmpSliceList.add(data);
+    if (typeof this.#tmpSliceList[dataId] !== 'undefined') {
+      this.#tmpSliceList[dataId].add(data);
     }
 
     // append data if no duplicate origin
@@ -830,16 +830,16 @@ export class DataController {
 
     // data with duplicate origin case: build image
     // from final slice list
-    if (typeof this.#tmpSliceList !== 'undefined' &&
+    if (typeof this.#tmpSliceList[dataId] !== 'undefined' &&
       data.hasDuplicateOrigin()
     ) {
-      const finalData = this.#tmpSliceList.buildData();
+      const finalData = this.#tmpSliceList[dataId].buildData();
       // set image: sends dataimageset event
       this.setImage(dataId, finalData.image);
       // set meta
       data.meta = finalData.meta;
       // reset tmp var
-      this.#tmpSliceList = undefined;
+      delete this.#tmpSliceList[dataId];
       // mark image as changed
       res.imageHasChanged = true;
     }
