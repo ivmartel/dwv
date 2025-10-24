@@ -1296,6 +1296,64 @@ export class Image {
   }
 
   /**
+   * Reset the contour buffer for the values at an offset.
+   *
+   * @param {number} offset The offset to reset.
+   */
+  #resetContourAtOffset(offset) {
+    if (this.#contourBuffer !== null) {
+      this.#contourBuffer[offset * 3] = 0;
+      this.#contourBuffer[(offset * 3) + 1] = 0;
+      this.#contourBuffer[(offset * 3) + 2] = 0;
+    }
+  }
+
+  /**
+   * Reset the contour buffer for the values around an offset.
+   * Prevents certain artifacts, especially at small brush sizes.
+   *
+   * @param {number} offset The offset to reset.
+   */
+  #resetContourAroundOffset(offset) {
+    this.#resetContourAtOffset(offset);
+
+    const size = this.#geometry.getSize();
+    const xOffset = size.getDimSize(0);
+    const yOffset = size.getDimSize(1);
+    const zOffset = size.getDimSize(2);
+
+    const px = offset + xOffset;
+    if (px < this.#buffer.length) {
+      this.#resetContourAtOffset(px);
+    }
+
+    const mx = offset - xOffset;
+    if (mx >= 0) {
+      this.#resetContourAtOffset(mx);
+    }
+
+    const py = offset + yOffset;
+    if (py < this.#buffer.length) {
+      this.#resetContourAtOffset(py);
+    }
+
+    const my = offset - yOffset;
+    if (my >= 0) {
+      this.#resetContourAtOffset(my);
+    }
+
+    const pz = offset + zOffset;
+    if (pz < this.#buffer.length) {
+      this.#resetContourAtOffset(pz);
+    }
+
+    const mz = offset + zOffset;
+    if (mz >= 0) {
+      this.#resetContourAtOffset(mz);
+    }
+  }
+
+  /**
    * Set the inner buffer values at given offsets.
    *
    * @param {number[][]} offsetsLists List of offset lists where
@@ -1334,11 +1392,7 @@ export class Image {
         }
         // write update value
         this.#buffer[offset] = value;
-        if (this.#contourBuffer !== null) {
-          this.#contourBuffer[offset * 3] = 0;
-          this.#contourBuffer[(offset * 3) + 1] = 0;
-          this.#contourBuffer[(offset * 3) + 2] = 0;
-        }
+        this.#resetContourAroundOffset(offset);
       }
       originalValuesLists.push(originalValues);
     }
@@ -1377,9 +1431,7 @@ export class Image {
       while (!ival.done) {
         const offset = offsets[ival.index];
         this.#buffer[offset] = ival.value;
-        if (this.#contourBuffer !== null) {
-          this.#contourBuffer[offset] = 0;
-        }
+        this.#resetContourAtOffset(offset);
         ival = iterator.next();
       }
     }

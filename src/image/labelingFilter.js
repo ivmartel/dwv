@@ -402,6 +402,17 @@ export class LabelingFilter {
   }
 
   /**
+   * Check if an angle is reasonably close to 90 degrees.
+   *
+   * @param {number} angle The angle to test.
+   * @param {number} epsilon How close to 90 degrees it needs to be.
+   * @returns {boolean} Is the angle close enough to 90 degrees.
+   */
+  #goodPerpendicularAngle(angle, epsilon) {
+    return angle > (90 - epsilon) && angle < (90 + epsilon);
+  }
+
+  /**
    * Calculate the major and minor (perpendicular) diameters of each segment.
    *
    * @param {TypedArray} buffer The image buffer to calculate diameters for.
@@ -449,42 +460,41 @@ export class LabelingFilter {
           let borderOffset2 = 0;
           while (this.#borders[zOffset + borderOffset2] >= 0) {
             const offset2 = this.#borders[zOffset + borderOffset2];
-            if (offset1 !== offset2) {
-              const label2 = this.#find(this.#labels[offset2]);
+            const label2 = this.#find(this.#labels[offset2]);
 
-              if (label1 === label2) {
-                const sliceOffset2 = offset2 - zOffset;
-                const slicePosition2 =
-                  this.#sliceOffsetToSliceWorld(
-                    sliceOffset2,
-                    unitVectors,
-                    spacing
-                  );
+            if (label1 === label2) {
+              const sliceOffset2 = offset2 - zOffset;
+              const slicePosition2 =
+                this.#sliceOffsetToSliceWorld(
+                  sliceOffset2,
+                  unitVectors,
+                  spacing
+                );
 
-                const sliceLine = new Line(slicePosition1, slicePosition2);
-                const distance = sliceLine.getLength();
+              const sliceLine = new Line(slicePosition1, slicePosition2);
+              const distance = sliceLine.getLength();
 
-                const maxDiameter = maxDiameters[label1];
-                if (
-                  typeof maxDiameter === 'undefined' ||
-                  maxDiameter.major.diameter < distance
-                ) {
-                  maxDiameters[label1] = {
-                    id: buffer[offset1],
-                    major: {
-                      diameter: distance,
-                      line: sliceLine,
-                      offset1: offset1,
-                      offset2: offset2,
-                    },
-                    zIndex: z
-                  };
-                }
+              const maxDiameter = maxDiameters[label1];
+              if (
+                typeof maxDiameter === 'undefined' ||
+                maxDiameter.major.diameter < distance
+              ) {
+                maxDiameters[label1] = {
+                  id: buffer[offset1],
+                  major: {
+                    diameter: distance,
+                    line: sliceLine,
+                    offset1: offset1,
+                    offset2: offset2,
+                  },
+                  zIndex: z
+                };
               }
             }
 
             borderOffset2++;
           }
+
         }
 
         borderOffset1++;
@@ -520,40 +530,59 @@ export class LabelingFilter {
         let borderOffset2 = 0;
         while (this.#borders[zOffset + borderOffset2] >= 0) {
           const offset2 = this.#borders[zOffset + borderOffset2];
-          if (offset1 !== offset2) {
-            const label2 = this.#find(this.#labels[offset2]);
-            if (label2.toString() === label && label1 === label2) {
-              const sliceOffset2 = offset2 - zOffset;
-              const slicePosition2 =
-                this.#sliceOffsetToSliceWorld(
-                  sliceOffset2,
-                  unitVectors,
-                  spacing
-                );
+          const label2 = this.#find(this.#labels[offset2]);
+          if (label2.toString() === label && label1 === label2) {
+            const sliceOffset2 = offset2 - zOffset;
+            const slicePosition2 =
+              this.#sliceOffsetToSliceWorld(
+                sliceOffset2,
+                unitVectors,
+                spacing
+              );
 
-              // Check angle for perpendicularity
-              const sliceLine = new Line(slicePosition1, slicePosition2);
-              const angle = sliceLine.getInclination();
+            // Check angle for perpendicularity
+            const sliceLine = new Line(slicePosition1, slicePosition2);
+            const angle = sliceLine.getInclination();
 
-              const angleDifference = Math.abs(angle - diameterAngle);
-              if (
-                angleDifference > 89.5 &&
-                angleDifference < 90.5
-              ) {
-                const distance = sliceLine.getLength();
+            const angleDifference = Math.abs(angle - diameterAngle);
 
-                if (
-                  typeof diameter.minor === 'undefined' ||
-                  diameter.minor.diameter < distance
-                ) {
-                  diameter.minor = {
-                    diameter: distance,
-                    line: sliceLine,
-                    offset1: offset1,
-                    offset2: offset2
-                  };
-                }
-              }
+            const distance = sliceLine.getLength();
+
+            const isGoodAngle =
+              this.#goodPerpendicularAngle(angleDifference, 0.5);
+
+            // If we can't find any angles close to 90 degrees then
+            // prioritize finding something remotely useable.
+            // This only really happens on very small/thin segments.
+            const isReasonableWithoutBetter =
+              typeof diameter.minor !== 'undefined' &&
+              (!this.#goodPerpendicularAngle(
+                diameter.minor.angleDiff,
+                0.5
+              )) &&
+              (this.#goodPerpendicularAngle(
+                angleDifference,
+                10
+              ));
+
+            if (
+              typeof diameter.minor === 'undefined' ||
+              (
+                diameter.minor.diameter < distance &&
+                isReasonableWithoutBetter
+              ) ||
+              (
+                diameter.minor.diameter < distance &&
+                isGoodAngle
+              )
+            ) {
+              diameter.minor = {
+                diameter: distance,
+                line: sliceLine,
+                offset1: offset1,
+                offset2: offset2,
+                angleDiff: angleDifference
+              };
             }
           }
 

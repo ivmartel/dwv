@@ -186,16 +186,6 @@ export class LabelingDebug {
     borders,
     maxDiameters
   ) {
-    for (let z = 0; z < sizes[2]; z++) {
-      let borderOffset = 0;
-      while (borders[(unitVectors[2] * z) + borderOffset] > 0) {
-        const offset = borders[(unitVectors[2] * z) + borderOffset];
-        if (imageBuffer[offset] > 0) {
-          imageBuffer[offset] = imageBuffer[offset] + 128;
-        }
-        borderOffset++;
-      }
-    }
     Object.values(maxDiameters).map((diameter) => {
       this.#plotPoints(
         imageBuffer,
