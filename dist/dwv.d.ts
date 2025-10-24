@@ -466,6 +466,13 @@ export declare class App {
      */
     getDataIdsFromSopUids(uids: string[]): string[];
     /**
+     * Get the first data id with the given SeriesInstanceUID.
+     *
+     * @param {string} uid The SeriesInstanceUID.
+     * @returns {string} The data id.
+     */
+    getDataIdFromSeriesUid(uid: string): string;
+    /**
      * Can the data (of the active view of the active layer) be scrolled?
      *
      * @returns {boolean} True if the data has a third dimension greater than one.
@@ -2639,6 +2646,16 @@ export declare function getPixelDataTag(): Tag;
  * @returns {Index[]} The indices of the rectangle.
  */
 export declare function getRectangleIndices(center: Index, size: number[], dir: number[]): Index[];
+
+/**
+ * Get the referenced series UID from the data elements.
+ *
+ * @param {Object<string, DataElement>} dataElements The data elements.
+ * @returns {string|undefined} The referenced series UID.
+ */
+export declare function getReferencedSeriesUID(dataElements: {
+    [x: string]: DataElement;
+}): string | undefined;
 
 /**
  * Get patient orientation label in the reverse direction.

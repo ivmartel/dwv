@@ -116,6 +116,7 @@ export class App {
     getBaseScale(): Scalar3D;
     getCurrentStackIndex(): number;
     getData(dataId: string): DicomData | undefined;
+    getDataIdFromSeriesUid(uid: string): string;
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
     getDataViewConfigs(): {
@@ -555,6 +556,11 @@ export function getPixelDataTag(): Tag;
 
 // @public
 export function getRectangleIndices(center: Index, size: number[], dir: number[]): Index[];
+
+// @public
+export function getReferencedSeriesUID(dataElements: {
+    [x: string]: DataElement;
+}): string | undefined;
 
 // @public
 export function getReverseOrientation(ori: string): string;
