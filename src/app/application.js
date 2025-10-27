@@ -306,25 +306,23 @@ export class App {
   }
 
   /**
-   * Add a new DicomData.
+   * Get the next data id.
    *
-   * @param {DicomData} data The new data.
    * @returns {string} The data id.
    */
-  addData(data) {
-    // get a new dataId
-    const dataId = this.#dataController.getNextDataId();
-    // add image to data controller
-    this.#dataController.add(
-      dataId,
-      data
-    );
-    // optional render
-    // if (this.#options.viewOnFirstLoadItem) {
-    //   this.render(dataId);
-    // }
-    // return
-    return dataId;
+  getNextDataId() {
+    return this.#dataController.getNextDataId();
+  }
+
+  /**
+   * Add a new DicomData.
+   *
+   * @param {string} dataId The data id.
+   * @param {DicomData} data The new data.
+   * @returns {boolean} False if the data cannot be added.
+   */
+  addData(dataId, data) {
+    return this.#dataController.add(dataId, data);
   }
 
   /**
@@ -1763,7 +1761,11 @@ export class App {
    */
   addAndRenderAnnotationData(data, divId, refDataId) {
     // add new data
-    const dataId = this.addData(data);
+    const dataId = this.getNextDataId();
+    const added = this.addData(dataId, data);
+    if (!added) {
+      throw new Error('Cannot add annotation data');
+    }
     // add data view config based on reference data
     const refDataViewConfigs = this.getViewConfigs(refDataId);
     const refDataViewConfig = refDataViewConfigs.find(

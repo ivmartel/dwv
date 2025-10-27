@@ -642,10 +642,12 @@ export class DataController {
    *
    * @param {string} dataId The data id.
    * @param {DicomData} data The data.
+   * @returns {boolean} False if the data cannot be added.
    */
   add(dataId, data) {
-    if (typeof this.#dataList[dataId] !== 'undefined') {
-      throw new Error('Data id already used in storage: ' + dataId);
+    if (typeof dataId === 'undefined' ||
+      typeof this.#dataList[dataId] !== 'undefined') {
+      return false;
     }
     // store the new image
     this.#dataList[dataId] = data;
@@ -693,6 +695,8 @@ export class DataController {
       type: 'dataadd',
       dataid: dataId
     });
+
+    return true;
   }
 
   /**

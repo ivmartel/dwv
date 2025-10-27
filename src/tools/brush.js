@@ -775,7 +775,12 @@ export class Brush extends EventTarget {
     const elements = getElementsFromJSONTags(firstSliceMeta);
     const data = new DicomData(elements);
     data.image = this.#mask;
-    return this.#app.addData(data);
+    const dataId = this.#app.getNextDataId();
+    const added = this.#app.addData(dataId, data);
+    if (!added) {
+      throw new Error('Cannot add mask data');
+    }
+    return dataId;
   }
 
   /**
