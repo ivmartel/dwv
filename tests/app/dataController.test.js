@@ -50,12 +50,9 @@ QUnit.test('DataController class', function (assert) {
   assert.ok(dc0Data0.image.getGeometry().equals(imgGeometry0),
     'get image has good geometry');
 
-  // add again should throw
-  assert.throws(function () {
-    dc0.add(dataId0, dicomData0);
-  },
-  new Error('Data id already used in storage: ' + dataId0),
-  'add already existing.');
+  // add again should fail
+  const added = dc0.add(dataId0, dicomData0);
+  assert.equal(added, false, 'add already existing.');
 
   // set image
   let receivedImageSet = false;
