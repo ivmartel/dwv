@@ -71,6 +71,8 @@ QUnit.test('MaskSegmentHelper findOverlap', function (assert) {
 
   const overlap1 = segmentHelper1.findOverlap(image0);
 
+  // Undefined tests
+
   assert.notStrictEqual(
     typeof overlap1,
     'undefined',
@@ -87,75 +89,142 @@ QUnit.test('MaskSegmentHelper findOverlap', function (assert) {
     'undefined',
     'Expected overlaps on label 2 returned for find overlap'
   );
-  assert.strictEqual(
+  assert.notStrictEqual(
     typeof overlap1[3],
     'undefined',
-    'Expected no overlaps on label 3 returned for find overlap'
+    'Expected overlaps on label 3 returned for find overlap'
   );
-  assert.strictEqual(
+  assert.notStrictEqual(
     typeof overlap1[4],
     'undefined',
-    'Expected no overlaps on label 4 returned for find overlap'
+    'Expected overlaps on label 4 returned for find overlap'
   );
 
   assert.notStrictEqual(
-    typeof overlap1[1][1],
+    typeof overlap1[1].overlap[1],
     'undefined',
     'Expected overlaps on label 1 for label 1 returned for find overlap'
   );
   assert.notStrictEqual(
-    typeof overlap1[1][2],
+    typeof overlap1[1].overlap[2],
     'undefined',
     'Expected overlaps on label 1 for label 2 returned for find overlap'
   );
   assert.strictEqual(
-    typeof overlap1[1][3],
+    typeof overlap1[1].overlap[3],
     'undefined',
     'Expected no overlaps on label 1 for label 3 returned for find overlap'
   );
 
   assert.notStrictEqual(
-    typeof overlap1[2][1],
+    typeof overlap1[2].overlap[1],
     'undefined',
     'Expected overlaps on label 2 for label 1 returned for find overlap'
   );
   assert.notStrictEqual(
-    typeof overlap1[2][2],
+    typeof overlap1[2].overlap[2],
     'undefined',
     'Expected overlaps on label 2 for label 2 returned for find overlap'
   );
   assert.notStrictEqual(
-    typeof overlap1[2][3],
+    typeof overlap1[2].overlap[3],
     'undefined',
     'Expected overlaps on label 2 for label 3 returned for find overlap'
   );
 
   assert.equal(
-    overlap1[1][1],
+    Object.keys(overlap1[3].overlap).length,
+    0,
+    'Expected no overlaps on label 3 returned for find overlap'
+  );
+  assert.equal(
+    Object.keys(overlap1[4].overlap).length,
+    0,
+    'Expected no overlaps on label 4 returned for find overlap'
+  );
+
+  // Total count tests
+
+  assert.equal(
+    overlap1[1].count,
+    8,
+    'Expected count on label 1'
+  );
+
+  assert.equal(
+    overlap1[2].count,
+    12,
+    'Expected count on label 2'
+  );
+
+  assert.equal(
+    overlap1[3].count,
+    6,
+    'Expected count on label 3'
+  );
+
+  assert.equal(
+    overlap1[4].count,
+    6,
+    'Expected count on label 4'
+  );
+
+  // Overlap count tests
+
+  assert.equal(
+    overlap1[1].overlap[1].count,
     2,
     'Expected count on label 1 for label 1 for find overlap'
   );
   assert.equal(
-    overlap1[1][2],
+    overlap1[1].overlap[2].count,
     1,
     'Expected count on label 1 for label 2 for find overlap'
   );
 
   assert.equal(
-    overlap1[2][1],
+    overlap1[2].overlap[1].count,
     6,
     'Expected count on label 2 for label 1 for find overlap'
   );
   assert.equal(
-    overlap1[2][2],
+    overlap1[2].overlap[2].count,
     3,
     'Expected count on label 2 for label 2 for find overlap'
   );
   assert.equal(
-    overlap1[2][2],
+    overlap1[2].overlap[3].count,
     3,
     'Expected count on label 2 for label 3 for find overlap'
   );
 
+  // Overlap percentage tests
+
+  assert.equal(
+    overlap1[1].overlap[1].percentage,
+    0.25,
+    'Expected percentage on label 1 for label 1 for find overlap'
+  );
+  assert.equal(
+    overlap1[1].overlap[2].percentage,
+    0.125,
+    'Expected percentage on label 1 for label 2 for find overlap'
+  );
+
+  assert.equal(
+    overlap1[2].overlap[1].percentage,
+    0.5,
+    'Expected percentage on label 2 for label 1 for find overlap'
+  );
+  assert.equal(
+    overlap1[2].overlap[2].percentage,
+    0.25,
+    'Expected percentage on label 2 for label 2 for find overlap'
+  );
+  assert.equal(
+    overlap1[2].overlap[3].percentage,
+    0.25,
+    'Expected percentage on label 2 for label 3 for find overlap'
+  );
 
 });

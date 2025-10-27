@@ -175,12 +175,22 @@ export class MaskSegmentHelper {
   }
 
   /**
-   * An Dictionary containing the count of overlapping voxels of a single
-   * segment with a set of different segments.
-   * The key is the segment number of the overlapping segment in the set.
-   * The value is the overlapping voxel count.
+   * The overlap count of a signle segment with another segment.
    *
-   * @typedef {Object.<number, number>} OverlapCount
+   * @typedef OverlapCount
+   * @property {number} count The number of overlapping voxels.
+   * @property {number} percentage The overlap percentage between 0 and 1.
+   */
+
+  /**
+   * The count of overlapping voxels of a single segment with a set of
+   * different segments.
+   *
+   * @typedef Overlap
+   * @property {Object.<number, OverlapCount>} overlap A Dictionary
+   *  containing the counts. The key is the segment number of the overlapping
+   *  segment.
+   * @property {number} count The voxel volume of this segment.
    */
 
   /**
@@ -190,7 +200,7 @@ export class MaskSegmentHelper {
    * The value is a Dictionary of all of the segments in the second set
    * that overlap with the key segment.
    *
-   * @typedef {Object.<number, OverlapCount>} Overlap
+   * @typedef {Object.<number, Overlap>} OverlapMap
    */
 
   /**
@@ -198,7 +208,7 @@ export class MaskSegmentHelper {
    * It is assumed these images have the same orientation.
    *
    * @param {Image} compare The segmentation image to find overlap with.
-   * @returns {Overlap} The overlapping voxel counts. First level is the
+   * @returns {OverlapMap} The overlapping voxel counts. First level is the
    *  segments from this image, second level is the compare image segments.
    */
   findOverlap(compare) {
@@ -209,7 +219,7 @@ export class MaskSegmentHelper {
     const compareSize = compareGeometry.getSize();
 
     /**
-     * @type {Overlap}
+     * @type {OverlapMap}
      */
     const overlap = {};
 
@@ -217,6 +227,15 @@ export class MaskSegmentHelper {
     for (let i = 0; i < thisTotalSize; i++) {
       const thisValue = this.#mask.getValueAtOffset(i);
       if (thisValue !== 0) {
+        if (typeof overlap[thisValue] !== 'undefined') {
+          overlap[thisValue].count += 1;
+        } else {
+          overlap[thisValue] = {
+            overlap: {},
+            count: 1
+          };
+        }
+
         const thisIndex = thisSize.offsetToIndex(i);
         const thisWorld = thisGeometry.indexToWorld(thisIndex);
         const compareIndex = compareGeometry.worldToIndex(thisWorld);
@@ -224,17 +243,21 @@ export class MaskSegmentHelper {
         const compareValue = compare.getValueAtOffset(compareOffset);
 
         if (typeof compareValue !== 'undefined' && compareValue !== 0) {
-          if (typeof overlap[thisValue] !== 'undefined') {
-            if (typeof overlap[thisValue][compareValue] !== 'undefined') {
-              overlap[thisValue][compareValue] += 1;
-            } else {
-              overlap[thisValue][compareValue] = 1;
-            }
+          if (typeof overlap[thisValue].overlap[compareValue] !== 'undefined') {
+            overlap[thisValue].overlap[compareValue].count += 1;
           } else {
-            overlap[thisValue] = {};
-            overlap[thisValue][compareValue] = 1;
+            overlap[thisValue].overlap[compareValue] = {
+              count: 1,
+              percentage: 0
+            };
           }
         }
+      }
+    }
+
+    for (const thisOverlap of Object.values(overlap)) {
+      for (const overlapCount of Object.values(thisOverlap.overlap)) {
+        overlapCount.percentage = overlapCount.count / thisOverlap.count;
       }
     }
 
