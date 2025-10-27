@@ -437,12 +437,19 @@ export declare class App {
      */
     setImage(dataId: string, img: Image_2): void;
     /**
-     * Add a new DicomData.
+     * Get the next data id.
      *
-     * @param {DicomData} data The new data.
      * @returns {string} The data id.
      */
-    addData(data: DicomData): string;
+    getNextDataId(): string;
+    /**
+     * Add a new DicomData.
+     *
+     * @param {string} dataId The data id.
+     * @param {DicomData} data The new data.
+     * @returns {boolean} False if the data cannot be added.
+     */
+    addData(dataId: string, data: DicomData): boolean;
     /**
      * Get the meta data.
      *

@@ -97,7 +97,7 @@ export class App {
     abortAllLoads(): void;
     abortLoad(dataId: string): void;
     addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
-    addData(data: DicomData): string;
+    addData(dataId: string, data: DicomData): boolean;
     addDataViewConfig(dataId: string, config: ViewConfig, doRender?: boolean): void;
     addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
@@ -130,6 +130,7 @@ export class App {
     getMetaData(dataId: string): {
         [x: string]: DataElement;
     } | undefined;
+    getNextDataId(): string;
     getNumberOfLayerGroups(): number;
     getOffset(): Scalar3D;
     getOverlayData(dataId: string): OverlayData | undefined;
