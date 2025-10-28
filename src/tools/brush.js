@@ -714,6 +714,7 @@ export class Brush extends EventTarget {
       throw new Error('Z position is undefined');
     }
     const index = new Index([0, 0, imgK]);
+    const imagePosPat = sourceGeometry.getOrigins()[imgK];
 
     // default tags
     const firstSliceMeta = getDefaultDicomSegJson();
@@ -751,7 +752,7 @@ export class Brush extends EventTarget {
         {
           dimIndex: [1, 1],
           refSegmentNumber: 1,
-          imagePosPat: sourceGeometry.getOrigins()[imgK].getValues(),
+          imagePosPat: imagePosPat.getValues(),
           derivationImages: [
             {
               sourceImages: referencedSOPs
@@ -766,7 +767,7 @@ export class Brush extends EventTarget {
 
     this.#mask = this.#createMaskImage(
       sourceGeometry,
-      sourceGeometry.indexToWorld(index).get3D(),
+      imagePosPat,
       firstSliceMeta
     );
 
