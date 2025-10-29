@@ -3995,6 +3995,65 @@ export declare class MaskSegmentHelper {
      * @param {MaskSegment} segment The segment to update.
      */
     updateSegment(segment: MaskSegment): void;
+    /**
+     * The overlap count of a signle segment with another segment.
+     *
+     * @typedef OverlapCount@typedef OverlapCount
+     * @property {number} count The number of overlapping voxels.
+     * @property {number} percentage The overlap percentage between 0 and 1.
+     */
+    /**
+     * The count of overlapping voxels of a single segment with a set of
+     * different segments.
+     *
+     * @typedef Overlap@typedef Overlap
+     * @property {Object.<number, OverlapCount>} overlap A Dictionary
+     *  containing the counts. The key is the segment number of the overlapping
+     *  segment.
+     * @property {number} count The voxel volume of this segment.
+     */
+    /**
+     * An Dictionary containing the count of overlapping voxels between two
+     * sets of segments.
+     * The key is the segment number of a segment in the first set.
+     * The value is a Dictionary of all of the segments in the second set
+     * that overlap with the key segment.
+     *
+     * @typedef {Object.<number, Overlap>} OverlapMap
+     */
+    /**
+     * Find the overlap for each segment between two segmentation masks.
+     * It is assumed these images have the same orientation.
+     *
+     * @param {Image} compare The segmentation image to find overlap with.
+     * @returns {OverlapMap} The overlapping voxel counts. First level is the
+     *  segments from this image, second level is the compare image segments.
+     */
+    findOverlap(compare: Image_2): {
+        [x: number]: {
+            /**
+             * A Dictionary
+             * containing the counts. The key is the segment number of the overlapping
+             * segment.
+             */
+            overlap: {
+                [x: number]: {
+                    /**
+                     * The number of overlapping voxels.
+                     */
+                    count: number;
+                    /**
+                     * The overlap percentage between 0 and 1.
+                     */
+                    percentage: number;
+                };
+            };
+            /**
+             * The voxel volume of this segment.
+             */
+            count: number;
+        };
+    };
     #private;
 }
 

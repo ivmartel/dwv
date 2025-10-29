@@ -829,6 +829,17 @@ export class MaskSegment {
 export class MaskSegmentHelper {
     constructor(mask: Image_2);
     addSegment(segment: MaskSegment): void;
+    findOverlap(compare: Image_2): {
+        [x: number]: {
+            overlap: {
+                [x: number]: {
+                    count: number;
+                    percentage: number;
+                };
+            };
+            count: number;
+        };
+    };
     getNumberOfSegments(): number;
     getSegment(segmentNumber: number): MaskSegment | undefined;
     hasSegment(segmentNumber: number): boolean;
