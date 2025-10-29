@@ -255,6 +255,30 @@ export class SegmentationUI {
   };
 
   /**
+   * Add to the list of segmentations on the overlap checker.
+   *
+   * @param {object} segmentation The segmentation to add.
+   * @param {number} segmentationIndex The segmentation index.
+   */
+  #addOverlapCheckerSelection(segmentation, segmentationIndex) {
+    const overlapSelect0 =
+      document.getElementById('overlap-checker-select-list-0');
+    const overlapSelect1 =
+      document.getElementById('overlap-checker-select-list-1');
+
+    const newOption0 = document.createElement('option');
+    newOption0.innerHTML = getSegmentationHtmlId(segmentationIndex);
+    newOption0.value = segmentation.dataId;
+
+    const newOption1 = document.createElement('option');
+    newOption1.innerHTML = getSegmentationHtmlId(segmentationIndex);
+    newOption1.value = segmentation.dataId;
+
+    overlapSelect0.appendChild(newOption0);
+    overlapSelect1.appendChild(newOption1);
+  }
+
+  /**
    * Add a segment HTML to the main HTML.
    *
    * @param {object} segmentation The segmentation.
@@ -273,6 +297,8 @@ export class SegmentationUI {
     const segList = document.getElementById('segmentation-list');
     segList.appendChild(item);
     segList.appendChild(addItem);
+
+    this.#addOverlapCheckerSelection(segmentation, _segmentations.length - 1);
   }
 
   /**
@@ -395,8 +421,9 @@ export class SegmentationUI {
       this.#addSegmentationHtml(segmentation);
     };
     addItem.appendChild(addSegmentationButton);
-
     segList.appendChild(addItem);
+
+    const overlapChecker = this.#getSegmentationOverlapHtml();
 
     // fieldset
     const legend = document.createElement('legend');
@@ -404,6 +431,7 @@ export class SegmentationUI {
     const fieldset = document.createElement('fieldset');
     fieldset.appendChild(legend);
     fieldset.appendChild(segList);
+    fieldset.appendChild(overlapChecker);
 
     // main div
     const line = document.createElement('div');
@@ -1027,4 +1055,106 @@ export class SegmentationUI {
     return segmentationItem;
   }
 
+  /**
+   * Get the HTML for the segmentation overlap chacker.
+   *
+   * @returns {HTMLLIElement} The HTML element.
+   */
+  #getSegmentationOverlapHtml() {
+    // create overlap checker
+    const overlapChecker = document.createElement('div');
+    overlapChecker.id = 'overlap-checker';
+
+    // label
+    const overlapLabel = document.createElement('label');
+    overlapLabel.innerHTML = 'Overlap:';
+    overlapChecker.appendChild(overlapLabel);
+
+    // dropdowns
+    const overlapSelect0 = document.createElement('select');
+    const overlapSelect1 = document.createElement('select');
+    overlapSelect0.id = 'overlap-checker-select-list-0';
+    overlapSelect1.id = 'overlap-checker-select-list-1';
+    overlapChecker.appendChild(overlapSelect0);
+    overlapChecker.appendChild(overlapSelect1);
+
+    // button
+    const overlapButton = document.createElement('button');
+    overlapButton.innerHTML = 'Check Overlap';
+    overlapChecker.appendChild(overlapButton);
+
+    // result holder
+    const overlapResult = document.createElement('div');
+    overlapChecker.appendChild(overlapResult);
+
+    overlapButton.onclick = (/*event*/) => {
+      const segment0 = overlapSelect0.value;
+      const segment1 = overlapSelect1.value;
+      const maskImage0 = this.#app.getData(segment0).image;
+      const maskImage1 = this.#app.getData(segment1).image;
+      const segHelper0 = new MaskSegmentHelper(maskImage0);
+      const segHelper1 = new MaskSegmentHelper(maskImage1);
+      const overlap = segHelper0.findOverlap(maskImage1);
+
+      overlapResult.innerHTML = ''; // clear old results
+      for (
+        const [segmentNumber0, segmentOverlap] of
+        Object.entries(overlap)
+      ) {
+        const segment0 = segHelper0.getSegment(Number(segmentNumber0));
+
+        // title (segment that these overlaps are for)
+        const segmentLabel = document.createElement('h4');
+        segmentLabel.innerHTML += segment0.label;
+        segmentLabel.innerHTML += ' (';
+        segmentLabel.innerHTML += segmentOverlap.count;
+        segmentLabel.innerHTML += ' voxels):';
+        overlapResult.appendChild(segmentLabel);
+
+        // create table
+        const overlapList = document.createElement('table');
+        const listHeaders = document.createElement('thead');
+
+        // table headers
+        const headerRow = document.createElement('tr');
+        const headerLabel = document.createElement('th');
+        headerLabel.innerHTML = 'Segmentation';
+        const headerValue = document.createElement('th');
+        headerValue.innerHTML = 'Overlap (voxels)';
+        const headerPercentage = document.createElement('th');
+        headerPercentage.innerHTML = 'Overlap (percentage)';
+        headerRow.appendChild(headerLabel);
+        headerRow.appendChild(headerValue);
+        headerRow.appendChild(headerPercentage);
+        listHeaders.appendChild(headerRow);
+        overlapList.appendChild(listHeaders);
+
+        // table body
+        const listBody = document.createElement('tbody');
+        overlapList.appendChild(listBody);
+        for (
+          const [segmentNumber1, count] of
+          Object.entries(segmentOverlap.overlap)
+        ) {
+          const entry = document.createElement('tr');
+          const segment1 = segHelper1.getSegment(Number(segmentNumber1));
+          const entryLabel = document.createElement('td');
+          entryLabel.innerHTML += segment1.label;
+          const entryValue = document.createElement('td');
+          entryValue.innerHTML += count.count;
+          const entryPercentage = document.createElement('td');
+          entryPercentage.innerHTML += (count.percentage * 100).toPrecision(4);
+          entryPercentage.innerHTML += '%';
+          entry.appendChild(entryLabel);
+          entry.appendChild(entryValue);
+          entry.appendChild(entryPercentage);
+          listBody.appendChild(entry);
+        }
+
+        overlapResult.appendChild(overlapList);
+      }
+    };
+
+    return overlapChecker;
+  }
 }; // SegmentationUI
