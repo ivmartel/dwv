@@ -496,9 +496,11 @@ export class Geometry {
    */
   equals(rhs) {
     return rhs !== null &&
+      typeof rhs !== 'undefined' &&
       this.getOrigin().equals(rhs.getOrigin()) &&
       this.getSize().equals(rhs.getSize()) &&
-      this.getSpacing().equals(rhs.getSpacing());
+      this.getSpacing().equals(rhs.getSpacing()) &&
+      this.getOrientation().equals(rhs.getOrientation());
   }
 
   /**
