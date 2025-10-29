@@ -1097,6 +1097,7 @@ export class SegmentationUI {
       const overlap = segHelper0.findOverlap(maskImage1);
 
       overlapResult.innerHTML = ''; // clear old results
+      const overlapList = document.createElement('ul');
       for (
         const [segmentNumber0, segmentOverlap] of
         Object.entries(overlap)
@@ -1104,55 +1105,30 @@ export class SegmentationUI {
         const segment0 = segHelper0.getSegment(Number(segmentNumber0));
 
         // title (segment that these overlaps are for)
-        const segmentLabel = document.createElement('h4');
-        segmentLabel.innerHTML += segment0.label;
-        segmentLabel.innerHTML += ' (';
-        segmentLabel.innerHTML += segmentOverlap.count;
-        segmentLabel.innerHTML += ' voxels):';
-        overlapResult.appendChild(segmentLabel);
+        const segmentLi = document.createElement('li');
+        segmentLi.innerHTML = segment0.label +
+          ' (' + segmentOverlap.count + ' voxels): ';
 
-        // create table
-        const overlapList = document.createElement('table');
-        const listHeaders = document.createElement('thead');
-
-        // table headers
-        const headerRow = document.createElement('tr');
-        const headerLabel = document.createElement('th');
-        headerLabel.innerHTML = 'Segmentation';
-        const headerValue = document.createElement('th');
-        headerValue.innerHTML = 'Overlap (voxels)';
-        const headerPercentage = document.createElement('th');
-        headerPercentage.innerHTML = 'Overlap (percentage)';
-        headerRow.appendChild(headerLabel);
-        headerRow.appendChild(headerValue);
-        headerRow.appendChild(headerPercentage);
-        listHeaders.appendChild(headerRow);
-        overlapList.appendChild(listHeaders);
-
-        // table body
-        const listBody = document.createElement('tbody');
-        overlapList.appendChild(listBody);
+        // list of overlaps
+        let first = true;
         for (
           const [segmentNumber1, count] of
           Object.entries(segmentOverlap.overlap)
         ) {
-          const entry = document.createElement('tr');
+          if (first) {
+            first = false;
+          } else {
+            segmentLi.innerHTML += ', ';
+          }
           const segment1 = segHelper1.getSegment(Number(segmentNumber1));
-          const entryLabel = document.createElement('td');
-          entryLabel.innerHTML += segment1.label;
-          const entryValue = document.createElement('td');
-          entryValue.innerHTML += count.count;
-          const entryPercentage = document.createElement('td');
-          entryPercentage.innerHTML += (count.percentage * 100).toPrecision(4);
-          entryPercentage.innerHTML += '%';
-          entry.appendChild(entryLabel);
-          entry.appendChild(entryValue);
-          entry.appendChild(entryPercentage);
-          listBody.appendChild(entry);
+          segmentLi.innerHTML += segment1.label + ' (' +
+            count.count + ' voxels, ' +
+            (count.percentage * 100).toPrecision(4) + '%)';
         }
 
-        overlapResult.appendChild(overlapList);
+        overlapList.appendChild(segmentLi);
       }
+      overlapResult.appendChild(overlapList);
     };
 
     return overlapChecker;
