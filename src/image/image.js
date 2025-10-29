@@ -1311,7 +1311,8 @@ export class Image {
 
   /**
    * Reset the contour buffer for the values around an offset.
-   * Prevents certain artifacts, especially at small brush sizes.
+   * Prevents certain artifacts, especially at small brush sizes
+   * and when erasing.
    *
    * @param {number} offset The offset to reset.
    */
@@ -1323,34 +1324,21 @@ export class Image {
     const yOffset = size.getDimSize(1);
     const zOffset = size.getDimSize(2);
 
-    const px = offset + xOffset;
-    if (px < this.#buffer.length) {
-      this.#resetContourAtOffset(px);
-    }
-
-    const mx = offset - xOffset;
-    if (mx >= 0) {
-      this.#resetContourAtOffset(mx);
-    }
-
-    const py = offset + yOffset;
-    if (py < this.#buffer.length) {
-      this.#resetContourAtOffset(py);
-    }
-
-    const my = offset - yOffset;
-    if (my >= 0) {
-      this.#resetContourAtOffset(my);
-    }
-
-    const pz = offset + zOffset;
-    if (pz < this.#buffer.length) {
-      this.#resetContourAtOffset(pz);
-    }
-
-    const mz = offset + zOffset;
-    if (mz >= 0) {
-      this.#resetContourAtOffset(mz);
+    const max = MAX_CONTOUR_SIZE / 2;
+    const min = -max;
+    for (let x = min; x < max; x++) {
+      for (let y = min; y < max; y++) {
+        for (let z = min; z < max; z++) {
+          const p =
+            offset +
+            (xOffset * x) +
+            (yOffset * y) +
+            (zOffset * z);
+          if (p >= 0 && p < this.#buffer.length) {
+            this.#resetContourAtOffset(p);
+          }
+        }
+      }
     }
   }
 
