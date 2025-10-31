@@ -13,9 +13,20 @@ import {DrawLayer} from '../gui/drawLayer.js';
  * Window/level binder.
  */
 export class WindowLevelBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'wlchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
@@ -37,9 +48,20 @@ export class WindowLevelBinder {
  * Colour map binder.
  */
 export class ColourMapBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'colourmapchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
@@ -55,9 +77,20 @@ export class ColourMapBinder {
  * Position binder.
  */
 export class PositionBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'positionchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const pointValues = event.value[1];
@@ -85,9 +118,20 @@ export class PositionBinder {
  * Zoom binder.
  */
 export class ZoomBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'zoomchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const scale = {
@@ -113,9 +157,20 @@ export class ZoomBinder {
  * Offset binder.
  */
 export class OffsetBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'offsetchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       layerGroup.setOffset({
@@ -132,9 +187,20 @@ export class OffsetBinder {
  * Opacity binder. Only propagates to view layers of the same data.
  */
 export class OpacityBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'opacitychange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       // exit if no data id
