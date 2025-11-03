@@ -142,7 +142,7 @@ export class PositionHelper {
    *   with the input value.
    *
    * @param {number} dim The dimension.
-   * @param {number} value The value to used at dimension index.
+   * @param {number} value The value to use at dimension index.
    * @returns {Point} The position.
    */
   getCurrentPositionAtDimValue(dim, value) {
