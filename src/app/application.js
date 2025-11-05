@@ -77,6 +77,18 @@ export class ViewConfig {
    */
   opacity;
   /**
+   * Optional segmentation layer fill opacity; in [0, 1] range.
+   *
+   * @type {number|undefined}
+   */
+  fillOpacity;
+  /**
+   * Optional segmentation contour thickness; in [0, 10] range.
+   *
+   * @type {number|undefined}
+   */
+  contourThickness;
+  /**
    * Optional layer window level preset name.
    * If present, the preset name will be used and
    * the window centre and width ignored.
@@ -2132,6 +2144,14 @@ export class App {
     const isSegmentationLayer = data.image.getMeta().Modality === 'SEG';
     if (isSegmentationLayer) {
       data.image.initializeContour();
+      // possible presets
+      if (typeof viewConfig.fillOpacity !== 'undefined') {
+        view.setFillOpacity(viewConfig.fillOpacity);
+      }
+      if (typeof viewConfig.contourThickness !== 'undefined') {
+        view.setContourThickness(viewConfig.contourThickness);
+      }
+      // set alpha function
       view.setAlphaFunction(function (value, index) {
         if (value === 0) {
           return 0;
