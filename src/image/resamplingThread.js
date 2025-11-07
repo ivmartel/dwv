@@ -182,6 +182,11 @@ export function generateResampledGeometry(
     targetSpacingArrMax[2] * volumeRatio
   ];
 
+  const sourceSpacingNDims = sourceSpacing.length();
+  for (let d = 2; d < sourceSpacingNDims - 1; d++) {
+    targetSpacingArr.push(sourceSpacing.get(d));
+  }
+
   const targetSpacing = new Spacing(targetSpacingArr);
 
   // Calculate updated size
@@ -228,7 +233,7 @@ export function generateResampledGeometry(
     }
   }
 
-  const targetSize = new Size([
+  const sizeArr = [
     Math.round(
       Math.abs((maxBounds[0] - minBounds[0]) / targetSpacing.get(0))
     ),
@@ -238,7 +243,14 @@ export function generateResampledGeometry(
     Math.round(
       Math.abs((maxBounds[2] - minBounds[2]) / targetSpacing.get(2))
     )
-  ]);
+  ];
+
+  const sourceSizeNDims = sourceSize.length();
+  for (let d = 2; d < sourceSizeNDims - 1; d++) {
+    sizeArr.push(sourceSize.get(d));
+  }
+
+  const targetSize = new Size(sizeArr);
 
   // Calculate updated origin
   //---------------------------------
