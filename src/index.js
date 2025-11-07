@@ -54,6 +54,11 @@ import {
   getDicomSRContentItem
 } from './dicom/dicomSRContent.js';
 import {MaskSegment} from './dicom/dicomSegment.js';
+import {
+  NormalisedManufacturers,
+  getManufacturer,
+  getNormalisedManufacturer
+} from './dicom/dicomManufacturer.js';
 // gui
 import {
   getMousePoint,
@@ -207,6 +212,7 @@ export {
   toolList,
   toolOptions,
   Orientation,
+  NormalisedManufacturers,
   addTagsToDictionary,
   createImage,
   createMaskImage,
@@ -231,6 +237,8 @@ export {
   getSRContent,
   getDicomSRContentItem,
   getReferencedSeriesUID,
+  getManufacturer,
+  getNormalisedManufacturer,
   hasDicomPrefix,
   precisionRound,
   buildMultipart,
