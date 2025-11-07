@@ -390,9 +390,10 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Get the list of origins and thein occurences.
+   * Get the list of origins and thein occurences in a list
+   *   of {pos, indices, count}.
    *
-   * @returns {{pos, indices, count}[]} A list of origins and
+   * @returns {object[]} A list of origins and
    *   their number of occurences.
    */
   #getOriginList() {

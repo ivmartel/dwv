@@ -378,9 +378,9 @@ export class LabelingFilter {
    *
    * @param {number} sliceOffset Offset relative to the offset at the
    * start of the slice.
-   * @param {number []} unitVectors The unit vectors for index to offset
+   * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
-   * @param {number []} spacing The pixel spacing of the image.
+   * @param {number[]} spacing The pixel spacing of the image.
    *
    * @returns {Point2D} Point on the slice, scaled.
    */

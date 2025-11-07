@@ -25,9 +25,6 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../../src/app/application.js';
-/**
- * @typedef {import('../../src/image/image.js').Label} Label
- */
 /* eslint-enable no-unused-vars */
 
 /**
@@ -35,7 +32,7 @@ import {App} from '../../src/app/application.js';
  *
  * @typedef Segmentation
  * @property {number} dataId The segmentation data ID.
- * @property {Label[]} labels The segmentation labels.
+ * @property {object[]} labels The segmentation labels.
  * @property {boolean} hasNewSegments If the segmentation is new.
  * @property {object[]} segments The segmentation segments.
  * @property {MaskSegmentViewHelper} viewHelper A view helper.

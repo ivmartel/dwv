@@ -36,7 +36,7 @@ const TagKeys = {
  * Private b-value tag rules. Tested in order.
  * Rules are either `{manufacturer, key}` or `{uidPrefix, key}`.
  *
- * @type {Object[]}
+ * @type {object[]}
  */
 const LocalBValueRules = [
   {

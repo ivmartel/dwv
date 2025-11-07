@@ -32,7 +32,7 @@ export const custom = {
    * `{manufacturer, key}` or `{uidPrefix, key}`. For example:
    * `{manufacturer: 'GE', key: '00431039'}`.
    *
-   * @type {Object[]}
+   * @type {object[]}
    */
   privateBValueRules: undefined,
 

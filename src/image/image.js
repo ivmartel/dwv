@@ -1867,8 +1867,8 @@ export class Image {
    * @param {number} direction Offset to move cursor.
    * @param {number} dim The index of the current dimension.
    * @param {number} checkValue Initial pixel value.
-   * @param {(()=>number)[]} queue Ordered queue of locations to check.
-   * @returns {()=>number} A function that returns the distance to the nearest
+   * @param {Function[]} queue Ordered queue of locations to check.
+   * @returns {Function} A function that returns the distance to the nearest
    *  border pixel or 0.
    */
   #recursiveDistanceCheckX(distance, index, direction, dim, checkValue, queue) {
@@ -1921,8 +1921,8 @@ export class Image {
    * @param {number} yDim The index of the y dimension.
    * @param {number} xDim The index of the x dimension.
    * @param {number} checkValue Initial pixel value.
-   * @param {(()=>number)[]} queue Ordered queue of locations to check.
-   * @returns {()=>number} A function that returns the distance to the nearest
+   * @param {Function[]} queue Ordered queue of locations to check.
+   * @returns {Function} A function that returns the distance to the nearest
    *  border pixel or 0.
    */
   #recursiveDistanceCheckY(
