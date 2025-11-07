@@ -28,6 +28,15 @@ export const custom = {
   labelTexts: undefined,
 
   /**
+   * List of private diffusion b-value rules. Rules are either
+   * `{manufacturer, key}` or `{uidPrefix, key}`. For example:
+   * `{manufacturer: 'GE', key: '00431039'}`.
+   *
+   * @type {Object[]}
+   */
+  privateBValueRules: undefined,
+
+  /**
    * Open a dialogue to edit roi data. Defaults to window.prompt.
    *
    * @param {Annotation} annotation The roi data.
