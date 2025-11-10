@@ -1343,6 +1343,7 @@ export declare namespace custom {
             [x: string]: string;
         };
     };
+    let privateBValueRules: object[];
     let openRoiDialog: any;
     let getVolumeIdTagValue: any;
     let getPostLoadVolumeIdTagValue: any;
@@ -2620,12 +2621,33 @@ export declare function getEllipseIndices(center: Index, radius: number[], dir: 
 export declare function getLayerDetailsFromEvent(event: object): object;
 
 /**
+ * Get the manufacturer.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @returns {string|undefined} The manufacturer.
+ */
+export declare function getManufacturer(elements: {
+    [x: string]: DataElement;
+}): string | undefined;
+
+/**
  * Get the offset of an input mouse event.
  *
  * @param {object} event The event to get the offset from.
  * @returns {Point2D} The 2D point.
  */
 export declare function getMousePoint(event: object): Point2D;
+
+/**
+ * Get the normalised manufacturer.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @returns {string|undefined} The manufacturer as a unique
+ *   all lower case string.
+ */
+export declare function getNormalisedManufacturer(elements: {
+    [x: string]: DataElement;
+}): string | undefined;
 
 /**
  * Get the name of an image orientation patient.
@@ -4229,6 +4251,13 @@ export declare class Matrix33 {
     #private;
 }
 
+export declare namespace NormalisedManufacturers {
+    let GE: string;
+    let SIEMENS: string;
+    let PHILIPS: string;
+    let HITASHI: string;
+}
+
 /**
  * Number range.
  */
@@ -4734,7 +4763,7 @@ export declare class PositionHelper {
      *   with the input value.
      *
      * @param {number} dim The dimension.
-     * @param {number} value The value to used at dimension index.
+     * @param {number} value The value to use at dimension index.
      * @returns {Point} The position.
      */
     getCurrentPositionAtDimValue(dim: number, value: number): Point;
@@ -6072,6 +6101,18 @@ export declare class ViewConfig {
      * @type {number|undefined}
      */
     opacity: number | undefined;
+    /**
+     * Optional segmentation layer fill opacity; in [0, 1] range.
+     *
+     * @type {number|undefined}
+     */
+    fillOpacity: number | undefined;
+    /**
+     * Optional segmentation contour thickness; in [0, 10] range.
+     *
+     * @type {number|undefined}
+     */
+    contourThickness: number | undefined;
     /**
      * Optional layer window level preset name.
      * If present, the preset name will be used and

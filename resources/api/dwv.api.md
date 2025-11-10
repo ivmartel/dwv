@@ -287,6 +287,8 @@ export namespace custom {
         };
     };
     let // (undocumented)
+    privateBValueRules: object[];
+    let // (undocumented)
     openRoiDialog: any;
     let // (undocumented)
     getVolumeIdTagValue: any;
@@ -547,7 +549,17 @@ export function getEllipseIndices(center: Index, radius: number[], dir: number[]
 export function getLayerDetailsFromEvent(event: object): object;
 
 // @public
+export function getManufacturer(elements: {
+    [x: string]: DataElement;
+}): string | undefined;
+
+// @public
 export function getMousePoint(event: object): Point2D;
+
+// @public
+export function getNormalisedManufacturer(elements: {
+    [x: string]: DataElement;
+}): string | undefined;
 
 // @public
 export function getOrientationName(cosines: number[]): string | undefined;
@@ -876,6 +888,18 @@ export class Matrix33 {
     multiplyTypedArray3D(sourceArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, outArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
+}
+
+// @public (undocumented)
+export namespace NormalisedManufacturers {
+    let // (undocumented)
+    GE: string;
+    let // (undocumented)
+    SIEMENS: string;
+    let // (undocumented)
+    PHILIPS: string;
+    let // (undocumented)
+    HITASHI: string;
 }
 
 // @public
@@ -1230,7 +1254,9 @@ export class View {
 export class ViewConfig {
     constructor(divId: string);
     colourMap: string | undefined;
+    contourThickness: number | undefined;
     divId: string;
+    fillOpacity: number | undefined;
     opacity: number | undefined;
     orientation: string | undefined;
     windowCenter: number | undefined;
