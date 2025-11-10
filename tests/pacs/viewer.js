@@ -598,7 +598,7 @@ function updateFrameControls(visible) {
         const newPos = pos.add(new Point([0, 0, 0, -1]));
         vc.setCurrentPosition(newPos);
       }
-    }
+    };
     const forward = document.createElement('button');
     forward.innerHTML = '->';
     forward.onclick = () => {
@@ -609,7 +609,7 @@ function updateFrameControls(visible) {
         const newPos = pos.add(new Point([0, 0, 0, 1]));
         vc.setCurrentPosition(newPos);
       }
-    }
+    };
 
     controls.appendChild(back);
     controls.appendChild(forward);

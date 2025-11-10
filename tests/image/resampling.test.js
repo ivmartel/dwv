@@ -5,9 +5,8 @@ import {Matrix33} from '../../src/math/matrix.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {ResamplingFilter} from '../../src/image/resamplingFilter.js';
 import {
-  generateWorkerMessage,
-  generateResampledGeometry,
-  generateBuffer
+  generateWorkerMessages,
+  generateResampledGeometry
 } from '../../src/image/resamplingThread.js';
 
 /**
@@ -64,20 +63,16 @@ QUnit.test('ResamplingFilter class', function (assert) {
     imgGeometry0,
     targetOrientation0
   );
-  const resampledBuffer0 = generateBuffer(
-    imgBuffer0,
-    0,
-    resampledGeometry0.getSize()
-  );
-  const imgEvent0 = generateWorkerMessage(
+  const imgEvent0 = generateWorkerMessages(
     imgBuffer0,
     imgGeometry0,
-    resampledBuffer0,
     resampledGeometry0,
-    false
+    0,
+    false,
+    '0'
   );
 
-  resamplingFilter.run(imgEvent0);
+  const runReturn0 = resamplingFilter.run(imgEvent0[0]);
 
   const expectedSize0 = new Size([3, 2, 3]);
   const expectedSpacing0 = new Spacing([1, 3, 2]);
@@ -105,7 +100,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
 
   const buffersMatch0 =
     expectedBuffer0.map((value, index) => {
-      return value === resampledBuffer0[index];
+      return value === runReturn0.targetImageBuffer[index];
     }).reduce((a, b) => {
       return a && b;
     });
@@ -134,20 +129,17 @@ QUnit.test('ResamplingFilter class', function (assert) {
     imgGeometry0,
     targetOrientation1
   );
-  const resampledBuffer1 = generateBuffer(
-    imgBuffer0,
-    0,
-    resampledGeometry1.getSize()
-  );
-  const imgEvent1 = generateWorkerMessage(
+
+  const imgEvent1 = generateWorkerMessages(
     imgBuffer0,
     imgGeometry0,
-    resampledBuffer1,
     resampledGeometry1,
-    false
+    0,
+    false,
+    '1'
   );
 
-  resamplingFilter.run(imgEvent1);
+  const runReturn1 = resamplingFilter.run(imgEvent1[0]);
 
   const expectedSize1 = new Size([2, 3, 3]);
   const expectedSpacing1 = new Spacing([3, 2, 1]);
@@ -176,7 +168,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
 
   const buffersMatch1 =
     expectedBuffer1.map((value, index) => {
-      return value === resampledBuffer1[index];
+      return value === runReturn1.targetImageBuffer[index];
     }).reduce((a, b) => {
       return a && b;
     });
@@ -205,20 +197,16 @@ QUnit.test('ResamplingFilter class', function (assert) {
     imgGeometry0,
     targetOrientation2
   );
-  const resampledBuffer2 = generateBuffer(
-    imgBuffer0,
-    0,
-    resampledGeometry2.getSize()
-  );
-  const imgEvent2 = generateWorkerMessage(
+  const imgEvent2 = generateWorkerMessages(
     imgBuffer0,
     imgGeometry0,
-    resampledBuffer2,
     resampledGeometry2,
-    false
+    0,
+    false,
+    '2'
   );
 
-  resamplingFilter.run(imgEvent2);
+  const runReturn2 = resamplingFilter.run(imgEvent2[0]);
 
   const expectedSize2 = new Size([3, 3, 2]);
   const expectedSpacing2 = new Spacing([2, 1, 3]);
@@ -244,7 +232,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
 
   const buffersMatch2 =
     expectedBuffer2.map((value, index) => {
-      return value === resampledBuffer2[index];
+      return value === runReturn2.targetImageBuffer[index];
     }).reduce((a, b) => {
       return a && b;
     });

@@ -1,5 +1,6 @@
 
 import {Matrix33, BIG_EPSILON} from '../math/matrix.js';
+import {getTypedArray} from '../dicom/dicomParser.js';
 
 export class ResamplingFilter {
   /**
@@ -9,9 +10,10 @@ export class ResamplingFilter {
    * @param {TypedArray} buffer The buffer to sample.
    * @param {number[]} size The buffer size.
    * @param {number[]} unitVectors The buffer offset space unit vectors.
+   * @param {number} startOffset The offset to add to all sampled points.
    * @returns {number} The sampled value.
    */
-  #bilinearSample(point, buffer, size, unitVectors) {
+  #bilinearSample(point, buffer, size, unitVectors, startOffset) {
     // base point
     const q0x = Math.floor(point[0]);
     const q0y = Math.floor(point[1]);
@@ -32,14 +34,14 @@ export class ResamplingFilter {
     const y1v = y1 * unitVectors[1];
     const z0v = z0 * unitVectors[2];
     const z1v = z1 * unitVectors[2];
-    const off000 = x0v + y0v + z0v;
-    const off001 = x0v + y0v + z1v;
-    const off010 = x0v + y1v + z0v;
-    const off011 = x0v + y1v + z1v;
-    const off100 = x1v + y0v + z0v;
-    const off101 = x1v + y0v + z1v;
-    const off110 = x1v + y1v + z0v;
-    const off111 = x1v + y1v + z1v;
+    const off000 = x0v + y0v + z0v + startOffset;
+    const off001 = x0v + y0v + z1v + startOffset;
+    const off010 = x0v + y1v + z0v + startOffset;
+    const off011 = x0v + y1v + z1v + startOffset;
+    const off100 = x1v + y0v + z0v + startOffset;
+    const off101 = x1v + y0v + z1v + startOffset;
+    const off110 = x1v + y1v + z0v + startOffset;
+    const off111 = x1v + y1v + z1v + startOffset;
 
     // bounding points values
     const x0ok = x0 >= 0 && x0 < size[0];
@@ -99,9 +101,43 @@ export class ResamplingFilter {
   }
 
   /**
+   * Generate the buffer for the resampled frame.
+   *
+   * @param {TypedArray} sourceImageBuffer The current image buffer.
+   * @param {number} pixelRepresentation The source image pixel representation.
+   * @param {number[]} targetSize The size of the target.
+   * @param {number[]} targetUnitVectors The buffer offset space unit vectors.
+   *
+   * @returns {TypedArray} The new buffer.
+   */
+  #generateReturnBuffer(
+    sourceImageBuffer,
+    pixelRepresentation,
+    targetSize,
+    targetUnitVectors
+  ) {
+    const totalSize = targetUnitVectors[2] * targetSize[2];
+
+    const targetImageBuffer = getTypedArray(
+      sourceImageBuffer.BYTES_PER_ELEMENT * 8,
+      pixelRepresentation,
+      totalSize
+    );
+
+    if (targetImageBuffer === null) {
+      throw new Error('Cannot reallocate data for image resampling.');
+    }
+
+    targetImageBuffer.fill(0);
+
+    return targetImageBuffer;
+  }
+
+  /**
    * Calculate the resampling.
    *
    * @param {object} workerMessage The worker message.
+   * @returns {object} The resampled data and metadata.
    */
   run(workerMessage) {
     const sourceSize = workerMessage.sourceSize;
@@ -112,8 +148,19 @@ export class ResamplingFilter {
     const targetSpacing = workerMessage.targetSpacing;
 
     const sourceImageBuffer = workerMessage.sourceImageBuffer;
+    const pixelRepresentation = workerMessage.pixelRepresentation;
 
+    const targetImageBuffer = this.#generateReturnBuffer(
+      sourceImageBuffer,
+      pixelRepresentation,
+      targetSize,
+      targetUnitVectors
+    );
+
+    const sourceStartOffset = workerMessage.sourceStartOffset;
+    const targetStartOffset = workerMessage.targetStartOffset;
     const interpolate = workerMessage.interpolate;
+    const jobId = workerMessage.jobId;
 
     // Can't pass them in as matrixes, so we need to re-create them
     const sourceMatrix = new Matrix33(workerMessage.sourceOrientation);
@@ -167,7 +214,7 @@ export class ResamplingFilter {
             point[1] >= 0 && point[1] < sourceSize[1] &&
             point[2] >= 0 && point[2] < sourceSize[2]
           ) {
-            targetOffset = targetOffXY + targetUnitVectors[2] * z;
+            targetOffset = targetOffXY + (targetUnitVectors[2] * z);
 
             if (interpolate) {
               // Bilinear
@@ -175,23 +222,31 @@ export class ResamplingFilter {
                 point,
                 sourceImageBuffer,
                 sourceSize,
-                sourceUnitVectors
+                sourceUnitVectors,
+                sourceStartOffset
               );
-              workerMessage.targetImageBuffer[targetOffset] = sample;
+              targetImageBuffer[targetOffset] = sample;
 
             } else {
               // Nearest Neighbor
               const inOffset =
                 (sourceUnitVectors[0] * Math.round(point[0])) +
                 (sourceUnitVectors[1] * Math.round(point[1])) +
-                (sourceUnitVectors[2] * Math.round(point[2]));
+                (sourceUnitVectors[2] * Math.round(point[2])) +
+                sourceStartOffset;
 
-              workerMessage.targetImageBuffer[targetOffset] =
+              targetImageBuffer[targetOffset] =
                 workerMessage.sourceImageBuffer[inOffset];
             }
           }
         }
       }
     }
+
+    return {
+      targetImageBuffer: targetImageBuffer,
+      startOffset: targetStartOffset,
+      jobId: jobId
+    };
   }
 }
