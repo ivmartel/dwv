@@ -929,7 +929,7 @@ export class Brush extends EventTarget {
    * Get the mask offset for an event.
    *
    * @param {object} event The event containing the mask position.
-   * @returns {Array} The array of offset to paint.
+   * @returns {number[]} The array of offset to paint.
    */
   #getMaskOffsets(event) {
     const layerDetails = getLayerDetailsFromEvent(event);
@@ -974,7 +974,12 @@ export class Brush extends EventTarget {
         ));
       }
       sourceImage = sourceData.image;
-      //
+      // exit if reference image is resampled
+      if (sourceImage.isResampled()) {
+        logger.warn('Cannot update mask with resampled reference image.');
+        return [];
+      }
+      // get source position
       const sourceVl = layerGroup.getViewLayersByDataId(sourceDataId)[0];
       const sourceViewController = sourceVl.getViewController();
       const planePos = sourceVl.displayToPlanePos(mousePoint);
@@ -992,7 +997,12 @@ export class Brush extends EventTarget {
         ));
       }
       sourceImage = sourceData.image;
-
+      // exit if reference image is resampled
+      if (sourceImage.isResampled()) {
+        logger.warn('Cannot create mask on resampled image.');
+        return [];
+      }
+      // get source position
       const planePos = viewLayer.displayToPlanePos(mousePoint);
       sourcePosition = viewController.getPositionFromPlanePoint(planePos);
       // create mask (sets this.#mask)
@@ -1124,33 +1134,13 @@ export class Brush extends EventTarget {
   }
 
   /**
-   * Chack if the base image is resampled.
-   *
-   * @param {MouseEvent} event The mouse down event.
-   * @returns {boolean} True if the image is resampled.
-   */
-  #isResampled(event) {
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(
-      layerDetails.groupDivId
-    );
-    const viewLayer = layerGroup.getBaseViewLayer();
-    const referenceDataId = viewLayer.getDataId();
-    const referenceData = this.#app.getData(referenceDataId);
-    const image = referenceData.image;
-
-    return image.isResampled();
-  }
-
-  /**
    * Handle mouse down event.
    *
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
     if (!this.#activeLayerIsViewLayer(event) ||
-      this.#isInBlackList(event) ||
-      this.#isResampled(event)) {
+      this.#isInBlackList(event)) {
       return;
     }
     if (typeof this.#selectedSegmentNumber === 'undefined') {
