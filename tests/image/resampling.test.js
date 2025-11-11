@@ -250,5 +250,125 @@ QUnit.test('ResamplingFilter class', function (assert) {
     'Expected 90° Z-axis rotation resampled geometry to match expected geometry'
   );
 
+  // Basic 90° 4D Rotation
+  // --------------------------
+  const imgSize3 = new Size([3, 3, 2, 2]);
+  const imgSpacing3 = new Spacing([1, 2, 3, 1]);
+  const imgOrigins3 = [
+    new Point3D(0, 0, 0),
+    new Point3D(0, 0, 3)
+  ];
+  const imgOrientation3 = new Matrix33([
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1
+  ]);
+  const imgGeometry3 = new Geometry(
+    imgOrigins3,
+    imgSize3,
+    imgSpacing3,
+    imgOrientation3
+  );
+  const imgBuffer3 = new Uint8Array([
+    0, 0, 0,
+    0, 1, 1,
+    0, 1, 1,
+
+    0, 0, 0,
+    0, 1, 1,
+    0, 1, 1,
+
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0,
+
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0,
+  ]);
+
+  const targetOrientation3 = new Matrix33([
+    0, -1, 0,
+    1, 0, 0,
+    0, 0, 1
+  ]);
+  const resampledGeometry3 = generateResampledGeometry(
+    imgGeometry3,
+    targetOrientation3
+  );
+  const imgEvent3 = generateWorkerMessages(
+    imgBuffer3,
+    imgGeometry3,
+    resampledGeometry3,
+    false
+  );
+
+  const runReturn3a = resamplingFilter.run(imgEvent3[0]);
+  const runReturn3b = resamplingFilter.run(imgEvent3[1]);
+
+  const expectedSize3 = new Size([3, 3, 2, 2]);
+  const expectedSpacing3 = new Spacing([2, 1, 3, 1]);
+  const expectedOrigins3 = [
+    new Point3D(3, 0, 0),
+    new Point3D(3, 0, 3),
+  ];
+  const expectedGeometry3 = new Geometry(
+    expectedOrigins3,
+    expectedSize3,
+    expectedSpacing3,
+    targetOrientation3
+  );
+  const expectedBuffer3a = new Uint8Array([
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0,
+
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0
+  ]);
+
+  const expectedBuffer3b = new Uint8Array([
+    1, 1, 0,
+    1, 1, 0,
+    0, 0, 0,
+
+    1, 1, 0,
+    1, 1, 0,
+    0, 0, 0
+  ]);
+
+  const buffersMatch3a =
+    expectedBuffer3a.map((value, index) => {
+      return value === runReturn3a.targetImageBuffer[index];
+    }).reduce((a, b) => {
+      return a && b;
+    });
+
+  const buffersMatch3b =
+    expectedBuffer3b.map((value, index) => {
+      return value === runReturn3b.targetImageBuffer[index];
+    }).reduce((a, b) => {
+      return a && b;
+    });
+
+  const geometriesMatch3 =
+    expectedGeometry3.equals(resampledGeometry3);
+
+  assert.equal(
+    buffersMatch3a,
+    1,
+    'Expected 90° 4D resampled buffer for frame 1 to match expected buffer'
+  );
+  assert.equal(
+    buffersMatch3b,
+    1,
+    'Expected 90° 4D resampled buffer for frame 2 to match expected buffer'
+  );
+  assert.true(
+    geometriesMatch3,
+    'Expected 90° 4D resampled geometry to match expected geometry'
+  );
+
   /* eslint-enable @stylistic/js/array-element-newline */
 });
