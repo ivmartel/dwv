@@ -747,7 +747,7 @@ export class SegmentationUI {
     // volumes display
     const volumesSpan = document.createElement('span');
     volumesSpan.id = getHtmlId(prefixes.volumes, segmentId);
-    volumesSpan.innerText = this.#getLabelsString(segment, segmentationIndex);
+    this.#addLabelsInfo(segment, segmentationIndex, volumesSpan);
 
     // segment colour
     const colourInput = document.createElement('input');
@@ -908,57 +908,123 @@ export class SegmentationUI {
   };
 
   /**
-   * Convert the labels of a segmentation into a displayable string.
+   * Add labels info to a span.
    *
    * @param {object} segment The segment.
    * @param {number} segmentationIndex The segmentation index.
-   * @returns {string} The display string of labels.
+   * @param {HTMLSpanElement} rootSpan The root span to add the info to.
    */
-  #getLabelsString(segment, segmentationIndex) {
+  #addLabelsInfo(segment, segmentationIndex, rootSpan) {
+    // get the labels info strings
     const segmentation = _segmentations[segmentationIndex];
-    const start = ' [';
-
-    let res = start;
+    const labelsInfo = [];
     for (const label of segmentation.labels) {
       if (label.id === segment.number) {
-        if (res !== start) {
-          res += ', ';
-        }
-        res += label.volume.value.toPrecision(4) + i18n.t(label.volume.unit);
+        const main =
+          label.volume.value.toPrecision(4) + i18n.t(label.volume.unit);
+
+        let details = '';
         if (typeof label.diameters !== 'undefined') {
-          res += ' (';
           if (typeof label.diameters.major.diameter.value !== 'undefined') {
-            res += label.diameters.major.diameter.value.toPrecision(4) +
+            details += label.diameters.major.diameter.value.toPrecision(4) +
               i18n.t(label.diameters.major.diameter.unit);
           } else {
-            res += 'undefined';
+            details += 'undefined';
           }
-          res += ', ';
+          details += ', ';
           if (typeof label.diameters.minor.diameter.value !== 'undefined') {
-            res += label.diameters.minor.diameter.value.toPrecision(4) +
+            details += label.diameters.minor.diameter.value.toPrecision(4) +
               i18n.t(label.diameters.minor.diameter.unit);
           } else {
-            res += 'undefined';
+            details += 'undefined';
           }
-          res += ', ';
+          details += ', ';
           if (typeof label.height !== 'undefined') {
-            res += label.height.value.toPrecision(4) +
+            details += label.height.value.toPrecision(4) +
               i18n.t(label.height.unit);
           } else {
-            res += 'undefined';
+            details += 'undefined';
           }
-          res += ')';
         }
+
+        labelsInfo.push({
+          main,
+          details
+        });
       }
     }
-    res += ']';
 
-    // clear if empty
-    if (res === start + ']') {
-      res = '';
+    // hide/show next sibling on click
+    const onClick = function () {
+      const content = this.nextElementSibling;
+      if (content.style.display === 'inline') {
+        content.style.display = 'none';
+      } else {
+        content.style.display = 'inline';
+      }
+    };
+
+    // add labels info to root
+    if (labelsInfo.length !== 0) {
+      // clear root if less labels
+      const numberOfLabelsInRoot =
+        rootSpan.getElementsByClassName('collapse-main').length;
+      if (labelsInfo.length < numberOfLabelsInRoot) {
+        rootSpan.innerText = '';
+      }
+      // begin span
+      let begin = rootSpan.firstElementChild;
+      const emptyRoot = begin === null;
+      if (emptyRoot) {
+        begin = document.createElement('span');
+        begin.id = 'labels-begin';
+        begin.innerText = ' [';
+        rootSpan.appendChild(begin);
+      }
+      let previousElement = begin;
+      // add/update labels span
+      for (let i = 0; i < labelsInfo.length; ++i) {
+        const info = labelsInfo[i];
+        // find exisiting
+        const id0 = 'collapse-main-' + i;
+        const id1 = 'collapse-details-' + i;
+        let main = rootSpan.querySelector('#' + id0);
+        let details = rootSpan.querySelector('#' + id1);
+        // add spans if not found
+        if (!main) {
+          if (i !== 0) {
+            const separator = document.createElement('span');
+            separator.id = 'labels-separator';
+            separator.innerText = ', ';
+            previousElement.insertAdjacentElement('afterend', separator);
+            previousElement = separator;
+          }
+          main = document.createElement('span');
+          main.className = 'collapse-main';
+          main.id = id0;
+          main.onclick = onClick;
+          previousElement.insertAdjacentElement('afterend', main);
+          previousElement = main;
+
+          details = document.createElement('span');
+          details.className = 'collapse-details';
+          details.id = id1;
+          previousElement.insertAdjacentElement('afterend', details);
+        }
+        // update text
+        main.innerText = info.main;
+        details.innerText = ' (' + info.details + ')';
+        // update previous
+        previousElement = details;
+      }
+      // last span
+      if (emptyRoot) {
+        const last = document.createElement('span');
+        last.id = 'labels-last';
+        last.innerText = ']';
+        rootSpan.appendChild(last);
+      }
     }
-
-    return res;
   }
 
   /**
@@ -980,7 +1046,7 @@ export class SegmentationUI {
         const spanId = getHtmlId(prefixes.volumes, segmentId);
         const span = document.getElementById(spanId);
         if (span) {
-          span.innerText = this.#getLabelsString(segment, segmentationIndex);
+          this.#addLabelsInfo(segment, segmentationIndex, span);
         }
       }
     }
