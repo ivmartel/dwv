@@ -4,7 +4,7 @@ import {getTypedArray} from '../dicom/dicomParser.js';
 
 export class ResamplingFilter {
   /**
-   * Simple bilinear sampling function.
+   * Simple trilinear sampling function.
    *
    * @param {number[]} point The index space point to sample.
    * @param {TypedArray} buffer The buffer to sample.
@@ -13,7 +13,7 @@ export class ResamplingFilter {
    * @param {number} startOffset The offset to add to all sampled points.
    * @returns {number} The sampled value.
    */
-  #bilinearSample(point, buffer, size, unitVectors, startOffset) {
+  #trilinearSample(point, buffer, size, unitVectors, startOffset) {
     // base point
     const q0x = Math.floor(point[0]);
     const q0y = Math.floor(point[1]);
@@ -218,7 +218,7 @@ export class ResamplingFilter {
 
             if (interpolate) {
               // Bilinear
-              const sample = this.#bilinearSample(
+              const sample = this.#trilinearSample(
                 point,
                 sourceImageBuffer,
                 sourceSize,

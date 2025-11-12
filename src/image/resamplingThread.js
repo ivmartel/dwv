@@ -110,7 +110,7 @@ export function generateWorkerMessages(
   };
 
   if (targetNDims <= 3) {
-    return [generateMessage(0)];
+    return [generateMessage(0, 0)];
   } else {
     const frames = targetSize.get(3);
     const sourceFrameSize = sourceSize.getDimSize(3);
@@ -463,6 +463,7 @@ export class ResamplingThread {
       );
 
     this.#threadPool.onworkitem = this.ondoneframe;
+    this.#threadPool.onworkend = this.ondone;
 
     workerMessages.forEach((workerMessage) => {
       const workerTask = new ResamplingWorkerTask(workerMessage, {});
