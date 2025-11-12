@@ -182,6 +182,24 @@ export class View {
   #contourThickness = 1;
 
   /**
+   * @callback alphaFn
+   * @param {number[]|number} value The pixel value.
+   *   Can be a number for monochrome data or an array for RGB data.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value in [0,255] range.
+   */
+
+  /**
+   * Per value alpha function.
+   *
+   * @type {alphaFn}
+   */
+  #alphaFunction = function (_value, _index) {
+    // default always returns fully visible
+    return 0xff;
+  };
+
+  /**
    * Listener handler.
    *
    * @type {ListenerHandler}
@@ -353,26 +371,6 @@ export class View {
     // round milliseconds per frame to nearest whole number
     return Math.round(1000 / recommendedDisplayFrameRate);
   }
-
-  /**
-   * Per value alpha function.
-   *
-   * @param {number[]|number} _value The pixel value.
-   *   Can be a number for monochrome data or an array for RGB data.
-   * @param {number} _index The index of the value.
-   * @returns {number} The coresponding alpha [0,255].
-   */
-  #alphaFunction = function (_value, _index) {
-    // default always returns fully visible
-    return 0xff;
-  };
-
-  /**
-   * @callback alphaFn
-   * @param {number[]|number} value The pixel value.
-   * @param {number} index The values' index.
-   * @returns {number} The opacity of the input value.
-   */
 
   /**
    * Get the alpha function.
