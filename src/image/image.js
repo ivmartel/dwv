@@ -2154,7 +2154,7 @@ export class Image {
         /** @type {Label[]} */
         const labelsSorted =
           labels.sort((v1, v2) => {
-            return v2.volume - v1.volume;
+            return v2.volume.value - v1.volume.value;
           }).sort((v1, v2) => {
             return v1.id - v2.id;
           });
