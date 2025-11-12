@@ -1420,7 +1420,7 @@ export class Image {
       while (!ival.done) {
         const offset = offsets[ival.index];
         this.#buffer[offset] = ival.value;
-        this.#resetContourAtOffset(offset);
+        this.#resetContourAroundOffset(offset);
         ival = iterator.next();
       }
     }
