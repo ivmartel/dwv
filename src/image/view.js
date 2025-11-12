@@ -294,7 +294,7 @@ export class View {
     } else if (opacity < 0) {
       this.#fillOpacity = 0;
     } else {
-      this.#fillOpacity = opacity;
+      this.#fillOpacity = parseFloat(opacity);
     }
 
     // We can treat this like an alpha function update.
@@ -326,7 +326,7 @@ export class View {
     } else if (thickness > MAX_CONTOUR_SIZE) {
       this.#contourThickness = MAX_CONTOUR_SIZE;
     } else {
-      this.#contourThickness = thickness;
+      this.#contourThickness = parseInt(thickness, 10);
     }
 
     // We can treat this like an alpha function update.
