@@ -624,6 +624,7 @@ export class DataTableUI {
         0, 10,
         initialLayer.getContourThickness(),
         onChangeContourThickness,
+        1,
         1
       ));
     }
