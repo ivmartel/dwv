@@ -227,6 +227,15 @@ export class View {
   }
 
   /**
+   * Check is the associated image is a mask.
+   *
+   * @returns {boolean} True if the associated image is a mask.
+   */
+  isMask() {
+    return this.#image.getMeta().Modality === 'SEG';
+  }
+
+  /**
    * Get the view orientation.
    *
    * @returns {Matrix33} The orientation matrix.

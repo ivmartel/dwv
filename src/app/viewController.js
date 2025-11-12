@@ -59,13 +59,6 @@ export class ViewController {
   #playerID;
 
   /**
-   * Is DICOM seg mask flag.
-   *
-   * @type {boolean}
-   */
-  #isMask = false;
-
-  /**
    * @param {View} view The associated view.
    */
   constructor(view) {
@@ -84,11 +77,6 @@ export class ViewController {
 
     // position helper
     this.#positionHelper = new PositionHelper(view);
-
-    // mask segment helper
-    if (view.getImage().getMeta().Modality === 'SEG') {
-      this.#isMask = true;
-    }
   }
 
   /**
@@ -116,7 +104,7 @@ export class ViewController {
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return this.#isMask;
+    return this.#view.isMask();
   }
 
   /**

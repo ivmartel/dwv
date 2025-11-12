@@ -2141,8 +2141,7 @@ export class App {
 
     // make pixel of value 0 transparent for segmentation
     // (assuming RGB data)
-    const isSegmentationLayer = data.image.getMeta().Modality === 'SEG';
-    if (isSegmentationLayer) {
+    if (view.isMask()) {
       data.image.initializeContour();
       // possible presets
       if (typeof viewConfig.fillOpacity !== 'undefined') {
@@ -2185,7 +2184,7 @@ export class App {
       opacity = viewConfig.opacity;
     } else {
       if (!isBaseLayer) {
-        if (isSegmentationLayer) {
+        if (view.isMask()) {
           // Assuming contours are enabled be default
           opacity = 0.8;
         } else {
