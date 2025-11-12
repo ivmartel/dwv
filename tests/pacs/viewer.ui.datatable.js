@@ -588,7 +588,7 @@ export class DataTableUI {
           const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
           const layer = lg.getActiveLayer();
           if (typeof layer !== 'undefined') {
-            layer.setFillOpacity(value);
+            layer.setFillOpacity(parseFloat(value));
             layer.draw();
           }
         }
@@ -612,7 +612,7 @@ export class DataTableUI {
           const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
           const layer = lg.getActiveLayer();
           if (typeof layer !== 'undefined') {
-            layer.setContourThickness(value);
+            layer.setContourThickness(parseInt(value, 10));
             layer.draw();
           }
         }
