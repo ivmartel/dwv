@@ -44,6 +44,15 @@ export class MaskSegmentHelper {
   }
 
   /**
+   * Get the associated mask image.
+   *
+   * @returns {Image} The mask image.
+   */
+  getMask() {
+    return this.#mask;
+  }
+
+  /**
    * Find the index of a segment in the segments list.
    *
    * @param {number} segmentNumber The number to find.
@@ -207,15 +216,17 @@ export class MaskSegmentHelper {
    * Find the overlap for each segment between two segmentation masks.
    * It is assumed these images have the same orientation.
    *
-   * @param {Image} compare The segmentation image to find overlap with.
+   * @param {MaskSegmentHelper} rhs The helper of the
+   *   segmentation image to find overlap with.
    * @returns {OverlapMap} The overlapping voxel counts. First level is the
    *  segments from this image, second level is the compare image segments.
    */
-  findOverlap(compare) {
+  findOverlap(rhs) {
     // Find the overlapping slices
     const thisGeometry = this.#mask.getGeometry();
     const thisSize = thisGeometry.getSize();
-    const compareGeometry = compare.getGeometry();
+    const compareMask = rhs.getMask();
+    const compareGeometry = compareMask.getGeometry();
     const compareSize = compareGeometry.getSize();
 
     /**
@@ -240,7 +251,7 @@ export class MaskSegmentHelper {
         const thisWorld = thisGeometry.indexToWorld(thisIndex);
         const compareIndex = compareGeometry.worldToIndex(thisWorld);
         const compareOffset = compareSize.indexToOffset(compareIndex);
-        const compareValue = compare.getValueAtOffset(compareOffset);
+        const compareValue = compareMask.getValueAtOffset(compareOffset);
 
         if (typeof compareValue !== 'undefined' && compareValue !== 0) {
           if (typeof overlap[thisValue].overlap[compareValue] !== 'undefined') {

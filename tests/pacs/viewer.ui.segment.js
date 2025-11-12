@@ -1157,7 +1157,7 @@ export class SegmentationUI {
       const maskImage1 = this.#app.getData(segment1).image;
       const segHelper0 = new MaskSegmentHelper(maskImage0);
       const segHelper1 = new MaskSegmentHelper(maskImage1);
-      const overlap = segHelper0.findOverlap(maskImage1);
+      const overlap = segHelper0.findOverlap(segHelper1);
 
       overlapResult.innerHTML = ''; // clear old results
       const overlapList = document.createElement('ul');

@@ -51,6 +51,7 @@ QUnit.test('MaskSegmentHelper findOverlap', function (assert) {
   ]);
   /* eslint-enable @stylistic/js/array-element-newline */
   const image0 = new Image(imgGeometry, imgBuffer0);
+  const segmentHelper0 = new MaskSegmentHelper(image0);
 
   /* eslint-disable @stylistic/js/array-element-newline */
   const imgBuffer1 = new Uint8Array([
@@ -69,7 +70,7 @@ QUnit.test('MaskSegmentHelper findOverlap', function (assert) {
   image1.setMeta({});
   const segmentHelper1 = new MaskSegmentHelper(image1);
 
-  const overlap1 = segmentHelper1.findOverlap(image0);
+  const overlap1 = segmentHelper1.findOverlap(segmentHelper0);
 
   // Undefined tests
 
