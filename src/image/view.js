@@ -271,13 +271,6 @@ export class View {
     }
 
     // We can treat this like an alpha function update.
-    /**
-     * Alpha func change event.
-     *
-     * @event View#alphafuncchange
-     * @type {object}
-     * @property {string} type The event type.
-     */
     this.#fireEvent({
       type: 'alphafuncchange'
     });
@@ -310,13 +303,6 @@ export class View {
     }
 
     // We can treat this like an alpha function update.
-    /**
-     * Alpha func change event.
-     *
-     * @event View#alphafuncchange
-     * @type {object}
-     * @property {string} type The event type.
-     */
     this.#fireEvent({
       type: 'alphafuncchange'
     });
