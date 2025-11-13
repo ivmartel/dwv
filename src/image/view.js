@@ -249,7 +249,7 @@ export class View {
    * Segment view helper to handle
    *   hidden segments.
    *
-   * @type {MaskSegmentViewHelper}
+   * @type {MaskSegmentViewHelper|undefined}
    */
   #segmentViewHelper;
 
@@ -284,28 +284,28 @@ export class View {
   setImage(image) {
     this.#image = image;
 
-    // default helper
-    this.#segmentViewHelper = new MaskSegmentViewHelper();
-
     // reset alpha function
     if (this.isMask()) {
+      // default helper
+      this.#segmentViewHelper = new MaskSegmentViewHelper();
+      // mask alpha func
       this.#alphaFunction = this.#maskAlphaFuntion;
     } else {
+      // image alpha func
       this.#alphaFunction = this.#imageAlphaFunction;
+      // listen to appendframe event to update the current position
+      //   to add the extra dimension
+      this.#image.addEventListener('appendframe', () => {
+        // update current position if first appendFrame
+        const index = this.getCurrentIndex();
+        if (index.length() === 3) {
+          // add dimension
+          const values = index.getValues();
+          values.push(0);
+          this.setCurrentIndex(new Index(values));
+        }
+      });
     }
-
-    // listen to appendframe event to update the current position
-    //   to add the extra dimension
-    this.#image.addEventListener('appendframe', () => {
-      // update current position if first appendFrame
-      const index = this.getCurrentIndex();
-      if (index.length() === 3) {
-        // add dimension
-        const values = index.getValues();
-        values.push(0);
-        this.setCurrentIndex(new Index(values));
-      }
-    });
   }
 
   /**
