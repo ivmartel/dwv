@@ -51,6 +51,24 @@ QUnit.test('MaskSegmentHelper findOverlap', function (assert) {
   ]);
   /* eslint-enable @stylistic/js/array-element-newline */
   const image0 = new Image(imgGeometry, imgBuffer0);
+  image0.setMeta({
+    custom: {
+      segments: [
+        {
+          number: 1,
+          label: 'label1'
+        },
+        {
+          number: 2,
+          label: 'label2'
+        },
+        {
+          number: 3,
+          label: 'label3'
+        }
+      ]
+    }
+  });
   const segmentHelper0 = new MaskSegmentHelper(image0);
 
   /* eslint-disable @stylistic/js/array-element-newline */
@@ -67,7 +85,28 @@ QUnit.test('MaskSegmentHelper findOverlap', function (assert) {
   ]);
   /* eslint-enable @stylistic/js/array-element-newline */
   const image1 = new Image(imgGeometry, imgBuffer1);
-  image1.setMeta({});
+  image1.setMeta({
+    custom: {
+      segments: [
+        {
+          number: 1,
+          label: 'label1'
+        },
+        {
+          number: 2,
+          label: 'label2'
+        },
+        {
+          number: 3,
+          label: 'label3'
+        },
+        {
+          number: 4,
+          label: 'label4'
+        }
+      ]
+    }
+  });
   const segmentHelper1 = new MaskSegmentHelper(image1);
 
   const overlap1 = segmentHelper1.findOverlap(segmentHelper0);

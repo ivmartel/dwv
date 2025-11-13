@@ -1162,20 +1162,18 @@ export class SegmentationUI {
       overlapResult.innerHTML = ''; // clear old results
       const overlapList = document.createElement('ul');
       for (
-        const [segmentNumber0, segmentOverlap] of
+        const [/*segmentNumber0*/, segmentOverlap] of
         Object.entries(overlap)
       ) {
-        const segment0 = segHelper0.getSegment(Number(segmentNumber0));
-
         // title (segment that these overlaps are for)
         const segmentLi = document.createElement('li');
-        segmentLi.innerHTML = segment0.label +
+        segmentLi.innerHTML = segmentOverlap.label +
           ' (' + segmentOverlap.count + ' voxels): ';
 
         // list of overlaps
         let first = true;
         for (
-          const [segmentNumber1, count] of
+          const [/*segmentNumber1*/, count] of
           Object.entries(segmentOverlap.overlap)
         ) {
           if (first) {
@@ -1183,8 +1181,7 @@ export class SegmentationUI {
           } else {
             segmentLi.innerHTML += ', ';
           }
-          const segment1 = segHelper1.getSegment(Number(segmentNumber1));
-          segmentLi.innerHTML += segment1.label + ' (' +
+          segmentLi.innerHTML += count.label + ' (' +
             count.count + ' voxels, ' +
             (count.percentage * 100).toPrecision(4) + '%)';
         }

@@ -184,9 +184,10 @@ export class MaskSegmentHelper {
   }
 
   /**
-   * The overlap count of a signle segment with another segment.
+   * The overlap count of a single segment with another segment.
    *
    * @typedef OverlapCount
+   * @property {string} label The segment label.
    * @property {number} count The number of overlapping voxels.
    * @property {number} percentage The overlap percentage between 0 and 1.
    */
@@ -196,6 +197,7 @@ export class MaskSegmentHelper {
    * different segments.
    *
    * @typedef Overlap
+   * @property {string} label The segment label.
    * @property {Object.<number, OverlapCount>} overlap A Dictionary
    *  containing the counts. The key is the segment number of the overlapping
    *  segment.
@@ -241,7 +243,9 @@ export class MaskSegmentHelper {
         if (typeof overlap[thisValue] !== 'undefined') {
           overlap[thisValue].count += 1;
         } else {
+          const thisSegment = this.getSegment(thisValue);
           overlap[thisValue] = {
+            label: thisSegment.label,
             overlap: {},
             count: 1
           };
@@ -257,7 +261,9 @@ export class MaskSegmentHelper {
           if (typeof overlap[thisValue].overlap[compareValue] !== 'undefined') {
             overlap[thisValue].overlap[compareValue].count += 1;
           } else {
+            const compareSegment = rhs.getSegment(compareValue);
             overlap[thisValue].overlap[compareValue] = {
+              label: compareSegment.label,
               count: 1,
               percentage: 0
             };
