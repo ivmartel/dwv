@@ -242,28 +242,28 @@ QUnit.test('MaskSegmentHelper findOverlap', function (assert) {
 
   assert.equal(
     overlap1[1].overlap[1].percentage,
-    0.25,
+    25,
     'Expected percentage on label 1 for label 1 for find overlap'
   );
   assert.equal(
     overlap1[1].overlap[2].percentage,
-    0.125,
+    12.5,
     'Expected percentage on label 1 for label 2 for find overlap'
   );
 
   assert.equal(
     overlap1[2].overlap[1].percentage,
-    0.5,
+    50,
     'Expected percentage on label 2 for label 1 for find overlap'
   );
   assert.equal(
     overlap1[2].overlap[2].percentage,
-    0.25,
+    25,
     'Expected percentage on label 2 for label 2 for find overlap'
   );
   assert.equal(
     overlap1[2].overlap[3].percentage,
-    0.25,
+    25,
     'Expected percentage on label 2 for label 3 for find overlap'
   );
 
