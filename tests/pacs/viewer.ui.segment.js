@@ -620,7 +620,7 @@ export class SegmentationUI {
     }
     for (const vl of vls) {
       const vc = vl.getViewController();
-      vc.setViewAlphaFunction(segViewHelper.getAlphaFunc());
+      vc.setMaskViewHelper(segViewHelper);
     }
   };
 

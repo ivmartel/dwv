@@ -28,6 +28,7 @@ import {
   Point3D
 } from '../math/point.js';
 import {DataElement} from '../dicom/dataElement.js';
+import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
 /* eslint-enable no-unused-vars */
 
 export const MAX_CONTOUR_SIZE = 10;
@@ -190,14 +191,67 @@ export class View {
    */
 
   /**
+   * @callback maskAlphaFn
+   * @param {number} value The pixel value.
+   *   Can be a number for monochrome data or an array for RGB data.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value in [0,255] range.
+   */
+
+  /**
    * Per value alpha function.
+   *
+   * @type {alphaFn|maskAlphaFn}
+   */
+  #alphaFunction;
+
+  /**
+   * Image alpha function.
    *
    * @type {alphaFn}
    */
-  #alphaFunction = function (_value, _index) {
+  #imageAlphaFunction = function (_value, _index) {
     // default always returns fully visible
     return 0xff;
   };
+
+  /**
+   * Mask image alpha function.
+   *
+   * @type {maskAlphaFn}
+   */
+  #maskAlphaFuntion = (value, index) => {
+    // transparent: 0 (background) and hidden
+    if (value === 0 || this.#segmentViewHelper.isHidden(value)) {
+      return 0;
+    } else {
+      if (this.getContourThickness() !== 0) {
+        // ideally getContourDistance would be passed in by an
+        // iterator, but that would require a large change to a
+        // lot of components for this one edge case.
+        const contourDistance =
+          this.#image.getContourDistance(
+            index,
+            this.getOrientation()
+          );
+        if (contourDistance <= this.getContourThickness()) {
+          return 0xff;
+        } else {
+          return 0xff * this.getFillOpacity();
+        }
+      } else {
+        return 0xff * this.getFillOpacity();
+      }
+    }
+  };
+
+  /**
+   * Segment view helper to handle
+   *   hidden segments.
+   *
+   * @type {MaskSegmentViewHelper}
+   */
+  #segmentViewHelper;
 
   /**
    * Listener handler.
@@ -210,7 +264,35 @@ export class View {
    * @param {Image} image The associated image.
    */
   constructor(image) {
+    this.setImage(image);
+  }
+
+  /**
+   * Get the associated image.
+   *
+   * @returns {Image} The associated image.
+   */
+  getImage() {
+    return this.#image;
+  }
+
+  /**
+   * Set the associated image.
+   *
+   * @param {Image} image The associated image.
+   */
+  setImage(image) {
     this.#image = image;
+
+    // default helper
+    this.#segmentViewHelper = new MaskSegmentViewHelper();
+
+    // reset alpha function
+    if (this.isMask()) {
+      this.#alphaFunction = this.#maskAlphaFuntion;
+    } else {
+      this.#alphaFunction = this.#imageAlphaFunction;
+    }
 
     // listen to appendframe event to update the current position
     //   to add the extra dimension
@@ -227,30 +309,26 @@ export class View {
   }
 
   /**
-   * Get the associated image.
-   *
-   * @returns {Image} The associated image.
-   */
-  getImage() {
-    return this.#image;
-  }
-
-  /**
-   * Set the associated image.
-   *
-   * @param {Image} inImage The associated image.
-   */
-  setImage(inImage) {
-    this.#image = inImage;
-  }
-
-  /**
    * Check is the associated image is a mask.
    *
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
     return this.#image.getMeta().Modality === 'SEG';
+  }
+
+  /**
+   * Set the mask segment view helper to handle
+   *   hidden segments.
+   *
+   * @param {MaskSegmentViewHelper} helper The helper.
+   */
+  setMaskViewHelper(helper) {
+    this.#segmentViewHelper = helper;
+
+    this.#fireEvent({
+      type: 'alphafuncchange'
+    });
   }
 
   /**

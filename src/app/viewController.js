@@ -23,6 +23,7 @@ import {Point, Point2D} from '../math/point.js';
 import {Scalar2D} from '../math/scalar.js';
 import {Matrix33} from '../math/matrix.js';
 import {ViewLayer} from '../gui/viewLayer.js';
+import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -874,6 +875,16 @@ export class ViewController {
    */
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);
+  }
+
+  /**
+   * Set the mask segment view helper to handle
+   *   hidden segments.
+   *
+   * @param {MaskSegmentViewHelper} helper The helper.
+   */
+  setMaskViewHelper(helper) {
+    this.#view.setMaskViewHelper(helper);
   }
 
   /**
