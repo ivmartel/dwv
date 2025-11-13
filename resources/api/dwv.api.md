@@ -841,10 +841,12 @@ export class MaskSegment {
 export class MaskSegmentHelper {
     constructor(mask: Image_2);
     addSegment(segment: MaskSegment): void;
-    findOverlap(compare: Image_2): {
+    findOverlap(rhs: MaskSegmentHelper): {
         [x: number]: {
+            label: string;
             overlap: {
                 [x: number]: {
+                    label: string;
                     count: number;
                     percentage: number;
                 };
@@ -852,6 +854,7 @@ export class MaskSegmentHelper {
             count: number;
         };
     };
+    getMask(): Image_2;
     getNumberOfSegments(): number;
     getSegment(segmentNumber: number): MaskSegment | undefined;
     hasSegment(segmentNumber: number): boolean;
@@ -863,7 +866,6 @@ export class MaskSegmentHelper {
 // @public
 export class MaskSegmentViewHelper {
     addToHidden(segmentNumber: number): void;
-    getAlphaFunc(): (value: number | number[], index: number) => number;
     isHidden(segmentNumber: number): boolean;
     removeFromHidden(segmentNumber: number): void;
 }
@@ -1232,6 +1234,7 @@ export class View {
     includesImageUid(uid: string): boolean;
     init(): void;
     isAquisitionOrientation(): boolean;
+    isMask(): boolean;
     isPositionInBounds(position?: Point): boolean;
     removeEventListener(type: string, callback: Function): void;
     setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
@@ -1240,8 +1243,9 @@ export class View {
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(position: Point, silent?: boolean): boolean;
     setFillOpacity(opacity: number): void;
-    setImage(inImage: Image_2): void;
+    setImage(image: Image_2): void;
     setInitialIndex(): void;
+    setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     setOrientation(mat33: Matrix33): void;
     setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
     setWindowLevelMinMax(): void;
@@ -1328,6 +1332,7 @@ export class ViewController {
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
     setFillOpacity(opacity: number): void;
     setImage(img: Image_2): void;
+    setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setWindowLevel(wl: WindowLevel): void;
     setWindowLevelPreset(name: string): void;

@@ -3972,6 +3972,12 @@ export declare class MaskSegmentHelper {
      */
     constructor(mask: Image_2);
     /**
+     * Get the associated mask image.
+     *
+     * @returns {Image} The mask image.
+     */
+    getMask(): Image_2;
+    /**
      * Check if a segment is part of the segments list.
      *
      * @param {number} segmentNumber The segment number.
@@ -4018,9 +4024,10 @@ export declare class MaskSegmentHelper {
      */
     updateSegment(segment: MaskSegment): void;
     /**
-     * The overlap count of a signle segment with another segment.
+     * The overlap count of a single segment with another segment.
      *
      * @typedef OverlapCount@typedef OverlapCount
+     * @property {string} label The segment label.
      * @property {number} count The number of overlapping voxels.
      * @property {number} percentage The overlap percentage between 0 and 1.
      */
@@ -4029,6 +4036,7 @@ export declare class MaskSegmentHelper {
      * different segments.
      *
      * @typedef Overlap@typedef Overlap
+     * @property {string} label The segment label.
      * @property {Object.<number, OverlapCount>} overlap A Dictionary
      *  containing the counts. The key is the segment number of the overlapping
      *  segment.
@@ -4047,12 +4055,17 @@ export declare class MaskSegmentHelper {
      * Find the overlap for each segment between two segmentation masks.
      * It is assumed these images have the same orientation.
      *
-     * @param {Image} compare The segmentation image to find overlap with.
+     * @param {MaskSegmentHelper} rhs The helper of the
+     *   segmentation image to find overlap with.
      * @returns {OverlapMap} The overlapping voxel counts. First level is the
      *  segments from this image, second level is the compare image segments.
      */
-    findOverlap(compare: Image_2): {
+    findOverlap(rhs: MaskSegmentHelper): {
         [x: number]: {
+            /**
+             * The segment label.
+             */
+            label: string;
             /**
              * A Dictionary
              * containing the counts. The key is the segment number of the overlapping
@@ -4060,6 +4073,10 @@ export declare class MaskSegmentHelper {
              */
             overlap: {
                 [x: number]: {
+                    /**
+                     * The segment label.
+                     */
+                    label: string;
                     /**
                      * The number of overlapping voxels.
                      */
@@ -4102,18 +4119,6 @@ export declare class MaskSegmentViewHelper {
      * @param {number} segmentNumber The segment number.
      */
     removeFromHidden(segmentNumber: number): void;
-    /**
-     * @callback alphaFn@callback alphaFn
-     * @param {number|number[]} value The pixel value.
-     * @param {number} index The values' index.
-     * @returns {number} The opacity of the input value.
-     */
-    /**
-     * Get the alpha function to apply hidden colors.
-     *
-     * @returns {alphaFn} The corresponding alpha function.
-     */
-    getAlphaFunc(): (value: number | number[], index: number) => number;
     #private;
 }
 
@@ -5800,9 +5805,22 @@ export declare class View {
     /**
      * Set the associated image.
      *
-     * @param {Image} inImage The associated image.
+     * @param {Image} image The associated image.
      */
-    setImage(inImage: Image_2): void;
+    setImage(image: Image_2): void;
+    /**
+     * Check is the associated image is a mask.
+     *
+     * @returns {boolean} True if the associated image is a mask.
+     */
+    isMask(): boolean;
+    /**
+     * Set the mask segment view helper to handle
+     *   hidden segments.
+     *
+     * @param {MaskSegmentViewHelper} helper The helper.
+     */
+    setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     /**
      * Get the view orientation.
      *
@@ -5859,12 +5877,6 @@ export declare class View {
      * @returns {number} The milliseconds per frame.
      */
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
-    /**
-     * @callback alphaFn@callback alphaFn
-     * @param {number[]|number} value The pixel value.
-     * @param {number} index The values' index.
-     * @returns {number} The opacity of the input value.
-     */
     /**
      * Get the alpha function.
      *
@@ -6540,6 +6552,13 @@ export declare class ViewController {
      * @param {alphaFn} func The function.
      */
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
+    /**
+     * Set the mask segment view helper to handle
+     *   hidden segments.
+     *
+     * @param {MaskSegmentViewHelper} helper The helper.
+     */
+    setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     /**
      * Get the fill opacity relative to the global opacity.
      *
