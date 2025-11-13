@@ -189,7 +189,7 @@ export class MaskSegmentHelper {
    * @typedef OverlapCount
    * @property {string} label The segment label.
    * @property {number} count The number of overlapping voxels.
-   * @property {number} percentage The overlap percentage between 0 and 1.
+   * @property {number} percentage The overlap percentage between 0 and 100.
    */
 
   /**
@@ -274,7 +274,7 @@ export class MaskSegmentHelper {
 
     for (const thisOverlap of Object.values(overlap)) {
       for (const overlapCount of Object.values(thisOverlap.overlap)) {
-        overlapCount.percentage = overlapCount.count / thisOverlap.count;
+        overlapCount.percentage = overlapCount.count * 100 / thisOverlap.count;
       }
     }
 

@@ -1183,7 +1183,7 @@ export class SegmentationUI {
           }
           segmentLi.innerHTML += count.label + ' (' +
             count.count + ' voxels, ' +
-            (count.percentage * 100).toPrecision(4) + '%)';
+            (count.percentage).toPrecision(4) + '%)';
         }
 
         overlapList.appendChild(segmentLi);
