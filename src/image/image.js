@@ -2220,7 +2220,7 @@ export class Image {
         // we only care about the most recent one.
         if (this.#resamplingJobId === data.jobId) {
           this.#buffer.set(data.targetImageBuffer, data.startOffset);
-          this.#fireEvent({type: 'imageresampled'});
+          this.#fireEvent({type: 'imageresampled', frame: data.frame});
         }
       };
 

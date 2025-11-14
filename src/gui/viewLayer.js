@@ -418,7 +418,12 @@ export class ViewLayer {
    * @function
    */
   onimageresampled = (event) => {
-    if (this.#dataId === event.dataid) {
+    const maybeTimeIndex = this.#viewController.getCurrentIndex().get(3);
+    const matchingTimeIndex =
+      typeof maybeTimeIndex === 'undefined' ||
+      maybeTimeIndex === event.frame;
+
+    if (this.#dataId === event.dataid && matchingTimeIndex) {
       this.#needsDataUpdate = true;
       this.draw();
     }

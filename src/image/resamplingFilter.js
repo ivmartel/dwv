@@ -160,7 +160,9 @@ export class ResamplingFilter {
     const sourceStartOffset = workerMessage.sourceStartOffset;
     const targetStartOffset = workerMessage.targetStartOffset;
     const interpolate = workerMessage.interpolate;
+
     const jobId = workerMessage.jobId;
+    const frame = workerMessage.frame;
 
     // Can't pass them in as matrixes, so we need to re-create them
     const sourceMatrix = new Matrix33(workerMessage.sourceOrientation);
@@ -246,7 +248,8 @@ export class ResamplingFilter {
     return {
       targetImageBuffer: targetImageBuffer,
       startOffset: targetStartOffset,
-      jobId: jobId
+      jobId: jobId,
+      frame: frame
     };
   }
 }

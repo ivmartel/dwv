@@ -82,7 +82,7 @@ export function generateWorkerMessages(
   const sourceTotalSize = sourceSize.getTotalSize();
   const targetTotalSize = targetSize.getTotalSize();
 
-  const generateMessage = (sourceStartOffset, targetStartOffset) => {
+  const generateMessage = (sourceStartOffset, targetStartOffset, frame) => {
     return {
       sourceImageBuffer: sourceImageBuffer,
       sourceOrigin: sourceImageGeometry.getOrigin().getValues(),
@@ -105,12 +105,13 @@ export function generateWorkerMessages(
       sourceStartOffset: sourceStartOffset,
       targetStartOffset: targetStartOffset,
 
-      jobId: jobId
+      jobId: jobId,
+      frame: frame
     };
   };
 
   if (targetNDims <= 3) {
-    return [generateMessage(0, 0)];
+    return [generateMessage(0, 0, 0)];
   } else {
     const frames = targetSize.get(3);
     const sourceFrameSize = sourceSize.getDimSize(3);
@@ -120,7 +121,7 @@ export function generateWorkerMessages(
     for (let f = 0; f < frames; f++) {
       const sourceOffset = sourceFrameSize * f;
       const targetOffset = targetFrameSize * f;
-      messages.push(generateMessage(sourceOffset, targetOffset));
+      messages.push(generateMessage(sourceOffset, targetOffset, f));
     }
 
     return messages;
