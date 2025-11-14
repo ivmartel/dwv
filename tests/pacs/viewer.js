@@ -356,12 +356,6 @@ function viewerSetup() {
     }
     // update sliders' value
     updateSliders(_layouts[_selectedLayoutIndex]);
-    // if this is a time series add the frame controls if needed
-    if (event.value[1].length >= 4) {
-      updateFrameControls(true);
-    } else {
-      updateFrameControls(false);
-    }
   });
 
   _app.addEventListener('filterrun', function (event) {
@@ -578,44 +572,6 @@ function mergeConfigs(config, configToMerge) {
     }
   }
   return config;
-}
-
-/**
- * Shows or hides frame controls for 4D data.
- *
- * @param {bool} visible If the controls should be visible.
- */
-function updateFrameControls(visible) {
-  const controls = document.getElementById('position-frame-controls');
-  if (visible && controls.innerHTML === '') {
-    const back = document.createElement('button');
-    back.innerHTML = '<-';
-    back.onclick = () => {
-      const vls = _app.getViewLayersByDataId('0');
-      const vc = vls[0].getViewController();
-      const pos = vc.getCurrentPosition();
-      if (pos.length() >= 4) {
-        const newPos = pos.add(new Point([0, 0, 0, -1]));
-        vc.setCurrentPosition(newPos);
-      }
-    };
-    const forward = document.createElement('button');
-    forward.innerHTML = '->';
-    forward.onclick = () => {
-      const vls = _app.getViewLayersByDataId('0');
-      const vc = vls[0].getViewController();
-      const pos = vc.getCurrentPosition();
-      if (pos.length() >= 4) {
-        const newPos = pos.add(new Point([0, 0, 0, 1]));
-        vc.setCurrentPosition(newPos);
-      }
-    };
-
-    controls.appendChild(back);
-    controls.appendChild(forward);
-  } else if (!visible && controls.innerHTML !== '') {
-    controls.innerHTML = '';
-  }
 }
 
 /**
