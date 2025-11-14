@@ -375,7 +375,7 @@ function viewerSetup() {
   _app.addEventListener('imageresamplingstart', function (event) {
     console.time('resample-data-' + event.dataid);
   });
-  _app.addEventListener('imageresampled', function (event) {
+  _app.addEventListener('imageresamplingcomplete', function (event) {
     console.timeEnd('resample-data-' + event.dataid);
   });
 
@@ -724,10 +724,8 @@ function setupPositionLine() {
     const vc = vls[0].getViewController();
     const element = event.target;
     const values = element.value.split(',');
-    vc.setCurrentPosition(new Point([
-      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
-    ])
-    );
+    const point = new Point(values.map(parseFloat));
+    vc.setCurrentPosition(point);
   });
 }
 

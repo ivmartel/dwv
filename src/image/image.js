@@ -80,6 +80,7 @@ export const imageEventNames = [
   'imagecontentchange',
   'imagegeometrychange',
   'imageresamplingstart',
+  'imageresamplingcomplete',
   'imageresampled',
   'labelingstart',
   'labelschanged'
@@ -218,6 +219,13 @@ export class Image {
    * @type {boolean}
    */
   #resampled;
+
+  /**
+   * The ID of the current resampling job.
+   *
+   * @type {string}
+   */
+  #resamplingJobId;
 
   /**
    * Data geometry, unmodified if image is resampled, null otherwise.
@@ -362,6 +370,7 @@ export class Image {
     this.#geometry = geometry;
     this.#buffer = buffer;
     this.#resampled = false;
+    this.#resamplingJobId = '0';
     this.#rawGeometry = null;
     this.#rawBuffer = null;
     this.#contourBuffer = null;
@@ -2205,10 +2214,19 @@ export class Image {
     if (this.#resamplingThread === null) {
       this.#resamplingThread = new ResamplingThread();
 
-      this.#resamplingThread.ondone = (event) => {
+      this.#resamplingThread.ondoneframe = (event) => {
         const data = event.data;
-        this.#buffer = data.targetImageBuffer;
-        this.#fireEvent({type: 'imageresampled'});
+
+        // In case multiple resampled jobs are running at the same time,
+        // we only care about the most recent one.
+        if (this.#resamplingJobId === data.jobId) {
+          this.#buffer.set(data.targetImageBuffer, data.startOffset);
+          this.#fireEvent({type: 'imageresampled', frame: data.frame});
+        }
+      };
+
+      this.#resamplingThread.ondone = (_) => {
+        this.#fireEvent({type: 'imageresamplingcomplete'});
       };
     }
 
@@ -2239,6 +2257,7 @@ export class Image {
 
     this.#buffer = resampled.buffer;
     this.#geometry = resampled.geometry;
+    this.#resamplingJobId = resampled.jobId;
 
     this.#fireEvent({type: 'imagecontentchange'});
     this.#fireEvent({type: 'imagegeometrychange'});

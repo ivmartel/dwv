@@ -5,9 +5,8 @@ import {Matrix33} from '../../src/math/matrix.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {ResamplingFilter} from '../../src/image/resamplingFilter.js';
 import {
-  generateWorkerMessage,
-  generateResampledGeometry,
-  generateBuffer
+  generateWorkerMessages,
+  generateResampledGeometry
 } from '../../src/image/resamplingThread.js';
 
 /**
@@ -64,20 +63,16 @@ QUnit.test('ResamplingFilter class', function (assert) {
     imgGeometry0,
     targetOrientation0
   );
-  const resampledBuffer0 = generateBuffer(
-    imgBuffer0,
-    0,
-    resampledGeometry0.getSize()
-  );
-  const imgEvent0 = generateWorkerMessage(
+  const imgEvent0 = generateWorkerMessages(
     imgBuffer0,
     imgGeometry0,
-    resampledBuffer0,
     resampledGeometry0,
-    false
+    0,
+    false,
+    '0'
   );
 
-  resamplingFilter.run(imgEvent0);
+  const runReturn0 = resamplingFilter.run(imgEvent0[0]);
 
   const expectedSize0 = new Size([3, 2, 3]);
   const expectedSpacing0 = new Spacing([1, 3, 2]);
@@ -105,7 +100,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
 
   const buffersMatch0 =
     expectedBuffer0.map((value, index) => {
-      return value === resampledBuffer0[index];
+      return value === runReturn0.targetImageBuffer[index];
     }).reduce((a, b) => {
       return a && b;
     });
@@ -134,20 +129,17 @@ QUnit.test('ResamplingFilter class', function (assert) {
     imgGeometry0,
     targetOrientation1
   );
-  const resampledBuffer1 = generateBuffer(
-    imgBuffer0,
-    0,
-    resampledGeometry1.getSize()
-  );
-  const imgEvent1 = generateWorkerMessage(
+
+  const imgEvent1 = generateWorkerMessages(
     imgBuffer0,
     imgGeometry0,
-    resampledBuffer1,
     resampledGeometry1,
-    false
+    0,
+    false,
+    '1'
   );
 
-  resamplingFilter.run(imgEvent1);
+  const runReturn1 = resamplingFilter.run(imgEvent1[0]);
 
   const expectedSize1 = new Size([2, 3, 3]);
   const expectedSpacing1 = new Spacing([3, 2, 1]);
@@ -176,7 +168,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
 
   const buffersMatch1 =
     expectedBuffer1.map((value, index) => {
-      return value === resampledBuffer1[index];
+      return value === runReturn1.targetImageBuffer[index];
     }).reduce((a, b) => {
       return a && b;
     });
@@ -205,20 +197,16 @@ QUnit.test('ResamplingFilter class', function (assert) {
     imgGeometry0,
     targetOrientation2
   );
-  const resampledBuffer2 = generateBuffer(
-    imgBuffer0,
-    0,
-    resampledGeometry2.getSize()
-  );
-  const imgEvent2 = generateWorkerMessage(
+  const imgEvent2 = generateWorkerMessages(
     imgBuffer0,
     imgGeometry0,
-    resampledBuffer2,
     resampledGeometry2,
-    false
+    0,
+    false,
+    '2'
   );
 
-  resamplingFilter.run(imgEvent2);
+  const runReturn2 = resamplingFilter.run(imgEvent2[0]);
 
   const expectedSize2 = new Size([3, 3, 2]);
   const expectedSpacing2 = new Spacing([2, 1, 3]);
@@ -244,7 +232,7 @@ QUnit.test('ResamplingFilter class', function (assert) {
 
   const buffersMatch2 =
     expectedBuffer2.map((value, index) => {
-      return value === resampledBuffer2[index];
+      return value === runReturn2.targetImageBuffer[index];
     }).reduce((a, b) => {
       return a && b;
     });
@@ -260,6 +248,126 @@ QUnit.test('ResamplingFilter class', function (assert) {
   assert.true(
     geometriesMatch2,
     'Expected 90° Z-axis rotation resampled geometry to match expected geometry'
+  );
+
+  // Basic 90° 4D Rotation
+  // --------------------------
+  const imgSize3 = new Size([3, 3, 2, 2]);
+  const imgSpacing3 = new Spacing([1, 2, 3, 1]);
+  const imgOrigins3 = [
+    new Point3D(0, 0, 0),
+    new Point3D(0, 0, 3)
+  ];
+  const imgOrientation3 = new Matrix33([
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1
+  ]);
+  const imgGeometry3 = new Geometry(
+    imgOrigins3,
+    imgSize3,
+    imgSpacing3,
+    imgOrientation3
+  );
+  const imgBuffer3 = new Uint8Array([
+    0, 0, 0,
+    0, 1, 1,
+    0, 1, 1,
+
+    0, 0, 0,
+    0, 1, 1,
+    0, 1, 1,
+
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0,
+
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0,
+  ]);
+
+  const targetOrientation3 = new Matrix33([
+    0, -1, 0,
+    1, 0, 0,
+    0, 0, 1
+  ]);
+  const resampledGeometry3 = generateResampledGeometry(
+    imgGeometry3,
+    targetOrientation3
+  );
+  const imgEvent3 = generateWorkerMessages(
+    imgBuffer3,
+    imgGeometry3,
+    resampledGeometry3,
+    false
+  );
+
+  const runReturn3a = resamplingFilter.run(imgEvent3[0]);
+  const runReturn3b = resamplingFilter.run(imgEvent3[1]);
+
+  const expectedSize3 = new Size([3, 3, 2, 2]);
+  const expectedSpacing3 = new Spacing([2, 1, 3, 1]);
+  const expectedOrigins3 = [
+    new Point3D(3, 0, 0),
+    new Point3D(3, 0, 3),
+  ];
+  const expectedGeometry3 = new Geometry(
+    expectedOrigins3,
+    expectedSize3,
+    expectedSpacing3,
+    targetOrientation3
+  );
+  const expectedBuffer3a = new Uint8Array([
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0,
+
+    0, 1, 1,
+    0, 1, 1,
+    0, 0, 0
+  ]);
+
+  const expectedBuffer3b = new Uint8Array([
+    1, 1, 0,
+    1, 1, 0,
+    0, 0, 0,
+
+    1, 1, 0,
+    1, 1, 0,
+    0, 0, 0
+  ]);
+
+  const buffersMatch3a =
+    expectedBuffer3a.map((value, index) => {
+      return value === runReturn3a.targetImageBuffer[index];
+    }).reduce((a, b) => {
+      return a && b;
+    });
+
+  const buffersMatch3b =
+    expectedBuffer3b.map((value, index) => {
+      return value === runReturn3b.targetImageBuffer[index];
+    }).reduce((a, b) => {
+      return a && b;
+    });
+
+  const geometriesMatch3 =
+    expectedGeometry3.equals(resampledGeometry3);
+
+  assert.equal(
+    buffersMatch3a,
+    1,
+    'Expected 90° 4D resampled buffer for frame 1 to match expected buffer'
+  );
+  assert.equal(
+    buffersMatch3b,
+    1,
+    'Expected 90° 4D resampled buffer for frame 2 to match expected buffer'
+  );
+  assert.true(
+    geometriesMatch3,
+    'Expected 90° 4D resampled geometry to match expected geometry'
   );
 
   /* eslint-enable @stylistic/js/array-element-newline */

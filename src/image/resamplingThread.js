@@ -43,19 +43,22 @@ class ResamplingWorkerTask extends WorkerTask {
  *
  * @param {TypedArray} sourceImageBuffer The buffer to resample.
  * @param {Geometry} sourceImageGeometry The current image geometry.
- * @param {TypedArray} targetImageBuffer The buffer to resample to.
  * @param {Geometry} targetImageGeometry The geometry to resample to.
+ * @param {number} pixelRepresentation The pixel representation of the
+ *  source image.
  * @param {boolean} interpolated If true use bilinear
  *  sampling, otherwise use nearest neighbor.
+ * @param {string} jobId Unique resampling job id.
  *
- * @returns {object} The message to send to the worker.
+ * @returns {object[]} The message to send to the worker.
  */
-export function generateWorkerMessage(
+export function generateWorkerMessages(
   sourceImageBuffer,
   sourceImageGeometry,
-  targetImageBuffer,
   targetImageGeometry,
-  interpolated
+  pixelRepresentation,
+  interpolated,
+  jobId
 ) {
   // We can't pass these metadata objects directly, so we will just
   // pull out what we need and pass that.
@@ -79,25 +82,50 @@ export function generateWorkerMessage(
   const sourceTotalSize = sourceSize.getTotalSize();
   const targetTotalSize = targetSize.getTotalSize();
 
-  return {
-    sourceImageBuffer: sourceImageBuffer,
-    sourceOrigin: sourceImageGeometry.getOrigin().getValues(),
-    sourceSize: sourceImageGeometry.getSize().getValues(),
-    sourceSpacing: sourceImageGeometry.getSpacing().getValues(),
-    sourceOrientation: sourceImageGeometry.getOrientation().getValues(),
-    sourceUnitVectors: sourceUnitVectors,
-    sourceTotalSize: sourceTotalSize,
+  const generateMessage = (sourceStartOffset, targetStartOffset, frame) => {
+    return {
+      sourceImageBuffer: sourceImageBuffer,
+      sourceOrigin: sourceImageGeometry.getOrigin().getValues(),
+      sourceSize: sourceImageGeometry.getSize().getValues(),
+      sourceSpacing: sourceImageGeometry.getSpacing().getValues(),
+      sourceOrientation: sourceImageGeometry.getOrientation().getValues(),
+      sourceUnitVectors: sourceUnitVectors,
+      sourceTotalSize: sourceTotalSize,
 
-    targetImageBuffer: targetImageBuffer,
-    targetOrigin: targetImageGeometry.getOrigin().getValues(),
-    targetSize: targetImageGeometry.getSize().getValues(),
-    targetSpacing: targetImageGeometry.getSpacing().getValues(),
-    targetOrientation: targetImageGeometry.getOrientation().getValues(),
-    targetUnitVectors: targetUnitVectors,
-    targetTotalSize: targetTotalSize,
+      // targetImageBuffer: targetImageBuffer,
+      targetOrigin: targetImageGeometry.getOrigin().getValues(),
+      targetSize: targetImageGeometry.getSize().getValues(),
+      targetSpacing: targetImageGeometry.getSpacing().getValues(),
+      targetOrientation: targetImageGeometry.getOrientation().getValues(),
+      targetUnitVectors: targetUnitVectors,
+      targetTotalSize: targetTotalSize,
 
-    interpolate: interpolated
+      pixelRepresentation: pixelRepresentation,
+      interpolate: interpolated,
+      sourceStartOffset: sourceStartOffset,
+      targetStartOffset: targetStartOffset,
+
+      jobId: jobId,
+      frame: frame
+    };
   };
+
+  if (targetNDims <= 3) {
+    return [generateMessage(0, 0, 0)];
+  } else {
+    const frames = targetSize.get(3);
+    const sourceFrameSize = sourceSize.getDimSize(3);
+    const targetFrameSize = targetSize.getDimSize(3);
+
+    const messages = [];
+    for (let f = 0; f < frames; f++) {
+      const sourceOffset = sourceFrameSize * f;
+      const targetOffset = targetFrameSize * f;
+      messages.push(generateMessage(sourceOffset, targetOffset, f));
+    }
+
+    return messages;
+  }
 }
 
 /**
@@ -182,6 +210,11 @@ export function generateResampledGeometry(
     targetSpacingArrMax[2] * volumeRatio
   ];
 
+  const sourceSpacingNDims = sourceSpacing.length();
+  for (let d = 3; d < sourceSpacingNDims; d++) {
+    targetSpacingArr.push(sourceSpacing.get(d));
+  }
+
   const targetSpacing = new Spacing(targetSpacingArr);
 
   // Calculate updated size
@@ -228,7 +261,7 @@ export function generateResampledGeometry(
     }
   }
 
-  const targetSize = new Size([
+  const sizeArr = [
     Math.round(
       Math.abs((maxBounds[0] - minBounds[0]) / targetSpacing.get(0))
     ),
@@ -238,7 +271,14 @@ export function generateResampledGeometry(
     Math.round(
       Math.abs((maxBounds[2] - minBounds[2]) / targetSpacing.get(2))
     )
-  ]);
+  ];
+
+  const sourceSizeNDims = sourceSize.length();
+  for (let d = 3; d < sourceSizeNDims; d++) {
+    sizeArr.push(sourceSize.get(d));
+  }
+
+  const targetSize = new Size(sizeArr);
 
   // Calculate updated origin
   //---------------------------------
@@ -364,7 +404,7 @@ export class ResamplingThread {
    *
    * @type {ThreadPool}
    */
-  #threadPool = new ThreadPool(1);
+  #threadPool = new ThreadPool(5);
 
   constructor() {
     this.#threadPool.onerror = ((e) => {
@@ -396,6 +436,9 @@ export class ResamplingThread {
   ) {
     // We can't just pass in an Image or we would get a circular dependency
 
+    // Just needs to be resonably unique
+    const jobId = Date.now() + '' + Math.random();
+
     const targetImageGeometry =
       generateResampledGeometry(
         sourceImageGeometry,
@@ -410,27 +453,40 @@ export class ResamplingThread {
         targetImageGeometry.getSize()
       );
 
-    const workerMessage =
-      generateWorkerMessage(
+    const workerMessages =
+      generateWorkerMessages(
         sourceImageBuffer,
         sourceImageGeometry,
-        targetImageBuffer,
         targetImageGeometry,
-        interpolated
+        pixelRepresentation,
+        interpolated,
+        jobId
       );
 
-    this.#threadPool.onworkitem = this.ondone;
+    this.#threadPool.onworkitem = this.ondoneframe;
+    this.#threadPool.onworkend = this.ondone;
 
-    const workerTask = new ResamplingWorkerTask(workerMessage, {});
-
-    // add it the queue and run it
-    this.#threadPool.addWorkerTask(workerTask);
+    workerMessages.forEach((workerMessage) => {
+      const workerTask = new ResamplingWorkerTask(workerMessage, {});
+      // add it the queue and run it
+      this.#threadPool.addWorkerTask(workerTask);
+    });
 
     return {
       buffer: targetImageBuffer,
-      geometry: targetImageGeometry
+      geometry: targetImageGeometry,
+      jobId: jobId
     };
   }
+
+  /**
+   * Handle a completed resampling of a 3D frame. Default behavior is do
+   * nothing, this is meant to be overridden.
+   *
+   * @param {object} _event The work item event fired when a resampling
+   *   calculation is completed.
+   */
+  ondoneframe(_event) {}
 
   /**
    * Handle a completed resampling. Default behavior is do nothing,
