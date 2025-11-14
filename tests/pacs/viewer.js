@@ -375,7 +375,7 @@ function viewerSetup() {
   _app.addEventListener('imageresamplingstart', function (event) {
     console.time('resample-data-' + event.dataid);
   });
-  _app.addEventListener('imageresampled', function (event) {
+  _app.addEventListener('imageresamplingcomplete', function (event) {
     console.timeEnd('resample-data-' + event.dataid);
   });
 

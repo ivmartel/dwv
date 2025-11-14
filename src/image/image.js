@@ -80,6 +80,7 @@ export const imageEventNames = [
   'imagecontentchange',
   'imagegeometrychange',
   'imageresamplingstart',
+  'imageresamplingcomplete',
   'imageresampled',
   'labelingstart',
   'labelschanged'
