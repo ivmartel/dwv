@@ -74,6 +74,35 @@ export class ColourMapBinder {
 }
 
 /**
+ * Mask view binder.
+ */
+export class MaskViewBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
+  getEventType = function () {
+    return 'maskviewchange';
+  };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input layer group.
+   * @returns {Function} The event handler.
+   */
+  getCallback = function (layerGroup) {
+    return function (event) {
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
+      if (viewLayers.length !== 0) {
+        viewLayers[0].setFillOpacity(event.value[0]);
+        viewLayers[0].setContourThickness(event.value[1]);
+      }
+    };
+  };
+}
+
+/**
  * Position binder.
  */
 export class PositionBinder {
@@ -227,7 +256,8 @@ export const binderList = {
   ZoomBinder,
   OffsetBinder,
   OpacityBinder,
-  ColourMapBinder
+  ColourMapBinder,
+  MaskViewBinder
 };
 
 /**

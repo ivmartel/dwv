@@ -44,7 +44,8 @@ export const viewEventNames = [
   'colourmapchange',
   'positionchange',
   'opacitychange',
-  'alphafuncchange'
+  'alphafuncchange',
+  'maskviewchange'
 ];
 
 /**
@@ -375,9 +376,16 @@ export class View {
       this.#fillOpacity = opacity;
     }
 
-    // We can treat this like an alpha function update.
+    /**
+     * Mask view change event.
+     *
+     * @event View#maskviewchange
+     * @type {object}
+     * @property {string} type The event type.
+     */
     this.#fireEvent({
-      type: 'alphafuncchange'
+      type: 'maskviewchange',
+      value: [this.#fillOpacity, this.#contourThickness]
     });
   }
 
@@ -407,9 +415,10 @@ export class View {
       this.#contourThickness = thickness;
     }
 
-    // We can treat this like an alpha function update.
+    // fire mask view change
     this.#fireEvent({
-      type: 'alphafuncchange'
+      type: 'maskviewchange',
+      value: [this.#fillOpacity, this.#contourThickness]
     });
   }
 

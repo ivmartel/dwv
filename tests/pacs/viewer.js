@@ -921,7 +921,8 @@ function setupBindersCheckboxes() {
     'Zoom',
     'Offset',
     'Opacity',
-    'ColourMap'
+    'ColourMap',
+    'MaskView'
   ];
   const binders = [];
   // add all binders at startup

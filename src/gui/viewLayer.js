@@ -281,6 +281,7 @@ export class ViewLayer {
     view.addEventListener('colourmapchange', this.#onColourMapChange);
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
+    view.addEventListener('maskviewchange', this.#onMaskViewChange);
     // propagate view events
     for (const eventName of viewEventNames) {
       view.addEventListener(eventName, this.#fireEvent);
@@ -1225,6 +1226,20 @@ export class ViewLayer {
    * @param {object} event The event fired when changing the function.
    */
   #onAlphaFuncChange = (event) => {
+    const skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
+      this.#needsDataUpdate = true;
+      this.draw();
+    }
+  };
+
+  /**
+   * Handle mask view change.
+   *
+   * @param {object} event The event fired when changing the function.
+   */
+  #onMaskViewChange = (event) => {
     const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {
