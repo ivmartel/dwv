@@ -1344,15 +1344,47 @@ export class App {
    *  orientation from.
    */
   resampleMatch(dataIdTarget, dataIdSource) {
-    const sourceImage = this.#dataController.get(dataIdSource);
-
-    if (
-      typeof sourceImage !== 'undefined'
-    ) {
-      const sourceOrientation =
-        sourceImage.image.getGeometry().getOrientation();
-      this.resample(dataIdTarget, sourceOrientation);
+    // target (to do orientation check)
+    const targetData = this.#dataController.get(dataIdTarget);
+    if (typeof targetData === 'undefined') {
+      logger.debug(
+        'Cannot resample match, target data \'' +
+        dataIdTarget + '\' is undefined');
+      return;
     }
+    if (typeof targetData.image === 'undefined') {
+      logger.debug(
+        'Cannot resample match, target image \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    // source
+    const sourceData = this.#dataController.get(dataIdSource);
+    if (typeof sourceData === 'undefined') {
+      logger.debug(
+        'Cannot resample match, source data \'' +
+        dataIdSource + '\' is undefined');
+      return;
+    }
+    if (typeof sourceData.image === 'undefined') {
+      logger.debug(
+        'Cannot resample match, source image \'' +
+        dataIdSource + '\' is undefined');
+      return;
+    }
+    // check orientation
+    const targetOrientation =
+      targetData.image.getGeometry().getOrientation();
+    const sourceOrientation =
+      sourceData.image.getGeometry().getOrientation();
+    if (targetOrientation.equals(sourceOrientation)) {
+      logger.info(
+        'Same orientation, no resample match for data \'' +
+        dataIdTarget + '\' and \'' + dataIdSource + '\'');
+      return;
+    }
+    // resample
+    this.resample(dataIdTarget, sourceOrientation);
   }
 
   /**
@@ -1362,39 +1394,57 @@ export class App {
    * @param {Matrix33} orientation The orientation to resample to.
    */
   resample(dataIdTarget, orientation) {
-    const targetImage = this.#dataController.get(dataIdTarget);
+    // target
+    const targetData = this.#dataController.get(dataIdTarget);
+    if (typeof targetData === 'undefined') {
+      logger.debug(
+        'Cannot resample, target data \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    if (typeof targetData.image === 'undefined') {
+      logger.debug(
+        'Cannot resample, target image \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    // check orientation
+    const targetOrientation =
+      targetData.image.getGeometry().getOrientation();
+    if (targetOrientation.equals(orientation)) {
+      logger.info(
+        'Same orientation, no resample for data \'' +
+        dataIdTarget + '\'');
+      return;
+    }
 
-    if (
-      typeof targetImage !== 'undefined'
-    ) {
-      targetImage.image.resample(orientation);
+    targetData.image.resample(orientation);
 
-      const configs = this.#options.dataViewConfigs;
+    const configs = this.#options.dataViewConfigs;
 
-      const metaTarget = targetImage.image.getMeta();
-      const dataIds = this.#dataController.getDataIds();
-      for (let i = 0; i < dataIds.length; i++) {
-        const data = this.#dataController.get(dataIds[i]);
+    const metaTarget = targetData.image.getMeta();
+    const dataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < dataIds.length; i++) {
+      const data = this.#dataController.get(dataIds[i]);
 
-        const meta = data.image.getMeta();
-        if (meta.Modality === 'SEG' &&
-          meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
-          this.#dataController.stash(dataIds[i]);
-        }
+      const meta = data.image.getMeta();
+      if (meta.Modality === 'SEG' &&
+        meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+        this.#dataController.stash(dataIds[i]);
       }
+    }
 
-      // the image drastically changed, it is much easier to just
-      // take the view config and forcefully re-initialize it
+    // the image drastically changed, it is much easier to just
+    // take the view config and forcefully re-initialize it
 
-      // Only updating the configs of the affected images can cause
-      // layers to inherit some configs from their segmentation layers
-      // for some unknown reason. For now we just update all of them.
-      this.setDataViewConfigs(configs);
-      // render data (creates layers)
-      const newDataIds = this.#dataController.getDataIds();
-      for (let i = 0; i < newDataIds.length; ++i) {
-        this.render(newDataIds[i]);
-      }
+    // Only updating the configs of the affected images can cause
+    // layers to inherit some configs from their segmentation layers
+    // for some unknown reason. For now we just update all of them.
+    this.setDataViewConfigs(configs);
+    // render data (creates layers)
+    const newDataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < newDataIds.length; ++i) {
+      this.render(newDataIds[i]);
     }
   }
 
@@ -1404,13 +1454,32 @@ export class App {
    * @param {string} dataIdTarget The target image id to revert.
    */
   revertResample(dataIdTarget) {
-    const targetImage = this.#dataController.get(dataIdTarget);
+    const targetData = this.#dataController.get(dataIdTarget);
+    if (typeof targetData === 'undefined') {
+      logger.debug(
+        'Cannot revert resample, target data \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    if (typeof targetData.image === 'undefined') {
+      logger.debug(
+        'Cannot revert resample, target image \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    // exit if not resampled
+    if (!targetData.image.isResampled()) {
+      logger.info(
+        'No revert resample needed for data \'' +
+        dataIdTarget + '\'');
+      return;
+    }
 
-    targetImage.image.revert();
+    targetData.image.revert();
 
     const configs = this.#options.dataViewConfigs;
 
-    const metaTarget = targetImage.image.getMeta();
+    const metaTarget = targetData.image.getMeta();
     const dataIds = this.#dataController.getStashedDataIds();
     for (let i = 0; i < dataIds.length; i++) {
       const data = this.#dataController.getStashed(dataIds[i]);
@@ -2133,6 +2202,7 @@ export class App {
     // create and setup view
     const viewFactory = new ViewFactory();
     const view = viewFactory.create(data.meta, data.image);
+    view.init(layerGroup.getCurrentPosition());
     const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
       getMatrixFromName(viewConfig.orientation)

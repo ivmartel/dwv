@@ -894,6 +894,14 @@ function setupRotateLine() {
     if (dataIds.length < 2) {
       console.log('Not enough datas to match geometries');
     }
+    // log geometries if resample is needed
+    const geometry0 = _app.getData(dataIds[0]).image.getGeometry();
+    const geometry1 = _app.getData(dataIds[1]).image.getGeometry();
+    if (!geometry0.getOrientation().equals(geometry1.getOrientation())) {
+      console.log('Resample match');
+      console.log('geometry0', geometry0.toString());
+      console.log('geometry1', geometry1.toString());
+    }
     // resample match data 0 and 1
     _app.resampleMatch(dataIds[0], dataIds[1]);
   });
