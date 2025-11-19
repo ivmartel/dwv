@@ -2202,7 +2202,6 @@ export class App {
     // create and setup view
     const viewFactory = new ViewFactory();
     const view = viewFactory.create(data.meta, data.image);
-    view.init(layerGroup.getCurrentPosition());
     const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
       getMatrixFromName(viewConfig.orientation)
