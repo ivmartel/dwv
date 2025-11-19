@@ -4029,7 +4029,7 @@ export declare class MaskSegmentHelper {
      * @typedef OverlapCount@typedef OverlapCount
      * @property {string} label The segment label.
      * @property {number} count The number of overlapping voxels.
-     * @property {number} percentage The overlap percentage between 0 and 1.
+     * @property {number} percentage The overlap percentage between 0 and 100.
      */
     /**
      * The count of overlapping voxels of a single segment with a set of
@@ -4082,7 +4082,7 @@ export declare class MaskSegmentHelper {
                      */
                     count: number;
                     /**
-                     * The overlap percentage between 0 and 1.
+                     * The overlap percentage between 0 and 100.
                      */
                     percentage: number;
                 };
