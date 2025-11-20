@@ -2,6 +2,7 @@ import {stringToUint8Array} from '../../src/utils/string.js';
 import {
   toStringId,
   getArrayFromStringId,
+  arrayMap,
   arrayContains,
   arraySortEquals,
   arrayEquals,
@@ -79,6 +80,55 @@ QUnit.test('Index stringId', function (assert) {
   },
   new Error('Non valid dimension for toStringId'),
   'toStringId error');
+});
+
+/**
+ * Tests for {@link arrayMap}.
+ *
+ * @function module:tests/utils~arraymap
+ */
+QUnit.test('arrayMap', function (assert) {
+  // basic case
+  const arr000 = [0, 1, 2, 3];
+  const arr001 = [1, 2, 3, 4];
+  const res00 = arrayMap(arr000, arr001, Math.min);
+  const theoRes00 = [0, 1, 2, 3];
+  assert.deepEqual(res00, theoRes00, 'test #00');
+
+  // smaller second array
+  const arr010 = [0, 1, 2, 3];
+  const arr011 = [1, 2, 3];
+  const res01 = arrayMap(arr010, arr011, Math.min);
+  const theoRes01 = [0, 1, 2, 3];
+  assert.deepEqual(res01, theoRes01, 'test #01');
+
+  // smaller first array
+  const arr020 = [0, 1, 2];
+  const arr021 = [1, 2, 3, 4];
+  const res02 = arrayMap(arr020, arr021, Math.min);
+  const theoRes02 = [0, 1, 2, 4];
+  assert.deepEqual(res02, theoRes02, 'test #02');
+
+  // undefined in second array
+  const arr100 = [0, 1, 2];
+  const arr101 = [1, undefined, 3];
+  const res10 = arrayMap(arr100, arr101, Math.min);
+  const theoRes10 = [0, 1, 2];
+  assert.deepEqual(res10, theoRes10, 'test #10');
+
+  // undefined in first array
+  const arr110 = [0, undefined, 2];
+  const arr111 = [1, 2, 3];
+  const res11 = arrayMap(arr110, arr111, Math.min);
+  const theoRes11 = [0, 2, 2];
+  assert.deepEqual(res11, theoRes11, 'test #11');
+
+  // undefined in both arrays
+  const arr120 = [0, undefined, 2];
+  const arr121 = [1, undefined, 3];
+  const res12 = arrayMap(arr120, arr121, Math.min);
+  const theoRes12 = [0, undefined, 2];
+  assert.deepEqual(res12, theoRes12, 'test #12');
 });
 
 /**

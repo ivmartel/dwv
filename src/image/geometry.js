@@ -12,6 +12,7 @@ import {logger} from '../utils/logger.js';
 import {Size} from './size.js';
 import {Spacing} from './spacing.js';
 import {BooleanResult} from '../utils/result.js';
+import {arrayMap} from '../utils/array.js';
 import {Matrix33} from '../math/matrix.js';
 
 /**
@@ -751,10 +752,10 @@ export function mergeGeometries(geometry1, geometry2) {
   const invOrientation = orientation.getInverse();
 
   const minByIndex = function (array1, array2) {
-    return array1.map((v, i) => Math.min(v, array2[i]));
+    return arrayMap(array1, array2, Math.min);
   };
   const maxByIndex = function (array1, array2) {
-    return array1.map((v, i) => Math.max(v, array2[i]));
+    return arrayMap(array1, array2, Math.max);
   };
 
   const newSpacing = new Spacing(minByIndex(
