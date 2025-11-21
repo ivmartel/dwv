@@ -134,7 +134,7 @@ export class View {
    *
    * @type {string}
    */
-  #currentPresetName = null;
+  #currentPresetName;
 
   /**
    * Current window level.
@@ -156,7 +156,7 @@ export class View {
    *
    * @type {Point}
    */
-  #currentPosition = null;
+  #currentPosition;
 
   /**
    * View orientation. Undefined will use the original slice ordering.
@@ -285,6 +285,11 @@ export class View {
   setImage(image) {
     this.#image = image;
 
+    // default to middle index
+    if (typeof this.getCurrentPosition() === 'undefined') {
+      this.setCurrentIndex(this.#getMiddleIndex(), true);
+    }
+
     // reset alpha function
     if (this.isMask()) {
       // default helper
@@ -303,7 +308,7 @@ export class View {
           // add dimension
           const values = index.getValues();
           values.push(0);
-          this.setCurrentIndex(new Index(values));
+          this.setCurrentIndex(new Index(values), true);
         }
       });
     }
@@ -423,16 +428,11 @@ export class View {
   }
 
   /**
-   * Initialise the view: set initial index.
+   * Get the middle index of the current image.
+   *
+   * @returns {Index} The middle index.
    */
-  init() {
-    this.setInitialIndex();
-  }
-
-  /**
-   * Set the initial index to the middle position.
-   */
-  setInitialIndex() {
+  #getMiddleIndex() {
     const geometry = this.#image.getGeometry();
     const size = geometry.getSize();
     const values = new Array(size.length());
@@ -441,7 +441,7 @@ export class View {
     values[0] = Math.floor(size.get(0) / 2);
     values[1] = Math.floor(size.get(1) / 2);
     values[2] = Math.floor(size.get(2) / 2);
-    this.setCurrentIndex(new Index(values), true);
+    return new Index(values);
   }
 
   /**
@@ -497,19 +497,18 @@ export class View {
    */
   #getCurrentWindowLut() {
     // special case for 'perslice' presets
-    if (this.#currentPresetName &&
+    if (typeof this.#currentPresetName !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName].perslice !==
       'undefined' &&
       this.#windowPresets[this.#currentPresetName].perslice === true &&
       // TODO: we currently can't handle per-slice wl on resampled images
       !this.#image.isResampled()) {
-      // check position
-      if (!this.getCurrentIndex()) {
-        this.setInitialIndex();
-      }
       // get the slice window level
       const currentIndex = this.getCurrentIndex();
+      if (typeof currentIndex === 'undefined') {
+        throw new Error('Cannot get window lut with no current index');
+      }
       const offset = this.#image.getSecondaryOffset(currentIndex);
       const currentPreset = this.#windowPresets[this.#currentPresetName];
       const sliceWl = currentPreset.wl[offset];
@@ -641,7 +640,7 @@ export class View {
   /**
    * Get the current window level preset name.
    *
-   * @returns {string} The preset name.
+   * @returns {string|undefined} The preset name.
    */
   getCurrentWindowPresetName() {
     return this.#currentPresetName;
@@ -696,7 +695,7 @@ export class View {
   /**
    * Get the current position.
    *
-   * @returns {Point} The current position.
+   * @returns {Point|undefined} The current position.
    */
   getCurrentPosition() {
     return this.#currentPosition;
@@ -705,12 +704,12 @@ export class View {
   /**
    * Get the current index.
    *
-   * @returns {Index} The current index.
+   * @returns {Index|undefined} The current index.
    */
   getCurrentIndex() {
     const position = this.getCurrentPosition();
-    if (!position) {
-      return null;
+    if (typeof position === 'undefined') {
+      return;
     }
     const geometry = this.getImage().getGeometry();
     return geometry.worldToIndex(position);
@@ -837,16 +836,12 @@ export class View {
     }
 
     // calculate diff dims before updating internal
-    let diffDims = null;
-    let currentIndex = null;
-    if (this.getCurrentPosition()) {
-      currentIndex = this.getCurrentIndex();
-    }
-    if (currentIndex) {
+    let diffDims = [];
+    const currentIndex = this.getCurrentIndex();
+    if (typeof currentIndex !== 'undefined') {
       if (currentIndex.canCompare(index)) {
         diffDims = currentIndex.compare(index);
       } else {
-        diffDims = [];
         const minLen = Math.min(currentIndex.length(), index.length());
         for (let i = 0; i < minLen; ++i) {
           if (currentIndex.get(i) !== index.get(i)) {
@@ -859,7 +854,6 @@ export class View {
         }
       }
     } else {
-      diffDims = [];
       for (let k = 0; k < index.length(); ++k) {
         diffDims.push(k);
       }
@@ -1101,10 +1095,11 @@ export class View {
   generateImageData(data, index) {
     // check index
     if (typeof index === 'undefined') {
-      if (!this.getCurrentIndex()) {
-        this.setInitialIndex();
-      }
+      // use current index
       index = this.getCurrentIndex();
+      if (typeof index === 'undefined') {
+        throw new Error('Cannot generate image data with no current index');
+      }
     }
 
     const image = this.getImage();
@@ -1163,12 +1158,12 @@ export class View {
    * @returns {number} The index.
    */
   getScrollDimIndex() {
-    let index = null;
+    // default to z
+    let index = 2;
+    // use orientation if available
     const orientation = this.getOrientation();
     if (typeof orientation !== 'undefined') {
       index = orientation.getThirdColMajorDirection();
-    } else {
-      index = 2;
     }
     return index;
   }
