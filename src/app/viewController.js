@@ -46,13 +46,6 @@ export class ViewController {
   #planeHelper;
 
   /**
-   * Position helper.
-   *
-   * @type {PositionHelper}
-   */
-  #positionHelper;
-
-  /**
    * Third dimension player ID (created by setInterval).
    *
    * @type {number|undefined}
@@ -75,9 +68,6 @@ export class ViewController {
       view.getImage().getGeometry(),
       view.getOrientation()
     );
-
-    // position helper
-    this.#positionHelper = new PositionHelper(view);
   }
 
   /**
@@ -201,20 +191,12 @@ export class ViewController {
   }
 
   /**
-   * Get the position helper.
+   * Get a position helper: returns a new helper
+   * based on the current view.
    *
    * @returns {PositionHelper} The helper.
    */
   getPositionHelper() {
-    return this.#positionHelper;
-  }
-
-  /**
-   * Get a clone of the position helper.
-   *
-   * @returns {PositionHelper} The helper clone.
-   */
-  getPositionHelperClone() {
     return new PositionHelper(this.#view);
   }
 
@@ -224,7 +206,7 @@ export class ViewController {
    * @returns {Point} The position.
    */
   getCurrentPosition() {
-    return this.#positionHelper.getCurrentPosition();
+    return this.#view.getCurrentPosition();
   }
 
   /**
@@ -233,7 +215,7 @@ export class ViewController {
    * @returns {Index} The current index.
    */
   getCurrentIndex() {
-    return this.#positionHelper.getCurrentIndex();
+    return this.#view.getCurrentIndex();
   }
 
   /**
@@ -371,7 +353,6 @@ export class ViewController {
       this.#view.setInitialIndex();
       // update helpers
       this.updatePlaneHelper();
-      this.#positionHelper = new PositionHelper(this.#view);
     }
   }
 
@@ -778,13 +759,14 @@ export class ViewController {
         recommendedDisplayFrameRate);
       const size = image.getGeometry().getSize();
       const canScroll3D = size.canScroll3D();
+      const helper = this.getPositionHelper();
 
       this.#playerID = window.setInterval(() => {
         let canDoMore = false;
         if (canScroll3D) {
-          canDoMore = this.#positionHelper.incrementPositionAlongScroll();
+          canDoMore = helper.incrementPositionAlongScroll();
         } else {
-          canDoMore = this.#positionHelper.incrementPosition(3);
+          canDoMore = helper.incrementPosition(3);
         }
         // end of scroll, loop back
         if (!canDoMore) {
