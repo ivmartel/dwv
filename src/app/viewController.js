@@ -349,8 +349,6 @@ export class ViewController {
 
     // update if geometry changes
     if (!geometry0.equals(geometry1)) {
-      // set the initial index (and indirectly the position)
-      this.#view.setInitialIndex();
       // update helpers
       this.updatePlaneHelper();
     }
