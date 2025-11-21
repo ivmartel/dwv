@@ -208,7 +208,8 @@ export class LayerGroup {
   /**
    * Get the position helper.
    *
-   * @returns {PositionHelper} The position helper.
+   * @returns {PositionHelper|undefined} The position helper or
+   * undefined if no layers.
    */
   getPositionHelper() {
     if (typeof this.#positionHelper === 'undefined') {
