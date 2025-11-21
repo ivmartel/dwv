@@ -185,13 +185,6 @@ export class LayerGroup {
   #tooltipHtmlElement;
 
   /**
-   * The current position used for the crosshair.
-   *
-   * @type {Point}
-   */
-  #currentPosition;
-
-  /**
    * Image smoothing flag.
    *
    * @type {boolean}
@@ -973,16 +966,9 @@ export class LayerGroup {
   }
 
   /**
-   * Show a crosshair at a given position.
-   *
-   * @param {Point} [position] The position where to show the crosshair,
-   *   defaults to current position.
+   * Show a crosshair at the current position.
    */
-  #showCrosshairDiv(position) {
-    if (typeof position === 'undefined') {
-      position = this.#currentPosition;
-    }
-
+  #showCrosshairDiv() {
     // remove previous
     this.#removeCrosshairDiv();
 
@@ -1007,9 +993,9 @@ export class LayerGroup {
     }
 
     const vc = baseLayer.getViewController();
+    const position = vc.getCurrentPosition();
     const planePos = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(planePos);
-
 
     // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
@@ -1182,13 +1168,6 @@ export class LayerGroup {
     const index = new Index(event.value[0]);
     const position = new Point(event.value[1]);
 
-    // store current position
-    this.#currentPosition = position;
-
-    if (this.#showCrosshair) {
-      this.#showCrosshairDiv(position);
-    }
-
     // origin of the first view layer
     const viewLayerOffsets = {};
     let baseViewLayerOrigin0;
@@ -1266,6 +1245,11 @@ export class LayerGroup {
       if (!hasSetPos && hasSetOffset) {
         layer.draw();
       }
+    }
+
+    // show crosshair after position update
+    if (this.#showCrosshair) {
+      this.#showCrosshairDiv();
     }
 
     // re-start positionchange listeners
