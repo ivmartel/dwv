@@ -291,7 +291,7 @@ export class Size {
    * Normalise a list of values to this size.
    *
    * @param {number[]} inValues The input values.
-   * @param {number[]} extra The values used to fill extra dimensions.
+   * @param {number[]} extraValues The values used to fill extra dimensions.
    * @returns {number[]} The result values.
    */
   #normaliseValues(inValues, extraValues) {
