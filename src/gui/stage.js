@@ -123,20 +123,25 @@ export class PositionBinder {
   getCallback = function (layerGroup) {
     return function (event) {
       const pointValues = event.value[1];
-      const vl = layerGroup.getBaseViewLayer();
+      const vls = layerGroup.getViewLayersByDataId(event.dataid);
+      let vl;
+      let sameData = false;
+      if (vls.length !== 0) {
+        // use first layer
+        vl = vls[0];
+        sameData = true;
+      } else {
+        vl = layerGroup.getBaseViewLayer();
+      }
       const vc = vl.getViewController();
-      // handle different number of dimensions
+      // bind 3D for all
+      // bind 4D if same data, otherwise use 3D and keep current
       const currentPos = vc.getCurrentPosition();
       const currentDims = currentPos.length();
       const inputDims = pointValues.length;
-      if (inputDims !== currentDims) {
-        if (inputDims === currentDims - 1) {
-          // add missing dim, for ex: input 3D -> current 4D
-          pointValues.push(currentPos.get(currentDims - 1));
-        } else if (inputDims === currentDims + 1) {
-          // remove extra dim, for ex: input 4D -> current 3D
-          pointValues.pop();
-        }
+      if (!sameData &&
+        inputDims > 3 && currentDims > 3) {
+        pointValues[3] = currentPos.get(3);
       }
       vc.setCurrentPosition(new Point(pointValues));
     };
