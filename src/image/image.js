@@ -1449,13 +1449,16 @@ export class Image {
    * @param {number} i The X index.
    * @param {number} j The Y index.
    * @param {number} k The Z index.
-   * @param {number} f The frame number.
+   * @param {number} [f] Optional frame number.
    * @returns {number} The value at the desired position.
    * Warning: No size check...
    */
   getValue(i, j, k, f) {
-    const frame = (f || 0);
-    const index = new Index([i, j, k, frame]);
+    const values = [i, j, k];
+    if (typeof f !== 'undefined') {
+      values.push(f);
+    }
+    const index = new Index(values);
     return this.getValueAtOffset(
       this.getGeometry().getSize().indexToOffset(index));
   }
@@ -1478,20 +1481,20 @@ export class Image {
    * @param {number} i The X index.
    * @param {number} j The Y index.
    * @param {number} k The Z index.
-   * @param {number} f The frame number.
+   * @param {number} [f] Optional frame number.
    * @returns {number} The rescaled value at the desired position.
    * Warning: No size check...
    */
   getRescaledValue(i, j, k, f) {
-    if (typeof f === 'undefined') {
-      f = 0;
-    }
     let val = this.getValue(i, j, k, f);
     if (!this.isIdentityRSI()) {
       if (this.isConstantRSI()) {
         val = this.getRescaleSlopeAndIntercept().apply(val);
       } else {
-        const values = [i, j, k, f];
+        const values = [i, j, k];
+        if (typeof f !== 'undefined') {
+          values.push(f);
+        }
         const index = new Index(values);
         val = this.getRescaleSlopeAndIntercept(index).apply(val);
       }
