@@ -20,8 +20,8 @@ QUnit.module('image');
 /**
  * Compare an image and a buffer.
  *
- * @param {object} image The input image.
- * @param {object} size The size of the input buffer.
+ * @param {Image} image The input image.
+ * @param {Size} size The size of the input buffer.
  * @param {Array} buffer The input buffer.
  * @param {object} rsi The rescale slope of the input buffer.
  * @returns {object} Statistics of the value and rescaled value differences.

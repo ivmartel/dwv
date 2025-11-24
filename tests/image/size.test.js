@@ -146,56 +146,67 @@ QUnit.test('Index to and from offset', function (assert) {
     {values: [3, 2, 1], offset: 23}
   ];
   for (let i = 0; i < testData00.length; ++i) {
-    const index = new Index(testData00[i].values);
+    const values = testData00[i].values;
+    const index = new Index(values);
     const offset = testData00[i].offset;
     assert.equal(
       size00.indexToOffset(index), offset, 'indexToOffset #' + i);
     assert.ok(
       size00.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
+    // index wiht less dims than size
+    if (values[2] === 0) {
+      const index1 = new Index(values.slice(0, 2));
+      assert.equal(
+        size00.indexToOffset(index1), offset, 'indexToOffset small #' + i);
+    }
   }
 
   // test indexToOffset with start
-  const size01 = new Size([5, 4, 3, 2]);
-  const index01 = new Index([0, 0, 0, 0]);
+  const size10 = new Size([5, 4, 3, 2]);
+  const index10 = new Index([0, 0, 0, 0]);
+
+  // no error
+  assert.equal(size10.indexToOffset(index10, 2), 0, 'indexToOffset start #0');
+  const index03 = new Index([0, 0, 1, 0]);
+  assert.equal(size10.indexToOffset(index03, 2), 1, 'indexToOffset start #1');
+  const index04 = new Index([0, 0, 0, 1]);
+  assert.equal(size10.indexToOffset(index04, 2), 3, 'indexToOffset start #2');
+  const index05 = new Index([0, 0, 2, 1]);
+  assert.equal(size10.indexToOffset(index05, 2), 5, 'indexToOffset start #3');
+  const index06 = new Index([0, 0, 2, 1]);
+  assert.equal(size10.indexToOffset(index06, 3), 1, 'indexToOffset start #4');
+  const index07 = new Index([0, 0, 2]);
+  assert.equal(size10.indexToOffset(index07, 2), 2, 'indexToOffset start #5');
+
   // error: start too big
   assert.throws(function () {
-    size01.indexToOffset(index01, 4);
+    size10.indexToOffset(index10, 4);
   },
   new Error('Invalid start value for indexToOffset'),
   'indexToOffset start too big');
-  // error: index bad length
-  const index02 = new Index([0, 0, 0]);
+  // error: index too many dimensions
+  const index20 = new Index([0, 0, 0, 0, 0]);
   assert.throws(function () {
-    size01.indexToOffset(index02, 2);
+    size10.indexToOffset(index20, 2);
   },
   new Error('Incompatible index and size length'),
   'indexToOffset start index bad length');
-  // no error
-  assert.equal(size01.indexToOffset(index01, 2), 0, 'indexToOffset start #0');
-  const index03 = new Index([0, 0, 1, 0]);
-  assert.equal(size01.indexToOffset(index03, 2), 1, 'indexToOffset start #1');
-  const index04 = new Index([0, 0, 0, 1]);
-  assert.equal(size01.indexToOffset(index04, 2), 3, 'indexToOffset start #2');
-  const index05 = new Index([0, 0, 2, 1]);
-  assert.equal(size01.indexToOffset(index05, 2), 5, 'indexToOffset start #3');
-  const index06 = new Index([0, 0, 2, 1]);
-  assert.equal(size01.indexToOffset(index06, 3), 1, 'indexToOffset start #4');
 
-  const index07 = new Index([5, 0, 0, 0]);
+  const index21 = new Index([5, 0, 0, 0]);
   assert.equal(
-    size01.indexToOffset(index07, 0),
+    size10.indexToOffset(index21, 0),
     -1,
     'indexToOffset bounds #0'
   );
-  const index08 = new Index([0, 0, 3, 2]);
+  const index22 = new Index([0, 0, 3, 2]);
   assert.equal(
-    size01.indexToOffset(index08, 2),
+    size10.indexToOffset(index22, 2),
     -1,
     'indexToOffset bounds #1'
   );
-  const index09 = new Index([0, 0, 3, 2]);
+  const index23 = new Index([0, 0, 3, 2]);
   assert.equal(
-    size01.indexToOffset(index09, 3),
+    size10.indexToOffset(index23, 3),
     -1,
     'indexToOffset bounds #2'
   );
