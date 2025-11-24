@@ -441,7 +441,7 @@ export class View {
     values[0] = Math.floor(size.get(0) / 2);
     values[1] = Math.floor(size.get(1) / 2);
     values[2] = Math.floor(size.get(2) / 2);
-    return new Index(values);
+    return size.normaliseIndex(new Index(values));
   }
 
   /**
@@ -798,18 +798,20 @@ export class View {
   /**
    * Set current position.
    *
-   * @param {Point} position The new position.
+   * @param {Point} inPosition The new position.
    * @param {boolean} [silent] Flag to fire event or not.
    * @returns {boolean} False if not in bounds.
    * @fires View#positionchange
    */
-  setCurrentPosition(position, silent) {
+  setCurrentPosition(inPosition, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
     const geometry = this.#image.getGeometry();
+    const position = geometry.getSize().normalisePoint(
+      inPosition, this.#currentPosition);
     const index = geometry.worldToIndex(position);
 
     // check if possible
@@ -825,7 +827,7 @@ export class View {
           type: 'positionchange',
           value: [
             index.getValues(),
-            position.getValues(),
+            inPosition.getValues(),
           ],
           valid: false
         });
@@ -875,7 +877,7 @@ export class View {
         type: 'positionchange',
         value: [
           index.getValues(),
-          position.getValues(),
+          inPosition.getValues(),
         ],
         diffDims: diffDims,
         data: {
