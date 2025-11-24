@@ -59,6 +59,11 @@ export class PositionHelper {
   #geometry;
 
   /**
+   * @type {Point}
+   */
+  #currentPosition;
+
+  /**
    * @type {number}
    */
   #scrollDimIndex;
@@ -69,6 +74,7 @@ export class PositionHelper {
   constructor(view) {
     this.#positionAccessor = new ViewPositionAccessor(view);
     this.#geometry = view.getImage().getGeometry();
+    this.#currentPosition = view.getCurrentPosition();
     this.#scrollDimIndex = view.getScrollDimIndex();
   }
 
@@ -115,7 +121,10 @@ export class PositionHelper {
    * @returns {Point} The current position.
    */
   getCurrentPosition() {
-    return this.#positionAccessor.getCurrentPosition();
+    return this.#geometry.getSize().normalisePoint(
+      this.#positionAccessor.getCurrentPosition(),
+      this.#currentPosition
+    );
   }
 
   /**
@@ -180,6 +189,10 @@ export class PositionHelper {
   setCurrentPosition(position, silent) {
     let res = false;
     if (typeof position !== 'undefined') {
+      // save locally
+      this.#currentPosition = this.#geometry.getSize().normalisePoint(
+        position, this.#currentPosition);
+      // pass on to accessor
       res = this.#positionAccessor.setCurrentPosition(position, silent);
     }
     return res;
@@ -215,6 +228,11 @@ export class PositionHelper {
 
     // merge geometries
     this.#geometry = mergeGeometries(this.#geometry, rhs.getGeometry());
+
+    // merge pos
+    this.#currentPosition = this.#geometry.getSize().normalisePoint(
+      this.#currentPosition, rhs.getCurrentPosition()
+    );
   }
 
   /**
