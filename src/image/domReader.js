@@ -3,6 +3,7 @@ import {Spacing} from '../image/spacing.js';
 import {Geometry} from '../image/geometry.js';
 import {Image} from '../image/image.js';
 import {Point3D} from '../math/point.js';
+import {DicomData} from '../app/dataController.js';
 
 /**
  * Convert a string into an UID.
@@ -128,12 +129,13 @@ export function getViewFromDOMImage(domImage, origin, index) {
   meta.SeriesInstanceUID = seriesUID;
   image.setMeta(meta);
 
+  // create data
+  const data = new DicomData(info);
+  data.image = image;
+
   // return
   return {
-    data: {
-      image: image,
-      meta: info
-    },
+    data,
     source: origin
   };
 }
@@ -221,12 +223,12 @@ export function getViewFromDOMVideo(
       const meta = image.getMeta();
       meta.SeriesInstanceUID = seriesUID;
       image.setMeta(meta);
+      // create data
+      const data = new DicomData(info);
+      data.image = image;
       // call callback
       onloaditem({
-        data: {
-          image: image,
-          meta: info
-        },
+        data,
         source: origin
       });
     } else {
