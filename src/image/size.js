@@ -291,7 +291,8 @@ export class Size {
    * Normalise a list of values to this size.
    *
    * @param {number[]} inValues The input values.
-   * @param {number[]} extraValues The values used to fill extra dimensions.
+   * @param {number[]} [extraValues] Optional values used
+   * to fill extra dimensions.
    * @returns {number[]} The result values.
    */
   #normaliseValues(inValues, extraValues) {
@@ -314,7 +315,7 @@ export class Size {
    * Normalise a point to this size.
    *
    * @param {Point} point The input point.
-   * @param {Point} extra The point used to fill extra dimensions.
+   * @param {Point} [extra] Optional point used to fill extra dimensions.
    * @returns {Point} The result point.
    */
   normalisePoint(point, extra) {
@@ -330,7 +331,7 @@ export class Size {
    * Normalise an index to this size.
    *
    * @param {Index} index The input index.
-   * @param {Index} extra The point used to fill extra dimensions.
+   * @param {Index} [extra] Optional index used to fill extra dimensions.
    * @returns {Index} The result point.
    */
   normaliseIndex(index, extra) {
