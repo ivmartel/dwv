@@ -778,13 +778,18 @@ export function mergeGeometries(geometry1, geometry2) {
     range2[1].getValues()
   );
 
-  const sizeValues = [];
+  let sizeValues = [];
   for (let i = 0; i < minRangeValues.length; ++i) {
     sizeValues.push(Math.round(
       Math.abs(maxRangeValues[i] - minRangeValues[i]) / newSpacing.get(i)
     ));
   }
-  // TODO: handle extra dims
+  // handle extra dims
+  const maxSize = maxByIndex(
+    geometry1.getSize().getValues(),
+    geometry2.getSize().getValues()
+  );
+  sizeValues = sizeValues.concat(maxSize.slice(3));
   const newSize = new Size(sizeValues);
 
   const newOrigins = [];
