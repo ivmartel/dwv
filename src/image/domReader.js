@@ -130,6 +130,7 @@ export function getViewFromDOMImage(domImage, origin, index) {
   image.setMeta(meta);
 
   // create data
+  // @ts-expect-error
   const data = new DicomData(info);
   data.image = image;
 
@@ -224,6 +225,7 @@ export function getViewFromDOMVideo(
       meta.SeriesInstanceUID = seriesUID;
       image.setMeta(meta);
       // create data
+      // @ts-expect-error
       const data = new DicomData(info);
       data.image = image;
       // call callback
