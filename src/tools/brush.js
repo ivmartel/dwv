@@ -980,7 +980,8 @@ export class Brush extends EventTarget {
         return [];
       }
       // get source position
-      const sourceVl = layerGroup.getViewLayersByDataId(sourceDataId)[0];
+      // any layer from the app (could be other layer group)
+      const sourceVl = this.#app.getViewLayersByDataId(sourceDataId)[0];
       const sourceViewController = sourceVl.getViewController();
       const planePos = sourceVl.displayToPlanePos(mousePoint);
       sourcePosition = sourceViewController.getPositionFromPlanePoint(planePos);
