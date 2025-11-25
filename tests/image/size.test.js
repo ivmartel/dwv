@@ -1,5 +1,6 @@
-import {Index} from '../../src/math/index.js';
 import {Size} from '../../src/image/size.js';
+import {Index} from '../../src/math/index.js';
+import {Point} from '../../src/math/point.js';
 
 /**
  * Tests for the 'image/size.js' file.
@@ -210,4 +211,122 @@ QUnit.test('Index to and from offset', function (assert) {
     -1,
     'indexToOffset bounds #2'
   );
+});
+
+/**
+ * Tests for {@link Size.normalisePoint}.
+ *
+ * @function module:tests/image~normalise-point
+ */
+QUnit.test('Index normalisePoint', function (assert) {
+  const size00 = new Size([4, 3, 2]);
+
+  // same number of dims
+  const test00 = new Point([1, 2, 3]);
+  const testRes00 = size00.normalisePoint(test00);
+  const testRef00 = new Point([1, 2, 3]);
+  assert.true(testRes00.equals(testRef00), 'normalise point #0');
+
+  // dims -1
+  const test01 = new Point([1, 2]);
+  const testRes01 = size00.normalisePoint(test01);
+  const testRef01 = new Point([1, 2, 0]);
+  assert.true(testRes01.equals(testRef01), 'normalise point #1');
+
+  // dims -2
+  const test02 = new Point([1]);
+  const testRes02 = size00.normalisePoint(test02);
+  const testRef02 = new Point([1, 0, 0]);
+  assert.true(testRes02.equals(testRef02), 'normalise point #2');
+
+  // dims +1
+  const test03 = new Point([1, 2, 3, 4]);
+  const testRes03 = size00.normalisePoint(test03);
+  const testRef03 = new Point([1, 2, 3]);
+  assert.true(testRes03.equals(testRef03), 'normalise point #3');
+
+  const extra10 = new Point([4, 5, 6]);
+
+  // same number of dims + extra
+  const test10 = new Point([1, 2, 3]);
+  const testRes10 = size00.normalisePoint(test10, extra10);
+  const testRef10 = new Point([1, 2, 3]);
+  assert.true(testRes10.equals(testRef10), 'normalise point with extra #0');
+
+  // dims -1 + extra
+  const test11 = new Point([1, 2]);
+  const testRes11 = size00.normalisePoint(test11, extra10);
+  const testRef11 = new Point([1, 2, 6]);
+  assert.true(testRes11.equals(testRef11), 'normalise point with extra #1');
+
+  // dims -2 + extra
+  const test12 = new Point([1]);
+  const testRes12 = size00.normalisePoint(test12, extra10);
+  const testRef12 = new Point([1, 5, 6]);
+  assert.true(testRes12.equals(testRef12), 'normalise point with extra #2');
+
+  // dims +1 + extra
+  const test13 = new Point([1, 2, 3, 7]);
+  const testRes13 = size00.normalisePoint(test13, extra10);
+  const testRef13 = new Point([1, 2, 3]);
+  assert.true(testRes13.equals(testRef13), 'normalise point with extra #3');
+});
+
+/**
+ * Tests for {@link Size.normaliseIndex}.
+ *
+ * @function module:tests/image~normalise-index
+ */
+QUnit.test('Index normaliseIndex', function (assert) {
+  const size00 = new Size([4, 3, 2]);
+
+  // same number of dims
+  const test00 = new Index([1, 2, 3]);
+  const testRes00 = size00.normaliseIndex(test00);
+  const testRef00 = new Index([1, 2, 3]);
+  assert.true(testRes00.equals(testRef00), 'normalise index #0');
+
+  // dims -1
+  const test01 = new Index([1, 2]);
+  const testRes01 = size00.normaliseIndex(test01);
+  const testRef01 = new Index([1, 2, 0]);
+  assert.true(testRes01.equals(testRef01), 'normalise index #1');
+
+  // dims -2
+  const test02 = new Index([1]);
+  const testRes02 = size00.normaliseIndex(test02);
+  const testRef02 = new Index([1, 0, 0]);
+  assert.true(testRes02.equals(testRef02), 'normalise index #2');
+
+  // dims +1
+  const test03 = new Index([1, 2, 3, 4]);
+  const testRes03 = size00.normaliseIndex(test03);
+  const testRef03 = new Index([1, 2, 3]);
+  assert.true(testRes03.equals(testRef03), 'normalise index #3');
+
+  const extra10 = new Index([4, 5, 6]);
+
+  // same number of dims + extra
+  const test10 = new Index([1, 2, 3]);
+  const testRes10 = size00.normaliseIndex(test10, extra10);
+  const testRef10 = new Index([1, 2, 3]);
+  assert.true(testRes10.equals(testRef10), 'normalise index with extra #0');
+
+  // dims -1 + extra
+  const test11 = new Index([1, 2]);
+  const testRes11 = size00.normaliseIndex(test11, extra10);
+  const testRef11 = new Index([1, 2, 6]);
+  assert.true(testRes11.equals(testRef11), 'normalise index with extra #1');
+
+  // dims -2 + extra
+  const test12 = new Index([1]);
+  const testRes12 = size00.normaliseIndex(test12, extra10);
+  const testRef12 = new Index([1, 5, 6]);
+  assert.true(testRes12.equals(testRef12), 'normalise index with extra #2');
+
+  // dims +1 + extra
+  const test13 = new Index([1, 2, 3, 7]);
+  const testRes13 = size00.normaliseIndex(test13, extra10);
+  const testRef13 = new Index([1, 2, 3]);
+  assert.true(testRes13.equals(testRef13), 'normalise index with extra #3');
 });
