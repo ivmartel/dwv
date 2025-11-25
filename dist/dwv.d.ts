@@ -3156,11 +3156,11 @@ declare class Image_2 {
      * @param {number} i The X index.
      * @param {number} j The Y index.
      * @param {number} k The Z index.
-     * @param {number} f The frame number.
+     * @param {number} [f] Optional frame number.
      * @returns {number} The value at the desired position.
      * Warning: No size check...
      */
-    getValue(i: number, j: number, k: number, f: number): number;
+    getValue(i: number, j: number, k: number, f?: number): number;
     /**
      * Get the value of the image at a specific index.
      *
@@ -3175,11 +3175,11 @@ declare class Image_2 {
      * @param {number} i The X index.
      * @param {number} j The Y index.
      * @param {number} k The Z index.
-     * @param {number} f The frame number.
+     * @param {number} [f] Optional frame number.
      * @returns {number} The rescaled value at the desired position.
      * Warning: No size check...
      */
-    getRescaledValue(i: number, j: number, k: number, f: number): number;
+    getRescaledValue(i: number, j: number, k: number, f?: number): number;
     /**
      * Get the rescaled value of the image at a specific index.
      *
@@ -3436,9 +3436,10 @@ export declare class LayerGroup {
     /**
      * Get the position helper.
      *
-     * @returns {PositionHelper} The position helper.
+     * @returns {PositionHelper|undefined} The position helper or
+     * undefined if no layers.
      */
-    getPositionHelper(): PositionHelper;
+    getPositionHelper(): PositionHelper | undefined;
     /**
      * Get the showCrosshair flag.
      *
@@ -5318,7 +5319,7 @@ export declare class Size {
      *
      * @param {Index} index The index to convert.
      * @param {number} [start] Optional start dimension to base the offset on.
-     * @returns {number} The offset.
+     * @returns {number} The offset or -1 if out of bounds.
      */
     indexToOffset(index: Index, start?: number): number;
     /**
@@ -5334,6 +5335,22 @@ export declare class Size {
      * @returns {Scalar2D} The 2D base [0,1] as {x,y}.
      */
     get2D(): Scalar2D;
+    /**
+     * Normalise a point to this size.
+     *
+     * @param {Point} point The input point.
+     * @param {Point} [extra] Optional point used to fill extra dimensions.
+     * @returns {Point} The result point.
+     */
+    normalisePoint(point: Point, extra?: Point): Point;
+    /**
+     * Normalise an index to this size.
+     *
+     * @param {Index} index The input index.
+     * @param {Index} [extra] Optional index used to fill extra dimensions.
+     * @returns {Index} The result point.
+     */
+    normaliseIndex(index: Index, extra?: Index): Index;
     #private;
 }
 
@@ -5863,14 +5880,6 @@ export declare class View {
      */
     setContourThickness(thickness: number): void;
     /**
-     * Initialise the view: set initial index.
-     */
-    init(): void;
-    /**
-     * Set the initial index to the middle position.
-     */
-    setInitialIndex(): void;
-    /**
      * Get the milliseconds per frame from frame rate.
      *
      * @param {number} recommendedDisplayFrameRate Recommended Display Frame Rate.
@@ -5917,9 +5926,9 @@ export declare class View {
     /**
      * Get the current window level preset name.
      *
-     * @returns {string} The preset name.
+     * @returns {string|undefined} The preset name.
      */
-    getCurrentWindowPresetName(): string;
+    getCurrentWindowPresetName(): string | undefined;
     /**
      * Get the colour map of the image.
      *
@@ -5936,15 +5945,15 @@ export declare class View {
     /**
      * Get the current position.
      *
-     * @returns {Point} The current position.
+     * @returns {Point|undefined} The current position.
      */
-    getCurrentPosition(): Point;
+    getCurrentPosition(): Point | undefined;
     /**
      * Get the current index.
      *
-     * @returns {Index} The current index.
+     * @returns {Index|undefined} The current index.
      */
-    getCurrentIndex(): Index;
+    getCurrentIndex(): Index | undefined;
     /**
      * Get the SOP image UID of the current image.
      *
@@ -5992,12 +6001,12 @@ export declare class View {
     /**
      * Set current position.
      *
-     * @param {Point} position The new position.
+     * @param {Point} inPosition The new position.
      * @param {boolean} [silent] Flag to fire event or not.
      * @returns {boolean} False if not in bounds.
      * @fires View#positionchange
      */
-    setCurrentPosition(position: Point, silent?: boolean): boolean;
+    setCurrentPosition(inPosition: Point, silent?: boolean): boolean;
     /**
      * Set the view window/level.
      *
@@ -6227,17 +6236,12 @@ export declare class ViewController {
      */
     isPlaying(): boolean;
     /**
-     * Get the position helper.
+     * Get a position helper: returns a new helper
+     * based on the current view.
      *
      * @returns {PositionHelper} The helper.
      */
     getPositionHelper(): PositionHelper;
-    /**
-     * Get a clone of the position helper.
-     *
-     * @returns {PositionHelper} The helper clone.
-     */
-    getPositionHelperClone(): PositionHelper;
     /**
      * Get the current position.
      *

@@ -653,12 +653,12 @@ class Image_2 {
     getPhotometricInterpretation(): string;
     getPlanarConfiguration(): number;
     getRescaledDataRange(): NumberRange;
-    getRescaledValue(i: number, j: number, k: number, f: number): number;
+    getRescaledValue(i: number, j: number, k: number, f?: number): number;
     getRescaledValueAtIndex(index: Index): number;
     getRescaledValueAtOffset(offset: number): number;
     getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     getSecondaryOffset(index: Index): number;
-    getValue(i: number, j: number, k: number, f: number): number;
+    getValue(i: number, j: number, k: number, f?: number): number;
     getValueAtIndex(index: Index): number;
     getValueAtOffset(offset: number): number;
     hasValues(values: any[]): boolean[];
@@ -739,7 +739,7 @@ export class LayerGroup {
     getNumberOfLayers(): number;
     getNumberOfViewLayers(): number;
     getOffset(): Scalar3D;
-    getPositionHelper(): PositionHelper;
+    getPositionHelper(): PositionHelper | undefined;
     getScale(): Scalar3D;
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
@@ -1127,6 +1127,8 @@ export class Size {
     isInBounds(index: Index, dirs: number[]): boolean;
     length(): number;
     moreThanOne(dimension: number): boolean;
+    normaliseIndex(index: Index, extra?: Index): Index;
+    normalisePoint(point: Point, extra?: Point): Point;
     offsetToIndex(offset: number): Index;
     toString(): string;
 }
@@ -1217,9 +1219,9 @@ export class View {
     getColourMap(): string;
     getContourThickness(): number;
     getCurrentImageUid(): string;
-    getCurrentIndex(): Index;
-    getCurrentPosition(): Point;
-    getCurrentWindowPresetName(): string;
+    getCurrentIndex(): Index | undefined;
+    getCurrentPosition(): Point | undefined;
+    getCurrentWindowPresetName(): string | undefined;
     getFillOpacity(): number;
     getImage(): Image_2;
     getOrientation(): Matrix33;
@@ -1232,7 +1234,6 @@ export class View {
     getWindowPresets(): object;
     getWindowPresetsNames(): string[];
     includesImageUid(uid: string): boolean;
-    init(): void;
     isAquisitionOrientation(): boolean;
     isMask(): boolean;
     isPositionInBounds(position?: Point): boolean;
@@ -1241,10 +1242,9 @@ export class View {
     setColourMap(name: string): void;
     setContourThickness(thickness: number): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
-    setCurrentPosition(position: Point, silent?: boolean): boolean;
+    setCurrentPosition(inPosition: Point, silent?: boolean): boolean;
     setFillOpacity(opacity: number): void;
     setImage(image: Image_2): void;
-    setInitialIndex(): void;
     setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     setOrientation(mat33: Matrix33): void;
     setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
@@ -1309,7 +1309,6 @@ export class ViewController {
     getPlanePositionFromPosition(point: Point): Point2D;
     getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     getPositionHelper(): PositionHelper;
-    getPositionHelperClone(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollDimIndex(): number;
     getSopClassUid(): string | undefined;
