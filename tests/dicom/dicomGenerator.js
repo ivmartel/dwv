@@ -70,10 +70,13 @@ export function checkTags(tags, requiredTags, withLog) {
  * Get the DICOM pixel data from a DICOM tags object.
  *
  * @param {object} tags The DICOM tags object.
- * @param {string} pixGeneratorName The name of a pixel generator.
- * @param {number} sliceNumber The slice number.
- * @param {Array} images The images to pass to the generator.
- * @param {number} numberOfSlices The result number of slices.
+ * @param {string} [pixGeneratorName] The name of a pixel generator,
+ * defaults to gradSquare.
+ * @param {number} [sliceNumber] The slice number,
+ * default to 0.
+ * @param {Array} [images] The images to pass to the generator.
+ * @param {number} [numberOfSlices] The result number of slices,
+ * default to 1.
  * @returns {object} The DICOM pixel data element.
  */
 export function generatePixelDataFromJSONTags(
