@@ -438,17 +438,18 @@ function generateBinary(tags) {
   const dataLength = numberOfRows * numberOfColumns * numberOfFrames;
   const pixelBuffer = new Uint8Array(dataLength);
 
-  const halfCols = numberOfRows * 0.5;
-  const halfRows = numberOfColumns * 0.5;
+  const borderI = Math.ceil(numberOfColumns * 0.25);
+  const borderJ = Math.ceil(numberOfRows * 0.25);
+
+  const minI = borderI;
+  const minJ = borderJ;
+  const maxI = numberOfColumns - borderI;
+  const maxJ = numberOfRows - borderJ;
 
   const getFunc = function (i, j) {
-    let value = 0;
-    const jc = Math.abs(j - halfRows);
-    const ic = Math.abs(i - halfCols);
-    if (jc < halfRows / 2 && ic < halfCols / 2) {
-      value = 1;
-    }
-    return value;
+    const inRange = i >= minI && i < maxI &&
+      j >= minJ && j < maxJ;
+    return inRange ? 1 : 0;
   };
 
   // main loop
