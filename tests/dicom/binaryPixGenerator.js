@@ -20,8 +20,8 @@ export class BinaryPixGenerator {
     this.#numberOfRows = options.numberOfRows;
     this.#numberOfFrames = options.numberOfFrames;
 
-    const borderI = Math.ceil(this.#numberOfColumns * 0.5);
-    const borderJ = Math.ceil(this.#numberOfRows * 0.5);
+    const borderI = Math.ceil(this.#numberOfColumns * 0.25);
+    const borderJ = Math.ceil(this.#numberOfRows * 0.25);
 
     this.#minI = borderI;
     this.#minJ = borderJ;
