@@ -271,7 +271,7 @@ export class ImageFactory {
    *
    * @param {DataElements} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
-   * @throws Error for missing or wrong data.
+   * @throws {Error} Error for missing or wrong data.
    */
   checkElements(dataElements) {
     // reset
@@ -311,7 +311,7 @@ export class ImageFactory {
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
    * @param {number} numberOfFiles The input number of files.
    * @returns {Image} A new Image.
-   * @throws Error for missing or wrong data.
+   * @throws {Error} Error for missing or wrong data.
    */
   create(dataElements, pixelBuffer, numberOfFiles) {
     // safe get shortcuts

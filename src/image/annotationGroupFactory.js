@@ -247,7 +247,6 @@ export class AnnotationGroupFactory {
    *
    * @param {Object<string, DataElement>} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
-   * @throws Error for missing or wrong data.
    */
   checkElements(dataElements) {
     // reset
@@ -1090,7 +1089,7 @@ export class AnnotationGroupFactory {
    *
    * @param {Object<string, DataElement>} dataElements The DICOM tags.
    * @returns {AnnotationGroup} A new annotation group.
-   * @throws Error for missing or wrong data.
+   * @throws {Error} Error for missing or wrong data.
    */
   create(dataElements) {
     const srContent = getSRContent(dataElements);

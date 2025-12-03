@@ -11,6 +11,7 @@ export default [
     },
     settings: {
       jsdoc: {
+        mode: 'jsdoc',
         // 1. jsdoc gives an error for index signatures as type:
         // {[key: string]: {red: number[], green: number[], blue: number[]}}
         // -> ERROR: Unable to parse a tag's type expression for source file ...
@@ -31,7 +32,13 @@ export default [
       'jsdoc/tag-lines': ['error', 'any', {startLines: 1}],
       // require description complete sentence
       // https://github.com/gajus/eslint-plugin-jsdoc/blob/HEAD/docs/rules/require-description-complete-sentence.md
-      'jsdoc/require-description-complete-sentence': ['error']
+      'jsdoc/require-description-complete-sentence': ['error'],
+      // allow function type
+      // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/reject-function-type.md
+      'jsdoc/reject-function-type': 'off',
+      // allow any type
+      // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/reject-any-type.md
+      'jsdoc/reject-any-type': 'off'
     }
   }
 ];
