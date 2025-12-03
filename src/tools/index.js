@@ -17,6 +17,14 @@ import {RulerFactory} from './ruler.js';
 
 import {Filter, Threshold, Sobel, Sharpen} from './filter.js';
 
+import {ScrollWheel} from './scrollWheel.js';
+import {DrawShapeHandler} from './drawShapeHandler.js';
+
+export {
+  DrawShapeHandler,
+  ScrollWheel,
+};
+
 /**
  * List of client provided tools to be added to
  * the default ones.
