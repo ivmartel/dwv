@@ -34,6 +34,8 @@ QUnit.test('Line class - #DWV-REQ-UI-07-007 Draw ruler', function (assert) {
   // getMidpoint
   const pMid = new Point2D(0, -2.5); // rounded...
   assert.equal(l00.getMidpoint().equals(pMid), true, 'getMidpoint');
+  // getCentroid
+  assert.equal(l00.getCentroid().equals(pMid), true, 'getCentroid');
 
   // equals: true
   const l01 = new Line(p00, p01);

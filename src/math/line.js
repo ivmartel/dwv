@@ -120,12 +120,10 @@ export class Line {
    * Get the mid point of the line.
    *
    * @returns {Point2D} The mid point of the line.
+   * @deprecated Since v0.36, please use getCentroid instead.
    */
   getMidpoint() {
-    return new Point2D(
-      (this.getBegin().getX() + this.getEnd().getX()) / 2,
-      (this.getBegin().getY() + this.getEnd().getY()) / 2
-    );
+    return this.getCentroid();
   }
 
   /**
@@ -134,7 +132,10 @@ export class Line {
    * @returns {Point2D} THe centroid point.
    */
   getCentroid() {
-    return this.getMidpoint();
+    return new Point2D(
+      (this.getBegin().getX() + this.getEnd().getX()) / 2,
+      (this.getBegin().getY() + this.getEnd().getY()) / 2
+    );
   }
 
   /**

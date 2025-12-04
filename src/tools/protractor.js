@@ -440,9 +440,9 @@ export class ProtractorFactory {
       protractor.getPoint(1), protractor.getPoint(2));
 
     const midX =
-      (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
+      (line0.getCentroid().getX() + line1.getCentroid().getX()) / 2;
     const midY =
-      (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
+      (line0.getCentroid().getY() + line1.getCentroid().getY()) / 2;
 
     return new Point2D(
       midX,
