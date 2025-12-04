@@ -4,6 +4,7 @@ bower_components
 
 # build
 build
+dist
 
 # misc
 npm-debug.log
