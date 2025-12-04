@@ -1,4 +1,7 @@
-import {Index} from '../../src/math/index.js';
+import {
+  Index,
+  getZeroIndex
+} from '../../src/math/index.js';
 import {Point} from '../../src/math/point.js';
 
 /**
@@ -92,4 +95,45 @@ QUnit.test('Index class', function (assert) {
   assert.equal(i42.get(0), 3, '[add] get0');
   assert.equal(i42.get(1), 5, '[add] get1');
   assert.equal(i42.get(2), 7, '[add] get2');
+
+  // next
+  const i50 = new Index([1, 2, 3]);
+  const i51res = i50.next(0);
+  const i51theo = new Index([2, 2, 3]);
+  assert.ok(i51res.equals(i51theo), '[next] #0');
+  const i52res = i50.next(1);
+  const i52theo = new Index([1, 3, 3]);
+  assert.ok(i52res.equals(i52theo), '[next] #1');
+  const i53res = i50.next(2);
+  const i53theo = new Index([1, 2, 4]);
+  assert.ok(i53res.equals(i53theo), '[next] #2');
+
+  // previous
+  const i60 = new Index([1, 2, 3]);
+  const i61res = i60.previous(0);
+  const i61theo = new Index([0, 2, 3]);
+  assert.ok(i61res.equals(i61theo), '[previous] #0');
+  const i62res = i60.previous(1);
+  const i62theo = new Index([1, 1, 3]);
+  assert.ok(i62res.equals(i62theo), '[previous] 1');
+  const i63res = i60.previous(2);
+  const i63theo = new Index([1, 2, 2]);
+  assert.ok(i63res.equals(i63theo), '[previous] 2');
+
+  // getWithNew2D
+  const i70 = new Index([1, 2, 3]);
+  const i71res = i70.getWithNew2D(0, 1);
+  const i71theo = new Index([0, 1, 3]);
+  assert.ok(i71res.equals(i71theo), '[getWithNew2D] #0');
+});
+
+/**
+ * Tests for {@link getZeroIndex}.
+ *
+ * @function module:tests/math~index-getZeroIndex
+ */
+QUnit.test('Index getZeroIndex', function (assert) {
+  const i0 = getZeroIndex(3);
+  const i0theo = new Index([0, 0, 0]);
+  assert.ok(i0.equals(i0theo), '[getZeroIndex] #0');
 });
