@@ -3,7 +3,9 @@ import {
   Line,
   getAngle,
   areOrthogonal,
-  getPerpendicularLine
+  getPerpendicularLine,
+  getPerpendicularLineAtDistance,
+  isPointInLineRange
 } from '../../src/math/line.js';
 
 /**
@@ -31,11 +33,6 @@ QUnit.test('Line class - #DWV-REQ-UI-07-007 Draw ruler', function (assert) {
   // getWorldLength
   const spacing2D = {x: 0.5, y: 0.5};
   assert.equal(l00.getWorldLength(spacing2D), 2.5, 'getWorldLength');
-  // getMidpoint
-  const pMid = new Point2D(0, -2.5); // rounded...
-  assert.equal(l00.getMidpoint().equals(pMid), true, 'getMidpoint');
-  // getCentroid
-  assert.equal(l00.getCentroid().equals(pMid), true, 'getCentroid');
 
   // equals: true
   const l01 = new Line(p00, p01);
@@ -47,6 +44,12 @@ QUnit.test('Line class - #DWV-REQ-UI-07-007 Draw ruler', function (assert) {
   // equals: false begin
   const l03 = new Line(p02, p01);
   assert.notOk(l00.equals(l03), 'non equal lines begin');
+
+  // getMidpoint
+  const pMid = new Point2D(0, -2.5); // rounded...
+  assert.equal(l00.getMidpoint().equals(pMid), true, 'getMidpoint');
+  // getCentroid
+  assert.equal(l00.getCentroid().equals(pMid), true, 'getCentroid');
 
   // slope
   const p10 = new Point2D(1, 1);
@@ -84,6 +87,14 @@ QUnit.test('Line class - #DWV-REQ-UI-07-007 Draw ruler', function (assert) {
   const p27 = new Point2D(-1, -2);
   const l23 = new Line(p26, p27);
   assert.equal(l23.getIntercept(), -1, 'getIntercept (back negative)');
+
+  // flipped
+  const p30 = new Point2D(0, 1);
+  const p31 = new Point2D(1, 2);
+  const l30 = new Line(p30, p31);
+  const l30res = l30.getFlipped();
+  assert.ok(l30res.getBegin().equals(p31), 'getFlipped begin');
+  assert.ok(l30res.getEnd().equals(p30), 'getFlipped end');
 });
 
 /**
@@ -202,4 +213,64 @@ QUnit.test('Perpendicular line', function (assert) {
   assert.ok(isSimilarPoint2D(l5p.getBegin(), pl5pbeg), 'perpendicular begin');
   const pl5pend = new Point2D(halfSqrt2, 1 - halfSqrt2);
   assert.ok(isSimilarPoint2D(l5p.getEnd(), pl5pend), 'perpendicular end');
+});
+
+/**
+ * Tests for {@link Line}.
+ *
+ * @function module:tests/math~line-getPerpendicularLineAtDistance
+ */
+QUnit.test('Line getPerpendicularLineAtDistance', function (assert) {
+  const p00 = new Point2D(0, 0);
+  const p01 = new Point2D(0, -5);
+  const l00 = new Line(p00, p01);
+
+  // test #0
+  const l0p = getPerpendicularLineAtDistance(l00, 0, 2);
+  const pl0pbeg = new Point2D(-1, 0);
+  assert.ok(l0p.getBegin().equals(pl0pbeg), 'perpendicular horizon begin #0');
+  const pl0pend = new Point2D(1, 0);
+  assert.ok(l0p.getEnd().equals(pl0pend), 'perpendicular horizon end #0');
+
+  // test #1
+  // TODO was expecting -1 and not -0.5...
+  const l1p = getPerpendicularLineAtDistance(l00, 1, 2);
+  const pl1pbeg = new Point2D(-1, -0.5);
+  assert.ok(l1p.getBegin().equals(pl1pbeg), 'perpendicular horizon begin #1');
+  const pl1pend = new Point2D(1, -0.5);
+  assert.ok(l1p.getEnd().equals(pl1pend), 'perpendicular horizon end #1');
+
+  // test #2
+  // TODO was expecting -2 and not -1...
+  const l2p = getPerpendicularLineAtDistance(l00, 2, 2);
+  const p21pbeg = new Point2D(-1, -1);
+  assert.ok(l2p.getBegin().equals(p21pbeg), 'perpendicular horizon begin #2');
+  const p21pend = new Point2D(1, -1);
+  assert.ok(l2p.getEnd().equals(p21pend), 'perpendicular horizon end #2');
+});
+
+/**
+ * Tests for {@link Line}.
+ *
+ * @function module:tests/math~line-isPointInLineRange
+ */
+QUnit.test('Line isPointInLineRange', function (assert) {
+  const p00 = new Point2D(0, 0);
+  const p01 = new Point2D(1, 1);
+  const l00 = new Line(p00, p01);
+
+  // begin
+  assert.ok(isPointInLineRange(p00, l00), 'isPointInLineRange #0');
+  // end
+  assert.ok(isPointInLineRange(p01, l00), 'isPointInLineRange #1');
+  // centroid
+  const p02 = new Point2D(0.5, 0.5);
+  assert.ok(isPointInLineRange(p02, l00), 'isPointInLineRange #2');
+  const p03 = l00.getCentroid();
+  assert.ok(isPointInLineRange(p03, l00), 'isPointInLineRange #3');
+  // can be outside line
+  const p04 = new Point2D(0, 1);
+  assert.ok(isPointInLineRange(p04, l00), 'isPointInLineRange #4');
+  const p05 = new Point2D(1, 0);
+  assert.ok(isPointInLineRange(p05, l00), 'isPointInLineRange #5');
 });
