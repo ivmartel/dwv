@@ -1226,6 +1226,15 @@ export class ViewLayer {
   };
 
   /**
+   * Check if the position is valid.
+   *
+   * @returns {boolean} True if the position is valid.
+   */
+  isValidPosition() {
+    return this.#isValidPosition;
+  }
+
+  /**
    * Handle alpha function change.
    *
    * @param {object} event The event fired when changing the function.

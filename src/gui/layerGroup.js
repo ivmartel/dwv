@@ -1150,6 +1150,17 @@ export class LayerGroup {
   }
 
   /**
+   * Check if any layer has a valid position.
+   *
+   * @returns {boolean} True if any layer has a valid position.
+   */
+  hasAnyLayerWithValidPosition() {
+    return this.someViewLayer(function (layer) {
+      return layer.isValidPosition();
+    });
+  }
+
+  /**
    * Update layers (but not the event source layer) to a position change.
    *
    * @param {object} event The position change event.
@@ -1246,6 +1257,13 @@ export class LayerGroup {
         layer.draw();
       }
     }
+
+    const hasValidPosition = this.hasAnyLayerWithValidPosition();
+    this.#fireEvent({
+      type: 'outofrange',
+      layergroupid: this.getDivId(),
+      value: [!hasValidPosition]
+    });
 
     // show crosshair after position update
     if (this.#showCrosshair) {
