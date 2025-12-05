@@ -2134,6 +2134,7 @@ export class App {
     group.addEventListener('zoomchange', this.#fireEvent);
     group.addEventListener('offsetchange', this.#fireEvent);
     group.addEventListener('layerremove', this.#fireEvent);
+    group.addEventListener('outofrange', this.#fireEvent);
     // propagate viewLayer events
     group.addEventListener('renderstart', this.#fireEvent);
     group.addEventListener('renderend', this.#fireEvent);
