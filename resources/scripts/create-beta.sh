@@ -69,7 +69,6 @@ then
   b2="${betaVersion}"
   sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
 
-
   ((step++))
 fi
 
@@ -78,6 +77,7 @@ if [ $step -eq 2 ]
 then
   info "(2/4) create build"
 
+  rm -r dist
   yarn run build-all
 
   ((step++))

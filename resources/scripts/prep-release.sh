@@ -108,6 +108,7 @@ if [ $step -eq 3 ]
 then
   info "(3/5) create build"
 
+  rm -r dist
   yarn run build-all
 
   ((step++))
