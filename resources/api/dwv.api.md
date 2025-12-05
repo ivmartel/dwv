@@ -312,6 +312,18 @@ export class DataElement {
 }
 
 // @public
+export const defaultToolList: {
+    [x: string]: any;
+};
+
+// @public
+export const defaultToolOptions: {
+    [x: string]: {
+        [x: string]: any;
+    };
+};
+
+// @public
 export class DeleteSegmentCommand {
     constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
     execute(): void;
@@ -747,6 +759,7 @@ export class LayerGroup {
     getViewLayers(callbackFn?: Function): ViewLayer[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
     getViewLayersFromActive(callbackFn?: Function): ViewLayer[];
+    hasAnyLayerWithValidPosition(): boolean;
     includes(id: string): boolean;
     isPositionInBounds(position: Point): boolean;
     moreThanOne(dim: number): boolean;
@@ -1373,6 +1386,7 @@ export class ViewLayer {
     getViewController(): ViewController;
     initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
     initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
+    isValidPosition(): boolean;
     isVisible(): boolean;
     onimagecontentchange: (event: object) => void;
     onimagegeometrychange: (event: object) => void;

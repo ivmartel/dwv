@@ -25,7 +25,7 @@
       "package": "package.json",
       "theme_opts": {
         "title": "DWV",
-        "footer": "<i>Documentation generated for dwv v0.36.0-beta.13.</i>",
+        "footer": "<i>Documentation generated for dwv v0.36.0-beta.14.</i>",
         "sections": [
           "Tutorials",
           "Namespaces",
