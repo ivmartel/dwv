@@ -18,6 +18,7 @@ export class UnitValue {
 
   /**
    * The unit of the value.
+   *
    * @type {string}
    */
   unit;
@@ -84,7 +85,6 @@ export class Label {
    * The world coordinates of the centroid.
    *
    * @type {Point}
-   *
    */
   centroid;
 
@@ -92,7 +92,6 @@ export class Label {
    * The closest voxel Index to the centroid.
    *
    * @type {number[]}
-   *
    */
   centroidIndex;
 
@@ -100,7 +99,6 @@ export class Label {
    * The volume of the labeled segment.
    *
    * @type {UnitValue}
-   *
    */
   volume;
 
@@ -108,7 +106,6 @@ export class Label {
    * The voxel count of the labeled segment.
    *
    * @type {number}
-   *
    */
   count;
 
@@ -116,7 +113,6 @@ export class Label {
    * The diameters of the segment.
    *
    * @type {Diameters}
-   *
    */
   diameters;
 
@@ -124,7 +120,6 @@ export class Label {
    * The scaled height of the segment.
    *
    * @type {UnitValue}
-   *
    */
   height;
 
@@ -132,7 +127,6 @@ export class Label {
    * The segment label id.
    *
    * @type {number}
-   *
    */
   id;
 
@@ -140,7 +134,6 @@ export class Label {
    * The Z index of the largest slice of the segment.
    *
    * @type {number}
-   *
    */
   largestSliceZ;
 
