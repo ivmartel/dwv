@@ -39,6 +39,8 @@ import {
 } from './changeSegmentColourCommand.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
+import {Diameter, Diameters, Label, UnitValue} from './label.js';
+
 
 export {
   Annotation,
@@ -48,8 +50,11 @@ export {
   ChangeSegmentColourCommand,
   ColourMap,
   DeleteSegmentCommand,
+  Diameter,
+  Diameters,
   Geometry,
   Image,
+  Label,
   MaskFactory,
   MaskSegmentHelper,
   MaskSegmentViewHelper,
@@ -59,6 +64,7 @@ export {
   ResponseEvaluation,
   Size,
   Spacing,
+  UnitValue,
   View,
   WindowLevel,
   luts,
