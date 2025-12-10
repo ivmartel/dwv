@@ -24,52 +24,11 @@ import {DataElement} from '../dicom/dataElement.js';
 import {RGB} from '../utils/colour.js';
 import {ColourMap} from './luts.js';
 import {Point} from '../math/point.js';
+import {Label} from './label.js';
 /* eslint-enable no-unused-vars */
 
 const ML_PER_MM = 0.001; // ml/mm^3
 
-/**
- * Unit value.
- *
- * @typedef UnitValue
- * @property {number} value The value.
- * @property {string} unit The unit of the value.
- */
-
-/**
- * Diameter type.
- *
- * @typedef Diameter
- * @property {UnitValue} diameter The scaled diameter value.
- * @property {number} offset1 The offset of the pixel at the start
- *  of the line used to calculate this diameter.
- * @property {number} offset2 The offset of the pixel at the end
- *  of the line used to calculate this diameter.
- */
-
-/**
- * Diameters type.
- *
- * @typedef Diameters
- * @property {Diameter} major The major (longest) diameter of the segment.
- * @property {Diameter} minor The minor (longest perpendicular to the major)
- *  diameter of the segment.
- */
-
-/**
- * Label type.
- *
- * @typedef Label
- * @property {Point} centroid The world coordinates of the centroid.
- * @property {number[]} centroidIndex The closest voxel Index to the centroid.
- * @property {UnitValue} volume The volume of the labeled segment.
- * @property {number} count The voxel count of the labeled segment.
- * @property {Diameters} diameters The diameters of the segment.
- * @property {UnitValue} height The scaled height of the segment.
- * @property {number} id The segment label id.
- * @property {number} largestSliceZ The Z index of the largest slice of the
- *  segment.
- */
 
 /**
  * List of image event names.
