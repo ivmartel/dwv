@@ -23,7 +23,8 @@ If you have questions, please [open an issue](https://www.github.com/ivmartel/dw
 - `doc`: create documentation
 
 I'm using `yarn` as the main package manager. Best to use it to install since
-the lock file (that contains the exact dependency tree) is a yarn file.
+the lock file (that contains the exact dependency tree) is a yarn file. No need
+to install it, just run `corepack enable` should be enough.
 All scripts also work with `npm`.
 
 ## Steps to run the viewer from scratch
