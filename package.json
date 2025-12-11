@@ -78,5 +78,6 @@
     "gren": "gren",
     "types": "tsc -p resources/api/tsconfig.json",
     "api": "api-extractor run -c resources/api/api-extractor.json --local"
-  }
+  },
+  "packageManager": "yarn@4.12.0"
 }
