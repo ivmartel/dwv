@@ -335,6 +335,19 @@ export class DeleteSegmentCommand {
 }
 
 // @public
+export class Diameter {
+    diameter: UnitValue;
+    offset1: number;
+    offset2: number;
+}
+
+// @public
+export class Diameters {
+    major: Diameter;
+    minor: Diameter;
+}
+
+// @public
 export class DicomCode {
     constructor(meaning: string);
     longValue: string | undefined;
@@ -718,6 +731,18 @@ export class Index {
 
 // @public
 export function isEqualRgb(c1: RGB, c2: RGB): boolean;
+
+// @public
+export class Label {
+    centroid: Point;
+    centroidIndex: number[];
+    count: number;
+    diameters: Diameters;
+    height: UnitValue;
+    id: number;
+    largestSliceZ: number;
+    volume: UnitValue;
+}
 
 // @public
 export function labToUintLab(triplet: object): object;
@@ -1207,6 +1232,12 @@ export const toolOptions: {
         [x: string]: any;
     };
 };
+
+// @public
+export class UnitValue {
+    unit: string;
+    value: number;
+}
 
 // @public
 export class Vector3D {
