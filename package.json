@@ -69,7 +69,7 @@
     "build-demo": "webpack --config config/webpack.demo.js",
     "lint": "eslint -c config/eslint.config-full.js 'src/**/*.js' 'tests/**/*.js' '*.js'",
     "test": "vitest",
-    "test-ci": "vitest --coverage --watch false --reporter json",
+    "test-ci": "vitest --coverage --watch false --reporter default --reporter json",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
     "gren": "gren",
     "types": "tsc -p resources/api/tsconfig.json",
