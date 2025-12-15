@@ -1,7 +1,10 @@
 import {describe, test, assert} from 'vitest';
 import {Point2D} from '../../src/math/point.js';
 import {Index} from '../../src/math/index.js';
-import {Rectangle} from '../../src/math/rectangle.js';
+import {
+  Rectangle,
+  getRectangleIndices
+} from '../../src/math/rectangle.js';
 
 /**
  * Tests for the 'math/rectangle.js' file.
@@ -48,6 +51,10 @@ describe('math', () => {
       // getWorldSurface
       const spacing2D = {x: 0.5, y: 0.5};
       assert.equal(r00.getWorldSurface(spacing2D), 4, 'getWorldSurface');
+      // getCentroid
+      const centroid = r00.getCentroid();
+      const theoCentroid = new Point2D(-2, -2);
+      assert.ok(centroid.equals(theoCentroid), 'getCentroid');
     }
   );
 
@@ -95,6 +102,27 @@ describe('math', () => {
         theoQuant0.stdDev.value, 'quant stdDev');
       assert.equal(
         resQuant0.surface.value, theoQuant0.surface.value, 'quant surface');
+    }
+  );
+
+  /**
+   * Tests for {@link Rectangle} getRectangleIndices.
+   *
+   * @function module:tests/math~rectangle-getRectangleIndices
+   */
+  test('Rectangle getRectangleIndices',
+    () => {
+      const center0 = new Index([1, 1]);
+      const size0 = [2, 2];
+      const dir0 = [0, 1];
+      const indicesTheo0 = [
+        new Index([0, 0]),
+        new Index([0, 1]),
+        new Index([1, 0]),
+        new Index([1, 1])
+      ];
+      const indices0 = getRectangleIndices(center0, size0, dir0);
+      assert.deepEqual(indices0, indicesTheo0, 'Get indices #0');
     }
   );
 
