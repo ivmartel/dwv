@@ -24,9 +24,9 @@ describe('utils', () => {
       tol = 1e-6;
     }
     const diff = Math.abs(a - b);
-    if (tol / diff > 10) {
-      console.log('precision could be lower: ', diff, tol);
-    }
+    // if (tol / diff > 10) {
+    //   console.log('precision could be lower: ', diff, tol);
+    // }
     return diff < tol;
   };
 
