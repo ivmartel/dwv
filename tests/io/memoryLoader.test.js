@@ -25,116 +25,122 @@ describe('io', () => {
    * @param {number} nDataOk The theoretical number of data with no error.
    */
   async function checkLoad(id, data, nData, nDataOk) {
-    const prefix = '[' + id + '] ';
-    const nDataError = nData - nDataOk;
 
-    // checks
-    const loadStartDates = [];
-    const progressDates = [];
-    const loadItemDates = [];
-    const loadDates = [];
-    const errorDates = [];
-    const abortDates = [];
-    let gotLoadEnd = false;
+    return new Promise((resolve) => {
 
-    // create loader
-    const loader = new MemoryLoader();
-    // callbacks
-    loader.onloadstart = function (/*event*/) {
-      loadStartDates.push(new Date());
-    };
-    loader.onprogress = function (/*event*/) {
-      progressDates.push(new Date());
-    };
-    loader.onloaditem = function (/*event*/) {
-      loadItemDates.push(new Date());
-    };
-    loader.onload = function (/*event*/) {
-      loadDates.push(new Date());
-    };
-    loader.onloadend = function (/*event*/) {
-      const loadEndDate = new Date();
-      assert.notOk(gotLoadEnd,
-        prefix + 'Received first load end.');
-      gotLoadEnd = true;
+      const prefix = '[' + id + '] ';
+      const nDataError = nData - nDataOk;
 
-      // check number of events
-      assert.equal(loadStartDates.length, 1,
-        prefix + 'Received one load start.');
-      if (nDataOk !== 0) {
-        assert.ok(progressDates.length > 0,
-          prefix + 'Received at least one progress.');
-      }
-      assert.equal(loadItemDates.length, nDataOk,
-        prefix + 'Received loaditem.');
-      const nLoad = nDataError === 0 ? 1 : 0;
-      assert.equal(loadDates.length, nLoad,
-        prefix + 'Received load.');
-      assert.equal(errorDates.length, nDataError,
-        prefix + 'Received error(s).');
-      assert.equal(abortDates.length, 0,
-        prefix + 'Received abort(s).');
+      // checks
+      const loadStartDates = [];
+      const progressDates = [];
+      const loadItemDates = [];
+      const loadDates = [];
+      const errorDates = [];
+      const abortDates = [];
+      let gotLoadEnd = false;
 
-      // check start/end sequence
-      const loadStartDate = loadStartDates[0];
-      assert.ok(loadStartDate <= loadEndDate,
-        prefix + 'Received start before load end.');
+      // create loader
+      const loader = new MemoryLoader();
+      // callbacks
+      loader.onloadstart = function (/*event*/) {
+        loadStartDates.push(new Date());
+      };
+      loader.onprogress = function (/*event*/) {
+        progressDates.push(new Date());
+      };
+      loader.onloaditem = function (/*event*/) {
+        loadItemDates.push(new Date());
+      };
+      loader.onload = function (/*event*/) {
+        loadDates.push(new Date());
+      };
+      loader.onloadend = function (/*event*/) {
+        const loadEndDate = new Date();
+        assert.notOk(gotLoadEnd,
+          prefix + 'Received first load end.');
+        gotLoadEnd = true;
 
-      let firstProgressDate = null;
-      let lastProgressDate = null;
-      let firstLoadItemDate = null;
-      let lastLoadItemDate = null;
+        // check number of events
+        assert.equal(loadStartDates.length, 1,
+          prefix + 'Received one load start.');
+        if (nDataOk !== 0) {
+          assert.ok(progressDates.length > 0,
+            prefix + 'Received at least one progress.');
+        }
+        assert.equal(loadItemDates.length, nDataOk,
+          prefix + 'Received loaditem.');
+        const nLoad = nDataError === 0 ? 1 : 0;
+        assert.equal(loadDates.length, nLoad,
+          prefix + 'Received load.');
+        assert.equal(errorDates.length, nDataError,
+          prefix + 'Received error(s).');
+        assert.equal(abortDates.length, 0,
+          prefix + 'Received abort(s).');
 
-      if (nDataOk !== 0) {
-        // check progress sequence
-        progressDates.sort();
-        firstProgressDate = progressDates[0];
-        lastProgressDate = progressDates[progressDates.length - 1];
-        assert.ok(loadStartDate <= firstProgressDate,
-          prefix + 'Received start before first progress.');
-        assert.ok(loadEndDate >= lastProgressDate,
-          prefix + 'Received end after last progress.');
+        // check start/end sequence
+        const loadStartDate = loadStartDates[0];
+        assert.ok(loadStartDate <= loadEndDate,
+          prefix + 'Received start before load end.');
 
-        // check load item sequence
-        loadItemDates.sort();
-        firstLoadItemDate = loadItemDates[0];
-        lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
-        assert.ok(loadStartDate <= firstLoadItemDate,
-          prefix + 'Received start before first load item.');
-        assert.ok(loadEndDate >= lastLoadItemDate,
-          prefix + 'Received end after last load item.');
-      }
+        let firstProgressDate = null;
+        let lastProgressDate = null;
+        let firstLoadItemDate = null;
+        let lastLoadItemDate = null;
 
-      // check load or error event sequence
-      if (nDataError === 0) {
-        // load is sent if no error happened
-        const loadDate = loadDates[0];
-        assert.ok(loadStartDate <= loadDate,
-          prefix + 'Received start before load.');
-        assert.ok(loadDate >= lastProgressDate,
-          prefix + 'Received load after last progress.');
-        assert.ok(loadDate >= lastLoadItemDate,
-          prefix + 'Received load after last load item.');
-        assert.ok(loadEndDate >= loadDate,
-          prefix + 'Received end after load.');
-      } else {
-        errorDates.sort();
-        const firstErrorDate = errorDates[0];
-        const lastErrorDate = errorDates[errorDates.length - 1];
-        assert.ok(loadStartDate <= firstErrorDate,
-          prefix + 'Received start before first error.');
-        assert.ok(loadEndDate >= lastErrorDate,
-          prefix + 'Received end after last error.');
-      }
-    };
-    loader.onerror = function (/*event*/) {
-      errorDates.push(new Date());
-    };
-    loader.onabort = function (/*event*/) {
-      abortDates.push(new Date());
-    };
-    // launch load
-    loader.load(data);
+        if (nDataOk !== 0) {
+          // check progress sequence
+          progressDates.sort();
+          firstProgressDate = progressDates[0];
+          lastProgressDate = progressDates[progressDates.length - 1];
+          assert.ok(loadStartDate <= firstProgressDate,
+            prefix + 'Received start before first progress.');
+          assert.ok(loadEndDate >= lastProgressDate,
+            prefix + 'Received end after last progress.');
+
+          // check load item sequence
+          loadItemDates.sort();
+          firstLoadItemDate = loadItemDates[0];
+          lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
+          assert.ok(loadStartDate <= firstLoadItemDate,
+            prefix + 'Received start before first load item.');
+          assert.ok(loadEndDate >= lastLoadItemDate,
+            prefix + 'Received end after last load item.');
+        }
+
+        // check load or error event sequence
+        if (nDataError === 0) {
+          // load is sent if no error happened
+          const loadDate = loadDates[0];
+          assert.ok(loadStartDate <= loadDate,
+            prefix + 'Received start before load.');
+          assert.ok(loadDate >= lastProgressDate,
+            prefix + 'Received load after last progress.');
+          assert.ok(loadDate >= lastLoadItemDate,
+            prefix + 'Received load after last load item.');
+          assert.ok(loadEndDate >= loadDate,
+            prefix + 'Received end after load.');
+        } else {
+          errorDates.sort();
+          const firstErrorDate = errorDates[0];
+          const lastErrorDate = errorDates[errorDates.length - 1];
+          assert.ok(loadStartDate <= firstErrorDate,
+            prefix + 'Received start before first error.');
+          assert.ok(loadEndDate >= lastErrorDate,
+            prefix + 'Received end after last error.');
+        }
+        resolve(true);
+      };
+      loader.onerror = function (/*event*/) {
+        errorDates.push(new Date());
+      };
+      loader.onabort = function (/*event*/) {
+        abortDates.push(new Date());
+      };
+
+      // launch load
+      loader.load(data);
+    });
   }
 
   /**
