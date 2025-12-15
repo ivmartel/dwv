@@ -23,6 +23,7 @@ describe('io', () => {
    * @param {Array} data The data to load as a string array.
    * @param {number} nData The theoretical number of data.
    * @param {number} nDataOk The theoretical number of data with no error.
+   * @returns {Promise} The load promise.
    */
   async function checkLoad(id, data, nData, nDataOk) {
 
