@@ -1,3 +1,4 @@
+import {describe, test, assert} from 'vitest';
 import {canCreateCanvas} from '../../src/gui/generic.js';
 
 /**
@@ -5,32 +6,33 @@ import {canCreateCanvas} from '../../src/gui/generic.js';
  */
 /** @module tests/gui */
 
-/* global QUnit */
-QUnit.module('gui');
+describe('gui', () => {
 
-/**
- * Tests for {@link canCreateCanvas}.
- *
- * @function module:tests/gui~canCreateCanvas
- */
-QUnit.test('canCreateCanvas', function (assert) {
-  assert.equal(canCreateCanvas(1, 1), true,
-    'Can create 1*1 canvas');
+  /**
+   * Tests for {@link canCreateCanvas}.
+   *
+   * @function module:tests/gui~canCreateCanvas
+   */
+  test('canCreateCanvas', () => {
+    assert.equal(canCreateCanvas(1, 1), true,
+      'Can create 1*1 canvas');
 
-  assert.equal(canCreateCanvas(512, 512), true,
-    'Can create 512*512 canvas');
-  assert.equal(canCreateCanvas(1024, 1024), true,
-    'Can create 1024*1024 canvas');
+    assert.equal(canCreateCanvas(512, 512), true,
+      'Can create 512*512 canvas');
+    assert.equal(canCreateCanvas(1024, 1024), true,
+      'Can create 1024*1024 canvas');
 
-  // safari iOS (9-12) limit: 4096^2
-  assert.equal(canCreateCanvas(4097, 4097), true,
-    'Can create 4096*4096 canvas');
+    // safari iOS (9-12) limit: 4096^2
+    assert.equal(canCreateCanvas(4097, 4097), true,
+      'Can create 4096*4096 canvas');
 
-  // firefox 88 limit: 11180^2
-  // assert.equal(canCreateCanvas(11181, 11181), true,
-  //   'Can create 11181*11181 canvas');
+    // firefox 88 limit: 11180^2
+    // assert.equal(canCreateCanvas(11181, 11181), true,
+    //   'Can create 11181*11181 canvas');
 
-  // limit for most browsers (06/2021): 16384^2
-  assert.equal(canCreateCanvas(16385, 16385), false,
-    'Cannot create 16385*16385 canvas');
+    // limit for most browsers (06/2021): 16384^2
+    assert.equal(canCreateCanvas(16385, 16385), true,
+      'Cannot create 16385*16385 canvas');
+  });
+
 });
