@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, expect} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {b64urlToArrayBuffer} from '../dicom/utils.js';
 import {
@@ -56,6 +56,25 @@ describe('annotation', () => {
       group = fac.create(tags);
     }
     return group;
+  }
+
+  /**
+   * Get a dwv v0.34 annotation group from a buffer string.
+   *
+   * @param {string} bufferStr The buffer string.
+   * @returns {AnnotationGroup} The annotation group.
+   */
+  function get034AnnotationGroup(bufferStr) {
+    // console warn spy
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // run test
+    const res = getAnnotationGroup(bufferStr);
+    // expect warn call
+    expect(consoleSpy).toHaveBeenCalledWith('DWV v0.34 annotation');
+    // reset spy
+    consoleSpy.mockReset();
+
+    return res;
   }
 
   /**
@@ -309,7 +328,7 @@ describe('annotation', () => {
    * @function module:tests/annotation~read-dwv034-arrow
    */
   test('Read dwv034 annotation arrow', () => {
-    const annotationGroup = getAnnotationGroup(dwv034Arrow);
+    const annotationGroup = get034AnnotationGroup(dwv034Arrow);
     checkGroupCommonProperties(annotationGroup, 'arrow');
     checkArrowGroup(annotationGroup);
   });
@@ -320,7 +339,7 @@ describe('annotation', () => {
    * @function module:tests/annotation~read-dwv034-circle
    */
   test('Read dwv034 annotation circle', () => {
-    const annotationGroup = getAnnotationGroup(dwv034Circle);
+    const annotationGroup = get034AnnotationGroup(dwv034Circle);
     checkGroupCommonProperties(annotationGroup, 'circle');
     checkCircleGroup(annotationGroup);
   });
@@ -331,7 +350,7 @@ describe('annotation', () => {
    * @function module:tests/annotation~read-dwv034-ellipse
    */
   test('Read dwv034 annotation ellipse', () => {
-    const annotationGroup = getAnnotationGroup(dwv034Ellipse);
+    const annotationGroup = get034AnnotationGroup(dwv034Ellipse);
     checkGroupCommonProperties(annotationGroup, 'ellipse');
     checkEllipseGroup(annotationGroup);
   });
@@ -342,7 +361,7 @@ describe('annotation', () => {
    * @function module:tests/annotation~read-dwv034-protractor
    */
   test('Read dwv034 annotation protractor', () => {
-    const annotationGroup = getAnnotationGroup(dwv034Protractor);
+    const annotationGroup = get034AnnotationGroup(dwv034Protractor);
     checkGroupCommonProperties(annotationGroup, 'protractor');
     checkProtractorGroup(annotationGroup);
   });
@@ -353,7 +372,7 @@ describe('annotation', () => {
    * @function module:tests/annotation~read-dwv034-rectangle
    */
   test('Read dwv034 annotation rectangle', () => {
-    const annotationGroup = getAnnotationGroup(dwv034Rectangle);
+    const annotationGroup = get034AnnotationGroup(dwv034Rectangle);
     checkGroupCommonProperties(annotationGroup, 'rectangle');
     checkRectangleGroup(annotationGroup);
   });
@@ -364,7 +383,7 @@ describe('annotation', () => {
    * @function module:tests/annotation~read-dwv034-roi
    */
   test('Read dwv034 annotation roi', () => {
-    const annotationGroup = getAnnotationGroup(dwv034Roi);
+    const annotationGroup = get034AnnotationGroup(dwv034Roi);
     checkGroupCommonProperties(annotationGroup, 'roi');
     checkRoiGroup(annotationGroup);
   });
@@ -375,7 +394,7 @@ describe('annotation', () => {
    * @function module:tests/annotation~read-dwv034-ruler
    */
   test('Read dwv034 annotation ruler', () => {
-    const annotationGroup = getAnnotationGroup(dwv034Ruler);
+    const annotationGroup = get034AnnotationGroup(dwv034Ruler);
     checkGroupCommonProperties(annotationGroup, 'ruler');
     checkRulerGroup(annotationGroup);
   });

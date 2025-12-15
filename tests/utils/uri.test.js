@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, expect} from 'vitest';
 import {
   getUrlFromUri,
   splitUri,
@@ -408,8 +408,16 @@ describe('utils', () => {
       // main
       doc.documentElement.appendChild(patient);
 
+      // console warn spy
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       // decode (only reads first series)
       const res = parseWeasisXMLManifest(doc, 2);
+      // expect warn call
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'More than one series, loading first one.');
+      // reset spy
+      consoleSpy.mockReset();
+
       // theoretical test decode result
       const middle = '?requestType=WADO&contentType=application/dicom&';
       const theoLinkRoot = wadoUrl + middle + '&studyUID=' + studyInstanceUID +

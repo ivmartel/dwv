@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {
   DicomWriter,
@@ -485,7 +485,11 @@ describe('dicom', () => {
   function testWriteReadDataFromConfig(config, writerRules, outConfig) {
     // add private tags to dict if present
     let useUnVrForPrivateSq = false;
+    let consoleSpy;
     if (typeof config.privateDictionary !== 'undefined') {
+      // console warn spy
+      consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
       const keys = Object.keys(config.privateDictionary);
       for (let i = 0; i < keys.length; ++i) {
         const group = keys[i];
@@ -538,6 +542,13 @@ describe('dicom', () => {
 
     // compare contents
     compare(outConfig.tags, elements, config.name, assert);
+
+    // reset spy
+    if (typeof consoleSpy !== 'undefined') {
+      // TODO could try to check message...
+      // reset
+      consoleSpy.mockReset();
+    }
   }
 
   /**

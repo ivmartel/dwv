@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, expect} from 'vitest';
 import {MemoryLoader} from '../../src/io/memoryLoader.js';
 import {b64urlToArrayBuffer} from '../dicom/utils.js';
 
@@ -199,7 +199,19 @@ describe('io', () => {
       ];
       const nData3 = data3.length;
       const nDataOk3 = 1;
+
+      // console warn spy
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // run test
       await checkLoad('3', data3, nData3, nDataOk3);
+      // expect warn call
+      expect(consoleSpy).toHaveBeenNthCalledWith(
+        1, 'Invalid DICM prefix (DIMC), trying to guess tansfer syntax.');
+      const vr = String.fromCharCode(0, 0);
+      expect(consoleSpy).toHaveBeenNthCalledWith(
+        2, 'Unknown VR: ' + vr + ' (for tag 00000000), treating as \'UN\'');
+      // reset spy
+      consoleSpy.mockReset();
     }
   );
 
@@ -271,7 +283,16 @@ describe('io', () => {
       ];
       const nData2 = 2;
       const nDataOk2 = 1;
+
+      // console warn spy
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // run test
       await checkLoad('2', data2, nData2, nDataOk2);
+      // expect warn call
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Invalid DICM prefix (DIMC), trying to guess tansfer syntax.');
+      // reset spy
+      consoleSpy.mockReset();
     }
   );
 
