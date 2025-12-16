@@ -118,71 +118,91 @@ export function getDateTime(element) {
  * Extract date values from a Date object.
  *
  * @param {Date} date The input date.
- * @returns {{year, monthIndex, day}} A 'date' object.
+ * @returns {{year, monthIndex, day}|undefined} A 'date' object.
  */
 export function dateToDateObj(date) {
-  return {
-    year: date.getFullYear().toString(),
-    monthIndex: padZeroTwoDigit((date.getMonth() + 1).toString()),
-    day: padZeroTwoDigit(date.getDate().toString())
-  };
+  let res;
+  if (typeof date !== 'undefined') {
+    res = {
+      year: date.getFullYear().toString(),
+      monthIndex: padZeroTwoDigit((date.getMonth() + 1).toString()),
+      day: padZeroTwoDigit(date.getDate().toString())
+    };
+  }
+  return res;
 }
 
 /**
  * Extract time values from a Date object.
  *
  * @param {Date} date The input date.
- * @returns {{hours, minutes, seconds}} A 'time' object.
+ * @returns {{hours, minutes, seconds}|undefined} A 'time' object.
  */
 export function dateToTimeObj(date) {
-  return {
-    hours: padZeroTwoDigit(date.getHours().toString()),
-    minutes: padZeroTwoDigit(date.getMinutes().toString()),
-    seconds: padZeroTwoDigit(date.getSeconds().toString())
-  };
+  let res;
+  if (typeof date !== 'undefined') {
+    res = {
+      hours: padZeroTwoDigit(date.getHours().toString()),
+      minutes: padZeroTwoDigit(date.getMinutes().toString()),
+      seconds: padZeroTwoDigit(date.getSeconds().toString())
+    };
+  }
+  return res;
 }
 
 /**
- * Get a DICOM formated date string.
+ * Get a DICOM formated date string 'YYYYMMDD'.
  *
  * @param {{year, monthIndex, day}} dateObj The date to format.
- * @returns {string} The formated date.
+ * @returns {string|undefined} The formated date.
  */
 export function getDicomDate(dateObj) {
-  // YYYYMMDD
-  return (
-    dateObj.year +
-    dateObj.monthIndex +
-    dateObj.day
-  );
+  let res;
+  if (typeof dateObj !== 'undefined') {
+    // YYYYMMDD
+    res = dateObj.year +
+      dateObj.monthIndex +
+      dateObj.day
+    ;
+  }
+  return res;
 }
 
 /**
- * Get a DICOM formated time string.
+ * Get a DICOM formated time string as 'HHMMSS'.
  *
  * @param {{hours, minutes, seconds}} dateObj The date to format.
- * @returns {string} The formated time.
+ * @returns {string|undefined} The formated time.
  */
 export function getDicomTime(dateObj) {
-  // HHMMSS
-  return (
-    dateObj.hours +
-    dateObj.minutes +
-    dateObj.seconds
-  );
+  let res;
+  if (typeof dateObj !== 'undefined') {
+    // HHMMSS
+    res = dateObj.hours +
+      dateObj.minutes +
+      dateObj.seconds
+    ;
+  }
+  return res;
 }
 
 /**
  * Get a DICOM formated datetime string.
  *
  * @param {{date, time}} datetime The datetime to format.
- * @returns {string} The formated datetime.
+ * @returns {string|undefined} The formated datetime.
  */
 export function getDicomDateTime(datetime) {
-  // HHMMSS
-  let res = getDicomDate(datetime.date);
-  if (typeof datetime.time !== 'undefined') {
-    res += getDicomTime(datetime.time);
+  let res;
+  if (typeof datetime !== 'undefined') {
+    if (typeof datetime.date !== 'undefined') {
+      res = getDicomDate(datetime.date);
+    }
+    if (typeof res !== 'undefined' &&
+      typeof datetime.time !== 'undefined'
+    ) {
+      res += getDicomTime(datetime.time);
+    }
   }
   return res;
 }
