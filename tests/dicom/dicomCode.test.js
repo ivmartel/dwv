@@ -4,14 +4,16 @@ import {
   DicomCode,
   isEqualCode,
   getCode,
-  getDicomCodeItem
+  getDicomCodeItem,
+  getSegmentationCode,
+  getConceptNameCode,
+  getMeasurementUnitsCode
 } from '../../src/dicom/dicomCode.js';
 import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
 
 /**
  * Tests for the 'dicom/dicomCode.js' file.
  */
-/** @module tests/dicom */
 
 describe('dicom', () => {
 
@@ -59,6 +61,8 @@ describe('dicom', () => {
       'Test #00 value');
     assert.equal(code00.schemeDesignator, undefined,
       'Test #00 scheme designator');
+    assert.equal(code00.toString(), '(undefined, undefined, \'code0\')',
+      'Test #00 toString');
 
     // example codes
     // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.10.html
@@ -89,6 +93,13 @@ describe('dicom', () => {
       urnValue: 'urn:lex:us:federal:codified.regulation:2013-04-25;45CFR164'
     };
     testCode(code03, assert, 'Test #03 (URN)');
+
+    const code04 = new DicomCode('a');
+    code04.value = '0';
+    code04.schemeDesignator = 'TEST';
+    const str04 = '(0, TEST, \'a\')';
+    assert.equal(code04.toString(), str04,
+      'Test #04 toString');
   });
 
   /**
@@ -106,7 +117,55 @@ describe('dicom', () => {
         }
       }
     }
-    assert.equal(count, 0, 'DCmCodes duplicate');
+    assert.equal(count, 0, 'Check DcmCodes duplicate');
+  });
+
+  /**
+   * Tests for {@link DicomCode} getSegmentationCode.
+   *
+   * @function module:tests/dicom~getSegmentationCode
+   */
+  test('DICOM code getSegmentationCode', () => {
+    const code0 = getSegmentationCode();
+    const theoCode0 = new DicomCode('Segmentation');
+    theoCode0.value = '113076';
+    theoCode0.schemeDesignator = 'DCM';
+    assert.ok(isEqualCode(code0, theoCode0), 'getSegmentationCode #0');
+  });
+
+  /**
+   * Tests for {@link DicomCode} getConceptNameCode.
+   *
+   * @function module:tests/dicom~getConceptNameCode
+   */
+  test('DICOM code getConceptNameCode', () => {
+    const code0 = getConceptNameCode('test');
+    assert.equal(code0, undefined, 'getConceptNameCode #0');
+
+    const code1 = getConceptNameCode('a');
+    const theoCode1 = new DicomCode('a');
+    theoCode1.value = '103339001';
+    theoCode1.schemeDesignator = 'SCT';
+    assert.ok(isEqualCode(code1, theoCode1), 'getConceptNameCode #1');
+  });
+
+  /**
+   * Tests for {@link DicomCode} getMeasurementUnitsCode.
+   *
+   * @function module:tests/dicom~getMeasurementUnitsCode
+   */
+  test('DICOM code getMeasurementUnitsCode', () => {
+    const code0 = getMeasurementUnitsCode('test');
+    const theoCode0 = new DicomCode('No units');
+    theoCode0.value = '1';
+    theoCode0.schemeDesignator = 'UCUM';
+    assert.ok(isEqualCode(code0, theoCode0), 'getMeasurementUnitsCode #0');
+
+    const code1 = getMeasurementUnitsCode('unit.mm');
+    const theoCode1 = new DicomCode('unit.mm');
+    theoCode1.value = 'mm';
+    theoCode1.schemeDesignator = 'UCUM';
+    assert.ok(isEqualCode(code1, theoCode1), 'getMeasurementUnitsCode #1');
   });
 
 });

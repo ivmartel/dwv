@@ -2,7 +2,12 @@ import {describe, test, assert} from 'vitest';
 import {
   getDate,
   getTime,
-  getDateTime
+  getDateTime,
+  dateToDateObj,
+  dateToTimeObj,
+  getDicomDate,
+  getDicomTime,
+  getDicomDateTime
 } from '../../src/dicom/dicomDate.js';
 
 /**
@@ -122,6 +127,116 @@ describe('dicom', () => {
       time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12}
     };
     assert.deepEqual(dt17, dtTheo17, 'test time #17');
+  });
+
+  /**
+   * Tests for dateToDateObj.
+   *
+   * @function module:tests/dicom~date-to-date-obj
+   */
+  test('dateToDateObj', () => {
+    assert.equal(dateToDateObj(), undefined, 'dateToDateObj #00');
+
+    const dateObj0 = {
+      year: '2025',
+      monthIndex: '04',
+      day: '01'
+    };
+    const date0 = new Date(
+      dateObj0.year,
+      dateObj0.monthIndex - 1,
+      dateObj0.day);
+    assert.deepEqual(dateToDateObj(date0), dateObj0, 'dateToDateObj #01');
+  });
+
+  /**
+   * Tests for dateToTimeObj.
+   *
+   * @function module:tests/dicom~date-to-time-obj
+   */
+  test('dateToTimeObj', () => {
+    assert.equal(dateToTimeObj(), undefined, 'dateToTimeObj #00');
+
+    const dateObj0 = {
+      year: '2025',
+      monthIndex: '04',
+      day: '01'
+    };
+    const timeObj0 = {
+      hours: '12',
+      minutes: '05',
+      seconds: '30'
+    };
+    const date0 = new Date(
+      dateObj0.year,
+      dateObj0.monthIndex - 1,
+      dateObj0.day,
+      timeObj0.hours,
+      timeObj0.minutes,
+      timeObj0.seconds
+    );
+    assert.deepEqual(dateToTimeObj(date0), timeObj0, 'dateToTimeObj #01');
+  });
+
+  /**
+   * Tests for getDicomDate.
+   *
+   * @function module:tests/dicom~get-dicom-date
+   */
+  test('getDicomDate', () => {
+    assert.equal(getDicomDate(), undefined, 'getDicomDate #00');
+
+    const dateObj0 = {
+      year: '2025',
+      monthIndex: '04',
+      day: '01'
+    };
+    assert.equal(getDicomDate(dateObj0), '20250401', 'getDicomDate #01');
+  });
+
+  /**
+   * Tests for getDicomTime.
+   *
+   * @function module:tests/dicom~get-dicom-time
+   */
+  test('getDicomTime', () => {
+    assert.equal(getDicomTime(), undefined, 'getDicomTime #00');
+
+    const timeObj0 = {
+      hours: '12',
+      minutes: '05',
+      seconds: '30'
+    };
+    assert.equal(getDicomTime(timeObj0), '120530', 'getDicomTime #01');
+  });
+
+  /**
+   * Tests for getDicomDateTime.
+   *
+   * @function module:tests/dicom~get-dicom-date-time
+   */
+  test('getDicomDateTime', () => {
+    assert.equal(getDicomDateTime(), undefined, 'getDicomDateTime #00');
+
+    const dateObj0 = {
+      year: '2025',
+      monthIndex: '04',
+      day: '01'
+    };
+    const dateTime0 = {
+      date: dateObj0
+    };
+    assert.equal(getDicomDateTime(dateTime0), '20250401',
+      'getDicomDateTime #01');
+
+    const timeObj0 = {
+      hours: '12',
+      minutes: '05',
+      seconds: '30'
+    };
+    dateTime0.time = timeObj0;
+    assert.equal(getDicomDateTime(dateTime0), '20250401120530',
+      'getDicomDateTime #02');
   });
 
 });
