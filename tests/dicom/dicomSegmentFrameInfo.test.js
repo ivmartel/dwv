@@ -17,10 +17,9 @@ describe('dicom', () => {
    * SegmentFrameInfo test: translate to element and back.
    *
    * @param {object} frameInfo The frameInfo as an object.
-   * @param {object} assert The QUnit assert.
    * @param {string} testName The test name.
    */
-  function testSegmentFrameInfo(frameInfo, assert, testName) {
+  function testSegmentFrameInfo(frameInfo, testName) {
     // frame info -> simple dicom element
     // (treat simple code as code)
     const frameInfoSimpleElements = getDicomSegmentFrameInfoItem(frameInfo);
@@ -91,7 +90,7 @@ describe('dicom', () => {
       derivationImages: derivationImages0,
       refSegmentNumber: refSegmentNumber0
     };
-    testSegmentFrameInfo(frameInfo01, assert, 'Test #01');
+    testSegmentFrameInfo(frameInfo01, 'Test #01');
   });
 
 });

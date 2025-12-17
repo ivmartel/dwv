@@ -181,12 +181,11 @@ describe('image', () => {
   /**
    * Check iter.
    *
-   * @param {object} assert The qunit assert.
    * @param {Function} getIter Function to get the iter at a given position.
    * @param {Array} theoValues Theoretical values.
    * @param {string} name String to identify test.
    */
-  function checkIterator(assert, getIter, theoValues, name) {
+  function checkIterator(getIter, theoValues, name) {
     for (let i = 0; i < theoValues.length; ++i) {
       const res = runIterator(getIter(i));
       const theo = theoValues[i];
@@ -259,14 +258,10 @@ describe('image', () => {
       };
     };
 
-    checkIterator(assert,
-      getAxIter(false, false), testData0.valuesAx, 'axial');
-    checkIterator(assert,
-      getAxIter(true, false), testData0.valuesAxR1, 'axialR1');
-    checkIterator(assert,
-      getAxIter(false, true), testData0.valuesAxR2, 'axialR2');
-    checkIterator(assert,
-      getAxIter(true, true), testData0.valuesAxR1R2, 'axialR1R2');
+    checkIterator(getAxIter(false, false), testData0.valuesAx, 'axial');
+    checkIterator(getAxIter(true, false), testData0.valuesAxR1, 'axialR1');
+    checkIterator(getAxIter(false, true), testData0.valuesAxR2, 'axialR2');
+    checkIterator(getAxIter(true, true), testData0.valuesAxR1R2, 'axialR1R2');
 
     // axial: yxz
     const getAx2Iter = function (reverse1, reverse2) {
@@ -280,14 +275,11 @@ describe('image', () => {
       };
     };
 
-    checkIterator(assert,
-      getAx2Iter(false, false), testData0.valuesAx2, 'axial2');
-    checkIterator(assert,
-      getAx2Iter(true, false), testData0.valuesAx2R1, 'axial2R1');
-    checkIterator(assert,
-      getAx2Iter(false, true), testData0.valuesAx2R2, 'axial2R2');
-    checkIterator(assert,
-      getAx2Iter(true, true), testData0.valuesAx2R1R2, 'axial2R1R2');
+    checkIterator(getAx2Iter(false, false), testData0.valuesAx2, 'axial2');
+    checkIterator(getAx2Iter(true, false), testData0.valuesAx2R1, 'axial2R1');
+    checkIterator(getAx2Iter(false, true), testData0.valuesAx2R2, 'axial2R2');
+    checkIterator(getAx2Iter(true, true), testData0.valuesAx2R1R2,
+      'axial2R1R2');
   });
 
   /**
@@ -318,14 +310,11 @@ describe('image', () => {
       };
     };
 
-    checkIterator(assert,
-      getCoroIter(false, false), testData0.valuesCo, 'coronal');
-    checkIterator(assert,
-      getCoroIter(true, false), testData0.valuesCoR1, 'coronalR1');
-    checkIterator(assert,
-      getCoroIter(false, true), testData0.valuesCoR2, 'coronalR2');
-    checkIterator(assert,
-      getCoroIter(true, true), testData0.valuesCoR1R2, 'coronalR1R2');
+    checkIterator(getCoroIter(false, false), testData0.valuesCo, 'coronal');
+    checkIterator(getCoroIter(true, false), testData0.valuesCoR1, 'coronalR1');
+    checkIterator(getCoroIter(false, true), testData0.valuesCoR2, 'coronalR2');
+    checkIterator(getCoroIter(true, true), testData0.valuesCoR1R2,
+      'coronalR1R2');
 
     // coronal: zxy
     const getCoro2Iter = function (reverse1, reverse2) {
@@ -377,14 +366,11 @@ describe('image', () => {
       };
     };
 
-    checkIterator(assert,
-      getSagIter(false, false), testData0.valuesSa, 'sagittal');
-    checkIterator(assert,
-      getSagIter(true, false), testData0.valuesSaR1, 'sagittalR1');
-    checkIterator(assert,
-      getSagIter(false, true), testData0.valuesSaR2, 'sagittalR2');
-    checkIterator(assert,
-      getSagIter(true, true), testData0.valuesSaR1R2, 'sagittalR1R2');
+    checkIterator(getSagIter(false, false), testData0.valuesSa, 'sagittal');
+    checkIterator(getSagIter(true, false), testData0.valuesSaR1, 'sagittalR1');
+    checkIterator(getSagIter(false, true), testData0.valuesSaR2, 'sagittalR2');
+    checkIterator(getSagIter(true, true), testData0.valuesSaR1R2,
+      'sagittalR1R2');
 
     // sagittal: zyx
     const getSag2Iter = function (reverse1, reverse2) {
@@ -398,14 +384,13 @@ describe('image', () => {
       };
     };
 
-    checkIterator(assert,
-      getSag2Iter(false, false), testData0.valuesSa2, 'sagittal2');
-    checkIterator(assert,
-      getSag2Iter(true, false), testData0.valuesSa2R1, 'sagittal2R1');
-    checkIterator(assert,
-      getSag2Iter(false, true), testData0.valuesSa2R2, 'sagittal2R2');
-    checkIterator(assert,
-      getSag2Iter(true, true), testData0.valuesSa2R1R2, 'sagittal2R1R2');
+    checkIterator(getSag2Iter(false, false), testData0.valuesSa2, 'sagittal2');
+    checkIterator(getSag2Iter(true, false), testData0.valuesSa2R1,
+      'sagittal2R1');
+    checkIterator(getSag2Iter(false, true), testData0.valuesSa2R2,
+      'sagittal2R2');
+    checkIterator(getSag2Iter(true, true), testData0.valuesSa2R1R2,
+      'sagittal2R1R2');
   });
 
   /**

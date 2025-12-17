@@ -40,10 +40,9 @@ describe('dicom', () => {
    * MaskSegment test: translate to element and back.
    *
    * @param {object} segment The segment as an object.
-   * @param {object} assert The QUnit assert.
    * @param {string} testName The test name.
    */
-  function testSegment(segment, assert, testName) {
+  function testSegment(segment, testName) {
     // segment -> simple dicom element
     // (treat simple code as code)
     const segmentSimpleElements = getDicomSegmentItem(segment);
@@ -112,7 +111,7 @@ describe('dicom', () => {
       trackingId: '01234',
       trackingUid: '01234'
     };
-    testSegment(segment01, assert, 'Test #01');
+    testSegment(segment01, 'Test #01');
   });
 
 });
