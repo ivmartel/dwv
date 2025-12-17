@@ -328,14 +328,14 @@ describe('image', () => {
       };
     };
 
-    checkIterator(assert,
-      getCoro2Iter(false, false), testData0.valuesCo2, 'coronal2');
-    checkIterator(assert,
-      getCoro2Iter(true, false), testData0.valuesCo2R1, 'coronal2R1');
-    checkIterator(assert,
-      getCoro2Iter(false, true), testData0.valuesCo2R2, 'coronal2R2');
-    checkIterator(assert,
-      getCoro2Iter(true, true), testData0.valuesCo2R1R2, 'coronal2R1R2');
+    checkIterator(getCoro2Iter(false, false), testData0.valuesCo2,
+      'coronal2');
+    checkIterator(getCoro2Iter(true, false), testData0.valuesCo2R1,
+      'coronal2R1');
+    checkIterator(getCoro2Iter(false, true), testData0.valuesCo2R2,
+      'coronal2R2');
+    checkIterator(getCoro2Iter(true, true), testData0.valuesCo2R1R2,
+      'coronal2R1R2');
   });
 
   /**
@@ -510,8 +510,7 @@ describe('image', () => {
 
     // axial: xyz
     viewOrientation = getIdentityMat33();
-    checkIterator(assert,
-      getAxIter(viewOrientation), testData0.valuesAx, 'axial');
+    checkIterator(getAxIter(viewOrientation), testData0.valuesAx, 'axial');
     // axial: yxz
     /* eslint-disable @stylistic/js/array-element-newline */
     viewOrientation = new Matrix33([
@@ -520,8 +519,7 @@ describe('image', () => {
       0, 0, 1
     ]);
     /* eslint-enable @stylistic/js/array-element-newline */
-    checkIterator(assert,
-      getAxIter(viewOrientation), testData0.valuesAx2, 'axial2');
+    checkIterator(getAxIter(viewOrientation), testData0.valuesAx2, 'axial2');
 
     // coronal
     const getCoroIter = function (orientation) {
@@ -534,8 +532,7 @@ describe('image', () => {
 
     // coronal: xzy
     viewOrientation = getMatrixFromName('coronal');
-    checkIterator(assert,
-      getCoroIter(viewOrientation), testData0.valuesCo, 'coronal');
+    checkIterator(getCoroIter(viewOrientation), testData0.valuesCo, 'coronal');
     // coronal: zxy
     /* eslint-disable @stylistic/js/array-element-newline */
     viewOrientation = new Matrix33([
@@ -544,8 +541,8 @@ describe('image', () => {
       1, 0, 0
     ]);
     /* eslint-enable @stylistic/js/array-element-newline */
-    checkIterator(assert,
-      getCoroIter(viewOrientation), testData0.valuesCo2, 'coronal2');
+    checkIterator(getCoroIter(viewOrientation), testData0.valuesCo2,
+      'coronal2');
 
     // sagittal
     const getSagIter = function (orientation) {
@@ -558,8 +555,7 @@ describe('image', () => {
 
     // sagittal: yzx
     viewOrientation = getMatrixFromName('sagittal');
-    checkIterator(assert,
-      getSagIter(viewOrientation), testData0.valuesSa, 'sagittal');
+    checkIterator(getSagIter(viewOrientation), testData0.valuesSa, 'sagittal');
     // sagittal: zyx
     /* eslint-disable @stylistic/js/array-element-newline */
     viewOrientation = new Matrix33([
@@ -568,8 +564,8 @@ describe('image', () => {
       1, 0, 0
     ]);
     /* eslint-enable @stylistic/js/array-element-newline */
-    checkIterator(assert,
-      getSagIter(viewOrientation), testData0.valuesSa2, 'sagittal2');
+    checkIterator(getSagIter(viewOrientation), testData0.valuesSa2,
+      'sagittal2');
   });
 
   /**
