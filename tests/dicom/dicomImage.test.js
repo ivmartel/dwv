@@ -1,8 +1,20 @@
 import {describe, test, expect, vi} from 'vitest';
 import {
+  getImage2DSize,
   getPixelSpacing,
-  isMonochrome
+  getPixelAspectRatio,
+  getSpacingFromMeasure,
+  getTagPixelUnit,
+  getOrientationMatrix,
+  getDicomMeasureItem,
+  getDicomPlaneOrientationItem,
+  getPhotometricInterpretation,
+  isMonochrome,
+  isSecondatyCapture,
+  getReferencedSeriesUID
 } from '../../src/dicom/dicomImage.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Matrix33} from '../../src/math/matrix.js';
 
 /**
  * Tests for the 'dicom/dicomImage.js' file.
@@ -154,6 +166,310 @@ describe('dicom', () => {
     expect(isMonochrome('abcd')).not.toBeTruthy();
     expect(isMonochrome('RGB')).not.toBeTruthy();
     expect(isMonochrome('PALETTE COLOR')).not.toBeTruthy();
+  });
+
+  /**
+   * Tests for getImage2DSize.
+   *
+   * @function module:tests/dicom~getImage2DSize
+   */
+  test('getImage2DSize', () => {
+    const TagKeys = {
+      Rows: '00280010',
+      Columns: '00280011'
+    };
+
+    // no rows
+    const elements00 = {};
+    elements00[TagKeys.Columns] = {value: [512]};
+    expect(getImage2DSize(elements00)).toBeUndefined();
+
+    // no columns
+    const elements01 = {};
+    elements01[TagKeys.Rows] = {value: [512]};
+    expect(getImage2DSize(elements01)).toBeUndefined();
+
+    // both present
+    const elements02 = {};
+    elements02[TagKeys.Rows] = {value: [512]};
+    elements02[TagKeys.Columns] = {value: [256]};
+    expect(getImage2DSize(elements02)).toEqual([256, 512]);
+
+    // empty object
+    expect(getImage2DSize({})).toBeUndefined();
+  });
+
+  /**
+   * Tests for getPixelAspectRatio.
+   *
+   * @function module:tests/dicom~getPixelAspectRatio
+   */
+  test('getPixelAspectRatio', () => {
+    const TagKeys = {
+      PixelAspectRatio: '00280034'
+    };
+
+    // single value (should be undefined)
+    const elements00 = {};
+    elements00[TagKeys.PixelAspectRatio] = {value: [1.0]};
+    expect(getPixelAspectRatio(elements00)).toBeUndefined();
+
+    // two values
+    const elements01 = {};
+    elements01[TagKeys.PixelAspectRatio] = {value: [1.0, 2.0]};
+    expect(getPixelAspectRatio(elements01)).toEqual([2.0, 1.0]);
+
+    // no pixel aspect ratio
+    expect(getPixelAspectRatio({})).toBeUndefined();
+  });
+
+  /**
+   * Tests for getSpacingFromMeasure.
+   *
+   * @function module:tests/dicom~getSpacingFromMeasure
+   */
+  test('getSpacingFromMeasure', () => {
+    const TagKeys = {
+      PixelSpacing: '00280030',
+      SpacingBetweenSlices: '00180088'
+    };
+
+    // no pixel spacing
+    const elements00 = {};
+    expect(getSpacingFromMeasure(elements00)).toBeUndefined();
+
+    // pixel spacing only
+    const elements01 = {};
+    elements01[TagKeys.PixelSpacing] = {value: [1.0, 2.0]};
+    const spacing01 = getSpacingFromMeasure(elements01);
+    expect(spacing01).toBeDefined();
+    expect(spacing01.get(0)).toBe(2.0);
+    expect(spacing01.get(1)).toBe(1.0);
+    expect(spacing01.get(2)).toBeUndefined();
+
+    // pixel spacing with spacing between slices
+    const elements02 = {};
+    elements02[TagKeys.PixelSpacing] = {value: [1.0, 2.0]};
+    elements02[TagKeys.SpacingBetweenSlices] = {value: [3.0]};
+    const spacing02 = getSpacingFromMeasure(elements02);
+    expect(spacing02).toBeDefined();
+    expect(spacing02.get(0)).toBe(2.0);
+    expect(spacing02.get(1)).toBe(1.0);
+    expect(spacing02.get(2)).toBe(3.0);
+  });
+
+  /**
+   * Tests for getTagPixelUnit.
+   *
+   * @function module:tests/dicom~getTagPixelUnit
+   */
+  test('getTagPixelUnit', () => {
+    const TagKeys = {
+      RescaleType: '00281054',
+      Units: '00541001',
+      Modality: '00080060'
+    };
+
+    // RescaleType
+    const elements00 = {};
+    elements00[TagKeys.RescaleType] = {value: ['HU']};
+    expect(getTagPixelUnit(elements00)).toBe('HU');
+
+    // Units
+    const elements01 = {};
+    elements01[TagKeys.Units] = {value: ['Bq/mL']};
+    expect(getTagPixelUnit(elements01)).toBe('Bq/mL');
+
+    // CT modality default
+    const elements02 = {};
+    elements02[TagKeys.Modality] = {value: ['CT']};
+    expect(getTagPixelUnit(elements02)).toBe('HU');
+
+    // non-CT modality
+    const elements03 = {};
+    elements03[TagKeys.Modality] = {value: ['MR']};
+    expect(getTagPixelUnit(elements03)).toBeUndefined();
+
+    // empty
+    expect(getTagPixelUnit({})).toBeUndefined();
+  });
+
+  /**
+   * Tests for getOrientationMatrix.
+   *
+   * @function module:tests/dicom~getOrientationMatrix
+   */
+  test('getOrientationMatrix', () => {
+    const TagKeys = {
+      ImageOrientationPatient: '00200037'
+    };
+
+    // no orientation
+    expect(getOrientationMatrix({})).toBeUndefined();
+
+    // identity orientation
+    const elements00 = {};
+    elements00[TagKeys.ImageOrientationPatient] = {
+      value: ['1', '0', '0', '0', '1', '0']
+    };
+    const matrix00 = getOrientationMatrix(elements00);
+    expect(matrix00).toBeDefined();
+    expect(matrix00.get(0, 0)).toBe(1);
+    expect(matrix00.get(1, 0)).toBe(0);
+    expect(matrix00.get(0, 1)).toBe(0);
+
+    // different orientation
+    const elements01 = {};
+    elements01[TagKeys.ImageOrientationPatient] = {
+      value: ['0', '1', '0', '-1', '0', '0']
+    };
+    const matrix01 = getOrientationMatrix(elements01);
+    expect(matrix01).toBeDefined();
+  });
+
+  /**
+   * Tests for getDicomMeasureItem.
+   *
+   * @function module:tests/dicom~getDicomMeasureItem
+   */
+  test('getDicomMeasureItem', () => {
+    const spacing = new Spacing([1.5, 2.5, 3.5]);
+    const item = getDicomMeasureItem(spacing);
+
+    expect(item).toBeDefined();
+    expect(item.PixelSpacing).toEqual([2.5, 1.5]);
+    expect(item.SpacingBetweenSlices).toBe(3.5);
+  });
+
+  /**
+   * Tests for getDicomPlaneOrientationItem.
+   *
+   * @function module:tests/dicom~getDicomPlaneOrientationItem
+   */
+  test('getDicomPlaneOrientationItem', () => {
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const matrix = new Matrix33([
+      1, 0, 0,
+      0, 1, 0,
+      0, 0, 1
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+    const item = getDicomPlaneOrientationItem(matrix);
+
+    expect(item).toBeDefined();
+    expect(item.ImageOrientationPatient).toEqual([1, 0, 0, 0, 1, 0]);
+  });
+
+  /**
+   * Tests for getPhotometricInterpretation.
+   *
+   * @function module:tests/dicom~getPhotometricInterpretation
+   */
+  test('getPhotometricInterpretation', () => {
+    const TagKeys = {
+      PhotometricInterpretation: '00280004',
+      TransferSyntax: '00020010',
+      SamplesPerPixel: '00280002'
+    };
+
+    // no elements
+    expect(getPhotometricInterpretation({})).toBeUndefined();
+
+    // monochrome
+    const elements00 = {};
+    elements00[TagKeys.PhotometricInterpretation] = {
+      value: ['MONOCHROME2']
+    };
+    elements00[TagKeys.TransferSyntax] = {
+      value: ['1.2.840.10008.1.2']
+    };
+    expect(getPhotometricInterpretation(elements00)).toBe('MONOCHROME2');
+
+    // RGB
+    const elements01 = {};
+    elements01[TagKeys.PhotometricInterpretation] = {
+      value: ['RGB']
+    };
+    elements01[TagKeys.TransferSyntax] = {
+      value: ['1.2.840.10008.1.2']
+    };
+    elements01[TagKeys.SamplesPerPixel] = {value: [3]};
+    expect(getPhotometricInterpretation(elements01)).toBe('RGB');
+
+    // JPEG baseline
+    const elements02 = {};
+    elements02[TagKeys.PhotometricInterpretation] = {
+      value: ['YBR_FULL_422']
+    };
+    elements02[TagKeys.TransferSyntax] = {
+      value: ['1.2.840.10008.1.2.4.50']
+    };
+    elements02[TagKeys.SamplesPerPixel] = {value: [3]};
+    expect(getPhotometricInterpretation(elements02)).toBe('RGB');
+
+    // single sample RGB -> PALETTE COLOR
+    const elements03 = {};
+    elements03[TagKeys.PhotometricInterpretation] = {
+      value: ['RGB']
+    };
+    elements03[TagKeys.TransferSyntax] = {
+      value: ['1.2.840.10008.1.2']
+    };
+    elements03[TagKeys.SamplesPerPixel] = {
+      value: [1]
+    };
+    expect(getPhotometricInterpretation(elements03)).toBe('PALETTE COLOR');
+  });
+
+  /**
+   * Tests for isSecondatyCapture.
+   *
+   * @function module:tests/dicom~isSecondatyCapture
+   */
+  test('isSecondatyCapture', () => {
+    // valid secondary capture UIDs
+    expect(isSecondatyCapture('1.2.840.10008.5.1.4.1.1.7')).toBeTruthy();
+    expect(isSecondatyCapture('1.2.840.10008.5.1.4.1.1.7.1')).toBeTruthy();
+    expect(isSecondatyCapture('1.2.840.10008.5.1.4.1.1.7.2')).toBeTruthy();
+
+    // invalid UIDs
+    expect(isSecondatyCapture('1.2.840.10008.5.1.4.1.1.2')).not.toBeTruthy();
+    expect(isSecondatyCapture('1.2.840.10008.5.1.4.1.1')).not.toBeTruthy();
+    expect(isSecondatyCapture()).not.toBeTruthy();
+    expect(isSecondatyCapture('invalid')).not.toBeTruthy();
+  });
+
+  /**
+   * Tests for getReferencedSeriesUID.
+   *
+   * @function module:tests/dicom~getReferencedSeriesUID
+   */
+  test('getReferencedSeriesUID', () => {
+    const TagKeys = {
+      ReferencedSeriesSequence: '00081115',
+      SeriesInstanceUID: '0020000E'
+    };
+
+    // no sequence
+    expect(getReferencedSeriesUID({})).toBeUndefined();
+
+    // with sequence and UID
+    const elements00 = {};
+    elements00[TagKeys.ReferencedSeriesSequence] = {
+      value: [
+        {
+          [TagKeys.SeriesInstanceUID]: {value: ['1.2.3']}
+        }
+      ]
+    };
+    expect(getReferencedSeriesUID(elements00)).toBe('1.2.3');
+
+    // with sequence but no UID
+    const elements01 = {};
+    elements01[TagKeys.ReferencedSeriesSequence] = {
+      value: [{}]
+    };
+    expect(getReferencedSeriesUID(elements01)).toBeUndefined();
   });
 
 });
