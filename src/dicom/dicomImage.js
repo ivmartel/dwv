@@ -264,7 +264,7 @@ function defaultGetTagPixelUnit(elements) {
   let unit;
   const tags = ['RescaleType', 'Units'];
   for (const tag of tags) {
-    const unit = safeGet(elements, TagKeys[tag]);
+    unit = safeGet(elements, TagKeys[tag]);
     if (typeof unit !== 'undefined') {
       break;
     }
