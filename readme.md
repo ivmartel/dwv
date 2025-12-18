@@ -17,7 +17,7 @@ If you have questions, please [open an issue](https://www.github.com/ivmartel/dw
 
 - `ìnstall`: install dependencies
 - `lint`: run code linting
-- `test`: opens a web page with test pages and karmas' results (with live reload)
+- `test`: run tests with live reload
 - `test-ci`: one shot test run
 - `build`: create release files
 - `doc`: create documentation
