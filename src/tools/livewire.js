@@ -5,7 +5,7 @@ import {
 } from '../gui/generic.js';
 import {Point2D} from '../math/point.js';
 import {Path} from '../math/path.js';
-import {Scissors} from '../math/scissors.js';
+import {Scissors} from '../image/scissors.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {logger} from '../utils/logger.js';
 import {ROI} from '../math/roi.js';
