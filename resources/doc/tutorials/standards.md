@@ -1,10 +1,12 @@
 These are the standards that should be used when coding for this project.
 
 - Code:
-  - Check with [ESlint](https://eslint.org/)
+  - Bundle with [Webpack](https://webpack.js.org/)
+  - Check API with [api-extractor](https://api-extractor.com/)
+  - Static analysis with [ESlint](https://eslint.org/)
   - Follow [google](https://google.github.io/styleguide/jsguide.html) guide,
   - Use design patterns from [dofactory](https://www.dofactory.com/javascript/design-patterns) and [addyosmani](http://www.addyosmani.com/resources/essentialjsdesignpatterns/book/)
-- Test: use of [QUnit](https://qunitjs.com/) via [Karma](https://karma-runner.github.io),
+- Test: use of [Vitest](https://vitest.dev/),
 - Documentation: use of [jsdoc](https://jsdoc.app/),
 - Versioning: [Semantic Versioning](http://semver.org/)
 - Branch: try to follow some kind of [branching model](http://nvie.com/posts/a-successful-git-branching-model/)
@@ -23,7 +25,6 @@ Others
 
 Others:
 
-- [Code Climate](https://codeclimate.com) ([status](http://status.codeclimate.com/)): code review + test coverage + lint, [dwv page](https://codeclimate.com/github/ivmartel/dwv)
 - [Fossa](https://fossa.com/): license check, [dwv page](https://app.fossa.io/projects/git%2Bgithub.com%2Fivmartel%2Fdwv)
 
 ## Generic
