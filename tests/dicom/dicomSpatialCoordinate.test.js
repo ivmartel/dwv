@@ -1,0 +1,552 @@
+import {describe, test, assert} from 'vitest';
+import {
+  SpatialCoordinate,
+  GraphicTypes,
+  getSpatialCoordinate,
+  getDicomSpatialCoordinateItem,
+  getScoordFromShape,
+  getShapeFromScoord
+} from '../../src/dicom/dicomSpatialCoordinate.js';
+import {DataElement} from '../../src/dicom/dataElement.js';
+import {Point2D} from '../../src/math/point.js';
+import {Line} from '../../src/math/line.js';
+import {Protractor} from '../../src/math/protractor.js';
+import {ROI} from '../../src/math/roi.js';
+import {Circle} from '../../src/math/circle.js';
+import {Ellipse} from '../../src/math/ellipse.js';
+import {Rectangle} from '../../src/math/rectangle.js';
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  PixelOriginInterpretation: '00480301',
+  GraphicData: '00700022',
+  GraphicType: '00700023',
+  FiducialUID: '0070031A'
+};
+
+/**
+ * Tests for the 'dicom/dicomSpatialCoordinate.js' file.
+ */
+
+describe('dicom', () => {
+
+  describe('SpatialCoordinate', () => {
+
+    test('constructor creates instance with undefined properties', () => {
+      const coord = new SpatialCoordinate();
+      assert.isUndefined(coord.graphicData);
+      assert.isUndefined(coord.graphicType);
+      assert.isUndefined(coord.pixelOriginInterpretation);
+      assert.isUndefined(coord.fiducialUID);
+    });
+
+    test('toString with graphic type and data', () => {
+      const coord = new SpatialCoordinate();
+      coord.graphicType = GraphicTypes.point;
+      coord.graphicData = ['1.0', '2.0'];
+
+      const result = coord.toString();
+      assert.equal(result, 'POINT {1.0,2.0}');
+    });
+
+    test('toString with polyline data', () => {
+      const coord = new SpatialCoordinate();
+      coord.graphicType = GraphicTypes.polyline;
+      coord.graphicData = ['1.0', '2.0', '3.0', '4.0'];
+
+      const result = coord.toString();
+      assert.equal(result, 'POLYLINE {1.0,2.0,3.0,4.0}');
+    });
+
+  });
+
+  describe('getSpatialCoordinate', () => {
+
+    test('extracts all properties', () => {
+      const deGraphicData = new DataElement('IS');
+      deGraphicData.value = ['100', '200'];
+
+      const deGraphicType = new DataElement('CS');
+      deGraphicType.value = [GraphicTypes.point];
+
+      const dePixelOrigin = new DataElement('CS');
+      dePixelOrigin.value = ['SCREEN'];
+
+      const deFiducialUID = new DataElement('UI');
+      deFiducialUID.value = ['1.2.3.4.5'];
+
+      const dataElements = {
+        [TagKeys.GraphicData]: deGraphicData,
+        [TagKeys.GraphicType]: deGraphicType,
+        [TagKeys.PixelOriginInterpretation]: dePixelOrigin,
+        [TagKeys.FiducialUID]: deFiducialUID
+      };
+
+      const result = getSpatialCoordinate(dataElements);
+
+      assert.deepEqual(result.graphicData, ['100', '200']);
+      assert.equal(result.graphicType, GraphicTypes.point);
+      assert.equal(result.pixelOriginInterpretation, 'SCREEN');
+      assert.equal(result.fiducialUID, '1.2.3.4.5');
+    });
+
+    test('extracts only graphic type and data', () => {
+      const deGraphicData = new DataElement('IS');
+      deGraphicData.value = ['100', '200', '300', '400'];
+
+      const deGraphicType = new DataElement('CS');
+      deGraphicType.value = [GraphicTypes.polyline];
+
+      const dataElements = {
+        [TagKeys.GraphicData]: deGraphicData,
+        [TagKeys.GraphicType]: deGraphicType
+      };
+
+      const result = getSpatialCoordinate(dataElements);
+
+      assert.deepEqual(result.graphicData, ['100', '200', '300', '400']);
+      assert.equal(result.graphicType, GraphicTypes.polyline);
+      assert.isUndefined(result.pixelOriginInterpretation);
+      assert.isUndefined(result.fiducialUID);
+    });
+
+    test('returns empty SpatialCoordinate when no tags present', () => {
+      const result = getSpatialCoordinate({});
+
+      assert.isUndefined(result.graphicData);
+      assert.isUndefined(result.graphicType);
+      assert.isUndefined(result.pixelOriginInterpretation);
+      assert.isUndefined(result.fiducialUID);
+    });
+
+    test('takes first value from graphic type array', () => {
+      const deGraphicType = new DataElement('CS');
+      deGraphicType.value = [GraphicTypes.point, 'EXTRA'];
+
+      const dataElements = {
+        [TagKeys.GraphicType]: deGraphicType
+      };
+
+      const result = getSpatialCoordinate(dataElements);
+
+      assert.equal(result.graphicType, GraphicTypes.point);
+    });
+
+  });
+
+  describe('getDicomSpatialCoordinateItem', () => {
+
+    test('converts all properties to item', () => {
+      const coord = new SpatialCoordinate();
+      coord.graphicData = ['100', '200'];
+      coord.graphicType = GraphicTypes.point;
+      coord.pixelOriginInterpretation = 'SCREEN';
+      coord.fiducialUID = '1.2.3.4.5';
+
+      const item = getDicomSpatialCoordinateItem(coord);
+
+      assert.deepEqual(item.GraphicData, ['100', '200']);
+      assert.equal(item.GraphicType, GraphicTypes.point);
+      assert.equal(item.PixelOriginInterpretation, 'SCREEN');
+      assert.equal(item.FiducialUID, '1.2.3.4.5');
+    });
+
+    test('omits undefined fields', () => {
+      const coord = new SpatialCoordinate();
+      coord.graphicType = GraphicTypes.circle;
+      coord.graphicData = ['50', '50', '150', '150'];
+      coord.fiducialUID = '1.2.3.4.5';
+
+      const item = getDicomSpatialCoordinateItem(coord);
+
+      assert.isUndefined(item.PixelOriginInterpretation);
+      assert.equal(item.GraphicType, GraphicTypes.circle);
+      assert.deepEqual(item.GraphicData, ['50', '50', '150', '150']);
+      assert.equal(item.FiducialUID, '1.2.3.4.5');
+    });
+
+    test('returns empty object when no properties set', () => {
+      const coord = new SpatialCoordinate();
+      const item = getDicomSpatialCoordinateItem(coord);
+
+      assert.deepEqual(item, {});
+    });
+
+  });
+
+  describe('getScoordFromShape', () => {
+
+    test('creates scoord from Point2D', () => {
+      const point = new Point2D(10, 20);
+      const scoord = getScoordFromShape(point);
+
+      assert.equal(scoord.graphicType, GraphicTypes.point);
+      assert.equal(scoord.graphicData.length, 2);
+      assert.equal(scoord.graphicData[0], '10');
+      assert.equal(scoord.graphicData[1], '20');
+    });
+
+    test('creates scoord from Line', () => {
+      const line = new Line(new Point2D(10, 20), new Point2D(30, 40));
+      const scoord = getScoordFromShape(line);
+
+      assert.equal(scoord.graphicType, GraphicTypes.polyline);
+      assert.equal(scoord.graphicData.length, 4);
+      assert.equal(scoord.graphicData[0], '10');
+      assert.equal(scoord.graphicData[1], '20');
+      assert.equal(scoord.graphicData[2], '30');
+      assert.equal(scoord.graphicData[3], '40');
+    });
+
+    test('creates scoord from Circle', () => {
+      const circle = new Circle(new Point2D(50, 50), 25);
+      const scoord = getScoordFromShape(circle);
+
+      assert.equal(scoord.graphicType, GraphicTypes.circle);
+      assert.equal(scoord.graphicData.length, 4);
+      // Center
+      assert.equal(scoord.graphicData[0], '50');
+      assert.equal(scoord.graphicData[1], '50');
+      // Perimeter point
+      assert.equal(scoord.graphicData[2], '75');
+      assert.equal(scoord.graphicData[3], '50');
+    });
+
+    test('creates scoord from Protractor', () => {
+      const protractor = new Protractor([
+        new Point2D(10, 10),
+        new Point2D(20, 20),
+        new Point2D(30, 10)
+      ]);
+      const scoord = getScoordFromShape(protractor);
+
+      assert.equal(scoord.graphicType, GraphicTypes.polyline);
+      assert.equal(scoord.graphicData.length, 6);
+      // Three points from protractor
+      assert.equal(scoord.graphicData[0], '10');
+      assert.equal(scoord.graphicData[1], '10');
+      assert.equal(scoord.graphicData[2], '20');
+      assert.equal(scoord.graphicData[3], '20');
+      assert.equal(scoord.graphicData[4], '30');
+      assert.equal(scoord.graphicData[5], '10');
+    });
+
+    test('creates scoord from ROI', () => {
+      const roi = new ROI();
+      roi.addPoint(new Point2D(10, 10));
+      roi.addPoint(new Point2D(20, 10));
+      roi.addPoint(new Point2D(20, 20));
+      roi.addPoint(new Point2D(10, 20));
+
+      const scoord = getScoordFromShape(roi);
+
+      assert.equal(scoord.graphicType, GraphicTypes.polyline);
+      // 4 points + 1 repeated first point to close = 10 coordinates
+      assert.equal(scoord.graphicData.length, 10);
+      // First point
+      assert.equal(scoord.graphicData[0], '10');
+      assert.equal(scoord.graphicData[1], '10');
+      // Last point should equal first (closed shape)
+      assert.equal(scoord.graphicData[8], '10');
+      assert.equal(scoord.graphicData[9], '10');
+    });
+
+    test('creates scoord from Ellipse', () => {
+      const ellipse = new Ellipse(new Point2D(50, 50), 30, 20);
+      const scoord = getScoordFromShape(ellipse);
+
+      assert.equal(scoord.graphicType, GraphicTypes.ellipse);
+      // 4 points (left, right, top, bottom) = 8 coordinates
+      assert.equal(scoord.graphicData.length, 8);
+      // Left point
+      assert.equal(scoord.graphicData[0], '20');
+      assert.equal(scoord.graphicData[1], '50');
+      // Right point
+      assert.equal(scoord.graphicData[2], '80');
+      assert.equal(scoord.graphicData[3], '50');
+      // Top point
+      assert.equal(scoord.graphicData[4], '50');
+      assert.equal(scoord.graphicData[5], '30');
+      // Bottom point
+      assert.equal(scoord.graphicData[6], '50');
+      assert.equal(scoord.graphicData[7], '70');
+    });
+
+    test('creates scoord from Rectangle', () => {
+      const rectangle = new Rectangle(
+        new Point2D(10, 10),
+        new Point2D(30, 30)
+      );
+      const scoord = getScoordFromShape(rectangle);
+
+      assert.equal(scoord.graphicType, GraphicTypes.polyline);
+      // 4 corner points + 1 repeated first point to close = 10 coordinates
+      assert.equal(scoord.graphicData.length, 10);
+      // First point (top-left, begin)
+      assert.equal(scoord.graphicData[0], '10');
+      assert.equal(scoord.graphicData[1], '10');
+      // Second point (bottom-left)
+      assert.equal(scoord.graphicData[2], '10');
+      assert.equal(scoord.graphicData[3], '30');
+      // Third point (bottom-right, end)
+      assert.equal(scoord.graphicData[4], '30');
+      assert.equal(scoord.graphicData[5], '30');
+      // Fourth point (top-right)
+      assert.equal(scoord.graphicData[6], '30');
+      assert.equal(scoord.graphicData[7], '10');
+      // Last point (closed, repeated first)
+      assert.equal(scoord.graphicData[8], '10');
+      assert.equal(scoord.graphicData[9], '10');
+    });
+
+  });
+
+  describe('getShapeFromScoord', () => {
+
+    test('returns undefined when graphic data is undefined', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.point;
+
+      const shape = getShapeFromScoord(scoord);
+
+      assert.isUndefined(shape);
+    });
+
+    test('throws error when data has no coordinates', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.poin;
+      scoord.graphicData = [];
+
+      assert.throws(() => {
+        getShapeFromScoord(scoord);
+      }, 'No coordinates in scoord data');
+    });
+
+    test('throws error when data has odd number of coordinates', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.poin;
+      scoord.graphicData = ['1', '2', '3'];
+
+      assert.throws(() => {
+        getShapeFromScoord(scoord);
+      }, 'Expecting even number of coordinates in scoord data');
+    });
+
+    test('creates Point2D from point graphic type', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.point;
+      scoord.graphicData = ['10', '20'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      assert.ok(shape instanceof Point2D);
+      assert.equal(shape.getX(), 10);
+      assert.equal(shape.getY(), 20);
+    });
+
+    test('creates Line from polyline with 2 points', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.polyline;
+      scoord.graphicData = ['10', '20', '30', '40'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      assert.ok(shape instanceof Line);
+      assert.equal(shape.getBegin().getX(), 10);
+      assert.equal(shape.getBegin().getY(), 20);
+      assert.equal(shape.getEnd().getX(), 30);
+      assert.equal(shape.getEnd().getY(), 40);
+    });
+
+    test('creates Circle from circle graphic type', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.circle;
+      scoord.graphicData = ['50', '50', '75', '50'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      assert.ok(shape instanceof Circle);
+      assert.equal(shape.getCenter().getX(), 50);
+      assert.equal(shape.getCenter().getY(), 50);
+      assert.equal(shape.getRadius(), 25);
+    });
+
+    test('throws error for circle with less than 2 points', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.circle;
+      scoord.graphicData = ['50', '50'];
+
+      assert.throws(() => {
+        getShapeFromScoord(scoord);
+      }, 'Expecting 2 points for circles, got 1');
+    });
+
+    test('creates Ellipse from ellipse graphic type', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.ellipse;
+      // Left, right, top, bottom points
+      scoord.graphicData = ['20', '50', '80', '50', '50', '30', '50', '70'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      assert.ok(shape instanceof Ellipse);
+      assert.equal(shape.getCenter().getX(), 50);
+      assert.equal(shape.getCenter().getY(), 50);
+      assert.equal(shape.getA(), 30);
+      assert.equal(shape.getB(), 20);
+    });
+
+    test('throws error for ellipse with less than 4 points', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.ellipse;
+      scoord.graphicData = ['20', '50', '80', '50', '50', '30'];
+
+      assert.throws(() => {
+        getShapeFromScoord(scoord);
+      }, 'Expecting 4 points for ellipses, got 3');
+    });
+
+    test('creates Protractor from polyline with 3 points', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.polyline;
+      // 3 points not closed
+      scoord.graphicData = ['10', '10', '20', '20', '30', '10'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      assert.ok(shape instanceof Protractor);
+      assert.equal(shape.getPoint(0).getX(), 10);
+      assert.equal(shape.getPoint(0).getY(), 10);
+      assert.equal(shape.getPoint(1).getX(), 20);
+      assert.equal(shape.getPoint(1).getY(), 20);
+      assert.equal(shape.getPoint(2).getX(), 30);
+      assert.equal(shape.getPoint(2).getY(), 10);
+    });
+
+    test('creates ROI from polyline with 4 non-orthogonal closed points',
+      () => {
+        const scoord = new SpatialCoordinate();
+        scoord.graphicType = GraphicTypes.polyline;
+        // 5 points: 4 non-orthogonal corners with first point
+        // repeated (closed but not rectangle)
+        scoord.graphicData = [
+          '10', '10', '25', '15', '30', '25', '15', '30', '10', '10'
+        ];
+
+        const shape = getShapeFromScoord(scoord);
+
+        assert.ok(shape instanceof ROI);
+        assert.equal(shape.getLength(), 4);
+        assert.equal(shape.getPoint(0).getX(), 10);
+        assert.equal(shape.getPoint(0).getY(), 10);
+        assert.equal(shape.getPoint(1).getX(), 25);
+        assert.equal(shape.getPoint(1).getY(), 15);
+        assert.equal(shape.getPoint(2).getX(), 30);
+        assert.equal(shape.getPoint(2).getY(), 25);
+        assert.equal(shape.getPoint(3).getX(), 15);
+        assert.equal(shape.getPoint(3).getY(), 30);
+      }
+    );
+
+    test('creates ROI from polyline with 6+ non-orthogonal closed points',
+      () => {
+        const scoord = new SpatialCoordinate();
+        scoord.graphicType = GraphicTypes.polyline;
+        // 7 points: 6 points with first repeated (closed)
+        scoord.graphicData = [
+          '0',
+          '0',
+          '10',
+          '5',
+          '20',
+          '0',
+          '25',
+          '15',
+          '15',
+          '25',
+          '5',
+          '20',
+          '0',
+          '0'
+        ];
+
+        const shape = getShapeFromScoord(scoord);
+
+        assert.ok(shape instanceof ROI);
+        assert.equal(shape.getLength(), 6);
+        assert.equal(shape.getPoint(0).getX(), 0);
+        assert.equal(shape.getPoint(0).getY(), 0);
+        assert.equal(shape.getPoint(5).getX(), 5);
+        assert.equal(shape.getPoint(5).getY(), 20);
+      }
+    );
+
+    test('returns undefined for multipoint type (not yet implemented)', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.multipoint;
+      // Multiple points not closed
+      scoord.graphicData = ['10', '10', '20', '20', '30', '30'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      // multipoint type is not yet implemented, returns undefined
+      assert.isUndefined(shape);
+    });
+
+  });
+
+  describe('round-trip conversion via items', () => {
+
+    test('dataElements -> SpatialCoordinate -> item -> SpatialCoordinate',
+      () => {
+        const deGraphicData = new DataElement('IS');
+        deGraphicData.value = ['100', '200'];
+
+        const deGraphicType = new DataElement('CS');
+        deGraphicType.value = [GraphicTypes.poin];
+
+        const dePixelOrigin = new DataElement('CS');
+        dePixelOrigin.value = ['SCREEN'];
+
+        const deFiducialUID = new DataElement('UI');
+        deFiducialUID.value = ['1.2.3.4.5'];
+
+        const dataElements = {
+          [TagKeys.GraphicData]: deGraphicData,
+          [TagKeys.GraphicType]: deGraphicType,
+          [TagKeys.PixelOriginInterpretation]: dePixelOrigin,
+          [TagKeys.FiducialUID]: deFiducialUID
+        };
+
+        const coord1 = getSpatialCoordinate(dataElements);
+        const item = getDicomSpatialCoordinateItem(coord1);
+
+        // recreate SpatialCoordinate from item
+        const coord2 = new SpatialCoordinate();
+        if (typeof item.GraphicData !== 'undefined') {
+          coord2.graphicData = item.GraphicData;
+        }
+        if (typeof item.GraphicType !== 'undefined') {
+          coord2.graphicType = item.GraphicType;
+        }
+        if (typeof item.PixelOriginInterpretation !== 'undefined') {
+          coord2.pixelOriginInterpretation = item.PixelOriginInterpretation;
+        }
+        if (typeof item.FiducialUID !== 'undefined') {
+          coord2.fiducialUID = item.FiducialUID;
+        }
+
+        // verify round-trip
+        assert.deepEqual(coord1.graphicData, coord2.graphicData);
+        assert.equal(coord1.graphicType, coord2.graphicType);
+        assert.equal(coord1.pixelOriginInterpretation,
+          coord2.pixelOriginInterpretation);
+        assert.equal(coord1.fiducialUID, coord2.fiducialUID);
+      }
+    );
+
+  });
+
+});
