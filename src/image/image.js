@@ -1665,9 +1665,6 @@ export class Image {
       }
     }
 
-    // allow special indent for matrices
-    /*jshint indent:false */
-
     // default weight offset matrix
     const wOff = [];
     wOff[0] = (-ncols - 1) * factor;
@@ -1682,6 +1679,8 @@ export class Image {
 
     // border weight offset matrices
     // borders are extended (see http://en.wikipedia.org/wiki/Kernel_%28image_processing%29)
+
+    /* eslint-disable @stylistic/js/max-statements-per-line */
 
     // i=0, j=0
     const wOff00 = [];
@@ -1727,8 +1726,7 @@ export class Image {
     wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
     wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
 
-    // restore indent for rest of method
-    /*jshint indent:4 */
+    /* eslint-enable @stylistic/js/max-statements-per-line */
 
     // loop vars
     let pixelOffset = startOffset;

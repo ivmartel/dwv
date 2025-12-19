@@ -61,6 +61,9 @@ export default [
       // newline at array elements (default: always)
       // https://eslint.style/rules/js/array-element-newline
       '@stylistic/js/array-element-newline': ['error', 'consistent'],
+      // one statement per line
+      // https://eslint.style/rules/js/max-statements-per-line
+      '@stylistic/js/max-statements-per-line': ['error', {max: 1}],
       // force 'one true brace style' (1tbs)
       // https://eslint.style/rules/js/brace-style
       '@stylistic/js/brace-style': 'error',
