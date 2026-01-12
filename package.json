@@ -47,7 +47,7 @@
     "canvas": "^3.2.0",
     "clean-jsdoc-theme": "^4.3.0",
     "eslint": "^9.39.1",
-    "eslint-plugin-jsdoc": "^61.4.1",
+    "eslint-plugin-jsdoc": "^62.0.0",
     "github-release-notes": "0.17.2",
     "globals": "^17.0.0",
     "html-webpack-plugin": "^5.6.5",
