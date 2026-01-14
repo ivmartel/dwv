@@ -1551,7 +1551,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.39.2, @eslint/js@npm:^9.39.1":
+"@eslint/js@npm:9.39.2, @eslint/js@npm:^9.39.2":
   version: 9.39.2
   resolution: "@eslint/js@npm:9.39.2"
   checksum: 10c0/00f51c52b04ac79faebfaa65a9652b2093b9c924e945479f1f3945473f78aee83cbc76c8d70bbffbf06f7024626575b16d97b66eab16182e1d0d39daff2f26f5
@@ -2177,7 +2177,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stylistic/eslint-plugin@npm:^5.6.1":
+"@stylistic/eslint-plugin@npm:^5.7.0":
   version: 5.7.0
   resolution: "@stylistic/eslint-plugin@npm:5.7.0"
   dependencies:
@@ -2479,7 +2479,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:^4.0.15":
+"@vitest/coverage-v8@npm:^4.0.17":
   version: 4.0.17
   resolution: "@vitest/coverage-v8@npm:4.0.17"
   dependencies:
@@ -3737,7 +3737,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"canvas@npm:^3.2.0":
+"canvas@npm:^3.2.1":
   version: 3.2.1
   resolution: "canvas@npm:3.2.1"
   dependencies:
@@ -4744,28 +4744,28 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.28.5"
     "@babel/preset-env": "npm:^7.28.5"
-    "@eslint/js": "npm:^9.39.1"
+    "@eslint/js": "npm:^9.39.2"
     "@microsoft/api-extractor": "npm:^7.55.1"
-    "@stylistic/eslint-plugin": "npm:^5.6.1"
-    "@vitest/coverage-v8": "npm:^4.0.15"
+    "@stylistic/eslint-plugin": "npm:^5.7.0"
+    "@vitest/coverage-v8": "npm:^4.0.17"
     babel-loader: "npm:^10.0.0"
     babel-plugin-istanbul: "npm:^7.0.1"
     benchmark: "npm:^2.1.4"
-    canvas: "npm:^3.2.0"
+    canvas: "npm:^3.2.1"
     clean-jsdoc-theme: "npm:^4.3.0"
-    eslint: "npm:^9.39.1"
+    eslint: "npm:^9.39.2"
     eslint-plugin-jsdoc: "npm:^62.0.0"
     github-release-notes: "npm:0.17.2"
     globals: "npm:^17.0.0"
     html-webpack-plugin: "npm:^5.6.5"
     jsdoc: "npm:^4.0.5"
-    jsdom: "npm:^27.3.0"
+    jsdom: "npm:^27.4.0"
     jszip: "npm:^3.10.1"
     konva: "npm:~9.3.20"
     magic-wand-tool: "npm:~1.1.7"
     typescript: "npm:5.6.3"
-    vitest: "npm:^4.0.15"
-    webpack: "npm:^5.103.0"
+    vitest: "npm:^4.0.17"
+    webpack: "npm:^5.104.1"
     webpack-cli: "npm:^6.0.1"
     webpack-dev-server: "npm:^5.2.2"
     webpack-merge: "npm:^6.0.1"
@@ -5292,7 +5292,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^9.39.1":
+"eslint@npm:^9.39.2":
   version: 9.39.2
   resolution: "eslint@npm:9.39.2"
   dependencies:
@@ -7398,7 +7398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdom@npm:^27.3.0":
+"jsdom@npm:^27.4.0":
   version: 27.4.0
   resolution: "jsdom@npm:27.4.0"
   dependencies:
@@ -12177,7 +12177,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:^4.0.15":
+"vitest@npm:^4.0.17":
   version: 4.0.17
   resolution: "vitest@npm:4.0.17"
   dependencies:
@@ -12392,7 +12392,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.103.0":
+"webpack@npm:^5.104.1":
   version: 5.104.1
   resolution: "webpack@npm:5.104.1"
   dependencies:
