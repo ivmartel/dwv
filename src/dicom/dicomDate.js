@@ -1,16 +1,6 @@
 import {DataElement} from './dataElement.js';
 
 /**
- * Pad an input string with a '0' to form a 2 digit one.
- *
- * @param {string} str The string to pad.
- * @returns {string} The padded string.
- */
-function padZeroTwoDigit(str) {
-  return ('0' + str).slice(-2);
-}
-
-/**
  * Get a 'date' object with {year, monthIndex, day} ready for the
  *   Date constructor from a DICOM element with vr=DA.
  *
@@ -125,8 +115,8 @@ export function dateToDateObj(date) {
   if (typeof date !== 'undefined') {
     res = {
       year: date.getFullYear().toString(),
-      monthIndex: padZeroTwoDigit((date.getMonth() + 1).toString()),
-      day: padZeroTwoDigit(date.getDate().toString())
+      monthIndex: (date.getMonth() + 1).toString().padStart(2, '0'),
+      day: date.getDate().toString().padStart(2, '0')
     };
   }
   return res;
@@ -142,9 +132,9 @@ export function dateToTimeObj(date) {
   let res;
   if (typeof date !== 'undefined') {
     res = {
-      hours: padZeroTwoDigit(date.getHours().toString()),
-      minutes: padZeroTwoDigit(date.getMinutes().toString()),
-      seconds: padZeroTwoDigit(date.getSeconds().toString())
+      hours: date.getHours().toString().padStart(2, '0'),
+      minutes: date.getMinutes().toString().padStart(2, '0'),
+      seconds: date.getSeconds().toString().padStart(2, '0')
     };
   }
   return res;
