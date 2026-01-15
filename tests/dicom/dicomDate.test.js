@@ -2,6 +2,7 @@ import {describe, test, assert} from 'vitest';
 import {
   getDateObj,
   getTimeObj,
+  getDate,
   getDateTimeObj,
   dateToDateObj,
   dateToTimeObj,
@@ -60,6 +61,42 @@ describe('dicom', () => {
     const tm13 = getTimeObj({value: ['193610.012345']});
     const tmTheo13 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 12};
     assert.deepEqual(tm13, tmTheo13, 'test time #13');
+  });
+
+  /**
+   * Tests for getDate.
+   *
+   * @function module:tests/dicom~get-date
+   */
+  test('getDate', () => {
+    const da00 = getDate(undefined);
+    assert.equal(da00, undefined, 'test date #00');
+
+    // just date
+    const daObj10 = {year: 2023, monthIndex: 4, day: 1};
+    const da10 = getDate(daObj10);
+    const resDateObj10 = dateToDateObj(da10);
+    assert.deepEqual(resDateObj10, daObj10, 'test date #10');
+    const timObj10 = {hours: 0, minutes: 0, seconds: 0, milliseconds: 0};
+    const resTimeObj10 = dateToTimeObj(da10);
+    assert.deepEqual(resTimeObj10, timObj10, 'test time #10');
+
+    // date and time
+    const timObj11 = {hours: 12, minutes: 30, seconds: 10, milliseconds: 0};
+    const da11 = getDate(daObj10, timObj11);
+    const resDateObj11 = dateToDateObj(da11);
+    assert.deepEqual(resDateObj11, daObj10, 'test date #11');
+    const resTimeObj11 = dateToTimeObj(da11);
+    assert.deepEqual(resTimeObj11, timObj11, 'test time #11');
+
+    // just time
+    // minimum date that will return as is
+    const daObj12 = {year: 1900, monthIndex: 0, day: 1};
+    const da12 = getDate(daObj12, timObj11);
+    const resDateObj12 = dateToDateObj(da12);
+    assert.deepEqual(resDateObj12, daObj12, 'test date #12');
+    const resTimeObj12 = dateToTimeObj(da12);
+    assert.deepEqual(resTimeObj12, timObj11, 'test time #12');
   });
 
   /**

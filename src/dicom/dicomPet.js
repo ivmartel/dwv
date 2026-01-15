@@ -1,6 +1,7 @@
 import {
   getDateObj,
   getTimeObj,
+  getDate,
   getDateTimeObj
 } from './dicomDate.js';
 import {checkDataElement} from './dataElement.js';
@@ -108,35 +109,14 @@ function getDecayedDose(elements) {
       radioStartDateObj = radioStartDateTime.date;
       radioStartTimeObj = radioStartDateTime.time;
     }
-    if (typeof radioStartTimeObj === 'undefined') {
-      radioStartTimeObj = {
-        hours: 0, minutes: 0, seconds: 0, milliseconds: 0
-      };
-    }
-    radioStart = new Date(
-      radioStartDateObj.year,
-      radioStartDateObj.monthIndex,
-      radioStartDateObj.day,
-      radioStartTimeObj.hours,
-      radioStartTimeObj.minutes,
-      radioStartTimeObj.seconds,
-      radioStartTimeObj.milliseconds
-    );
+    radioStart = getDate(radioStartDateObj, radioStartTimeObj);
   }
 
   // SeriesTime (type1)
   const seriesTimeEl = elements[TagKeys.SeriesTime];
   const seriesTimeObj = getTimeObj(seriesTimeEl);
   // Series date/time
-  let scanStart = new Date(
-    seriesDateObj.year,
-    seriesDateObj.monthIndex,
-    seriesDateObj.day,
-    seriesTimeObj.hours,
-    seriesTimeObj.minutes,
-    seriesTimeObj.seconds,
-    seriesTimeObj.milliseconds
-  );
+  let scanStart = getDate(seriesDateObj, seriesTimeObj);
 
   // scanStart Date check
   // AcquisitionDate (type3)
@@ -147,15 +127,7 @@ function getDecayedDose(elements) {
     typeof acqTimeEl !== 'undefined') {
     const acqDateObj = getDateObj(acqDateEl);
     const acqTimeObj = getTimeObj(acqTimeEl);
-    const acqDate = new Date(
-      acqDateObj.year,
-      acqDateObj.monthIndex,
-      acqDateObj.day,
-      acqTimeObj.hours,
-      acqTimeObj.minutes,
-      acqTimeObj.seconds,
-      acqTimeObj.milliseconds
-    );
+    const acqDate = getDate(acqDateObj, acqTimeObj);
 
     if (scanStart > acqDate) {
       const diff = scanStart.getTime() - acqDate.getTime();

@@ -93,6 +93,47 @@ export function getTimeObj(element) {
 }
 
 /**
+ * Get a javascript Date object from objects with date information.
+ *
+ * @param {DateObj} dateObj The date object.
+ * @param {TimeObj} [timeObj] Optional time object.
+ * @returns {Date|undefined} The full date.
+ */
+export function getDate(dateObj, timeObj) {
+  let res;
+  if (typeof dateObj !== 'undefined') {
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+    let milliseconds = 0;
+    if (typeof timeObj !== 'undefined') {
+      if (typeof timeObj.hours !== 'undefined') {
+        hours = timeObj.hours;
+      }
+      if (typeof timeObj.minutes !== 'undefined') {
+        minutes = timeObj.minutes;
+      }
+      if (typeof timeObj.seconds !== 'undefined') {
+        seconds = timeObj.seconds;
+      }
+      if (typeof timeObj.milliseconds !== 'undefined') {
+        milliseconds = timeObj.milliseconds;
+      }
+    }
+    res = new Date(
+      dateObj.year,
+      dateObj.monthIndex,
+      dateObj.day,
+      hours,
+      minutes,
+      seconds,
+      milliseconds,
+    );
+  }
+  return res;
+}
+
+/**
  * Get a 'dateTime' object with {date, time} ready for the
  *   Date constructor from a DICOM element with vr=DT.
  *
