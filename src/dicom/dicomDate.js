@@ -114,9 +114,9 @@ export function dateToDateObj(date) {
   let res;
   if (typeof date !== 'undefined') {
     res = {
-      year: date.getFullYear().toString(),
-      monthIndex: (date.getMonth() + 1).toString().padStart(2, '0'),
-      day: date.getDate().toString().padStart(2, '0')
+      year: date.getFullYear(),
+      monthIndex: date.getMonth(),
+      day: date.getDate()
     };
   }
   return res;
@@ -132,9 +132,9 @@ export function dateToTimeObj(date) {
   let res;
   if (typeof date !== 'undefined') {
     res = {
-      hours: date.getHours().toString().padStart(2, '0'),
-      minutes: date.getMinutes().toString().padStart(2, '0'),
-      seconds: date.getSeconds().toString().padStart(2, '0')
+      hours: date.getHours(),
+      minutes: date.getMinutes(),
+      seconds: date.getSeconds()
     };
   }
   return res;
@@ -150,9 +150,10 @@ export function getDicomDate(dateObj) {
   let res;
   if (typeof dateObj !== 'undefined') {
     // YYYYMMDD
-    res = dateObj.year +
-      dateObj.monthIndex +
-      dateObj.day
+    res =
+      dateObj.year.toString() +
+      (dateObj.monthIndex + 1).toString().padStart(2, '0') +
+      dateObj.day.toString().padStart(2, '0')
     ;
   }
   return res;
@@ -168,9 +169,10 @@ export function getDicomTime(dateObj) {
   let res;
   if (typeof dateObj !== 'undefined') {
     // HHMMSS
-    res = dateObj.hours +
-      dateObj.minutes +
-      dateObj.seconds
+    res =
+      dateObj.hours.toString().padStart(2, '0') +
+      dateObj.minutes.toString().padStart(2, '0') +
+      dateObj.seconds.toString().padStart(2, '0')
     ;
   }
   return res;

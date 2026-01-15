@@ -138,13 +138,13 @@ describe('dicom', () => {
     assert.equal(dateToDateObj(), undefined, 'dateToDateObj #00');
 
     const dateObj0 = {
-      year: '2025',
-      monthIndex: '04',
-      day: '01'
+      year: 2025,
+      monthIndex: 4,
+      day: 1
     };
     const date0 = new Date(
       dateObj0.year,
-      dateObj0.monthIndex - 1,
+      dateObj0.monthIndex,
       dateObj0.day);
     assert.deepEqual(dateToDateObj(date0), dateObj0, 'dateToDateObj #01');
   });
@@ -158,14 +158,14 @@ describe('dicom', () => {
     assert.equal(dateToTimeObj(), undefined, 'dateToTimeObj #00');
 
     const dateObj0 = {
-      year: '2025',
-      monthIndex: '04',
-      day: '01'
+      year: 2025,
+      monthIndex: 4,
+      day: 1
     };
     const timeObj0 = {
-      hours: '12',
-      minutes: '05',
-      seconds: '30'
+      hours: 12,
+      minutes: 5,
+      seconds: 30
     };
     const date0 = new Date(
       dateObj0.year,
@@ -187,11 +187,11 @@ describe('dicom', () => {
     assert.equal(getDicomDate(), undefined, 'getDicomDate #00');
 
     const dateObj0 = {
-      year: '2025',
-      monthIndex: '04',
-      day: '01'
+      year: 2025,
+      monthIndex: 4,
+      day: 1
     };
-    assert.equal(getDicomDate(dateObj0), '20250401', 'getDicomDate #01');
+    assert.equal(getDicomDate(dateObj0), '20250501', 'getDicomDate #01');
   });
 
   /**
@@ -203,9 +203,9 @@ describe('dicom', () => {
     assert.equal(getDicomTime(), undefined, 'getDicomTime #00');
 
     const timeObj0 = {
-      hours: '12',
-      minutes: '05',
-      seconds: '30'
+      hours: 12,
+      minutes: 5,
+      seconds: 30
     };
     assert.equal(getDicomTime(timeObj0), '120530', 'getDicomTime #01');
   });
@@ -219,23 +219,23 @@ describe('dicom', () => {
     assert.equal(getDicomDateTime(), undefined, 'getDicomDateTime #00');
 
     const dateObj0 = {
-      year: '2025',
-      monthIndex: '04',
-      day: '01'
+      year: 2025,
+      monthIndex: 4,
+      day: 1
     };
     const dateTime0 = {
       date: dateObj0
     };
-    assert.equal(getDicomDateTime(dateTime0), '20250401',
+    assert.equal(getDicomDateTime(dateTime0), '20250501',
       'getDicomDateTime #01');
 
     const timeObj0 = {
-      hours: '12',
-      minutes: '05',
-      seconds: '30'
+      hours: 12,
+      minutes: 5,
+      seconds: 30
     };
     dateTime0.time = timeObj0;
-    assert.equal(getDicomDateTime(dateTime0), '20250401120530',
+    assert.equal(getDicomDateTime(dateTime0), '20250501120530',
       'getDicomDateTime #02');
   });
 
