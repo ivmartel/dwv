@@ -153,7 +153,8 @@ export function dateToTimeObj(date) {
     res = {
       hours: date.getHours(),
       minutes: date.getMinutes(),
-      seconds: date.getSeconds()
+      seconds: date.getSeconds(),
+      milliseconds: date.getMilliseconds()
     };
   }
   return res;
