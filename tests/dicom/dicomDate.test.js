@@ -17,11 +17,11 @@ import {
 describe('dicom', () => {
 
   /**
-   * Tests for getDate.
+   * Tests for getDateObj.
    *
-   * @function module:tests/dicom~get-dicom-date
+   * @function module:tests/dicom~get-date-obj
    */
-  test('Get DICOM Date', () => {
+  test('getDateObj', () => {
     const da00 = getDateObj(undefined);
     const daTheo00 = undefined;
     assert.equal(da00, daTheo00, 'test date #00');
@@ -36,11 +36,11 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getTime.
+   * Tests for getTimeObj.
    *
-   * @function module:tests/dicom~get-dicom-time
+   * @function module:tests/dicom~get-time-obj
    */
-  test('Get DICOM Time', () => {
+  test('getTimeObj', () => {
     const tm00 = getTimeObj(undefined);
     const tmTheo00 = undefined;
     assert.equal(tm00, tmTheo00, 'test time #00');
@@ -63,11 +63,11 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDateTime.
+   * Tests for getDateTimeObj.
    *
-   * @function module:tests/dicom~get-dicom-datetime
+   * @function module:tests/dicom~get-datetime-obj
    */
-  test('Get DICOM datetime', () => {
+  test('getDatetimeObj', () => {
     const dt00 = getDateTimeObj(undefined);
     const dtTheo00 = undefined;
     assert.equal(dt00, dtTheo00, 'test date-time #00');
