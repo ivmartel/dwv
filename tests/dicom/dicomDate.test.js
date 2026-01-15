@@ -2,7 +2,7 @@ import {describe, test, assert} from 'vitest';
 import {
   getDateObj,
   getTimeObj,
-  getDateTime,
+  getDateTimeObj,
   dateToDateObj,
   dateToTimeObj,
   getDicomDate,
@@ -68,60 +68,60 @@ describe('dicom', () => {
    * @function module:tests/dicom~get-dicom-datetime
    */
   test('Get DICOM datetime', () => {
-    const dt00 = getDateTime(undefined);
+    const dt00 = getDateTimeObj(undefined);
     const dtTheo00 = undefined;
     assert.equal(dt00, dtTheo00, 'test date-time #00');
 
-    const dt10 = getDateTime({value: ['2023']});
+    const dt10 = getDateTimeObj({value: ['2023']});
     const dtTheo10 = {
       date: {year: 2023, monthIndex: 0, day: 0},
       time: undefined
     };
     assert.deepEqual(dt10, dtTheo10, 'test time #10');
 
-    const dt11 = getDateTime({value: ['202305']});
+    const dt11 = getDateTimeObj({value: ['202305']});
     const dtTheo11 = {
       date: {year: 2023, monthIndex: 4, day: 0},
       time: undefined
     };
     assert.deepEqual(dt11, dtTheo11, 'test time #11');
 
-    const dt12 = getDateTime({value: ['20230501']});
+    const dt12 = getDateTimeObj({value: ['20230501']});
     const dtTheo12 = {
       date: {year: 2023, monthIndex: 4, day: 1},
       time: undefined
     };
     assert.deepEqual(dt12, dtTheo12, 'test time #12');
 
-    const dt13 = getDateTime({value: ['2023050119']});
+    const dt13 = getDateTimeObj({value: ['2023050119']});
     const dtTheo13 = {
       date: {year: 2023, monthIndex: 4, day: 1},
       time: {hours: 19, minutes: 0, seconds: 0, milliseconds: 0}
     };
     assert.deepEqual(dt13, dtTheo13, 'test time #13');
 
-    const dt14 = getDateTime({value: ['202305011936']});
+    const dt14 = getDateTimeObj({value: ['202305011936']});
     const dtTheo14 = {
       date: {year: 2023, monthIndex: 4, day: 1},
       time: {hours: 19, minutes: 36, seconds: 0, milliseconds: 0}
     };
     assert.deepEqual(dt14, dtTheo14, 'test time #14');
 
-    const dt15 = getDateTime({value: ['20230501193610']});
+    const dt15 = getDateTimeObj({value: ['20230501193610']});
     const dtTheo15 = {
       date: {year: 2023, monthIndex: 4, day: 1},
       time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 0}
     };
     assert.deepEqual(dt15, dtTheo15, 'test time #15');
 
-    const dt16 = getDateTime({value: ['20230501193610.012345']});
+    const dt16 = getDateTimeObj({value: ['20230501193610.012345']});
     const dtTheo16 = {
       date: {year: 2023, monthIndex: 4, day: 1},
       time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12}
     };
     assert.deepEqual(dt16, dtTheo16, 'test time #16');
 
-    const dt17 = getDateTime({value: ['20230501193610.012345&0200']});
+    const dt17 = getDateTimeObj({value: ['20230501193610.012345&0200']});
     const dtTheo17 = {
       date: {year: 2023, monthIndex: 4, day: 1},
       time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12}

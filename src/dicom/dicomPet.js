@@ -1,7 +1,7 @@
 import {
   getDateObj,
   getTimeObj,
-  getDateTime
+  getDateTimeObj
 } from './dicomDate.js';
 import {checkDataElement} from './dataElement.js';
 import {logger} from '../utils/logger.js';
@@ -104,7 +104,7 @@ function getDecayedDose(elements) {
         radioInfoSq.value[0][TagKeys.RadiopharmaceuticalStartTime];
       radioStartTimeObj = getTimeObj(radioStartTimeEl);
     } else {
-      const radioStartDateTime = getDateTime(radioStartDateTimeEl);
+      const radioStartDateTime = getDateTimeObj(radioStartDateTimeEl);
       radioStartDateObj = radioStartDateTime.date;
       radioStartTimeObj = radioStartDateTime.time;
     }

@@ -80,7 +80,7 @@ export function getTimeObj(element) {
  * @param {DataElement} element The DICOM element with date-time information.
  * @returns {{date, time}|undefined} The time object.
  */
-export function getDateTime(element) {
+export function getDateTimeObj(element) {
   if (typeof element === 'undefined') {
     return undefined;
   }
