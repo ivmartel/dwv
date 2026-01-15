@@ -165,7 +165,8 @@ describe('dicom', () => {
     const timeObj0 = {
       hours: 12,
       minutes: 5,
-      seconds: 30
+      seconds: 30,
+      milliseconds: 0
     };
     const date0 = new Date(
       dateObj0.year,
