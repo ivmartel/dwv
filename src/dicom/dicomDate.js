@@ -3,7 +3,7 @@ import {DataElement} from './dataElement.js';
 /**
  * Date object.
  *
- * @typedef {Object} DateObj
+ * @typedef {object} DateObj
  * @property {number} year The year number.
  * @property {number} monthIndex The month index ([0, 11] range).
  * @property {number} day The day number.
@@ -12,7 +12,7 @@ import {DataElement} from './dataElement.js';
 /**
  * Time object.
  *
- * @typedef {Object} TimeObj
+ * @typedef {object} TimeObj
  * @property {number} hours The hours number.
  * @property {number} minutes The minutes number.
  * @property {number} seconds The seconds number.
@@ -97,7 +97,7 @@ export function getTimeObj(element) {
  *   Date constructor from a DICOM element with vr=DT.
  *
  * @param {DataElement} element The DICOM element with date-time information.
- * @returns {{data: DateObj, time: TimeObj}|undefined} The time object.
+ * @returns {{date: DateObj, time: TimeObj}|undefined} The time object.
  */
 export function getDateTimeObj(element) {
   if (typeof element === 'undefined') {
