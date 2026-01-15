@@ -17,7 +17,7 @@ function padZeroTwoDigit(str) {
  * @param {DataElement} element The DICOM element with date information.
  * @returns {{year, monthIndex, day}|undefined} The 'date' object.
  */
-export function getDate(element) {
+export function getDateObj(element) {
   if (typeof element === 'undefined') {
     return undefined;
   }
@@ -56,7 +56,7 @@ export function getDate(element) {
  * @param {DataElement} element The DICOM element with date information.
  * @returns {{hours, minutes, seconds, milliseconds}|undefined} The time object.
  */
-export function getTime(element) {
+export function getTimeObj(element) {
   if (typeof element === 'undefined') {
     return undefined;
   }
@@ -103,11 +103,11 @@ export function getDateTime(element) {
   const dtValue = dtFullValue.split('&')[0];
   const dateDataElement = new DataElement('DA');
   dateDataElement.value = [dtValue.substring(0, 8)];
-  const dtDate = getDate(dateDataElement);
+  const dtDate = getDateObj(dateDataElement);
   const timeDataElement = new DataElement('TM');
   timeDataElement.value = [dtValue.substring(8)];
   const dtTime = dtValue.length >= 9
-    ? getTime(timeDataElement) : undefined;
+    ? getTimeObj(timeDataElement) : undefined;
   return {
     date: dtDate,
     time: dtTime

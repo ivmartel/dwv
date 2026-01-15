@@ -1,7 +1,7 @@
 import {describe, test, assert} from 'vitest';
 import {
-  getDate,
-  getTime,
+  getDateObj,
+  getTimeObj,
   getDateTime,
   dateToDateObj,
   dateToTimeObj,
@@ -22,15 +22,15 @@ describe('dicom', () => {
    * @function module:tests/dicom~get-dicom-date
    */
   test('Get DICOM Date', () => {
-    const da00 = getDate(undefined);
+    const da00 = getDateObj(undefined);
     const daTheo00 = undefined;
     assert.equal(da00, daTheo00, 'test date #00');
 
-    const da10 = getDate({value: ['20230501']});
+    const da10 = getDateObj({value: ['20230501']});
     const daTheo10 = {year: 2023, monthIndex: 4, day: 1};
     assert.deepEqual(da10, daTheo10, 'test date #10');
 
-    const da11 = getDate({value: ['20230131']});
+    const da11 = getDateObj({value: ['20230131']});
     const daTheo11 = {year: 2023, monthIndex: 0, day: 31};
     assert.deepEqual(da11, daTheo11, 'test date #11');
   });
@@ -41,23 +41,23 @@ describe('dicom', () => {
    * @function module:tests/dicom~get-dicom-time
    */
   test('Get DICOM Time', () => {
-    const tm00 = getTime(undefined);
+    const tm00 = getTimeObj(undefined);
     const tmTheo00 = undefined;
     assert.equal(tm00, tmTheo00, 'test time #00');
 
-    const tm10 = getTime({value: ['19']});
+    const tm10 = getTimeObj({value: ['19']});
     const tmTheo10 = {hours: 19, minutes: 0, seconds: 0, milliseconds: 0};
     assert.deepEqual(tm10, tmTheo10, 'test time #10');
 
-    const tm11 = getTime({value: ['1936']});
+    const tm11 = getTimeObj({value: ['1936']});
     const tmTheo11 = {hours: 19, minutes: 36, seconds: 0, milliseconds: 0};
     assert.deepEqual(tm11, tmTheo11, 'test time #11');
 
-    const tm12 = getTime({value: ['193610']});
+    const tm12 = getTimeObj({value: ['193610']});
     const tmTheo12 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 0};
     assert.deepEqual(tm12, tmTheo12, 'test time #12');
 
-    const tm13 = getTime({value: ['193610.012345']});
+    const tm13 = getTimeObj({value: ['193610.012345']});
     const tmTheo13 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 12};
     assert.deepEqual(tm13, tmTheo13, 'test time #13');
   });

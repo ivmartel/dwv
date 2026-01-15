@@ -1,7 +1,7 @@
 import {getTransferSyntaxName} from './dicomParser.js';
 import {
-  getDate,
-  getTime
+  getDateObj,
+  getTimeObj
 } from './dicomDate.js';
 import {
   isAnyPixelDataTag,
@@ -97,11 +97,11 @@ function getElementValueAsString(tag, dicomElement, pretty) {
     dicomElement.undefinedLength) {
     str = '(PixelSequence)';
   } else if (dicomElement.vr === 'DA' && pretty) {
-    const daObj = getDate(dicomElement);
+    const daObj = getDateObj(dicomElement);
     const da = new Date(daObj.year, daObj.monthIndex, daObj.day);
     str = da.toLocaleDateString();
   } else if (dicomElement.vr === 'TM' && pretty) {
-    const tmObj = getTime(dicomElement);
+    const tmObj = getTimeObj(dicomElement);
     str = tmObj.hours + ':' + tmObj.minutes + ':' + tmObj.seconds;
   } else {
     let isOtherVR = false;

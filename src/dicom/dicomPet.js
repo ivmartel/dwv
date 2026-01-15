@@ -1,6 +1,6 @@
 import {
-  getDate,
-  getTime,
+  getDateObj,
+  getTimeObj,
   getDateTime
 } from './dicomDate.js';
 import {checkDataElement} from './dataElement.js';
@@ -45,7 +45,7 @@ function getDecayedDose(elements) {
 
   // SeriesDate (type1)
   const seriesDateEl = elements[TagKeys.SeriesDate];
-  const seriesDateObj = getDate(seriesDateEl);
+  const seriesDateObj = getDateObj(seriesDateEl);
 
   let totalDose;
   let halfLife;
@@ -102,7 +102,7 @@ function getDecayedDose(elements) {
       // try RadiopharmaceuticalStartTime (type3)
       const radioStartTimeEl =
         radioInfoSq.value[0][TagKeys.RadiopharmaceuticalStartTime];
-      radioStartTimeObj = getTime(radioStartTimeEl);
+      radioStartTimeObj = getTimeObj(radioStartTimeEl);
     } else {
       const radioStartDateTime = getDateTime(radioStartDateTimeEl);
       radioStartDateObj = radioStartDateTime.date;
@@ -126,7 +126,7 @@ function getDecayedDose(elements) {
 
   // SeriesTime (type1)
   const seriesTimeEl = elements[TagKeys.SeriesTime];
-  const seriesTimeObj = getTime(seriesTimeEl);
+  const seriesTimeObj = getTimeObj(seriesTimeEl);
   // Series date/time
   let scanStart = new Date(
     seriesDateObj.year,
@@ -145,8 +145,8 @@ function getDecayedDose(elements) {
   const acqTimeEl = elements[TagKeys.AcquisitionTime];
   if (typeof acqDateEl !== 'undefined' &&
     typeof acqTimeEl !== 'undefined') {
-    const acqDateObj = getDate(acqDateEl);
-    const acqTimeObj = getTime(acqTimeEl);
+    const acqDateObj = getDateObj(acqDateEl);
+    const acqTimeObj = getTimeObj(acqTimeEl);
     const acqDate = new Date(
       acqDateObj.year,
       acqDateObj.monthIndex,
