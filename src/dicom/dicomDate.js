@@ -1,11 +1,30 @@
 import {DataElement} from './dataElement.js';
 
 /**
+ * Date object.
+ *
+ * @typedef {Object} DateObj
+ * @property {number} year The year number.
+ * @property {number} monthIndex The month index ([0, 11] range).
+ * @property {number} day The day number.
+ */
+
+/**
+ * Time object.
+ *
+ * @typedef {Object} TimeObj
+ * @property {number} hours The hours number.
+ * @property {number} minutes The minutes number.
+ * @property {number} seconds The seconds number.
+ * @property {number} milliseconds The milliseconds number.
+ */
+
+/**
  * Get a 'date' object with {year, monthIndex, day} ready for the
  *   Date constructor from a DICOM element with vr=DA.
  *
  * @param {DataElement} element The DICOM element with date information.
- * @returns {{year, monthIndex, day}|undefined} The 'date' object.
+ * @returns {DateObj|undefined} The 'date' object.
  */
 export function getDateObj(element) {
   if (typeof element === 'undefined') {
@@ -44,7 +63,7 @@ export function getDateObj(element) {
  *   Date constructor from a DICOM element with vr=TM.
  *
  * @param {DataElement} element The DICOM element with date information.
- * @returns {{hours, minutes, seconds, milliseconds}|undefined} The time object.
+ * @returns {TimeObj|undefined} The time object.
  */
 export function getTimeObj(element) {
   if (typeof element === 'undefined') {
@@ -78,7 +97,7 @@ export function getTimeObj(element) {
  *   Date constructor from a DICOM element with vr=DT.
  *
  * @param {DataElement} element The DICOM element with date-time information.
- * @returns {{date, time}|undefined} The time object.
+ * @returns {{data: DateObj, time: TimeObj}|undefined} The time object.
  */
 export function getDateTimeObj(element) {
   if (typeof element === 'undefined') {
@@ -108,7 +127,7 @@ export function getDateTimeObj(element) {
  * Extract date values from a Date object.
  *
  * @param {Date} date The input date.
- * @returns {{year, monthIndex, day}|undefined} A 'date' object.
+ * @returns {DateObj|undefined} A 'date' object.
  */
 export function dateToDateObj(date) {
   let res;
@@ -126,7 +145,7 @@ export function dateToDateObj(date) {
  * Extract time values from a Date object.
  *
  * @param {Date} date The input date.
- * @returns {{hours, minutes, seconds}|undefined} A 'time' object.
+ * @returns {TimeObj|undefined} A 'time' object.
  */
 export function dateToTimeObj(date) {
   let res;
@@ -143,7 +162,7 @@ export function dateToTimeObj(date) {
 /**
  * Get a DICOM formated date string 'YYYYMMDD'.
  *
- * @param {{year, monthIndex, day}} dateObj The date to format.
+ * @param {DateObj} dateObj The date to format.
  * @returns {string|undefined} The formated date.
  */
 export function getDicomDate(dateObj) {
@@ -162,7 +181,7 @@ export function getDicomDate(dateObj) {
 /**
  * Get a DICOM formated time string as 'HHMMSS'.
  *
- * @param {{hours, minutes, seconds}} dateObj The date to format.
+ * @param {TimeObj} dateObj The date object to format.
  * @returns {string|undefined} The formated time.
  */
 export function getDicomTime(dateObj) {
