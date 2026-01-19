@@ -3,7 +3,7 @@ import {Point2D} from '../math/point.js';
 import {Line} from '../math/line.js';
 
 // Set this to true to show the debug contour and diameter display
-const DIAMETER_DEBUG = false;
+const DIAMETER_DEBUG = true;
 
 /**
  * Filter for calculating labels.
