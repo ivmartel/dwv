@@ -18,6 +18,7 @@ import {PositionHelper} from '../image/positionHelper.js';
 
 /**
  * Get the layer div id.
+ * For example: 'layerGroup0-layer-0'.
  *
  * @param {string} groupDivId The layer group div id.
  * @param {number} layerIndex The layer index.
@@ -28,7 +29,8 @@ export function getLayerDivId(groupDivId, layerIndex) {
 }
 
 /**
- * Get the layer details from a div id.
+ * Get the layer details from a div id
+ * created by getLayerDivId.
  *
  * @param {string} idString The layer div id.
  * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.

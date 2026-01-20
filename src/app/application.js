@@ -272,7 +272,11 @@ export class App {
    */
   #style = new Style();
 
-  // overlay datas
+  /**
+   * Overlay datas.
+   *
+   * @type {Object<string, OverlayData>}
+   */
   #overlayDatas = {};
 
   /**
