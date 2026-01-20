@@ -3,7 +3,7 @@ import {
   LayerGroup,
   getLayerDetailsFromEvent
 } from './layerGroup.js';
-import {OverlayData} from './overlayData.js';
+import {InfoData} from './infoData.js';
 import {ViewLayer} from './viewLayer.js';
 import {
   getMousePoint,
@@ -13,7 +13,7 @@ import {
 export {
   DrawLayer,
   LayerGroup,
-  OverlayData,
+  InfoData,
   ViewLayer,
   getLayerDetailsFromEvent,
   getMousePoint,

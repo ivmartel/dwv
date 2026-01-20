@@ -21,7 +21,7 @@ import {UndoStack} from '../utils/undoStack.js';
 import {ToolboxController} from './toolboxController.js';
 import {LoadController} from './loadController.js';
 import {DataController} from './dataController.js';
-import {OverlayData} from '../gui/overlayData.js';
+import {InfoData} from '../gui/infoData.js';
 import {
   toolList,
   defaultToolList,
@@ -177,7 +177,7 @@ export class AppOptions {
    */
   defaultCharacterSet;
   /**
-   * Optional overlay config.
+   * Optional overlay layer config.
    *
    * @type {object|undefined}
    */
@@ -273,11 +273,11 @@ export class App {
   #style = new Style();
 
   /**
-   * Overlay datas.
+   * Info datas.
    *
-   * @type {Object<string, OverlayData>}
+   * @type {Object<string, InfoData>}
    */
-  #overlayDatas = {};
+  #infoDatas = {};
 
   /**
    * Listener handler.
@@ -741,7 +741,7 @@ export class App {
   reset() {
     // clear objects
     this.#stage.empty();
-    this.#overlayDatas = {};
+    this.#infoDatas = {};
     // reset undo/redo
     if (this.#undoStack) {
       this.#undoStack = new UndoStack();
@@ -1760,26 +1760,26 @@ export class App {
   }
 
   /**
-   * Get the overlay data for a data id.
+   * Get the info data for a data id.
    *
    * @param {string} dataId The data id.
-   * @returns {OverlayData|undefined} The overlay data.
+   * @returns {InfoData|undefined} The info data.
    */
-  getOverlayData(dataId) {
+  getInfoData(dataId) {
     let data;
-    if (typeof this.#overlayDatas !== 'undefined') {
-      data = this.#overlayDatas[dataId];
+    if (typeof this.#infoDatas !== 'undefined') {
+      data = this.#infoDatas[dataId];
     }
     return data;
   }
 
   /**
-   * Toggle overlay listeners.
+   * Toggle info data listeners.
    *
    * @param {string} dataId The data id.
    */
-  toggleOverlayListeners(dataId) {
-    const data = this.getOverlayData(dataId);
+  toggleInfoDataListeners(dataId) {
+    const data = this.getInfoData(dataId);
     if (typeof data !== 'undefined') {
       if (data.isListening()) {
         data.removeAppListeners();
@@ -1889,9 +1889,9 @@ export class App {
    * @param {object} event The load start event.
    */
   #onloadstart = (event) => {
-    // create overlay data
+    // create info data
     if (typeof this.#options.overlayConfig !== 'undefined') {
-      this.#overlayDatas[event.dataid] = new OverlayData(
+      this.#infoDatas[event.dataid] = new InfoData(
         this, event.dataid, this.#options.overlayConfig);
     }
     /**
@@ -1997,10 +1997,10 @@ export class App {
       warn: event.warn
     });
 
-    // update overlay data if present
-    if (typeof this.#overlayDatas !== 'undefined' &&
-      typeof this.#overlayDatas[event.dataid] !== 'undefined') {
-      this.#overlayDatas[event.dataid].addItemMeta(eventMetaData);
+    // update info data if present
+    if (typeof this.#infoDatas !== 'undefined' &&
+      typeof this.#infoDatas[event.dataid] !== 'undefined') {
+      this.#infoDatas[event.dataid].addItemMeta(eventMetaData);
     }
 
     // render if first and flag allows

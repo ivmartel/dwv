@@ -58,9 +58,9 @@ function replaceFlags(inputStr, values) {
 }
 
 /**
- * DICOM Header overlay info.
+ * DICOM Header info data.
  */
-export class OverlayData {
+export class InfoData {
 
   /**
    * Associated app.
@@ -77,7 +77,7 @@ export class OverlayData {
   #dataId;
 
   /**
-   * Overlay config.
+   * Info data config.
    *
    * @type {object}
    */
@@ -98,7 +98,7 @@ export class OverlayData {
   #isListening;
 
   /**
-   * Overlay data.
+   * Meta data storage.
    *
    * @type {Array}
    */
@@ -121,14 +121,14 @@ export class OverlayData {
   /**
    * @param {App} app The associated application.
    * @param {string} dataId The associated data id.
-   * @param {object} configs The overlay config.
+   * @param {object} configs The info data config.
    */
   constructor(app, dataId, configs) {
     this.#app = app;
     this.#dataId = dataId;
     this.#configs = configs;
 
-    // parse overlays to get the list of events to listen to
+    // parse config to get the list of events to listen to
     const keys = Object.keys(this.#configs);
     for (let i = 0; i < keys.length; ++i) {
       const config = this.#configs[keys[i]];
@@ -159,7 +159,7 @@ export class OverlayData {
    * @param {object} data The item meta data.
    */
   addItemMeta(data) {
-    // create and store overlay data
+    // create and store info data
     let dataUid;
     // check if dicom data (00020010: transfer syntax)
     if (typeof data['00020010'] !== 'undefined') {
@@ -169,7 +169,7 @@ export class OverlayData {
       } else {
         dataUid = data.length;
       }
-      this.#data[dataUid] = createOverlayData(data, this.#configs);
+      this.#data[dataUid] = createInfoData(data, this.#configs);
     } else {
       // image file case
       const keys = Object.keys(data);
@@ -180,7 +180,7 @@ export class OverlayData {
           break;
         }
       }
-      this.#data[dataUid] = createOverlayDataForDom(data, this.#configs);
+      this.#data[dataUid] = createInfoDataForDom(data, this.#configs);
     }
     // store uid
     this.#currentDataUid = dataUid;
@@ -204,9 +204,9 @@ export class OverlayData {
   };
 
   /**
-   * Update the overlay data.
+   * Update the info data.
    *
-   * @param {object} event An event defined by the overlay map and
+   * @param {object} event An event defined by the info map and
    *   registered in toggleListeners.
    */
   #updateData = (event) => {
@@ -214,32 +214,32 @@ export class OverlayData {
       return;
     }
 
-    const sliceOverlayData = this.#data[this.#currentDataUid];
-    if (typeof sliceOverlayData === 'undefined') {
-      console.warn('No slice overlay data for: ' + this.#currentDataUid);
+    const sliceInfoData = this.#data[this.#currentDataUid];
+    if (typeof sliceInfoData === 'undefined') {
+      console.warn('No slice info data for: ' + this.#currentDataUid);
       return;
     }
 
-    for (let n = 0; n < sliceOverlayData.length; ++n) {
+    for (let n = 0; n < sliceInfoData.length; ++n) {
       let text = undefined;
-      if (typeof sliceOverlayData[n].tags !== 'undefined') {
+      if (typeof sliceInfoData[n].tags !== 'undefined') {
         // update tags only on slice change
         if (event.type === 'positionchange') {
-          text = sliceOverlayData[n].value;
+          text = sliceInfoData[n].value;
         }
       } else {
         // update text if the value is an event type
-        if (typeof sliceOverlayData[n].event !== 'undefined' &&
-          sliceOverlayData[n].event === event.type) {
-          const format = sliceOverlayData[n].format;
+        if (typeof sliceInfoData[n].event !== 'undefined' &&
+          sliceInfoData[n].event === event.type) {
+          const format = sliceInfoData[n].format;
           let values = event.value;
           // optional number precision
-          if (typeof sliceOverlayData[n].precision !== 'undefined') {
+          if (typeof sliceInfoData[n].precision !== 'undefined') {
             let mapFunc = null;
-            if (sliceOverlayData[n].precision === 'round') {
+            if (sliceInfoData[n].precision === 'round') {
               mapFunc = Math.round;
             } else {
-              mapFunc = getNumberToPrecision(sliceOverlayData[n].precision);
+              mapFunc = getNumberToPrecision(sliceInfoData[n].precision);
             }
             values = values.map(mapFunc);
           }
@@ -247,21 +247,21 @@ export class OverlayData {
         }
       }
       if (typeof text !== 'undefined') {
-        sliceOverlayData[n].value = text;
+        sliceInfoData[n].value = text;
       }
     }
 
     /**
      * Value change event.
      *
-     * @event OverlayData#valuechange
+     * @event InfoData#valuechange
      * @type {object}
      * @property {string} type The event type.
-     * @property {Array} data The value of the overlay data.
+     * @property {Array} data The value of the info data.
      */
     this.#fireEvent({
       type: 'valuechange',
-      data: sliceOverlayData
+      data: sliceInfoData
     });
   };
 
@@ -333,35 +333,35 @@ export class OverlayData {
     this.#listenerHandler.fireEvent(event);
   }
 
-} // class OverlayData
+} // class InfoData
 
 /**
- * Create overlay data array for a DICOM image.
+ * Create info data array for a DICOM image.
  *
  * @param {object} dicomElements DICOM elements of the image.
- * @param {object} configs The overlay data configs.
- * @returns {Array} Overlay data array.
+ * @param {object} configs The info data configs.
+ * @returns {Array} Info data array.
  */
-function createOverlayData(dicomElements, configs) {
-  const overlays = [];
+function createInfoData(dicomElements, configs) {
+  const datas = [];
   let modality;
   const modElement = dicomElements['00080060'];
   if (typeof modElement !== 'undefined') {
     modality = modElement.value[0];
   } else {
-    return overlays;
+    return datas;
   }
-  const config = configs[modality] || configs['*'];
-  if (!config) {
-    return overlays;
+  const modalityConfigs = configs[modality] || configs['*'];
+  if (!modalityConfigs) {
+    return datas;
   }
 
-  for (let n = 0; n < config.length; ++n) {
+  for (let n = 0; n < modalityConfigs.length; ++n) {
     // deep copy
-    const overlay = JSON.parse(JSON.stringify(config[n]));
+    const config = JSON.parse(JSON.stringify(modalityConfigs[n]));
 
     // add tag values
-    const tags = overlay.tags;
+    const tags = config.tags;
     if (typeof tags !== 'undefined' && tags.length !== 0) {
       // get values
       const values = [];
@@ -374,14 +374,14 @@ function createOverlayData(dicomElements, configs) {
         }
       }
       // format
-      if (typeof overlay.format === 'undefined' || overlay.format === null) {
-        overlay.format = createDefaultReplaceFormat(values.length);
+      if (typeof config.format === 'undefined' || config.format === null) {
+        config.format = createDefaultReplaceFormat(values.length);
       }
-      overlay.value = replaceFlags(overlay.format, values).trim();
+      config.value = replaceFlags(config.format, values).trim();
     }
 
     // store
-    overlays.push(overlay);
+    datas.push(config);
   }
 
   // (0020,0020) Patient Orientation
@@ -391,45 +391,45 @@ function createOverlayData(dicomElements, configs) {
   ) {
     const po0 = poElement.value[0];
     const po1 = poElement.value[1];
-    overlays.push({
+    datas.push({
       pos: 'cr', value: po0, format: '{v0}'
     });
-    overlays.push({
+    datas.push({
       pos: 'cl', value: getReverseOrientation(po0), format: '{v0}'
     });
-    overlays.push({
+    datas.push({
       pos: 'bc', value: po1, format: '{v0}'
     });
-    overlays.push({
+    datas.push({
       pos: 'tc', value: getReverseOrientation(po1), format: '{v0}'
     });
   }
 
-  return overlays;
+  return datas;
 }
 
 /**
- * Create overlay data array for a DOM image.
+ * Create info data array for a DOM image.
  *
  * @param {object} info Meta data.
- * @param {object} configs The overlay data configs.
- * @returns {Array} Overlay data array.
+ * @param {object} configs The info data configs.
+ * @returns {Array} Info data array.
  */
-function createOverlayDataForDom(info, configs) {
-  const overlays = [];
-  const config = configs.DOM;
-  if (!config) {
-    return overlays;
+function createInfoDataForDom(info, configs) {
+  const datas = [];
+  const domConfigs = configs.DOM;
+  if (!domConfigs) {
+    return datas;
   }
 
   const infoKeys = Object.keys(info);
 
-  for (let n = 0; n < config.length; ++n) {
+  for (let n = 0; n < domConfigs.length; ++n) {
     // deep copy
-    const overlay = JSON.parse(JSON.stringify(config[n]));
+    const config = JSON.parse(JSON.stringify(domConfigs[n]));
 
     // add tag values
-    const tags = overlay.tags;
+    const tags = config.tags;
     if (typeof tags !== 'undefined' && tags.length !== 0) {
       // get values
       const values = [];
@@ -441,15 +441,15 @@ function createOverlayDataForDom(info, configs) {
         }
       }
       // format
-      if (typeof overlay.format === 'undefined' || overlay.format === null) {
-        overlay.format = createDefaultReplaceFormat(values.length);
+      if (typeof config.format === 'undefined' || config.format === null) {
+        config.format = createDefaultReplaceFormat(values.length);
       }
-      overlay.value = replaceFlags(overlay.format, values).trim();
+      config.value = replaceFlags(config.format, values).trim();
     }
 
     // store
-    overlays.push(overlay);
+    datas.push(config);
   }
 
-  return overlays;
+  return datas;
 }
