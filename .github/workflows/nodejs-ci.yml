@@ -36,6 +36,7 @@ jobs:
         run: |
           yarn run build-demo
           cp -Rf tests/pacs/viewer.html ./build/demo
+          cp -Rf tests/pacs/overlays.json ./build/demo
           cp tests/favicon.ico ./build/demo
           ./resources/scripts/prep-deploy.sh -f build/demo/viewer.html
       - name: Push to gh-pages (if master or develop branch)
