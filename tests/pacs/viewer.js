@@ -20,13 +20,13 @@ import {AnnotationUI} from './viewer.ui.annot.js';
 import {SegmentationUI} from './viewer.ui.segment.js';
 import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
+import {overlayConfig} from './overlays.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {ViewConfig} from '../../src/app/application.js';
 /* eslint-enable no-unused-vars */
 
-import overlayConfig from './overlays.json';
 
 // global vars
 
@@ -227,7 +227,7 @@ function viewerSetup() {
   const options = new AppOptions();
   options.tools = _tools;
   options.viewOnFirstLoadItem = viewOnFirstLoadItem;
-  options.overlayConfig = JSON.parse(overlayConfig);
+  options.overlayConfig = overlayConfig;
   // app
   _app = new App();
   _app.init(options);
