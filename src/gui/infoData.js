@@ -1,10 +1,51 @@
 import {ListenerHandler} from '../utils/listen.js';
 import {getReverseOrientation} from '../dicom/dicomParser.js';
+import {
+  getDateObj,
+  getTimeObj,
+  getDate
+} from '../dicom/dicomDate.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application.js';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Info data item class.
+ */
+export class InfoDataItem {
+  /**
+   * List of tag keys.
+   *
+   * @type {string[]|undefined}
+   */
+  tags;
+  /**
+   * @type {string|undefined}
+   */
+  event;
+
+  /**
+   * @type {string}
+   */
+  pos;
+  /**
+   * @type {string}
+   */
+  format;
+  /**
+   * @type {string|undefined}
+   */
+  precision;
+
+  /**
+   * @type {string}
+   */
+  value;
+}
 
 /**
  * Get a number toprecision function with the provided precision.
@@ -41,7 +82,7 @@ function createDefaultReplaceFormat(length) {
  * braces in the form: '{v0}, {v1}'.
  *
  * @param {string} inputStr The input string.
- * @param {string[]} values An array of strings.
+ * @param {Array} values An array of values.
  * @example
  *    var values = ["a", "b"];
  *    var str = "The length is: {v0}. The size is: {v1}";
@@ -77,11 +118,11 @@ export class InfoData {
   #dataId;
 
   /**
-   * Info data config.
+   * Info data config indexed by modality.
    *
-   * @type {object}
+   * @type {Object<string, InfoDataItem[]>}
    */
-  #configs;
+  #infoConfigs;
 
   /**
    * List of event used by the config.
@@ -98,16 +139,16 @@ export class InfoData {
   #isListening;
 
   /**
-   * Meta data storage.
+   * Meta data storage indexed by dataUid.
    *
-   * @type {Array}
+   * @type {Object<string, InfoDataItem[]>|undefined}
    */
-  #data = [];
+  #infoData = {};
 
   /**
    * Current data uid: set on pos change.
    *
-   * @type {number}
+   * @type {string}
    */
   #currentDataUid;
 
@@ -121,19 +162,19 @@ export class InfoData {
   /**
    * @param {App} app The associated application.
    * @param {string} dataId The associated data id.
-   * @param {object} configs The info data config.
+   * @param {Object<string, InfoDataItem[]>} configs The info data config.
    */
   constructor(app, dataId, configs) {
     this.#app = app;
     this.#dataId = dataId;
-    this.#configs = configs;
+    this.#infoConfigs = configs;
 
     // parse config to get the list of events to listen to
-    const keys = Object.keys(this.#configs);
+    const keys = Object.keys(this.#infoConfigs);
     for (let i = 0; i < keys.length; ++i) {
-      const config = this.#configs[keys[i]];
-      for (let j = 0; j < config.length; ++j) {
-        const eventType = config[j].event;
+      const modalityConfig = this.#infoConfigs[keys[i]];
+      for (const item of modalityConfig) {
+        const eventType = item.event;
         if (typeof eventType !== 'undefined') {
           if (!this.#eventNames.includes(eventType)) {
             this.#eventNames.push(eventType);
@@ -149,14 +190,14 @@ export class InfoData {
    * Reset the data.
    */
   reset() {
-    this.#data = [];
+    this.#infoData = {};
     this.#currentDataUid = undefined;
   }
 
   /**
    * Handle a new loaded item event.
    *
-   * @param {object} data The item meta data.
+   * @param {Object<string, DataElement>} data The item meta data.
    */
   addItemMeta(data) {
     // create and store info data
@@ -166,24 +207,23 @@ export class InfoData {
       if (typeof data['00080018'] !== 'undefined') {
         // SOP instance UID
         dataUid = data['00080018'].value[0];
+        this.#infoData[dataUid] = createInfoData(data, this.#infoConfigs);
       } else {
-        dataUid = data.length;
+        logger.warn('Missing DICOM SOP instance UID for info data indexing');
       }
-      this.#data[dataUid] = createInfoData(data, this.#configs);
     } else {
       // image file case
-      const keys = Object.keys(data);
-      for (let d = 0; d < keys.length; ++d) {
-        const obj = data[keys[d]];
-        if (keys[d] === 'imageUid') {
-          dataUid = obj.value;
-          break;
-        }
+      if (typeof data['imageUid'] !== 'undefined') {
+        dataUid = data['imageUid'].value[0];
+        this.#infoData[dataUid] = createInfoDataForDom(data, this.#infoConfigs);
+      } else {
+        logger.warn('Missing DOM image UID for info data indexing');
       }
-      this.#data[dataUid] = createInfoDataForDom(data, this.#configs);
     }
     // store uid
-    this.#currentDataUid = dataUid;
+    if (typeof dataUid !== 'undefined') {
+      this.#currentDataUid = dataUid;
+    }
   }
 
   /**
@@ -191,7 +231,7 @@ export class InfoData {
    *
    * @param {object} event The slicechange event.
    */
-  #onSliceChange = (event) => {
+  onSliceChange = (event) => {
     if (event.dataid !== this.#dataId) {
       return;
     }
@@ -210,36 +250,39 @@ export class InfoData {
    *   registered in toggleListeners.
    */
   #updateData = (event) => {
-    if (event.dataid !== this.#dataId) {
+    if (typeof event.dataid !== 'undefined' &&
+      event.dataid !== this.#dataId) {
       return;
     }
 
-    const sliceInfoData = this.#data[this.#currentDataUid];
+    const sliceInfoData = this.#infoData[this.#currentDataUid];
     if (typeof sliceInfoData === 'undefined') {
       console.warn('No slice info data for: ' + this.#currentDataUid);
       return;
     }
 
-    for (let n = 0; n < sliceInfoData.length; ++n) {
+    for (const infoDataItem of sliceInfoData) {
       let text = undefined;
-      if (typeof sliceInfoData[n].tags !== 'undefined') {
+      if (typeof infoDataItem.tags !== 'undefined') {
         // update tags only on slice change
         if (event.type === 'positionchange') {
-          text = sliceInfoData[n].value;
+          text = infoDataItem.value;
         }
       } else {
         // update text if the value is an event type
-        if (typeof sliceInfoData[n].event !== 'undefined' &&
-          sliceInfoData[n].event === event.type) {
-          const format = sliceInfoData[n].format;
+        if (typeof infoDataItem.event !== 'undefined' &&
+          infoDataItem.event === event.type) {
+          const format = infoDataItem.format;
           let values = event.value;
           // optional number precision
-          if (typeof sliceInfoData[n].precision !== 'undefined') {
+          if (typeof infoDataItem.precision !== 'undefined') {
             let mapFunc = null;
-            if (sliceInfoData[n].precision === 'round') {
+            if (infoDataItem.precision === 'round') {
               mapFunc = Math.round;
             } else {
-              mapFunc = getNumberToPrecision(sliceInfoData[n].precision);
+              mapFunc = getNumberToPrecision(
+                parseInt(infoDataItem.precision, 10)
+              );
             }
             values = values.map(mapFunc);
           }
@@ -247,7 +290,7 @@ export class InfoData {
         }
       }
       if (typeof text !== 'undefined') {
-        sliceInfoData[n].value = text;
+        infoDataItem.value = text;
       }
     }
 
@@ -257,7 +300,7 @@ export class InfoData {
      * @event InfoData#valuechange
      * @type {object}
      * @property {string} type The event type.
-     * @property {Array} data The value of the info data.
+     * @property {InfoDataItem[]} data The value of the info data.
      */
     this.#fireEvent({
       type: 'valuechange',
@@ -279,10 +322,10 @@ export class InfoData {
    */
   addAppListeners() {
     // listen to update tags data
-    this.#app.addEventListener('positionchange', this.#onSliceChange);
+    this.#app.addEventListener('positionchange', this.onSliceChange);
     // add event listeners
-    for (let i = 0; i < this.#eventNames.length; ++i) {
-      this.#app.addEventListener(this.#eventNames[i], this.#updateData);
+    for (const eventName of this.#eventNames) {
+      this.#app.addEventListener(eventName, this.#updateData);
     }
     // update flag
     this.#isListening = true;
@@ -293,10 +336,10 @@ export class InfoData {
    */
   removeAppListeners() {
     // stop listening to update tags data
-    this.#app.removeEventListener('positionchange', this.#onSliceChange);
+    this.#app.removeEventListener('positionchange', this.onSliceChange);
     // remove event listeners
-    for (let i = 0; i < this.#eventNames.length; ++i) {
-      this.#app.removeEventListener(this.#eventNames[i], this.#updateData);
+    for (const eventName of this.#eventNames) {
+      this.#app.removeEventListener(eventName, this.#updateData);
     }
     // update flag
     this.#isListening = false;
@@ -339,8 +382,8 @@ export class InfoData {
  * Create info data array for a DICOM image.
  *
  * @param {object} dicomElements DICOM elements of the image.
- * @param {object} configs The info data configs.
- * @returns {Array} Info data array.
+ * @param {Object<string, InfoDataItem[]>} configs The info data configs.
+ * @returns {InfoDataItem[]} Info data array.
  */
 function createInfoData(dicomElements, configs) {
   const datas = [];
@@ -356,32 +399,46 @@ function createInfoData(dicomElements, configs) {
     return datas;
   }
 
-  for (let n = 0; n < modalityConfigs.length; ++n) {
+  // transform a config item into data item by adding a value
+  for (const modalityConfig of modalityConfigs) {
     // deep copy
-    const config = JSON.parse(JSON.stringify(modalityConfigs[n]));
+    const dataItem = JSON.parse(JSON.stringify(modalityConfig));
 
     // add tag values
-    const tags = config.tags;
+    const tags = dataItem.tags;
     if (typeof tags !== 'undefined' && tags.length !== 0) {
       // get values
       const values = [];
-      for (let i = 0; i < tags.length; ++i) {
-        const elem = dicomElements[tags[i]];
+      for (const tag of tags) {
+        const elem = dicomElements[tag];
         if (typeof elem !== 'undefined') {
-          values.push(dicomElements[tags[i]].value);
+          if (elem.vr === 'DA') {
+            const da = getDate(getDateObj(elem));
+            if (typeof da !== 'undefined') {
+              values.push(da.toLocaleDateString());
+            }
+          } else if (elem.vr === 'TM') {
+            const baseDateObj = {year: 1900, monthIndex: 0, day: 1};
+            const da = getDate(baseDateObj, getTimeObj(elem));
+            if (typeof da !== 'undefined') {
+              values.push(da.toLocaleTimeString());
+            }
+          } else {
+            values.push(elem.value);
+          }
         } else {
-          values.push('');
+          values.push('undefined');
         }
       }
       // format
-      if (typeof config.format === 'undefined' || config.format === null) {
-        config.format = createDefaultReplaceFormat(values.length);
+      if (typeof dataItem.format === 'undefined' || dataItem.format === null) {
+        dataItem.format = createDefaultReplaceFormat(values.length);
       }
-      config.value = replaceFlags(config.format, values).trim();
+      dataItem.value = replaceFlags(dataItem.format, values).trim();
     }
 
     // store
-    datas.push(config);
+    datas.push(dataItem);
   }
 
   // (0020,0020) Patient Orientation
@@ -411,44 +468,42 @@ function createInfoData(dicomElements, configs) {
 /**
  * Create info data array for a DOM image.
  *
- * @param {object} info Meta data.
- * @param {object} configs The info data configs.
- * @returns {Array} Info data array.
+ * @param {object} domElements Meta data.
+ * @param {Object<string, InfoDataItem[]>} configs The info data configs.
+ * @returns {InfoDataItem[]} Info data array.
  */
-function createInfoDataForDom(info, configs) {
+function createInfoDataForDom(domElements, configs) {
   const datas = [];
   const domConfigs = configs.DOM;
   if (!domConfigs) {
     return datas;
   }
 
-  const infoKeys = Object.keys(info);
-
-  for (let n = 0; n < domConfigs.length; ++n) {
+  // transform a config item into data item by adding a value
+  for (const domConfig of domConfigs) {
     // deep copy
-    const config = JSON.parse(JSON.stringify(domConfigs[n]));
+    const dataItem = JSON.parse(JSON.stringify(domConfig));
 
     // add tag values
-    const tags = config.tags;
+    const tags = dataItem.tags;
     if (typeof tags !== 'undefined' && tags.length !== 0) {
       // get values
       const values = [];
-      for (let i = 0; i < tags.length; ++i) {
-        for (let j = 0; j < infoKeys.length; ++j) {
-          if (tags[i] === infoKeys[j]) {
-            values.push(info[infoKeys[j]].value);
-          }
+      for (const tag of tags) {
+        const elem = domElements[tag];
+        if (typeof elem !== 'undefined') {
+          values.push(elem.value);
         }
       }
       // format
-      if (typeof config.format === 'undefined' || config.format === null) {
-        config.format = createDefaultReplaceFormat(values.length);
+      if (typeof dataItem.format === 'undefined' || dataItem.format === null) {
+        dataItem.format = createDefaultReplaceFormat(values.length);
       }
-      config.value = replaceFlags(config.format, values).trim();
+      dataItem.value = replaceFlags(dataItem.format, values).trim();
     }
 
     // store
-    datas.push(config);
+    datas.push(dataItem);
   }
 
   return datas;

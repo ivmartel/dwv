@@ -26,6 +26,8 @@ import {BrushToolUI} from './viewer.ui.brush.js';
 import {ViewConfig} from '../../src/app/application.js';
 /* eslint-enable no-unused-vars */
 
+import overlayConfig from './overlays.json';
+
 // global vars
 
 /**
@@ -225,6 +227,7 @@ function viewerSetup() {
   const options = new AppOptions();
   options.tools = _tools;
   options.viewOnFirstLoadItem = viewOnFirstLoadItem;
+  options.overlayConfig = JSON.parse(overlayConfig);
   // app
   _app = new App();
   _app.init(options);

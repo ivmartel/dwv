@@ -407,11 +407,13 @@ export class Stage {
    * The new layer group will be marked as the active layer group.
    *
    * @param {object} htmlElement The HTML element of the layer group.
+   * @param {boolean} [withInfoOverlay] Optional with info overlay flag,
+   * default to false.
    * @returns {LayerGroup} The newly created layer group.
    */
-  addLayerGroup(htmlElement) {
+  addLayerGroup(htmlElement, withInfoOverlay) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
-    const layerGroup = new LayerGroup(htmlElement);
+    const layerGroup = new LayerGroup(htmlElement, withInfoOverlay);
     layerGroup.setImageSmoothing(this.#imageSmoothing);
     // add to storage
     const isBound = this.#callbackStore && this.#callbackStore.length !== 0;

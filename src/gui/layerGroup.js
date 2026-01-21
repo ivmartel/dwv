@@ -8,12 +8,14 @@ import {precisionRound} from '../utils/string.js';
 import {ViewLayer} from './viewLayer.js';
 import {DrawLayer} from './drawLayer.js';
 import {SOPClassUIDs} from '../dicom/dictionary.js';
+import {InfoLayer} from './infoLayer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Point2D, Point3D} from '../math/point.js';
 import {Scalar2D, Scalar3D} from '../math/scalar.js';
 import {PositionHelper} from '../image/positionHelper.js';
+import {InfoData} from './infoData.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -45,6 +47,29 @@ export function getLayerDetailsFromLayerDivId(idString) {
     layerIndex: split[1],
     layerId: idString,
   };
+}
+
+/**
+ * Get the info layer div id.
+ * For example: 'layerGroup0-infoLayer'.
+ *
+ * @param {string} groupDivId The layer group div id.
+ * @returns {string} A string id.
+ */
+export function getInfoLayerDivId(groupDivId) {
+  return groupDivId + '-infolayer';
+}
+
+/**
+ * Get the layer details from an info layer div id
+ * created by getInfoLayerDivId.
+ *
+ * @param {string} idString The layer div id.
+ * @returns {object} The layer details as {groupDivId}.
+ */
+export function getLayerDetailsFromInfoLayerDivId(idString) {
+  const groupDivId = idString.substring(0, idString.length - 10);
+  return {groupDivId};
 }
 
 /**
@@ -201,6 +226,27 @@ export class LayerGroup {
   #positionHelper;
 
   /**
+   * Info layer.
+   *
+   * @type {InfoLayer}
+   */
+  #infoLayer;
+
+  /**
+   * List of info data.
+   *
+   * @type {InfoData[]}
+   */
+  #infoDatas = [];
+
+  /**
+   * Dataid of the info source data.
+   *
+   * @type {string}
+   */
+  #infoDataId;
+
+  /**
    * Get the position helper.
    *
    * @returns {PositionHelper|undefined} The position helper or
@@ -225,9 +271,21 @@ export class LayerGroup {
 
   /**
    * @param {HTMLElement} containerDiv The associated HTML div.
+   * @param {boolean} [withInfoLayer] Optional with info layer flag,
+   * default to false.
    */
-  constructor(containerDiv) {
+  constructor(containerDiv, withInfoLayer) {
     this.#containerDiv = containerDiv;
+
+    if (typeof withInfoLayer !== 'undefined' &&
+      withInfoLayer === true
+    ) {
+      const layerDiv = document.createElement('div');
+      layerDiv.id = getInfoLayerDivId(containerDiv.id);
+      layerDiv.className = 'infoLayer';
+      containerDiv.appendChild(layerDiv);
+      this.#infoLayer = new InfoLayer(layerDiv);
+    }
   }
 
   /**
@@ -697,6 +755,14 @@ export class LayerGroup {
    */
   setActiveLayer(index) {
     this.#activeLayerIndex = index;
+
+    const layer = this.#layers[index];
+    if (typeof this.#infoLayer !== 'undefined') {
+      this.unbindInfoData();
+      const dataId = layer.getDataId();
+      this.bindInfoData(dataId);
+    }
+
     /**
      * Active layer change event.
      *
@@ -876,6 +942,46 @@ export class LayerGroup {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.removeEventListener(
       'positionchange', this.#fireEvent);
+  }
+
+  /**
+   * Add info data.
+   *
+   * @param {InfoData} data The data to add.
+   * @param {string} dataId The associated data ID.
+   */
+  addInfoData(data, dataId) {
+    this.#infoDatas[dataId] = data;
+  }
+
+  /**
+   * Bind info data.
+   *
+   * @param {string} dataId The associated data ID.
+   */
+  bindInfoData(dataId) {
+    // just bind one data id
+    if (typeof this.#infoDataId !== 'undefined') {
+      return;
+    }
+    const infoData = this.#infoDatas[dataId];
+    if (typeof infoData !== 'undefined') {
+      infoData.addEventListener('valuechange',
+        this.#infoLayer.onDataChange);
+    }
+    this.#infoDataId = dataId;
+  }
+
+  /**
+   * Unbind info data.
+   */
+  unbindInfoData() {
+    const infoData = this.#infoDatas[this.#infoDataId];
+    if (typeof infoData !== 'undefined') {
+      infoData.removeEventListener('valuechange',
+        this.#infoLayer.onDataChange);
+    }
+    this.#infoDataId = undefined;
   }
 
   /**
@@ -1163,6 +1269,18 @@ export class LayerGroup {
   }
 
   /**
+   * Update info data on position change.
+   *
+   * @param {object} event The position change event.
+   */
+  #updateInfoData = (event) => {
+    const infoData = this.#infoDatas[event.dataid];
+    if (typeof infoData !== 'undefined') {
+      infoData.onSliceChange(event);
+    }
+  };
+
+  /**
    * Update layers (but not the event source layer) to a position change.
    *
    * @param {object} event The position change event.
@@ -1175,6 +1293,8 @@ export class LayerGroup {
         layer.removeEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.removeEventListener('positionchange', this.#fireEvent);
+
+        layer.addEventListener('positionchange', this.#updateInfoData);
       }
     }
 
@@ -1278,6 +1398,8 @@ export class LayerGroup {
         layer.addEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.addEventListener('positionchange', this.#fireEvent);
+
+        layer.removeEventListener('positionchange', this.#updateInfoData);
       }
     }
   };

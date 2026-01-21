@@ -1186,7 +1186,8 @@ export class App {
   #createLayerGroup(viewConfig) {
     // create new layer group
     const element = this.#options.rootDocument.getElementById(viewConfig.divId);
-    const layerGroup = this.#stage.addLayerGroup(element);
+    const withInfoOverlay = typeof this.#options.overlayConfig !== 'undefined';
+    const layerGroup = this.#stage.addLayerGroup(element, withInfoOverlay);
     // bind events
     this.#bindLayerGroupToApp(layerGroup);
   }
@@ -2278,6 +2279,12 @@ export class App {
     // listen to image set
     this.#dataController.addEventListener(
       'dataimageset', viewLayer.onimageset);
+
+    // bind overlay data
+    if (typeof this.#options.overlayConfig !== 'undefined') {
+      layerGroup.addInfoData(this.getInfoData(dataId), dataId);
+      layerGroup.bindInfoData(dataId);
+    }
 
     // sync layers position
     const value = [
