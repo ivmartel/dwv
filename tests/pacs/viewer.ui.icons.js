@@ -39,6 +39,7 @@ function getIconElement(name) {
 export function getButton(name) {
   const button = document.createElement('button');
   button.title = name;
+  button.name = name;
   button.appendChild(getIconElement(name));
   return button;
 }
@@ -51,8 +52,10 @@ export function getButton(name) {
  */
 export function setButtonPressed(button, state) {
   if (state) {
+    button.value = '1';
     button.style.borderStyle = 'inset';
   } else {
+    button.value = '0';
     button.style.borderStyle = 'outset';
   }
 }
@@ -64,5 +67,5 @@ export function setButtonPressed(button, state) {
  * @returns {boolean} True if pressed.
  */
 export function isButtonPressed(button) {
-  return button.style.borderStyle === 'inset';
+  return button.value === '1';
 }
