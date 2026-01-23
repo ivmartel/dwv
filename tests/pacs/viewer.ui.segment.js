@@ -21,6 +21,7 @@ import {
   getHtmlId,
   getRootFromHtmlId
 } from './viewer.ui.js';
+import {getButton} from './viewer.ui.icons.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -758,25 +759,22 @@ export class SegmentationUI {
     colourInput.onchange = this.#onSegmentColourChange;
 
     // segment view
-    const viewButton = document.createElement('button');
+    const viewButton = getButton('View');
     viewButton.style.borderStyle = 'outset';
     viewButton.id = getHtmlId(prefixes.view, segmentId);
     viewButton.title = 'Show/hide segment';
-    viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
     viewButton.onclick = this.#onSegmentViewChange;
 
     // goto segment
-    const gotoButton = document.createElement('button');
+    const gotoButton = getButton('Goto');
     gotoButton.id = getHtmlId(prefixes.goto, segmentId);
     gotoButton.title = 'Goto segment';
-    gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
     gotoButton.onclick = this.#onGotoSegment;
 
     // segment delete
-    const deleteButton = document.createElement('button');
+    const deleteButton = getButton('Delete');
     deleteButton.id = getHtmlId(prefixes.delete, segmentId);
     deleteButton.title = 'Delete segment';
-    deleteButton.appendChild(document.createTextNode('\u{274C}'));
     deleteButton.onclick = this.#onSegmentDelete;
 
     // segment span
@@ -1066,8 +1064,7 @@ export class SegmentationUI {
     const segmentationItem = document.createElement('li');
 
     // save segmentation
-    const saveButton = document.createElement('button');
-    saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
+    const saveButton = getButton('Save');
     saveButton.title = 'Save segmentation';
     saveButton.id = getHtmlId(prefixes.save, segmentationName);
     saveButton.onclick = this.#onSegmentationSave;
@@ -1099,8 +1096,7 @@ export class SegmentationUI {
     eraserLabel.appendChild(document.createTextNode('Eraser'));
 
     // add segment
-    const addSegmentButton = document.createElement('button');
-    addSegmentButton.appendChild(document.createTextNode('\u2795'));
+    const addSegmentButton = getButton('Add');
     addSegmentButton.title = 'Add segment';
     addSegmentButton.id = getHtmlId(prefixes.addSegment, segmentationName);
     addSegmentButton.onclick = this.#onSegmentAdd;

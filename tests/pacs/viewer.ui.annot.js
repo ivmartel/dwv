@@ -6,6 +6,7 @@ import {
   getUID,
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
+import {getButton} from './viewer.ui.icons.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -172,11 +173,10 @@ export class AnnotationUI {
       }
     };
 
-    const gotoButton = document.createElement('button');
+    const gotoButton = getButton('Goto');
     const gbIdPrefix = 'gotob-';
     gotoButton.id = gbIdPrefix + annotationDivId;
     gotoButton.title = 'Goto annotation';
-    gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
     gotoButton.onclick = (event) => {
       const target = event.target;
       // get annotation
@@ -197,12 +197,11 @@ export class AnnotationUI {
       }
     };
 
-    const viewButton = document.createElement('button');
+    const viewButton = getButton('View');
     viewButton.style.borderStyle = 'outset';
     const vbIdPrefix = 'vb-';
     viewButton.id = vbIdPrefix + annotationDivId;
     viewButton.title = 'Show/hide annotation';
-    viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
     viewButton.onclick = (event) => {
       const target = event.target;
       // get annotatio
@@ -226,11 +225,10 @@ export class AnnotationUI {
       }
     };
 
-    const deleteButton = document.createElement('button');
+    const deleteButton = getButton('Delete');
     const dbIdPrefix = 'db-';
     deleteButton.id = dbIdPrefix + annotationDivId;
     deleteButton.title = 'Delete annotation';
-    deleteButton.appendChild(document.createTextNode('\u{274C}'));
     deleteButton.onclick = (event) => {
       const target = event.target;
       // get segment and mask
@@ -284,10 +282,9 @@ export class AnnotationUI {
     const item = document.createElement('li');
     item.id = 'li-' + getAnnotationGroupDivId(dataId);
 
-    const lockButton = document.createElement('button');
+    const lockButton = getButton('Lock');
     lockButton.style.borderStyle = 'outset';
     lockButton.id = 'lockb-' + getAnnotationGroupDivId(dataId);
-    lockButton.appendChild(document.createTextNode('\u{1F512}'));
     lockButton.onclick = function (event) {
       const target = event.target;
       // toggle hidden
@@ -307,8 +304,7 @@ export class AnnotationUI {
     item.appendChild(lockButton);
 
     // save segment button
-    const saveButton = document.createElement('button');
-    saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
+    const saveButton = getButton('Save');
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = function () {
       const factory = new AnnotationGroupFactory();
@@ -344,11 +340,10 @@ export class AnnotationUI {
     };
     item.appendChild(saveButton);
 
-    const hideLabelsButton = document.createElement('button');
+    const hideLabelsButton = getButton('Label');
     hideLabelsButton.style.borderStyle = 'outset';
     hideLabelsButton.id = 'b-hidelabels';
     hideLabelsButton.title = 'Show/hide annotation labels';
-    hideLabelsButton.appendChild(document.createTextNode('\u{1F3F7}\u{FE0F}'));
     hideLabelsButton.onclick = (event) => {
       const target = event.target;
       const drawLayer = this.#app.getDrawLayersByDataId(dataId)[0];
