@@ -216,12 +216,12 @@ export class AnnotationUI {
       const drawLayers = this.#app.getDrawLayersByDataId(dataId);
       // toggle hidden
       if (isButtonPressed(target)) {
-        setButtonPressed(viewButton, false);
+        setButtonPressed(target, false);
         for (const layer of drawLayers) {
           layer.setAnnotationVisibility(annotationId, true);
         }
       } else {
-        setButtonPressed(viewButton, true);
+        setButtonPressed(target, true);
         for (const layer of drawLayers) {
           layer.setAnnotationVisibility(annotationId, false);
         }
@@ -353,10 +353,10 @@ export class AnnotationUI {
         console.warn('Cannot find draw layer with id ' + dataId);
       }
       if (isButtonPressed(target)) {
-        setButtonPressed(hideLabelsButton, false);
+        setButtonPressed(target, false);
         drawLayer.setLabelsVisibility(true);
       } else {
-        setButtonPressed(hideLabelsButton, true);
+        setButtonPressed(target, true);
         drawLayer.setLabelsVisibility(false);
       }
     };
