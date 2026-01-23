@@ -42,3 +42,27 @@ export function getButton(name) {
   button.appendChild(getIconElement(name));
   return button;
 }
+
+/**
+ * Set a button as pressed or not.
+ *
+ * @param {HTMLButtonElement} button The button to set state.
+ * @param {boolean} state True to set as pressed.
+ */
+export function setButtonPressed(button, state) {
+  if (state) {
+    button.style.borderStyle = 'inset';
+  } else {
+    button.style.borderStyle = 'outset';
+  }
+}
+
+/**
+ * Get a button pressed state.
+ *
+ * @param {HTMLButtonElement} button The button to get state.
+ * @returns {boolean} True if pressed.
+ */
+export function isButtonPressed(button) {
+  return button.style.borderStyle === 'inset';
+}

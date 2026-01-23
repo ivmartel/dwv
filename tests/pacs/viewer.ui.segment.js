@@ -21,7 +21,11 @@ import {
   getHtmlId,
   getRootFromHtmlId
 } from './viewer.ui.js';
-import {getButton} from './viewer.ui.icons.js';
+import {
+  getButton,
+  setButtonPressed,
+  isButtonPressed
+} from './viewer.ui.icons.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -606,12 +610,11 @@ export class SegmentationUI {
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
     // toggle hidden
     const segViewHelper = segmentation.viewHelper;
-    const isPressed = target.style.borderStyle === 'inset';
-    if (isPressed) {
-      target.style.borderStyle = 'outset';
+    if (isButtonPressed(target)) {
+      setButtonPressed(target, false);
       segViewHelper.removeFromHidden(segment.number);
     } else {
-      target.style.borderStyle = 'inset';
+      setButtonPressed(target, true);
       segViewHelper.addToHidden(segment.number);
     }
     // apply hidden
@@ -760,7 +763,7 @@ export class SegmentationUI {
 
     // segment view
     const viewButton = getButton('View');
-    viewButton.style.borderStyle = 'outset';
+    setButtonPressed(viewButton, false);
     viewButton.id = getHtmlId(prefixes.view, segmentId);
     viewButton.title = 'Show/hide segment';
     viewButton.onclick = this.#onSegmentViewChange;

@@ -6,7 +6,11 @@ import {
   getUID,
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
-import {getButton} from './viewer.ui.icons.js';
+import {
+  getButton,
+  setButtonPressed,
+  isButtonPressed
+} from './viewer.ui.icons.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -198,7 +202,7 @@ export class AnnotationUI {
     };
 
     const viewButton = getButton('View');
-    viewButton.style.borderStyle = 'outset';
+    setButtonPressed(viewButton, false);
     const vbIdPrefix = 'vb-';
     viewButton.id = vbIdPrefix + annotationDivId;
     viewButton.title = 'Show/hide annotation';
@@ -211,14 +215,13 @@ export class AnnotationUI {
       const annotationId = indices.annotationId;
       const drawLayers = this.#app.getDrawLayersByDataId(dataId);
       // toggle hidden
-      const isPressed = target.style.borderStyle === 'inset';
-      if (isPressed) {
-        target.style.borderStyle = 'outset';
+      if (isButtonPressed(target)) {
+        setButtonPressed(viewButton, false);
         for (const layer of drawLayers) {
           layer.setAnnotationVisibility(annotationId, true);
         }
       } else {
-        target.style.borderStyle = 'inset';
+        setButtonPressed(viewButton, true);
         for (const layer of drawLayers) {
           layer.setAnnotationVisibility(annotationId, false);
         }
@@ -283,19 +286,18 @@ export class AnnotationUI {
     item.id = 'li-' + getAnnotationGroupDivId(dataId);
 
     const lockButton = getButton('Lock');
-    lockButton.style.borderStyle = 'outset';
+    setButtonPressed(lockButton, false);
     lockButton.id = 'lockb-' + getAnnotationGroupDivId(dataId);
     lockButton.onclick = function (event) {
       const target = event.target;
       // toggle hidden
-      const isPressed = target.style.borderStyle === 'inset';
-      if (isPressed) {
-        target.style.borderStyle = 'outset';
+      if (isButtonPressed(target)) {
+        setButtonPressed(target, false);
         if (typeof annotationGroup !== 'undefined') {
           annotationGroup.setEditable(true);
         }
       } else {
-        target.style.borderStyle = 'inset';
+        setButtonPressed(target, true);
         if (typeof annotationGroup !== 'undefined') {
           annotationGroup.setEditable(false);
         }
@@ -341,7 +343,7 @@ export class AnnotationUI {
     item.appendChild(saveButton);
 
     const hideLabelsButton = getButton('Label');
-    hideLabelsButton.style.borderStyle = 'outset';
+    setButtonPressed(hideLabelsButton, false);
     hideLabelsButton.id = 'b-hidelabels';
     hideLabelsButton.title = 'Show/hide annotation labels';
     hideLabelsButton.onclick = (event) => {
@@ -350,12 +352,11 @@ export class AnnotationUI {
       if (typeof drawLayer === 'undefined') {
         console.warn('Cannot find draw layer with id ' + dataId);
       }
-      const isPressed = target.style.borderStyle === 'inset';
-      if (isPressed) {
-        target.style.borderStyle = 'outset';
+      if (isButtonPressed(target)) {
+        setButtonPressed(hideLabelsButton, false);
         drawLayer.setLabelsVisibility(true);
       } else {
-        target.style.borderStyle = 'inset';
+        setButtonPressed(hideLabelsButton, true);
         drawLayer.setLabelsVisibility(false);
       }
     };
