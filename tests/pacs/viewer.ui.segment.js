@@ -141,7 +141,8 @@ const prefixes = {
   selectEraser: 'select-eraser-',
   save: 'save-',
   volumes: 'span-volumes-',
-  goto: 'gotob-'
+  goto: 'gotob-',
+  li: 'li-'
 };
 
 /**
@@ -207,10 +208,29 @@ export class SegmentationUI {
   #app;
 
   /**
-   * @param {object} app The associated application.
+   * The root document.
+   *
+   * @type {Document}
    */
-  constructor(app) {
+  #rootDoc = document;
+
+  /**
+   * With overlap check flag.
+   *
+   * @type {boolean}
+   */
+  #withOverlapCheck = true;
+
+  /**
+   * @param {App} app The associated application.
+   * @param {Document} [rootDoc] Optional root document,
+   *   defaults to `window.document`.
+   */
+  constructor(app, rootDoc) {
     this.#app = app;
+    if (typeof rootDoc !== 'undefined') {
+      this.#rootDoc = rootDoc;
+    }
   }
 
   /**
@@ -220,6 +240,38 @@ export class SegmentationUI {
     this.#app.addEventListener('dataadd', this.#onDataAdd);
     this.#app.addEventListener('labelschanged', this.#onLabelsChanged);
   };
+
+  /**
+   * Setup the container div.
+   */
+  #setupContainerDiv() {
+    // fieldset
+    const legend = document.createElement('legend');
+    legend.appendChild(document.createTextNode('Segmentations'));
+
+    const fieldset = document.createElement('fieldset');
+    fieldset.id = 'segmentations-fieldset';
+    fieldset.appendChild(legend);
+
+    // main div
+    const line = document.createElement('div');
+    line.id = 'segmentations-line';
+    line.className = 'line';
+    line.appendChild(fieldset);
+
+    // insert
+    const detailsEl = this.#rootDoc.getElementById('layersdetails');
+    detailsEl.parentElement.insertBefore(line, detailsEl);
+  }
+
+  /**
+   * Get the container div.
+   *
+   * @returns {HTMLDivElement} The element.
+   */
+  #getContainerDiv() {
+    return this.#rootDoc.getElementById('segmentations-fieldset');
+  }
 
   /**
    * Calculate mask labels.
@@ -257,30 +309,6 @@ export class SegmentationUI {
   };
 
   /**
-   * Add to the list of segmentations on the overlap checker.
-   *
-   * @param {object} segmentation The segmentation to add.
-   * @param {number} segmentationIndex The segmentation index.
-   */
-  #addOverlapCheckerSelection(segmentation, segmentationIndex) {
-    const overlapSelect0 =
-      document.getElementById('overlap-checker-select-list-0');
-    const overlapSelect1 =
-      document.getElementById('overlap-checker-select-list-1');
-
-    const newOption0 = document.createElement('option');
-    newOption0.innerHTML = getSegmentationHtmlId(segmentationIndex);
-    newOption0.value = segmentation.dataId;
-
-    const newOption1 = document.createElement('option');
-    newOption1.innerHTML = getSegmentationHtmlId(segmentationIndex);
-    newOption1.value = segmentation.dataId;
-
-    overlapSelect0.appendChild(newOption0);
-    overlapSelect1.appendChild(newOption1);
-  }
-
-  /**
    * Add a segment HTML to the main HTML.
    *
    * @param {object} segmentation The segmentation.
@@ -291,16 +319,18 @@ export class SegmentationUI {
       this.#getSegmentationHtml(segmentation, _segmentations.length - 1);
 
     // add segmentation item
-    const addItem = document.getElementById('addsegmentationitem');
+    const addItem = this.#rootDoc.getElementById('addsegmentationitem');
     // remove and add after to make it last item
     addItem.remove();
 
     // update list
-    const segList = document.getElementById('segmentation-list');
+    const segList = this.#rootDoc.getElementById('segmentation-list');
     segList.appendChild(item);
     segList.appendChild(addItem);
 
-    this.#addOverlapCheckerSelection(segmentation, _segmentations.length - 1);
+    if (this.#withOverlapCheck) {
+      this.#addOverlapCheckerSelection(segmentation, _segmentations.length - 1);
+    }
   }
 
   /**
@@ -315,7 +345,7 @@ export class SegmentationUI {
     if (typeof maskImage !== 'undefined' &&
       maskImage.getMeta().Modality === 'SEG') {
       // setup html if needed
-      if (!document.getElementById('segmentation-list')) {
+      if (!this.#rootDoc.getElementById('segmentation-list')) {
         this.#setupHtml();
       }
 
@@ -395,6 +425,7 @@ export class SegmentationUI {
     // segmentation list
     const segList = document.createElement('ul');
     segList.id = 'segmentation-list';
+    segList.className = 'data-list';
 
     // loop on segmentations
     for (let i = 0; i < _segmentations.length; ++i) {
@@ -425,25 +456,15 @@ export class SegmentationUI {
     addItem.appendChild(addSegmentationButton);
     segList.appendChild(addItem);
 
-    const overlapChecker = this.#getSegmentationOverlapHtml();
 
-    // fieldset
-    const legend = document.createElement('legend');
-    legend.appendChild(document.createTextNode('Segmentations'));
-    const fieldset = document.createElement('fieldset');
-    fieldset.appendChild(legend);
-    fieldset.appendChild(segList);
-    fieldset.appendChild(overlapChecker);
+    // setup and append
+    this.#setupContainerDiv();
+    this.#getContainerDiv().appendChild(segList);
 
-    // main div
-    const line = document.createElement('div');
-    line.id = 'segmentations-line';
-    line.className = 'line';
-    line.appendChild(fieldset);
-
-    // insert
-    const detailsEl = document.getElementById('layersdetails');
-    detailsEl.parentElement.insertBefore(line, detailsEl);
+    if (this.#withOverlapCheck) {
+      const overlapChecker = this.#getSegmentationOverlapHtml();
+      this.#getContainerDiv().appendChild(overlapChecker);
+    }
   }
 
   /**
@@ -643,17 +664,17 @@ export class SegmentationUI {
       indices.segmentNumber, indices.segmentationIndex);
 
     // get segment divs
-    const segmentSpan = document.getElementById(
-      getHtmlId(prefixes.span, segmentId)
+    const listItem = this.#rootDoc.getElementById(
+      getHtmlId(prefixes.li, segmentId)
     );
-    if (!segmentSpan) {
-      throw new Error('No delete span');
+    if (!listItem) {
+      throw new Error('No segment item');
     }
-    const spanParent = segmentSpan.parentNode;
-    if (!spanParent) {
+    const parent = listItem.parentNode;
+    if (!parent) {
       throw new Error('No delete span parent');
     }
-    const spanNext = segmentSpan.nextSibling;
+    const nextItem = listItem.nextSibling;
 
     // get mask
     const data = this.#app.getData(segmentation.dataId);
@@ -664,13 +685,13 @@ export class SegmentationUI {
       // create delete command
       const delCmd = new DeleteSegmentCommand(data.image, segment);
       delCmd.onExecute = function () {
-        segmentSpan.remove();
+        listItem.remove();
         if (segmentation.viewHelper.isHidden(segment.number)) {
           segmentation.viewHelper.removeFromHidden(segment);
         }
       };
       delCmd.onUndo = function () {
-        spanParent.insertBefore(segmentSpan, spanNext);
+        parent.insertBefore(listItem, nextItem);
       };
       // execute command
       if (delCmd.isValid()) {
@@ -678,16 +699,16 @@ export class SegmentationUI {
         this.#app.addToUndoStack(delCmd);
       }
     } else {
-      segmentSpan.remove();
+      listItem.remove();
     }
 
     // update labels
     this.#calculateLabels(segmentation.dataId);
 
     // select first segment
-    const spanChildren = spanParent.childNodes;
+    const spanChildren = parent.childNodes;
     for (const spanNode of spanChildren) {
-      if (spanNode.nodeName === 'SPAN') {
+      if (spanNode.nodeName === 'LI') {
         const spanNodeChildren = spanNode.childNodes;
         for (const node of spanNodeChildren) {
           if (node.nodeName === 'INPUT') {
@@ -725,7 +746,7 @@ export class SegmentationUI {
    *
    * @param {object} segment The segment.
    * @param {number} segmentationIndex The segmentation index.
-   * @returns {HTMLSpanElement} THe HTML element.
+   * @returns {HTMLLiElement} THe HTML element.
    */
   #getSegmentHtml(segment, segmentationIndex) {
     const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
@@ -780,18 +801,29 @@ export class SegmentationUI {
     deleteButton.title = 'Delete segment';
     deleteButton.onclick = this.#onSegmentDelete;
 
-    // segment span
-    const span = document.createElement('span');
-    span.id = getHtmlId(prefixes.span, segmentId);
-    span.appendChild(selectInput);
-    span.appendChild(selectLabel);
-    span.appendChild(volumesSpan);
-    span.appendChild(colourInput);
-    span.appendChild(gotoButton);
-    span.appendChild(viewButton);
-    span.appendChild(deleteButton);
+    // content
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'data-item-list-item-content';
+    contentDiv.appendChild(selectInput);
+    contentDiv.appendChild(selectLabel);
+    contentDiv.appendChild(volumesSpan);
 
-    return span;
+    // actions
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'data-item-list-item-actions';
+    actionsDiv.appendChild(colourInput);
+    actionsDiv.appendChild(gotoButton);
+    actionsDiv.appendChild(viewButton);
+    actionsDiv.appendChild(deleteButton);
+
+    // list item
+    const item = document.createElement('li');
+    item.id = getHtmlId(prefixes.li, segmentId);
+    item.className = 'data-item-list-item';
+    item.appendChild(contentDiv);
+    item.appendChild(actionsDiv);
+
+    return item;
   }
 
   /**
@@ -829,17 +861,10 @@ export class SegmentationUI {
     // update flag
     segmentation.hasNewSegments = true;
 
-    // update UI
-    const actionGroup = target.parentElement;
-    const list = actionGroup.parentElement;
-    // remove action group
-    actionGroup.remove();
-    // add segment to list
-    list.appendChild(
-      this.#getSegmentHtml(newSegment, segmentationIndex)
-    );
-    // put back action group
-    list.appendChild(actionGroup);
+    // add item to list
+    const listDivId = getSegmentationHtmlId(segmentationIndex) + '-list';
+    const listDiv = this.#rootDoc.getElementById(listDivId);
+    listDiv.appendChild(this.#getSegmentHtml(newSegment, segmentationIndex));
   };
 
   /**
@@ -1045,7 +1070,7 @@ export class SegmentationUI {
       for (const segment of segmentation.segments) {
         const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
         const spanId = getHtmlId(prefixes.volumes, segmentId);
-        const span = document.getElementById(spanId);
+        const span = this.#rootDoc.getElementById(spanId);
         if (span) {
           this.#addLabelsInfo(segment, segmentationIndex, span);
         }
@@ -1063,27 +1088,51 @@ export class SegmentationUI {
   #getSegmentationHtml(segmentation, segmentationIndex) {
     const segmentationName = getSegmentationHtmlId(segmentationIndex);
 
-    // segmentation item
-    const segmentationItem = document.createElement('li');
+    // name
+    const nameDiv = document.createElement('span');
+    nameDiv.id = segmentationName + '-name';
+    nameDiv.className = 'data-item-name';
+    nameDiv.appendChild(document.createTextNode(segmentationName));
 
-    // save segmentation
+    // save button
     const saveButton = getButton('Save');
     saveButton.title = 'Save segmentation';
     saveButton.id = getHtmlId(prefixes.save, segmentationName);
     saveButton.onclick = this.#onSegmentationSave;
 
-    segmentationItem.appendChild(saveButton);
+    // add button
+    const addButton = getButton('Add');
+    addButton.title = 'Add segment';
+    addButton.id = getHtmlId(prefixes.addSegment, segmentationName);
+    addButton.onclick = this.#onSegmentAdd;
 
-    // segmentation name
-    segmentationItem.appendChild(document.createTextNode(segmentationName));
+    // actions
+    const actionGroupDiv = document.createElement('div');
+    actionGroupDiv.id = segmentationName + '-actions';
+    actionGroupDiv.className = 'data-item-actions';
+    actionGroupDiv.appendChild(saveButton);
+    actionGroupDiv.appendChild(addButton);
 
-    // add segments
-    const segments = segmentation.segments;
-    for (let j = 0; j < segments.length; ++j) {
-      segmentationItem.appendChild(
-        this.#getSegmentHtml(segments[j], segmentationIndex)
-      );
+    // segment list
+    const listDiv = document.createElement('ul');
+    listDiv.id = segmentationName + '-list';
+    listDiv.className = 'data-item-list';
+    for (const segment of segmentation.segments) {
+      listDiv.appendChild(this.#getSegmentHtml(segment, segmentationIndex));
     }
+
+    // data-item-header
+    const headerDiv = document.createElement('div');
+    headerDiv.id = segmentationName + '-header';
+    headerDiv.className = 'data-item-header';
+    headerDiv.appendChild(nameDiv);
+    headerDiv.appendChild(actionGroupDiv);
+
+    // data-item-content
+    const contentDiv = document.createElement('div');
+    contentDiv.id = segmentationName + '-content';
+    contentDiv.className = 'data-item-content';
+    contentDiv.appendChild(listDiv);
 
     // segment eraser
     const eraserInput = document.createElement('input');
@@ -1098,23 +1147,47 @@ export class SegmentationUI {
     eraserLabel.title = eraserInput.title;
     eraserLabel.appendChild(document.createTextNode('Eraser'));
 
-    // add segment
-    const addSegmentButton = getButton('Add');
-    addSegmentButton.title = 'Add segment';
-    addSegmentButton.id = getHtmlId(prefixes.addSegment, segmentationName);
-    addSegmentButton.onclick = this.#onSegmentAdd;
-
     // action span
-    const actionSpan = document.createElement('span');
-    actionSpan.id = 'span-action-' + segmentationName;
-    actionSpan.appendChild(eraserInput);
-    actionSpan.appendChild(eraserLabel);
-    actionSpan.appendChild(addSegmentButton);
+    const postActionsDiv = document.createElement('span');
+    postActionsDiv.id = 'span-action-' + segmentationName;
+    postActionsDiv.appendChild(eraserInput);
+    postActionsDiv.appendChild(eraserLabel);
 
     // append span to item
-    segmentationItem.appendChild(actionSpan);
+    contentDiv.appendChild(postActionsDiv);
+
+    // segmentation item
+    const segmentationItem = document.createElement('li');
+    segmentationItem.id = segmentationName;
+    segmentationItem.className = 'data-item';
+    segmentationItem.appendChild(headerDiv);
+    segmentationItem.appendChild(contentDiv);
 
     return segmentationItem;
+  }
+
+  /**
+   * Add to the list of segmentations on the overlap checker.
+   *
+   * @param {object} segmentation The segmentation to add.
+   * @param {number} segmentationIndex The segmentation index.
+   */
+  #addOverlapCheckerSelection(segmentation, segmentationIndex) {
+    const overlapSelect0 =
+      this.#rootDoc.getElementById('overlap-checker-select-list-0');
+    const overlapSelect1 =
+      this.#rootDoc.getElementById('overlap-checker-select-list-1');
+
+    const newOption0 = document.createElement('option');
+    newOption0.innerHTML = getSegmentationHtmlId(segmentationIndex);
+    newOption0.value = segmentation.dataId;
+
+    const newOption1 = document.createElement('option');
+    newOption1.innerHTML = getSegmentationHtmlId(segmentationIndex);
+    newOption1.value = segmentation.dataId;
+
+    overlapSelect0.appendChild(newOption0);
+    overlapSelect1.appendChild(newOption1);
   }
 
   /**

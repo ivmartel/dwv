@@ -274,6 +274,7 @@ export class AnnotationUI {
       // delete if possible
       const drawController = new DrawController(
         this.#app.getData(dataId).annotationGroup);
+      // TODO reposition div at same position after delete undo?
       drawController.removeAnnotationWithCommand(
         annotationId,
         this.#app.addToUndoStack
@@ -290,27 +291,30 @@ export class AnnotationUI {
       }
     );
 
-    const actions = document.createElement('div');
-    actions.className = 'data-item-list-item-actions';
-    actions.appendChild(inputColour);
-    actions.appendChild(gotoButton);
-    actions.appendChild(viewButton);
-    actions.appendChild(deleteButton);
-
-    const text = document.createElement('span');
-    text.className = 'data-item-list-item-text';
+    // content
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'data-item-list-item-content';
     let factoryName = 'unknown';
     if (typeof annotation.getFactory() !== 'undefined') {
       factoryName = annotation.getFactory().getName();
     }
-    text.appendChild(document.createTextNode(
+    contentDiv.appendChild(document.createTextNode(
       annotation.trackingId + ' (' + factoryName + ')'));
 
+    // actions
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'data-item-list-item-actions';
+    actionsDiv.appendChild(inputColour);
+    actionsDiv.appendChild(gotoButton);
+    actionsDiv.appendChild(viewButton);
+    actionsDiv.appendChild(deleteButton);
+
+    // list item
     const item = document.createElement('li');
     item.id = annotationDivId;
     item.className = 'data-item-list-item';
-    item.appendChild(text);
-    item.appendChild(actions);
+    item.appendChild(contentDiv);
+    item.appendChild(actionsDiv);
 
     return item;
   }
@@ -323,10 +327,13 @@ export class AnnotationUI {
    * @returns {HTMLIement} The annotation list element.
    */
   #getAnnotationGroupHtml(annotationGroup, dataId) {
-    const actionGroupDiv = document.createElement('div');
-    actionGroupDiv.id = getAnnotationGroupDivId(dataId) + '-actions';
-    actionGroupDiv.className = 'data-item-actions';
+    // name
+    const nameDiv = document.createElement('span');
+    nameDiv.id = getAnnotationGroupDivId(dataId) + '-name';
+    nameDiv.className = 'data-item-name';
+    nameDiv.appendChild(document.createTextNode('group #' + dataId));
 
+    // lock button
     const lockButton = getButton('Lock');
     setButtonPressed(lockButton, false);
     lockButton.id = 'lockb-' + getAnnotationGroupDivId(dataId);
@@ -345,9 +352,8 @@ export class AnnotationUI {
         }
       }
     };
-    actionGroupDiv.appendChild(lockButton);
 
-    // save segment button
+    // save button
     const saveButton = getButton('Save');
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = function () {
@@ -382,8 +388,8 @@ export class AnnotationUI {
       element.click();
       URL.revokeObjectURL(element.href);
     };
-    actionGroupDiv.appendChild(saveButton);
 
+    // hide button
     const hideLabelsButton = getButton('Label');
     setButtonPressed(hideLabelsButton, false);
     hideLabelsButton.id = 'b-hidelabels';
@@ -402,34 +408,37 @@ export class AnnotationUI {
         drawLayer.setLabelsVisibility(false);
       }
     };
+
+    // actions
+    const actionGroupDiv = document.createElement('div');
+    actionGroupDiv.id = getAnnotationGroupDivId(dataId) + '-actions';
+    actionGroupDiv.className = 'data-item-actions';
+    actionGroupDiv.appendChild(lockButton);
+    actionGroupDiv.appendChild(saveButton);
     actionGroupDiv.appendChild(hideLabelsButton);
 
-    const text = document.createElement('span');
-    text.id = getAnnotationGroupDivId(dataId) + '-name';
-    text.className = 'data-item-name';
-    text.appendChild(document.createTextNode('group #' + dataId));
+    // annotation list
+    const listDiv = document.createElement('ul');
+    listDiv.id = getAnnotationGroupDivId(dataId) + '-list';
+    listDiv.className = 'data-item-list';
+    for (const annotation of annotationGroup.getList()) {
+      listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
+    }
 
+    // data-item-header
     const headerDiv = document.createElement('div');
     headerDiv.id = getAnnotationGroupDivId(dataId) + '-header';
     headerDiv.className = 'data-item-header';
-
-    headerDiv.appendChild(text);
+    headerDiv.appendChild(nameDiv);
     headerDiv.appendChild(actionGroupDiv);
 
+    // data-item-content
     const contentDiv = document.createElement('div');
     contentDiv.id = getAnnotationGroupDivId(dataId) + '-content';
     contentDiv.className = 'data-item-content';
+    contentDiv.appendChild(listDiv);
 
-    const annotList = document.createElement('ul');
-    annotList.id = getAnnotationGroupDivId(dataId) + '-list';
-    annotList.className = 'data-item-list';
-
-    contentDiv.appendChild(annotList);
-
-    for (const annotation of annotationGroup.getList()) {
-      annotList.appendChild(this.#getAnnotationHtml(annotation, dataId));
-    }
-
+    // data-item
     const item = document.createElement('li');
     item.id = getAnnotationGroupDivId(dataId);
     item.className = 'data-item';
@@ -496,10 +505,10 @@ export class AnnotationUI {
   #onAnnotationAdd = (event) => {
     const annotation = event.data;
     const dataId = event.dataid;
-    // add annotation html to list
-    const annotationGroupDivId = getAnnotationGroupDivId(dataId) + '-list';
-    const item = this.#rootDoc.getElementById(annotationGroupDivId);
-    item.appendChild(this.#getAnnotationHtml(annotation, dataId));
+    // add item to list
+    const listDivId = getAnnotationGroupDivId(dataId) + '-list';
+    const listDiv = this.#rootDoc.getElementById(listDivId);
+    listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
   };
 
   /**
