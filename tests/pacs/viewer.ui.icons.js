@@ -4,6 +4,8 @@ const icons = {
   add: '\u2795',
   // floppy
   save: '\u{1F4BE}',
+  // target
+  goto: '\u{1F3AF}',
   // eye
   view: '\u{1F441}\u{FE0F}',
   // cross
