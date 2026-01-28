@@ -7,6 +7,7 @@ import {
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
 import {
+  getIconElement,
   getButton,
   setButtonPressed,
   isButtonPressed
@@ -210,30 +211,6 @@ export class AnnotationUI {
       }
     };
 
-    const gotoButton = getButton('Goto');
-    const gbIdPrefix = 'gotob-';
-    gotoButton.id = gbIdPrefix + annotationDivId;
-    gotoButton.title = 'Goto annotation';
-    gotoButton.onclick = (event) => {
-      const target = event.target;
-      // get annotation
-      const indices =
-        splitAnnotationDivId(target.id.substring(gbIdPrefix.length));
-      const dataId = indices.dataId;
-      const annotationId = indices.annotationId;
-      const annotationGroup = this.#app.getData(dataId).annotationGroup;
-      const annotation = annotationGroup.find(annotationId);
-      const annotCentroid = annotation.getCentroid();
-      if (typeof annotCentroid !== 'undefined') {
-        const drawLayers = this.#app.getDrawLayersByDataId(dataId);
-        for (const layer of drawLayers) {
-          layer.setCurrentPosition(annotCentroid);
-        }
-      } else {
-        console.log('No centroid for annotation');
-      }
-    };
-
     const viewButton = getButton('View');
     setButtonPressed(viewButton, false);
     const vbIdPrefix = 'vb-';
@@ -299,14 +276,14 @@ export class AnnotationUI {
     if (typeof annotation.getFactory() !== 'undefined') {
       factoryName = annotation.getFactory().getName();
     }
+    contentDiv.appendChild(getIconElement(factoryName));
     contentDiv.appendChild(document.createTextNode(
-      annotation.trackingId + ' (' + factoryName + ')'));
+      ' ' + annotation.trackingId));
 
     // actions
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'data-item-list-item-actions';
     actionsDiv.appendChild(inputColour);
-    actionsDiv.appendChild(gotoButton);
     actionsDiv.appendChild(viewButton);
     actionsDiv.appendChild(deleteButton);
 
@@ -316,6 +293,34 @@ export class AnnotationUI {
     item.className = 'data-item-list-item';
     item.appendChild(contentDiv);
     item.appendChild(actionsDiv);
+
+    // click on li to go to annotation
+    item.addEventListener('click', (event) => {
+      const target = event.currentTarget;
+
+      // remove selected class from other rows
+      const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
+      const items = mainlist.querySelectorAll('.data-item-list-item');
+      items.forEach(item => item.classList.remove('selected'));
+      // mark this row as selected
+      target.classList.add('selected');
+
+      // get annotation
+      const indices = splitAnnotationDivId(target.id);
+      const dataId = indices.dataId;
+      const annotationId = indices.annotationId;
+      const annotationGroup = this.#app.getData(dataId).annotationGroup;
+      const annotation = annotationGroup.find(annotationId);
+      const annotCentroid = annotation.getCentroid();
+      if (typeof annotCentroid !== 'undefined') {
+        const drawLayers = this.#app.getDrawLayersByDataId(dataId);
+        for (const layer of drawLayers) {
+          layer.setCurrentPosition(annotCentroid);
+        }
+      } else {
+        console.log('No centroid for annotation');
+      }
+    });
 
     return item;
   }

@@ -1,19 +1,32 @@
 // list of icons as emoji
 const icons = {
   // plus
-  Add: '\u2795',
+  add: '\u2795',
   // floppy
-  Save: '\u{1F4BE}',
-  // target
-  Goto: '\u{1F3AF}',
+  save: '\u{1F4BE}',
   // eye
-  View: '\u{1F441}\u{FE0F}',
+  view: '\u{1F441}\u{FE0F}',
   // cross
-  Delete: '\u{274C}',
+  delete: '\u{274C}',
   // label
-  Label: '\u{1F3F7}\u{FE0F}',
+  label: '\u{1F3F7}\u{FE0F}',
   // lock
-  Lock: '\u{1F512}'
+  lock: '\u{1F512}',
+
+  // north east arrow
+  arrow: '\u{2197}',
+  // straight ruler
+  ruler: '\u{1F4CF}',
+  // black large square
+  rectangle: '\u{2B1B}',
+  // medium black circle
+  circle: '\u{26AB}',
+  // rugby footbal
+  ellipse: '\u{1F3C9}',
+  // triangular ruler
+  protractor: '\u{1F4D0}',
+  // wavy dash
+  roi: '\u{3030}'
 };
 
 /**
@@ -22,8 +35,8 @@ const icons = {
  * @param {string} name The concept.
  * @returns {HTMLElement} The element.
  */
-function getIconElement(name) {
-  let text = icons[name];
+export function getIconElement(name) {
+  let text = icons[name.toLowerCase()];
   if (typeof text === 'undefined') {
     text = name;
   }
