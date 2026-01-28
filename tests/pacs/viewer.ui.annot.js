@@ -189,6 +189,10 @@ export class AnnotationUI {
     const inputColourPrefix = 'cb-';
     inputColour.id = inputColourPrefix + annotationDivId;
     inputColour.value = annotation.colour;
+    inputColour.onclick = (event) => {
+      // do not propagate to parent that triggers goto
+      event.stopPropagation();
+    };
     inputColour.onchange = (event) => {
       const target = event.target;
       const newColour = target.value;
@@ -217,6 +221,8 @@ export class AnnotationUI {
     viewButton.id = vbIdPrefix + annotationDivId;
     viewButton.title = 'Show/hide annotation';
     viewButton.onclick = (event) => {
+      // do not propagate to parent (triggers goto)
+      event.stopPropagation();
       const target = event.target;
       // get annotatio
       const indices =
@@ -243,6 +249,8 @@ export class AnnotationUI {
     deleteButton.id = dbIdPrefix + annotationDivId;
     deleteButton.title = 'Delete annotation';
     deleteButton.onclick = (event) => {
+      // do not propagate to parent (triggers goto)
+      event.stopPropagation();
       const target = event.target;
       // get segment and mask
       const indices =
