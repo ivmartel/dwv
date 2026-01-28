@@ -1,30 +1,8 @@
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Point} from '../math/point.js';
+import {Value} from '../math/value.js';
 /* eslint-enable no-unused-vars */
-
-
-/**
- * Unit value.
- */
-export class UnitValue {
-  /**
-   * The value.
-   *
-   * @type {number}
-   */
-  value;
-
-
-  /**
-   * The unit of the value.
-   *
-   * @type {string}
-   */
-  unit;
-
-  constructor() {}
-}
 
 /**
  * Diameter type.
@@ -33,7 +11,7 @@ export class Diameter {
   /**
    * The scaled diameter value.
    *
-   * @type {UnitValue}
+   * @type {Value}
    */
   diameter;
 
@@ -98,7 +76,7 @@ export class Label {
   /**
    * The volume of the labeled segment.
    *
-   * @type {UnitValue}
+   * @type {Value}
    */
   volume;
 
@@ -119,7 +97,7 @@ export class Label {
   /**
    * The scaled height of the segment.
    *
-   * @type {UnitValue}
+   * @type {Value}
    */
   height;
 

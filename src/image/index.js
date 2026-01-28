@@ -39,7 +39,7 @@ import {
 } from './changeSegmentColourCommand.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
-import {Diameter, Diameters, Label, UnitValue} from './label.js';
+import {Diameter, Diameters, Label} from './label.js';
 
 
 export {
@@ -64,7 +64,6 @@ export {
   ResponseEvaluation,
   Size,
   Spacing,
-  UnitValue,
   View,
   WindowLevel,
   luts,

@@ -6,6 +6,7 @@ import {Index} from './index.js';
 /* eslint-disable no-unused-vars */
 import {ViewController} from '../app/viewController.js';
 import {Scalar2D} from './scalar.js';
+import {Value} from './value.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -189,35 +190,37 @@ export class Rectangle {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {object} A quantification object.
+   * @returns {Object<string, Value>} A quantification object.
    */
   quantify(viewController, index, flags) {
-    const quant = {};
-    // shape quantification
     const spacing2D = viewController.get2DSpacing();
     const lengthUnit = viewController.getLengthUnit();
-    quant.width = {
+    const width = {
       value: this.getWidth() * spacing2D.x,
       unit: lengthUnit
     };
-    quant.height = {
+    const height = {
       value: this.getHeight() * spacing2D.y,
       unit: lengthUnit
     };
-    const surface = this.getWorldSurface(spacing2D);
-    if (surface !== null) {
+    const worldSurface = this.getWorldSurface(spacing2D);
+    let surface;
+    if (worldSurface !== null) {
       if (lengthUnit === 'unit.mm') {
-        quant.surface = {
-          value: surface / 100,
+        surface = {
+          value: worldSurface / 100,
           unit: 'unit.cm2'
         };
       } else {
-        quant.surface = {
-          value: surface,
+        surface = {
+          value: worldSurface,
           unit: lengthUnit
         };
       }
     }
+
+    // shape quantification
+    const quant = {width, height, surface};
 
     // pixel values quantification
     if (viewController.canQuantifyImage()) {

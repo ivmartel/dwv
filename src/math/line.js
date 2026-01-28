@@ -8,6 +8,7 @@ import {
 /* eslint-disable no-unused-vars */
 import {ViewController} from '../app/viewController.js';
 import {Scalar2D} from './scalar.js';
+import {Value} from './value.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -185,21 +186,21 @@ export class Line {
    * Quantify a line according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
-   * @returns {object} A quantification object.
+   * @returns {Object<string, Value>} A quantification object.
    */
   quantify(viewController) {
-    const quant = {};
     // length
     const spacing2D = viewController.get2DSpacing();
-    const length = this.getWorldLength(spacing2D);
-    if (length !== null) {
-      quant.length = {
-        value: length,
+    const worldLength = this.getWorldLength(spacing2D);
+    let length;
+    if (worldLength !== null) {
+      length = {
+        value: worldLength,
         unit: viewController.getLengthUnit()
       };
     }
     // return
-    return quant;
+    return {length};
   }
 
 } // Line class

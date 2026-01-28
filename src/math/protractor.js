@@ -3,6 +3,7 @@ import {Line, getAngle} from './line.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Point2D} from '../math/point.js';
+import {Value} from './value.js';
 import {ViewController} from '../app/viewController.js';
 /* eslint-enable no-unused-vars */
 
@@ -63,23 +64,23 @@ export class Protractor {
    *
    * @param {ViewController} _viewController The associated view controller.
    * @param {string[]} _flags A list of stat values to calculate.
-   * @returns {object} A quantification object.
+   * @returns {Object<string, Value>} A quantification object.
    */
   quantify(_viewController, _flags) {
-    const quant = {};
+    let angle;
     if (this.#points.length === 3) {
       const line0 = new Line(this.#points[0], this.#points[1]);
       const line1 = new Line(this.#points[1], this.#points[2]);
-      let angle = getAngle(line0, line1);
-      if (angle > 180) {
-        angle = 360 - angle;
+      let angleNumber = getAngle(line0, line1);
+      if (angleNumber > 180) {
+        angleNumber = 360 - angleNumber;
       }
-      quant.angle = {
-        value: angle,
+      angle = {
+        value: angleNumber,
         unit: 'unit.degree'
       };
     }
-    return quant;
+    return {angle};
   }
 
 } // Protractor class
