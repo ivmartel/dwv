@@ -45,7 +45,7 @@ describe('math', () => {
    *
    * @function module:tests/math~circle-quantification
    */
-  test('Circle quantication - #DWV-REQ-UI-07-002 Draw circle',
+  test('Circle quantification - #DWV-REQ-UI-07-002 Draw circle',
     () => {
       const center0 = new Point2D(2, 2);
       const c0 = new Circle(center0, 2);
