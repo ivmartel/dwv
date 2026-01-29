@@ -141,7 +141,7 @@ const prefixes = {
   selectEraser: 'select-eraser-',
   save: 'save-',
   volumes: 'span-volumes-',
-  goto: 'gotob-',
+  info: 'info-',
   li: 'li-'
 };
 
@@ -304,7 +304,6 @@ export class SegmentationUI {
 
     if (typeof segmentation !== 'undefined') {
       segmentation.labels = event.labels;
-      this.#updateLabelsSpan(segmentation);
     }
   };
 
@@ -593,10 +592,10 @@ export class SegmentationUI {
    * @param {MouseEvent} event HTML event.
    */
   #onGotoSegment = (event) => {
-    const target = event.target;
+    const target = event.currentTarget;
     // get segment
     const indices = splitSegmentHtmlId(
-      getRootFromHtmlId(prefixes.goto, target.id));
+      getRootFromHtmlId(prefixes.li, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
 
@@ -623,6 +622,9 @@ export class SegmentationUI {
    * @param {MouseEvent} event HTML event.
    */
   #onSegmentViewChange = (event) => {
+    // do not propagate to parent (triggers goto)
+    event.stopPropagation();
+
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
@@ -655,6 +657,9 @@ export class SegmentationUI {
    * @param {MouseEvent} event HTML event.
    */
   #onSegmentDelete = (event) => {
+    // do not propagate to parent (triggers goto)
+    event.stopPropagation();
+
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
@@ -769,10 +774,37 @@ export class SegmentationUI {
     selectLabel.title = selectInput.title;
     selectLabel.appendChild(document.createTextNode(segment.label));
 
-    // volumes display
-    const volumesSpan = document.createElement('span');
-    volumesSpan.id = getHtmlId(prefixes.volumes, segmentId);
-    this.#addLabelsInfo(segment, segmentationIndex, volumesSpan);
+    const infoButton = getButton('Info');
+    infoButton.id = getHtmlId(prefixes.info, segmentId);
+    infoButton.title = 'Information';
+    infoButton.onclick = (event) => {
+      // do not propagate to parent that triggers goto
+      event.stopPropagation();
+      const target = event.target;
+      // get segment
+      const indices = splitSegmentHtmlId(
+        getRootFromHtmlId(prefixes.info, target.id));
+      const segmentation = _segmentations[indices.segmentationIndex];
+      const segment = getSegment(indices.segmentNumber, segmentation.segments);
+
+      const labelsInfo = this.#getLabelsInfo(segment, segmentationIndex);
+
+      let qStr = 'Quantification:\n';
+      let i = 0;
+      for (const labelInfo of labelsInfo) {
+        qStr += '- label #' + i + '\n';
+        const keys = Object.keys(labelInfo);
+        for (const key of keys) {
+          const quant = labelInfo[key];
+          qStr += '  - ' + key + ': ' +
+            quant.value.toPrecision(4) +
+            i18n.t(quant.unit);
+          qStr += '\n';
+        }
+        ++i;
+      }
+      alert(qStr);
+    };
 
     // segment colour
     const colourInput = document.createElement('input');
@@ -781,6 +813,10 @@ export class SegmentationUI {
     colourInput.id = getHtmlId(prefixes.colour, segmentId);
     colourInput.value = rgbToHex(segment.displayRGBValue);
     colourInput.onchange = this.#onSegmentColourChange;
+    colourInput.onclick = (event) => {
+      // do not propagate to parent that triggers goto
+      event.stopPropagation();
+    };
 
     // segment view
     const viewButton = getButton('View');
@@ -788,12 +824,6 @@ export class SegmentationUI {
     viewButton.id = getHtmlId(prefixes.view, segmentId);
     viewButton.title = 'Show/hide segment';
     viewButton.onclick = this.#onSegmentViewChange;
-
-    // goto segment
-    const gotoButton = getButton('Goto');
-    gotoButton.id = getHtmlId(prefixes.goto, segmentId);
-    gotoButton.title = 'Goto segment';
-    gotoButton.onclick = this.#onGotoSegment;
 
     // segment delete
     const deleteButton = getButton('Delete');
@@ -806,13 +836,12 @@ export class SegmentationUI {
     contentDiv.className = 'data-item-list-item-content';
     contentDiv.appendChild(selectInput);
     contentDiv.appendChild(selectLabel);
-    contentDiv.appendChild(volumesSpan);
 
     // actions
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'data-item-list-item-actions';
+    actionsDiv.appendChild(infoButton);
     actionsDiv.appendChild(colourInput);
-    actionsDiv.appendChild(gotoButton);
     actionsDiv.appendChild(viewButton);
     actionsDiv.appendChild(deleteButton);
 
@@ -820,8 +849,23 @@ export class SegmentationUI {
     const item = document.createElement('li');
     item.id = getHtmlId(prefixes.li, segmentId);
     item.className = 'data-item-list-item';
+    item.title = 'Go to segment';
     item.appendChild(contentDiv);
     item.appendChild(actionsDiv);
+
+    // click on li to go to annotation
+    item.addEventListener('click', (event) => {
+      const target = event.currentTarget;
+
+      // remove selected class from other rows
+      const mainlist = this.#rootDoc.getElementById('segmentation-list');
+      const items = mainlist.querySelectorAll('.data-item-list-item');
+      items.forEach(item => item.classList.remove('selected'));
+      // mark this row as selected
+      target.classList.add('selected');
+
+      this.#onGotoSegment(event);
+    });
 
     return item;
   }
@@ -934,148 +978,37 @@ export class SegmentationUI {
   };
 
   /**
-   * Add labels info to a span.
+   * Get labels info.
    *
    * @param {object} segment The segment.
    * @param {number} segmentationIndex The segmentation index.
-   * @param {HTMLSpanElement} rootSpan The root span to add the info to.
+   * @returns {object[]} The labels info.
    */
-  #addLabelsInfo(segment, segmentationIndex, rootSpan) {
+  #getLabelsInfo(segment, segmentationIndex) {
     // get the labels info strings
     const segmentation = _segmentations[segmentationIndex];
     const labelsInfo = [];
     for (const label of segmentation.labels) {
       if (label.id === segment.number) {
-        const main =
-          label.volume.value.toPrecision(4) + i18n.t(label.volume.unit);
+        const labelInfo = {};
+        labelInfo.volume = label.volume;
 
-        let details = '';
         if (typeof label.diameters !== 'undefined') {
           if (typeof label.diameters.major.diameter.value !== 'undefined') {
-            details += label.diameters.major.diameter.value.toPrecision(4) +
-              i18n.t(label.diameters.major.diameter.unit);
-          } else {
-            details += 'undefined';
+            labelInfo.majorDiameter = label.diameters.major.diameter;
           }
-          details += ', ';
           if (typeof label.diameters.minor.diameter.value !== 'undefined') {
-            details += label.diameters.minor.diameter.value.toPrecision(4) +
-              i18n.t(label.diameters.minor.diameter.unit);
-          } else {
-            details += 'undefined';
+            labelInfo.minorDiameter = label.diameters.minor.diameter;
           }
-          details += ', ';
           if (typeof label.height !== 'undefined') {
-            details += label.height.value.toPrecision(4) +
-              i18n.t(label.height.unit);
-          } else {
-            details += 'undefined';
+            labelInfo.height = label.height;
           }
         }
 
-        labelsInfo.push({
-          main,
-          details
-        });
+        labelsInfo.push(labelInfo);
       }
     }
-
-    // hide/show next sibling on click
-    const onClick = function () {
-      const content = this.nextElementSibling;
-      if (content.style.display === 'inline') {
-        content.style.display = 'none';
-      } else {
-        content.style.display = 'inline';
-      }
-    };
-
-    // add labels info to root
-    if (labelsInfo.length !== 0) {
-      // clear root if less labels
-      const numberOfLabelsInRoot =
-        rootSpan.getElementsByClassName('collapse-main').length;
-      if (labelsInfo.length < numberOfLabelsInRoot) {
-        rootSpan.innerText = '';
-      }
-      // begin span
-      let begin = rootSpan.firstElementChild;
-      const emptyRoot = begin === null;
-      if (emptyRoot) {
-        begin = document.createElement('span');
-        begin.id = 'labels-begin';
-        begin.innerText = ' [';
-        rootSpan.appendChild(begin);
-      }
-      let previousElement = begin;
-      // add/update labels span
-      for (let i = 0; i < labelsInfo.length; ++i) {
-        const info = labelsInfo[i];
-        // find exisiting
-        const id0 = 'collapse-main-' + i;
-        const id1 = 'collapse-details-' + i;
-        let main = rootSpan.querySelector('#' + id0);
-        let details = rootSpan.querySelector('#' + id1);
-        // add spans if not found
-        if (!main) {
-          if (i !== 0) {
-            const separator = document.createElement('span');
-            separator.id = 'labels-separator';
-            separator.innerText = ', ';
-            previousElement.insertAdjacentElement('afterend', separator);
-            previousElement = separator;
-          }
-          main = document.createElement('span');
-          main.className = 'collapse-main';
-          main.id = id0;
-          main.onclick = onClick;
-          previousElement.insertAdjacentElement('afterend', main);
-          previousElement = main;
-
-          details = document.createElement('span');
-          details.className = 'collapse-details';
-          details.id = id1;
-          previousElement.insertAdjacentElement('afterend', details);
-        }
-        // update text
-        main.innerText = info.main;
-        details.innerText = ' (' + info.details + ')';
-        // update previous
-        previousElement = details;
-      }
-      // last span
-      if (emptyRoot) {
-        const last = document.createElement('span');
-        last.id = 'labels-last';
-        last.innerText = ']';
-        rootSpan.appendChild(last);
-      }
-    }
-  }
-
-  /**
-   * Updates the text of the labels diplay for a segmentation.
-   *
-   * @param {object} segmentation The segmentation.
-   */
-  #updateLabelsSpan(segmentation) {
-    const segmentationIndex =
-      _segmentations.findIndex(
-        (seg) => {
-          return seg === segmentation;
-        }
-      );
-
-    if (segmentationIndex >= 0) {
-      for (const segment of segmentation.segments) {
-        const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
-        const spanId = getHtmlId(prefixes.volumes, segmentId);
-        const span = this.#rootDoc.getElementById(spanId);
-        if (span) {
-          this.#addLabelsInfo(segment, segmentationIndex, span);
-        }
-      }
-    }
+    return labelsInfo;
   }
 
   /**

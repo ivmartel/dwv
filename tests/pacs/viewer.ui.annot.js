@@ -6,6 +6,7 @@ import {
   getUID,
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
+import {i18n} from '../../src/utils/i18n.js';
 import {
   getIconElement,
   getButton,
@@ -183,6 +184,38 @@ export class AnnotationUI {
   #getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
 
+    const infoButton = getButton('Info');
+    const ibIdPrefix = 'ib-';
+    infoButton.id = ibIdPrefix + annotationDivId;
+    infoButton.title = 'Information';
+    infoButton.onclick = (event) => {
+      // do not propagate to parent that triggers goto
+      event.stopPropagation();
+      const target = event.target;
+      // get annotatio
+      const indices =
+        splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
+      const dataId = indices.dataId;
+      const annotationId = indices.annotationId;
+      const annotationGroup = this.#app.getData(dataId).annotationGroup;
+      const annotation = annotationGroup.find(annotationId);
+
+      let qStr = 'Quantification:\n';
+      if (typeof annotation.quantification !== 'undefined') {
+        const keys = Object.keys(annotation.quantification);
+        for (const key of keys) {
+          const quant = annotation.quantification[key];
+          qStr += '- ' + key + ': ' +
+            quant.value.toPrecision(4) +
+            i18n.t(quant.unit);
+          qStr += '\n';
+        }
+      } else {
+        qStr = 'No quantification.';
+      }
+      alert(qStr);
+    };
+
     const inputColour = document.createElement('input');
     inputColour.type = 'color';
     inputColour.title = 'Change annotation colour';
@@ -291,6 +324,7 @@ export class AnnotationUI {
     // actions
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'data-item-list-item-actions';
+    actionsDiv.appendChild(infoButton);
     actionsDiv.appendChild(inputColour);
     actionsDiv.appendChild(viewButton);
     actionsDiv.appendChild(deleteButton);
@@ -301,6 +335,7 @@ export class AnnotationUI {
     item.className = 'data-item-list-item';
     item.appendChild(contentDiv);
     item.appendChild(actionsDiv);
+    item.title = 'Go to annotation';
 
     // click on li to go to annotation
     item.addEventListener('click', (event) => {

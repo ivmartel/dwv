@@ -4,8 +4,6 @@ const icons = {
   add: '\u2795',
   // floppy
   save: '\u{1F4BE}',
-  // target
-  goto: '\u{1F3AF}',
   // eye
   view: '\u{1F441}\u{FE0F}',
   // cross
@@ -14,6 +12,8 @@ const icons = {
   label: '\u{1F3F7}\u{FE0F}',
   // lock
   lock: '\u{1F512}',
+  // information
+  info: '\u{2139}',
 
   // north east arrow
   arrow: '\u{2197}',
