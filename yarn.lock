@@ -5145,7 +5145,7 @@ __metadata:
     jsdoc: "npm:^4.0.5"
     jsdom: "npm:^27.4.0"
     jszip: "npm:^3.10.1"
-    konva: "npm:~9.3.20"
+    konva: "npm:~10.2.0"
     magic-wand-tool: "npm:~1.1.7"
     typescript: "npm:5.6.3"
     vitest: "npm:^4.0.17"
@@ -8060,10 +8060,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"konva@npm:~9.3.20":
-  version: 9.3.22
-  resolution: "konva@npm:9.3.22"
-  checksum: 10c0/d9bdaaffec95381e5f4225485a102b14971a3a8f6fd691a78ac55bf88104654cca876714265999eceb3bbb4fc50d1f34b0385e5876d6b918739456c2d7de37fa
+"konva@npm:~10.2.0":
+  version: 10.2.0
+  resolution: "konva@npm:10.2.0"
+  checksum: 10c0/afbb59a8a83c41c75f6e3103aa7f2ddb7f4f2132dab612d54e7dcefcd50f9b28b6b02fb88ce1387fe2b33905e67dc73ba2dba2cd1cb01abfc47250798f61c88f
   languageName: node
   linkType: hard
 
