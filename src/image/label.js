@@ -30,8 +30,6 @@ export class Diameter {
    * @type {number}
    */
   offset2;
-
-  constructor() {}
 }
 
 /**
@@ -51,8 +49,6 @@ export class Diameters {
    * @type {Diameter}
    */
   minor;
-
-  constructor() {}
 }
 
 /**
@@ -114,6 +110,4 @@ export class Label {
    * @type {number}
    */
   largestSliceZ;
-
-  constructor() {}
 }

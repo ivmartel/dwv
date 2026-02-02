@@ -10,6 +10,4 @@ export class Value {
    * @type {string|undefined}
    */
   unit;
-
-  constructor() {}
 }
