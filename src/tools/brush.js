@@ -1371,24 +1371,24 @@ export class Brush extends EventTarget {
       this.#brushSize + 1 < this.#brushSizeRange.max
     ) {
       this.#brushSize += 1;
-      const event = new CustomEvent('brushsizechange', {
+      const sizeEvent = new CustomEvent('brushsizechange', {
         detail: {
           value: this.#brushSize
         }
       });
-      this.dispatchEvent(event);
+      this.dispatchEvent(sizeEvent);
     } else if (
       !ctrlOrAlt &&
       event.key === '-' &&
       this.#brushSize - 1 >= this.#brushSizeRange.min
     ) {
       this.#brushSize -= 1;
-      const event = new CustomEvent('brushsizechange', {
+      const sizeEvent = new CustomEvent('brushsizechange', {
         detail: {
           value: this.#brushSize
         }
       });
-      this.dispatchEvent(event);
+      this.dispatchEvent(sizeEvent);
     } else if (!ctrlOrAlt && !Number.isNaN(Number.parseInt(event.key, 10))) {
       this.#brushMode = _BrushMode.Add;
       //const number = Number.parseInt(event.key, 10);
@@ -1512,6 +1512,7 @@ export class Brush extends EventTarget {
     return [
       'brushdraw',
       'brushremove',
+      'brushsizechange',
       'erasingactivated',
       'erasingdeactivated'
     ];
