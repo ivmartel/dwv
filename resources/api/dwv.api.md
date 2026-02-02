@@ -28,7 +28,9 @@ export class Annotation {
     mathShape: object;
     planeOrigin: Point3D | undefined;
     planePoints: Point3D[] | undefined;
-    quantification: object | undefined;
+    quantification: {
+        [x: string]: Value;
+    } | undefined;
     referencedFrameNumber: number | undefined;
     referencedSopClassUID: string;
     referencedSopInstanceUID: string;
@@ -126,6 +128,7 @@ export class App {
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     // @deprecated
     getImage(dataId: string): Image_2 | undefined;
+    getInfoData(dataId: string): InfoData | undefined;
     getLayerGroupByDivId(divId: string): LayerGroup | undefined;
     getMetaData(dataId: string): {
         [x: string]: DataElement;
@@ -133,7 +136,6 @@ export class App {
     getNextDataId(): string;
     getNumberOfLayerGroups(): number;
     getOffset(): Scalar3D;
-    getOverlayData(dataId: string): OverlayData | undefined;
     getStackSize(): number;
     getStyle(): object;
     getToolboxController(): ToolboxController;
@@ -183,7 +185,7 @@ export class App {
     setToolFeatures(list: object): void;
     // @deprecated
     setWindowLevelPreset(preset: string): void;
-    toggleOverlayListeners(dataId: string): void;
+    toggleInfoDataListeners(dataId: string): void;
     translate(tx: number, ty: number): void;
     undo(): void;
     updateDataViewConfig(dataId: string, divId: string, config: ViewConfig): void;
@@ -246,7 +248,9 @@ export class Circle {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): {
+        [x: string]: Value;
+    };
 }
 
 // @public
@@ -336,7 +340,7 @@ export class DeleteSegmentCommand {
 
 // @public
 export class Diameter {
-    diameter: UnitValue;
+    diameter: Value;
     offset1: number;
     offset2: number;
 }
@@ -503,7 +507,9 @@ export class Ellipse {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): {
+        [x: string]: Value;
+    };
 }
 
 // @public
@@ -730,6 +736,33 @@ export class Index {
 }
 
 // @public
+export class InfoData {
+    constructor(app: App, dataId: string, configs: {
+        [x: string]: InfoDataItem[];
+    });
+    addAppListeners(): void;
+    addEventListener(type: string, callback: object): void;
+    addItemMeta(data: {
+        [x: string]: DataElement;
+    }): void;
+    isListening(): boolean;
+    onSliceChange: (event: object) => void;
+    removeAppListeners(): void;
+    removeEventListener(type: string, callback: object): void;
+    reset(): void;
+}
+
+// @public
+export class InfoDataItem {
+    event: string | undefined;
+    format: string;
+    pos: string;
+    precision: string | undefined;
+    tags: string[] | undefined;
+    value: string;
+}
+
+// @public
 export function isEqualRgb(c1: RGB, c2: RGB): boolean;
 
 // @public
@@ -738,10 +771,10 @@ export class Label {
     centroidIndex: number[];
     count: number;
     diameters: Diameters;
-    height: UnitValue;
+    height: Value;
     id: number;
     largestSliceZ: number;
-    volume: UnitValue;
+    volume: Value;
 }
 
 // @public
@@ -749,12 +782,14 @@ export function labToUintLab(triplet: object): object;
 
 // @public
 export class LayerGroup {
-    constructor(containerDiv: HTMLElement);
+    constructor(containerDiv: HTMLElement, withInfoLayer?: boolean);
     addDrawLayer(): DrawLayer;
     addEventListener(type: string, callback: Function): void;
+    addInfoData(data: InfoData, dataId: string): void;
     addScale(scaleStep: number, center: Point3D): void;
     addTranslation(translation: Scalar3D): void;
     addViewLayer(): ViewLayer;
+    bindInfoData(dataId: string): void;
     canScroll(): boolean;
     display(flag: boolean): void;
     draw(): void;
@@ -807,6 +842,7 @@ export class LayerGroup {
     shouldBind(): boolean;
     showTooltip(point: Point2D): void;
     someViewLayer(callbackFn: Function): boolean;
+    unbindInfoData(): void;
     updateLayersToPositionChange: (event: object) => void;
 }
 
@@ -960,18 +996,6 @@ export namespace Orientation {
 }
 
 // @public
-export class OverlayData {
-    constructor(app: App, dataId: string, configs: object);
-    addAppListeners(): void;
-    addEventListener(type: string, callback: object): void;
-    addItemMeta(data: object): void;
-    isListening(): boolean;
-    removeAppListeners(): void;
-    removeEventListener(type: string, callback: object): void;
-    reset(): void;
-}
-
-// @public
 export class PlaneHelper {
     constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
     getCosines(): number[];
@@ -1073,7 +1097,9 @@ export class Protractor {
     getCentroid(): Point2D;
     getLength(): number;
     getPoint(index: number): Point2D | undefined;
-    quantify(_viewController: ViewController, _flags: string[]): object;
+    quantify(_viewController: ViewController, _flags: string[]): {
+        [x: string]: Value;
+    };
 }
 
 // @public
@@ -1090,7 +1116,9 @@ export class Rectangle {
     getSurface(): number;
     getWidth(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): {
+        [x: string]: Value;
+    };
 }
 
 // @public
@@ -1234,8 +1262,8 @@ export const toolOptions: {
 };
 
 // @public
-export class UnitValue {
-    unit: string;
+export class Value {
+    unit: string | undefined;
     value: number;
 }
 
