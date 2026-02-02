@@ -24,8 +24,20 @@ export class BrushToolUI {
     this.#app = app;
   }
 
-  getValue() {};
+  /**
+   * Get the value of the tool UI.
+   *
+   * @returns {object|undefined} The value.
+   */
+  getValue() {
+    return;
+  };
 
+  /**
+   * Get the HTML element of the tool UI.
+   *
+   * @returns {HTMLElement} The element.
+   */
   getHtml() {
     // list of segmentations
     const res = document.createElement('ul');

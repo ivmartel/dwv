@@ -1,22 +1,43 @@
 import {DicomCode} from '../../src/dicom/dicomCode.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Draw tool UI.
  */
 export class DrawToolUI {
 
+  /**
+   * The associated application.
+   *
+   * @type {App}
+   */
   #app;
+
+  /**
+   * The tool configuration.
+   *
+   * @type {object}
+   */
   #toolConfig;
 
   /**
-   * @param {object} app The associated application.
-   * @param {object} toolConfig The tood configuration.
+   * @param {App} app The associated application.
+   * @param {object} toolConfig The tool configuration.
    */
   constructor(app, toolConfig) {
     this.#app = app;
     this.#toolConfig = toolConfig;
   }
 
+  /**
+   * Get the value of the tool UI.
+   *
+   * @returns {object|undefined} The value.
+   */
   getValue() {
     const shapeSelect = document.getElementById('draw-shape-select');
     // example annotation meta data added at draw time
@@ -50,6 +71,11 @@ export class DrawToolUI {
     };
   };
 
+  /**
+   * Get the HTML element of the tool UI.
+   *
+   * @returns {HTMLElement} The element.
+   */
   getHtml() {
     const shapeSelect = document.createElement('select');
     shapeSelect.id = 'draw-shape-select';
