@@ -14,6 +14,7 @@ import {DicomData} from '../app/dataController.js';
 import {ViewConfig} from '../app/application.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {ScrollWheel} from './scrollWheel.js';
+import {Command} from '../utils/undoStack.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -277,7 +278,7 @@ class DrawBrushCommandProperties {
 /**
  * Draw brush command.
  */
-class DrawBrushCommand {
+class DrawBrushCommand extends Command {
   #mask;
   #dataId;
   #offsetsLists;
@@ -294,6 +295,7 @@ class DrawBrushCommand {
    * @param {DrawBrushCommandProperties} properties The command properties.
    */
   constructor(properties) {
+    super();
     this.#mask = properties.mask;
     this.#dataId = properties.dataId;
     this.#offsetsLists = properties.offsetsLists;

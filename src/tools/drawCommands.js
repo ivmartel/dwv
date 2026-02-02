@@ -1,3 +1,5 @@
+import {Command} from '../utils/undoStack.js';
+
 // external
 import Konva from 'konva';
 
@@ -35,7 +37,7 @@ export function getShapeDisplayName(shape) {
 /**
  * Add annotation command.
  */
-export class AddAnnotationCommand {
+export class AddAnnotationCommand extends Command {
   /**
    * @type {Annotation}
    */
@@ -51,6 +53,7 @@ export class AddAnnotationCommand {
    * @param {DrawController} drawController The associated draw controller.
    */
   constructor(annotation, drawController) {
+    super();
     this.#annotation = annotation;
     this.#drawController = drawController;
   }
@@ -82,7 +85,7 @@ export class AddAnnotationCommand {
 /**
  * Remove annotation command.
  */
-export class RemoveAnnotationCommand {
+export class RemoveAnnotationCommand extends Command {
   /**
    * @type {Annotation}
    */
@@ -98,6 +101,7 @@ export class RemoveAnnotationCommand {
    * @param {DrawController} drawController The associated draw controller.
    */
   constructor(annotation, drawController) {
+    super();
     this.#annotation = annotation;
     this.#drawController = drawController;
   }
@@ -129,7 +133,7 @@ export class RemoveAnnotationCommand {
 /**
  * Update annotation command.
  */
-export class UpdateAnnotationCommand {
+export class UpdateAnnotationCommand extends Command {
   /**
    * @type {Annotation}
    */
@@ -161,6 +165,7 @@ export class UpdateAnnotationCommand {
    * @param {DrawController} drawController The associated draw controller.
    */
   constructor(annotation, originaProps, newProps, drawController) {
+    super();
     this.#annotation = annotation;
     this.#drawController = drawController;
     this.#originalProps = originaProps;

@@ -44,6 +44,7 @@ import {Matrix33} from '../math/matrix.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {Scalar3D} from '../math/scalar.js';
 import {DicomData} from './dataController.js';
+import {Command} from '../utils/undoStack.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -546,7 +547,7 @@ export class App {
   /**
    * Add a command to the undo stack.
    *
-   * @param {object} cmd The command to add.
+   * @param {Command} cmd The command to add.
    * @fires UndoStack#undoadd
    * @function
    */

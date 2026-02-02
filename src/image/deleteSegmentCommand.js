@@ -1,4 +1,5 @@
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
+import {Command} from '../utils/undoStack.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -9,7 +10,7 @@ import {MaskSegment} from '../dicom/dicomSegment.js';
 /**
  * Delete segment command.
  */
-export class DeleteSegmentCommand {
+export class DeleteSegmentCommand extends Command {
 
   /**
    * The associated mask.
@@ -45,6 +46,7 @@ export class DeleteSegmentCommand {
    * @param {boolean} [silent] Whether to send a creation event or not.
    */
   constructor(mask, segment, silent) {
+    super();
     this.#mask = mask;
     this.#segment = segment;
     this.#isSilent = (typeof silent === 'undefined') ? false : silent;

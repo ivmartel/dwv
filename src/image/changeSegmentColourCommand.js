@@ -1,3 +1,5 @@
+import {Command} from '../utils/undoStack.js';
+
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from './image.js';
@@ -8,7 +10,7 @@ import {RGB} from '../utils/colour.js';
 /**
  * Change segment colour command.
  */
-export class ChangeSegmentColourCommand {
+export class ChangeSegmentColourCommand extends Command {
 
   /**
    * The associated mask.
@@ -59,6 +61,7 @@ export class ChangeSegmentColourCommand {
    * @param {boolean} [silent] Whether to send a creation event or not.
    */
   constructor(mask, segment, newColour, silent) {
+    super();
     this.#mask = mask;
     this.#segment = segment;
     this.#newColour = newColour;
