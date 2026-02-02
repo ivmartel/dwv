@@ -417,6 +417,7 @@ function viewerSetup() {
   for (const toolName in _tools) {
     if (typeof toolsUI[toolName] !== 'undefined') {
       const toolUI = new toolsUI[toolName](_app, _tools[toolName]);
+      toolUI.registerListeners();
       _toolFeaturesUI[toolName] = toolUI;
     }
   }

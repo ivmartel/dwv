@@ -34,6 +34,11 @@ export class DrawToolUI {
   }
 
   /**
+   * Bind app to ui.
+   */
+  registerListeners() {};
+
+  /**
    * Get the value of the tool UI.
    *
    * @returns {object|undefined} The value.

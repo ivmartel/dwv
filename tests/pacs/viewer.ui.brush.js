@@ -25,6 +25,14 @@ export class BrushToolUI {
   }
 
   /**
+   * Bind app to ui.
+   */
+  registerListeners() {
+    // listen to brush size event (via shortcut)
+    this.#app.addEventListener('brushsizechange', this.#onBrushSizeChange);
+  };
+
+  /**
    * Get the value of the tool UI.
    *
    * @returns {object|undefined} The value.
@@ -54,7 +62,7 @@ export class BrushToolUI {
     this.#app.setToolFeatures({brushSize: defaultCursorSize});
     // append range
     const controlDiv = getControlDiv(
-      'brush-size-range',
+      'brush-size',
       'Brush size',
       1,
       20,
@@ -78,6 +86,21 @@ export class BrushToolUI {
 
     return res;
   };
+
+  /**
+   * Handle brush size change event.
+   *
+   * @param {object} event The change event.
+   */
+  #onBrushSizeChange(event) {
+    const newValue = event.detail.value;
+    const controlRange = document.getElementById('brush-size-range');
+    const controlValue = document.getElementById('brush-size-number');
+    if (controlRange && controlValue) {
+      controlRange.value = newValue;
+      controlValue.value = newValue;
+    }
+  }
 
   /**
    * Update the brush cursor size.
@@ -114,7 +137,7 @@ export class BrushToolUI {
   //   document.body.prepend(cursorDiv);
 
   //   // default size
-  //   const cursorRange = document.getElementById('brush-size-range-range');
+  //   const cursorRange = document.getElementById('brush-size-range');
   //   this.#updateBrushCursorSize(parseInt(cursorRange.value, 10));
 
   //   // update position on mouse move
