@@ -1,14 +1,24 @@
 import {getControlDiv} from './viewer.ui.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Brush tool UI.
  */
 export class BrushToolUI {
 
+  /**
+   * The associated application.
+   *
+   * @type {App}
+   */
   #app;
 
   /**
-   * @param {object} app The associated application.
+   * @param {App} app The associated application.
    */
   constructor(app, /*toolConfig*/) {
     this.#app = app;
