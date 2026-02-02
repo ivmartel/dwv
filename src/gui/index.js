@@ -3,7 +3,10 @@ import {
   LayerGroup,
   getLayerDetailsFromEvent
 } from './layerGroup.js';
-import {InfoData} from './infoData.js';
+import {
+  InfoDataItem,
+  InfoData
+} from './infoData.js';
 import {ViewLayer} from './viewLayer.js';
 import {
   getMousePoint,
@@ -13,6 +16,7 @@ import {
 export {
   DrawLayer,
   LayerGroup,
+  InfoDataItem,
   InfoData,
   ViewLayer,
   getLayerDetailsFromEvent,
