@@ -1,6 +1,7 @@
 # ignored folders
 /build
 /config
+/coverage
 /resources
 /src
 /tests
