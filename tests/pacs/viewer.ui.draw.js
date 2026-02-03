@@ -79,7 +79,7 @@ export class DrawToolUI {
   /**
    * Get the HTML element of the tool UI.
    *
-   * @returns {HTMLElement} The element.
+   * @returns {HTMLElement|undefined} The element.
    */
   getHtml() {
     const shapeSelect = document.createElement('select');

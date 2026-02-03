@@ -44,7 +44,7 @@ export class BrushToolUI {
   /**
    * Get the HTML element of the tool UI.
    *
-   * @returns {HTMLElement} The element.
+   * @returns {HTMLElement|undefined} The element.
    */
   getHtml() {
     // list of segmentations
