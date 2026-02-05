@@ -103,7 +103,7 @@ export class App {
     addDataViewConfig(dataId: string, config: ViewConfig, doRender?: boolean): void;
     addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
-    addToUndoStack: (cmd: object) => void;
+    addToUndoStack: (cmd: Command) => void;
     // @deprecated
     applyJsonState(jsonState: string, dataId: string): void;
     // @deprecated
@@ -228,14 +228,11 @@ export class CADReport {
 }
 
 // @public
-export class ChangeSegmentColourCommand {
+export class ChangeSegmentColourCommand extends Command {
     constructor(mask: Image_2, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
-    execute(): void;
-    getName(): string;
     isValid(): boolean;
     onExecute(_event: object): void;
     onUndo(_event: object): void;
-    undo(): void;
 }
 
 // @public
@@ -259,6 +256,13 @@ export class ColourMap {
     blue: number[];
     green: number[];
     red: number[];
+}
+
+// @public
+export class Command {
+    execute(): void;
+    getName(): string;
+    undo(): void;
 }
 
 // @public
@@ -328,14 +332,11 @@ export const defaultToolOptions: {
 };
 
 // @public
-export class DeleteSegmentCommand {
+export class DeleteSegmentCommand extends Command {
     constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
-    execute(): void;
-    getName(): string;
     isValid(): boolean;
     onExecute(_event: object): void;
     onUndo(_event: object): void;
-    undo(): void;
 }
 
 // @public
