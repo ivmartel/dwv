@@ -2,605 +2,1169 @@
 
 ## Context
 
-Date: Wed Jul 02 2025 12:51:27 GMT+0200 (Central European Summer Time)
+Commit: [15e8722](https://github.com/ivmartel/dwv/commit/15e87229f378e26dc70b4b5bc1b8425baa732130)
 
-Commit: [0291298](https://github.com/ivmartel/dwv/commit/029129879492980b65e0bc2d2cd6e86694b486ba)
+Date: Thu Feb 05 2026 17:32:08 GMT+0100 (Central European Standard Time)
 
-Browser: Chrome Headless 138.0.0.0 (Linux x86_64)
+Environement: jsdom ^28.0.0
 
 ## Summary
-Success: 191 ✅
+Success: 379 ✅
 
 Failed: 0 ❌
 
-(total: 191, skipped: 0, total time: 1879ms)
+(total: 379, skipped: 0, total time: 11234ms)
 
 ## Tests details
 
-(38 / 191 tests with requirement(s), 153 tests with no requirement)
+(40 / 379 tests with requirement(s), 339 tests with no requirement)
 
 ### annotation
 
-- Read dwv034 annotation arrow: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-arrow))
+- Read dwv034 arrow: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-arrow))
 
-- Read dwv034 annotation circle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-circle))
+- Read dwv034 circle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-circle))
 
-- Read dwv034 annotation ellipse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-ellipse))
+- Read dwv034 ellipse: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-ellipse))
 
-- Read dwv034 annotation protractor: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-protractor))
+- Read dwv034 protractor: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-protractor))
 
-- Read dwv034 annotation rectangle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-rectangle))
+- Read dwv034 rectangle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-rectangle))
 
-- Read dwv034 annotation roi: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-roi))
+- Read dwv034 roi: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-roi))
 
-- Read dwv034 annotation ruler: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-ruler))
+- Read dwv034 ruler: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-ruler))
 
-- Read tid1500 v0 annotation arrow: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-arrow))
+- Read tid1500 v0 arrow: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-arrow))
 
-- Read tid1500 v0 annotation circle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-circle))
+- Read tid1500 v0 circle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-circle))
 
-- Read tid1500 v0 annotation ellipse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-ellipse))
+- Read tid1500 v0 ellipse: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-ellipse))
 
-- Read tid1500 v0 annotation protractor: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-protractor))
+- Read tid1500 v0 protractor: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-protractor))
 
-- Read tid1500 v0 annotation rectangle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-rectangle))
+- Read tid1500 v0 rectangle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-rectangle))
 
-- Read tid1500 v0 annotation roi: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-roi))
+- Read tid1500 v0 roi: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-roi))
 
-- Read tid1500 v0 annotation ruler: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-ruler))
-### utils
-
-- Index stringId: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~index-stringid))
-
-- arrayContains: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraycontains))
-
-- arraySortEquals: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraysortequals))
-
-- Parse multipart: ✅ 
-(URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url), [jsdoc](module-tests_utils.html#~parse-multipart))
-
-- isEqualRgb: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isequalrgb))
-
-- ybrToRgb: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ybrtorgb))
-
-- hexToRgb: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~hextorgb))
-
-- isDarkColour: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isdarkcolour))
-
-- cielab to ciexyz: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-ciexyz))
-
-- ciexyz to cielab: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-cielab))
-
-- ciexyz to srgb: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-srgb))
-
-- srgb to ciexyz: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-ciexyz))
-
-- cielab to rgb: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-rgb))
-
-- srgb to cielab: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-cielab))
-
-- logging: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~logging))
-
-- Merge objects: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~merge-objects))
-
-- CapitaliseFirstLetter: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~capitalisefirstletter))
-
-- StartsWith: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~startswith))
-
-- EndsWith: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~endswith))
-
-- getFlags: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getflags))
-
-- ReplaceFlags: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~replaceflags))
-
-- getFileExtension: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getfileextension))
-
-- precisionRound: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~precisionround))
-
-- ThreadPool class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~threadpool-class))
-
-- UndoStack: ✅ 
-(URS [#DWV-REQ-UI-08-002 (Draw action undo/redo)](tutorial-user-stories.html#dwv-req-ui-08-002-draw-action-undo%2Fredo), [jsdoc](module-tests_utils.html#~undostack))
-
-- getUrlFromUri: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~geturlfromuri))
-
-- splitUri: ✅ 
-(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~splituri))
-
-- getURIQuery: ✅ 
-(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~geturiquery))
-
-- Decode Manifest: ✅ 
-(URS [#DWV-REQ-IO-02-006 (Load Data Manifest URL)](tutorial-user-stories.html#dwv-req-io-02-006-load-data-manifest-url), [jsdoc](module-tests_utils.html#~decode-manifest))
-### math
-
-- BucketQueue class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~bucketqueue-class))
-
-- Circle class: ✅ 
-(URS [#DWV-REQ-UI-07-002 (Draw circle)](tutorial-user-stories.html#dwv-req-ui-07-002-draw-circle), [jsdoc](module-tests_math.html#~circle-class))
-
-- Circle quantication: ✅ 
-(URS [#DWV-REQ-UI-07-002 (Draw circle)](tutorial-user-stories.html#dwv-req-ui-07-002-draw-circle), [jsdoc](module-tests_math.html#~circle-quantication))
-
-- Ellipse class: ✅ 
-(URS [#DWV-REQ-UI-07-003 (Draw ellipse)](tutorial-user-stories.html#dwv-req-ui-07-003-draw-ellipse), [jsdoc](module-tests_math.html#~ellipse-class))
-
-- Ellipse quantification: ✅ 
-(URS [#DWV-REQ-UI-07-003 (Draw ellipse)](tutorial-user-stories.html#dwv-req-ui-07-003-draw-ellipse), [jsdoc](module-tests_math.html#~ellipse-quantification))
-
-- Test getEllipseIndices: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~test-getellipseindices))
-
-- Index class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~index-class))
-
-- Line class: ✅ 
-(URS [#DWV-REQ-UI-07-007 (Draw ruler)](tutorial-user-stories.html#dwv-req-ui-07-007-draw-ruler), [jsdoc](module-tests_math.html#~line-class))
-
-- Angle between lines: ✅ 
-(URS [#DWV-REQ-UI-07-005 (Draw protractor)](tutorial-user-stories.html#dwv-req-ui-07-005-draw-protractor), [jsdoc](module-tests_math.html#~angle-between-lines))
-
-- areOrthogonal: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~areorthogonal))
-
-- Perpendicular line: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~perpendicular-line))
-
-- Matrix33 class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-class))
-
-- Matrix33 tostring: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-tostring))
-
-- Matrix33 multiply vector: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-multiply-vector))
-
-- Matrix33 multiply: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-multiply))
-
-- Matrix33 inverse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-inverse))
-
-- Matrix33 abs: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-abs))
-
-- Matrix33 asOneAndZeros: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-asoneandzeros))
-
-- Matrix33 factories: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-factories))
-
-- orientation matrix factories: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~orientation-matrix-factories))
-
-- getOrientationFromCosines: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationfromcosines))
-
-- getOrientationStringLPS: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationstringlps))
-
-- getOrientationName: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationname))
-
-- Path class: ✅ 
-(URS [#DWV-REQ-UI-07-004 (Draw free hand)](tutorial-user-stories.html#dwv-req-ui-07-004-draw-free-hand), [jsdoc](module-tests_math.html#~path-class))
-
-- Point2D class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~point2d-class))
-
-- Point3D class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~point3d-class))
-
-- Point class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~point-class))
-
-- Rectangle class: ✅ 
-(URS [#DWV-REQ-UI-07-006 (Draw rectangle)](tutorial-user-stories.html#dwv-req-ui-07-006-draw-rectangle), [jsdoc](module-tests_math.html#~rectangle-class))
-
-- Rectangle quantification: ✅ 
-(URS [#DWV-REQ-UI-07-006 (Draw rectangle)](tutorial-user-stories.html#dwv-req-ui-07-006-draw-rectangle), [jsdoc](module-tests_math.html#~rectangle-quantification))
-
-- ROI class: ✅ 
-(URS [#DWV-REQ-UI-07-008 (Draw ROI)](tutorial-user-stories.html#dwv-req-ui-07-008-draw-roi), [jsdoc](module-tests_math.html#~roi-class))
-
-- getBasicStats: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getbasicstats))
-
-- getFullStats: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getfullstats))
-
-- GUID: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~guid))
-
-- Vector3D class: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~vector3d-class))
-
-- Vector3D crossProduct: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~vector3d-crossproduct))
-
-- Vector3D dotProduct: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~vector3d-dotproduct))
+- Read tid1500 v0 ruler: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-ruler))
 ### app
 
-- DataController class: ✅ 
+- DataController class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_app.html#~datacontroller-class))
 ### dicom
 
-- DICOM code class: ✅ 
+- Data element class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~data-element-class))
+
+- DICOM code class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-code-class))
 
-- DICOM code dictionary: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-code-dictionary))
+- dictionary: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dictionary))
 
-- Get DICOM Date: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~get-dicom-date))
+- getSegmentationCode: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsegmentationcode))
 
-- Get DICOM Time: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~get-dicom-time))
+- getConceptNameCode: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getconceptnamecode))
 
-- Get DICOM datetime: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~get-dicom-datetime))
+- getMeasurementUnitsCode: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmeasurementunitscode))
 
-- DICOM dump: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-dump))
+- getDateObj: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdateobj))
 
-- isMonochrome: ✅ 
+- getTimeObj: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~gettimeobj))
+
+- getDate: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdate))
+
+- getDatetimeObj: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdatetimeobj))
+
+- dateToDateObj: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~datetodateobj))
+
+- dateToTimeObj: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~datetotimeobj))
+
+- getDicomDate: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomdate))
+
+- getDicomTime: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomtime))
+
+- getDicomDateTime: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomdatetime))
+
+- dump: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dump))
+
+- getPixelSpacing: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getpixelspacing))
+
+- isMonochrome: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~ismonochrome))
 
-- DICOM parsing - Implementation class and name: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-parsing---implementation-class-and-name))
+- getImage2DSize: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getimage2dsize))
 
-- DICOM parsing - compare version: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-parsing---compare-version))
+- getPixelAspectRatio: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getpixelaspectratio))
 
-- DICOM parsing - isVersionInBounds: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-parsing---isversioninbounds))
+- getSpacingFromMeasure: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspacingfrommeasure))
 
-- Simple DICOM parsing: ✅ 
+- getTagPixelUnit: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~gettagpixelunit))
+
+- getOrientationMatrix: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getorientationmatrix))
+
+- getDicomMeasureItem: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasureitem))
+
+- getDicomPlaneOrientationItem: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomplaneorientationitem))
+
+- getPhotometricInterpretation: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getphotometricinterpretation))
+
+- isSecondatyCapture: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~issecondatycapture))
+
+- getReferencedSeriesUID: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getreferencedseriesuid))
+
+- ImageReference with undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~imagereference-with-undefined))
+
+- ImageReference class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~imagereference-class))
+
+- ImageReference round trip: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~imagereference-round-trip))
+
+- getImageReference good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getimagereference-good-input))
+
+- getImageReference incomplete input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getimagereference-incomplete-input))
+
+- getImageReference empty input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getimagereference-empty-input))
+
+- getDicomImageReferenceItem good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomimagereferenceitem-good-input))
+
+- getDicomImageReferenceItem undefined input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomimagereferenceitem-undefined-input))
+
+- getManufacturer good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmanufacturer-good-input))
+
+- getManufacturer returns first: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmanufacturer-returns-first))
+
+- getManufacturer no tag: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmanufacturer-no-tag))
+
+- getManufacturer no value: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmanufacturer-no-value))
+
+- getManufacturer undefined value: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmanufacturer-undefined-value))
+
+- getManufacturer undefined tag: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmanufacturer-undefined-tag))
+
+- getNormalisedManufacturer GE: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnormalisedmanufacturer-ge))
+
+- getNormalisedManufacturer Siemens: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnormalisedmanufacturer-siemens))
+
+- getNormalisedManufacturer Philips: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnormalisedmanufacturer-philips))
+
+- getNormalisedManufacturer unknown: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnormalisedmanufacturer-unknown))
+
+- getNormalisedManufacturer empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnormalisedmanufacturer-empty))
+
+- getNormalisedManufacturer no value: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnormalisedmanufacturer-no-value))
+
+- getNormalisedManufacturer returns first: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnormalisedmanufacturer-returns-first))
+
+- MeasuredValue empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~measuredvalue-empty))
+
+- MeasuredValue toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~measuredvalue-tostring))
+
+- MeasuredValue round trip: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~measuredvalue-round-trip))
+
+- getMeasuredValue numeric: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmeasuredvalue-numeric))
+
+- getMeasuredValue float: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmeasuredvalue-float))
+
+- getMeasuredValue rational: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmeasuredvalue-rational))
+
+- getMeasuredValue code: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmeasuredvalue-code))
+
+- getMeasuredValue all: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmeasuredvalue-all))
+
+- getMeasuredValue no tag: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getmeasuredvalue-no-tag))
+
+- getDicomMeasuredValueItem numeric: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasuredvalueitem-numeric))
+
+- getDicomMeasuredValueItem float: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasuredvalueitem-float))
+
+- getDicomMeasuredValueItem rational: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasuredvalueitem-rational))
+
+- getDicomMeasuredValueItem code: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasuredvalueitem-code))
+
+- getDicomMeasuredValueItem all: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasuredvalueitem-all))
+
+- getDicomMeasuredValueItem undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasuredvalueitem-undefined))
+
+- getDicomMeasuredValueItem empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicommeasuredvalueitem-empty))
+
+- NumericMeasurement undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~numericmeasurement-undefined))
+
+- NumericMeasurement toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~numericmeasurement-tostring))
+
+- NumericMeasurement toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~numericmeasurement-tostring))
+
+- NumericMeasurement code toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~numericmeasurement-code-tostring))
+
+- NumericMeasurement undefined toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~numericmeasurement-undefined-tostring))
+
+- NumericMeasurement round trip: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~numericmeasurement-round-trip))
+
+- getNumericMeasurement value: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnumericmeasurement-value))
+
+- getNumericMeasurement code: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnumericmeasurement-code))
+
+- getNumericMeasurement good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnumericmeasurement-good-input))
+
+- getNumericMeasurement undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getnumericmeasurement-undefined))
+
+- getDicomNumericMeasurementItem value: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomnumericmeasurementitem-value))
+
+- getDicomNumericMeasurementItem code: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomnumericmeasurementitem-code))
+
+- getDicomNumericMeasurementItem good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomnumericmeasurementitem-good-input))
+
+- getDicomNumericMeasurementItem undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomnumericmeasurementitem-undefined))
+
+- getImplementationClassUID: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getimplementationclassuid))
+
+- compareVersions: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~compareversions))
+
+- isVersionInBounds: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~isversioninbounds))
+
+- Simple DICOM parsing: ✅
 (URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~simple-dicom-parsing))
 
-- Simple DICOM parsing - until tag: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~simple-dicom-parsing---until-tag))
+- Simple DICOM parsing until tag: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~simple-dicom-parsing-until-tag))
 
-- DICOM sequence parsing: ✅ 
+- DICOM sequence parsing: ✅
 (URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~dicom-sequence-parsing))
 
-- cleanString: ✅ 
+- cleanString: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~cleanstring))
 
-- DICOMDIR parsing: ✅ 
+- DICOMDIR parsing: ✅
 (URS [#DWV-REQ-IO-02-004 (Load DICOMDIR URL)](tutorial-user-stories.html#dwv-req-io-02-004-load-dicomdir-url), [jsdoc](module-tests_dicom.html#~dicomdir-parsing))
 
-- DICOM segment class: ✅ 
+- getSuvFactor no corrected: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-no-corrected))
+
+- getSuvFactor no decay: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-no-decay))
+
+- getSuvFactor no units: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-no-units))
+
+- getSuvFactor no weight: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-no-weight))
+
+- getSuvFactor no radio: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-no-radio))
+
+- getSuvFactor no total dose: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-no-total-dose))
+
+- getSuvFactor no half life: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-no-half-life))
+
+- getSuvFactor good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-good-input))
+
+- getSuvFactor radio start date: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-radio-start-date))
+
+- getSuvFactor invalid weight: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-invalid-weight))
+
+- getSuvFactor correct: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsuvfactor-correct))
+
+- getContentTemplate: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getcontenttemplate))
+
+- DicomSRContent toString hasHeader: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicomsrcontent-tostring-hasheader))
+
+- isEqualContentItem: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~isequalcontentitem))
+
+- getSRContent: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsrcontent))
+
+- getDicomSRContentItem: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomsrcontentitem))
+
+- getSRContent CODE: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsrcontent-code))
+
+- DICOM segment class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-segment-class))
 
-- DICOM segment frame info class: ✅ 
+- DICOM segment frame info class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-segment-frame-info-class))
 
-- DICOM tag class: ✅ 
+- SopInstanceReference good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~sopinstancereference-good-input))
+
+- SopInstanceReference toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~sopinstancereference-tostring))
+
+- SopInstanceReference toString SOPinstance: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~sopinstancereference-tostring-sopinstance))
+
+- SopInstanceReference toString SOPClass: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~sopinstancereference-tostring-sopclass))
+
+- SopInstanceReference undefined toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~sopinstancereference-undefined-tostring))
+
+- SopInstanceReference round trip: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~sopinstancereference-round-trip))
+
+- getSopInstanceReference good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsopinstancereference-good-input))
+
+- getSopInstanceReference SOPClass: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsopinstancereference-sopclass))
+
+- getSopInstanceReference SOPInstance: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsopinstancereference-sopinstance))
+
+- getSopInstanceReference empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsopinstancereference-empty))
+
+- getSopInstanceReference other tag: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsopinstancereference-other-tag))
+
+- getSopInstanceReference multiple: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getsopinstancereference-multiple))
+
+- getDicomSopInstanceReferenceItem good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomsopinstancereferenceitem-good-input))
+
+- getDicomSopInstanceReferenceItem SOPClass: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomsopinstancereferenceitem-sopclass))
+
+- getDicomSopInstanceReferenceItem SOPInstance: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomsopinstancereferenceitem-sopinstance))
+
+- getDicomSopInstanceReferenceItem undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomsopinstancereferenceitem-undefined))
+
+- getDicomSopInstanceReferenceItem mapping: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomsopinstancereferenceitem-mapping))
+
+- SpatialCoordinate undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate-undefined))
+
+- SpatialCoordinate toString POINT: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate-tostring-point))
+
+- SpatialCoordinate toString POLYLINE: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate-tostring-polyline))
+
+- SpatialCoordinate round trip: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate-round-trip))
+
+- getSpatialCoordinate good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate-good-input))
+
+- getSpatialCoordinate minimum input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate-minimum-input))
+
+- getSpatialCoordinate empty input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate-empty-input))
+
+- getSpatialCoordinate multiple input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate-multiple-input))
+
+- getDicomSpatialCoordinateItem good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinateitem-good-input))
+
+- getDicomSpatialCoordinateItem incomplete: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinateitem-incomplete))
+
+- getDicomSpatialCoordinateItem undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinateitem-undefined))
+
+- getScoordFromShape Point2D: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getscoordfromshape-point2d))
+
+- getScoordFromShape Line: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getscoordfromshape-line))
+
+- getScoordFromShape Circle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getscoordfromshape-circle))
+
+- getScoordFromShape Protractor: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getscoordfromshape-protractor))
+
+- getScoordFromShape ROI: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getscoordfromshape-roi))
+
+- getScoordFromShape Ellipse: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getscoordfromshape-ellipse))
+
+- getScoordFromShape Rectangle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getscoordfromshape-rectangle))
+
+- getShapeFromScoord no data: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-no-data))
+
+- getShapeFromScoord no coord: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-no-coord))
+
+- getShapeFromScoord odd coord: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-odd-coord))
+
+- getShapeFromScoord point: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-point))
+
+- getShapeFromScoord polyline 2 points: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-polyline-2-points))
+
+- getShapeFromScoord circle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-circle))
+
+- getShapeFromScoord bad circle: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-bad-circle))
+
+- getShapeFromScoord ellipse: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-ellipse))
+
+- getShapeFromScoord bad ellipse: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-bad-ellipse))
+
+- getShapeFromScoord polyline 3 points: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-polyline-3-points))
+
+- getShapeFromScoord polyline 4 points: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-polyline-4-points))
+
+- getShapeFromScoord polyline 6 points: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-polyline-6-points))
+
+- getShapeFromScoord multipoint: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getshapefromscoord-multipoint))
+
+- SpatialCoordinate3D undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate3d-undefined))
+
+- SpatialCoordinate3D toString: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate3d-tostring))
+
+- SpatialCoordinate3D toString multiple: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate3d-tostring-multiple))
+
+- SpatialCoordinate3D toString empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate3d-tostring-empty))
+
+- SpatialCoordinate3D round trip: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~spatialcoordinate3d-round-trip))
+
+- getSpatialCoordinate3D good input: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate3d-good-input))
+
+- getSpatialCoordinate3D only graphic: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate3d-only-graphic))
+
+- getSpatialCoordinate3D multiple: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate3d-multiple))
+
+- getSpatialCoordinate3D only frame: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate3d-only-frame))
+
+- getSpatialCoordinate3D only fiducial: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate3d-only-fiducial))
+
+- getSpatialCoordinate3D empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate3d-empty))
+
+- getSpatialCoordinate3D first graphic: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getspatialcoordinate3d-first-graphic))
+
+- getDicomSpatialCoordinate3DItem good: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinate3ditem-good))
+
+- getDicomSpatialCoordinate3DItem only graphic: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinate3ditem-only-graphic))
+
+- getDicomSpatialCoordinate3DItem undefined: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinate3ditem-undefined))
+
+- getDicomSpatialCoordinate3DItem empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinate3ditem-empty))
+
+- getDicomSpatialCoordinate3DItem graphic arr: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getdicomspatialcoordinate3ditem-graphic-arr))
+
+- DICOM tag class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-tag-class))
 
-- getTagFromDictionary: ✅ 
+- getTagFromDictionary: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~gettagfromdictionary))
 
-- Test getUID: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~test-getuid))
+- getUID: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getuid))
 
-- Multiframe write: ✅ 
-(URS [#DWV-REQ-IO-05-001 (Write DICOM file)](tutorial-user-stories.html#dwv-req-io-05-001-write-dicom-file), [jsdoc](module-tests_dicom.html#~multiframe-write))
+- Write multiframe: ✅
+(URS [#DWV-REQ-IO-05-001 (Write DICOM file)](tutorial-user-stories.html#dwv-req-io-05-001-write-dicom-file), [jsdoc](module-tests_dicom.html#~write-multiframe))
 
-- Write anonymised: ✅ 
+- Write anonymised: ✅
 (URS [#DWV-REQ-IO-05-002 (Write anonymised DICOM file)](tutorial-user-stories.html#dwv-req-io-05-002-write-anonymised-dicom-file), [jsdoc](module-tests_dicom.html#~write-anonymised))
 
-- Write anonymised and add tags: ✅ 
+- Write anonymised and add tags: ✅
 (URS [#DWV-REQ-IO-05-002 (Write anonymised DICOM file)](tutorial-user-stories.html#dwv-req-io-05-002-write-anonymised-dicom-file), [jsdoc](module-tests_dicom.html#~write-anonymised-and-add-tags))
 
-- Read/write synthetic explicit: ✅ 
-(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read%2Fwrite-synthetic-explicit))
+- Read-write synthetic explicit: ✅
+(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read-write-synthetic-explicit))
 
-- Read/write synthetic explicit with rules: ✅ 
-(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read%2Fwrite-synthetic-explicit-with-rules))
+- Read-write synthetic explicit with rules: ✅
+(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read-write-synthetic-explicit-with-rules))
 
-- Read/write synthetic implicit: ✅ 
-(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read%2Fwrite-synthetic-implicit))
+- Read-write synthetic implicit: ✅
+(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read-write-synthetic-implicit))
 
-- Read/write synthetic implicit with rules: ✅ 
-(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read%2Fwrite-synthetic-implicit-with-rules))
+- Read-write synthetic implicit with rules: ✅
+(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read-write-synthetic-implicit-with-rules))
 
-- Read/write synthetic explicit big endian: ✅ 
-(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read%2Fwrite-synthetic-explicit-big-endian))
+- Read-write synthetic explicit big endian: ✅
+(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read-write-synthetic-explicit-big-endian))
 
-- Read/write synthetic explicit big endian with rules: ✅ 
-(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read%2Fwrite-synthetic-explicit-big-endian-with-rules))
-### io
-
-- DICOM loader canloadurl: ✅ 
-(URS [#DWV-REQ-IO-02-001 (Load DICOM discrete URL(s))](tutorial-user-stories.html#dwv-req-io-02-001-load-dicom-discrete-url(s)), [jsdoc](module-tests_io.html#~dicom-loader-canloadurl))
-
-- JSON loader canloadurl: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~json-loader-canloadurl))
-
-- MemoryLoader events single frame: ✅ 
-(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-single-frame))
-
-- MemoryLoader events multi frame: ✅ 
-(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-multi-frame))
-
-- MemoryLoader events zip: ✅ 
-(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-zip))
-
-- Multipart loader canloadurl: ✅ 
-(URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url), [jsdoc](module-tests_io.html#~multipart-loader-canloadurl))
-
-- RAW image loader canloadurl: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~raw-image-loader-canloadurl))
-
-- RAW image loader canloadurl: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~raw-image-loader-canloadurl))
-
-- ZIP loader canloadurl: ✅ 
-(URS [#DWV-REQ-IO-02-003 (Load DICOM ZIP URL)](tutorial-user-stories.html#dwv-req-io-02-003-load-dicom-zip-url), [jsdoc](module-tests_io.html#~zip-loader-canloadurl))
+- Read-write synthetic explicit BE with rules: ✅
+(URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read-write-synthetic-explicit-be-with-rules))
 ### gui
 
-- canCreateCanvas: ✅ 
+- canCreateCanvas: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_gui.html#~cancreatecanvas))
 
-- LayerGroup string id: ✅ 
+- LayerGroup string id: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_gui.html#~layergroup-string-id))
 
-- LayerGroup creation: ✅ 
+- LayerGroup creation: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_gui.html#~layergroup-creation))
 
-- LayerGroup add remove view layer: ✅ 
+- LayerGroup add remove view layer: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_gui.html#~layergroup-add-remove-view-layer))
 
-- LayerGroup add remove draw layer: ✅ 
+- LayerGroup add remove draw layer: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_gui.html#~layergroup-add-remove-draw-layer))
 ### image
 
-- Geometry class: ✅ 
+- Geometry class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~geometry-class))
 
-- Image getValue: ✅ 
+- Image getValue: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~image-getvalue))
 
-- Image histogram: ✅ 
+- Image histogram: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~image-histogram))
 
-- Image append slice: ✅ 
+- Image append slice: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~image-append-slice))
 
-- Image convolute2D: ✅ 
+- Image convolute2D: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~image-convolute2d))
 
-- Image transform: ✅ 
+- Image transform: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~image-transform))
 
-- Image compose: ✅ 
+- Image compose: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~image-compose))
 
-- ImageFactory: ✅ 
+- ImageFactory: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~imagefactory))
 
-- hasValues getOffsets: ✅ 
+- hasValues getOffsets: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~hasvalues-getoffsets))
 
-- simpleRange iterator: ✅ 
+- Image getContourDistance: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~image-getcontourdistance))
+
+- clone: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~clone))
+
+- simpleRange iterator: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~simplerange-iterator))
 
-- Range iterator axial: ✅ 
+- Range iterator axial: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~range-iterator-axial))
 
-- Range iterator coronal: ✅ 
+- Range iterator coronal: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~range-iterator-coronal))
 
-- Range iterator sagittal: ✅ 
+- Range iterator sagittal: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~range-iterator-sagittal))
 
-- RGB iterator: ✅ 
+- RGB iterator: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~rgb-iterator))
 
-- getSliceIterator: ✅ 
+- getSliceIterator: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~getsliceiterator))
 
-- Region iterator: ✅ 
+- Region iterator: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~region-iterator))
 
-- LabelingFilter class: ✅ 
+- LabelingFilter class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~labelingfilter-class))
 
-- Size class: ✅ 
+- ResamplingFilter class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~resamplingfilter-class))
+
+- MaskSegmentHelper findOverlap: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~masksegmenthelper-findoverlap))
+
+- Size class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~size-class))
 
-- Index to and from offset: ✅ 
+- Index to and from offset: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~index-to-and-from-offset))
 
-- Spacing class: ✅ 
+- Index normalise Point: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~index-normalise-point))
+
+- Size normalise Index: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~size-normalise-index))
+
+- Spacing class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~spacing-class))
 
-- View wlchange event: ✅ 
+- View wlchange event: ✅
 (URS [#DWV-REQ-UI-03-001 (Change image window/level)](tutorial-user-stories.html#dwv-req-ui-03-001-change-image-window%2Flevel), [jsdoc](module-tests_image.html#~view-wlchange-event))
 
-- Playback milliseconds: ✅ 
+- Playback milliseconds: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~playback-milliseconds))
 
-- Generate data MONO: ✅ 
+- Generate data MONO: ✅
 (URS [#DWV-REQ-UI-02-001 (Display image)](tutorial-user-stories.html#dwv-req-ui-02-001-display-image), [jsdoc](module-tests_image.html#~generate-data-mono))
 
-- Generate data MONO with RSI: ✅ 
+- Generate data MONO with RSI: ✅
 (URS [#DWV-REQ-UI-02-001 (Display image)](tutorial-user-stories.html#dwv-req-ui-02-001-display-image), [jsdoc](module-tests_image.html#~generate-data-mono-with-rsi))
 
-- Generate data RGB: ✅ 
+- Generate data RGB: ✅
 (URS [#DWV-REQ-UI-02-001 (Display image)](tutorial-user-stories.html#dwv-req-ui-02-001-display-image), [jsdoc](module-tests_image.html#~generate-data-rgb))
 
-- Generate data timing: ✅ 
+- Generate data timing: ✅
 (URS [#DWV-REQ-UI-02-001 (Display image)](tutorial-user-stories.html#dwv-req-ui-02-001-display-image), [jsdoc](module-tests_image.html#~generate-data-timing))
 
-- VoiLutLinearFunction class: ✅ 
+- VoiLutLinearFunction class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~voilutlinearfunction-class))
 
-- VoiLutSigmoidFunction class: ✅ 
+- VoiLutSigmoidFunction class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~voilutsigmoidfunction-class))
 
-- WindowLevel class: ✅ 
+- WindowLevel class: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~windowlevel-class))
 
-- validateWindowLevel.: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~validatewindowlevel.))
+- validateWindowLevel: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~validatewindowlevel))
+### io
+
+- DICOM data loader canloadurl: ✅
+(URS [#DWV-REQ-IO-02-001 (Load DICOM discrete URL(s))](tutorial-user-stories.html#dwv-req-io-02-001-load-dicom-discrete-url(s)), [jsdoc](module-tests_io.html#~dicom-data-loader-canloadurl))
+
+- JSONTextLoader-events isLoading initial: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-events-isloading-initial))
+
+- JSONTextLoader-events load sets flag and fires: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-events-load-sets-flag-and-fires))
+
+- JSONTextLoader-events load resets flag: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-events-load-resets-flag))
+
+- JSONTextLoader-events load fires error: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-events-load-fires-error))
+
+- JSONTextLoader-events abort resets internals: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-events-abort-resets-internals))
+
+- JSONTextLoader-events setOptions does nothing: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-events-setoptions-does-nothing))
+
+- JSONTextLoader-events default does not throw: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-events-default-does-not-throw))
+
+- JSONTextLoader-file true for json: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-file-true-for-json))
+
+- JSONTextLoader-file false for non-json: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-file-false-for-non-json))
+
+- JSONTextLoader-file handles uppercase: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-file-handles-uppercase))
+
+- JSONTextLoader-file handles multiple: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-file-handles-multiple))
+
+- JSONTextLoader-file handles no extension: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-file-handles-no-extension))
+
+- JSONTextLoader-memory json content-type: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-memory-json-content-type))
+
+- JSONTextLoader-memory json content-type charset: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-memory-json-content-type-charset))
+
+- JSONTextLoader-memory non-json content-type: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-memory-non-json-content-type))
+
+- JSONTextLoader-memory no content-type: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-memory-no-content-type))
+
+- JSONTextLoader-memory non-json filename: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-memory-non-json-filename))
+
+- JSONTextLoader-memory empty: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-memory-empty))
+
+- JSONTextLoader-loadFileAs returns Text: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-loadfileas-returns-text))
+
+- JSONTextLoader-loadUrlAs returns Text: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-loadurlas-returns-text))
+
+- JSONTextLoader-canLoadUrl patterns: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~jsontextloader-canloadurl-patterns))
+
+- MemoryLoader events single frame: ✅
+(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-single-frame))
+
+- MemoryLoader events multi frame: ✅
+(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-multi-frame))
+
+- MemoryLoader events zip: ✅
+(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-zip))
+
+- Multipart loader canloadurl: ✅
+(URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url), [jsdoc](module-tests_io.html#~multipart-loader-canloadurl))
+
+- RAW image loader canloadurl: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~raw-image-loader-canloadurl))
+
+- RAW video loader canloadurl: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~raw-video-loader-canloadurl))
+
+- ZIP loader canloadurl: ✅
+(URS [#DWV-REQ-IO-02-003 (Load DICOM ZIP URL)](tutorial-user-stories.html#dwv-req-io-02-003-load-dicom-zip-url), [jsdoc](module-tests_io.html#~zip-loader-canloadurl))
+### math
+
+- BucketQueue class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~bucketqueue-class))
+
+- Circle class: ✅
+(URS [#DWV-REQ-UI-07-002 (Draw circle)](tutorial-user-stories.html#dwv-req-ui-07-002-draw-circle), [jsdoc](module-tests_math.html#~circle-class))
+
+- Circle quantification: ✅
+(URS [#DWV-REQ-UI-07-002 (Draw circle)](tutorial-user-stories.html#dwv-req-ui-07-002-draw-circle), [jsdoc](module-tests_math.html#~circle-quantification))
+
+- Ellipse class: ✅
+(URS [#DWV-REQ-UI-07-003 (Draw ellipse)](tutorial-user-stories.html#dwv-req-ui-07-003-draw-ellipse), [jsdoc](module-tests_math.html#~ellipse-class))
+
+- Ellipse quantification: ✅
+(URS [#DWV-REQ-UI-07-003 (Draw ellipse)](tutorial-user-stories.html#dwv-req-ui-07-003-draw-ellipse), [jsdoc](module-tests_math.html#~ellipse-quantification))
+
+- getEllipseIndices: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getellipseindices))
+
+- Index class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~index-class))
+
+- Index getZeroIndex: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~index-getzeroindex))
+
+- Line class: ✅
+(URS [#DWV-REQ-UI-07-007 (Draw ruler)](tutorial-user-stories.html#dwv-req-ui-07-007-draw-ruler), [jsdoc](module-tests_math.html#~line-class))
+
+- Angle between lines: ✅
+(URS [#DWV-REQ-UI-07-005 (Draw protractor)](tutorial-user-stories.html#dwv-req-ui-07-005-draw-protractor), [jsdoc](module-tests_math.html#~angle-between-lines))
+
+- areOrthogonal: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~areorthogonal))
+
+- Perpendicular line: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~perpendicular-line))
+
+- Line getPerpendicularLineAtDistance: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~line-getperpendicularlineatdistance))
+
+- Line isPointInLineRange: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~line-ispointinlinerange))
+
+- Matrix33 class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-class))
+
+- Matrix33 tostring: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-tostring))
+
+- Matrix33 multiply vector: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-multiply-vector))
+
+- Matrix33 multiply: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-multiply))
+
+- Matrix33 inverse: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-inverse))
+
+- Matrix33 abs: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-abs))
+
+- Matrix33 asOneAndZeros: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-asoneandzeros))
+
+- Matrix33 factories: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-factories))
+
+- orientation matrix factories: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~orientation-matrix-factories))
+
+- getOrientationFromCosines: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationfromcosines))
+
+- getOrientationStringLPS: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationstringlps))
+
+- getOrientationName: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationname))
+
+- Path class: ✅
+(URS [#DWV-REQ-UI-07-004 (Draw free hand)](tutorial-user-stories.html#dwv-req-ui-07-004-draw-free-hand), [jsdoc](module-tests_math.html#~path-class))
+
+- Point2D class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~point2d-class))
+
+- Point3D class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~point3d-class))
+
+- Point class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~point-class))
+
+- Protractor class: ✅
+(URS [#DWV-REQ-UI-07-005 (Draw protractor)](tutorial-user-stories.html#dwv-req-ui-07-005-draw-protractor), [jsdoc](module-tests_math.html#~protractor-class))
+
+- Protractor quantification: ✅
+(URS [#DWV-REQ-UI-07-005 (Draw protractor)](tutorial-user-stories.html#dwv-req-ui-07-005-draw-protractor), [jsdoc](module-tests_math.html#~protractor-quantification))
+
+- Rectangle class: ✅
+(URS [#DWV-REQ-UI-07-006 (Draw rectangle)](tutorial-user-stories.html#dwv-req-ui-07-006-draw-rectangle), [jsdoc](module-tests_math.html#~rectangle-class))
+
+- Rectangle quantification: ✅
+(URS [#DWV-REQ-UI-07-006 (Draw rectangle)](tutorial-user-stories.html#dwv-req-ui-07-006-draw-rectangle), [jsdoc](module-tests_math.html#~rectangle-quantification))
+
+- Rectangle getRectangleIndices: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~rectangle-getrectangleindices))
+
+- ROI class: ✅
+(URS [#DWV-REQ-UI-07-008 (Draw ROI)](tutorial-user-stories.html#dwv-req-ui-07-008-draw-roi), [jsdoc](module-tests_math.html#~roi-class))
+
+- getBasicStats: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getbasicstats))
+
+- getFullStats: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getfullstats))
+
+- GUID: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~guid))
+
+- Vector3D class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~vector3d-class))
+
+- Vector3D crossProduct: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~vector3d-crossproduct))
+
+- Vector3D dotProduct: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~vector3d-dotproduct))
 ### state
 
-- Read v01 state line: ✅ 
+- Read v01 state line: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-line))
 
-- Read v01 state roi: ✅ 
+- Read v01 state roi: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-roi))
 
-- Read v01 state ellipse: ✅ 
+- Read v01 state ellipse: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-ellipse))
 
-- Read v01 state protractor: ✅ 
+- Read v01 state protractor: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-protractor))
 
-- Read v01 state rectangle: ✅ 
+- Read v01 state rectangle: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-rectangle))
 
-- Read v01 state line multi-slice: ✅ 
+- Read v01 state line multi-slice: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-line-multi-slice))
 
-- Read v02 state arrow: ✅ 
+- Read v02 state arrow: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-arrow))
 
-- Read v02 state ruler: ✅ 
+- Read v02 state ruler: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-ruler))
 
-- Read v02 state roi: ✅ 
+- Read v02 state roi: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-roi))
 
-- Read v02 state hand: ✅ 
+- Read v02 state hand: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-hand))
 
-- Read v02 state ellipse: ✅ 
+- Read v02 state ellipse: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-ellipse))
 
-- Read v02 state protractor: ✅ 
+- Read v02 state protractor: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-protractor))
 
-- Read v02 state rectangle: ✅ 
+- Read v02 state rectangle: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-rectangle))
 
-- Read v02 state ruler multi-slice: ✅ 
+- Read v02 state ruler multi-slice: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-ruler-multi-slice))
 
-- Read v03 state arrow: ✅ 
+- Read v03 state arrow: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-arrow))
 
-- Read v03 state ruler: ✅ 
+- Read v03 state ruler: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-ruler))
 
-- Read v03 state roi: ✅ 
+- Read v03 state roi: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-roi))
 
-- Read v03 state hand: ✅ 
+- Read v03 state hand: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-hand))
 
-- Read v03 state ellipse: ✅ 
+- Read v03 state ellipse: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-ellipse))
 
-- Read v03 state protractor: ✅ 
+- Read v03 state protractor: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-protractor))
 
-- Read v03 state rectangle: ✅ 
+- Read v03 state rectangle: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-rectangle))
 
-- Read v03 state ruler multi-slice: ✅ 
+- Read v03 state ruler multi-slice: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-ruler-multi-slice))
 
-- Read v04 state arrow: ✅ 
+- Read v04 state arrow: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-arrow))
 
-- Read v04 state ruler: ✅ 
+- Read v04 state ruler: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-ruler))
 
-- Read v04 state roi: ✅ 
+- Read v04 state roi: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-roi))
 
-- Read v04 state hand: ✅ 
+- Read v04 state hand: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-hand))
 
-- Read v04 state ellipse: ✅ 
+- Read v04 state ellipse: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-ellipse))
 
-- Read v04 state protractor: ✅ 
+- Read v04 state protractor: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-protractor))
 
-- Read v04 state rectangle: ✅ 
+- Read v04 state rectangle: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-rectangle))
 
-- Read v04 state ruler multi-slice: ✅ 
+- Read v04 state ruler multi-slice: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-ruler-multi-slice))
 
-- Read v05 state arrow: ✅ 
+- Read v05 state arrow: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-arrow))
 
-- Read v05 state ruler: ✅ 
+- Read v05 state ruler: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-ruler))
 
-- Read v05 state roi: ✅ 
+- Read v05 state roi: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-roi))
 
-- Read v05 state hand: ✅ 
+- Read v05 state hand: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-hand))
 
-- Read v05 state ellipse: ✅ 
+- Read v05 state ellipse: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-ellipse))
 
-- Read v05 state protractor: ✅ 
+- Read v05 state protractor: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-protractor))
 
-- Read v05 state rectangle: ✅ 
+- Read v05 state rectangle: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-rectangle))
 
-- Read v05 state ruler multi-slice: ✅ 
+- Read v05 state ruler multi-slice: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-ruler-multi-slice))
+### utils
+
+- toStringId: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~tostringid))
+
+- arrayMap: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraymap))
+
+- arrayContains: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraycontains))
+
+- arraySortEquals: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraysortequals))
+
+- Parse multipart: ✅
+(URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url), [jsdoc](module-tests_utils.html#~parse-multipart))
+
+- isEqualRgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isequalrgb))
+
+- ybrToRgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ybrtorgb))
+
+- hexToRgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~hextorgb))
+
+- isDarkColour: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isdarkcolour))
+
+- cielab to ciexyz: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-ciexyz))
+
+- ciexyz to cielab: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-cielab))
+
+- ciexyz to srgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-srgb))
+
+- srgb to ciexyz: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-ciexyz))
+
+- cielab to rgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-rgb))
+
+- srgb to cielab: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-cielab))
+
+- i18n: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~i18n))
+
+- logging: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~logging))
+
+- Merge objects: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~merge-objects))
+
+- CapitaliseFirstLetter: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~capitalisefirstletter))
+
+- StartsWith: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~startswith))
+
+- EndsWith: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~endswith))
+
+- getFlags: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getflags))
+
+- ReplaceFlags: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~replaceflags))
+
+- getFileExtension: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getfileextension))
+
+- precisionRound: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~precisionround))
+
+- ThreadPool class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~threadpool-class))
+
+- UndoStack: ✅
+(URS [#DWV-REQ-UI-08-002 (Draw action undo/redo)](tutorial-user-stories.html#dwv-req-ui-08-002-draw-action-undo%2Fredo), [jsdoc](module-tests_utils.html#~undostack))
+
+- getUrlFromUri: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~geturlfromuri))
+
+- splitUri: ✅
+(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~splituri))
+
+- getURIQuery: ✅
+(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~geturiquery))
+
+- Parse Manifest: ✅
+(URS [#DWV-REQ-IO-02-006 (Load Data Manifest URL)](tutorial-user-stories.html#dwv-req-io-02-006-load-data-manifest-url), [jsdoc](module-tests_utils.html#~parse-manifest))
 
 ## Traceability
 
@@ -609,45 +1173,45 @@ Failed: 0 ❌
 ### io
 
 URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)):
- ✅ Simple DICOM parsing 
- ✅ DICOM sequence parsing 
- ✅ Read/write synthetic explicit 
- ✅ Read/write synthetic explicit with rules 
- ✅ Read/write synthetic implicit 
- ✅ Read/write synthetic implicit with rules 
- ✅ Read/write synthetic explicit big endian 
- ✅ Read/write synthetic explicit big endian with rules 
+ ✅ Simple DICOM parsing
+ ✅ DICOM sequence parsing
+ ✅ Read-write synthetic explicit
+ ✅ Read-write synthetic explicit with rules
+ ✅ Read-write synthetic implicit
+ ✅ Read-write synthetic implicit with rules
+ ✅ Read-write synthetic explicit big endian
+ ✅ Read-write synthetic explicit BE with rules
 
 URS [#DWV-REQ-IO-01-002 (Load DICOM ZIP file)](tutorial-user-stories.html#dwv-req-io-01-002-load-dicom-zip-file):
  ⚠️ No tests
 
 URS [#DWV-REQ-IO-02-001 (Load DICOM discrete URL(s))](tutorial-user-stories.html#dwv-req-io-02-001-load-dicom-discrete-url(s)):
- ✅ DICOM loader canloadurl 
+ ✅ DICOM data loader canloadurl
 
 URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url):
- ✅ Parse multipart 
- ✅ Multipart loader canloadurl 
+ ✅ Multipart loader canloadurl
+ ✅ Parse multipart
 
 URS [#DWV-REQ-IO-02-003 (Load DICOM ZIP URL)](tutorial-user-stories.html#dwv-req-io-02-003-load-dicom-zip-url):
- ✅ ZIP loader canloadurl 
+ ✅ ZIP loader canloadurl
 
 URS [#DWV-REQ-IO-02-004 (Load DICOMDIR URL)](tutorial-user-stories.html#dwv-req-io-02-004-load-dicomdir-url):
- ✅ DICOMDIR parsing 
+ ✅ DICOMDIR parsing
 
 URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme):
- ✅ splitUri 
- ✅ getURIQuery 
+ ✅ splitUri
+ ✅ getURIQuery
 
 URS [#DWV-REQ-IO-02-006 (Load Data Manifest URL)](tutorial-user-stories.html#dwv-req-io-02-006-load-data-manifest-url):
- ✅ Decode Manifest 
+ ✅ Parse Manifest
 
 URS [#DWV-REQ-IO-03-001 (DICOM data load output)](tutorial-user-stories.html#dwv-req-io-03-001-dicom-data-load-output):
  ⚠️ No tests
 
 URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event):
- ✅ MemoryLoader events single frame 
- ✅ MemoryLoader events multi frame 
- ✅ MemoryLoader events zip 
+ ✅ MemoryLoader events single frame
+ ✅ MemoryLoader events multi frame
+ ✅ MemoryLoader events zip
 
 URS [#DWV-REQ-IO-04-002 (DICOM load progress event)](tutorial-user-stories.html#dwv-req-io-04-002-dicom-load-progress-event):
  ⚠️ No tests
@@ -668,11 +1232,11 @@ URS [#DWV-REQ-IO-04-007 (DICOM load end event)](tutorial-user-stories.html#dwv-r
  ⚠️ No tests
 
 URS [#DWV-REQ-IO-05-001 (Write DICOM file)](tutorial-user-stories.html#dwv-req-io-05-001-write-dicom-file):
- ✅ Multiframe write 
+ ✅ Write multiframe
 
 URS [#DWV-REQ-IO-05-002 (Write anonymised DICOM file)](tutorial-user-stories.html#dwv-req-io-05-002-write-anonymised-dicom-file):
- ✅ Write anonymised 
- ✅ Write anonymised and add tags 
+ ✅ Write anonymised
+ ✅ Write anonymised and add tags
 
 ### ui
 
@@ -680,10 +1244,10 @@ URS [#DWV-REQ-UI-01-001 (Integration in web application)](tutorial-user-stories.
  ⚠️ No tests
 
 URS [#DWV-REQ-UI-02-001 (Display image)](tutorial-user-stories.html#dwv-req-ui-02-001-display-image):
- ✅ Generate data MONO 
- ✅ Generate data MONO with RSI 
- ✅ Generate data RGB 
- ✅ Generate data timing 
+ ✅ Generate data MONO
+ ✅ Generate data MONO with RSI
+ ✅ Generate data RGB
+ ✅ Generate data timing
 
 URS [#DWV-REQ-UI-02-002 (Image reorientation)](tutorial-user-stories.html#dwv-req-ui-02-002-image-reorientation):
  ⚠️ No tests
@@ -692,7 +1256,7 @@ URS [#DWV-REQ-UI-02-003 (Image overlay)](tutorial-user-stories.html#dwv-req-ui-0
  ⚠️ No tests
 
 URS [#DWV-REQ-UI-03-001 (Change image window/level)](tutorial-user-stories.html#dwv-req-ui-03-001-change-image-window%2Flevel):
- ✅ View wlchange event 
+ ✅ View wlchange event
 
 URS [#DWV-REQ-UI-03-002 (Change image position)](tutorial-user-stories.html#dwv-req-ui-03-002-change-image-position):
  ⚠️ No tests
@@ -743,38 +1307,39 @@ URS [#DWV-REQ-UI-07-001 (Draw arrow)](tutorial-user-stories.html#dwv-req-ui-07-0
  ⚠️ No tests
 
 URS [#DWV-REQ-UI-07-002 (Draw circle)](tutorial-user-stories.html#dwv-req-ui-07-002-draw-circle):
- ✅ Circle class 
- ✅ Circle quantication 
+ ✅ Circle class
+ ✅ Circle quantification
 
 URS [#DWV-REQ-UI-07-003 (Draw ellipse)](tutorial-user-stories.html#dwv-req-ui-07-003-draw-ellipse):
- ✅ Ellipse class 
- ✅ Ellipse quantification 
+ ✅ Ellipse class
+ ✅ Ellipse quantification
 
 URS [#DWV-REQ-UI-07-004 (Draw free hand)](tutorial-user-stories.html#dwv-req-ui-07-004-draw-free-hand):
- ✅ Path class 
+ ✅ Path class
 
 URS [#DWV-REQ-UI-07-005 (Draw protractor)](tutorial-user-stories.html#dwv-req-ui-07-005-draw-protractor):
- ✅ Angle between lines 
+ ✅ Angle between lines
+ ✅ Protractor class
+ ✅ Protractor quantification
 
 URS [#DWV-REQ-UI-07-006 (Draw rectangle)](tutorial-user-stories.html#dwv-req-ui-07-006-draw-rectangle):
- ✅ Rectangle class 
- ✅ Rectangle quantification 
+ ✅ Rectangle class
+ ✅ Rectangle quantification
 
 URS [#DWV-REQ-UI-07-007 (Draw ruler)](tutorial-user-stories.html#dwv-req-ui-07-007-draw-ruler):
- ✅ Line class 
+ ✅ Line class
 
 URS [#DWV-REQ-UI-07-008 (Draw ROI)](tutorial-user-stories.html#dwv-req-ui-07-008-draw-roi):
- ✅ ROI class 
+ ✅ ROI class
 
 URS [#DWV-REQ-UI-08-001 (Draw delete)](tutorial-user-stories.html#dwv-req-ui-08-001-draw-delete):
  ⚠️ No tests
 
 URS [#DWV-REQ-UI-08-002 (Draw action undo/redo)](tutorial-user-stories.html#dwv-req-ui-08-002-draw-action-undo%2Fredo):
- ✅ UndoStack 
+ ✅ UndoStack
 
 URS [#DWV-REQ-UI-09-001 (Livewire)](tutorial-user-stories.html#dwv-req-ui-09-001-livewire):
  ⚠️ No tests
 
 URS [#DWV-REQ-UI-09-002 (Floodfill)](tutorial-user-stories.html#dwv-req-ui-09-002-floodfill):
  ⚠️ No tests
-

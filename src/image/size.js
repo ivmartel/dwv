@@ -1,4 +1,5 @@
 import {Index} from '../math/index.js';
+import {Point} from '../math/point.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -226,11 +227,11 @@ export class Size {
    *
    * @param {Index} index The index to convert.
    * @param {number} [start] Optional start dimension to base the offset on.
-   * @returns {number} The offset.
+   * @returns {number} The offset or -1 if out of bounds.
    */
   indexToOffset(index, start) {
-    // TODO check for equality
-    if (index.length() < this.length()) {
+    // index cannot have more dimensions than this size
+    if (index.length() > this.length()) {
       throw new Error('Incompatible index and size length');
     }
     if (typeof start === 'undefined') {
@@ -241,7 +242,7 @@ export class Size {
       }
     }
     let offset = 0;
-    for (let i = start; i < this.length(); ++i) {
+    for (let i = start; i < index.length(); ++i) {
       const dimMax = this.get(i);
       const dimIndex = index.get(i);
 
@@ -284,6 +285,62 @@ export class Size {
       x: this.get(0),
       y: this.get(1)
     };
+  }
+
+  /**
+   * Normalise a list of values to this size.
+   *
+   * @param {number[]} inValues The input values.
+   * @param {number[]} [extraValues] Optional values used
+   * to fill extra dimensions.
+   * @returns {number[]} The result values.
+   */
+  #normaliseValues(inValues, extraValues) {
+    // will reduce if needed
+    const values = inValues.slice(0, this.length());
+    // append if needed
+    for (let i = inValues.length; i < this.length(); ++i) {
+      if (typeof extraValues !== 'undefined' &&
+        typeof extraValues[i] !== 'undefined'
+      ) {
+        values.push(extraValues[i]);
+      } else {
+        values.push(0);
+      }
+    }
+    return values;
+  }
+
+  /**
+   * Normalise a point to this size.
+   *
+   * @param {Point} point The input point.
+   * @param {Point} [extra] Optional point used to fill extra dimensions.
+   * @returns {Point} The result point.
+   */
+  normalisePoint(point, extra) {
+    let extraValues;
+    if (typeof extra !== 'undefined') {
+      extraValues = extra.getValues();
+    }
+    const newValues = this.#normaliseValues(point.getValues(), extraValues);
+    return new Point(newValues);
+  }
+
+  /**
+   * Normalise an index to this size.
+   *
+   * @param {Index} index The input index.
+   * @param {Index} [extra] Optional index used to fill extra dimensions.
+   * @returns {Index} The result point.
+   */
+  normaliseIndex(index, extra) {
+    let extraValues;
+    if (typeof extra !== 'undefined') {
+      extraValues = extra.getValues();
+    }
+    const newValues = this.#normaliseValues(index.getValues(), extraValues);
+    return new Index(newValues);
   }
 
 } // Size class

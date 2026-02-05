@@ -7,6 +7,7 @@ import {
 import {safeGet, safeGetAll} from './dataElement.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
 import {Spacing} from '../image/spacing.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -21,18 +22,26 @@ const TagKeys = {
   TransferSyntax: '00020010',
   SOPClassUID: '00080016',
   Modality: '00080060',
+  ReferencedSeriesSequence: '00081115',
+  SeriesInstanceUID: '0020000E',
   Rows: '00280010',
   Columns: '00280011',
   PixelSpacing: '00280030',
   ImagerPixelSpacing: '00181164',
   NominalScannedPixelSpacing: '00182010',
+  DistanceSourceToDetector: '00181110',
+  DistanceSourceToPatient: '00181111',
+  EstimatedRadiographicMagnificationFactor: '00181114',
   PixelAspectRatio: '00280034',
   SpacingBetweenSlices: '00180088',
   RescaleType: '00281054',
   Units: '00541001',
   ImageOrientationPatient: '00200037',
   PhotometricInterpretation: '00280004',
-  SamplesPerPixel: '00280002'
+  SamplesPerPixel: '00280002',
+  PixelMeasuresSequence: '00289110',
+  SharedFunctionalGroupsSequence: '52009229',
+  PerFrameFunctionalGroupsSequence: '52009230'
 };
 
 /**
@@ -54,6 +63,127 @@ export function getImage2DSize(elements) {
 }
 
 /**
+ * Get the 2D spacing values.
+ *
+ * @param {Object<string, DataElement>} elements The dicom element.
+ * @param {string} tagKey The tag key.
+ * @returns {number[]|undefined} The values if present.
+ */
+function get2DSpacingValues(elements, tagKey) {
+  let res;
+  const values = safeGetAll(elements, tagKey);
+  if (typeof values !== 'undefined' &&
+    values.length === 2) {
+    // dicom spacing order: [row, column]
+    res = [
+      parseFloat(values[1]),
+      parseFloat(values[0])
+    ];
+  }
+  return res;
+}
+
+/**
+ * Get the 2D spacing values from a functional group.
+ *
+ * @param {Object<string, DataElement>} funcGroupElements The dicom elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
+  let res;
+  // Pixel Measures Sequence
+  const pixelMeasuresSeq =
+    safeGetAll(funcGroupElements, TagKeys.PixelMeasuresSequence);
+  if (typeof pixelMeasuresSeq !== 'undefined') {
+    // should be only one
+    res = get2DSpacingValues(pixelMeasuresSeq[0], TagKeys.PixelSpacing);
+  }
+  return res;
+}
+
+/**
+ * Get the pixel spacing for projection data.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function getProjection2DSpacingValues(elements) {
+  // ImagerPixelSpacing
+  let res = get2DSpacingValues(elements, TagKeys.ImagerPixelSpacing);
+  if (typeof res !== 'undefined') {
+    let factor;
+    const magnification = parseFloat(
+      safeGet(elements, TagKeys.EstimatedRadiographicMagnificationFactor));
+    if (!isNaN(magnification)) {
+      factor = magnification;
+    } else {
+      const d0 = parseFloat(
+        safeGet(elements, TagKeys.DistanceSourceToDetector));
+      const d1 = parseFloat(
+        safeGet(elements, TagKeys.DistanceSourceToPatient));
+      if (!isNaN(d0) && !isNaN(d1) && d1 !== 0) {
+        factor = d0 / d1;
+      }
+    }
+    if (typeof factor !== 'undefined') {
+      res = res.map((value) => value / factor);
+      logger.warn('Got pixel spacing from corrected ImagerPixelSpacing tag');
+    } else {
+      logger.warn('Got pixel spacing from raw ImagerPixelSpacing tag');
+    }
+  }
+  return res;
+}
+
+/**
+ * Get the pixel spacing for secondary capture data.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function getSecondaryCapture2DSpacingValues(elements) {
+  // NominalScannedPixelSpacing
+  const res = get2DSpacingValues(elements, TagKeys.NominalScannedPixelSpacing);
+  if (typeof res !== 'undefined') {
+    logger.warn('Got pixel spacing from NominalScannedPixelSpacing tag');
+  }
+  return res;
+}
+
+/**
+ * Get the pixel spacing for multi-frame data.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+function getMultiFrame2DSpacingValues(elements) {
+  let res;
+
+  // SharedFunctionalGroupsSequence (multi-frame)
+  const sharedFunctionalGroupsSeq =
+    safeGetAll(elements, TagKeys.SharedFunctionalGroupsSequence);
+  if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
+    // should be only one
+    const funcGroup = sharedFunctionalGroupsSeq[0];
+    res = get2DSpacingValuesFromFuncGroup(funcGroup);
+  }
+
+  // PerFrameFunctionalGroupsSequence (multi-frame)
+  if (typeof res === 'undefined') {
+    const perFrameFunctionalGroupsSeq =
+      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+    if (typeof perFrameFunctionalGroupsSeq !== 'undefined') {
+      // take first one
+      // TODO: use proper frame
+      const funcGroup = perFrameFunctionalGroupsSeq[0];
+      res = get2DSpacingValuesFromFuncGroup(funcGroup);
+    }
+  }
+
+  return res;
+}
+
+/**
  * Get the pixel spacing from the different spacing tags.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
@@ -61,28 +191,33 @@ export function getImage2DSize(elements) {
  *   undefined if not present.
  */
 export function getPixelSpacing(elements) {
-  let res;
-
-  const tags = [
-    'PixelSpacing',
-    'ImagerPixelSpacing',
-    'NominalScannedPixelSpacing',
-    'PixelAspectRatio'
-  ];
-  for (const tag of tags) {
-    const spacing = safeGetAll(elements, TagKeys[tag]);
-    if (typeof spacing !== 'undefined' &&
-      spacing.length === 2) {
-      // dicom spacing order: [row, column]
-      res = [
-        parseFloat(spacing[1]),
-        parseFloat(spacing[0])
-      ];
-      break;
-    }
+  // main tag
+  let res = get2DSpacingValues(elements, TagKeys.PixelSpacing);
+  // projection related
+  // TODO: use SOPClassUID filter?
+  if (typeof res === 'undefined') {
+    res = getProjection2DSpacingValues(elements);
   }
-
+  // secondary capture (before multi-frame case)
+  if (typeof res === 'undefined') {
+    res = getSecondaryCapture2DSpacingValues(elements);
+  }
+  // multi-frame case (spacing in functional group)
+  if (typeof res === 'undefined') {
+    res = getMultiFrame2DSpacingValues(elements);
+  }
+  // return
   return res;
+}
+
+/**
+ * Get the pixel aspect ratio.
+ *
+ * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @returns {number[]|undefined} The values if present.
+ */
+export function getPixelAspectRatio(elements) {
+  return get2DSpacingValues(elements, TagKeys.PixelAspectRatio);
 }
 
 /**
@@ -93,17 +228,10 @@ export function getPixelSpacing(elements) {
  */
 export function getSpacingFromMeasure(dataElements) {
   // Pixel Spacing
-  const pixelSpacing = safeGetAll(dataElements, TagKeys.PixelSpacing);
-  if (typeof pixelSpacing === 'undefined' ||
-    pixelSpacing.length !== 2
-  ) {
+  const spacingValues = get2DSpacingValues(dataElements, TagKeys.PixelSpacing);
+  if (typeof spacingValues === 'undefined') {
     return undefined;
   }
-  // spacing order: [row, column]
-  const spacingValues = [
-    parseFloat(pixelSpacing[1]),
-    parseFloat(pixelSpacing[0]),
-  ];
   // Spacing Between Slices
   const sbs = safeGet(dataElements, TagKeys.SpacingBetweenSlices);
   if (typeof sbs !== 'undefined') {
@@ -136,7 +264,7 @@ function defaultGetTagPixelUnit(elements) {
   let unit;
   const tags = ['RescaleType', 'Units'];
   for (const tag of tags) {
-    const unit = safeGet(elements, TagKeys[tag]);
+    unit = safeGet(elements, TagKeys[tag]);
     if (typeof unit !== 'undefined') {
       break;
     }
@@ -260,4 +388,20 @@ export function isSecondatyCapture(SOPClassUID) {
   const pattern = /^1\.2\.840\.10008\.5\.1\.4\.1\.1\.7/;
   return typeof SOPClassUID !== 'undefined' &&
     pattern.test(SOPClassUID);
+}
+
+/**
+ * Get the referenced series UID from the data elements.
+ *
+ * @param {Object<string, DataElement>} dataElements The data elements.
+ * @returns {string|undefined} The referenced series UID.
+ */
+export function getReferencedSeriesUID(dataElements) {
+  let res;
+  const refSeriesSq =
+    safeGetAll(dataElements, TagKeys.ReferencedSeriesSequence);
+  if (typeof refSeriesSq !== 'undefined') {
+    res = safeGet(refSeriesSq[0], TagKeys.SeriesInstanceUID);
+  }
+  return res;
 }

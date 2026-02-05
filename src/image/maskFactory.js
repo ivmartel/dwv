@@ -383,7 +383,6 @@ export class MaskFactory {
    *
    * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
    * @returns {string|undefined} A possible warning.
-   * @throws Error for missing or wrong data.
    */
   checkElements(_dicomElements) {
     // does nothing
@@ -400,7 +399,7 @@ export class MaskFactory {
    * @param {Image} [refImage] Reference image, code will use its
    *   origins if present (best) or try to calculate them.
    * @returns {Image} A new Image.
-   * @throws Error for missing or wrong data.
+   * @throws {Error} Error for missing or wrong data.
    */
   create(dataElements, pixelBuffer, refImage) {
     // safe get shortcuts

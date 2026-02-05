@@ -279,6 +279,7 @@ class WorkerThread {
     event.itemNumber = this.runningTask.info.itemNumber;
     event.numberOfItems = this.runningTask.info.numberOfItems;
     event.index = this.runningTask.info.index;
+    event.indexOrigin = this.runningTask.info.indexOrigin;
     // send event
     this.parentPool.onworkitem(event);
     // tell the parent pool the task is done
@@ -295,6 +296,7 @@ class WorkerThread {
     event.itemNumber = this.runningTask.info.itemNumber;
     event.numberOfItems = this.runningTask.info.numberOfItems;
     event.index = this.runningTask.info.index;
+    event.indexOrigin = this.runningTask.info.indexOrigin;
     // pass to parent
     this.parentPool.handleWorkerError(event);
     // stop the worker and free the thread

@@ -68,6 +68,44 @@ export function getArrayFromStringId(inputStr) {
 }
 
 /**
+ * Apply an input 'compare'function after having checked the two
+ * inputs for undefined.
+ *
+ * @param {any} a The first input.
+ * @param {any} b The second input.
+ * @param {Function} func The compare function.
+ * @returns {any} The result of the function applied to the inputs
+ * or the not undefined input.
+ */
+function checkAndApply(a, b, func) {
+  if (typeof a === 'undefined') {
+    return b;
+  }
+  if (typeof b === 'undefined') {
+    return a;
+  }
+  return func(a, b);
+};
+
+/**
+ * Apply an input 'compare' function to items of 2 arrays.
+ * The output will have a length that is the maximum of
+ * both inputs.
+ *
+ * @param {Array} arr0 The first array.
+ * @param {Array} arr1 The second array.
+ * @param {Function} func The compare function.
+ * @returns {Array} The result array.
+ */
+export function arrayMap(arr0, arr1, func) {
+  let res = arr0.map((v, i) => checkAndApply(v, arr1[i], func));
+  if (arr1.length > arr0.length) {
+    res = res.concat(arr1.slice(arr0.length));
+  }
+  return res;
+}
+
+/**
  * Check if the first input array contains all the
  * elements of the second input array.
  *

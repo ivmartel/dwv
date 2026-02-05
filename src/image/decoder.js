@@ -1,6 +1,16 @@
 import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 /**
+ * List of compatible typed arrays.
+ *
+ * @typedef {(
+ *   Uint8Array | Int8Array |
+ *   Uint16Array | Int16Array |
+ *   Uint32Array | Int32Array
+ * )} TypedArray
+ */
+
+/**
  * Jpeg baseline worker task.
  */
 class JpegBaselineWorkerTask extends WorkerTask {
@@ -106,7 +116,7 @@ export class PixelBufferDecoder {
   /**
    * Decode a pixel buffer.
    *
-   * @param {Array} pixelBuffer The pixel buffer.
+   * @param {TypedArray} pixelBuffer The pixel buffer.
    * @param {object} pixelMeta The input meta data.
    * @param {object} info Information object about the input data.
    */

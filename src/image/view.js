@@ -4,8 +4,9 @@ import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
 import {VoiLut} from './voiLut.js';
 import {
-  validateWindowLevel,
-  WindowLevel
+  WindowLevel,
+  equalWl,
+  validateWindowLevel
 } from './windowLevel.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
 import {generateImageDataPaletteColor} from './viewPaletteColor.js';
@@ -27,7 +28,10 @@ import {
   Point3D
 } from '../math/point.js';
 import {DataElement} from '../dicom/dataElement.js';
+import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
 /* eslint-enable no-unused-vars */
+
+export const MAX_CONTOUR_SIZE = 10;
 
 /**
  * List of view event names.
@@ -40,7 +44,8 @@ export const viewEventNames = [
   'colourmapchange',
   'positionchange',
   'opacitychange',
-  'alphafuncchange'
+  'alphafuncchange',
+  'maskviewchange'
 ];
 
 /**
@@ -83,7 +88,7 @@ export function createView(elements, image) {
  *   ctx.putImageData(imageData, 0, 0);
  *   // update html
  *   const div = document.getElementById('dwv');
- *   div.appendChild(canvas);;
+ *   div.appendChild(canvas);
  * };
  * // DICOM file request
  * const request = new XMLHttpRequest();
@@ -129,7 +134,7 @@ export class View {
    *
    * @type {string}
    */
-  #currentPresetName = null;
+  #currentPresetName;
 
   /**
    * Current window level.
@@ -151,7 +156,7 @@ export class View {
    *
    * @type {Point}
    */
-  #currentPosition = null;
+  #currentPosition;
 
   /**
    * View orientation. Undefined will use the original slice ordering.
@@ -159,6 +164,95 @@ export class View {
    * @type {Matrix33}
    */
   #orientation;
+
+  /**
+   * The ill (non-contour) opacity relative to global opacity.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @type {number}
+   */
+  #fillOpacity = 0.33;
+
+  /**
+   * The thickness of the contour in pixels.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @type {number}
+   */
+  #contourThickness = 1;
+
+  /**
+   * @callback alphaFn
+   * @param {number[]|number} value The pixel value.
+   *   Can be a number for monochrome data or an array for RGB data.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value in [0,255] range.
+   */
+
+  /**
+   * @callback maskAlphaFn
+   * @param {number} value The pixel value.
+   *   Can be a number for monochrome data or an array for RGB data.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value in [0,255] range.
+   */
+
+  /**
+   * Per value alpha function.
+   *
+   * @type {alphaFn|maskAlphaFn}
+   */
+  #alphaFunction;
+
+  /**
+   * Image alpha function.
+   *
+   * @type {alphaFn}
+   */
+  #imageAlphaFunction = function (_value, _index) {
+    // default always returns fully visible
+    return 0xff;
+  };
+
+  /**
+   * Mask image alpha function.
+   *
+   * @type {maskAlphaFn}
+   */
+  #maskAlphaFuntion = (value, index) => {
+    // transparent: 0 (background) and hidden
+    if (value === 0 || this.#segmentViewHelper.isHidden(value)) {
+      return 0;
+    } else {
+      if (this.getContourThickness() !== 0) {
+        // ideally getContourDistance would be passed in by an
+        // iterator, but that would require a large change to a
+        // lot of components for this one edge case.
+        const contourDistance =
+          this.#image.getContourDistance(
+            index,
+            this.getOrientation()
+          );
+        if (contourDistance <= this.getContourThickness()) {
+          return 0xff;
+        } else {
+          return 0xff * this.getFillOpacity();
+        }
+      } else {
+        return 0xff * this.getFillOpacity();
+      }
+    }
+  };
+
+  /**
+   * Segment view helper to handle
+   *   hidden segments.
+   *
+   * @type {MaskSegmentViewHelper|undefined}
+   */
+  #segmentViewHelper;
 
   /**
    * Listener handler.
@@ -171,20 +265,7 @@ export class View {
    * @param {Image} image The associated image.
    */
   constructor(image) {
-    this.#image = image;
-
-    // listen to appendframe event to update the current position
-    //   to add the extra dimension
-    this.#image.addEventListener('appendframe', () => {
-      // update current position if first appendFrame
-      const index = this.getCurrentIndex();
-      if (index.length() === 3) {
-        // add dimension
-        const values = index.getValues();
-        values.push(0);
-        this.setCurrentIndex(new Index(values));
-      }
-    });
+    this.setImage(image);
   }
 
   /**
@@ -199,10 +280,61 @@ export class View {
   /**
    * Set the associated image.
    *
-   * @param {Image} inImage The associated image.
+   * @param {Image} image The associated image.
    */
-  setImage(inImage) {
-    this.#image = inImage;
+  setImage(image) {
+    this.#image = image;
+
+    // default to middle index
+    if (typeof this.getCurrentPosition() === 'undefined') {
+      this.setCurrentIndex(this.#getMiddleIndex(), true);
+    }
+
+    // reset alpha function
+    if (this.isMask()) {
+      // default helper
+      this.#segmentViewHelper = new MaskSegmentViewHelper();
+      // mask alpha func
+      this.#alphaFunction = this.#maskAlphaFuntion;
+    } else {
+      // image alpha func
+      this.#alphaFunction = this.#imageAlphaFunction;
+      // listen to appendframe event to update the current position
+      //   to add the extra dimension
+      this.#image.addEventListener('appendframe', () => {
+        // update current position if first appendFrame
+        const index = this.getCurrentIndex();
+        if (index.length() === 3) {
+          // add dimension
+          const values = index.getValues();
+          values.push(0);
+          this.setCurrentIndex(new Index(values), true);
+        }
+      });
+    }
+  }
+
+  /**
+   * Check is the associated image is a mask.
+   *
+   * @returns {boolean} True if the associated image is a mask.
+   */
+  isMask() {
+    return this.#image.getMeta().Modality === 'SEG';
+  }
+
+  /**
+   * Set the mask segment view helper to handle
+   *   hidden segments.
+   *
+   * @param {MaskSegmentViewHelper} helper The helper.
+   */
+  setMaskViewHelper(helper) {
+    this.#segmentViewHelper = helper;
+
+    this.#fireEvent({
+      type: 'alphafuncchange'
+    });
   }
 
   /**
@@ -224,16 +356,83 @@ export class View {
   }
 
   /**
-   * Initialise the view: set initial index.
+   * Get the fill opacity relative to the global opacity.
+   *
+   * @returns {number} The fill opacity (between 0 and 1).
    */
-  init() {
-    this.setInitialIndex();
+  getFillOpacity() {
+    return this.#fillOpacity;
   }
 
   /**
-   * Set the initial index to the middle position.
+   * Set the fill opacity relative to the global opacity.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} opacity The fill opacity (between 0 and 1).
    */
-  setInitialIndex() {
+  setFillOpacity(opacity) {
+    // Clamp to 0,1
+    if (opacity > 1) {
+      this.#fillOpacity = 1;
+    } else if (opacity < 0) {
+      this.#fillOpacity = 0;
+    } else {
+      this.#fillOpacity = opacity;
+    }
+
+    /**
+     * Mask view change event.
+     *
+     * @event View#maskviewchange
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    this.#fireEvent({
+      type: 'maskviewchange',
+      value: [this.#fillOpacity, this.#contourThickness]
+    });
+  }
+
+  /**
+   * Get the thickness of the contour in pixels.
+   *
+   * @returns {number} The contour thickness (0 <= integer <= MAX_CONTOUR_SIZE).
+   */
+  getContourThickness() {
+    return this.#contourThickness;
+  }
+
+  /**
+   * Set the thickness of the contour in pixels.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} thickness The contour thickness
+   *  (0 <= integer <= MAX_CONTOUR_SIZE).
+   */
+  setContourThickness(thickness) {
+    if (thickness < 0) {
+      this.#contourThickness = 0;
+    } else if (thickness > MAX_CONTOUR_SIZE) {
+      this.#contourThickness = MAX_CONTOUR_SIZE;
+    } else {
+      this.#contourThickness = thickness;
+    }
+
+    // fire mask view change
+    this.#fireEvent({
+      type: 'maskviewchange',
+      value: [this.#fillOpacity, this.#contourThickness]
+    });
+  }
+
+  /**
+   * Get the middle index of the current image.
+   *
+   * @returns {Index} The middle index.
+   */
+  #getMiddleIndex() {
     const geometry = this.#image.getGeometry();
     const size = geometry.getSize();
     const values = new Array(size.length());
@@ -242,7 +441,7 @@ export class View {
     values[0] = Math.floor(size.get(0) / 2);
     values[1] = Math.floor(size.get(1) / 2);
     values[2] = Math.floor(size.get(2) / 2);
-    this.setCurrentIndex(new Index(values), true);
+    return size.normaliseIndex(new Index(values));
   }
 
   /**
@@ -259,26 +458,6 @@ export class View {
     // round milliseconds per frame to nearest whole number
     return Math.round(1000 / recommendedDisplayFrameRate);
   }
-
-  /**
-   * Per value alpha function.
-   *
-   * @param {number[]|number} _value The pixel value.
-   *   Can be a number for monochrome data or an array for RGB data.
-   * @param {number} _index The index of the value.
-   * @returns {number} The coresponding alpha [0,255].
-   */
-  #alphaFunction = function (_value, _index) {
-    // default always returns fully visible
-    return 0xff;
-  };
-
-  /**
-   * @callback alphaFn
-   * @param {number[]|number} value The pixel value.
-   * @param {number} index The values' index.
-   * @returns {number} The opacity of the input value.
-   */
 
   /**
    * Get the alpha function.
@@ -318,17 +497,18 @@ export class View {
    */
   #getCurrentWindowLut() {
     // special case for 'perslice' presets
-    if (this.#currentPresetName &&
+    if (typeof this.#currentPresetName !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName].perslice !==
-        'undefined' &&
-      this.#windowPresets[this.#currentPresetName].perslice === true) {
-      // check position
-      if (!this.getCurrentIndex()) {
-        this.setInitialIndex();
-      }
+      'undefined' &&
+      this.#windowPresets[this.#currentPresetName].perslice === true &&
+      // TODO: we currently can't handle per-slice wl on resampled images
+      !this.#image.isResampled()) {
       // get the slice window level
       const currentIndex = this.getCurrentIndex();
+      if (typeof currentIndex === 'undefined') {
+        throw new Error('Cannot get window lut with no current index');
+      }
       const offset = this.#image.getSecondaryOffset(currentIndex);
       const currentPreset = this.#windowPresets[this.#currentPresetName];
       const sliceWl = currentPreset.wl[offset];
@@ -379,7 +559,7 @@ export class View {
       voiLutWl = voiLut.getWindowLevel();
     }
     if (typeof voiLut === 'undefined' ||
-      !this.#currentWl.equals(voiLutWl)) {
+      !equalWl(this.#currentWl, voiLutWl)) {
       // set lut window level
       const voiLut = new VoiLut(
         this.#currentWl,
@@ -460,7 +640,7 @@ export class View {
   /**
    * Get the current window level preset name.
    *
-   * @returns {string} The preset name.
+   * @returns {string|undefined} The preset name.
    */
   getCurrentWindowPresetName() {
     return this.#currentPresetName;
@@ -515,7 +695,7 @@ export class View {
   /**
    * Get the current position.
    *
-   * @returns {Point} The current position.
+   * @returns {Point|undefined} The current position.
    */
   getCurrentPosition() {
     return this.#currentPosition;
@@ -524,12 +704,12 @@ export class View {
   /**
    * Get the current index.
    *
-   * @returns {Index} The current index.
+   * @returns {Index|undefined} The current index.
    */
   getCurrentIndex() {
     const position = this.getCurrentPosition();
-    if (!position) {
-      return null;
+    if (typeof position === 'undefined') {
+      return;
     }
     const geometry = this.getImage().getGeometry();
     return geometry.worldToIndex(position);
@@ -618,18 +798,20 @@ export class View {
   /**
    * Set current position.
    *
-   * @param {Point} position The new position.
+   * @param {Point} inPosition The new position.
    * @param {boolean} [silent] Flag to fire event or not.
    * @returns {boolean} False if not in bounds.
    * @fires View#positionchange
    */
-  setCurrentPosition(position, silent) {
+  setCurrentPosition(inPosition, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
     const geometry = this.#image.getGeometry();
+    const position = geometry.getSize().normalisePoint(
+      inPosition, this.#currentPosition);
     const index = geometry.worldToIndex(position);
 
     // check if possible
@@ -645,7 +827,7 @@ export class View {
           type: 'positionchange',
           value: [
             index.getValues(),
-            position.getValues(),
+            inPosition.getValues(),
           ],
           valid: false
         });
@@ -656,16 +838,12 @@ export class View {
     }
 
     // calculate diff dims before updating internal
-    let diffDims = null;
-    let currentIndex = null;
-    if (this.getCurrentPosition()) {
-      currentIndex = this.getCurrentIndex();
-    }
-    if (currentIndex) {
+    let diffDims = [];
+    const currentIndex = this.getCurrentIndex();
+    if (typeof currentIndex !== 'undefined') {
       if (currentIndex.canCompare(index)) {
         diffDims = currentIndex.compare(index);
       } else {
-        diffDims = [];
         const minLen = Math.min(currentIndex.length(), index.length());
         for (let i = 0; i < minLen; ++i) {
           if (currentIndex.get(i) !== index.get(i)) {
@@ -678,7 +856,6 @@ export class View {
         }
       }
     } else {
-      diffDims = [];
       for (let k = 0; k < index.length(); ++k) {
         diffDims.push(k);
       }
@@ -700,7 +877,7 @@ export class View {
         type: 'positionchange',
         value: [
           index.getValues(),
-          position.getValues(),
+          inPosition.getValues(),
         ],
         diffDims: diffDims,
         data: {
@@ -752,7 +929,7 @@ export class View {
     );
 
     // check if new wl
-    const isNewWl = !wlBound.equals(this.#currentWl);
+    const isNewWl = !equalWl(wlBound, this.#currentWl);
     // check if new name
     const isNewName = this.#currentPresetName !== name;
 
@@ -828,7 +1005,9 @@ export class View {
     let wl = preset.wl[0];
     // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
-      preset.perslice === true) {
+      preset.perslice === true &&
+      // TODO: we currently can't handle per-slice wl on resampled images
+      !this.#image.isResampled()) {
       const offset = this.#image.getSecondaryOffset(this.getCurrentIndex());
       wl = preset.wl[offset];
     }
@@ -918,10 +1097,11 @@ export class View {
   generateImageData(data, index) {
     // check index
     if (typeof index === 'undefined') {
-      if (!this.getCurrentIndex()) {
-        this.setInitialIndex();
-      }
+      // use current index
       index = this.getCurrentIndex();
+      if (typeof index === 'undefined') {
+        throw new Error('Cannot generate image data with no current index');
+      }
     }
 
     const image = this.getImage();
@@ -980,12 +1160,12 @@ export class View {
    * @returns {number} The index.
    */
   getScrollDimIndex() {
-    let index = null;
+    // default to z
+    let index = 2;
+    // use orientation if available
     const orientation = this.getOrientation();
     if (typeof orientation !== 'undefined') {
       index = orientation.getThirdColMajorDirection();
-    } else {
-      index = 2;
     }
     return index;
   }

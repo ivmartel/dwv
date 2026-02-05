@@ -6,7 +6,7 @@ import {arrayEquals} from './array.js';
  * Objects need to be in the form of:
  * <code>
  * {
- *   idKey: {valueKey: [0]},
+ *   idKey: {valueKey: ['0']},
  *   key0: {valueKey: ["abc"]},
  *   key1: {valueKey: [33]}
  * }
@@ -15,7 +15,7 @@ import {arrayEquals} from './array.js';
  * Merged objects will be in the form of:
  * <code>
  * {
- *   idKey: {valueKey: [0,1,2], merged: true},
+ *   idKey: {valueKey: ['0','1','2'], merged: true},
  *   key0: {valueKey: {
  *     0: ["abc"],
  *     1: ["def"],
@@ -33,9 +33,16 @@ import {arrayEquals} from './array.js';
  * @param {object} obj2 The second object.
  * @param {string} idKey The key to use as index for duplicate values.
  * @param {string} valueKey The key to use to access object values.
+ * @param {string} [idSuffix] Optional suffix to add to id value
+ * (to differentiate time points for example).
  * @returns {object} The merged object.
  */
-export function mergeObjects(obj1, obj2, idKey, valueKey) {
+export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
+  // default suffix to empty string
+  if (typeof idSuffix === 'undefined') {
+    idSuffix = '';
+  }
+
   const res = {};
   // check id key
   if (!idKey) {
@@ -72,7 +79,7 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
       idKey + ', valueKey: ' + valueKey + ', ojb: ' + obj2);
   }
   let id1 = obj1[idKey][valueKey];
-  const id2 = obj2[idKey][valueKey][0];
+  const id2 = obj2[idKey][valueKey][0] + idSuffix;
   // update id key
   res[idKey] = obj1[idKey];
   if (mergedObj1) {
@@ -85,13 +92,16 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
     }
     res[idKey][valueKey].push(id2);
   } else {
-    id1 = id1[0];
+    id1 = id1[0] + idSuffix;
     if (id1 === id2) {
       throw new Error('Cannot merge object with same ids: ' +
         id1 + ', id2: ' + id2);
     }
-    // update merge object
+    // add suffix to first key
+    res[idKey][valueKey][0] = id1;
+    // add second key
     res[idKey][valueKey].push(id2);
+    // mark as merged
     res[idKey].merged = true;
   }
 

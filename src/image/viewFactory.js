@@ -76,9 +76,6 @@ export class ViewFactory {
     // store
     view.setWindowPresets(windowPresets);
 
-    // initialise the view
-    view.init();
-
     return view;
   }
 

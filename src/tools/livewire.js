@@ -5,7 +5,7 @@ import {
 } from '../gui/generic.js';
 import {Point2D} from '../math/point.js';
 import {Path} from '../math/path.js';
-import {Scissors} from '../math/scissors.js';
+import {Scissors} from '../image/scissors.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {logger} from '../utils/logger.js';
 import {ROI} from '../math/roi.js';
@@ -122,12 +122,32 @@ export class Livewire {
   #scissors = new Scissors();
 
   /**
+   * Chack if the base image is resampled.
+   *
+   * @param {string} divId The layer group divId.
+   * @returns {boolean} True if the image is resampled.
+   */
+  #isResampled(divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const referenceDataId = viewLayer.getDataId();
+    const referenceData = this.#app.getData(referenceDataId);
+    const image = referenceData.image;
+
+    return image.isResampled();
+  }
+
+  /**
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
    * @param {string} divId The layer group divId.
    */
   #start(point, divId) {
+    if (this.#isResampled(divId)) {
+      return;
+    }
+
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
 
     let viewLayer;

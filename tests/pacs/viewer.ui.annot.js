@@ -6,10 +6,18 @@ import {
   getUID,
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
+import {i18n} from '../../src/utils/i18n.js';
+import {
+  getIconElement,
+  getButton,
+  setButtonPressed,
+  isButtonPressed
+} from './viewer.ui.icons.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../../src/app/application.js';
+import {Annotation} from '../../src/image/annotation.js';
 import {AnnotationGroup} from '../../src/image/annotationGroup.js';
 /* eslint-enable no-unused-vars */
 
@@ -65,10 +73,22 @@ export class AnnotationUI {
   #app;
 
   /**
-   * @param {App} app The associated application.
+   * The root document.
+   *
+   * @type {Document}
    */
-  constructor(app) {
+  #rootDoc = document;
+
+  /**
+   * @param {App} app The associated application.
+   * @param {Document} [rootDoc] Optional root document,
+   *   defaults to `window.document`.
+   */
+  constructor(app, rootDoc) {
     this.#app = app;
+    if (typeof rootDoc !== 'undefined') {
+      this.#rootDoc = rootDoc;
+    }
   }
 
   /**
@@ -81,6 +101,38 @@ export class AnnotationUI {
     this.#app.addEventListener('annotationupdate', this.#onAnnotationUpdate);
     this.#app.addEventListener('annotationremove', this.#onAnnotationRemove);
   };
+
+  /**
+   * Setup the container div.
+   */
+  #setupContainerDiv() {
+    // fieldset
+    const legend = document.createElement('legend');
+    legend.appendChild(document.createTextNode('Annotation Groups'));
+
+    const fieldset = document.createElement('fieldset');
+    fieldset.id = 'annotationgroups-fieldset';
+    fieldset.appendChild(legend);
+
+    // main div
+    const line = document.createElement('div');
+    line.id = 'annotationgroups-line';
+    line.className = 'line';
+    line.appendChild(fieldset);
+
+    // insert
+    const detailsEl = this.#rootDoc.getElementById('layersdetails');
+    detailsEl.parentElement.insertBefore(line, detailsEl);
+  }
+
+  /**
+   * Get the container div.
+   *
+   * @returns {HTMLDivElement} The element.
+   */
+  #getContainerDiv() {
+    return this.#rootDoc.getElementById('annotationgroups-fieldset');
+  }
 
   /**
    * Setup the html for the annotation list.
@@ -114,24 +166,12 @@ export class AnnotationUI {
     // annotation list
     const annotList = document.createElement('ul');
     annotList.id = 'annotationgroup-list';
+    annotList.className = 'data-list';
     annotList.appendChild(addItem);
 
-    // fieldset
-    const legend = document.createElement('legend');
-    legend.appendChild(document.createTextNode('Annotation Groups'));
-    const fieldset = document.createElement('fieldset');
-    fieldset.appendChild(legend);
-    fieldset.appendChild(annotList);
-
-    // main div
-    const line = document.createElement('div');
-    line.id = 'annotationgroups-line';
-    line.className = 'line';
-    line.appendChild(fieldset);
-
-    // insert
-    const detailsEl = document.getElementById('layersdetails');
-    detailsEl.parentElement.insertBefore(line, detailsEl);
+    // setup and append
+    this.#setupContainerDiv();
+    this.#getContainerDiv().appendChild(annotList);
   }
 
   /**
@@ -139,10 +179,42 @@ export class AnnotationUI {
    *
    * @param {Annotation} annotation The annotation.
    * @param {string} dataId The annotation group dataId.
-   * @returns {HTMLSpanElement} The HTMl element.
+   * @returns {HTMLLIElement} The HTMl element.
    */
   #getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
+
+    const infoButton = getButton('Info');
+    const ibIdPrefix = 'ib-';
+    infoButton.id = ibIdPrefix + annotationDivId;
+    infoButton.title = 'Information';
+    infoButton.onclick = (event) => {
+      // do not propagate to parent that triggers goto
+      event.stopPropagation();
+      const target = event.target;
+      // get annotatio
+      const indices =
+        splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
+      const dataId = indices.dataId;
+      const annotationId = indices.annotationId;
+      const annotationGroup = this.#app.getData(dataId).annotationGroup;
+      const annotation = annotationGroup.find(annotationId);
+
+      let qStr = 'Quantification:\n';
+      if (typeof annotation.quantification !== 'undefined') {
+        const keys = Object.keys(annotation.quantification);
+        for (const key of keys) {
+          const quant = annotation.quantification[key];
+          qStr += '- ' + key + ': ' +
+            quant.value.toPrecision(4) +
+            i18n.t(quant.unit);
+          qStr += '\n';
+        }
+      } else {
+        qStr = 'No quantification.';
+      }
+      alert(qStr);
+    };
 
     const inputColour = document.createElement('input');
     inputColour.type = 'color';
@@ -150,6 +222,10 @@ export class AnnotationUI {
     const inputColourPrefix = 'cb-';
     inputColour.id = inputColourPrefix + annotationDivId;
     inputColour.value = annotation.colour;
+    inputColour.onclick = (event) => {
+      // do not propagate to parent that triggers goto
+      event.stopPropagation();
+    };
     inputColour.onchange = (event) => {
       const target = event.target;
       const newColour = target.value;
@@ -172,38 +248,14 @@ export class AnnotationUI {
       }
     };
 
-    const gotoButton = document.createElement('button');
-    const gbIdPrefix = 'gotob-';
-    gotoButton.id = gbIdPrefix + annotationDivId;
-    gotoButton.title = 'Goto annotation';
-    gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
-    gotoButton.onclick = (event) => {
-      const target = event.target;
-      // get annotation
-      const indices =
-        splitAnnotationDivId(target.id.substring(gbIdPrefix.length));
-      const dataId = indices.dataId;
-      const annotationId = indices.annotationId;
-      const annotationGroup = this.#app.getData(dataId).annotationGroup;
-      const annotation = annotationGroup.find(annotationId);
-      const annotCentroid = annotation.getCentroid();
-      if (typeof annotCentroid !== 'undefined') {
-        const drawLayers = this.#app.getDrawLayersByDataId(dataId);
-        for (const layer of drawLayers) {
-          layer.setCurrentPosition(annotCentroid);
-        }
-      } else {
-        console.log('No centroid for annotation');
-      }
-    };
-
-    const viewButton = document.createElement('button');
-    viewButton.style.borderStyle = 'outset';
+    const viewButton = getButton('View');
+    setButtonPressed(viewButton, false);
     const vbIdPrefix = 'vb-';
     viewButton.id = vbIdPrefix + annotationDivId;
     viewButton.title = 'Show/hide annotation';
-    viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
     viewButton.onclick = (event) => {
+      // do not propagate to parent (triggers goto)
+      event.stopPropagation();
       const target = event.target;
       // get annotatio
       const indices =
@@ -212,26 +264,26 @@ export class AnnotationUI {
       const annotationId = indices.annotationId;
       const drawLayers = this.#app.getDrawLayersByDataId(dataId);
       // toggle hidden
-      const isPressed = target.style.borderStyle === 'inset';
-      if (isPressed) {
-        target.style.borderStyle = 'outset';
+      if (isButtonPressed(target)) {
+        setButtonPressed(target, false);
         for (const layer of drawLayers) {
           layer.setAnnotationVisibility(annotationId, true);
         }
       } else {
-        target.style.borderStyle = 'inset';
+        setButtonPressed(target, true);
         for (const layer of drawLayers) {
           layer.setAnnotationVisibility(annotationId, false);
         }
       }
     };
 
-    const deleteButton = document.createElement('button');
+    const deleteButton = getButton('Delete');
     const dbIdPrefix = 'db-';
     deleteButton.id = dbIdPrefix + annotationDivId;
     deleteButton.title = 'Delete annotation';
-    deleteButton.appendChild(document.createTextNode('\u{274C}'));
     deleteButton.onclick = (event) => {
+      // do not propagate to parent (triggers goto)
+      event.stopPropagation();
       const target = event.target;
       // get segment and mask
       const indices =
@@ -241,6 +293,7 @@ export class AnnotationUI {
       // delete if possible
       const drawController = new DrawController(
         this.#app.getData(dataId).annotationGroup);
+      // TODO reposition div at same position after delete undo?
       drawController.removeAnnotationWithCommand(
         annotationId,
         this.#app.addToUndoStack
@@ -257,20 +310,62 @@ export class AnnotationUI {
       }
     );
 
-    const span = document.createElement('span');
-    span.id = 'span-' + annotationDivId;
+    // content
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'data-item-list-item-content';
     let factoryName = 'unknown';
     if (typeof annotation.getFactory() !== 'undefined') {
       factoryName = annotation.getFactory().getName();
     }
-    span.appendChild(document.createTextNode(
-      annotation.trackingId + ' (' + factoryName + ')'));
-    span.appendChild(inputColour);
-    span.appendChild(gotoButton);
-    span.appendChild(viewButton);
-    span.appendChild(deleteButton);
+    contentDiv.appendChild(getIconElement(factoryName));
+    contentDiv.appendChild(document.createTextNode(
+      ' ' + annotation.trackingId));
 
-    return span;
+    // actions
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'data-item-list-item-actions';
+    actionsDiv.appendChild(infoButton);
+    actionsDiv.appendChild(inputColour);
+    actionsDiv.appendChild(viewButton);
+    actionsDiv.appendChild(deleteButton);
+
+    // list item
+    const item = document.createElement('li');
+    item.id = annotationDivId;
+    item.className = 'data-item-list-item';
+    item.appendChild(contentDiv);
+    item.appendChild(actionsDiv);
+    item.title = 'Go to annotation';
+
+    // click on li to go to annotation
+    item.addEventListener('click', (event) => {
+      const target = event.currentTarget;
+
+      // remove selected class from other rows
+      const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
+      const items = mainlist.querySelectorAll('.data-item-list-item');
+      items.forEach(item => item.classList.remove('selected'));
+      // mark this row as selected
+      target.classList.add('selected');
+
+      // get annotation
+      const indices = splitAnnotationDivId(target.id);
+      const dataId = indices.dataId;
+      const annotationId = indices.annotationId;
+      const annotationGroup = this.#app.getData(dataId).annotationGroup;
+      const annotation = annotationGroup.find(annotationId);
+      const annotCentroid = annotation.getCentroid();
+      if (typeof annotCentroid !== 'undefined') {
+        const drawLayers = this.#app.getDrawLayersByDataId(dataId);
+        for (const layer of drawLayers) {
+          layer.setCurrentPosition(annotCentroid);
+        }
+      } else {
+        console.log('No centroid for annotation');
+      }
+    });
+
+    return item;
   }
 
   /**
@@ -281,34 +376,34 @@ export class AnnotationUI {
    * @returns {HTMLIement} The annotation list element.
    */
   #getAnnotationGroupHtml(annotationGroup, dataId) {
-    const item = document.createElement('li');
-    item.id = 'li-' + getAnnotationGroupDivId(dataId);
+    // name
+    const nameDiv = document.createElement('span');
+    nameDiv.id = getAnnotationGroupDivId(dataId) + '-name';
+    nameDiv.className = 'data-item-name';
+    nameDiv.appendChild(document.createTextNode('group #' + dataId));
 
-    const lockButton = document.createElement('button');
-    lockButton.style.borderStyle = 'outset';
+    // lock button
+    const lockButton = getButton('Lock');
+    setButtonPressed(lockButton, false);
     lockButton.id = 'lockb-' + getAnnotationGroupDivId(dataId);
-    lockButton.appendChild(document.createTextNode('\u{1F512}'));
     lockButton.onclick = function (event) {
       const target = event.target;
       // toggle hidden
-      const isPressed = target.style.borderStyle === 'inset';
-      if (isPressed) {
-        target.style.borderStyle = 'outset';
+      if (isButtonPressed(target)) {
+        setButtonPressed(target, false);
         if (typeof annotationGroup !== 'undefined') {
           annotationGroup.setEditable(true);
         }
       } else {
-        target.style.borderStyle = 'inset';
+        setButtonPressed(target, true);
         if (typeof annotationGroup !== 'undefined') {
           annotationGroup.setEditable(false);
         }
       }
     };
-    item.appendChild(lockButton);
 
-    // save segment button
-    const saveButton = document.createElement('button');
-    saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
+    // save button
+    const saveButton = getButton('Save');
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = function () {
       const factory = new AnnotationGroupFactory();
@@ -342,33 +437,62 @@ export class AnnotationUI {
       element.click();
       URL.revokeObjectURL(element.href);
     };
-    item.appendChild(saveButton);
 
-    const hideLabelsButton = document.createElement('button');
-    hideLabelsButton.style.borderStyle = 'outset';
+    // hide button
+    const hideLabelsButton = getButton('Label');
+    setButtonPressed(hideLabelsButton, false);
     hideLabelsButton.id = 'b-hidelabels';
     hideLabelsButton.title = 'Show/hide annotation labels';
-    hideLabelsButton.appendChild(document.createTextNode('\u{1F3F7}\u{FE0F}'));
     hideLabelsButton.onclick = (event) => {
       const target = event.target;
       const drawLayer = this.#app.getDrawLayersByDataId(dataId)[0];
       if (typeof drawLayer === 'undefined') {
         console.warn('Cannot find draw layer with id ' + dataId);
       }
-      const isPressed = target.style.borderStyle === 'inset';
-      if (isPressed) {
-        target.style.borderStyle = 'outset';
+      if (isButtonPressed(target)) {
+        setButtonPressed(target, false);
         drawLayer.setLabelsVisibility(true);
       } else {
-        target.style.borderStyle = 'inset';
+        setButtonPressed(target, true);
         drawLayer.setLabelsVisibility(false);
       }
     };
-    item.appendChild(hideLabelsButton);
 
+    // actions
+    const actionGroupDiv = document.createElement('div');
+    actionGroupDiv.id = getAnnotationGroupDivId(dataId) + '-actions';
+    actionGroupDiv.className = 'data-item-actions';
+    actionGroupDiv.appendChild(lockButton);
+    actionGroupDiv.appendChild(saveButton);
+    actionGroupDiv.appendChild(hideLabelsButton);
+
+    // annotation list
+    const listDiv = document.createElement('ul');
+    listDiv.id = getAnnotationGroupDivId(dataId) + '-list';
+    listDiv.className = 'data-item-list';
     for (const annotation of annotationGroup.getList()) {
-      item.appendChild(this.#getAnnotationHtml(annotation, dataId));
+      listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
     }
+
+    // data-item-header
+    const headerDiv = document.createElement('div');
+    headerDiv.id = getAnnotationGroupDivId(dataId) + '-header';
+    headerDiv.className = 'data-item-header';
+    headerDiv.appendChild(nameDiv);
+    headerDiv.appendChild(actionGroupDiv);
+
+    // data-item-content
+    const contentDiv = document.createElement('div');
+    contentDiv.id = getAnnotationGroupDivId(dataId) + '-content';
+    contentDiv.className = 'data-item-content';
+    contentDiv.appendChild(listDiv);
+
+    // data-item
+    const item = document.createElement('li');
+    item.id = getAnnotationGroupDivId(dataId);
+    item.className = 'data-item';
+    item.appendChild(headerDiv);
+    item.appendChild(contentDiv);
 
     return item;
   };
@@ -383,18 +507,18 @@ export class AnnotationUI {
     const ag = data.annotationGroup;
     if (typeof ag !== 'undefined') {
       // setup html if needed
-      if (!document.getElementById('annotationgroup-list')) {
+      if (!this.#rootDoc.getElementById('annotationgroup-list')) {
         this.#setupHtml();
       }
       // annotation group as html
       const item = this.#getAnnotationGroupHtml(ag, event.dataid);
       // add annotation group item
-      const addItem = document.getElementById('addannotationgroupitem');
+      const addItem = this.#rootDoc.getElementById('addannotationgroupitem');
       // remove and add after to make it last item
       addItem.remove();
 
       // update list
-      const annotList = document.getElementById('annotationgroup-list');
+      const annotList = this.#rootDoc.getElementById('annotationgroup-list');
       annotList.appendChild(item);
       annotList.appendChild(addItem);
     }
@@ -414,9 +538,8 @@ export class AnnotationUI {
       if (!annotation.canView()) {
         textDecoration = 'line-through';
       }
-      const annotationDivId =
-        'span-' + getAnnotationDivId(annotation, dataId);
-      const item = document.getElementById(annotationDivId);
+      const annotationDivId = getAnnotationDivId(annotation, dataId);
+      const item = this.#rootDoc.getElementById(annotationDivId);
       if (item) {
         item.style['text-decoration-line'] = textDecoration;
       }
@@ -431,10 +554,10 @@ export class AnnotationUI {
   #onAnnotationAdd = (event) => {
     const annotation = event.data;
     const dataId = event.dataid;
-    // add annotation html to list
-    const annotationGroupDivId = 'li-' + getAnnotationGroupDivId(dataId);
-    const item = document.getElementById(annotationGroupDivId);
-    item.appendChild(this.#getAnnotationHtml(annotation, dataId));
+    // add item to list
+    const listDivId = getAnnotationGroupDivId(dataId) + '-list';
+    const listDiv = this.#rootDoc.getElementById(listDivId);
+    listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
   };
 
   /**
@@ -451,7 +574,8 @@ export class AnnotationUI {
       const annotationDivId = getAnnotationDivId(annotation, dataId);
       // update colour input
       if (keys.includes('colour')) {
-        const inputColour = document.getElementById('cb-' + annotationDivId);
+        const inputColour = this.#rootDoc.getElementById(
+          'cb-' + annotationDivId);
         inputColour.value = annotation.colour;
       }
     }
@@ -466,8 +590,8 @@ export class AnnotationUI {
     const annotation = event.data;
     const dataId = event.dataid;
     // remove annotation from list
-    const annotationDivId = 'span-' + getAnnotationDivId(annotation, dataId);
-    const item = document.getElementById(annotationDivId);
+    const annotationDivId = getAnnotationDivId(annotation, dataId);
+    const item = this.#rootDoc.getElementById(annotationDivId);
     item.remove();
   };
 

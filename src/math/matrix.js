@@ -187,15 +187,55 @@ export class Matrix33 {
       throw new Error('Cannot multiply 3x3 matrix with non 3D array: ' +
         array3D.length);
     }
-    const values = [];
-    for (let i = 0; i < 3; ++i) {
-      let tmp = 0;
-      for (let j = 0; j < 3; ++j) {
-        tmp += this.get(i, j) * array3D[j];
-      }
-      values.push(tmp);
-    }
+    // (no loop for speedup)
+    const a0 = array3D[0];
+    const a1 = array3D[1];
+    const a2 = array3D[2];
+    const values = new Array(3);
+    values[0] =
+      this.#values[0] * a0 +
+      this.#values[1] * a1 +
+      this.#values[2] * a2;
+    values[1] =
+      this.#values[3] * a0 +
+      this.#values[4] * a1 +
+      this.#values[5] * a2;
+    values[2] =
+      this.#values[6] * a0 +
+      this.#values[7] * a1 +
+      this.#values[8] * a2;
     return values;
+  }
+
+  /**
+   * Multiply this matrix by a 3D typed array.
+   *
+   * @typedef {(
+   *   Uint8Array | Int8Array |
+   *   Uint16Array | Int16Array |
+   *   Uint32Array | Int32Array
+   * )} TypedArray
+   *
+   * @param {TypedArray} sourceArray The input 3D array.
+   * @param {TypedArray} outArray The array to write to.
+   */
+  multiplyTypedArray3D(sourceArray, outArray) {
+    // (no loop for speedup)
+    const a0 = sourceArray[0];
+    const a1 = sourceArray[1];
+    const a2 = sourceArray[2];
+    outArray[0] =
+      this.#values[0] * a0 +
+      this.#values[1] * a1 +
+      this.#values[2] * a2;
+    outArray[1] =
+      this.#values[3] * a0 +
+      this.#values[4] * a1 +
+      this.#values[5] * a2;
+    outArray[2] =
+      this.#values[6] * a0 +
+      this.#values[7] * a1 +
+      this.#values[8] * a2;
   }
 
   /**
@@ -281,6 +321,7 @@ export class Matrix33 {
    * @returns {Matrix33} The simplified matrix.
    */
   asOneAndZeros() {
+    // TODO: This breaks at 45 degree angles
     const res = [];
     for (let j = 0; j < 3; ++j) {
       const max = this.getRowAbsMax(j);
@@ -303,6 +344,15 @@ export class Matrix33 {
    */
   getThirdColMajorDirection() {
     return this.getColAbsMax(2).index;
+  }
+
+  /**
+   * Get the values of the matrix as an array.
+   *
+   * @returns {number[]} The matrix.
+   */
+  getValues() {
+    return this.#values.slice();
   }
 
 } // Matrix33

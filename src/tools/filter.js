@@ -4,6 +4,7 @@ import {
   SobelFilter,
   SharpenFilter
 } from '../image/filter.js';
+import {Command} from '../utils/undoStack.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -519,7 +520,7 @@ export class Sobel {
 /**
  * Run filter command.
  */
-export class RunFilterCommand {
+export class RunFilterCommand extends Command {
 
   /**
    * The filter to run.
@@ -548,6 +549,7 @@ export class RunFilterCommand {
    * @param {App} app The associated application.
    */
   constructor(filter, dataId, app) {
+    super();
     this.#filter = filter;
     this.#dataId = dataId;
     this.#app = app;

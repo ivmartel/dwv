@@ -1,5 +1,40 @@
 # Changelog
 
+## [v0.36.0](https://github.com/ivmartel/dwv/releases/tag/v0.36.0) - 05/02/2026
+
+### Added
+
+- Add info layer [#2064](https://github.com/ivmartel/dwv/issues/2064)
+- Migrate testing from Karma to Vitest [#2041](https://github.com/ivmartel/dwv/issues/2041)
+- Switch to yarn v4 [#2040](https://github.com/ivmartel/dwv/issues/2040)
+- Stop storing build with git [#2035](https://github.com/ivmartel/dwv/issues/2035)
+- Add default volume id getter methods [#2014](https://github.com/ivmartel/dwv/issues/2014)
+- Allow to resample 4D data [#2013](https://github.com/ivmartel/dwv/issues/2013)
+- Feature: Add functionality to calculate segmentation overlap [#2010](https://github.com/ivmartel/dwv/issues/2010)
+- Allow for post load image creation for multi volume [#2008](https://github.com/ivmartel/dwv/issues/2008)
+- Rename getTagTime method [#2007](https://github.com/ivmartel/dwv/issues/2007)
+- Deprecate loadFromUri and expose urls extraction code [#2004](https://github.com/ivmartel/dwv/issues/2004)
+- Remove support for loading state files from key-value uri [#2003](https://github.com/ivmartel/dwv/issues/2003)
+- Feature: Display the contour of segmentations [#2002](https://github.com/ivmartel/dwv/issues/2002)
+- Feature: Calculate the diameters of segmentations [#2000](https://github.com/ivmartel/dwv/issues/2000)
+- Compensate for magnification factor in X-ray images [#1996](https://github.com/ivmartel/dwv/issues/1996)
+- Get spacing from multi-frame functional groups [#1995](https://github.com/ivmartel/dwv/issues/1995)
+- Prevent overlay of data with different orientations [#1983](https://github.com/ivmartel/dwv/issues/1983)
+- Resampling and Series Alignment [#1919](https://github.com/ivmartel/dwv/issues/1919)
+
+### Fixed
+
+- Brush erase undo keeps previous contours [#2015](https://github.com/ivmartel/dwv/issues/2015)
+- Image clone linked to original [#2006](https://github.com/ivmartel/dwv/issues/2006)
+- Brush randomly not painting at creation [#1999](https://github.com/ivmartel/dwv/issues/1999)
+- Bug: imagePosPat (Image Position Patient) incorrectly set to ImageOrientationPatient in Brush tool [#1998](https://github.com/ivmartel/dwv/issues/1998)
+- Wrong unit for data with pixel aspect ratio [#1997](https://github.com/ivmartel/dwv/issues/1997)
+- Wrong size for secondary capture [#1994](https://github.com/ivmartel/dwv/issues/1994)
+- Bug: Secondary Capture images will incorrectly try to sync zoom/pan/slice when loaded along-side scans [#1975](https://github.com/ivmartel/dwv/issues/1975)
+- Bug: Incorrect spacing when loading an overlay on an MPR orientation [#1969](https://github.com/ivmartel/dwv/issues/1969)
+
+---
+
 ## [v0.35.1](https://github.com/ivmartel/dwv/releases/tag/v0.35.1) - 02/07/2025
 
 ### Fixed
@@ -7,6 +42,7 @@
 - Workers have to be in root '/assets' [#1968](https://github.com/ivmartel/dwv/issues/1968)
 - Doc examples not working [#1967](https://github.com/ivmartel/dwv/issues/1967)
 
+---
 
 ## [v0.35.0](https://github.com/ivmartel/dwv/releases/tag/v0.35.0) - 27/06/2025
 

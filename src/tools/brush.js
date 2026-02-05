@@ -14,6 +14,7 @@ import {DicomData} from '../app/dataController.js';
 import {ViewConfig} from '../app/application.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {ScrollWheel} from './scrollWheel.js';
+import {Command} from '../utils/undoStack.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -277,7 +278,7 @@ class DrawBrushCommandProperties {
 /**
  * Draw brush command.
  */
-class DrawBrushCommand {
+class DrawBrushCommand extends Command {
   #mask;
   #dataId;
   #offsetsLists;
@@ -294,6 +295,7 @@ class DrawBrushCommand {
    * @param {DrawBrushCommandProperties} properties The command properties.
    */
   constructor(properties) {
+    super();
     this.#mask = properties.mask;
     this.#dataId = properties.dataId;
     this.#offsetsLists = properties.offsetsLists;
@@ -714,6 +716,7 @@ export class Brush extends EventTarget {
       throw new Error('Z position is undefined');
     }
     const index = new Index([0, 0, imgK]);
+    const imagePosPat = sourceGeometry.getOrigins()[imgK];
 
     // default tags
     const firstSliceMeta = getDefaultDicomSegJson();
@@ -751,7 +754,7 @@ export class Brush extends EventTarget {
         {
           dimIndex: [1, 1],
           refSegmentNumber: 1,
-          imagePosPat: tags.ImageOrientationPatient,
+          imagePosPat: imagePosPat.getValues(),
           derivationImages: [
             {
               sourceImages: referencedSOPs
@@ -766,7 +769,7 @@ export class Brush extends EventTarget {
 
     this.#mask = this.#createMaskImage(
       sourceGeometry,
-      sourceGeometry.getOrigins()[imgK],
+      imagePosPat,
       firstSliceMeta
     );
 
@@ -775,7 +778,12 @@ export class Brush extends EventTarget {
     const elements = getElementsFromJSONTags(firstSliceMeta);
     const data = new DicomData(elements);
     data.image = this.#mask;
-    return this.#app.addData(data);
+    const dataId = this.#app.getNextDataId();
+    const added = this.#app.addData(dataId, data);
+    if (!added) {
+      throw new Error('Cannot add mask data');
+    }
+    return dataId;
   }
 
   /**
@@ -923,7 +931,7 @@ export class Brush extends EventTarget {
    * Get the mask offset for an event.
    *
    * @param {object} event The event containing the mask position.
-   * @returns {Array} The array of offset to paint.
+   * @returns {number[]} The array of offset to paint.
    */
   #getMaskOffsets(event) {
     const layerDetails = getLayerDetailsFromEvent(event);
@@ -968,8 +976,14 @@ export class Brush extends EventTarget {
         ));
       }
       sourceImage = sourceData.image;
-      //
-      const sourceVl = layerGroup.getViewLayersByDataId(sourceDataId)[0];
+      // exit if reference image is resampled
+      if (sourceImage.isResampled()) {
+        logger.warn('Cannot update mask with resampled reference image.');
+        return [];
+      }
+      // get source position
+      // any layer from the app (could be other layer group)
+      const sourceVl = this.#app.getViewLayersByDataId(sourceDataId)[0];
       const sourceViewController = sourceVl.getViewController();
       const planePos = sourceVl.displayToPlanePos(mousePoint);
       sourcePosition = sourceViewController.getPositionFromPlanePoint(planePos);
@@ -986,7 +1000,12 @@ export class Brush extends EventTarget {
         ));
       }
       sourceImage = sourceData.image;
-
+      // exit if reference image is resampled
+      if (sourceImage.isResampled()) {
+        logger.warn('Cannot create mask on resampled image.');
+        return [];
+      }
+      // get source position
       const planePos = viewLayer.displayToPlanePos(mousePoint);
       sourcePosition = viewController.getPositionFromPlanePoint(planePos);
       // create mask (sets this.#mask)
@@ -1097,12 +1116,34 @@ export class Brush extends EventTarget {
   }
 
   /**
+   * Determines if the active layer is a View layer.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   * @returns {boolean} True if the active layer is a View layer.
+   */
+  #activeLayerIsViewLayer(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(
+      layerDetails.groupDivId
+    );
+    if (typeof layerGroup === 'undefined') {
+      throw new Error('No layergroup to check for view layer');
+    }
+    const layer = layerGroup.getActiveLayer();
+    if (layer instanceof ViewLayer) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
-    if (this.#isInBlackList(event)) {
+    if (!this.#activeLayerIsViewLayer(event) ||
+      this.#isInBlackList(event)) {
       return;
     }
     if (typeof this.#selectedSegmentNumber === 'undefined') {
@@ -1332,14 +1373,24 @@ export class Brush extends EventTarget {
       this.#brushSize + 1 < this.#brushSizeRange.max
     ) {
       this.#brushSize += 1;
-      logger.debug('Brush size: ' + this.#brushSize);
+      const sizeEvent = new CustomEvent('brushsizechange', {
+        detail: {
+          value: this.#brushSize
+        }
+      });
+      this.dispatchEvent(sizeEvent);
     } else if (
       !ctrlOrAlt &&
       event.key === '-' &&
       this.#brushSize - 1 >= this.#brushSizeRange.min
     ) {
       this.#brushSize -= 1;
-      logger.debug('Brush size: ' + this.#brushSize);
+      const sizeEvent = new CustomEvent('brushsizechange', {
+        detail: {
+          value: this.#brushSize
+        }
+      });
+      this.dispatchEvent(sizeEvent);
     } else if (!ctrlOrAlt && !Number.isNaN(Number.parseInt(event.key, 10))) {
       this.#brushMode = _BrushMode.Add;
       //const number = Number.parseInt(event.key, 10);
@@ -1463,6 +1514,7 @@ export class Brush extends EventTarget {
     return [
       'brushdraw',
       'brushremove',
+      'brushsizechange',
       'erasingactivated',
       'erasingdeactivated'
     ];

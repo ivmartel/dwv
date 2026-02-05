@@ -43,7 +43,7 @@ export class MaskSegmentViewHelper {
     } else {
       logger.warn(
         'Not hidding segment, it is allready in the hidden list: ' +
-          segmentNumber);
+        segmentNumber);
     }
   }
 
@@ -59,33 +59,7 @@ export class MaskSegmentViewHelper {
     } else {
       logger.warn(
         'Cannot remove segment, it is not in the hidden list: ' +
-          segmentNumber);
+        segmentNumber);
     }
-  }
-
-  /**
-   * @callback alphaFn
-   * @param {number|number[]} value The pixel value.
-   * @param {number} index The values' index.
-   * @returns {number} The opacity of the input value.
-   */
-
-  /**
-   * Get the alpha function to apply hidden colors.
-   *
-   * @returns {alphaFn} The corresponding alpha function.
-   */
-  getAlphaFunc() {
-    // create alpha function
-    // (zero is hidden by default)
-    return (value/*, index*/) => {
-      if (!Array.isArray(value) && (
-        value === 0 ||
-        this.#hiddenNumbers.includes(value))) {
-        return 0;
-      }
-      // default
-      return 255;
-    };
   }
 }

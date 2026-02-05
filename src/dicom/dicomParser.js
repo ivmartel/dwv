@@ -33,7 +33,7 @@ import {logger} from '../utils/logger.js';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.35.1';
+  return '0.36.0';
 }
 
 /**
@@ -451,8 +451,8 @@ function guessTransferSyntax(firstDataElement) {
   if (group !== oEightGroupBigEndian &&
     group !== oEightGroupLittleEndian) {
     throw new Error(
-      'Not a valid DICOM file (no magic DICM word found' +
-        ' and first element not in 0008 group)'
+      'Not a valid DICOM file (invalid DICM word found' +
+      ' and first element not in 0008 group)'
     );
   }
   // reasonable assumption: 2 uppercase characters => explicit vr
@@ -1260,7 +1260,8 @@ export class DicomParser {
       syntax = dataElement.value[0];
 
     } else {
-      logger.warn('No DICM prefix, trying to guess tansfer syntax.');
+      logger.warn('Invalid DICM prefix (' + magicword +
+        '), trying to guess tansfer syntax.');
       // read first element
       dataElement = this.#readDataElement(dataReader, 0, false);
       // guess transfer syntax

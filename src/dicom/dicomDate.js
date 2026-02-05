@@ -1,39 +1,32 @@
-import {custom} from '../app/custom.js';
 import {DataElement} from './dataElement.js';
 
 /**
- * Pad an input string with a '0' to form a 2 digit one.
+ * Date object.
  *
- * @param {string} str The string to pad.
- * @returns {string} The padded string.
+ * @typedef {object} DateObj
+ * @property {number} year The year number.
+ * @property {number} monthIndex The month index ([0, 11] range).
+ * @property {number} day The day number.
  */
-function padZeroTwoDigit(str) {
-  return ('0' + str).slice(-2);
-}
 
 /**
- * Get the time from a list of tags. Defaults
- *   returns undefined.
+ * Time object.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {number|undefined} The time value if available.
+ * @typedef {object} TimeObj
+ * @property {number} hours The hours number.
+ * @property {number} minutes The minutes number.
+ * @property {number} seconds The seconds number.
+ * @property {number} milliseconds The milliseconds number.
  */
-export function getTagTime(elements) {
-  if (typeof custom.getTagTime !== 'undefined') {
-    return custom.getTagTime(elements);
-  } else {
-    return;
-  }
-}
 
 /**
  * Get a 'date' object with {year, monthIndex, day} ready for the
  *   Date constructor from a DICOM element with vr=DA.
  *
  * @param {DataElement} element The DICOM element with date information.
- * @returns {{year, monthIndex, day}|undefined} The 'date' object.
+ * @returns {DateObj|undefined} The 'date' object.
  */
-export function getDate(element) {
+export function getDateObj(element) {
   if (typeof element === 'undefined') {
     return undefined;
   }
@@ -70,9 +63,9 @@ export function getDate(element) {
  *   Date constructor from a DICOM element with vr=TM.
  *
  * @param {DataElement} element The DICOM element with date information.
- * @returns {{hours, minutes, seconds, milliseconds}|undefined} The time object.
+ * @returns {TimeObj|undefined} The time object.
  */
-export function getTime(element) {
+export function getTimeObj(element) {
   if (typeof element === 'undefined') {
     return undefined;
   }
@@ -100,13 +93,54 @@ export function getTime(element) {
 }
 
 /**
+ * Get a javascript Date object from objects with date information.
+ *
+ * @param {DateObj} dateObj The date object.
+ * @param {TimeObj} [timeObj] Optional time object.
+ * @returns {Date|undefined} The full date.
+ */
+export function getDate(dateObj, timeObj) {
+  let res;
+  if (typeof dateObj !== 'undefined') {
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+    let milliseconds = 0;
+    if (typeof timeObj !== 'undefined') {
+      if (typeof timeObj.hours !== 'undefined') {
+        hours = timeObj.hours;
+      }
+      if (typeof timeObj.minutes !== 'undefined') {
+        minutes = timeObj.minutes;
+      }
+      if (typeof timeObj.seconds !== 'undefined') {
+        seconds = timeObj.seconds;
+      }
+      if (typeof timeObj.milliseconds !== 'undefined') {
+        milliseconds = timeObj.milliseconds;
+      }
+    }
+    res = new Date(
+      dateObj.year,
+      dateObj.monthIndex,
+      dateObj.day,
+      hours,
+      minutes,
+      seconds,
+      milliseconds,
+    );
+  }
+  return res;
+}
+
+/**
  * Get a 'dateTime' object with {date, time} ready for the
  *   Date constructor from a DICOM element with vr=DT.
  *
  * @param {DataElement} element The DICOM element with date-time information.
- * @returns {{date, time}|undefined} The time object.
+ * @returns {{date: DateObj, time: TimeObj}|undefined} The time object.
  */
-export function getDateTime(element) {
+export function getDateTimeObj(element) {
   if (typeof element === 'undefined') {
     return undefined;
   }
@@ -119,11 +153,11 @@ export function getDateTime(element) {
   const dtValue = dtFullValue.split('&')[0];
   const dateDataElement = new DataElement('DA');
   dateDataElement.value = [dtValue.substring(0, 8)];
-  const dtDate = getDate(dateDataElement);
+  const dtDate = getDateObj(dateDataElement);
   const timeDataElement = new DataElement('TM');
   timeDataElement.value = [dtValue.substring(8)];
   const dtTime = dtValue.length >= 9
-    ? getTime(timeDataElement) : undefined;
+    ? getTimeObj(timeDataElement) : undefined;
   return {
     date: dtDate,
     time: dtTime
@@ -134,71 +168,94 @@ export function getDateTime(element) {
  * Extract date values from a Date object.
  *
  * @param {Date} date The input date.
- * @returns {{year, monthIndex, day}} A 'date' object.
+ * @returns {DateObj|undefined} A 'date' object.
  */
 export function dateToDateObj(date) {
-  return {
-    year: date.getFullYear().toString(),
-    monthIndex: padZeroTwoDigit((date.getMonth() + 1).toString()),
-    day: padZeroTwoDigit(date.getDate().toString())
-  };
+  let res;
+  if (typeof date !== 'undefined') {
+    res = {
+      year: date.getFullYear(),
+      monthIndex: date.getMonth(),
+      day: date.getDate()
+    };
+  }
+  return res;
 }
 
 /**
  * Extract time values from a Date object.
  *
  * @param {Date} date The input date.
- * @returns {{hours, minutes, seconds}} A 'time' object.
+ * @returns {TimeObj|undefined} A 'time' object.
  */
 export function dateToTimeObj(date) {
-  return {
-    hours: padZeroTwoDigit(date.getHours().toString()),
-    minutes: padZeroTwoDigit(date.getMinutes().toString()),
-    seconds: padZeroTwoDigit(date.getSeconds().toString())
-  };
+  let res;
+  if (typeof date !== 'undefined') {
+    res = {
+      hours: date.getHours(),
+      minutes: date.getMinutes(),
+      seconds: date.getSeconds(),
+      milliseconds: date.getMilliseconds()
+    };
+  }
+  return res;
 }
 
 /**
- * Get a DICOM formated date string.
+ * Get a DICOM formated date string 'YYYYMMDD'.
  *
- * @param {{year, monthIndex, day}} dateObj The date to format.
- * @returns {string} The formated date.
+ * @param {DateObj} dateObj The date to format.
+ * @returns {string|undefined} The formated date.
  */
 export function getDicomDate(dateObj) {
-  // YYYYMMDD
-  return (
-    dateObj.year +
-    dateObj.monthIndex +
-    dateObj.day
-  );
+  let res;
+  if (typeof dateObj !== 'undefined') {
+    // YYYYMMDD
+    res =
+      dateObj.year.toString() +
+      (dateObj.monthIndex + 1).toString().padStart(2, '0') +
+      dateObj.day.toString().padStart(2, '0')
+    ;
+  }
+  return res;
 }
 
 /**
- * Get a DICOM formated time string.
+ * Get a DICOM formated time string as 'HHMMSS'.
  *
- * @param {{hours, minutes, seconds}} dateObj The date to format.
- * @returns {string} The formated time.
+ * @param {TimeObj} dateObj The date object to format.
+ * @returns {string|undefined} The formated time.
  */
 export function getDicomTime(dateObj) {
-  // HHMMSS
-  return (
-    dateObj.hours +
-    dateObj.minutes +
-    dateObj.seconds
-  );
+  let res;
+  if (typeof dateObj !== 'undefined') {
+    // HHMMSS
+    res =
+      dateObj.hours.toString().padStart(2, '0') +
+      dateObj.minutes.toString().padStart(2, '0') +
+      dateObj.seconds.toString().padStart(2, '0')
+    ;
+  }
+  return res;
 }
 
 /**
  * Get a DICOM formated datetime string.
  *
  * @param {{date, time}} datetime The datetime to format.
- * @returns {string} The formated datetime.
+ * @returns {string|undefined} The formated datetime.
  */
 export function getDicomDateTime(datetime) {
-  // HHMMSS
-  let res = getDicomDate(datetime.date);
-  if (typeof datetime.time !== 'undefined') {
-    res += getDicomTime(datetime.time);
+  let res;
+  if (typeof datetime !== 'undefined') {
+    if (typeof datetime.date !== 'undefined') {
+      res = getDicomDate(datetime.date);
+    }
+    if (typeof res !== 'undefined' &&
+      typeof datetime.time !== 'undefined'
+    ) {
+      res += getDicomTime(datetime.time);
+    }
   }
   return res;
 }

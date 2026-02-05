@@ -5553,3 +5553,14 @@ export const transferSyntaxKeywords = {
   SMPTEST211030PCMDigitalAudio: '1.2.840.10008.1.2.7.3',
   Papyrus3ImplicitVRLittleEndian: '1.2.840.10008.1.20'
 };
+
+/**
+ * Standard SOP Class UIDs indexed by keyword. Not comprehensive, just ones needed by DWV.
+ *
+ * See {@link https://dicom.nema.org/dicom/2013/output/chtml/part04/sect_B.5.html#table_B.5-1}.
+ *
+ * @type {Object<string, string>}
+ */
+export const SOPClassUIDs = {
+  SecondaryCapture: '1.2.840.10008.5.1.4.1.1.7'
+};

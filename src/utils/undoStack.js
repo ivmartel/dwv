@@ -1,11 +1,33 @@
 /**
+ * Command interface.
+ */
+export class Command {
+  /**
+   * Get the command name.
+   *
+   * @returns {string} The command name.
+   */
+  getName() {
+    return '';
+  }
+  /**
+   * Execute the command.
+   */
+  execute() {}
+  /**
+   * Undo the command.
+   */
+  undo() {}
+}
+
+/**
  * UndoStack class.
  */
 export class UndoStack extends EventTarget {
   /**
    * Array of commands.
    *
-   * @type {Array}
+   * @type {Command[]}
    */
   #stack = [];
 
@@ -39,7 +61,7 @@ export class UndoStack extends EventTarget {
   /**
    * Get the current command.
    *
-   * @returns {object} The command.
+   * @returns {Command} The command.
    */
   getCurrentCommand() {
     return this.#stack[this.#curCmdIndex - 1];
@@ -48,7 +70,7 @@ export class UndoStack extends EventTarget {
   /**
    * Add a command to the stack.
    *
-   * @param {object} cmd The command to add.
+   * @param {Command} cmd The command to add.
    * @fires UndoStack#undoadd
    */
   add(cmd) {

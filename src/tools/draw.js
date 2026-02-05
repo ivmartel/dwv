@@ -487,13 +487,32 @@ export class Draw {
   }
 
   /**
+   * Chack if the base image is resampled.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   * @returns {boolean} True if the image is resampled.
+   */
+  #isResampled(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(
+      layerDetails.groupDivId
+    );
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const referenceDataId = viewLayer.getDataId();
+    const referenceData = this.#app.getData(referenceDataId);
+    const image = referenceData.image;
+
+    return image.isResampled();
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
     // exit if not started draw
-    if (this.#isDrawing) {
+    if (this.#isDrawing || this.#isResampled(event)) {
       return;
     }
     const mousePoint = getMousePoint(event);

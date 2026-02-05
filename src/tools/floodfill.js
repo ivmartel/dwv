@@ -362,12 +362,32 @@ export class Floodfill {
   }
 
   /**
+   * Chack if the base image is resampled.
+   *
+   * @param {string} divId The layer group divId.
+   * @returns {boolean} True if the image is resampled.
+   */
+  #isResampled(divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const referenceDataId = viewLayer.getDataId();
+    const referenceData = this.#app.getData(referenceDataId);
+    const image = referenceData.image;
+
+    return image.isResampled();
+  }
+
+  /**
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
    * @param {string} divId The layer group divId.
    */
   #start(point, divId) {
+    if (this.#isResampled(divId)) {
+      return;
+    }
+
     this.#annotation = undefined;
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);

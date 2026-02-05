@@ -1,7 +1,8 @@
 import {getTransferSyntaxName} from './dicomParser.js';
 import {
-  getDate,
-  getTime
+  getDateObj,
+  getTimeObj,
+  getDate
 } from './dicomDate.js';
 import {
   isAnyPixelDataTag,
@@ -97,11 +98,10 @@ function getElementValueAsString(tag, dicomElement, pretty) {
     dicomElement.undefinedLength) {
     str = '(PixelSequence)';
   } else if (dicomElement.vr === 'DA' && pretty) {
-    const daObj = getDate(dicomElement);
-    const da = new Date(daObj.year, daObj.monthIndex, daObj.day);
+    const da = getDate(getDateObj(dicomElement));
     str = da.toLocaleDateString();
   } else if (dicomElement.vr === 'TM' && pretty) {
-    const tmObj = getTime(dicomElement);
+    const tmObj = getTimeObj(dicomElement);
     str = tmObj.hours + ':' + tmObj.minutes + ':' + tmObj.seconds;
   } else {
     let isOtherVR = false;
@@ -214,14 +214,14 @@ function getElementAsString(tag, dicomElement, prefix) {
       line += dicomElement.value.length;
       line += ')';
     } else if (isOtherVR ||
-        dicomElement.vr === 'pi' ||
-        dicomElement.vr === 'UL' ||
-        dicomElement.vr === 'US' ||
-        dicomElement.vr === 'SL' ||
-        dicomElement.vr === 'SS' ||
-        dicomElement.vr === 'FL' ||
-        dicomElement.vr === 'FD' ||
-        dicomElement.vr === 'AT') {
+      dicomElement.vr === 'pi' ||
+      dicomElement.vr === 'UL' ||
+      dicomElement.vr === 'US' ||
+      dicomElement.vr === 'SL' ||
+      dicomElement.vr === 'SS' ||
+      dicomElement.vr === 'FL' ||
+      dicomElement.vr === 'FD' ||
+      dicomElement.vr === 'AT') {
       // 'O'ther array, limited display length
       line += ' ';
       line += getElementValueAsString(tag, dicomElement, false);

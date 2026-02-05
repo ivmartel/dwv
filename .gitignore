@@ -1,11 +1,25 @@
-# dependencies
-node_modules
-bower_components
+# GIT ignored files
 
-# build
-build
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/build
+/dist
+
+# yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # misc
-npm-debug.log
-yarn-error.log
-package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

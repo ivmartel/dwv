@@ -8,6 +8,7 @@ import {
 /* eslint-disable no-unused-vars */
 import {ViewController} from '../app/viewController.js';
 import {Scalar2D} from './scalar.js';
+import {Value} from './value.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -120,12 +121,10 @@ export class Line {
    * Get the mid point of the line.
    *
    * @returns {Point2D} The mid point of the line.
+   * @deprecated Since v0.36, please use getCentroid instead.
    */
   getMidpoint() {
-    return new Point2D(
-      (this.getBegin().getX() + this.getEnd().getX()) / 2,
-      (this.getBegin().getY() + this.getEnd().getY()) / 2
-    );
+    return this.getCentroid();
   }
 
   /**
@@ -134,7 +133,10 @@ export class Line {
    * @returns {Point2D} THe centroid point.
    */
   getCentroid() {
-    return this.getMidpoint();
+    return new Point2D(
+      (this.getBegin().getX() + this.getEnd().getX()) / 2,
+      (this.getBegin().getY() + this.getEnd().getY()) / 2
+    );
   }
 
   /**
@@ -172,24 +174,33 @@ export class Line {
   }
 
   /**
+   * Get a new line with the start and end flipped.
+   *
+   * @returns {Line} The new flipped line.
+   */
+  getFlipped() {
+    return new Line(this.#end, this.#begin);
+  }
+
+  /**
    * Quantify a line according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
-   * @returns {object} A quantification object.
+   * @returns {Object<string, Value>} A quantification object.
    */
   quantify(viewController) {
-    const quant = {};
     // length
     const spacing2D = viewController.get2DSpacing();
-    const length = this.getWorldLength(spacing2D);
-    if (length !== null) {
-      quant.length = {
-        value: length,
+    const worldLength = this.getWorldLength(spacing2D);
+    let length;
+    if (worldLength !== null) {
+      length = {
+        value: worldLength,
         unit: viewController.getLengthUnit()
       };
     }
     // return
-    return quant;
+    return {length};
   }
 
 } // Line class

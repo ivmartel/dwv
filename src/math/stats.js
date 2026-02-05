@@ -86,8 +86,8 @@ function includesFullStatsFlags(flags) {
   return typeof flags !== 'undefined' &&
     flags !== null &&
     (flags.includes('median') ||
-    flags.includes('p25') ||
-    flags.includes('p75'));
+      flags.includes('p25') ||
+      flags.includes('p75'));
 }
 
 /**

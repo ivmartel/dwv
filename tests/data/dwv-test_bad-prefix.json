@@ -1,0 +1,38 @@
+{
+  "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+  "Modality": "MR",
+  "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+  "PatientName": "dwv^patientName",
+  "PatientID": "DWV0001",
+  "PhotometricInterpretation": "MONOCHROME2",
+  "SamplesPerPixel": 1,
+  "PlanarConfiguration": 0,
+  "PixelRepresentation": 0,
+  "Rows": 32,
+  "Columns": 32,
+  "ImageOrientationPatient": [
+    1,
+    0,
+    0,
+    0,
+    1,
+    0
+  ],
+  "PixelSpacing": [
+    1,
+    1
+  ],
+  "SliceThickness": 1,
+  "BitsAllocated": 16,
+  "BitsStored": 12,
+  "HighBit": 11,
+  "StudyDate": "20251009",
+  "StudyTime": "180620",
+  "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251009160606.1",
+  "StudyID": 10000,
+  "StudyDescription": "dwv generated data",
+  "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251009160606.2",
+  "SeriesNumber": 10010,
+  "SeriesDescription": "Test data #0",
+  "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251009160620.1"
+}

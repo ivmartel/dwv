@@ -11,11 +11,9 @@ import {precisionRound} from '../utils/string.js';
 import {logger} from '../utils/logger.js';
 import {Size} from './size.js';
 import {Spacing} from './spacing.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
+import {BooleanResult} from '../utils/result.js';
+import {arrayMap} from '../utils/array.js';
 import {Matrix33} from '../math/matrix.js';
-/* eslint-enable no-unused-vars */
 
 /**
  * 2D/3D Geometry class.
@@ -65,13 +63,6 @@ export class Geometry {
   #orientation = getIdentityMat33();
 
   /**
-   * Flag to know if new origins were added.
-   *
-   * @type {boolean}
-   */
-  #newOrigins = false;
-
-  /**
    * @param {Point3D[]} origins The object origins.
    * @param {Size} size The object size.
    * @param {Spacing} spacing The object spacing.
@@ -85,12 +76,27 @@ export class Geometry {
     this.#spacing = spacing;
     if (typeof time !== 'undefined') {
       this.#initialTime = time;
-      this.#timeOrigins[time] = origins;
+      this.#timeOrigins[time] = origins.slice();
     }
     // check input orientation
     if (typeof orientation !== 'undefined') {
       this.#orientation = orientation;
     }
+  }
+
+  /**
+   * Clone the geometry.
+   *
+   * @returns {Geometry} A clone of this geometry.
+   */
+  clone() {
+    return new Geometry(
+      this.#origins.slice(),
+      new Size(this.#size.getValues()),
+      new Spacing(this.#spacing.getValues()),
+      new Matrix33(this.#orientation.getValues()),
+      this.#initialTime
+    );
   }
 
   /**
@@ -100,6 +106,19 @@ export class Geometry {
    */
   getInitialTime() {
     return this.#initialTime;
+  }
+
+  /**
+   * Set the initial time.
+   *
+   * @param {number} time The new time.
+   */
+  setInitialTime(time) {
+    if (typeof this.#timeOrigins[this.#initialTime] !== 'undefined') {
+      delete this.#timeOrigins[this.#initialTime];
+    }
+    this.#initialTime = time;
+    this.#timeOrigins[time] = this.#origins.slice();
   }
 
   /**
@@ -218,7 +237,7 @@ export class Geometry {
    * Calculate slice spacing from origins and replace current
    *   if needed.
    */
-  #updateSliceSpacing() {
+  updateSliceSpacing() {
     const geoSliceSpacing = getSliceGeometrySpacing(this.#origins);
     // update local if needed
     if (typeof geoSliceSpacing !== 'undefined') {
@@ -243,11 +262,6 @@ export class Geometry {
    * @returns {Spacing} The object spacing.
    */
   getSpacing(viewOrientation) {
-    // update slice spacing after appendSlice
-    if (this.#newOrigins) {
-      this.#updateSliceSpacing();
-      this.#newOrigins = false;
-    }
     let res = this.#spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
       let orientedValues = getOrientedArray3D(
@@ -294,7 +308,7 @@ export class Geometry {
    * magic...
    *
    * @param {Point3D} point The point to evaluate.
-   * @param {number} time Optional time index.
+   * @param {number} [time] Optional time index.
    * @returns {number} The slice index.
    */
   getSliceIndex(point, time) {
@@ -330,6 +344,91 @@ export class Geometry {
   }
 
   /**
+   * Check if another geometry is compatible with this one, ie that
+   * slices with these geometries can be merged into one volume.
+   *
+   * @param {Geometry} rhs The geometry to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the geometry is compatible.
+   */
+  canAppend(rhs) {
+    // check size
+    const rhsSize = rhs.getSize();
+    if (rhsSize.get(2) !== 1) {
+      return {
+        success: false,
+        message: 'Cannot append more than one slice'
+      };
+    }
+    const size = this.getSize();
+    if (size.get(0) !== rhsSize.get(0)) {
+      return {
+        success: false,
+        message: 'Cannot append a slice with different number of columns'
+      };
+    }
+    if (size.get(1) !== rhsSize.get(1)) {
+      return {
+        success: false,
+        message: 'Cannot append a slice with different number of rows'
+      };
+    }
+    // check orientation
+    if (!this.getOrientation().isSimilar(
+      rhs.getOrientation(), REAL_WORLD_EPSILON)) {
+      return {
+        success: false,
+        message: 'Cannot append a slice with different orientation'
+      };
+    }
+    // check origin
+    const canAppendOrigin =
+      this.canAppendOrigin(rhs.getOrigin(), rhs.getInitialTime());
+    if (!canAppendOrigin.success) {
+      return canAppendOrigin;
+    }
+
+    return new BooleanResult(true);
+  }
+
+  /**
+   * Check if an origin can be appended to this geometry.
+   *
+   * @param {Point3D} origin The origin to append.
+   * @param {number} [time] Optional time index.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the origin is compatible.
+   */
+  canAppendOrigin(origin, time) {
+    // equal callback
+    const equalToOrigin = function (element) {
+      return element.equals(origin);
+    };
+    if (typeof time !== 'undefined' && time !== this.#initialTime) {
+      // check if not already in list
+      if (typeof this.#timeOrigins[time] !== 'undefined') {
+        const found = this.#timeOrigins[time].find(equalToOrigin);
+        if (typeof found !== 'undefined') {
+          return {
+            success: false,
+            message: 'Cannot append same time origin twice'
+          };
+        }
+      }
+    } else {
+      // check if not already in list
+      const found = this.#origins.find(equalToOrigin);
+      if (typeof found !== 'undefined') {
+        return {
+          success: false,
+          message: 'Cannot append same origin twice'
+        };
+      }
+    }
+    return new BooleanResult(true);
+  }
+
+  /**
    * Append an origin to the geometry.
    *
    * @param {Point3D} origin The origin to append.
@@ -337,28 +436,17 @@ export class Geometry {
    * @param {number} [time] Optional time index.
    */
   appendOrigin(origin, index, time) {
-    // equal callback
-    const equalToOrigin = function (element) {
-      return element.equals(origin);
-    };
+    // check if possible
+    const canAppend = this.canAppendOrigin(origin, time);
+    if (!canAppend.success) {
+      throw new Error(canAppend.message);
+    }
+
+    // add in origin array
     if (typeof time !== 'undefined') {
-      // check if not already in list
-      const found = this.#timeOrigins[time].find(equalToOrigin);
-      if (typeof found !== 'undefined') {
-        throw new Error('Cannot append same time origin twice');
-      }
-      // add in origin array
       this.#timeOrigins[time].splice(index, 0, origin);
     }
     if (typeof time === 'undefined' || time === this.#initialTime) {
-      // check if not already in list
-      const found = this.#origins.find(equalToOrigin);
-      if (typeof found !== 'undefined') {
-        throw new Error('Cannot append same origin twice');
-      }
-      // update flag
-      this.#newOrigins = true;
-      // add in origin array
       this.#origins.splice(index, 0, origin);
       // increment second dimension
       const values = this.#size.getValues();
@@ -409,9 +497,11 @@ export class Geometry {
    */
   equals(rhs) {
     return rhs !== null &&
+      typeof rhs !== 'undefined' &&
       this.getOrigin().equals(rhs.getOrigin()) &&
       this.getSize().equals(rhs.getSize()) &&
-      this.getSpacing().equals(rhs.getSpacing());
+      this.getSpacing().equals(rhs.getSpacing()) &&
+      this.getOrientation().equals(rhs.getOrientation());
   }
 
   /**
@@ -656,16 +746,16 @@ export function getSliceGeometrySpacing(origins) {
 export function mergeGeometries(geometry1, geometry2) {
   const orientation = geometry1.getOrientation();
   // check input
-  if (!orientation.isSimilar(geometry2.getOrientation())) {
+  if (!orientation.isSimilar(geometry2.getOrientation(), REAL_WORLD_EPSILON)) {
     throw new Error('Cannot merge geometries with different orientation');
   }
   const invOrientation = orientation.getInverse();
 
   const minByIndex = function (array1, array2) {
-    return array1.map((v, i) => Math.min(v, array2[i]));
+    return arrayMap(array1, array2, Math.min);
   };
   const maxByIndex = function (array1, array2) {
-    return array1.map((v, i) => Math.max(v, array2[i]));
+    return arrayMap(array1, array2, Math.max);
   };
 
   const newSpacing = new Spacing(minByIndex(
@@ -688,13 +778,18 @@ export function mergeGeometries(geometry1, geometry2) {
     range2[1].getValues()
   );
 
-  const sizeValues = [];
+  let sizeValues = [];
   for (let i = 0; i < minRangeValues.length; ++i) {
     sizeValues.push(Math.round(
       Math.abs(maxRangeValues[i] - minRangeValues[i]) / newSpacing.get(i)
     ));
   }
-  // TODO: handle extra dims
+  // handle extra dims
+  const maxSize = maxByIndex(
+    geometry1.getSize().getValues(),
+    geometry2.getSize().getValues()
+  );
+  sizeValues = sizeValues.concat(maxSize.slice(3));
   const newSize = new Size(sizeValues);
 
   const newOrigins = [];

@@ -129,7 +129,7 @@ export class ZoomAndPan {
     this.#hasMoved = false;
     // points line
     this.#pointsLine = new Line(points[0], points[1]);
-    this.#midPoint = this.#pointsLine.getMidpoint();
+    this.#midPoint = this.#pointsLine.getCentroid();
   };
 
   /**

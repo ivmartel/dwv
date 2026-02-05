@@ -28,7 +28,9 @@ export class Annotation {
     mathShape: object;
     planeOrigin: Point3D | undefined;
     planePoints: Point3D[] | undefined;
-    quantification: object | undefined;
+    quantification: {
+        [x: string]: Value;
+    } | undefined;
     referencedFrameNumber: number | undefined;
     referencedSopClassUID: string;
     referencedSopInstanceUID: string;
@@ -47,7 +49,7 @@ export class Annotation {
 // @public
 export class AnnotationGroup {
     constructor(list?: Annotation[]);
-    add(annotation: Annotation): void;
+    add(annotation: Annotation, propagate?: boolean): void;
     addEventListener(type: string, callback: Function): void;
     find(uid: string): Annotation | undefined;
     getColour(): string;
@@ -59,7 +61,7 @@ export class AnnotationGroup {
     getMetaValue(key: string): string | object | undefined;
     hasMeta(key: string): boolean;
     isEditable(): boolean;
-    remove(uid: string): void;
+    remove(uid: string, propagate?: boolean): void;
     removeEventListener(type: string, callback: Function): void;
     setColour(colour: string): void;
     setEditable(flag: boolean): void;
@@ -97,11 +99,11 @@ export class App {
     abortAllLoads(): void;
     abortLoad(dataId: string): void;
     addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
-    addData(data: DicomData): string;
-    addDataViewConfig(dataId: string, config: ViewConfig): void;
+    addData(dataId: string, data: DicomData): boolean;
+    addDataViewConfig(dataId: string, config: ViewConfig, doRender?: boolean): void;
     addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
-    addToUndoStack: (cmd: object) => void;
+    addToUndoStack: (cmd: Command) => void;
     // @deprecated
     applyJsonState(jsonState: string, dataId: string): void;
     // @deprecated
@@ -116,6 +118,7 @@ export class App {
     getBaseScale(): Scalar3D;
     getCurrentStackIndex(): number;
     getData(dataId: string): DicomData | undefined;
+    getDataIdFromSeriesUid(uid: string): string;
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
     getDataViewConfigs(): {
@@ -125,13 +128,14 @@ export class App {
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     // @deprecated
     getImage(dataId: string): Image_2 | undefined;
+    getInfoData(dataId: string): InfoData | undefined;
     getLayerGroupByDivId(divId: string): LayerGroup | undefined;
     getMetaData(dataId: string): {
         [x: string]: DataElement;
     } | undefined;
+    getNextDataId(): string;
     getNumberOfLayerGroups(): number;
     getOffset(): Scalar3D;
-    getOverlayData(dataId: string): OverlayData | undefined;
     getStackSize(): number;
     getStyle(): object;
     getToolboxController(): ToolboxController;
@@ -143,6 +147,7 @@ export class App {
     // @deprecated
     initWLDisplay(): void;
     loadFiles: (files: File[]) => string;
+    // @deprecated
     loadFromUri: (uri: string, options?: object) => void;
     loadImageObject: (data: any[]) => string;
     loadURLs: (urls: string[], options?: object) => string;
@@ -153,6 +158,8 @@ export class App {
     removeEventListener(type: string, callback: Function): void;
     removeFromUndoStack: (name: string) => boolean;
     render(dataId: string, viewConfigs?: ViewConfig[]): void;
+    resample(dataIdTarget: string, orientation: Matrix33): void;
+    resampleMatch(dataIdTarget: string, dataIdSource: string): void;
     reset(): void;
     resetDisplay(): void;
     // @deprecated
@@ -160,6 +167,7 @@ export class App {
     resetViews(): void;
     resetZoom(): void;
     resetZoomPan(): void;
+    revertResample(dataIdTarget: string): void;
     setActiveLayerGroup(index: number): void;
     // @deprecated
     setColourMap(name: string): void;
@@ -177,7 +185,7 @@ export class App {
     setToolFeatures(list: object): void;
     // @deprecated
     setWindowLevelPreset(preset: string): void;
-    toggleOverlayListeners(dataId: string): void;
+    toggleInfoDataListeners(dataId: string): void;
     translate(tx: number, ty: number): void;
     undo(): void;
     updateDataViewConfig(dataId: string, divId: string, config: ViewConfig): void;
@@ -203,6 +211,13 @@ export class AppOptions {
 }
 
 // @public
+export class BooleanResult {
+    constructor(success: boolean);
+    message: string | undefined;
+    success: boolean;
+}
+
+// @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
 // @public
@@ -213,14 +228,11 @@ export class CADReport {
 }
 
 // @public
-export class ChangeSegmentColourCommand {
+export class ChangeSegmentColourCommand extends Command {
     constructor(mask: Image_2, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
-    execute(): void;
-    getName(): string;
     isValid(): boolean;
     onExecute(_event: object): void;
     onUndo(_event: object): void;
-    undo(): void;
 }
 
 // @public
@@ -233,7 +245,9 @@ export class Circle {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): {
+        [x: string]: Value;
+    };
 }
 
 // @public
@@ -242,6 +256,13 @@ export class ColourMap {
     blue: number[];
     green: number[];
     red: number[];
+}
+
+// @public
+export class Command {
+    execute(): void;
+    getName(): string;
+    undo(): void;
 }
 
 // @public
@@ -274,9 +295,13 @@ export namespace custom {
         };
     };
     let // (undocumented)
+    privateBValueRules: object[];
+    let // (undocumented)
     openRoiDialog: any;
     let // (undocumented)
-    getTagTime: any;
+    getVolumeIdTagValue: any;
+    let // (undocumented)
+    getPostLoadVolumeIdTagValue: any;
     let // (undocumented)
     getTagPixelUnit: any;
 }
@@ -295,14 +320,36 @@ export class DataElement {
 }
 
 // @public
-export class DeleteSegmentCommand {
+export const defaultToolList: {
+    [x: string]: any;
+};
+
+// @public
+export const defaultToolOptions: {
+    [x: string]: {
+        [x: string]: any;
+    };
+};
+
+// @public
+export class DeleteSegmentCommand extends Command {
     constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
-    execute(): void;
-    getName(): string;
     isValid(): boolean;
     onExecute(_event: object): void;
     onUndo(_event: object): void;
-    undo(): void;
+}
+
+// @public
+export class Diameter {
+    diameter: Value;
+    offset1: number;
+    offset2: number;
+}
+
+// @public
+export class Diameters {
+    major: Diameter;
+    minor: Diameter;
 }
 
 // @public
@@ -322,11 +369,17 @@ export class DicomData {
         [x: string]: DataElement;
     });
     annotationGroup: AnnotationGroup | undefined;
+    appendData(data: DicomData): void;
     buffer: any | undefined;
+    getComplete(): boolean | undefined;
+    hasDuplicateOrigin(): boolean;
     image: Image_2 | undefined;
     meta: {
         [x: string]: DataElement;
     };
+    numberOfFiles: number;
+    setComplete(flag: boolean): void;
+    warn: string[];
 }
 
 // @public
@@ -455,14 +508,22 @@ export class Ellipse {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): {
+        [x: string]: Value;
+    };
 }
+
+// @public
+export function equalWl(wl0: WindowLevel, wl1: WindowLevel): boolean;
 
 // @public
 export class Geometry {
     constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     appendFrame(origin: Point3D, time: number): void;
     appendOrigin(origin: Point3D, index: number, time?: number): void;
+    canAppend(rhs: Geometry): BooleanResult;
+    canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
+    clone(): Geometry;
     equals(rhs: Geometry): boolean;
     getCurrentNumberOfSlicesBeforeTime(time: number): number | undefined;
     getCurrentTotalNumberOfSlices(): number;
@@ -473,7 +534,7 @@ export class Geometry {
     getRange(): Point[];
     getRealSpacing(): Spacing;
     getSize(viewOrientation?: Matrix33): Size;
-    getSliceIndex(point: Point3D, time: number): number;
+    getSliceIndex(point: Point3D, time?: number): number;
     getSpacing(viewOrientation?: Matrix33): Spacing;
     hasSlicesAtTime(time: number): boolean;
     includesOrigin(point3D: Point3D, tol?: number): boolean;
@@ -481,7 +542,9 @@ export class Geometry {
     isInBounds(point: Point): boolean;
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
     pointToWorld(point: Point3D): Point3D;
+    setInitialTime(time: number): void;
     toString(): string;
+    updateSliceSpacing(): void;
     worldToIndex(point: Point): Index;
     worldToPoint(point: Point): Point3D;
 }
@@ -518,7 +581,17 @@ export function getEllipseIndices(center: Index, radius: number[], dir: number[]
 export function getLayerDetailsFromEvent(event: object): object;
 
 // @public
+export function getManufacturer(elements: {
+    [x: string]: DataElement;
+}): string | undefined;
+
+// @public
 export function getMousePoint(event: object): Point2D;
+
+// @public
+export function getNormalisedManufacturer(elements: {
+    [x: string]: DataElement;
+}): string | undefined;
 
 // @public
 export function getOrientationName(cosines: number[]): string | undefined;
@@ -528,6 +601,11 @@ export function getPixelDataTag(): Tag;
 
 // @public
 export function getRectangleIndices(center: Index, size: number[], dir: number[]): Index[];
+
+// @public
+export function getReferencedSeriesUID(dataElements: {
+    [x: string]: DataElement;
+}): string | undefined;
 
 // @public
 export function getReverseOrientation(ori: string): string;
@@ -553,6 +631,12 @@ export function getTypedArray(bitsAllocated: number, pixelRepresentation: number
 export function getUID(tagName: string): string;
 
 // @public
+export function getURLsFromKeyValueUri(uri: string): string[] | undefined;
+
+// @public
+export function handleURLsFromWeasisXMLManifest(uri: string, callback: Function): void;
+
+// @public
 export function hasDicomPrefix(buffer: ArrayBuffer): boolean;
 
 // @public
@@ -573,6 +657,7 @@ class Image_2 {
     calculateDataRange(): object;
     calculateHistogram(): object;
     calculateRescaledDataRange(): object;
+    canAppend(rhs: Image_2): BooleanResult;
     canQuantify(): boolean;
     canScroll(viewOrientation: Matrix33): boolean;
     // @deprecated
@@ -582,7 +667,10 @@ class Image_2 {
     containsImageUids(uids: string[]): boolean;
     convolute2D(weights: number[]): Image_2;
     convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
+    countourIsInitialized(): boolean;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
+    getComplete(): boolean;
+    getContourDistance(index: number, viewOrientation: Matrix33): number;
     getDataRange(): NumberRange;
     getGeometry(): Geometry;
     getHistogram(): any[];
@@ -597,24 +685,29 @@ class Image_2 {
     getPhotometricInterpretation(): string;
     getPlanarConfiguration(): number;
     getRescaledDataRange(): NumberRange;
-    getRescaledValue(i: number, j: number, k: number, f: number): number;
+    getRescaledValue(i: number, j: number, k: number, f?: number): number;
     getRescaledValueAtIndex(index: Index): number;
     getRescaledValueAtOffset(offset: number): number;
     getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     getSecondaryOffset(index: Index): number;
-    getValue(i: number, j: number, k: number, f: number): number;
+    getValue(i: number, j: number, k: number, f?: number): number;
     getValueAtIndex(index: Index): number;
     getValueAtOffset(offset: number): number;
     hasValues(values: any[]): boolean[];
     includesImageUid(uid: string): boolean;
+    initializeContour(): void;
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
     isMonochrome(): boolean;
+    isResampled(): boolean;
     recalculateLabels(): void;
     removeEventListener(type: string, callback: Function): void;
+    resample(orientation: Matrix33, interpolated?: boolean | undefined, centerOfRotation?: Point | undefined): void;
+    revert(): void;
     setAtOffsets(offsets: number[], value: number | RGB): void;
     setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
     setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
+    setComplete(flag: boolean): void;
     setMeta(rhs: {
         [x: string]: any;
     }): void;
@@ -644,19 +737,60 @@ export class Index {
 }
 
 // @public
+export class InfoData {
+    constructor(app: App, dataId: string, configs: {
+        [x: string]: InfoDataItem[];
+    });
+    addAppListeners(): void;
+    addEventListener(type: string, callback: object): void;
+    addItemMeta(data: {
+        [x: string]: DataElement;
+    }): void;
+    isListening(): boolean;
+    onSliceChange: (event: object) => void;
+    removeAppListeners(): void;
+    removeEventListener(type: string, callback: object): void;
+    reset(): void;
+}
+
+// @public
+export class InfoDataItem {
+    event: string | undefined;
+    format: string;
+    pos: string;
+    precision: string | undefined;
+    tags: string[] | undefined;
+    value: string;
+}
+
+// @public
 export function isEqualRgb(c1: RGB, c2: RGB): boolean;
+
+// @public
+export class Label {
+    centroid: Point;
+    centroidIndex: number[];
+    count: number;
+    diameters: Diameters;
+    height: Value;
+    id: number;
+    largestSliceZ: number;
+    volume: Value;
+}
 
 // @public
 export function labToUintLab(triplet: object): object;
 
 // @public
 export class LayerGroup {
-    constructor(containerDiv: HTMLElement);
+    constructor(containerDiv: HTMLElement, withInfoLayer?: boolean);
     addDrawLayer(): DrawLayer;
     addEventListener(type: string, callback: Function): void;
+    addInfoData(data: InfoData, dataId: string): void;
     addScale(scaleStep: number, center: Point3D): void;
     addTranslation(translation: Scalar3D): void;
     addViewLayer(): ViewLayer;
+    bindInfoData(dataId: string): void;
     canScroll(): boolean;
     display(flag: boolean): void;
     draw(): void;
@@ -678,7 +812,7 @@ export class LayerGroup {
     getNumberOfLayers(): number;
     getNumberOfViewLayers(): number;
     getOffset(): Scalar3D;
-    getPositionHelper(): PositionHelper;
+    getPositionHelper(): PositionHelper | undefined;
     getScale(): Scalar3D;
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
@@ -686,6 +820,7 @@ export class LayerGroup {
     getViewLayers(callbackFn?: Function): ViewLayer[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
     getViewLayersFromActive(callbackFn?: Function): ViewLayer[];
+    hasAnyLayerWithValidPosition(): boolean;
     includes(id: string): boolean;
     isPositionInBounds(position: Point): boolean;
     moreThanOne(dim: number): boolean;
@@ -705,8 +840,10 @@ export class LayerGroup {
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
     setShowCrosshair(flag: boolean): void;
+    shouldBind(): boolean;
     showTooltip(point: Point2D): void;
     someViewLayer(callbackFn: Function): boolean;
+    unbindInfoData(): void;
     updateLayersToPositionChange: (event: object) => void;
 }
 
@@ -779,6 +916,20 @@ export class MaskSegment {
 export class MaskSegmentHelper {
     constructor(mask: Image_2);
     addSegment(segment: MaskSegment): void;
+    findOverlap(rhs: MaskSegmentHelper): {
+        [x: number]: {
+            label: string;
+            overlap: {
+                [x: number]: {
+                    label: string;
+                    count: number;
+                    percentage: number;
+                };
+            };
+            count: number;
+        };
+    };
+    getMask(): Image_2;
     getNumberOfSegments(): number;
     getSegment(segmentNumber: number): MaskSegment | undefined;
     hasSegment(segmentNumber: number): boolean;
@@ -790,7 +941,6 @@ export class MaskSegmentHelper {
 // @public
 export class MaskSegmentViewHelper {
     addToHidden(segmentNumber: number): void;
-    getAlphaFunc(): (value: number | number[], index: number) => number;
     isHidden(segmentNumber: number): boolean;
     removeFromHidden(segmentNumber: number): void;
 }
@@ -806,13 +956,27 @@ export class Matrix33 {
     getInverse(): Matrix33 | undefined;
     getRowAbsMax(row: number): object;
     getThirdColMajorDirection(): number;
+    getValues(): number[];
     isSimilar(rhs: Matrix33, tol?: number): boolean;
     multiply(rhs: Matrix33): Matrix33;
     multiplyArray3D(array3D: number[]): number[];
     multiplyIndex3D(index3D: Index): Index;
     multiplyPoint3D(point3D: Point3D): Point3D;
+    multiplyTypedArray3D(sourceArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, outArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
+}
+
+// @public (undocumented)
+export namespace NormalisedManufacturers {
+    let // (undocumented)
+    GE: string;
+    let // (undocumented)
+    SIEMENS: string;
+    let // (undocumented)
+    PHILIPS: string;
+    let // (undocumented)
+    HITASHI: string;
 }
 
 // @public
@@ -830,18 +994,6 @@ export namespace Orientation {
     Coronal: string;
     let // (undocumented)
     Sagittal: string;
-}
-
-// @public
-export class OverlayData {
-    constructor(app: App, dataId: string, configs: object);
-    addAppListeners(): void;
-    addEventListener(type: string, callback: object): void;
-    addItemMeta(data: object): void;
-    isListening(): boolean;
-    removeAppListeners(): void;
-    removeEventListener(type: string, callback: object): void;
-    reset(): void;
 }
 
 // @public
@@ -946,7 +1098,9 @@ export class Protractor {
     getCentroid(): Point2D;
     getLength(): number;
     getPoint(index: number): Point2D | undefined;
-    quantify(_viewController: ViewController, _flags: string[]): object;
+    quantify(_viewController: ViewController, _flags: string[]): {
+        [x: string]: Value;
+    };
 }
 
 // @public
@@ -963,7 +1117,9 @@ export class Rectangle {
     getSurface(): number;
     getWidth(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): {
+        [x: string]: Value;
+    };
 }
 
 // @public
@@ -1038,6 +1194,8 @@ export class Size {
     isInBounds(index: Index, dirs: number[]): boolean;
     length(): number;
     moreThanOne(dimension: number): boolean;
+    normaliseIndex(index: Index, extra?: Index): Index;
+    normalisePoint(point: Point, extra?: Point): Point;
     offsetToIndex(offset: number): Index;
     toString(): string;
 }
@@ -1105,6 +1263,12 @@ export const toolOptions: {
 };
 
 // @public
+export class Value {
+    unit: string | undefined;
+    value: number;
+}
+
+// @public
 export class Vector3D {
     constructor(x: number, y: number, z: number);
     crossProduct(vector3D: Vector3D): Vector3D;
@@ -1126,10 +1290,12 @@ export class View {
     generateImageData(data: ImageData, index: Index): void;
     getAlphaFunction(): (value: number[] | number, index: number) => number;
     getColourMap(): string;
+    getContourThickness(): number;
     getCurrentImageUid(): string;
-    getCurrentIndex(): Index;
-    getCurrentPosition(): Point;
-    getCurrentWindowPresetName(): string;
+    getCurrentIndex(): Index | undefined;
+    getCurrentPosition(): Point | undefined;
+    getCurrentWindowPresetName(): string | undefined;
+    getFillOpacity(): number;
     getImage(): Image_2;
     getOrientation(): Matrix33;
     getOrigin(position?: Point): Point3D;
@@ -1141,16 +1307,18 @@ export class View {
     getWindowPresets(): object;
     getWindowPresetsNames(): string[];
     includesImageUid(uid: string): boolean;
-    init(): void;
     isAquisitionOrientation(): boolean;
+    isMask(): boolean;
     isPositionInBounds(position?: Point): boolean;
     removeEventListener(type: string, callback: Function): void;
     setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setColourMap(name: string): void;
+    setContourThickness(thickness: number): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
-    setCurrentPosition(position: Point, silent?: boolean): boolean;
-    setImage(inImage: Image_2): void;
-    setInitialIndex(): void;
+    setCurrentPosition(inPosition: Point, silent?: boolean): boolean;
+    setFillOpacity(opacity: number): void;
+    setImage(image: Image_2): void;
+    setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     setOrientation(mat33: Matrix33): void;
     setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
     setWindowLevelMinMax(): void;
@@ -1163,7 +1331,9 @@ export class View {
 export class ViewConfig {
     constructor(divId: string);
     colourMap: string | undefined;
+    contourThickness: number | undefined;
     divId: string;
+    fillOpacity: number | undefined;
     opacity: number | undefined;
     orientation: string | undefined;
     windowCenter: number | undefined;
@@ -1184,6 +1354,7 @@ export class ViewController {
     generateImageData(array: ImageData, index?: Index): void;
     get2DSpacing(): Scalar2D;
     getColourMap(): string;
+    getContourThickness(): number;
     getCurrentImageUid(): string;
     getCurrentIndex(): Index;
     getCurrentIndexScrollValue(): number;
@@ -1191,9 +1362,11 @@ export class ViewController {
     getCurrentPosition(): Point;
     getCurrentScrollPosition(): number;
     getCurrentWindowPresetName(): string;
+    getFillOpacity(): number;
     getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
+    getImageSpacing(): Spacing;
     getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     getImageWorldSize(): Scalar2D;
     getIndexFromPosition(point: Point): Index;
@@ -1209,7 +1382,6 @@ export class ViewController {
     getPlanePositionFromPosition(point: Point): Point2D;
     getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     getPositionHelper(): PositionHelper;
-    getPositionHelperClone(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollDimIndex(): number;
     getSopClassUid(): string | undefined;
@@ -1227,15 +1399,19 @@ export class ViewController {
     resetPosition(): void;
     resetWindowLevel(): void;
     setColourMap(name: string): void;
+    setContourThickness(thickness: number): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
+    setFillOpacity(opacity: number): void;
     setImage(img: Image_2): void;
+    setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setWindowLevel(wl: WindowLevel): void;
     setWindowLevelPreset(name: string): void;
     setWindowLevelPresetById(id: number): void;
     stop(): void;
     unbindImageAndLayer(viewLayer: ViewLayer): void;
+    updatePlaneHelper(): void;
 }
 
 // @public
@@ -1259,7 +1435,9 @@ export class ViewLayer {
     flipScaleZ(): void;
     getAbsoluteZoomOffset(): Scalar2D;
     getBaseSize(): Scalar2D;
+    getContourThickness(): number;
     getDataId(): string;
+    getFillOpacity(): number;
     getId(): string;
     getImageData(): object;
     getImageWorldSize(): Scalar2D;
@@ -1268,15 +1446,19 @@ export class ViewLayer {
     getViewController(): ViewController;
     initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
     initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
+    isValidPosition(): boolean;
     isVisible(): boolean;
     onimagecontentchange: (event: object) => void;
     onimagegeometrychange: (event: object) => void;
+    onimageresampled: (event: object) => void;
     onimageset: (event: object) => void;
     planePosToDisplay(point2D: Point2D): Point2D;
     removeEventListener(type: string, callback: Function): void;
     removeFromDOM(): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
-    setCurrentPosition(position: Point, _index: Index): boolean;
+    setContourThickness(thickness: number): void;
+    setCurrentPosition(position: Point, _index?: Index): boolean;
+    setFillOpacity(opacity: number): void;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
@@ -1290,7 +1472,6 @@ export class ViewLayer {
 export class WindowLevel {
     constructor(center: number, width: number);
     center: number;
-    equals(rhs: WindowLevel): boolean;
     width: number;
 }
 

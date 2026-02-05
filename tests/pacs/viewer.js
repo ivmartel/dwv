@@ -10,17 +10,23 @@ import {getAsSimpleElements} from '../../src/dicom/dicomTag.js';
 import {getSRContent} from '../../src/dicom/dicomSRContent.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
+import {Matrix33} from '../../src/math/matrix.js';
+import {getURLsFromKeyValueUri} from '../../src/utils/uri.js';
 
-import {
-  getViewConfig,
-  getLayerGroupDivIds
-} from './viewer.ui.js';
+import {LayoutProtocol} from './viewer.ui.js';
 import {DataTableUI} from './viewer.ui.datatable.js';
 import {setupRenderTests} from './viewer.rendertest.js';
 import {AnnotationUI} from './viewer.ui.annot.js';
 import {SegmentationUI} from './viewer.ui.segment.js';
 import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
+import {overlayConfig} from './overlays.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewConfig} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 
 // global vars
 
@@ -31,7 +37,111 @@ let _app;
 
 let _tools;
 const _toolFeaturesUI = {};
-let _layout = 'one';
+
+// layout related
+
+/**
+ * Select all: returns true.
+ *
+ * @returns {boolean} True if selected.
+ */
+function selectAll(/*id*/) {
+  return true;
+}
+/**
+ * Select event ids.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+function selectEven(id) {
+  return parseInt(id, 10) % 2 === 0;
+}
+/**
+ * Select odd ids.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+function selectOdd(id) {
+  return parseInt(id, 10) % 2 !== 0;
+}
+/**
+ * Select CT modality data.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+// function selectCT(id) {
+//   const modality = _app.getMetaData(id)['00080060'].value[0];
+//   return modality === 'CT';
+// }
+/**
+ * Select PET modality data.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+// function selectPET(id) {
+//   const modality = _app.getMetaData(id)['00080060'].value[0];
+//   return modality === 'PT';
+// }
+
+// single div
+const layoutConfig0 = {
+  id: '1*1',
+  displaySets: [
+    {
+      divId: 'layerGroup0',
+      dataSelector: selectAll,
+    }
+  ]
+};
+// one line, two columns
+const layoutConfig1 = {
+  id: '1*2',
+  displaySets: [
+    {
+      divId: 'layerGroup0',
+      dataSelector: selectEven,
+    },
+    {
+      divId: 'layerGroup1',
+      dataSelector: selectOdd,
+    }
+  ]
+};
+// MPR
+const layoutConfig2 = {
+  id: 'mpr',
+  displaySets: [
+    {
+      divId: 'layerGroup0',
+      orientation: 'axial',
+      dataSelector: selectAll,
+    },
+    {
+      divId: 'layerGroup1',
+      orientation: 'coronal',
+      dataSelector: selectAll,
+    },
+    {
+      divId: 'layerGroup2',
+      orientation: 'sagittal',
+      dataSelector: selectAll,
+    }
+  ]
+};
+
+/**
+ * @type {LayoutProtocol[]}
+ */
+const _layouts = [];
+_layouts.push(new LayoutProtocol(layoutConfig0));
+_layouts.push(new LayoutProtocol(layoutConfig1));
+_layouts.push(new LayoutProtocol(layoutConfig2));
+
+let _selectedLayoutIndex = 0;
 
 /**
  * Setup simple dwv app.
@@ -66,8 +176,8 @@ function viewerSetup() {
   //   }
   // };
 
-  // // example private logic for time value retrieval
-  // custom.getTagTime = function (elements) {
+  // // example private logic for volume id value retrieval
+  // custom.getVolumeIdTagValue = function (elements) {
   //   let value;
   //   const element = elements['ABCD0123'];
   //   if (typeof element !== 'undefined') {
@@ -82,21 +192,13 @@ function viewerSetup() {
   // };
 
   // stage options
-  let viewOnFirstLoadItem = true;
+  const viewOnFirstLoadItem = true;
 
   // load counters
   let numberOfDataToLoad = 0;
   let numberOfLoadendData = 0;
   const dataLoadProgress = [];
-
-  // add layer groups div
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  addLayerGroupsDiv(numberOfLayerGroups);
-
-  // special MPR
-  if (_layout === 'mpr') {
-    viewOnFirstLoadItem = false;
-  }
+  let firstRender = true;
 
   // tools
   _tools = {
@@ -125,6 +227,7 @@ function viewerSetup() {
   const options = new AppOptions();
   options.tools = _tools;
   options.viewOnFirstLoadItem = viewOnFirstLoadItem;
+  options.overlayConfig = overlayConfig;
   // app
   _app = new App();
   _app.init(options);
@@ -139,12 +242,17 @@ function viewerSetup() {
   // bind events
   _app.addEventListener('error', function (event) {
     console.error('load error', event, event.error);
+    const message = event.error.message;
+    const isRenderError = typeof message !== 'undefined' &&
+      message.startsWith('Render error');
     // abort load
-    _app.abortLoad(event.dataid);
+    if (!isRenderError) {
+      _app.abortLoad(event.dataid);
+    }
   });
   _app.addEventListener('loadstart', function (event) {
     console.log('%c----------------', 'color: teal;');
-    console.log('load source', event.source);
+    console.log('load source data:' + event.dataid, event.source);
     // timer
     console.time('load-data-' + event.dataid);
     // update load counters
@@ -161,8 +269,6 @@ function viewerSetup() {
     if (_app.getDataIds().length !== 0) {
       removePostLoadListeners();
     }
-    // add new data view config
-    addDataViewConfig(event.dataid);
   });
   const sumReducer = function (sum, value) {
     return sum + value;
@@ -182,6 +288,10 @@ function viewerSetup() {
       console.warn('load-warn', event.warn);
     }
   });
+  _app.addEventListener('loadstart', function (event) {
+    // add new data view config for new data
+    addNewDataViewConfig(event.dataid);
+  });
   _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data-' + event.dataid);
     // update load counter
@@ -190,35 +300,45 @@ function viewerSetup() {
     window.removeEventListener('keydown', abortShortcut);
   });
   _app.addEventListener('load', function (event) {
+    // log meta data
+    logMetaData(event.dataid, event.loadtype);
     // render if not done yet
     if (!viewOnFirstLoadItem) {
       _app.render(event.dataid);
     }
     // update sliders with new data info
     // (has to be after full load)
-    initSliders();
+    initSliders(_layouts[_selectedLayoutIndex]);
     // add post-load listeners
     addPostLoadListeners();
-    // log meta data
-    logMetaData(event.dataid, event.loadtype);
   });
 
   // update UI at first render of first data
   const onRenderEnd = function (/*event*/) {
-    if (_app.getDataIds().length === 1) {
+    if (firstRender) {
       // set app tool
       setAppTool();
-      // update html
-      const toolsFieldset = document.getElementById('tools');
-      toolsFieldset.disabled = false;
-      const changeLayoutSelect = document.getElementById('changelayout');
-      changeLayoutSelect.disabled = false;
-      const resetViewsButton = document.getElementById('resetviews');
-      resetViewsButton.disabled = false;
-      const smoothingChk = document.getElementById('changesmoothing');
-      smoothingChk.disabled = false;
+      // enable html
+      const elementIds = [
+        'tools',
+        'changelayout',
+        'resetviews',
+        'changesmoothing',
+        'rotate-x',
+        'rotate-y',
+        'rotate-z',
+        'rotate-match',
+        'rotate-reset'
+      ];
+      for (const elementId of elementIds) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.disabled = false;
+        }
+      }
       // remove handler
       _app.removeEventListener('renderend', onRenderEnd);
+      firstRender = false;
     }
   };
   // add handler (will be removed at first success)
@@ -238,7 +358,7 @@ function viewerSetup() {
       span.innerHTML = text;
     }
     // update sliders' value
-    updateSliders();
+    updateSliders(_layouts[_selectedLayoutIndex]);
   });
 
   _app.addEventListener('filterrun', function (event) {
@@ -246,6 +366,20 @@ function viewerSetup() {
   });
   _app.addEventListener('filterundo', function (event) {
     console.log('filterundo', event);
+  });
+  // labels
+  _app.addEventListener('labelingstart', function (event) {
+    console.time('label-data-' + event.dataid);
+  });
+  _app.addEventListener('labelschanged', function (event) {
+    console.timeEnd('label-data-' + event.dataid);
+  });
+  // resampling
+  _app.addEventListener('imageresamplingstart', function (event) {
+    console.time('resample-data-' + event.dataid);
+  });
+  _app.addEventListener('imageresamplingcomplete', function (event) {
+    console.timeEnd('resample-data-' + event.dataid);
   });
 
   _app.addEventListener('warn', function (event) {
@@ -255,42 +389,7 @@ function viewerSetup() {
   // default keyboard shortcuts
   window.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
-    // use ctrl to avoid html input events
-    if (event.ctrlKey) {
-      // mask segment related: has to be number
-      if (!isNaN(parseInt(event.key, 10))) {
-        const lg = _app.getActiveLayerGroup();
-        const vl = lg.getActiveViewLayer();
-        if (typeof vl === 'undefined') {
-          return;
-        }
-        const vc = vl.getViewController();
-        if (!vc.isMask()) {
-          return;
-        }
-        const number = parseInt(event.key, 10);
-        const segHelper = vc.getMaskSegmentHelper();
-        if (segHelper.hasSegment(number)) {
-          const segment = segHelper.getSegment(number);
-          if (event.altKey) {
-            // CTRL + ALT + number
-            console.log('Delete segment: ' + segment.label);
-            // delete
-            vc.deleteSegment(number, _app.addToUndoStack);
-          } else {
-            // CTRL + number
-            console.log('Show/hide segment: ' + segment.label);
-            // show/hide the selected segment
-            if (segHelper.isHidden(number)) {
-              segHelper.removeFromHidden(number);
-            } else {
-              segHelper.addToHidden(number);
-            }
-            vc.applyHiddenSegments();
-          }
-        }
-      }
-    }
+
     // filter
     if (getSelectedToolName() === 'Filter' &&
       event.altKey && event.key === 'r') {
@@ -318,6 +417,7 @@ function viewerSetup() {
   for (const toolName in _tools) {
     if (typeof toolsUI[toolName] !== 'undefined') {
       const toolUI = new toolsUI[toolName](_app, _tools[toolName]);
+      toolUI.registerListeners();
       _toolFeaturesUI[toolName] = toolUI;
     }
   }
@@ -370,8 +470,11 @@ function viewerSetup() {
       document.cookie = 'access_token=';
     }
   }
-  // load from window location
-  _app.loadFromUri(window.location.href, uriOptions);
+  // optional load from window location
+  const urls = getURLsFromKeyValueUri(window.location.href);
+  if (typeof urls !== 'undefined') {
+    _app.loadURLs(urls, uriOptions);
+  }
 }
 
 /**
@@ -386,9 +489,9 @@ function logMetaData(dataId, loadType) {
 
   // log tags for data with transfer syntax (dicom)
   if (typeof meta['00020010'] !== 'undefined') {
-    console.log('metadata', getAsSimpleElements(meta));
+    console.log('metadata data:' + dataId, getAsSimpleElements(meta));
   } else {
-    console.log('metadata', meta);
+    console.log('metadata data:' + dataId, meta);
   }
 
   // get modality
@@ -439,127 +542,40 @@ function removePostLoadListeners() {
 }
 
 /**
- * Get the number of layer groups according to layout.
+ * Merge with first app config.
  *
- * @returns {nunmber} The number.
+ * @param {Object<string, ViewConfig[]>} dataViewConfigs A list
+ *   of data view configs.
  */
-function getNumberOfLayerGroups() {
-  let number;
-  if (_layout === 'one') {
-    number = 1;
-  } else if (_layout === 'side') {
-    number = 2;
-  } else if (_layout === 'mpr') {
-    number = 3;
+function mergeAppConfig(dataViewConfigs) {
+  for (const dataId in dataViewConfigs) {
+    const configs = dataViewConfigs[dataId];
+    const appConfigs = _app.getViewConfigs(dataId);
+    if (appConfigs.length !== 0) {
+      // use first as base
+      for (const config of configs) {
+        mergeConfigs(config, appConfigs[0]);
+      }
+    }
   }
-  return number;
 }
 
 /**
- * Setup.
+ * Merge a data config into the first input one.
+ * Copies all but the divId and orientation property.
+ *
+ * @param {ViewConfig} config The config where to merge.
+ * @param {ViewConfig} configToMerge The config to merge.
+ * @returns {ViewConfig} The updated config.
  */
-function setup() {
-  // setup
-  viewerSetup();
-
-  const dataTable = new DataTableUI(_app);
-  dataTable.registerListeners(_layout);
-
-  const positionInput = document.getElementById('position');
-  positionInput.addEventListener('change', function (event) {
-    const vls = _app.getViewLayersByDataId('0');
-    const vc = vls[0].getViewController();
-    const element = event.target;
-    const values = element.value.split(',');
-    vc.setCurrentPosition(new Point([
-      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
-    ])
-    );
-  });
-
-  const resetViewsButton = document.getElementById('resetviews');
-  resetViewsButton.disabled = true;
-  resetViewsButton.addEventListener('click', function () {
-    _app.resetZoomPan();
-  });
-
-  const changeLayoutSelect = document.getElementById('changelayout');
-  changeLayoutSelect.disabled = true;
-  changeLayoutSelect.addEventListener('change', function (event) {
-    const selectElement = event.target;
-    const layout = selectElement.value;
-    if (layout !== 'one' &&
-      layout !== 'side' &&
-      layout !== 'mpr') {
-      throw new Error('Unknown layout: ' + layout);
+function mergeConfigs(config, configToMerge) {
+  for (const key in configToMerge) {
+    if (key !== 'divId' &&
+      key !== 'orientation') {
+      config[key] = configToMerge[key];
     }
-    _layout = layout;
-
-    // add layer groups div
-    const numberOfLayerGroups = getNumberOfLayerGroups();
-    addLayerGroupsDiv(numberOfLayerGroups);
-
-    // get configs
-    let configs;
-    const dataIds = _app.getDataIds();
-    if (layout === 'one') {
-      configs = getOnebyOneDataViewConfig(dataIds);
-    } else if (layout === 'side') {
-      configs = getOnebyTwoDataViewConfig(dataIds);
-    } else if (layout === 'mpr') {
-      configs = getMPRDataViewConfig(dataIds);
-    }
-    if (typeof configs === 'undefined') {
-      return;
-    }
-
-    // clear data table
-    dataTable.clearDataTable();
-
-    // set config (deletes previous layers)
-    _app.setDataViewConfigs(configs);
-
-    // render data (creates layers)
-    for (let i = 0; i < dataIds.length; ++i) {
-      _app.render(dataIds[i]);
-    }
-
-    // show crosshair depending on layout
-    if (layout !== 'one') {
-      const divIds = getLayerGroupDivIds(configs);
-      for (const divId of divIds) {
-        _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
-      }
-    }
-
-    // need to set tool after config change
-    setAppTool();
-  });
-
-  const smoothingChk = document.getElementById('changesmoothing');
-  smoothingChk.checked = false;
-  smoothingChk.disabled = true;
-  smoothingChk.addEventListener('change', function (event) {
-    const inputElement = event.target;
-    _app.setImageSmoothing(inputElement.checked);
-  });
-
-  // setup
-  setupBindersCheckboxes();
-  setupToolsCheckboxes();
-  setupRenderTests(_app);
-  setupAbout();
-
-  // bind app to input files
-  const fileinput = document.getElementById('fileinput');
-  fileinput.addEventListener('change', function (event) {
-    const files = event.target.files;
-    if (files.length !== 0) {
-      _app.loadFiles(files);
-    } else {
-      throw new Error('No files to load');
-    }
-  });
+  }
+  return config;
 }
 
 /**
@@ -588,11 +604,12 @@ function getSlider(layerGroupDivId) {
 
 /**
  * Init sliders: show them and set max.
+ *
+ * @param {LayoutProtocol} layout The current layout.
  */
-function initSliders() {
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  for (let i = 0; i < numberOfLayerGroups; ++i) {
-    initSlider('layerGroup' + i);
+function initSliders(layout) {
+  for (const divId of layout.getLayerGroupDivIds()) {
+    initSlider(divId);
   }
 }
 
@@ -625,14 +642,14 @@ function initSlider(layerGroupId) {
 
 /**
  * Update sliders: set the slider value to the current scroll index.
+ *
+ * @param {LayoutProtocol} layout The current layout.
  */
-function updateSliders() {
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  for (let i = 0; i < numberOfLayerGroups; ++i) {
-    const lgId = 'layerGroup' + i;
-    const slider = document.getElementById(lgId + '-slider');
+function updateSliders(layout) {
+  for (const divId of layout.getLayerGroupDivIds()) {
+    const slider = document.getElementById(divId + '-slider');
     if (slider) {
-      const lg = _app.getLayerGroupByDivId(lgId);
+      const lg = _app.getLayerGroupByDivId(divId);
       if (typeof lg !== 'undefined') {
         const ph = lg.getPositionHelper();
         slider.value = ph.getCurrentPositionScrollValue();
@@ -657,18 +674,19 @@ function addLayerGroupDiv(id) {
 }
 
 /**
- * Add Layer Groups div.
+ * Add Layer Groups divs.
+ *
+ * @param {LayoutProtocol} layout The current layout.
  */
-function addLayerGroupsDiv() {
+function addLayerGroupsDivs(layout) {
   // clean up
   const dwvDiv = document.getElementById('dwv');
   if (dwvDiv) {
     dwvDiv.innerHTML = '';
   }
   // add div
-  const numberOfLayerGroups = getNumberOfLayerGroups();
-  for (let i = 0; i < numberOfLayerGroups; ++i) {
-    addLayerGroupDiv('layerGroup' + i);
+  for (const divId of layout.getLayerGroupDivIds()) {
+    addLayerGroupDiv(divId);
   }
 }
 
@@ -677,157 +695,230 @@ function addLayerGroupsDiv() {
  *
  * @param {string} dataId The data ID.
  */
-function addDataViewConfig(dataId) {
-  const dataIds = [dataId];
-  let configs;
-  if (_layout === 'one') {
-    configs = getOnebyOneDataViewConfig(dataIds);
-  } else if (_layout === 'side') {
-    configs = getOnebyTwoDataViewConfig(dataIds);
-  } else if (_layout === 'mpr') {
-    configs = getMPRDataViewConfig(dataIds);
-  }
-  const viewConfigs = configs[dataId];
-  for (let i = 0; i < viewConfigs.length; ++i) {
-    _app.addDataViewConfig(dataId, viewConfigs[i]);
+function addNewDataViewConfig(dataId) {
+  const configs = _layouts[_selectedLayoutIndex].getViewConfigsByDataId(dataId);
+  for (const config of configs) {
+    _app.addDataViewConfig(dataId, config, false);
   }
 }
 
 /**
- * Merge a data config into the first input one.
- * Copies all but the divId and orientation property.
- *
- * @param {object} config The config where to merge.
- * @param {object} configToMerge The config to merge.
- * @returns {object} The updated config.
+ * Setup file line.
  */
-function mergeConfigs(config, configToMerge) {
-  for (const key in configToMerge) {
-    if (key !== 'divId' &&
-      key !== 'orientation') {
-      config[key] = configToMerge[key];
-    }
-  }
-  return config;
-}
-
-/**
- * Get the first view config for a data id.
- *
- * @param {string} dataId The data id.
- * @returns {object} The view config.
- */
-function getAppViewConfig(dataId) {
-  let res;
-  const appConfigs = _app.getViewConfigs(dataId);
-  if (appConfigs.length !== 0) {
-    res = appConfigs[0];
-  }
-  return res;
-}
-
-/**
- * Get the orientation of the first view config for a div id.
- *
- * @param {string} divId The div id.
- * @returns {object} The orientation.
- */
-function getAppViewConfigOrientation(divId) {
-  let orientation;
-  const appDataViewConfigs = _app.getDataViewConfigs();
-  let appDivIdConfig;
-  for (const key in appDataViewConfigs) {
-    const dataViewConfigs = appDataViewConfigs[key];
-    appDivIdConfig = dataViewConfigs.find(function (item) {
-      return item.divId === divId;
-    });
-    if (typeof appDivIdConfig !== 'undefined') {
-      orientation = appDivIdConfig.orientation;
-      break;
-    }
-  }
-  return orientation;
-}
-
-/**
- * Create 1*1 view config(s).
- *
- * @param {Array} dataIds The list of dataIds.
- * @returns {object} The view config.
- */
-function getOnebyOneDataViewConfig(dataIds) {
-  const orientation = getAppViewConfigOrientation('layerGroup0');
-  const configs = {};
-  for (const dataId of dataIds) {
-    const newConfig = getViewConfig('one', 'layerGroup0');
-    // merge possibly existing app config with the new one to
-    // keed window level for example
-    const appConfig = getAppViewConfig(dataId);
-    if (typeof appConfig !== 'undefined') {
-      mergeConfigs(newConfig, appConfig);
-    }
-    // if available use first orientation for all
-    if (typeof orientation !== 'undefined') {
-      newConfig.orientation = orientation;
-    }
-    // store
-    configs[dataId] = [newConfig];
-  }
-  return configs;
-}
-
-/**
- * Create 1*2 view config(s).
- *
- * @param {Array} dataIds The list of dataIds.
- * @returns {object} The view config.
- */
-function getOnebyTwoDataViewConfig(dataIds) {
-  const configs = {};
-  for (let i = 0; i < dataIds.length; ++i) {
-    const dataId = dataIds[i];
-    let newConfig;
-    if (i % 2 === 0) {
-      newConfig = getViewConfig('side', 'layerGroup0');
+function setupFileLine() {
+  // bind app to input files
+  const fileinput = document.getElementById('fileinput');
+  fileinput.addEventListener('change', function (event) {
+    const files = event.target.files;
+    if (files.length !== 0) {
+      _app.loadFiles(files);
     } else {
-      newConfig = getViewConfig('side', 'layerGroup1');
+      throw new Error('No files to load');
     }
-    // merge possibly existing app config with the new one to
-    // keed window level for example
-    const appConfig = getAppViewConfig(dataId);
-    if (typeof appConfig !== 'undefined') {
-      mergeConfigs(newConfig, appConfig);
-    }
-    // store
-    configs[dataIds[i]] = [newConfig];
-  }
-  return configs;
+  });
 }
 
 /**
- * Get MPR view config(s).
- *
- * @param {Array} dataIds The list of dataIds.
- * @returns {object} The view config.
+ * Setup position line.
  */
-function getMPRDataViewConfig(dataIds) {
-  const configs = {};
-  for (const dataId of dataIds) {
-    const newConfig0 = getViewConfig('mpr', 'layerGroup0');
-    const newConfig1 = getViewConfig('mpr', 'layerGroup1');
-    const newConfig2 = getViewConfig('mpr', 'layerGroup2');
-    // merge possibly existing app config with the new one to
-    // keed window level for example
-    const appConfig = getAppViewConfig(dataId);
-    if (typeof appConfig !== 'undefined') {
-      mergeConfigs(newConfig0, appConfig);
-      mergeConfigs(newConfig1, appConfig);
-      mergeConfigs(newConfig2, appConfig);
+function setupPositionLine() {
+  const positionInput = document.getElementById('position');
+  positionInput.addEventListener('change', function (event) {
+    const vls = _app.getViewLayersByDataId('0');
+    const vc = vls[0].getViewController();
+    const element = event.target;
+    const values = element.value.split(',');
+    const point = new Point(values.map(parseFloat));
+    vc.setCurrentPosition(point);
+  });
+}
+
+/**
+ * Setup layout line.
+ *
+ * @param {DataTableUI} dataTable The associated data table.
+ */
+function setupLayoutLine(dataTable) {
+  const resetViewsButton = document.getElementById('resetviews');
+  resetViewsButton.disabled = true;
+  resetViewsButton.addEventListener('click', function () {
+    _app.resetZoomPan();
+  });
+
+  const changeLayoutSelect = document.getElementById('changelayout');
+  changeLayoutSelect.disabled = true;
+  for (const layout of _layouts) {
+    const layoutId = layout.getId();
+    const option = document.createElement('option');
+    option.value = layoutId;
+    if (layoutId === _layouts[_selectedLayoutIndex].getId()) {
+      option.selected = true;
     }
-    // store
-    configs[dataId] = [newConfig0, newConfig1, newConfig2];
+    option.appendChild(document.createTextNode(layout.getId()));
+    changeLayoutSelect.appendChild(option);
   }
-  return configs;
+  changeLayoutSelect.addEventListener('change', function (event) {
+    const selectElement = event.target;
+    const layoutId = selectElement.value;
+    const layoutIndex = _layouts.findIndex(
+      (elem) => elem.getId() === layoutId
+    );
+    if (layoutIndex === -1) {
+      throw new Error('Unknown layout: ' + layoutId);
+    } else {
+      _selectedLayoutIndex = layoutIndex;
+    }
+    const selectedLayout = _layouts[_selectedLayoutIndex];
+
+    // add layer groups div
+    addLayerGroupsDivs(selectedLayout);
+
+    // get configs
+    const dataIds = _app.getDataIds();
+    const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
+
+    // merge app configs for possible extras (like window level)
+    mergeAppConfig(dataViewConfigs);
+
+    // clear data table
+    dataTable.unRegisterViewListeners();
+    dataTable.clearDataTable();
+
+    // update layout for data table
+    dataTable.unRegisterLayerAddListeners();
+    dataTable.registerLayerAddListeners(selectedLayout);
+
+    // set config (deletes previous layers)
+    _app.setDataViewConfigs(dataViewConfigs);
+
+    // render data (creates layers)
+    for (let i = 0; i < dataIds.length; ++i) {
+      _app.render(dataIds[i]);
+    }
+
+    // listen to view changes
+    dataTable.registerViewListeners();
+
+    // need to set tool after config change
+    setAppTool();
+  });
+
+  const smoothingChk = document.getElementById('changesmoothing');
+  smoothingChk.checked = false;
+  smoothingChk.disabled = true;
+  smoothingChk.addEventListener('change', function (event) {
+    const inputElement = event.target;
+    _app.setImageSmoothing(inputElement.checked);
+  });
+}
+
+/**
+ * Setup rotate line.
+ */
+function setupRotateLine() {
+  const rotateXButton = document.getElementById('rotate-x');
+  rotateXButton.disabled = true;
+  rotateXButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const angle = (Math.PI / 180) * 20;
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      1, 0, 0,
+      0, Math.cos(angle), -Math.sin(angle),
+      0, Math.sin(angle), Math.cos(angle)
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateYButton = document.getElementById('rotate-y');
+  rotateYButton.disabled = true;
+  rotateYButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const angle = (Math.PI / 180) * 20;
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      Math.cos(angle), 0, -Math.sin(angle),
+      0, 1, 0,
+      Math.sin(angle), 0, Math.cos(angle)
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateZButton = document.getElementById('rotate-z');
+  rotateZButton.disabled = true;
+  rotateZButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const angle = (Math.PI / 180) * 20;
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      Math.cos(angle), -Math.sin(angle), 0,
+      Math.sin(angle), Math.cos(angle), 0,
+      0, 0, 1
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateMatchButton = document.getElementById('rotate-match');
+  rotateMatchButton.disabled = true;
+  rotateMatchButton.addEventListener('click', function () {
+    const dataIds = _app.getDataIds();
+    if (dataIds.length < 2) {
+      console.log('Not enough datas to match geometries');
+    }
+    // log geometries if resample is needed
+    const geometry0 = _app.getData(dataIds[0]).image.getGeometry();
+    const geometry1 = _app.getData(dataIds[1]).image.getGeometry();
+    if (!geometry0.getOrientation().equals(geometry1.getOrientation())) {
+      console.log('Resample match');
+      console.log('geometry0', geometry0.toString());
+      console.log('geometry1', geometry1.toString());
+    }
+    // resample match data 0 and 1
+    _app.resampleMatch(dataIds[0], dataIds[1]);
+  });
+
+  const rotateResetButton = document.getElementById('rotate-reset');
+  rotateResetButton.disabled = true;
+  rotateResetButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    _app.revertResample(dataId);
+  });
 }
 
 /**
@@ -840,7 +931,8 @@ function setupBindersCheckboxes() {
     'Zoom',
     'Offset',
     'Opacity',
-    'ColourMap'
+    'ColourMap',
+    'MaskView'
   ];
   const binders = [];
   // add all binders at startup
@@ -1139,6 +1231,32 @@ function setupAbout() {
 }
 
 // ---------------------------------------------
+
+/**
+ * Main setup.
+ */
+function setup() {
+  // add layer groups div
+  addLayerGroupsDivs(_layouts[_selectedLayoutIndex]);
+
+  // viewer setup: creates app
+  viewerSetup();
+
+  // data table
+  const dataTable = new DataTableUI(_app);
+  dataTable.registerListeners();
+  dataTable.registerLayerAddListeners(_layouts[_selectedLayoutIndex]);
+
+  // setup
+  setupFileLine();
+  setupPositionLine();
+  setupLayoutLine(dataTable);
+  setupRotateLine();
+  setupBindersCheckboxes();
+  setupToolsCheckboxes();
+  setupRenderTests(_app);
+  setupAbout();
+}
 
 // launch
 setup();

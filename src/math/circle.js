@@ -4,6 +4,7 @@ import {getStats} from './stats.js';
 /* eslint-disable no-unused-vars */
 import {Index} from './index.js';
 import {Point2D} from '../math/point.js';
+import {Value} from './value.js';
 import {ViewController} from '../app/viewController.js';
 import {Scalar2D} from './scalar.js';
 /* eslint-enable no-unused-vars */
@@ -162,31 +163,34 @@ export class Circle {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {object} A quantification object.
+   * @returns {Object<string, Value>} A quantification object.
    */
   quantify(viewController, index, flags) {
-    const quant = {};
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
     const lengthUnit = viewController.getLengthUnit();
-    quant.radius = {
+    const radius = {
       value: this.getRadius() * spacing2D.x,
       unit: lengthUnit
     };
-    const surface = this.getWorldSurface(spacing2D);
-    if (surface !== null) {
+    const worldSurface = this.getWorldSurface(spacing2D);
+    let surface;
+    if (worldSurface !== null) {
       if (lengthUnit === 'unit.mm') {
-        quant.surface = {
-          value: surface / 100,
+        surface = {
+          value: worldSurface / 100,
           unit: 'unit.cm2'
         };
       } else {
-        quant.surface = {
-          value: surface,
+        surface = {
+          value: worldSurface,
           unit: lengthUnit
         };
       }
     }
+
+    // shape quantification
+    const quant = {radius, surface};
 
     // pixel values quantification
     if (viewController.canQuantifyImage()) {

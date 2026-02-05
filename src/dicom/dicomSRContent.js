@@ -247,10 +247,10 @@ export class DicomSRContent {
  */
 export function isEqualContentItem(item1, item2) {
   return Object.keys(item1).length === Object.keys(item2).length &&
-  Object.keys(item1).every(key =>
-    Object.prototype.hasOwnProperty.call(item2, key) &&
-    item1[key] === item2[key]
-  );
+    Object.keys(item1).every(key =>
+      Object.prototype.hasOwnProperty.call(item2, key) &&
+      item1[key] === item2[key]
+    );
 }
 
 /**

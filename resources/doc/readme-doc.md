@@ -8,6 +8,6 @@ Try a [live demo](https://ivmartel.github.io/dwv/) and find more information on 
 
 - All coding/implementation contributions and comments are welcome.
 - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>
-- Released under GNU GPL-3.0 license (see [license.txt](https://github.com/ivmartel/dwv/license.txt)).
+- Released under GNU GPL-3.0 license (see [license.txt](https://github.com/ivmartel/dwv/blob/master/license.txt)).
 
-<a name="footnote1">1</a>: Certification refers to official medical software certification that are issued by the FDA or EU Notified Bodies. The sentence here serves as a reminder that the Dicom Web Viewer is not ceritifed, and comes with no warranties (and no possible liability of its authors) as stated in the [license](https://github.com/ivmartel/dwv/license.txt). To learn more about standards used in certification, see the [wikipedia Medical software](https://en.wikipedia.org/wiki/Medical_software) page. If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).
+<a name="footnote1">1</a>: Certification refers to official medical software certification that are issued by the FDA or EU Notified Bodies. The sentence here serves as a reminder that the Dicom Web Viewer is not certifed, and comes with no warranties (and no possible liability of its authors) as stated in the license. To learn more about standards used in certification, see the [wikipedia Medical software](https://en.wikipedia.org/wiki/Medical_software) page. If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).

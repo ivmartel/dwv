@@ -25,6 +25,13 @@ export const webpackCommon = {
     // (otherwise clients use file:// scheme creating CORS error)
     workerPublicPath: './'
   },
+  optimization: {
+    splitChunks: {
+      // Stop webpack from trying to use importScript inside webworkers
+      // if any webworkers share imports.
+      chunks: 'initial'
+    }
+  },
   experiments: {
     // module is still experimental
     outputModule: true

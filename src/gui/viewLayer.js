@@ -113,6 +113,27 @@ export class ViewLayer {
   #flipScale = {x: 1, y: 1, z: 1};
 
   /**
+   * The fit size as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #containerSize = {x: 1, y: 1};
+
+  /**
+   * The div to world size ratio.
+   *
+   * @type {number}
+   */
+  #divToWorldSizeRatio = 1;
+
+  /**
+   * The fit offset as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #fitOffset = {x: 1, y: 1};
+
+  /**
    * The full layer offset: sum of all other offsets.
    *
    * @type {Scalar2D}
@@ -260,9 +281,10 @@ export class ViewLayer {
     view.addEventListener('colourmapchange', this.#onColourMapChange);
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
-    // view events
-    for (let j = 0; j < viewEventNames.length; ++j) {
-      view.addEventListener(viewEventNames[j], this.#fireEvent);
+    view.addEventListener('maskviewchange', this.#onMaskViewChange);
+    // propagate view events
+    for (const eventName of viewEventNames) {
+      view.addEventListener(eventName, this.#fireEvent);
     }
     // create view controller
     this.#viewController = new ViewController(view);
@@ -347,9 +369,24 @@ export class ViewLayer {
     // event.value = [index]
     if (this.#dataId === event.dataid) {
       const vcSize = this.#viewController.getImageSize().get2D();
-      if (this.#baseSize.x !== vcSize.x ||
-        this.#baseSize.y !== vcSize.y) {
-        // size changed, recalculate base offset
+      const vcSpacing = this.#viewController.getImageSpacing().get2D();
+
+      const sizeChanged =
+        this.#baseSize.x !== vcSize.x ||
+        this.#baseSize.y !== vcSize.y;
+
+      const spacingChanged =
+        this.#baseSpacing.x !== vcSpacing.x ||
+        this.#baseSpacing.y !== vcSpacing.y;
+
+      if (spacingChanged) {
+        this.#viewController.updatePlaneHelper();
+        // update base spacing
+        this.#setBaseSpacing(vcSpacing);
+      }
+
+      if (sizeChanged) {
+        // size/spacing changed, recalculate base offset
         // in case origin changed
         if (typeof this.#layerGroupOrigin !== 'undefined' &&
           typeof this.#layerGroupOrigin0 !== 'undefined') {
@@ -358,15 +395,38 @@ export class ViewLayer {
           const origin = this.#viewController.getOrigin(
             this.#viewController.getCurrentPosition()
           );
-          const planeOffset = this.#layerGroupOrigin.minus(origin);
-          this.setBaseOffset(scrollOffset, planeOffset);
+          if (typeof origin !== 'undefined') {
+            const planeOffset = this.#layerGroupOrigin.minus(origin);
+            this.setBaseOffset(scrollOffset, planeOffset);
+          }
         }
         // update base size
         this.#setBaseSize(vcSize);
+      }
+
+      if (spacingChanged || sizeChanged) {
         // flag update and draw
         this.#needsDataUpdate = true;
         this.draw();
       }
+    }
+  };
+
+  /**
+   * Handle an image resampled event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimageresampled = (event) => {
+    const maybeTimeIndex = this.#viewController.getCurrentIndex().get(3);
+    const matchingTimeIndex =
+      typeof maybeTimeIndex === 'undefined' ||
+      maybeTimeIndex === event.frame;
+
+    if (this.#dataId === event.dataid && matchingTimeIndex) {
+      this.#needsDataUpdate = true;
+      this.draw();
     }
   };
 
@@ -439,6 +499,46 @@ export class ViewLayer {
       value: [this.#opacity]
     };
     this.#fireEvent(event);
+  }
+
+  /**
+   * Get the fill opacity relative to the global opacity.
+   *
+   * @returns {number} The fill opacity (between 0 and 1).
+   */
+  getFillOpacity() {
+    return this.#viewController.getFillOpacity();
+  }
+
+  /**
+   * Set the fill opacity relative to the global opacity.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} opacity The fill opacity (between 0 and 1).
+   */
+  setFillOpacity(opacity) {
+    this.#viewController.setFillOpacity(opacity);
+  }
+
+  /**
+   * Get the thickness of the contour in pixels.
+   *
+   * @returns {number} The contour thickness (integer >= 1).
+   */
+  getContourThickness() {
+    return this.#viewController.getContourThickness();
+  }
+
+  /**
+   * Set the thickness of the contour in pixels.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} thickness The contour thickness (integer >= 1).
+   */
+  setContourThickness(thickness) {
+    this.#viewController.setContourThickness(thickness);
   }
 
   /**
@@ -854,6 +954,20 @@ export class ViewLayer {
   }
 
   /**
+   * Set the base spacing of the layer.
+   *
+   * @param {Scalar2D} spacing The spacing as {x,y}.
+   */
+  #setBaseSpacing(spacing) {
+    this.#baseSpacing = spacing;
+    this.fitToContainer(
+      this.#containerSize,
+      this.#divToWorldSizeRatio,
+      this.#fitOffset
+    );
+  }
+
+  /**
    * Fit the layer to its parent container.
    *
    * @param {Scalar2D} containerSize The fit size as {x,y}.
@@ -952,6 +1066,10 @@ export class ViewLayer {
       // update draw flag
       needsDraw = true;
     }
+
+    this.#containerSize = containerSize;
+    this.#divToWorldSizeRatio = divToWorldSizeRatio;
+    this.#fitOffset = fitOffset;
 
     // draw if needed
     if (needsDraw) {
@@ -1108,6 +1226,15 @@ export class ViewLayer {
   };
 
   /**
+   * Check if the position is valid.
+   *
+   * @returns {boolean} True if the position is valid.
+   */
+  isValidPosition() {
+    return this.#isValidPosition;
+  }
+
+  /**
    * Handle alpha function change.
    *
    * @param {object} event The event fired when changing the function.
@@ -1122,10 +1249,24 @@ export class ViewLayer {
   };
 
   /**
+   * Handle mask view change.
+   *
+   * @param {object} event The event fired when changing the function.
+   */
+  #onMaskViewChange = (event) => {
+    const skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
+      this.#needsDataUpdate = true;
+      this.draw();
+    }
+  };
+
+  /**
    * Set the current position.
    *
    * @param {Point} position The new position.
-   * @param {Index} _index The new index.
+   * @param {Index} [_index] The new index (not used).
    * @returns {boolean} True if the position was updated.
    */
   setCurrentPosition(position, _index) {

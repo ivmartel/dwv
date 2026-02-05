@@ -34,8 +34,8 @@ const _dataDicom = [
     uri: {
       type: 'dwvtest',
       file: '?file=bbmri-53323851.dcm&file=bbmri-53323707.dcm' +
-      '&file=bbmri-53323563.dcm&file=bbmri-53323419.dcm' +
-      '&file=bbmri-53323275.dcm&file=bbmri-53323131.dcm',
+        '&file=bbmri-53323563.dcm&file=bbmri-53323419.dcm' +
+        '&file=bbmri-53323275.dcm&file=bbmri-53323131.dcm',
       args: '&dwvReplaceMode=void'
     },
     img: 'babymri.png',
@@ -60,17 +60,6 @@ const _dataDicom = [
     },
     img: 'babymri-zip.png',
     desc: 'Brain MR, 256*256*2 ' +
-      'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
-  },
-  {
-    title: 'Baby MRI (with state)',
-    uri: {
-      type: 'dwvtest',
-      file: 'bbmri-53323851.dcm',
-      args: '&state=../state/v0.5/state-rectangle.json'
-    },
-    img: 'babymri-rect.png',
-    desc: 'Brain MR, 256*256*1, ' +
       'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
   },
   {

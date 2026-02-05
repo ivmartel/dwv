@@ -10,6 +10,7 @@ import {getUID} from '../dicom/dicomWriter.js';
 /* eslint-disable no-unused-vars */
 import {Point2D, Point3D} from '../math/point.js';
 import {Index} from '../math/index.js';
+import {Value} from '../math/value.js';
 import {ViewController} from '../app/viewController.js';
 import {PlaneHelper} from './planeHelper.js';
 import {DicomCode} from '../dicom/dicomCode.js';
@@ -78,7 +79,7 @@ export class Annotation {
   /**
    * Annotation quantification.
    *
-   * @type {object|undefined}
+   * @type {Object<string, Value>|undefined}
    */
   quantification;
 

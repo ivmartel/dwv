@@ -2,15 +2,12 @@ import {Orientation} from '../../src/math/orientation.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
 import {luts} from '../../src/image/luts.js';
 
-import {
-  getLayerGroupDivIds,
-  getViewConfig,
-  getControlDiv
-} from './viewer.ui.js';
+import {getControlDiv} from './viewer.ui.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../../src/app/application.js';
+import {LayoutProtocol} from './viewer.ui.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -38,6 +35,16 @@ export class DataTableUI {
   #app;
 
   /**
+   * @type {boolean}
+   */
+  #registeredViewListeners = false;
+
+  /**
+   * @type {Function}
+   */
+  #layerAddListener;
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
@@ -45,36 +52,62 @@ export class DataTableUI {
   }
 
   /**
-   * Bind app to ui.
-   *
-   * @param {string} layout The layout.
+   * Register view change listeners.
    */
-  registerListeners(layout) {
-    // add data row on layer creation
-    this.#app.addEventListener('viewlayeradd', (event) => {
-      this.#clearDataTableRow(event.dataid);
-      this.#addDataRow(event.dataid, layout);
-    });
-    this.#app.addEventListener('drawlayeradd', (event) => {
-      this.#clearDataTableRow(event.dataid);
-      this.#addDataRow(event.dataid, layout);
-    });
+  registerViewListeners() {
+    if (!this.#registeredViewListeners) {
+      this.#app.addEventListener('wlchange', this.#onWLChange);
+      this.#app.addEventListener('opacitychange', this.#onOpacityChange);
+      this.#registeredViewListeners = true;
+    }
+  }
 
+  /**
+   * Unregister view change listeners.
+   */
+  unRegisterViewListeners() {
+    if (this.#registeredViewListeners) {
+      this.#app.removeEventListener('wlchange', this.#onWLChange);
+      this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
+      this.#registeredViewListeners = false;
+    }
+  }
+
+  /**
+   * Bind layer add to ui.
+   *
+   * @param {LayoutProtocol} layout The layout.
+   */
+  registerLayerAddListeners(layout) {
+    // add data row on layer creation
+    this.#layerAddListener = (event) => {
+      this.#clearDataTableRow(event.dataid);
+      this.#addDataRow(event.dataid, layout);
+    };
+
+    this.#app.addEventListener('viewlayeradd', this.#layerAddListener);
+    this.#app.addEventListener('drawlayeradd', this.#layerAddListener);
+  }
+
+  /**
+   * Unbind layer add from ui.
+   */
+  unRegisterLayerAddListeners() {
+    this.#app.removeEventListener('viewlayeradd', this.#layerAddListener);
+    this.#app.removeEventListener('drawlayeradd', this.#layerAddListener);
+    this.#layerAddListener = undefined;
+  }
+
+  /**
+   * Bind app to ui.
+   */
+  registerListeners() {
     // control listeners (pause during load)
-    let registered = false;
     this.#app.addEventListener('loadstart', (/*event*/) => {
-      if (registered) {
-        this.#app.removeEventListener('wlchange', this.#onWLChange);
-        this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
-        registered = false;
-      }
+      this.unRegisterViewListeners();
     });
     this.#app.addEventListener('loadend', (/*event*/) => {
-      if (!registered) {
-        this.#app.addEventListener('wlchange', this.#onWLChange);
-        this.#app.addEventListener('opacitychange', this.#onOpacityChange);
-        registered = true;
-      }
+      this.registerViewListeners();
     });
   };
 
@@ -237,7 +270,7 @@ export class DataTableUI {
    * Add a data row.
    *
    * @param {string} dataId The data id.
-   * @param {string} layout The layout.
+   * @param {LayoutProtocol} layout The layout.
    */
   #addDataRow(dataId, layout) {
     const image = this.#app.getData(dataId).image;
@@ -246,7 +279,7 @@ export class DataTableUI {
     const isMonochrome = dataIsImage && image.isMonochrome();
 
     const dataViewConfigs = this.#app.getDataViewConfigs();
-    const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
+    const allLayerGroupDivIds = layout.getLayerGroupDivIds();
 
     const table = this.#getLayersTable(allLayerGroupDivIds.length);
     const body = table.tBodies[0];
@@ -298,7 +331,8 @@ export class DataTableUI {
       button.appendChild(document.createTextNode('+'));
       button.onclick = () => {
         // update app
-        this.#app.addDataViewConfig(dataId, getViewConfig(layout, divId));
+        const config = layout.getViewConfigsByDivId(divId);
+        this.#app.addDataViewConfig(dataId, config);
         // update html
         const parent = button.parentElement;
         if (parent) {
@@ -345,7 +379,7 @@ export class DataTableUI {
       button.appendChild(document.createTextNode(letter));
       button.onclick = () => {
         // update app
-        const config = getViewConfig(layout, divId);
+        const config = layout.getViewConfigsByDivId(divId);
         config.orientation = orientation;
         this.#app.updateDataViewConfig(dataId, divId, config);
       };
@@ -540,6 +574,60 @@ export class DataTableUI {
     // add controls
     cell.appendChild(getControlDiv(opacityId, 'opacity',
       0, 1, initialLayer.getOpacity(), onChangeOpacity, floatPrecision));
+
+    if (
+      initialLayer.getViewController &&
+      initialLayer.getViewController().getModality() === 'SEG'
+    ) {
+      const fillOpacityId = 'fill-opacity-' + dataId;
+      // callback
+      const onChangeFillOpacity = (value) => {
+        // update selected layers
+        const lgIds = getSelectedLayerGroupIds();
+        for (let i = 0; i < lgIds.length; ++i) {
+          const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+          const layer = lg.getActiveLayer();
+          if (typeof layer !== 'undefined') {
+            layer.setFillOpacity(parseFloat(value));
+            layer.draw();
+          }
+        }
+      };
+      // add controls
+      cell.appendChild(getControlDiv(
+        fillOpacityId,
+        'fill opacity',
+        0, 1,
+        initialLayer.getFillOpacity(),
+        onChangeFillOpacity,
+        floatPrecision
+      ));
+
+      const contourThicknessId = 'contour-thickness-' + dataId;
+      // callback
+      const onChangeContourThickness = (value) => {
+        // update selected layers
+        const lgIds = getSelectedLayerGroupIds();
+        for (let i = 0; i < lgIds.length; ++i) {
+          const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+          const layer = lg.getActiveLayer();
+          if (typeof layer !== 'undefined') {
+            layer.setContourThickness(parseInt(value, 10));
+            layer.draw();
+          }
+        }
+      };
+      // add controls
+      cell.appendChild(getControlDiv(
+        contourThicknessId,
+        'contour thickness',
+        0, 10,
+        initialLayer.getContourThickness(),
+        onChangeContourThickness,
+        1,
+        1
+      ));
+    }
 
     // cell: alpha range
     cell = row.insertCell();

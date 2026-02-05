@@ -28,6 +28,15 @@ export const custom = {
   labelTexts: undefined,
 
   /**
+   * List of private diffusion b-value rules. Rules are either
+   * `{manufacturer, key}` or `{uidPrefix, key}`. For example:
+   * `{manufacturer: 'GE', key: '00431039'}`.
+   *
+   * @type {object[]}
+   */
+  privateBValueRules: undefined,
+
+  /**
    * Open a dialogue to edit roi data. Defaults to window.prompt.
    *
    * @param {Annotation} annotation The roi data.
@@ -36,12 +45,20 @@ export const custom = {
   openRoiDialog: undefined,
 
   /**
-   * Get the time from a list of dicom tags.
+   * Get the volume id from a list of dicom tags.
    *
    * @param {Object<string, DataElement>} elements The DICOM elements.
-   * @returns {number|undefined} The time value if available.
+   * @returns {number|undefined} The id value if available.
    */
-  getTagTime: undefined,
+  getVolumeIdTagValue: undefined,
+
+  /**
+   * Get the volume id from a list of dicom tags parsed after load finishes.
+   *
+   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @returns {number|undefined} The id value if available.
+   */
+  getPostLoadVolumeIdTagValue: undefined,
 
   /**
    * Get the pixel data unit from a list of dicom tags.
@@ -51,6 +68,5 @@ export const custom = {
    * @returns {string|undefined} The unit value if available.
    */
   getTagPixelUnit: undefined,
-
 
 };

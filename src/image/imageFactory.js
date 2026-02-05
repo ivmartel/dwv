@@ -9,6 +9,7 @@ import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
   getPixelSpacing,
+  getPixelAspectRatio,
   getTagPixelUnit,
   getOrientationMatrix,
   getPhotometricInterpretation,
@@ -16,7 +17,7 @@ import {
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
-import {getTagTime} from '../dicom/dicomDate.js';
+import {getVolumeIdTagValue} from '../dicom/dicomVolume.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
@@ -270,7 +271,7 @@ export class ImageFactory {
    *
    * @param {DataElements} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
-   * @throws Error for missing or wrong data.
+   * @throws {Error} Error for missing or wrong data.
    */
   checkElements(dataElements) {
     // reset
@@ -310,7 +311,7 @@ export class ImageFactory {
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
    * @param {number} numberOfFiles The input number of files.
    * @returns {Image} A new Image.
-   * @throws Error for missing or wrong data.
+   * @throws {Error} Error for missing or wrong data.
    */
   create(dataElements, pixelBuffer, numberOfFiles) {
     // safe get shortcuts
@@ -341,6 +342,13 @@ export class ImageFactory {
     const spacing2D = getPixelSpacing(dataElements);
     if (typeof spacing2D !== 'undefined') {
       spacingValues = [spacing2D[0], spacing2D[1], 1];
+    } else {
+      // try pixel aspect ratio
+      const ratio = getPixelAspectRatio(dataElements);
+      if (typeof ratio !== 'undefined') {
+        spacingValues = [ratio[0], ratio[1], 1];
+        logger.warn('Use pixel aspect ratio as spacing');
+      }
     }
     const spacing = new Spacing(spacingValues);
 
@@ -362,7 +370,7 @@ export class ImageFactory {
     // geometry
     const origin = new Point3D(
       slicePosition[0], slicePosition[1], slicePosition[2]);
-    const time = getTagTime(dataElements);
+    const time = getVolumeIdTagValue(dataElements);
     const geometry = new Geometry(
       [origin], size, spacing, orientationMatrix, time);
 
@@ -463,9 +471,6 @@ export class ImageFactory {
 
     meta.BitsStored = safeGetLocal(TagKeys.BitsStored);
     meta.HighBit = safeGetLocal(TagKeys.HighBit);
-
-    meta.ImageOrientationPatient =
-      safeGetAllLocal(TagKeys.ImageOrientationPatient);
 
     // meta tags
     const metaKeys = Object.keys(MetaTagKeys);

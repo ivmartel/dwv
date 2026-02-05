@@ -1,4 +1,7 @@
 import {viewEventNames} from '../image/view.js';
+import {imageEventNames} from '../image/image.js';
+import {annotationGroupEventNames} from '../image/annotationGroup.js';
+import {dataEventNames} from '../app/dataController.js';
 import {ViewFactory} from '../image/viewFactory.js';
 import {
   getMatrixFromName,
@@ -18,7 +21,7 @@ import {UndoStack} from '../utils/undoStack.js';
 import {ToolboxController} from './toolboxController.js';
 import {LoadController} from './loadController.js';
 import {DataController} from './dataController.js';
-import {OverlayData} from '../gui/overlayData.js';
+import {InfoData} from '../gui/infoData.js';
 import {
   toolList,
   defaultToolList,
@@ -41,6 +44,7 @@ import {Matrix33} from '../math/matrix.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {Scalar3D} from '../math/scalar.js';
 import {DicomData} from './dataController.js';
+import {Command} from '../utils/undoStack.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -73,6 +77,18 @@ export class ViewConfig {
    * @type {number|undefined}
    */
   opacity;
+  /**
+   * Optional segmentation layer fill opacity; in [0, 1] range.
+   *
+   * @type {number|undefined}
+   */
+  fillOpacity;
+  /**
+   * Optional segmentation contour thickness; in [0, 10] range.
+   *
+   * @type {number|undefined}
+   */
+  contourThickness;
   /**
    * Optional layer window level preset name.
    * If present, the preset name will be used and
@@ -162,7 +178,7 @@ export class AppOptions {
    */
   defaultCharacterSet;
   /**
-   * Optional overlay config.
+   * Optional overlay layer config.
    *
    * @type {object|undefined}
    */
@@ -257,8 +273,12 @@ export class App {
    */
   #style = new Style();
 
-  // overlay datas
-  #overlayDatas = {};
+  /**
+   * Info datas.
+   *
+   * @type {Object<string, InfoData>}
+   */
+  #infoDatas = {};
 
   /**
    * Listener handler.
@@ -303,25 +323,23 @@ export class App {
   }
 
   /**
-   * Add a new DicomData.
+   * Get the next data id.
    *
-   * @param {DicomData} data The new data.
    * @returns {string} The data id.
    */
-  addData(data) {
-    // get a new dataId
-    const dataId = this.#dataController.getNextDataId();
-    // add image to data controller
-    this.#dataController.add(
-      dataId,
-      data
-    );
-    // optional render
-    // if (this.#options.viewOnFirstLoadItem) {
-    //   this.render(dataId);
-    // }
-    // return
-    return dataId;
+  getNextDataId() {
+    return this.#dataController.getNextDataId();
+  }
+
+  /**
+   * Add a new DicomData.
+   *
+   * @param {string} dataId The data id.
+   * @param {DicomData} data The new data.
+   * @returns {boolean} False if the data cannot be added.
+   */
+  addData(dataId, data) {
+    return this.#dataController.add(dataId, data);
   }
 
   /**
@@ -355,6 +373,16 @@ export class App {
    */
   getDataIdsFromSopUids(uids) {
     return this.#dataController.getDataIdsFromSopUids(uids);
+  }
+
+  /**
+   * Get the first data id with the given SeriesInstanceUID.
+   *
+   * @param {string} uid The SeriesInstanceUID.
+   * @returns {string} The data id.
+   */
+  getDataIdFromSeriesUid(uid) {
+    return this.#dataController.getDataIdFromSeriesUid(uid);
   }
 
   /**
@@ -519,7 +547,7 @@ export class App {
   /**
    * Add a command to the undo stack.
    *
-   * @param {object} cmd The command to add.
+   * @param {Command} cmd The command to add.
    * @fires UndoStack#undoadd
    * @function
    */
@@ -588,7 +616,9 @@ export class App {
     if (typeof this.#options.dataViewConfigs === 'undefined') {
       this.#options.dataViewConfigs = {};
     }
-    if (typeof this.#options.rootDocument === 'undefined') {
+    if (typeof this.#options.rootDocument === 'undefined' &&
+      typeof document !== 'undefined'
+    ) {
       this.#options.rootDocument = document;
     }
 
@@ -688,20 +718,17 @@ export class App {
     // create data controller
     this.#dataController = new DataController();
     // propagate data events
-    this.#dataController.addEventListener('dataadd', this.#fireEvent);
-    this.#dataController.addEventListener('dataremove', this.#fireEvent);
-    this.#dataController.addEventListener('dataimageset', this.#fireEvent);
-    this.#dataController.addEventListener('dataupdate', this.#fireEvent);
-    // propage individual data events
-    this.#dataController.addEventListener(
-      'imagecontentchange', this.#fireEvent);
-    this.#dataController.addEventListener(
-      'imagegeometrychange', this.#fireEvent);
-    this.#dataController.addEventListener('annotationadd', this.#fireEvent);
-    this.#dataController.addEventListener('annotationupdate', this.#fireEvent);
-    this.#dataController.addEventListener('annotationremove', this.#fireEvent);
-    this.#dataController.addEventListener(
-      'annotationgroupeditablechange', this.#fireEvent);
+    for (const eventName of dataEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propage image events
+    for (const eventName of imageEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propage annotation events
+    for (const eventName of annotationGroupEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
     // create stage
     this.#stage = new Stage();
     if (typeof this.#options.binders !== 'undefined') {
@@ -715,7 +742,7 @@ export class App {
   reset() {
     // clear objects
     this.#stage.empty();
-    this.#overlayDatas = {};
+    this.#infoDatas = {};
     // reset undo/redo
     if (this.#undoStack) {
       this.#undoStack = new UndoStack();
@@ -829,24 +856,14 @@ export class App {
    *
    * @param {string} uri The input uri, for example: 'window.location.href'.
    * @param {object} [options] Optional url request options.
+   * @deprecated Since v0.36, please extract the file list and
+   *   pass it to loadURLs. State from uri is no longer supported.
    * @function
    */
   loadFromUri = (uri, options) => {
     const query = getUriQuery(uri);
-
-    // load end callback: loads the state.
-    const onLoadEnd = (/*event*/) => {
-      this.removeEventListener('loadend', onLoadEnd);
-      this.loadURLs([query.state]);
-    };
-
     // check query
     if (query && typeof query.input !== 'undefined') {
-      // optional display state
-      if (typeof query.state !== 'undefined') {
-        // queue after main data load
-        this.addEventListener('loadend', onLoadEnd);
-      }
       // load base image
       decodeQuery(query, this.loadURLs, options);
     }
@@ -1004,8 +1021,13 @@ export class App {
    *
    * @param {string} dataId The data id.
    * @param {ViewConfig} config The view configuration.
+   * @param {boolean} [doRender] Render data after configuration
+   *   add. Defaults to true.
    */
-  addDataViewConfig(dataId, config) {
+  addDataViewConfig(dataId, config, doRender) {
+    if (typeof doRender === 'undefined') {
+      doRender = true;
+    }
     // add to list
     const configs = this.#options.dataViewConfigs;
     if (typeof configs[dataId] === 'undefined') {
@@ -1028,7 +1050,8 @@ export class App {
     }
 
     // render (will create layers)
-    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+    if (typeof this.#dataController.get(dataId) !== 'undefined' &&
+      doRender) {
       this.render(dataId, [config]);
     }
   }
@@ -1164,7 +1187,8 @@ export class App {
   #createLayerGroup(viewConfig) {
     // create new layer group
     const element = this.#options.rootDocument.getElementById(viewConfig.divId);
-    const layerGroup = this.#stage.addLayerGroup(element);
+    const withInfoOverlay = typeof this.#options.overlayConfig !== 'undefined';
+    const layerGroup = this.#stage.addLayerGroup(element, withInfoOverlay);
     // bind events
     this.#bindLayerGroupToApp(layerGroup);
   }
@@ -1187,6 +1211,39 @@ export class App {
   }
 
   /**
+   * Check if a data can be rendered in a provided layer group.
+   * If the layer group contains data, only similar orientation
+   * are permited. If not, returns true.
+   *
+   * @param {string} dataId The id of the data to check.
+   * @param {LayerGroup} layerGroup The layer group where to render.
+   * @returns {boolean} True if the data can be rendered.
+   */
+  #canRenderData(dataId, layerGroup) {
+    let res = false;
+    const baseViewLayer = layerGroup.getBaseViewLayer();
+    if (typeof baseViewLayer !== 'undefined') {
+      // base view exists: render is possible if overlay data
+      // has similar geometry than base
+      const baseData = this.#dataController.get(baseViewLayer.getDataId());
+      const baseImage = baseData.image;
+      const newData = this.#dataController.get(dataId);
+      const newImage = newData.image;
+      if (typeof baseImage !== 'undefined' &&
+        typeof newImage !== 'undefined'
+      ) {
+        const baseOrientation = baseImage.getGeometry().getOrientation();
+        const newOrientation = newImage.getGeometry().getOrientation();
+        res = newOrientation.isSimilar(baseOrientation);
+      }
+    } else {
+      // no base view: can render
+      res = true;
+    }
+    return res;
+  }
+
+  /**
    * Render the current data.
    *
    * @param {string} dataId The data id to render.
@@ -1196,11 +1253,13 @@ export class App {
     if (typeof dataId === 'undefined' || dataId === null) {
       throw new Error('Cannot render without data id');
     }
+    const data = this.getData(dataId);
+
     // guess data type
-    const isImage =
-      typeof this.getData(dataId).image !== 'undefined';
-    const isMeasurement =
-      typeof this.getData(dataId).annotationGroup !== 'undefined';
+    const isImage = typeof data !== 'undefined' &&
+      typeof data.image !== 'undefined';
+    const isMeasurement = typeof data !== 'undefined' &&
+      typeof data.annotationGroup !== 'undefined';
 
     // create layer groups if not done yet
     // (create all to allow for ratio sync)
@@ -1229,18 +1288,26 @@ export class App {
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
       }
+      // check compatibility
+      if (isImage && !this.#canRenderData(dataId, layerGroup)) {
+        // fire render error
+        this.#fireEvent({
+          type: 'error',
+          error: new Error('Render error: incompatible geometries for overlay'),
+          dataid: dataId
+        });
+        continue;
+      }
       // create layer if needed
       // warn: needs a loaded DOM
-      if (typeof this.#dataController.get(dataId) !== 'undefined') {
-        if (isImage &&
-          layerGroup.getViewLayersByDataId(dataId).length === 0
-        ) {
-          this.#addViewLayer(dataId, config);
-        } else if (isMeasurement &&
-          layerGroup.getDrawLayersByDataId(dataId).length === 0
-        ) {
-          this.addDrawLayer(dataId, config);
-        }
+      if (isImage &&
+        layerGroup.getViewLayersByDataId(dataId).length === 0
+      ) {
+        this.#addViewLayer(dataId, config);
+      } else if (isMeasurement &&
+        layerGroup.getDrawLayersByDataId(dataId).length === 0
+      ) {
+        this.addDrawLayer(dataId, config);
       }
       // draw
       layerGroup.draw();
@@ -1273,6 +1340,175 @@ export class App {
     const layerGroup = this.#stage.getActiveLayerGroup();
     layerGroup.addTranslation({x: tx, y: ty, z: 0});
     layerGroup.draw();
+  }
+
+  /**
+   * Resample one image to match the orientation of another.
+   *
+   * @param {string} dataIdTarget The target image id to resample.
+   * @param {string} dataIdSource The source image id to copy the
+   *  orientation from.
+   */
+  resampleMatch(dataIdTarget, dataIdSource) {
+    // target (to do orientation check)
+    const targetData = this.#dataController.get(dataIdTarget);
+    if (typeof targetData === 'undefined') {
+      logger.debug(
+        'Cannot resample match, target data \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    if (typeof targetData.image === 'undefined') {
+      logger.debug(
+        'Cannot resample match, target image \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    // source
+    const sourceData = this.#dataController.get(dataIdSource);
+    if (typeof sourceData === 'undefined') {
+      logger.debug(
+        'Cannot resample match, source data \'' +
+        dataIdSource + '\' is undefined');
+      return;
+    }
+    if (typeof sourceData.image === 'undefined') {
+      logger.debug(
+        'Cannot resample match, source image \'' +
+        dataIdSource + '\' is undefined');
+      return;
+    }
+    // check orientation
+    const targetOrientation =
+      targetData.image.getGeometry().getOrientation();
+    const sourceOrientation =
+      sourceData.image.getGeometry().getOrientation();
+    if (targetOrientation.equals(sourceOrientation)) {
+      logger.info(
+        'Same orientation, no resample match for data \'' +
+        dataIdTarget + '\' and \'' + dataIdSource + '\'');
+      return;
+    }
+    // resample
+    this.resample(dataIdTarget, sourceOrientation);
+  }
+
+  /**
+   * Resample an image to match an arbitrary orientation.
+   *
+   * @param {string} dataIdTarget The target image id to resample.
+   * @param {Matrix33} orientation The orientation to resample to.
+   */
+  resample(dataIdTarget, orientation) {
+    // target
+    const targetData = this.#dataController.get(dataIdTarget);
+    if (typeof targetData === 'undefined') {
+      logger.debug(
+        'Cannot resample, target data \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    if (typeof targetData.image === 'undefined') {
+      logger.debug(
+        'Cannot resample, target image \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    // check orientation
+    const targetOrientation =
+      targetData.image.getGeometry().getOrientation();
+    if (targetOrientation.equals(orientation)) {
+      logger.info(
+        'Same orientation, no resample for data \'' +
+        dataIdTarget + '\'');
+      return;
+    }
+
+    targetData.image.resample(orientation);
+
+    const configs = this.#options.dataViewConfigs;
+
+    const metaTarget = targetData.image.getMeta();
+    const dataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < dataIds.length; i++) {
+      const data = this.#dataController.get(dataIds[i]);
+
+      const meta = data.image.getMeta();
+      if (meta.Modality === 'SEG' &&
+        meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+        this.#dataController.stash(dataIds[i]);
+      }
+    }
+
+    // the image drastically changed, it is much easier to just
+    // take the view config and forcefully re-initialize it
+
+    // Only updating the configs of the affected images can cause
+    // layers to inherit some configs from their segmentation layers
+    // for some unknown reason. For now we just update all of them.
+    this.setDataViewConfigs(configs);
+    // render data (creates layers)
+    const newDataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < newDataIds.length; ++i) {
+      this.render(newDataIds[i]);
+    }
+  }
+
+  /**
+   * Revert an image back to its original orientation.
+   *
+   * @param {string} dataIdTarget The target image id to revert.
+   */
+  revertResample(dataIdTarget) {
+    const targetData = this.#dataController.get(dataIdTarget);
+    if (typeof targetData === 'undefined') {
+      logger.debug(
+        'Cannot revert resample, target data \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    if (typeof targetData.image === 'undefined') {
+      logger.debug(
+        'Cannot revert resample, target image \'' +
+        dataIdTarget + '\' is undefined');
+      return;
+    }
+    // exit if not resampled
+    if (!targetData.image.isResampled()) {
+      logger.info(
+        'No revert resample needed for data \'' +
+        dataIdTarget + '\'');
+      return;
+    }
+
+    targetData.image.revert();
+
+    const configs = this.#options.dataViewConfigs;
+
+    const metaTarget = targetData.image.getMeta();
+    const dataIds = this.#dataController.getStashedDataIds();
+    for (let i = 0; i < dataIds.length; i++) {
+      const data = this.#dataController.getStashed(dataIds[i]);
+
+      const meta = data.image.getMeta();
+      if (meta.Modality === 'SEG' &&
+        meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+        this.#dataController.unstash(dataIds[i]);
+      }
+    }
+
+    // the image drastically changed, it is much easier to just
+    // take the view config and forcefully re-initialize it
+
+    // Only updating the configs of the affected images can cause
+    // layers to inherit some configs from their segmentation layers
+    // for some unknown reason. For now we just update all of them.
+    this.setDataViewConfigs(configs);
+    // render data (creates layers)
+    const newDataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < newDataIds.length; ++i) {
+      this.render(newDataIds[i]);
+    }
   }
 
   /**
@@ -1526,26 +1762,26 @@ export class App {
   }
 
   /**
-   * Get the overlay data for a data id.
+   * Get the info data for a data id.
    *
    * @param {string} dataId The data id.
-   * @returns {OverlayData|undefined} The overlay data.
+   * @returns {InfoData|undefined} The info data.
    */
-  getOverlayData(dataId) {
+  getInfoData(dataId) {
     let data;
-    if (typeof this.#overlayDatas !== 'undefined') {
-      data = this.#overlayDatas[dataId];
+    if (typeof this.#infoDatas !== 'undefined') {
+      data = this.#infoDatas[dataId];
     }
     return data;
   }
 
   /**
-   * Toggle overlay listeners.
+   * Toggle info data listeners.
    *
    * @param {string} dataId The data id.
    */
-  toggleOverlayListeners(dataId) {
-    const data = this.getOverlayData(dataId);
+  toggleInfoDataListeners(dataId) {
+    const data = this.getInfoData(dataId);
     if (typeof data !== 'undefined') {
       if (data.isListening()) {
         data.removeAppListeners();
@@ -1612,7 +1848,11 @@ export class App {
    */
   addAndRenderAnnotationData(data, divId, refDataId) {
     // add new data
-    const dataId = this.addData(data);
+    const dataId = this.getNextDataId();
+    const added = this.addData(dataId, data);
+    if (!added) {
+      throw new Error('Cannot add annotation data');
+    }
     // add data view config based on reference data
     const refDataViewConfigs = this.getViewConfigs(refDataId);
     const refDataViewConfig = refDataViewConfigs.find(
@@ -1651,9 +1891,9 @@ export class App {
    * @param {object} event The load start event.
    */
   #onloadstart = (event) => {
-    // create overlay data
+    // create info data
     if (typeof this.#options.overlayConfig !== 'undefined') {
-      this.#overlayDatas[event.dataid] = new OverlayData(
+      this.#infoDatas[event.dataid] = new InfoData(
         this, event.dataid, this.#options.overlayConfig);
     }
     /**
@@ -1713,6 +1953,31 @@ export class App {
       eventMetaData = 'state';
     }
 
+    const isFirstLoadItem = event.isfirstitem;
+
+    if (event.loadtype === 'image') {
+      try {
+        if (isFirstLoadItem) {
+          this.#dataController.add(event.dataid, event.data);
+        } else {
+          this.#dataController.update(event.dataid, event.data);
+        }
+      } catch (error) {
+        this.#onloaderror({
+          dataid: event.dataid,
+          error: error,
+          source: event.source
+        });
+        this.#onloadend({
+          dataid: event.dataid,
+          source: event.source
+        });
+        return;
+      }
+    } else if (event.loadtype === 'state') {
+      this.applyJsonState(event.data, event.dataid);
+    }
+
     /**
      * Load item event: fired when an item has been successfully loaded.
      *
@@ -1734,22 +1999,10 @@ export class App {
       warn: event.warn
     });
 
-    const isFirstLoadItem = event.isfirstitem;
-
-    if (event.loadtype === 'image') {
-      if (isFirstLoadItem) {
-        this.#dataController.add(event.dataid, event.data);
-      } else {
-        this.#dataController.update(event.dataid, event.data);
-      }
-    } else if (event.loadtype === 'state') {
-      this.applyJsonState(event.data, event.dataid);
-    }
-
-    // update overlay data if present
-    if (typeof this.#overlayDatas !== 'undefined' &&
-      typeof this.#overlayDatas[event.dataid] !== 'undefined') {
-      this.#overlayDatas[event.dataid].addItemMeta(eventMetaData);
+    // update info data if present
+    if (typeof this.#infoDatas !== 'undefined' &&
+      typeof this.#infoDatas[event.dataid] !== 'undefined') {
+      this.#infoDatas[event.dataid].addItemMeta(eventMetaData);
     }
 
     // render if first and flag allows
@@ -1766,6 +2019,16 @@ export class App {
    * @param {object} event The load event.
    */
   #onload = (event) => {
+    // mark data as complete
+    const res = this.#dataController.markDataAsComplete(event.dataid);
+
+    // render if image has changed
+    if (this.#options.viewOnFirstLoadItem &&
+      typeof res.imageHasChanged !== 'undefined' &&
+      res.imageHasChanged) {
+      this.render(event.dataid);
+    }
+
     /**
      * Load event: fired when a load finishes successfully.
      *
@@ -1877,12 +2140,13 @@ export class App {
     group.addEventListener('zoomchange', this.#fireEvent);
     group.addEventListener('offsetchange', this.#fireEvent);
     group.addEventListener('layerremove', this.#fireEvent);
+    group.addEventListener('outofrange', this.#fireEvent);
     // propagate viewLayer events
     group.addEventListener('renderstart', this.#fireEvent);
     group.addEventListener('renderend', this.#fireEvent);
     // propagate view events
-    for (let j = 0; j < viewEventNames.length; ++j) {
-      group.addEventListener(viewEventNames[j], this.#fireEvent);
+    for (const eventName of viewEventNames) {
+      group.addEventListener(eventName, this.#fireEvent);
     }
     // updata data view config
     group.addEventListener('wlchange', (event) => {
@@ -1951,16 +2215,16 @@ export class App {
     );
     view.setOrientation(viewOrientation);
 
-    // make pixel of value 0 transparent for segmentation
-    // (assuming RGB data)
-    if (data.image.getMeta().Modality === 'SEG') {
-      view.setAlphaFunction(function (value /*, index*/) {
-        if (value === 0) {
-          return 0;
-        } else {
-          return 0xff;
-        }
-      });
+    // segmentation settings
+    if (view.isMask()) {
+      data.image.initializeContour();
+      // possible presets
+      if (typeof viewConfig.fillOpacity !== 'undefined') {
+        view.setFillOpacity(viewConfig.fillOpacity);
+      }
+      if (typeof viewConfig.contourThickness !== 'undefined') {
+        view.setContourThickness(viewConfig.contourThickness);
+      }
     }
 
     // do we have more than one layer
@@ -1973,7 +2237,12 @@ export class App {
       opacity = viewConfig.opacity;
     } else {
       if (!isBaseLayer) {
-        opacity = 0.5;
+        if (view.isMask()) {
+          // Assuming contours are enabled be default
+          opacity = 0.8;
+        } else {
+          opacity = 0.5;
+        }
       }
     }
 
@@ -2011,6 +2280,12 @@ export class App {
     // listen to image set
     this.#dataController.addEventListener(
       'dataimageset', viewLayer.onimageset);
+
+    // bind overlay data
+    if (typeof this.#options.overlayConfig !== 'undefined') {
+      layerGroup.addInfoData(this.getInfoData(dataId), dataId);
+      layerGroup.bindInfoData(dataId);
+    }
 
     // sync layers position
     const value = [

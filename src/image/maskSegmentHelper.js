@@ -44,6 +44,15 @@ export class MaskSegmentHelper {
   }
 
   /**
+   * Get the associated mask image.
+   *
+   * @returns {Image} The mask image.
+   */
+  getMask() {
+    return this.#mask;
+  }
+
+  /**
    * Find the index of a segment in the segments list.
    *
    * @param {number} segmentNumber The number to find.
@@ -138,7 +147,7 @@ export class MaskSegmentHelper {
     } else {
       logger.warn(
         'Not adding segment, it is allready in the segments list: ' +
-          segment.number);
+        segment.number);
     }
   }
 
@@ -154,7 +163,7 @@ export class MaskSegmentHelper {
     } else {
       logger.warn(
         'Cannot remove segment, it is not in the segments list: ' +
-          segmentNumber);
+        segmentNumber);
     }
   }
 
@@ -170,8 +179,106 @@ export class MaskSegmentHelper {
     } else {
       logger.warn(
         'Cannot update segment, it is not in the segments list: ' +
-          segment.number);
+        segment.number);
     }
+  }
+
+  /**
+   * The overlap count of a single segment with another segment.
+   *
+   * @typedef OverlapCount
+   * @property {string} label The segment label.
+   * @property {number} count The number of overlapping voxels.
+   * @property {number} percentage The overlap percentage between 0 and 100.
+   */
+
+  /**
+   * The count of overlapping voxels of a single segment with a set of
+   * different segments.
+   *
+   * @typedef Overlap
+   * @property {string} label The segment label.
+   * @property {Object.<number, OverlapCount>} overlap A Dictionary
+   *  containing the counts. The key is the segment number of the overlapping
+   *  segment.
+   * @property {number} count The voxel volume of this segment.
+   */
+
+  /**
+   * An Dictionary containing the count of overlapping voxels between two
+   * sets of segments.
+   * The key is the segment number of a segment in the first set.
+   * The value is a Dictionary of all of the segments in the second set
+   * that overlap with the key segment.
+   *
+   * @typedef {Object.<number, Overlap>} OverlapMap
+   */
+
+  /**
+   * Find the overlap for each segment between two segmentation masks.
+   * It is assumed these images have the same orientation.
+   *
+   * @param {MaskSegmentHelper} rhs The helper of the
+   *   segmentation image to find overlap with.
+   * @returns {OverlapMap} The overlapping voxel counts. First level is the
+   *  segments from this image, second level is the compare image segments.
+   */
+  findOverlap(rhs) {
+    // Find the overlapping slices
+    const thisGeometry = this.#mask.getGeometry();
+    const thisSize = thisGeometry.getSize();
+    const compareMask = rhs.getMask();
+    const compareGeometry = compareMask.getGeometry();
+    const compareSize = compareGeometry.getSize();
+
+    /**
+     * @type {OverlapMap}
+     */
+    const overlap = {};
+
+    const thisTotalSize = thisSize.getTotalSize();
+    for (let i = 0; i < thisTotalSize; i++) {
+      const thisValue = this.#mask.getValueAtOffset(i);
+      if (thisValue !== 0) {
+        if (typeof overlap[thisValue] !== 'undefined') {
+          overlap[thisValue].count += 1;
+        } else {
+          const thisSegment = this.getSegment(thisValue);
+          overlap[thisValue] = {
+            label: thisSegment.label,
+            overlap: {},
+            count: 1
+          };
+        }
+
+        const thisIndex = thisSize.offsetToIndex(i);
+        const thisWorld = thisGeometry.indexToWorld(thisIndex);
+        const compareIndex = compareGeometry.worldToIndex(thisWorld);
+        const compareOffset = compareSize.indexToOffset(compareIndex);
+        const compareValue = compareMask.getValueAtOffset(compareOffset);
+
+        if (typeof compareValue !== 'undefined' && compareValue !== 0) {
+          if (typeof overlap[thisValue].overlap[compareValue] !== 'undefined') {
+            overlap[thisValue].overlap[compareValue].count += 1;
+          } else {
+            const compareSegment = rhs.getSegment(compareValue);
+            overlap[thisValue].overlap[compareValue] = {
+              label: compareSegment.label,
+              count: 1,
+              percentage: 0
+            };
+          }
+        }
+      }
+    }
+
+    for (const thisOverlap of Object.values(overlap)) {
+      for (const overlapCount of Object.values(thisOverlap.overlap)) {
+        overlapCount.percentage = overlapCount.count * 100 / thisOverlap.count;
+      }
+    }
+
+    return overlap;
   }
 
 } // class MaskSegmentHelper

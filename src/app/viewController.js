@@ -23,6 +23,7 @@ import {Point, Point2D} from '../math/point.js';
 import {Scalar2D} from '../math/scalar.js';
 import {Matrix33} from '../math/matrix.js';
 import {ViewLayer} from '../gui/viewLayer.js';
+import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -45,25 +46,11 @@ export class ViewController {
   #planeHelper;
 
   /**
-   * Position helper.
-   *
-   * @type {PositionHelper}
-   */
-  #positionHelper;
-
-  /**
    * Third dimension player ID (created by setInterval).
    *
    * @type {number|undefined}
    */
   #playerID;
-
-  /**
-   * Is DICOM seg mask flag.
-   *
-   * @type {boolean}
-   */
-  #isMask = false;
 
   /**
    * @param {View} view The associated view.
@@ -81,14 +68,6 @@ export class ViewController {
       view.getImage().getGeometry(),
       view.getOrientation()
     );
-
-    // position helper
-    this.#positionHelper = new PositionHelper(view);
-
-    // mask segment helper
-    if (view.getImage().getMeta().Modality === 'SEG') {
-      this.#isMask = true;
-    }
   }
 
   /**
@@ -101,12 +80,22 @@ export class ViewController {
   }
 
   /**
+   * Update the plane helper if there is a change in the image geometry.
+   */
+  updatePlaneHelper() {
+    this.#planeHelper = new PlaneHelper(
+      this.#view.getImage().getGeometry(),
+      this.#view.getOrientation()
+    );
+  }
+
+  /**
    * Check is the associated image is a mask.
    *
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return this.#isMask;
+    return this.#view.isMask();
   }
 
   /**
@@ -202,20 +191,12 @@ export class ViewController {
   }
 
   /**
-   * Get the position helper.
+   * Get a position helper: returns a new helper
+   * based on the current view.
    *
    * @returns {PositionHelper} The helper.
    */
   getPositionHelper() {
-    return this.#positionHelper;
-  }
-
-  /**
-   * Get a clone of the position helper.
-   *
-   * @returns {PositionHelper} The helper clone.
-   */
-  getPositionHelperClone() {
     return new PositionHelper(this.#view);
   }
 
@@ -225,7 +206,7 @@ export class ViewController {
    * @returns {Point} The position.
    */
   getCurrentPosition() {
-    return this.#positionHelper.getCurrentPosition();
+    return this.#view.getCurrentPosition();
   }
 
   /**
@@ -234,7 +215,7 @@ export class ViewController {
    * @returns {Index} The current index.
    */
   getCurrentIndex() {
-    return this.#positionHelper.getCurrentIndex();
+    return this.#view.getCurrentIndex();
   }
 
   /**
@@ -360,7 +341,17 @@ export class ViewController {
    * @param {Image} img The associated image.
    */
   setImage(img) {
+    // geometries to check
+    const geometry0 = this.#view.getImage().getGeometry();
+    const geometry1 = img.getGeometry();
+
     this.#view.setImage(img);
+
+    // update if geometry changes
+    if (!geometry0.equals(geometry1)) {
+      // update helpers
+      this.updatePlaneHelper();
+    }
   }
 
   /**
@@ -562,6 +553,15 @@ export class ViewController {
       this.#view.getOrientation());
   }
 
+  /**
+   * Get the oriented image spacing.
+   *
+   * @returns {Spacing} The spacing.
+   */
+  getImageSpacing() {
+    return this.#view.getImage().getGeometry().getSpacing(
+      this.#view.getOrientation());
+  }
 
   /**
    * Is the data size larger than one in the given dimension?
@@ -757,13 +757,14 @@ export class ViewController {
         recommendedDisplayFrameRate);
       const size = image.getGeometry().getSize();
       const canScroll3D = size.canScroll3D();
+      const helper = this.getPositionHelper();
 
       this.#playerID = window.setInterval(() => {
         let canDoMore = false;
         if (canScroll3D) {
-          canDoMore = this.#positionHelper.incrementPositionAlongScroll();
+          canDoMore = helper.incrementPositionAlongScroll();
         } else {
-          canDoMore = this.#positionHelper.incrementPosition(3);
+          canDoMore = helper.incrementPosition(3);
         }
         // end of scroll, loop back
         if (!canDoMore) {
@@ -857,6 +858,56 @@ export class ViewController {
   }
 
   /**
+   * Set the mask segment view helper to handle
+   *   hidden segments.
+   *
+   * @param {MaskSegmentViewHelper} helper The helper.
+   */
+  setMaskViewHelper(helper) {
+    this.#view.setMaskViewHelper(helper);
+  }
+
+  /**
+   * Get the fill opacity relative to the global opacity.
+   *
+   * @returns {number} The fill opacity (between 0 and 1).
+   */
+  getFillOpacity() {
+    return this.#view.getFillOpacity();
+  }
+
+  /**
+   * Set the fill opacity relative to the global opacity.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} opacity The fill opacity (between 0 and 1).
+   */
+  setFillOpacity(opacity) {
+    this.#view.setFillOpacity(opacity);
+  }
+
+  /**
+   * Get the thickness of the contour in pixels.
+   *
+   * @returns {number} The contour thickness (integer >= 1).
+   */
+  getContourThickness() {
+    return this.#view.getContourThickness();
+  }
+
+  /**
+   * Set the thickness of the contour in pixels.
+   * This only has an effect on segmentation views, or any other alpha
+   * function that makes use of it.
+   *
+   * @param {number} thickness The contour thickness (integer >= 1).
+   */
+  setContourThickness(thickness) {
+    this.#view.setContourThickness(thickness);
+  }
+
+  /**
    * Bind the view image to the provided layer.
    *
    * @param {ViewLayer} viewLayer The layer to bind.
@@ -868,6 +919,9 @@ export class ViewController {
     );
     image.addEventListener('imagegeometrychange',
       viewLayer.onimagegeometrychange
+    );
+    image.addEventListener('imageresampled',
+      viewLayer.onimageresampled
     );
   }
 
@@ -883,6 +937,9 @@ export class ViewController {
     );
     image.removeEventListener('imagegeometrychange',
       viewLayer.onimagegeometrychange
+    );
+    image.removeEventListener('imageresampled',
+      viewLayer.onimageresampled
     );
   }
 

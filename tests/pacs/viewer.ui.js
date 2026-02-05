@@ -1,46 +1,107 @@
-import {Orientation} from '../../src/math/orientation.js';
+import {ViewConfig} from '../../src/app/application.js';
 
 /**
- * Get the layer groups div ids from the data view configs.
- *
- * @param {object} dataViewConfigs The configs.
- * @returns {string[]} The list of ids.
+ * Layout protocol class.
  */
-export function getLayerGroupDivIds(dataViewConfigs) {
-  const divIds = [];
-  const keys = Object.keys(dataViewConfigs);
-  for (let i = 0; i < keys.length; ++i) {
-    const dataViewConfig = dataViewConfigs[keys[i]];
-    for (let j = 0; j < dataViewConfig.length; ++j) {
-      const divId = dataViewConfig[j].divId;
-      if (!divIds.includes(divId)) {
-        divIds.push(divId);
+export class LayoutProtocol {
+  /**
+   * @type {string}
+   */
+  #id;
+  /**
+   * @type {object[]}
+   */
+  #displaySets;
+
+  /**
+   * @param {object} config As
+   *   {id, displaySets: [{divId, dataSelector, orientation}]}.
+   */
+  constructor(config) {
+    this.#id = config.id;
+    this.#displaySets = config.displaySets;
+  }
+
+  /**
+   * Get the layout id.
+   *
+   * @returns {string} The id.
+   */
+  getId() {
+    return this.#id;
+  }
+
+  /**
+   * Get the layer groups div ids from this layout.
+   *
+   * @returns {string[]} The ids.
+   */
+  getLayerGroupDivIds() {
+    const ids = [];
+    for (const set of this.#displaySets) {
+      const id = set.divId;
+      if (!ids.includes(id)) {
+        ids.push(id);
       }
     }
+    return ids;
   }
-  return divIds;
-};
 
-/**
- * Get a full view for a given div id.
- *
- * @param {string} layout The layout.
- * @param {string} divId The div id.
- * @returns {object} The config.
- */
-export function getViewConfig(layout, divId) {
-  const config = {divId: divId};
-  if (layout === 'mpr') {
-    if (divId === 'layerGroup0') {
-      config.orientation = Orientation.Axial;
-    } else if (divId === 'layerGroup1') {
-      config.orientation = Orientation.Coronal;
-    } else if (divId === 'layerGroup2') {
-      config.orientation = Orientation.Sagittal;
-    }
+  /**
+   * Convert a display set into a view config.
+   *
+   * @param {object} set The display set.
+   * @returns {ViewConfig} The view config.
+   */
+  #displaySetToViewConfig(set) {
+    const config = new ViewConfig(set.divId);
+    config.orientation = set.orientation;
+    return config;
   }
-  return config;
-};
+  /**
+   * Get the first view config for the given div id.
+   *
+   * @param {string} divId The div id.
+   * @returns {ViewConfig} The config.
+   */
+  getViewConfigsByDivId(divId) {
+    const set = this.#displaySets.find((elem) => elem.divId === divId);
+    return this.#displaySetToViewConfig(set);
+  }
+
+  /**
+   * Get the view configs for the given data id.
+   *
+   * @param {string} dataId The data id.
+   * @returns {ViewConfig[]} The view configs.
+   */
+  getViewConfigsByDataId(dataId) {
+    const sets =
+      this.#displaySets.filter((elem) => elem.dataSelector(dataId));
+    if (sets.length === 0) {
+      console.warn('Data not selected for display: ' + dataId);
+    }
+    const res = [];
+    for (const set of sets) {
+      res.push(this.#displaySetToViewConfig(set));
+    }
+    return res;
+  }
+
+  /**
+   * Get the data view configs for the given data ids.
+   *
+   * @param {string[]} dataIds The data id.
+   * @returns {Object<string, ViewConfig[]>} The data view configs.
+   */
+  getDataViewConfigs(dataIds) {
+    const res = {};
+    for (const dataId of dataIds) {
+      res[dataId] = this.getViewConfigsByDataId(dataId);
+    }
+    return res;
+  }
+}
 
 /**
  * Get a HTML id from a prefix and root part.

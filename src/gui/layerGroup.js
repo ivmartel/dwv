@@ -7,16 +7,20 @@ import {logger} from '../utils/logger.js';
 import {precisionRound} from '../utils/string.js';
 import {ViewLayer} from './viewLayer.js';
 import {DrawLayer} from './drawLayer.js';
+import {SOPClassUIDs} from '../dicom/dictionary.js';
+import {InfoLayer} from './infoLayer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Point2D, Point3D} from '../math/point.js';
 import {Scalar2D, Scalar3D} from '../math/scalar.js';
 import {PositionHelper} from '../image/positionHelper.js';
+import {InfoData} from './infoData.js';
 /* eslint-enable no-unused-vars */
 
 /**
  * Get the layer div id.
+ * For example: 'layerGroup0-layer-0'.
  *
  * @param {string} groupDivId The layer group div id.
  * @param {number} layerIndex The layer index.
@@ -27,7 +31,8 @@ export function getLayerDivId(groupDivId, layerIndex) {
 }
 
 /**
- * Get the layer details from a div id.
+ * Get the layer details from a div id
+ * created by getLayerDivId.
  *
  * @param {string} idString The layer div id.
  * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
@@ -42,6 +47,29 @@ export function getLayerDetailsFromLayerDivId(idString) {
     layerIndex: split[1],
     layerId: idString,
   };
+}
+
+/**
+ * Get the info layer div id.
+ * For example: 'layerGroup0-infoLayer'.
+ *
+ * @param {string} groupDivId The layer group div id.
+ * @returns {string} A string id.
+ */
+export function getInfoLayerDivId(groupDivId) {
+  return groupDivId + '-infolayer';
+}
+
+/**
+ * Get the layer details from an info layer div id
+ * created by getInfoLayerDivId.
+ *
+ * @param {string} idString The layer div id.
+ * @returns {object} The layer details as {groupDivId}.
+ */
+export function getLayerDetailsFromInfoLayerDivId(idString) {
+  const groupDivId = idString.substring(0, idString.length - 10);
+  return {groupDivId};
 }
 
 /**
@@ -184,13 +212,6 @@ export class LayerGroup {
   #tooltipHtmlElement;
 
   /**
-   * The current position used for the crosshair.
-   *
-   * @type {Point}
-   */
-  #currentPosition;
-
-  /**
    * Image smoothing flag.
    *
    * @type {boolean}
@@ -205,16 +226,38 @@ export class LayerGroup {
   #positionHelper;
 
   /**
+   * Info layer.
+   *
+   * @type {InfoLayer}
+   */
+  #infoLayer;
+
+  /**
+   * List of info data.
+   *
+   * @type {InfoData[]}
+   */
+  #infoDatas = [];
+
+  /**
+   * Dataid of the info source data.
+   *
+   * @type {string}
+   */
+  #infoDataId;
+
+  /**
    * Get the position helper.
    *
-   * @returns {PositionHelper} The position helper.
+   * @returns {PositionHelper|undefined} The position helper or
+   * undefined if no layers.
    */
   getPositionHelper() {
     if (typeof this.#positionHelper === 'undefined') {
       for (const layer of this.#layers) {
         if (layer instanceof ViewLayer) {
           const controller = layer.getViewController();
-          const helper = controller.getPositionHelperClone();
+          const helper = controller.getPositionHelper();
           if (typeof this.#positionHelper === 'undefined') {
             this.#positionHelper = helper;
           } else {
@@ -228,9 +271,21 @@ export class LayerGroup {
 
   /**
    * @param {HTMLElement} containerDiv The associated HTML div.
+   * @param {boolean} [withInfoLayer] Optional with info layer flag,
+   * default to false.
    */
-  constructor(containerDiv) {
+  constructor(containerDiv, withInfoLayer) {
     this.#containerDiv = containerDiv;
+
+    if (typeof withInfoLayer !== 'undefined' &&
+      withInfoLayer === true
+    ) {
+      const layerDiv = document.createElement('div');
+      layerDiv.id = getInfoLayerDivId(containerDiv.id);
+      layerDiv.className = 'infoLayer';
+      containerDiv.appendChild(layerDiv);
+      this.#infoLayer = new InfoLayer(layerDiv);
+    }
   }
 
   /**
@@ -551,10 +606,6 @@ export class LayerGroup {
         break;
       }
     }
-    if (typeof baseLayer === 'undefined') {
-      logger.warn('No layer found');
-      return;
-    }
     return baseLayer;
   }
 
@@ -704,6 +755,14 @@ export class LayerGroup {
    */
   setActiveLayer(index) {
     this.#activeLayerIndex = index;
+
+    const layer = this.#layers[index];
+    if (typeof this.#infoLayer !== 'undefined') {
+      this.unbindInfoData();
+      const dataId = layer.getDataId();
+      this.bindInfoData(dataId);
+    }
+
     /**
      * Active layer change event.
      *
@@ -886,6 +945,46 @@ export class LayerGroup {
   }
 
   /**
+   * Add info data.
+   *
+   * @param {InfoData} data The data to add.
+   * @param {string} dataId The associated data ID.
+   */
+  addInfoData(data, dataId) {
+    this.#infoDatas[dataId] = data;
+  }
+
+  /**
+   * Bind info data.
+   *
+   * @param {string} dataId The associated data ID.
+   */
+  bindInfoData(dataId) {
+    // just bind one data id
+    if (typeof this.#infoDataId !== 'undefined') {
+      return;
+    }
+    const infoData = this.#infoDatas[dataId];
+    if (typeof infoData !== 'undefined') {
+      infoData.addEventListener('valuechange',
+        this.#infoLayer.onDataChange);
+    }
+    this.#infoDataId = dataId;
+  }
+
+  /**
+   * Unbind info data.
+   */
+  unbindInfoData() {
+    const infoData = this.#infoDatas[this.#infoDataId];
+    if (typeof infoData !== 'undefined') {
+      infoData.removeEventListener('valuechange',
+        this.#infoLayer.onDataChange);
+    }
+    this.#infoDataId = undefined;
+  }
+
+  /**
    * Get the next layer DOM div.
    *
    * @returns {HTMLDivElement} A DOM div.
@@ -975,16 +1074,9 @@ export class LayerGroup {
   }
 
   /**
-   * Show a crosshair at a given position.
-   *
-   * @param {Point} [position] The position where to show the crosshair,
-   *   defaults to current position.
+   * Show a crosshair at the current position.
    */
-  #showCrosshairDiv(position) {
-    if (typeof position === 'undefined') {
-      position = this.#currentPosition;
-    }
-
+  #showCrosshairDiv() {
     // remove previous
     this.#removeCrosshairDiv();
 
@@ -1002,7 +1094,14 @@ export class LayerGroup {
       return;
     }
 
+    // no crosshair for secondary capture
+    if (this.#isViewLayerSecondaryCapture(baseLayer)) {
+      logger.warn('Not enabling crosshair for secondary capture');
+      return;
+    }
+
     const vc = baseLayer.getViewController();
+    const position = vc.getCurrentPosition();
     const planePos = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(planePos);
 
@@ -1114,6 +1213,38 @@ export class LayerGroup {
   }
 
   /**
+   * Check if the SOP class UID of the data of a view layer is
+   * secondary capture.
+   *
+   * @param {ViewLayer} layer The layer to check.
+   * @returns {boolean} True if secondary capture.
+   */
+  #isViewLayerSecondaryCapture(layer) {
+    let res = false;
+    const sopClassUID = layer.getViewController().getSopClassUid();
+    if (typeof sopClassUID !== 'undefined') {
+      res = sopClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
+    }
+    return res;
+  }
+
+  /**
+   * Returns whether or not a layer group should have its zoom/pan/etc
+   * synced to other views. Used for things like Secondary Capture where
+   * there is no meaningful real-world scale.
+   *
+   * @returns {boolean} Whether to sync the zoom/pan.
+   */
+  shouldBind() {
+    const baseLayer = this.getBaseViewLayer();
+    if (typeof baseLayer === 'undefined') {
+      return false;
+    }
+    const isSC = this.#isViewLayerSecondaryCapture(baseLayer);
+    return !isSC;
+  }
+
+  /**
    * Does one of the view layer have more than one slice in the
    *   given dimension.
    *
@@ -1125,6 +1256,29 @@ export class LayerGroup {
       return layer.getViewController().moreThanOne(dim);
     });
   }
+
+  /**
+   * Check if any layer has a valid position.
+   *
+   * @returns {boolean} True if any layer has a valid position.
+   */
+  hasAnyLayerWithValidPosition() {
+    return this.someViewLayer(function (layer) {
+      return layer.isValidPosition();
+    });
+  }
+
+  /**
+   * Update info data on position change.
+   *
+   * @param {object} event The position change event.
+   */
+  #updateInfoData = (event) => {
+    const infoData = this.#infoDatas[event.dataid];
+    if (typeof infoData !== 'undefined') {
+      infoData.onSliceChange(event);
+    }
+  };
 
   /**
    * Update layers (but not the event source layer) to a position change.
@@ -1139,18 +1293,13 @@ export class LayerGroup {
         layer.removeEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.removeEventListener('positionchange', this.#fireEvent);
+
+        layer.addEventListener('positionchange', this.#updateInfoData);
       }
     }
 
     const index = new Index(event.value[0]);
     const position = new Point(event.value[1]);
-
-    // store current position
-    this.#currentPosition = position;
-
-    if (this.#showCrosshair) {
-      this.#showCrosshairDiv(position);
-    }
 
     // origin of the first view layer
     const viewLayerOffsets = {};
@@ -1231,12 +1380,26 @@ export class LayerGroup {
       }
     }
 
+    const hasValidPosition = this.hasAnyLayerWithValidPosition();
+    this.#fireEvent({
+      type: 'outofrange',
+      layergroupid: this.getDivId(),
+      value: [!hasValidPosition]
+    });
+
+    // show crosshair after position update
+    if (this.#showCrosshair) {
+      this.#showCrosshairDiv();
+    }
+
     // re-start positionchange listeners
     for (const layer of this.#layers) {
       if (typeof layer !== 'undefined') {
         layer.addEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.addEventListener('positionchange', this.#fireEvent);
+
+        layer.removeEventListener('positionchange', this.#updateInfoData);
       }
     }
   };

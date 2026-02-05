@@ -202,7 +202,7 @@ export class UrlsLoader {
     // check if DICOMDIR case
     if (data.length === 1 &&
       (endsWith(data[0], 'DICOMDIR') ||
-      endsWith(data[0], '.dcmdir'))) {
+        endsWith(data[0], '.dcmdir'))) {
       this.#loadDicomDir(data[0], options);
     } else {
       this.#loadUrls(data, options);

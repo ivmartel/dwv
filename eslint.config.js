@@ -39,6 +39,8 @@ export default [
       // force 2 space indent (default: 4)
       // https://eslint.style/rules/js/indent
       '@stylistic/js/indent': ['error', 2],
+      // https://eslint.style/rules/js/indent-binary-ops
+      '@stylistic/js/indent-binary-ops': ['error', 2],
       // force single quotes (default 'double')
       // https://eslint.style/rules/js/quotes
       '@stylistic/js/quotes': ['error', 'single'],
@@ -59,6 +61,9 @@ export default [
       // newline at array elements (default: always)
       // https://eslint.style/rules/js/array-element-newline
       '@stylistic/js/array-element-newline': ['error', 'consistent'],
+      // one statement per line
+      // https://eslint.style/rules/js/max-statements-per-line
+      '@stylistic/js/max-statements-per-line': ['error', {max: 1}],
       // force 'one true brace style' (1tbs)
       // https://eslint.style/rules/js/brace-style
       '@stylistic/js/brace-style': 'error',
@@ -96,7 +101,7 @@ export default [
       '@stylistic/js/keyword-spacing': 'error',
       // no space before function call (default: never)
       // https://eslint.style/rules/js/function-call-spacing
-      '@stylistic/js/func-call-spacing': 'error',
+      '@stylistic/js/function-call-spacing': 'error',
       // spacing around colon
       // (default: {'beforeColon': false, 'afterColon': true})
       // https://eslint.style/rules/js/key-spacing

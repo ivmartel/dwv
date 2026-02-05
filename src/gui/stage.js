@@ -13,9 +13,20 @@ import {DrawLayer} from '../gui/drawLayer.js';
  * Window/level binder.
  */
 export class WindowLevelBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'wlchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
@@ -37,9 +48,20 @@ export class WindowLevelBinder {
  * Colour map binder.
  */
 export class ColourMapBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'colourmapchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
@@ -52,29 +74,74 @@ export class ColourMapBinder {
 }
 
 /**
+ * Mask view binder.
+ */
+export class MaskViewBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
+  getEventType = function () {
+    return 'maskviewchange';
+  };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input layer group.
+   * @returns {Function} The event handler.
+   */
+  getCallback = function (layerGroup) {
+    return function (event) {
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
+      if (viewLayers.length !== 0) {
+        viewLayers[0].setFillOpacity(event.value[0]);
+        viewLayers[0].setContourThickness(event.value[1]);
+      }
+    };
+  };
+}
+
+/**
  * Position binder.
  */
 export class PositionBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'positionchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const pointValues = event.value[1];
-      const vl = layerGroup.getBaseViewLayer();
+      const vls = layerGroup.getViewLayersByDataId(event.dataid);
+      let vl;
+      let sameData = false;
+      if (vls.length !== 0) {
+        // use first layer
+        vl = vls[0];
+        sameData = true;
+      } else {
+        vl = layerGroup.getBaseViewLayer();
+      }
       const vc = vl.getViewController();
-      // handle different number of dimensions
+      // bind 3D for all
+      // bind 4D if same data, otherwise use 3D and keep current
       const currentPos = vc.getCurrentPosition();
       const currentDims = currentPos.length();
       const inputDims = pointValues.length;
-      if (inputDims !== currentDims) {
-        if (inputDims === currentDims - 1) {
-          // add missing dim, for ex: input 3D -> current 4D
-          pointValues.push(currentPos.get(currentDims - 1));
-        } else if (inputDims === currentDims + 1) {
-          // remove extra dim, for ex: input 4D -> current 3D
-          pointValues.pop();
-        }
+      if (!sameData &&
+        inputDims > 3 && currentDims > 3) {
+        pointValues[3] = currentPos.get(3);
       }
       vc.setCurrentPosition(new Point(pointValues));
     };
@@ -85,9 +152,20 @@ export class PositionBinder {
  * Zoom binder.
  */
 export class ZoomBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'zoomchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       const scale = {
@@ -113,9 +191,20 @@ export class ZoomBinder {
  * Offset binder.
  */
 export class OffsetBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'offsetchange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       layerGroup.setOffset({
@@ -132,9 +221,20 @@ export class OffsetBinder {
  * Opacity binder. Only propagates to view layers of the same data.
  */
 export class OpacityBinder {
+  /**
+   * Get the associated event.
+   *
+   * @returns {string} The event name.
+   */
   getEventType = function () {
     return 'opacitychange';
   };
+  /**
+   * Get the event handler.
+   *
+   * @param {LayerGroup} layerGroup The input lqyer group.
+   * @returns {Function} The event handler.
+   */
   getCallback = function (layerGroup) {
     return function (event) {
       // exit if no data id
@@ -161,7 +261,8 @@ export const binderList = {
   ZoomBinder,
   OffsetBinder,
   OpacityBinder,
-  ColourMapBinder
+  ColourMapBinder,
+  MaskViewBinder
 };
 
 /**
@@ -306,11 +407,13 @@ export class Stage {
    * The new layer group will be marked as the active layer group.
    *
    * @param {object} htmlElement The HTML element of the layer group.
+   * @param {boolean} [withInfoOverlay] Optional with info overlay flag,
+   * default to false.
    * @returns {LayerGroup} The newly created layer group.
    */
-  addLayerGroup(htmlElement) {
+  addLayerGroup(htmlElement, withInfoOverlay) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
-    const layerGroup = new LayerGroup(htmlElement);
+    const layerGroup = new LayerGroup(htmlElement, withInfoOverlay);
     layerGroup.setImageSmoothing(this.#imageSmoothing);
     // add to storage
     const isBound = this.#callbackStore && this.#callbackStore.length !== 0;
@@ -449,21 +552,21 @@ export class Stage {
     const hasRatio = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
       const ratio = this.#layerGroups[i].getDivToWorldSizeRatio();
-      if (typeof ratio !== 'undefined') {
+      if (typeof ratio !== 'undefined' && this.#layerGroups[i].shouldBind()) {
         hasRatio.push(i);
         if (typeof minRatio === 'undefined' || ratio < minRatio) {
           minRatio = ratio;
         }
       }
     }
-    // exit if no ratio
-    if (typeof minRatio === 'undefined') {
-      return;
-    }
     // apply min ratio to layers
     for (let j = 0; j < this.#layerGroups.length; ++j) {
-      if (hasRatio.includes(j)) {
+      if (hasRatio.includes(j) && this.#layerGroups[j].shouldBind()) {
+        // minRatio has been set since hasRatio include j
         this.#layerGroups[j].fitToContainer(minRatio);
+      } else {
+        const ratio = this.#layerGroups[j].getDivToWorldSizeRatio();
+        this.#layerGroups[j].fitToContainer(ratio);
       }
     }
   }
@@ -481,8 +584,10 @@ export class Stage {
     this.#callbackStore = new Array(this.#layerGroups.length);
     // add listeners
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      for (let j = 0; j < this.#binders.length; ++j) {
-        this.#addEventListeners(i, this.#binders[j]);
+      if (this.#layerGroups[i].shouldBind()) {
+        for (let j = 0; j < this.#binders.length; ++j) {
+          this.#addEventListeners(i, this.#binders[j]);
+        }
       }
     }
   }
@@ -492,15 +597,16 @@ export class Stage {
    */
   unbindLayerGroups() {
     if (this.#layerGroups.length === 0 ||
-      this.#layerGroups.length === 1 ||
       this.#binders.length === 0 ||
       !this.#callbackStore) {
       return;
     }
     // remove listeners
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      for (let j = 0; j < this.#binders.length; ++j) {
-        this.#removeEventListeners(i, this.#binders[j]);
+      if (this.#layerGroups[i].shouldBind()) {
+        for (let j = 0; j < this.#binders.length; ++j) {
+          this.#removeEventListeners(i, this.#binders[j]);
+        }
       }
     }
     // clear callback store
@@ -562,7 +668,7 @@ export class Stage {
    */
   #addEventListeners(index, binder) {
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      if (i !== index) {
+      if (i !== index && this.#layerGroups[i].shouldBind()) {
         this.#layerGroups[index].addEventListener(
           binder.getEventType(),
           this.#getBinderCallback(binder, i)
@@ -578,12 +684,19 @@ export class Stage {
    * @param {object} binder The layer binder.
    */
   #removeEventListeners(index, binder) {
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      if (i !== index) {
-        this.#layerGroups[index].removeEventListener(
-          binder.getEventType(),
-          this.#getBinderCallback(binder, i)
-        );
+    if (!this.#callbackStore) {
+      return;
+    }
+    for (const key in this.#callbackStore) {
+      if (parseInt(key, 10) !== index) {
+        for (const binderObj of this.#callbackStore[key]) {
+          if (binderObj.binder.getEventType() === binder.getEventType()) {
+            this.#layerGroups[index].removeEventListener(
+              binder.getEventType(),
+              binderObj.callback
+            );
+          }
+        }
       }
     }
   }

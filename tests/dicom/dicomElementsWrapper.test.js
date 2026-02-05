@@ -1,34 +1,34 @@
+import {describe, test, assert} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {dcmdump} from '../../src/dicom/dicomElementsWrapper.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
-import dwvTestSimple from '../data/dwv-test-simple.dcm';
+import dwvTestSimple from '../data/dwv-test-simple.dcm?inline';
 
 /**
  * Tests for the 'dicom/dicomElementsWrapper.js' file.
  */
 
-/* global QUnit */
-QUnit.module('dicom');
+describe('dicom', () => {
 
-/**
- * Tests for dcmdump using simple DICOM data.
- * Using remote file for CI integration.
- *
- * @function module:tests/dicom~dicom-dump
- */
-QUnit.test('DICOM dump', function (assert) {
+  /**
+   * Tests for {@link dcmdump} using simple DICOM data.
+   * Using remote file for CI integration.
+   *
+   * @function module:tests/dicom~dump
+   */
+  test('dump', () => {
 
-  // parse DICOM
-  const dicomParser = new DicomParser();
-  dicomParser.parse(b64urlToArrayBuffer(dwvTestSimple));
+    // parse DICOM
+    const dicomParser = new DicomParser();
+    dicomParser.parse(b64urlToArrayBuffer(dwvTestSimple));
 
-  // wrapped tags
-  const tags = dicomParser.getDicomElements();
-  const dump = dcmdump(tags);
+    // wrapped tags
+    const tags = dicomParser.getDicomElements();
+    const dump = dcmdump(tags);
 
-  /* eslint-disable @stylistic/js/max-len */
-  const theoDump = '\n\
+    /* eslint-disable @stylistic/js/max-len */
+    const theoDump = '\n\
 # Dicom-File-Format\n\
 \n\
 # Dicom-Meta-Information-Header\n\
@@ -66,7 +66,9 @@ QUnit.test('DICOM dump', function (assert) {
 (0028,0102) US 11                                       # undefined, 1 HighBit\n\
 (0028,0103) US 0                                        # undefined, 1 PixelRepresentation\n\
 (7fe0,0010) OW ...                                      # undefined, 1 PixelData\n';
-  /* eslint-enable @stylistic/js/max-len */
+    /* eslint-enable @stylistic/js/max-len */
 
-  assert.equal(dump, theoDump, 'dump');
+    assert.equal(dump, theoDump, 'dump');
+  });
+
 });

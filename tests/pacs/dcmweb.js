@@ -466,8 +466,8 @@ function qidoResponseToTable() {
 
       const rootUrl = document.getElementById('rooturl').value;
       const seriesUrl = rootUrl +
-      '/studies/' + studyUID +
-      '/series/' + seriesUID;
+        '/studies/' + studyUID +
+        '/series/' + seriesUID;
       const thumbInstanceUID = getThumbInstanceUID(_seriesJson[seriesUID]);
       const thumbUrl = seriesUrl +
         '/instances/' + thumbInstanceUID +
