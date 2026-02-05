@@ -54,7 +54,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} getOrientationFromCosines.
    *
-   * @function module:tests/math~getOrientationFromCosines
+   * @function module:tests/math~getorientationfromcosines
    */
   test('getOrientationFromCosines', () => {
     // axial
@@ -82,7 +82,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} getOrientationStringLPS.
    *
-   * @function module:tests/math~getOrientationStringLPS
+   * @function module:tests/math~getorientationstringlps
    */
   test('getOrientationStringLPS', () => {
     // axial
@@ -131,7 +131,7 @@ describe('math', () => {
   /**
    * Tests for {@link getOrientationName}.
    *
-   * @function module:tests/dicom~getorientationname
+   * @function module:tests/math~getorientationname
    */
   test('getOrientationName', () => {
     const test00 = [1, 0, 0, 0, 1, 0];

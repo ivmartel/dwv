@@ -21,9 +21,9 @@ describe('utils', () => {
   /**
    * Tests for {@link toStringId}.
    *
-   * @function module:tests/utils~toStringId
+   * @function module:tests/utils~tostringid
    */
-  test('Index stringId', () => {
+  test('toStringId', () => {
     // test #00: all dims
     const i00 = [1, 2, 3];
     const i00strId = '#0-1_#1-2_#2-3';

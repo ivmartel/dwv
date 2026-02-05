@@ -8,6 +8,9 @@ import {View} from './view.js';
 import {Geometry} from './geometry.js';
 /* eslint-enable no-unused-vars */
 
+/**
+ * View position accessor class.
+ */
 class ViewPositionAccessor {
   /**
    * @type {View}

@@ -11,7 +11,7 @@ describe('gui', () => {
   /**
    * Tests for {@link canCreateCanvas}.
    *
-   * @function module:tests/gui~canCreateCanvas
+   * @function module:tests/gui~cancreatecanvas
    */
   test('canCreateCanvas', () => {
     assert.equal(canCreateCanvas(1, 1), true,

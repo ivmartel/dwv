@@ -25,7 +25,7 @@ describe('utils', () => {
   /**
    * Tests for {@link UndoStack}.
    *
-   * @function module:tests/utils~UndoStack
+   * @function module:tests/utils~undostack
    */
   test('UndoStack - #DWV-REQ-UI-08-002 Draw action undo/redo',
     () => {

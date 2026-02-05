@@ -10,7 +10,7 @@ describe('utils', () => {
   /**
    * Tests for {@link mergeObjects}.
    *
-   * @function module:tests/utils~mergeobjects
+   * @function module:tests/utils~merge-objects
    */
   test('Merge objects', () => {
     const obj001 = {id: {value: ['0']}, a: {value: [1]}, b: {value: [1]}};

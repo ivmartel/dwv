@@ -29,7 +29,12 @@ describe('dicom', () => {
 
   describe('MeasuredValue', () => {
 
-    test('constructor creates instance with undefined properties', () => {
+    /**
+     * Tests for empty {@link MeasuredValue}.
+     *
+     * @function module:tests/dicom~measuredvalue-empty
+     */
+    test('empty', () => {
       const value = new MeasuredValue();
       assert.isUndefined(value.numericValue);
       assert.isUndefined(value.floatingPointValue);
@@ -38,7 +43,12 @@ describe('dicom', () => {
       assert.isUndefined(value.measurementUnitsCode);
     });
 
-    test('toString with numeric value and units code', () => {
+    /**
+     * Tests for {@link MeasuredValue} toString.
+     *
+     * @function module:tests/dicom~measuredvalue-tostring
+     */
+    test('toString', () => {
       const code = new DicomCode('millimeter');
       code.value = 'mm';
 
@@ -51,11 +61,68 @@ describe('dicom', () => {
       assert.include(result, 'mm');
     });
 
+    /**
+     * Tests for {@link MeasuredValue} round trip.
+     *
+     * @function module:tests/dicom~measuredvalue-round-trip
+     */
+    test('round trip', () => {
+      const deNum = new DataElement('DS');
+      deNum.value = ['42.5'];
+
+      const deFloat = new DataElement('FD');
+      deFloat.value = ['42.5'];
+
+      const deNumer = new DataElement('IS');
+      deNumer.value = ['85'];
+
+      const deDenom = new DataElement('IS');
+      deDenom.value = ['2'];
+
+      const dataElements = {
+        [TagKeys.NumericValue]: deNum,
+        [TagKeys.FloatingPointValue]: deFloat,
+        [TagKeys.RationalNumeratorValue]: deNumer,
+        [TagKeys.RationalDenominatorValue]: deDenom
+      };
+
+      const value1 = getMeasuredValue(dataElements);
+      const item = getDicomMeasuredValueItem(value1);
+
+      // recreate MeasuredValue from item
+      const value2 = new MeasuredValue();
+      if (typeof item.NumericValue !== 'undefined') {
+        value2.numericValue = item.NumericValue;
+      }
+      if (typeof item.FloatingPointValue !== 'undefined') {
+        value2.floatingPointValue = item.FloatingPointValue;
+      }
+      if (typeof item.RationalNumeratorValue !== 'undefined') {
+        value2.rationalNumeratorValue = item.RationalNumeratorValue;
+      }
+      if (typeof item.RationalDenominatorValue !== 'undefined') {
+        value2.rationalDenominatorValue = item.RationalDenominatorValue;
+      }
+
+      // verify round-trip
+      assert.equal(value1.numericValue, value2.numericValue);
+      assert.equal(value1.floatingPointValue, value2.floatingPointValue);
+      assert.equal(value1.rationalNumeratorValue,
+        value2.rationalNumeratorValue);
+      assert.equal(value1.rationalDenominatorValue,
+        value2.rationalDenominatorValue);
+    });
+
   });
 
   describe('getMeasuredValue', () => {
 
-    test('extracts numeric value', () => {
+    /**
+     * Tests for {@link getMeasuredValue} numeric.
+     *
+     * @function module:tests/dicom~getmeasuredvalue-numeric
+     */
+    test('numeric', () => {
       const de = new DataElement('DS');
       de.value = ['42.5'];
 
@@ -68,9 +135,24 @@ describe('dicom', () => {
       assert.isUndefined(result.floatingPointValue);
       assert.isUndefined(result.rationalNumeratorValue);
       assert.isUndefined(result.rationalDenominatorValue);
+
+      // numeric float
+      const de1 = new DataElement('DS');
+      de1.value = ['3.14159'];
+      const dataElements1 = {
+        [TagKeys.NumericValue]: de1
+      };
+      const result1 = getMeasuredValue(dataElements1);
+      assert.approximately(result1.numericValue, 3.14159, 0.00001);
+
     });
 
-    test('extracts floating point value', () => {
+    /**
+     * Tests for {@link getMeasuredValue} float.
+     *
+     * @function module:tests/dicom~getmeasuredvalue-float
+     */
+    test('float', () => {
       const de = new DataElement('FD');
       de.value = ['123.456'];
 
@@ -83,31 +165,48 @@ describe('dicom', () => {
       assert.isUndefined(result.numericValue);
     });
 
-    test('extracts rational numerator value', () => {
-      const de = new DataElement('IS');
-      de.value = ['100'];
-
-      const dataElements = {
-        [TagKeys.RationalNumeratorValue]: de
+    /**
+     * Tests for {@link getMeasuredValue} rational.
+     *
+     * @function module:tests/dicom~getmeasuredvalue-rational
+     */
+    test('rational', () => {
+      const de0 = new DataElement('IS');
+      de0.value = ['100'];
+      const dataElements0 = {
+        [TagKeys.RationalNumeratorValue]: de0
       };
+      const result0 = getMeasuredValue(dataElements0);
+      assert.equal(result0.rationalNumeratorValue, 100);
 
-      const result = getMeasuredValue(dataElements);
-      assert.equal(result.rationalNumeratorValue, 100);
+      const de1 = new DataElement('IS');
+      de1.value = ['50'];
+      const dataElements1 = {
+        [TagKeys.RationalDenominatorValue]: de1
+      };
+      const result1 = getMeasuredValue(dataElements1);
+      assert.equal(result1.rationalDenominatorValue, 50);
+
+      const deNumer2 = new DataElement('IS');
+      deNumer2.value = ['255'];
+      const deDenom2 = new DataElement('IS');
+      deDenom2.value = ['256'];
+      const dataElements2 = {
+        [TagKeys.RationalNumeratorValue]: deNumer2,
+        [TagKeys.RationalDenominatorValue]: deDenom2
+      };
+      const result2 = getMeasuredValue(dataElements2);
+      assert.equal(result2.rationalNumeratorValue, 255);
+      assert.equal(result2.rationalDenominatorValue, 256);
+
     });
 
-    test('extracts rational denominator value', () => {
-      const de = new DataElement('IS');
-      de.value = ['50'];
-
-      const dataElements = {
-        [TagKeys.RationalDenominatorValue]: de
-      };
-
-      const result = getMeasuredValue(dataElements);
-      assert.equal(result.rationalDenominatorValue, 50);
-    });
-
-    test('extracts measurement units code sequence', () => {
+    /**
+     * Tests for {@link getMeasuredValue} code.
+     *
+     * @function module:tests/dicom~getmeasuredvalue-code
+     */
+    test('code', () => {
       const deCodeMeaning = new DataElement('LO');
       deCodeMeaning.value = ['millimeter'];
       const deCodeValue = new DataElement('SH');
@@ -134,7 +233,12 @@ describe('dicom', () => {
       assert.equal(result.measurementUnitsCode.meaning, 'millimeter');
     });
 
-    test('extracts all values together', () => {
+    /**
+     * Tests for {@link getMeasuredValue} all.
+     *
+     * @function module:tests/dicom~getmeasuredvalue-all
+     */
+    test('all', () => {
       const deNum = new DataElement('DS');
       deNum.value = ['42.5'];
 
@@ -181,7 +285,12 @@ describe('dicom', () => {
       assert.equal(result.measurementUnitsCode.value, 'mm');
     });
 
-    test('returns empty MeasuredValue when no tags present', () => {
+    /**
+     * Tests for {@link getMeasuredValue} no tag.
+     *
+     * @function module:tests/dicom~getmeasuredvalue-no-tag
+     */
+    test('no tag', () => {
       const result = getMeasuredValue({});
 
       assert.isUndefined(result.numericValue);
@@ -190,41 +299,16 @@ describe('dicom', () => {
       assert.isUndefined(result.rationalDenominatorValue);
       assert.isUndefined(result.measurementUnitsCode);
     });
-
-    test('parses numeric value as float', () => {
-      const de = new DataElement('DS');
-      de.value = ['3.14159'];
-
-      const dataElements = {
-        [TagKeys.NumericValue]: de
-      };
-
-      const result = getMeasuredValue(dataElements);
-      assert.approximately(result.numericValue, 3.14159, 0.00001);
-    });
-
-    test('parses integer values correctly', () => {
-      const deNumer = new DataElement('IS');
-      deNumer.value = ['255'];
-
-      const deDenom = new DataElement('IS');
-      deDenom.value = ['256'];
-
-      const dataElements = {
-        [TagKeys.RationalNumeratorValue]: deNumer,
-        [TagKeys.RationalDenominatorValue]: deDenom
-      };
-
-      const result = getMeasuredValue(dataElements);
-      assert.equal(result.rationalNumeratorValue, 255);
-      assert.equal(result.rationalDenominatorValue, 256);
-    });
-
   });
 
   describe('getDicomMeasuredValueItem', () => {
 
-    test('converts numeric value to item', () => {
+    /**
+     * Tests for {@link getDicomMeasuredValueItem} numeric.
+     *
+     * @function module:tests/dicom~getdicommeasuredvalueitem-numeric
+     */
+    test('numeric', () => {
       const value = new MeasuredValue();
       value.numericValue = 42.5;
 
@@ -236,7 +320,12 @@ describe('dicom', () => {
       assert.isUndefined(item.RationalDenominatorValue);
     });
 
-    test('converts floating point value to item', () => {
+    /**
+     * Tests for {@link getDicomMeasuredValueItem} float.
+     *
+     * @function module:tests/dicom~getdicommeasuredvalueitem-float
+     */
+    test('float', () => {
       const value = new MeasuredValue();
       value.floatingPointValue = 123.456;
 
@@ -245,7 +334,12 @@ describe('dicom', () => {
       assert.equal(item.FloatingPointValue, 123.456);
     });
 
-    test('converts rational values to item', () => {
+    /**
+     * Tests for {@link getDicomMeasuredValueItem} rational.
+     *
+     * @function module:tests/dicom~getdicommeasuredvalueitem-rational
+     */
+    test('rational', () => {
       const value = new MeasuredValue();
       value.rationalNumeratorValue = 85;
       value.rationalDenominatorValue = 2;
@@ -256,7 +350,12 @@ describe('dicom', () => {
       assert.equal(item.RationalDenominatorValue, 2);
     });
 
-    test('converts measurement units code to item', () => {
+    /**
+     * Tests for {@link getDicomMeasuredValueItem} code.
+     *
+     * @function module:tests/dicom~getdicommeasuredvalueitem-code
+     */
+    test('code', () => {
       const code = new DicomCode('millimeter');
       code.value = 'mm';
 
@@ -272,7 +371,12 @@ describe('dicom', () => {
       assert.equal(codeItem.CodeMeaning, 'millimeter');
     });
 
-    test('converts all values to item', () => {
+    /**
+     * Tests for {@link getDicomMeasuredValueItem} all.
+     *
+     * @function module:tests/dicom~getdicommeasuredvalueitem-all
+     */
+    test('all', () => {
       const code = new DicomCode('millimeter');
       code.value = 'mm';
 
@@ -292,7 +396,12 @@ describe('dicom', () => {
       assert.ok(item.MeasurementUnitsCodeSequence);
     });
 
-    test('omits undefined fields', () => {
+    /**
+     * Tests for {@link getDicomMeasuredValueItem} undefined.
+     *
+     * @function module:tests/dicom~getdicommeasuredvalueitem-undefined
+     */
+    test('undefined', () => {
       const value = new MeasuredValue();
       value.numericValue = 10;
 
@@ -305,62 +414,16 @@ describe('dicom', () => {
       assert.isUndefined(item.MeasurementUnitsCodeSequence);
     });
 
-    test('returns empty object when all properties undefined', () => {
+    /**
+     * Tests for {@link getDicomMeasuredValueItem} empty.
+     *
+     * @function module:tests/dicom~getdicommeasuredvalueitem-empty
+     */
+    test('empty', () => {
       const value = new MeasuredValue();
       const item = getDicomMeasuredValueItem(value);
 
       assert.deepEqual(item, {});
-    });
-
-  });
-
-  describe('round-trip conversion via items', () => {
-
-    test('dataElements -> MeasuredValue -> item -> MeasuredValue', () => {
-      const deNum = new DataElement('DS');
-      deNum.value = ['42.5'];
-
-      const deFloat = new DataElement('FD');
-      deFloat.value = ['42.5'];
-
-      const deNumer = new DataElement('IS');
-      deNumer.value = ['85'];
-
-      const deDenom = new DataElement('IS');
-      deDenom.value = ['2'];
-
-      const dataElements = {
-        [TagKeys.NumericValue]: deNum,
-        [TagKeys.FloatingPointValue]: deFloat,
-        [TagKeys.RationalNumeratorValue]: deNumer,
-        [TagKeys.RationalDenominatorValue]: deDenom
-      };
-
-      const value1 = getMeasuredValue(dataElements);
-      const item = getDicomMeasuredValueItem(value1);
-
-      // recreate MeasuredValue from item
-      const value2 = new MeasuredValue();
-      if (typeof item.NumericValue !== 'undefined') {
-        value2.numericValue = item.NumericValue;
-      }
-      if (typeof item.FloatingPointValue !== 'undefined') {
-        value2.floatingPointValue = item.FloatingPointValue;
-      }
-      if (typeof item.RationalNumeratorValue !== 'undefined') {
-        value2.rationalNumeratorValue = item.RationalNumeratorValue;
-      }
-      if (typeof item.RationalDenominatorValue !== 'undefined') {
-        value2.rationalDenominatorValue = item.RationalDenominatorValue;
-      }
-
-      // verify round-trip
-      assert.equal(value1.numericValue, value2.numericValue);
-      assert.equal(value1.floatingPointValue, value2.floatingPointValue);
-      assert.equal(value1.rationalNumeratorValue,
-        value2.rationalNumeratorValue);
-      assert.equal(value1.rationalDenominatorValue,
-        value2.rationalDenominatorValue);
     });
 
   });

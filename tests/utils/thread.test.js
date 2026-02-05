@@ -13,7 +13,7 @@ describe('utils', () => {
   /**
    * Tests for {@link ThreadPool}.
    *
-   * @function module:tests/utils~threadpool
+   * @function module:tests/utils~threadpool-class
    */
   test('ThreadPool class', () => {
 

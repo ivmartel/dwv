@@ -10,9 +10,9 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} events with single frame data.
    *
-   * @function module:tests/io~rawVideoLoader-canloadurl
+   * @function module:tests/io~raw-video-loader-canloadurl
    */
-  test('RAW image loader canloadurl', () => {
+  test('RAW video loader canloadurl', () => {
     const loader = new RawVideoLoader();
 
     // 'ok' tests

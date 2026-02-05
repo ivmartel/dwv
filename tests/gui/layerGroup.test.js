@@ -6,7 +6,7 @@ import {
 } from '../../src/gui/layerGroup.js';
 
 /**
- * Tests for the 'gui/LayerGroup.js' file.
+ * Tests for the 'gui/layerGroup.js' file.
  */
 
 describe('gui', () => {

@@ -225,9 +225,9 @@ describe('image', () => {
   /**
    * Tests for {@link Size.normalisePoint}.
    *
-   * @function module:tests/image~normalise-point
+   * @function module:tests/image~index-normalise-point
    */
-  test('Index normalisePoint', () => {
+  test('Index normalise Point', () => {
     const size00 = new Size([4, 3, 2]);
 
     // same number of dims
@@ -284,9 +284,9 @@ describe('image', () => {
   /**
    * Tests for {@link Size.normaliseIndex}.
    *
-   * @function module:tests/image~normalise-index
+   * @function module:tests/image~size-normalise-index
    */
-  test('Index normaliseIndex', () => {
+  test('Size normalise Index', () => {
     const size00 = new Size([4, 3, 2]);
 
     // same number of dims

@@ -12,12 +12,12 @@ import dwvTestSimple from '../data/dwv-test-simple.dcm?inline';
 describe('dicom', () => {
 
   /**
-   * Tests for dcmdump using simple DICOM data.
+   * Tests for {@link dcmdump} using simple DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicom-dump
+   * @function module:tests/dicom~dump
    */
-  test('DICOM dump', () => {
+  test('dump', () => {
 
     // parse DICOM
     const dicomParser = new DicomParser();

@@ -14,11 +14,11 @@ import {
 describe('dicom', () => {
 
   /**
-   * Tests for {@link DicomCode} using simple DICOM data.
+   * Tests for {@link DataElement} using simple DICOM data.
    *
-   * @function module:tests/dicom~dicom-code-class
+   * @function module:tests/dicom~data-element-class
    */
-  test('DICOM code class', () => {
+  test('Data element class', () => {
     assert.equal(checkDataElement(), ' undefined is undefined,',
       'checkDE empty #0');
     assert.equal(checkDataElement(undefined, 'a'), ' a is undefined,',

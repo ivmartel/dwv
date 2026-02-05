@@ -196,7 +196,7 @@ describe('image', () => {
   /**
    * Tests for {@link simpleRange}.
    *
-   * @function module:tests/image~simpleRange-iterator
+   * @function module:tests/image~simplerange-iterator
    */
   test('simpleRange iterator', () => {
     const dataAccessor = function (offset) {
@@ -478,7 +478,7 @@ describe('image', () => {
   /**
    * Tests for {@link getSliceIterator}.
    *
-   * @function module:tests/image~getSliceIterator
+   * @function module:tests/image~getsliceiterator
    */
   test('getSliceIterator', () => {
 

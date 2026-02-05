@@ -18,9 +18,9 @@ import {
 describe('dicom', () => {
 
   /**
-   * Tests for getDateObj.
+   * Tests for {@link getDateObj}.
    *
-   * @function module:tests/dicom~get-date-obj
+   * @function module:tests/dicom~getdateobj
    */
   test('getDateObj', () => {
     const da00 = getDateObj(undefined);
@@ -37,9 +37,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getTimeObj.
+   * Tests for {@link getTimeObj}.
    *
-   * @function module:tests/dicom~get-time-obj
+   * @function module:tests/dicom~gettimeobj
    */
   test('getTimeObj', () => {
     const tm00 = getTimeObj(undefined);
@@ -64,9 +64,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDate.
+   * Tests for {@link getDate}.
    *
-   * @function module:tests/dicom~get-date
+   * @function module:tests/dicom~getdate
    */
   test('getDate', () => {
     const da00 = getDate(undefined);
@@ -100,9 +100,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDateTimeObj.
+   * Tests for {@link getDateTimeObj}.
    *
-   * @function module:tests/dicom~get-datetime-obj
+   * @function module:tests/dicom~getdatetimeobj
    */
   test('getDatetimeObj', () => {
     const dt00 = getDateTimeObj(undefined);
@@ -167,9 +167,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for dateToDateObj.
+   * Tests for {@link dateToDateObj}.
    *
-   * @function module:tests/dicom~date-to-date-obj
+   * @function module:tests/dicom~datetodateobj
    */
   test('dateToDateObj', () => {
     assert.equal(dateToDateObj(), undefined, 'dateToDateObj #00');
@@ -187,9 +187,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for dateToTimeObj.
+   * Tests for {@link dateToTimeObj}.
    *
-   * @function module:tests/dicom~date-to-time-obj
+   * @function module:tests/dicom~datetotimeobj
    */
   test('dateToTimeObj', () => {
     assert.equal(dateToTimeObj(), undefined, 'dateToTimeObj #00');
@@ -217,9 +217,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDicomDate.
+   * Tests for {@link getDicomDate}.
    *
-   * @function module:tests/dicom~get-dicom-date
+   * @function module:tests/dicom~getdicomdate
    */
   test('getDicomDate', () => {
     assert.equal(getDicomDate(), undefined, 'getDicomDate #00');
@@ -233,9 +233,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDicomTime.
+   * Tests for {@link getDicomTime}.
    *
-   * @function module:tests/dicom~get-dicom-time
+   * @function module:tests/dicom~getdicomtime
    */
   test('getDicomTime', () => {
     assert.equal(getDicomTime(), undefined, 'getDicomTime #00');
@@ -249,9 +249,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDicomDateTime.
+   * Tests for {@link getDicomDateTime}.
    *
-   * @function module:tests/dicom~get-dicom-date-time
+   * @function module:tests/dicom~getdicomdatetime
    */
   test('getDicomDateTime', () => {
     assert.equal(getDicomDateTime(), undefined, 'getDicomDateTime #00');

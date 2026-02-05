@@ -32,13 +32,23 @@ describe('dicom', () => {
 
   describe('NumericMeasurement', () => {
 
-    test('constructor creates instance with undefined properties', () => {
+    /**
+     * Tests for {@link NumericMeasurement} with undefined.
+     *
+     * @function module:tests/dicom~numericmeasurement-undefined
+     */
+    test('undefined', () => {
       const measurement = new NumericMeasurement();
       assert.isUndefined(measurement.measuredValue);
       assert.isUndefined(measurement.numericValueQualifierCode);
     });
 
-    test('toString with measured value only', () => {
+    /**
+     * Tests for {@link NumericMeasurement} value toString.
+     *
+     * @function module:tests/dicom~numericmeasurement-value-tostring
+     */
+    test('toString', () => {
       const code = new DicomCode('millimeter');
       code.value = 'mm';
 
@@ -54,7 +64,12 @@ describe('dicom', () => {
       assert.include(result, 'mm');
     });
 
-    test('toString with both measured value and qualifier code', () => {
+    /**
+     * Tests for {@link NumericMeasurement} toString.
+     *
+     * @function module:tests/dicom~numericmeasurement-tostring
+     */
+    test('toString', () => {
       const code = new DicomCode('millimeter');
       code.value = 'mm';
 
@@ -75,7 +90,12 @@ describe('dicom', () => {
       assert.include(result, 'mean');
     });
 
-    test('toString with only qualifier code', () => {
+    /**
+     * Tests for {@link NumericMeasurement} code toString.
+     *
+     * @function module:tests/dicom~numericmeasurement-code-tostring
+     */
+    test('code toString', () => {
       const qualifierCode = new DicomCode('mean');
       qualifierCode.value = 'mean';
 
@@ -86,17 +106,85 @@ describe('dicom', () => {
       assert.include(result, 'mean');
     });
 
-    test('toString with neither property set', () => {
+    /**
+     * Tests for {@link NumericMeasurement} undefined toString.
+     *
+     * @function module:tests/dicom~numericmeasurement-undefined-tostring
+     */
+    test('undefined toString', () => {
       const measurement = new NumericMeasurement();
       const result = measurement.toString();
       assert.equal(result, '');
     });
 
+    /**
+     * Tests for {@link NumericMeasurement} round trip.
+     *
+     * @function module:tests/dicom~numericmeasurement-round-trip
+     */
+    test('round trip',
+      () => {
+        const deNumericValue = new DataElement('DS');
+        deNumericValue.value = ['42.5'];
+
+        const deCodeMeaning = new DataElement('LO');
+        deCodeMeaning.value = ['millimeter'];
+        const deCodeValue = new DataElement('SH');
+        deCodeValue.value = ['mm'];
+        const deScheme = new DataElement('SH');
+        deScheme.value = ['UCUM'];
+
+        const codeItem = {
+          [TagKeys.CodeMeaning]: deCodeMeaning,
+          [TagKeys.CodeValue]: deCodeValue,
+          [TagKeys.CodingSchemeDesignator]: deScheme
+        };
+
+        const deMeasUnits = new DataElement('SQ');
+        deMeasUnits.value = [codeItem];
+
+        const measuredValueItem = {
+          [TagKeys.NumericValue]: deNumericValue,
+          [TagKeys.MeasurementUnitsCodeSequence]: deMeasUnits
+        };
+
+        const deMeasured = new DataElement('SQ');
+        deMeasured.value = [measuredValueItem];
+
+        const dataElements = {
+          [TagKeys.MeasuredValueSequence]: deMeasured
+        };
+
+        const measurement1 = getNumericMeasurement(dataElements);
+        const item = getDicomNumericMeasurementItem(measurement1);
+
+        // recreate NumericMeasurement from item
+        const measurement2 = new NumericMeasurement();
+        if (typeof item.MeasuredValueSequence !== 'undefined') {
+          const valueItem = item.MeasuredValueSequence.value[0];
+          const newValue = new MeasuredValue();
+          if (typeof valueItem.NumericValue !== 'undefined') {
+            newValue.numericValue = valueItem.NumericValue;
+          }
+          measurement2.measuredValue = newValue;
+        }
+
+        // verify round-trip
+        assert.equal(measurement1.measuredValue.numericValue,
+          measurement2.measuredValue.numericValue);
+      }
+    );
+
   });
 
   describe('getNumericMeasurement', () => {
 
-    test('extracts measured value only', () => {
+    /**
+     * Tests for {@link getNumericMeasurement} value.
+     *
+     * @function module:tests/dicom~getnumericmeasurement-value
+     */
+    test('value', () => {
       const deNumericValue = new DataElement('DS');
       deNumericValue.value = ['42.5'];
 
@@ -135,7 +223,12 @@ describe('dicom', () => {
       assert.isUndefined(result.numericValueQualifierCode);
     });
 
-    test('extracts qualifier code only', () => {
+    /**
+     * Tests for {@link getNumericMeasurement} code.
+     *
+     * @function module:tests/dicom~getnumericmeasurement-code
+     */
+    test('code', () => {
       const deCodeMeaning = new DataElement('LO');
       deCodeMeaning.value = ['mean'];
       const deCodeValue = new DataElement('SH');
@@ -163,7 +256,12 @@ describe('dicom', () => {
       assert.equal(result.numericValueQualifierCode.value, 'mean');
     });
 
-    test('extracts both measured value and qualifier code', () => {
+    /**
+     * Tests for {@link getNumericMeasurement}.
+     *
+     * @function module:tests/dicom~getnumericmeasurement-good-input
+     */
+    test('good input', () => {
       const deNumericValue = new DataElement('DS');
       deNumericValue.value = ['42.5'];
 
@@ -220,7 +318,12 @@ describe('dicom', () => {
       assert.equal(result.numericValueQualifierCode.value, 'mean');
     });
 
-    test('returns empty NumericMeasurement when no tags present', () => {
+    /**
+     * Tests for {@link getNumericMeasurement} undefined.
+     *
+     * @function module:tests/dicom~getnumericmeasurement-undefined
+     */
+    test('undefined', () => {
       const result = getNumericMeasurement({});
 
       assert.isUndefined(result.measuredValue);
@@ -231,7 +334,12 @@ describe('dicom', () => {
 
   describe('getDicomNumericMeasurementItem', () => {
 
-    test('converts measured value only to item', () => {
+    /**
+     * Tests for {@link getDicomNumericMeasurementItem} value.
+     *
+     * @function module:tests/dicom~getdicomnumericmeasurementitem-value
+     */
+    test('value', () => {
       const value = new MeasuredValue();
       value.numericValue = 42.5;
 
@@ -245,7 +353,12 @@ describe('dicom', () => {
       assert.isUndefined(item.NumericValueQualifierCodeSequence);
     });
 
-    test('converts qualifier code only to item', () => {
+    /**
+     * Tests for {@link getDicomNumericMeasurementItem} code.
+     *
+     * @function module:tests/dicom~getdicomnumericmeasurementitem-code
+     */
+    test('code', () => {
       const code = new DicomCode('mean');
       code.value = 'mean';
 
@@ -259,7 +372,12 @@ describe('dicom', () => {
       assert.ok(Array.isArray(item.NumericValueQualifierCodeSequence.value));
     });
 
-    test('converts both measured value and qualifier to item', () => {
+    /**
+     * Tests for {@link getDicomNumericMeasurementItem}.
+     *
+     * @function module:tests/dicom~getdicomnumericmeasurementitem-good-input
+     */
+    test('good input', () => {
       const value = new MeasuredValue();
       value.numericValue = 42.5;
 
@@ -276,69 +394,17 @@ describe('dicom', () => {
       assert.ok(item.NumericValueQualifierCodeSequence);
     });
 
-    test('returns empty object when no properties set', () => {
+    /**
+     * Tests for {@link getDicomNumericMeasurementItem} undefined.
+     *
+     * @function module:tests/dicom~getdicomnumericmeasurementitem-undefined
+     */
+    test('undefined', () => {
       const measurement = new NumericMeasurement();
       const item = getDicomNumericMeasurementItem(measurement);
 
       assert.deepEqual(item, {});
     });
-
-  });
-
-  describe('round-trip conversion via items', () => {
-
-    test('dataElements -> NumericMeasurement -> item -> NumericMeasurement',
-      () => {
-        const deNumericValue = new DataElement('DS');
-        deNumericValue.value = ['42.5'];
-
-        const deCodeMeaning = new DataElement('LO');
-        deCodeMeaning.value = ['millimeter'];
-        const deCodeValue = new DataElement('SH');
-        deCodeValue.value = ['mm'];
-        const deScheme = new DataElement('SH');
-        deScheme.value = ['UCUM'];
-
-        const codeItem = {
-          [TagKeys.CodeMeaning]: deCodeMeaning,
-          [TagKeys.CodeValue]: deCodeValue,
-          [TagKeys.CodingSchemeDesignator]: deScheme
-        };
-
-        const deMeasUnits = new DataElement('SQ');
-        deMeasUnits.value = [codeItem];
-
-        const measuredValueItem = {
-          [TagKeys.NumericValue]: deNumericValue,
-          [TagKeys.MeasurementUnitsCodeSequence]: deMeasUnits
-        };
-
-        const deMeasured = new DataElement('SQ');
-        deMeasured.value = [measuredValueItem];
-
-        const dataElements = {
-          [TagKeys.MeasuredValueSequence]: deMeasured
-        };
-
-        const measurement1 = getNumericMeasurement(dataElements);
-        const item = getDicomNumericMeasurementItem(measurement1);
-
-        // recreate NumericMeasurement from item
-        const measurement2 = new NumericMeasurement();
-        if (typeof item.MeasuredValueSequence !== 'undefined') {
-          const valueItem = item.MeasuredValueSequence.value[0];
-          const newValue = new MeasuredValue();
-          if (typeof valueItem.NumericValue !== 'undefined') {
-            newValue.numericValue = valueItem.NumericValue;
-          }
-          measurement2.measuredValue = newValue;
-        }
-
-        // verify round-trip
-        assert.equal(measurement1.measuredValue.numericValue,
-          measurement2.measuredValue.numericValue);
-      }
-    );
 
   });
 

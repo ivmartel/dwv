@@ -10,7 +10,7 @@ describe('math', () => {
   /**
    * Tests for {@link Vector3D}.
    *
-   * @function module:tests/math~vector3D-class
+   * @function module:tests/math~vector3d-class
    */
   test('Vector3D class', () => {
     const v0 = new Vector3D(1, 2, 3);
@@ -62,7 +62,7 @@ describe('math', () => {
   /**
    * Tests for {@link Vector3D}.
    *
-   * @function module:tests/math~vector3D-crossproduct
+   * @function module:tests/math~vector3d-crossproduct
    */
   test('Vector3D crossProduct', () => {
     // test vectors
@@ -120,7 +120,7 @@ describe('math', () => {
   /**
    * Tests for {@link Vector3D}.
    *
-   * @function module:tests/math~vector3D-dotproduct
+   * @function module:tests/math~vector3d-dotproduct
    */
   test('Vector3D dotProduct', () => {
     // orthogonal

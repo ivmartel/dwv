@@ -10,7 +10,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} events with single frame data.
    *
-   * @function module:tests/io~rawImageLoader-canloadurl
+   * @function module:tests/io~raw-image-loader-canloadurl
    */
   test('RAW image loader canloadurl', () => {
     const loader = new RawImageLoader();

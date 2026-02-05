@@ -108,7 +108,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle} getRectangleIndices.
    *
-   * @function module:tests/math~rectangle-getRectangleIndices
+   * @function module:tests/math~rectangle-getrectangleindices
    */
   test('Rectangle getRectangleIndices',
     () => {

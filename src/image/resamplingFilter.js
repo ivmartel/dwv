@@ -2,6 +2,9 @@
 import {Matrix33, BIG_EPSILON} from '../math/matrix.js';
 import {getTypedArray} from '../dicom/dicomParser.js';
 
+/**
+ * Resampling file class.
+ */
 export class ResamplingFilter {
   /**
    * Simple trilinear sampling function.

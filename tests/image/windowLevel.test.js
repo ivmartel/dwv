@@ -13,7 +13,7 @@ describe('image', () => {
   /**
    * Tests for {@link WindowLevel}.
    *
-   * @function module:tests/image~windowlevel
+   * @function module:tests/image~windowlevel-class
    */
   test('WindowLevel class', () => {
     const wcaw00 = new WindowLevel(0, 2);
@@ -29,9 +29,9 @@ describe('image', () => {
   /**
    * Tests for validateWindowLevel.
    *
-   * @function module:tests/image~validateWindowLevel
+   * @function module:tests/image~validatewindowlevel
    */
-  test('validateWindowLevel.', () => {
+  test('validateWindowLevel', () => {
     const range0 = {min: 0, max: 10};
 
     const wl00 = new WindowLevel(5, 1);

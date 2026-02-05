@@ -23,9 +23,9 @@ import {Matrix33} from '../../src/math/matrix.js';
 describe('dicom', () => {
 
   /**
-   * Tests for getPixelSpacing.
+   * Tests for {@link getPixelSpacing}.
    *
-   * @function module:tests/dicom~getPixelSpacing
+   * @function module:tests/dicom~getpixelspacing
    */
   test('getPixelSpacing', () => {
     const TagKeys = {
@@ -146,9 +146,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for isMonochrome.
+   * Tests for {@link isMonochrome}.
    *
-   * @function module:tests/dicom~isMonochrome
+   * @function module:tests/dicom~ismonochrome
    */
   test('isMonochrome', () => {
     // ok
@@ -169,9 +169,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getImage2DSize.
+   * Tests for @function getImage2DSize}.
    *
-   * @function module:tests/dicom~getImage2DSize
+   * @function module:tests/dicom~getimage2dsize
    */
   test('getImage2DSize', () => {
     const TagKeys = {
@@ -200,9 +200,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getPixelAspectRatio.
+   * Tests for {@link getPixelAspectRatio}.
    *
-   * @function module:tests/dicom~getPixelAspectRatio
+   * @function module:tests/dicom~getpixelaspectratio
    */
   test('getPixelAspectRatio', () => {
     const TagKeys = {
@@ -224,9 +224,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getSpacingFromMeasure.
+   * Tests for {@link getSpacingFromMeasure}.
    *
-   * @function module:tests/dicom~getSpacingFromMeasure
+   * @function module:tests/dicom~getspacingfrommeasure
    */
   test('getSpacingFromMeasure', () => {
     const TagKeys = {
@@ -259,9 +259,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getTagPixelUnit.
+   * Tests for {@link getTagPixelUnit}.
    *
-   * @function module:tests/dicom~getTagPixelUnit
+   * @function module:tests/dicom~gettagpixelunit
    */
   test('getTagPixelUnit', () => {
     const TagKeys = {
@@ -295,9 +295,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getOrientationMatrix.
+   * Tests for (@link getOrientationMatrix}.
    *
-   * @function module:tests/dicom~getOrientationMatrix
+   * @function module:tests/dicom~getorientationmatrix
    */
   test('getOrientationMatrix', () => {
     const TagKeys = {
@@ -328,9 +328,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDicomMeasureItem.
+   * Tests for {@link getDicomMeasureItem}.
    *
-   * @function module:tests/dicom~getDicomMeasureItem
+   * @function module:tests/dicom~getdicommeasureitem
    */
   test('getDicomMeasureItem', () => {
     const spacing = new Spacing([1.5, 2.5, 3.5]);
@@ -342,9 +342,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getDicomPlaneOrientationItem.
+   * Tests for {@link getDicomPlaneOrientationItem}.
    *
-   * @function module:tests/dicom~getDicomPlaneOrientationItem
+   * @function module:tests/dicom~getdicomplaneorientationitem
    */
   test('getDicomPlaneOrientationItem', () => {
     /* eslint-disable @stylistic/js/array-element-newline */
@@ -361,9 +361,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getPhotometricInterpretation.
+   * Tests for {@link getPhotometricInterpretation}.
    *
-   * @function module:tests/dicom~getPhotometricInterpretation
+   * @function module:tests/dicom~getphotometricinterpretation
    */
   test('getPhotometricInterpretation', () => {
     const TagKeys = {
@@ -422,9 +422,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for isSecondatyCapture.
+   * Tests for {@link isSecondatyCapture}.
    *
-   * @function module:tests/dicom~isSecondatyCapture
+   * @function module:tests/dicom~issecondatycapture
    */
   test('isSecondatyCapture', () => {
     // valid secondary capture UIDs
@@ -440,9 +440,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for getReferencedSeriesUID.
+   * Tests for {@link getReferencedSeriesUID}.
    *
-   * @function module:tests/dicom~getReferencedSeriesUID
+   * @function module:tests/dicom~getreferencedseriesuid
    */
   test('getReferencedSeriesUID', () => {
     const TagKeys = {

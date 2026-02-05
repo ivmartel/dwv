@@ -11,10 +11,11 @@ describe('io', () => {
   /**
    * Tests for {@link DicomDataLoader} events with single frame data.
    *
-   * @function module:tests/io~dicomDataLoader-canloadurl
+   * @function module:tests/io~dicom-data-loader-canloadurl
    */
   test(
-    'DICOM loader canloadurl - #DWV-REQ-IO-02-001 Load DICOM discrete URL(s)',
+    'DICOM data loader canloadurl - ' +
+    '#DWV-REQ-IO-02-001 Load DICOM discrete URL(s)',
     () => {
       const loader = new DicomDataLoader();
 

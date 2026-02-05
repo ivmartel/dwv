@@ -14,7 +14,7 @@ describe('math', () => {
   /**
    * Tests for {@link Point2D}.
    *
-   * @function module:tests/math~point2D-class
+   * @function module:tests/math~point2d-class
    */
   test('Point2D class', () => {
     const p0 = new Point2D(1, 2);
@@ -43,7 +43,7 @@ describe('math', () => {
   /**
    * Tests for {@link Point3D}.
    *
-   * @function module:tests/math~point3D-class
+   * @function module:tests/math~point3d-class
    */
   test('Point3D class', () => {
     const p0 = new Point3D(1, 2, 3);

@@ -16,7 +16,7 @@ describe('image', () => {
   /**
    * Tests for {@link MaskSegmentHelper} findOverlap.
    *
-   * @function module:tests/image~MaskSegmentHelper-findOverlap
+   * @function module:tests/image~masksegmenthelper-findoverlap
    */
   test('MaskSegmentHelper findOverlap', () => {
     const imgOrigins = [new Point3D(0, 0, 0)];

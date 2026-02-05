@@ -2,7 +2,7 @@ import {describe, test, assert} from 'vitest';
 import {BucketQueue} from '../../src/math/bucketQueue.js';
 
 /**
- * Tests for the 'math/BucketQueue.js' file.
+ * Tests for the 'math/bucketQueue.js' file.
  */
 /** @module tests/math */
 

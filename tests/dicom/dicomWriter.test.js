@@ -32,11 +32,11 @@ import syntheticData from '/tests/dicom/synthetic-data.json';
 describe('dicom', () => {
 
   /**
-   * Tests getUID.
+   * Tests {@link getUID}.
    *
-   * @function module:tests/dicom~getUID
+   * @function module:tests/dicom~getuid
    */
-  test('Test getUID', () => {
+  test('getUID', () => {
     // check size
     const uid00 = getUID('mytag');
     assert.ok(uid00.length <= 64, 'uid length #0');
@@ -61,12 +61,12 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for {@link DicomWriter} using simple DICOM data.
+   * Tests for {@link DicomWriter} using multiframe DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicomWriter-multiframe
+   * @function module:tests/dicom~write-multiframe
    */
-  test('Multiframe write - #DWV-REQ-IO-05-001 Write DICOM file',
+  test('Write multiframe - #DWV-REQ-IO-05-001 Write DICOM file',
     () => {
       // parse DICOM
       let dicomParser = new DicomParser();
@@ -113,7 +113,7 @@ describe('dicom', () => {
    * Tests for {@link DicomWriter} anomnymisation.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicomWriter-anonymise
+   * @function module:tests/dicom~write-anonymised
    */
   test('Write anonymised - #DWV-REQ-IO-05-002 Write anonymised DICOM file',
     () => {
@@ -193,7 +193,7 @@ describe('dicom', () => {
    * Tests for {@link DicomWriter} anomnymisation and add tags.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicomWriterAnonymiseAddTags
+   * @function module:tests/dicom~write-anonymised-and-add-tags
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -600,10 +600,10 @@ describe('dicom', () => {
    * Tests write/read DICOM data with explicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~readwrite-synthetic-explicit
+   * @function module:tests/dicom~read-write-synthetic-explicit
    */
   test(
-    'Read/write synthetic explicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+    'Read-write synthetic explicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
       for (const config of syntheticData) {
         config.tags.TransferSyntaxUID =
@@ -617,11 +617,11 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with explicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~readwrite-synthetic-explicit-with-rules
+   * @function module:tests/dicom~read-write-synthetic-explicit-with-rules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
-    'Read/write synthetic explicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+    'Read-write synthetic explicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
       for (const config of syntheticData) {
         config.tags.TransferSyntaxUID =
@@ -638,10 +638,10 @@ describe('dicom', () => {
    * Tests write/read DICOM data with implicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~readwrite-synthetic-implicit
+   * @function module:tests/dicom~read-write-synthetic-implicit
    */
   test(
-    'Read/write synthetic implicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+    'Read-write synthetic implicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
       for (const config of syntheticData) {
         config.tags.TransferSyntaxUID =
@@ -655,11 +655,11 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with implicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~readwrite-synthetic-implicit-with-rules
+   * @function module:tests/dicom~read-write-synthetic-implicit-with-rules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
-    'Read/write synthetic implicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+    'Read-write synthetic implicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
       for (const config of syntheticData) {
         config.tags.TransferSyntaxUID =
@@ -676,11 +676,11 @@ describe('dicom', () => {
    * Tests write/read DICOM data with explicit big endian encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~readwrite-synthetic-explicit-big-endian
+   * @function module:tests/dicom~read-write-synthetic-explicit-big-endian
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
-    'Read/write synthetic explicit big endian - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+    'Read-write synthetic explicit big endian - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
       for (const config of syntheticData) {
         config.tags.TransferSyntaxUID =
@@ -694,11 +694,11 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with explicit big endian encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~readwrite-synthetic-explicit-be-with-rules
+   * @function module:tests/dicom~read-write-synthetic-explicit-be-with-rules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
-    'Read/write synthetic explicit big endian with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+    'Read-write synthetic explicit BE with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
       for (const config of syntheticData) {
         config.tags.TransferSyntaxUID =

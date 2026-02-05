@@ -327,7 +327,7 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~read-dwv034-arrow
    */
-  test('Read dwv034 annotation arrow', () => {
+  test('Read dwv034 arrow', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Arrow);
     checkGroupCommonProperties(annotationGroup, 'arrow');
     checkArrowGroup(annotationGroup);
@@ -338,7 +338,7 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~read-dwv034-circle
    */
-  test('Read dwv034 annotation circle', () => {
+  test('Read dwv034 circle', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Circle);
     checkGroupCommonProperties(annotationGroup, 'circle');
     checkCircleGroup(annotationGroup);
@@ -349,7 +349,7 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~read-dwv034-ellipse
    */
-  test('Read dwv034 annotation ellipse', () => {
+  test('Read dwv034 ellipse', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Ellipse);
     checkGroupCommonProperties(annotationGroup, 'ellipse');
     checkEllipseGroup(annotationGroup);
@@ -360,7 +360,7 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~read-dwv034-protractor
    */
-  test('Read dwv034 annotation protractor', () => {
+  test('Read dwv034 protractor', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Protractor);
     checkGroupCommonProperties(annotationGroup, 'protractor');
     checkProtractorGroup(annotationGroup);
@@ -371,7 +371,7 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~read-dwv034-rectangle
    */
-  test('Read dwv034 annotation rectangle', () => {
+  test('Read dwv034 rectangle', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Rectangle);
     checkGroupCommonProperties(annotationGroup, 'rectangle');
     checkRectangleGroup(annotationGroup);
@@ -382,7 +382,7 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~read-dwv034-roi
    */
-  test('Read dwv034 annotation roi', () => {
+  test('Read dwv034 roi', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Roi);
     checkGroupCommonProperties(annotationGroup, 'roi');
     checkRoiGroup(annotationGroup);
@@ -393,7 +393,7 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~read-dwv034-ruler
    */
-  test('Read dwv034 annotation ruler', () => {
+  test('Read dwv034 ruler', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Ruler);
     checkGroupCommonProperties(annotationGroup, 'ruler');
     checkRulerGroup(annotationGroup);
@@ -406,9 +406,9 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing an arrow.
    *
-   * @function module:tests/annotation~read-tid1500v0-arrow
+   * @function module:tests/annotation~read-tid1500-v0-arrow
    */
-  test('Read tid1500 v0 annotation arrow', () => {
+  test('Read tid1500 v0 arrow', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Arrow);
     checkGroupCommonProperties(annotationGroup, 'arrow');
     checkArrowGroup(annotationGroup);
@@ -417,9 +417,9 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a circle.
    *
-   * @function module:tests/annotation~read-tid1500v0-circle
+   * @function module:tests/annotation~read-tid1500-v0-circle
    */
-  test('Read tid1500 v0 annotation circle', () => {
+  test('Read tid1500 v0 circle', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Circle);
     checkGroupCommonProperties(annotationGroup, 'circle');
     checkCircleGroup(annotationGroup);
@@ -428,9 +428,9 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing an ellipse.
    *
-   * @function module:tests/annotation~read-tid1500v0-ellipse
+   * @function module:tests/annotation~read-tid1500-v0-ellipse
    */
-  test('Read tid1500 v0 annotation ellipse', () => {
+  test('Read tid1500 v0 ellipse', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Ellipse);
     checkGroupCommonProperties(annotationGroup, 'ellipse');
     checkEllipseGroup(annotationGroup);
@@ -439,9 +439,9 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a protractor.
    *
-   * @function module:tests/annotation~read-tid1500v0-protractor
+   * @function module:tests/annotation~read-tid1500-v0-protractor
    */
-  test('Read tid1500 v0 annotation protractor', () => {
+  test('Read tid1500 v0 protractor', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Protractor);
     checkGroupCommonProperties(annotationGroup, 'protractor');
     checkProtractorGroup(annotationGroup);
@@ -450,9 +450,9 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a rectangle.
    *
-   * @function module:tests/annotation~read-tid1500v0-rectangle
+   * @function module:tests/annotation~read-tid1500-v0-rectangle
    */
-  test('Read tid1500 v0 annotation rectangle', () => {
+  test('Read tid1500 v0 rectangle', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Rectangle);
     checkGroupCommonProperties(annotationGroup, 'rectangle');
     checkRectangleGroup(annotationGroup);
@@ -461,9 +461,9 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a roi.
    *
-   * @function module:tests/annotation~read-tid1500v0-roi
+   * @function module:tests/annotation~read-tid1500-v0-roi
    */
-  test('Read tid1500 v0 annotation roi', () => {
+  test('Read tid1500 v0 roi', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Roi);
     checkGroupCommonProperties(annotationGroup, 'roi');
     checkRoiGroup(annotationGroup);
@@ -472,9 +472,9 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a ruler.
    *
-   * @function module:tests/annotation~read-tid1500v0-ruler
+   * @function module:tests/annotation~read-tid1500-v0-ruler
    */
-  test('Read tid1500 v0 annotation ruler', () => {
+  test('Read tid1500 v0 ruler', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Ruler);
     checkGroupCommonProperties(annotationGroup, 'ruler');
     checkRulerGroup(annotationGroup);

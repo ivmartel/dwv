@@ -100,9 +100,9 @@ describe('math', () => {
   });
 
   /**
-   * Tests for {@link Line}.
+   * Tests for {@link getAngle}.
    *
-   * @function module:tests/math~line-angle
+   * @function module:tests/math~angle-between-lines
    */
   test('Angle between lines - #DWV-REQ-UI-07-005 Draw protractor',
     () => {
@@ -143,7 +143,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line} areOrthogonal.
    *
-   * @function module:tests/math~line-areOrthogonal
+   * @function module:tests/math~areorthogonal
    */
   test('areOrthogonal', () => {
     const p00 = new Point2D(0, 0);
@@ -174,7 +174,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line}.
    *
-   * @function module:tests/math~line-perpendicular
+   * @function module:tests/math~perpendicular-line
    */
   test('Perpendicular line', () => {
     const p00 = new Point2D(0, 0);
@@ -220,7 +220,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line}.
    *
-   * @function module:tests/math~line-getPerpendicularLineAtDistance
+   * @function module:tests/math~line-getperpendicularlineatdistance
    */
   test('Line getPerpendicularLineAtDistance', () => {
     const p00 = new Point2D(0, 0);
@@ -254,7 +254,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line}.
    *
-   * @function module:tests/math~line-isPointInLineRange
+   * @function module:tests/math~line-ispointinlinerange
    */
   test('Line isPointInLineRange', () => {
     const p00 = new Point2D(0, 0);

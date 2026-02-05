@@ -221,7 +221,7 @@ export class DicomData {
 }
 
 /**
- * DICOM data: meta and possible image.
+ * DICOM slice data list.
  */
 export class DicomSliceDataList {
 
@@ -426,7 +426,7 @@ export class DicomSliceDataList {
   }
 }
 
-/*
+/**
  * DicomData controller.
  */
 export class DataController {

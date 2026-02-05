@@ -76,7 +76,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getTagFromDictionary}.
    *
-   * @function module:tests/dicom~getTagFromDictionary
+   * @function module:tests/dicom~gettagfromdictionary
    */
   test('getTagFromDictionary', () => {
     const tag00 = getTagFromDictionary();

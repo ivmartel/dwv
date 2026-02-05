@@ -231,7 +231,7 @@ describe('utils', () => {
    *
    * Ref: {@link https://www.easyrgb.com/en/convert.php}.
    *
-   * @function module:tests/utils~cielab-to-srgb
+   * @function module:tests/utils~cielab-to-rgb
    */
   test('cielab to rgb', () => {
     const lab00 = {l: 0, a: 0, b: 0};

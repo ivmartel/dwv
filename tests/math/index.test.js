@@ -135,7 +135,7 @@ describe('math', () => {
   /**
    * Tests for {@link getZeroIndex}.
    *
-   * @function module:tests/math~index-getZeroIndex
+   * @function module:tests/math~index-getzeroindex
    */
   test('Index getZeroIndex', () => {
     const i0 = getZeroIndex(3);

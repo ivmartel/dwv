@@ -30,11 +30,11 @@ import dwvDicomDir from '../data/DICOMDIR?inline';
 describe('dicom', () => {
 
   /**
-   * Tests for {@link DicomParser} Implementation class.
+   * Tests for {@link getImplementationClassUID}.
    *
-   * @function module:tests/dicom~implementaion-class
+   * @function module:tests/dicom~getimplementationclassuid
    */
-  test('DICOM parsing - Implementation class and name', () => {
+  test('getImplementationClassUID', () => {
     // check UI
     const versionUI = getDwvVersionUI();
     const regex = /[a-zA-Z]/g;
@@ -61,11 +61,11 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for {@link DicomParser} compare version.
+   * Tests for {@link compareVersions}.
    *
-   * @function module:tests/dicom~compare-version
+   * @function module:tests/dicom~compareversions
    */
-  test('DICOM parsing - compare version', () => {
+  test('compareVersions', () => {
     const versions00 = '0.0.0';
     assert.equal(
       compareVersions(versions00, versions00), 0, 'compare version #00');
@@ -113,11 +113,11 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for {@link DicomParser} isVersionInBounds.
+   * Tests for {@link isVersionInBounds}.
    *
-   * @function module:tests/dicom~version-bounds
+   * @function module:tests/dicom~isversioninbounds
    */
-  test('DICOM parsing - isVersionInBounds', () => {
+  test('isVersionInBounds', () => {
     assert.ok(
       isVersionInBounds('0.1.1', '0.1.0', '0.1.2'),
       'isVersionInBounds #00');
@@ -193,9 +193,9 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using simple DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~simple-dicom-parsing
+   * @function module:tests/dicom~simple-dicom-parsing-until-tag
    */
-  test('Simple DICOM parsing - until tag',
+  test('Simple DICOM parsing until tag',
     () => {
       const buffer = b64urlToArrayBuffer(dwvTestSimple);
 

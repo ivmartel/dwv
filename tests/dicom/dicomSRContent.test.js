@@ -24,9 +24,14 @@ const TagKeys = {
   ContentSequence: '0040A730'
 };
 
-describe('dicom SR content', () => {
+describe('dicom', () => {
 
-  test('getContentTemplate returns mapping-resource - template id', () => {
+  /**
+   * Tests for {@link getContentTemplate} undefined.
+   *
+   * @function module:tests/dicom~getcontenttemplate
+   */
+  test('getContentTemplate', () => {
     const mapping = new DataElement('CS');
     mapping.value = ['DCMR'];
     const tid = new DataElement('SH');
@@ -46,7 +51,12 @@ describe('dicom SR content', () => {
     assert.equal(template, 'DCMR-T123');
   });
 
-  test('DicomSRContent toString and hasHeader', () => {
+  /**
+   * Tests for {@link DicomSRContent} toString and hasHeader.
+   *
+   * @function module:tests/dicom~dicomsrcontent-tostring-hasheader
+   */
+  test('DicomSRContent toString hasHeader', () => {
     const content = new DicomSRContent(ValueTypes.text);
     content.relationshipType = RelationshipTypes.contains;
     const code = new DicomCode('Length');
@@ -81,7 +91,12 @@ describe('dicom SR content', () => {
     ));
   });
 
-  test('isEqualContentItem compares flat objects', () => {
+  /**
+   * Tests for {@link isEqualContentItem}.
+   *
+   * @function module:tests/dicom~isequalcontentitem
+   */
+  test('isEqualContentItem', () => {
     const a = {x: 1, y: 2};
     const b = {x: 1, y: 2};
     const c = {x: 1};
@@ -89,7 +104,12 @@ describe('dicom SR content', () => {
     assert.notOk(isEqualContentItem(a, c));
   });
 
-  test('getSRContent parses TEXT and nested content', () => {
+  /**
+   * Tests for {@link getSRContent}.
+   *
+   * @function module:tests/dicom~getsrcontent
+   */
+  test('getSRContent', () => {
     const vt = new DataElement('CS');
     vt.value = [ValueTypes.text];
     const txt = new DataElement('UT');
@@ -131,7 +151,12 @@ describe('dicom SR content', () => {
     assert.equal(content.contentSequence[0].value, 'child');
   });
 
-  test('getDicomSRContentItem for numeric value', () => {
+  /**
+   * Tests for {@link getDicomSRContentItem}.
+   *
+   * @function module:tests/dicom~getdicomsrcontentitem
+   */
+  test('getDicomSRContentItem', () => {
     const content = getSRContentFromValue(
       'length',
       42,
@@ -145,7 +170,12 @@ describe('dicom SR content', () => {
     assert.ok(Array.isArray(item.MeasuredValueSequence.value));
   });
 
-  test('getSRContent parses CODE value type', () => {
+  /**
+   * Tests for {@link getSRContent} with code value type.
+   *
+   * @function module:tests/dicom~getsrcontent-code
+   */
+  test('getSRContent CODE', () => {
     const vt = new DataElement('CS');
     vt.value = [ValueTypes.code];
     // ConceptCodeSequence

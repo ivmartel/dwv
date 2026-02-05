@@ -34,7 +34,12 @@ describe('dicom', () => {
 
   describe('getSuvFactor', () => {
 
-    test('returns warning when CorrectedImage missing', () => {
+    /**
+     * Tests for {@link getSuvFactor} without corrected image.
+     *
+     * @function module:tests/dicom~getsuvfactor-no-corrected
+     */
+    test('no corrected', () => {
       const deSeriesDate = new DataElement('DA');
       deSeriesDate.value = ['20231215'];
 
@@ -53,7 +58,12 @@ describe('dicom', () => {
       assert.include(result.warning, 'Corrected Image');
     });
 
-    test('returns warning when DecayCorrection missing', () => {
+    /**
+     * Tests for {@link getSuvFactor} without decay correction.
+     *
+     * @function module:tests/dicom~getsuvfactor-no-decay
+     */
+    test('no decay', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -76,7 +86,12 @@ describe('dicom', () => {
       assert.include(result.warning, 'Decay Correction');
     });
 
-    test('returns warning when Units missing', () => {
+    /**
+     * Tests for {@link getSuvFactor} without Units.
+     *
+     * @function module:tests/dicom~getsuvfactor-no-units
+     */
+    test('no units', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -103,7 +118,12 @@ describe('dicom', () => {
       assert.include(result.warning, 'Units');
     });
 
-    test('returns warning when PatientWeight missing', () => {
+    /**
+     * Tests for {@link getSuvFactor} without PatientWeight.
+     *
+     * @function module:tests/dicom~getsuvfactor-no-weight
+     */
+    test('no weight', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -134,8 +154,13 @@ describe('dicom', () => {
       assert.include(result.warning, 'PatientWeight');
     });
 
-    test('returns warning when RadiopharmaceuticalInformationSequence ' +
-      'missing', () => {
+    /**
+     * Tests for {@link getSuvFactor} without
+     * RadiopharmaceuticalInformationSequence.
+     *
+     * @function module:tests/dicom~getsuvfactor-no-radio
+     */
+    test('no radio', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -171,7 +196,12 @@ describe('dicom', () => {
         'RadiopharmaceuticalInformationSequence');
     });
 
-    test('returns warning when RadionuclideTotalDose missing', () => {
+    /**
+     * Tests for {@link getSuvFactor} without RadionuclideTotalDose.
+     *
+     * @function module:tests/dicom~getsuvfactor-no-total-dose
+     */
+    test('no total dose', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -210,7 +240,12 @@ describe('dicom', () => {
       assert.include(result.warning, 'RadionuclideTotalDose');
     });
 
-    test('returns warning when RadionuclideHalfLife missing', () => {
+    /**
+     * Tests for {@link getSuvFactor} without RadionuclideHalfLife.
+     *
+     * @function module:tests/dicom~getsuvfactor-no-half-life
+     */
+    test('no half life', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -254,7 +289,12 @@ describe('dicom', () => {
       assert.include(result.warning, 'RadionuclideHalfLife');
     });
 
-    test('calculates SUV factor with basic required elements', () => {
+    /**
+     * Tests for {@link getSuvFactor}.
+     *
+     * @function module:tests/dicom~getsuvfactor-good-input
+     */
+    test('good input', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -302,7 +342,13 @@ describe('dicom', () => {
       assert.ok(result.value > 0);
     });
 
-    test('calculates SUV factor with RadiopharmaceuticalStartDateTime', () => {
+    /**
+     * Tests for {@link getSuvFactor} with
+     * RadiopharmaceuticalStartDateTime.
+     *
+     * @function module:tests/dicom~getsuvfactor-radio-start-date
+     */
+    test('radio start date', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -354,7 +400,13 @@ describe('dicom', () => {
       assert.ok(result.value > 0);
     });
 
-    test('returns warning for invalid PatientWeight', () => {
+    /**
+     * Tests for {@link getSuvFactor} with invalid
+     * PatientWeight.
+     *
+     * @function module:tests/dicom~getsuvfactor-invalid-weight
+     */
+    test('invalid weight', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 
@@ -389,7 +441,12 @@ describe('dicom', () => {
       assert.include(result.warning, 'PatientWeight is not a number');
     });
 
-    test('calculates correct SUV factor value', () => {
+    /**
+     * Tests for {@link getSuvFactor} correct.
+     *
+     * @function module:tests/dicom~getsuvfactor-correct
+     */
+    test('correct', () => {
       const deCorrectImage = new DataElement('CS');
       deCorrectImage.value = ['ATTN', 'DECY'];
 

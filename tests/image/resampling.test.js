@@ -11,7 +11,7 @@ import {
 } from '../../src/image/resamplingThread.js';
 
 /**
- * Tests for the 'image/ResamplingFilter.js' file.
+ * Tests for the 'image/resamplingFilter.js' file.
  */
 
 describe('image', () => {
@@ -19,7 +19,7 @@ describe('image', () => {
   /**
    * Tests for {@link ResamplingFilter}.
    *
-   * @function module:tests/image~ResamplingFilter-class
+   * @function module:tests/image~resamplingfilter-class
    */
   test('ResamplingFilter class', () => {
     /* eslint-disable @stylistic/js/array-element-newline */

@@ -96,9 +96,9 @@ describe('math', () => {
   /**
    * Tests for getEllipseIndices.
    *
-   * @function module:tests/math~getEllipseIndices
+   * @function module:tests/math~getellipseindices
    */
-  test('Test getEllipseIndices', () => {
+  test('getEllipseIndices', () => {
     const center00 = new Index([1, 1]);
     const radius00 = [2, 2];
     const dir00 = [0, 1];

@@ -105,9 +105,9 @@ describe('dicom', () => {
   /**
    * Tests for {@link DicomCode} dictionary.
    *
-   * @function module:tests/dicom~dicom-code-dict
+   * @function module:tests/dicom~dictionary
    */
-  test('DICOM code dictionary', () => {
+  test('dictionary', () => {
     let count = 0;
     for (const key0 in DcmCodes) {
       for (const key in DcmCodes) {
@@ -121,11 +121,11 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for {@link DicomCode} getSegmentationCode.
+   * Tests for {@link getSegmentationCode}.
    *
-   * @function module:tests/dicom~getSegmentationCode
+   * @function module:tests/dicom~getsegmentationcode
    */
-  test('DICOM code getSegmentationCode', () => {
+  test('getSegmentationCode', () => {
     const code0 = getSegmentationCode();
     const theoCode0 = new DicomCode('Segmentation');
     theoCode0.value = '113076';
@@ -134,11 +134,11 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for {@link DicomCode} getConceptNameCode.
+   * Tests for {@link getConceptNameCode}.
    *
-   * @function module:tests/dicom~getConceptNameCode
+   * @function module:tests/dicom~getconceptnamecode
    */
-  test('DICOM code getConceptNameCode', () => {
+  test('getConceptNameCode', () => {
     const code0 = getConceptNameCode('test');
     assert.equal(code0, undefined, 'getConceptNameCode #0');
 
@@ -150,11 +150,11 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for {@link DicomCode} getMeasurementUnitsCode.
+   * Tests for {@link getMeasurementUnitsCode}.
    *
-   * @function module:tests/dicom~getMeasurementUnitsCode
+   * @function module:tests/dicom~getmeasurementunitscode
    */
-  test('DICOM code getMeasurementUnitsCode', () => {
+  test('getMeasurementUnitsCode', () => {
     const code0 = getMeasurementUnitsCode('test');
     const theoCode0 = new DicomCode('No units');
     theoCode0.value = '1';

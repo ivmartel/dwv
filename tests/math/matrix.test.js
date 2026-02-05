@@ -124,7 +124,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} multiplication.
    *
-   * @function module:tests/math~Matrix33-multiply
+   * @function module:tests/math~matrix33-multiply
    */
   test('Matrix33 multiply', () => {
     // id

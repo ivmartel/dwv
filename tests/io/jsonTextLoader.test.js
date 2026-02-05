@@ -4,7 +4,8 @@ import {fileContentTypes} from '../../src/io/filesLoader.js';
 import {urlContentTypes} from '../../src/io/urlsLoader.js';
 
 describe('io', () => {
-  describe('JSONTextLoader - events', () => {
+
+  describe('JSONTextLoader-events', () => {
     let loader;
     let loadStartEvent;
     let progressEvent;
@@ -47,11 +48,21 @@ describe('io', () => {
       };
     });
 
-    test('isLoading returns false initially', () => {
+    /**
+     * Tests for {@link JSONTextLoader} events.
+     *
+     * @function module:tests/io~jsontextloader-events-isloading-initial
+     */
+    test('isLoading initial', () => {
       assert.notOk(loader.isLoading());
     });
 
-    test('load sets loading flag and fires all events', () => {
+    /**
+     * Tests for {@link JSONTextLoader} events.
+     *
+     * @function module:tests/io~jsontextloader-events-load-sets-flag-and-fires
+     */
+    test('load sets flag and fires', () => {
       const text = '{"key": "value"}';
       const origin = 'test-origin';
       const index = 0;
@@ -80,13 +91,23 @@ describe('io', () => {
       assert.equal(loadEndEvent.source, origin);
     });
 
-    test('load resets loading flag after completion', () => {
+    /**
+     * Tests for {@link JSONTextLoader} events.
+     *
+     * @function module:tests/io~jsontextloader-events-load-resets-flag
+     */
+    test('load resets flag', () => {
       assert.notOk(loader.isLoading());
       loader.load('test', 'origin', 0);
       assert.notOk(loader.isLoading());
     });
 
-    test('load fires error event on exception', () => {
+    /**
+     * Tests for {@link JSONTextLoader} events.
+     *
+     * @function module:tests/io~jsontextloader-events-load-fires-error
+     */
+    test('load fires error', () => {
       loader.onloaditem = () => {
         throw new Error('Test error');
       };
@@ -103,7 +124,12 @@ describe('io', () => {
       assert.ok(loadEndEvent);
     });
 
-    test('abort resets loading flag and fires events', () => {
+    /**
+     * Tests for {@link JSONTextLoader} events.
+     *
+     * @function module:tests/io~jsontextloader-events-abort-resets-internals
+     */
+    test('abort resets internals', () => {
       loader.abort();
 
       assert.notOk(loader.isLoading());
@@ -111,12 +137,22 @@ describe('io', () => {
       assert.ok(loadEndEvent);
     });
 
+    /**
+     * Tests for {@link JSONTextLoader} events.
+     *
+     * @function module:tests/io~jsontextloader-events-setoptions-does-nothing
+     */
     test('setOptions does nothing', () => {
       loader.setOptions({foo: 'bar'});
       assert.notOk(loader.isLoading());
     });
 
-    test('default event handlers do not throw', () => {
+    /**
+     * Tests for {@link JSONTextLoader} events.
+     *
+     * @function module:tests/io~jsontextloader-events-default-does-not-throw
+     */
+    test('default does not throw', () => {
       const loader2 = new JSONTextLoader();
       assert.doesNotThrow(() => {
         loader2.onloadstart({});
@@ -130,47 +166,77 @@ describe('io', () => {
     });
   });
 
-  describe('JSONTextLoader - canLoadFile', () => {
+  describe('JSONTextLoader-file', () => {
     let loader;
 
     beforeEach(() => {
       loader = new JSONTextLoader();
     });
 
-    test('returns true for json extension', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadFile.
+     *
+     * @function module:tests/io~jsontextloader-file-true-for-json
+     */
+    test('true for json', () => {
       const jsonFile = new File(['test'], 'test.json');
       assert.ok(loader.canLoadFile(jsonFile));
     });
 
-    test('returns false for non-json extension', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadFile.
+     *
+     * @function module:tests/io~jsontextloader-file-false-for-non-json
+     */
+    test('false for non-json', () => {
       const txtFile = new File(['test'], 'test.txt');
       assert.notOk(loader.canLoadFile(txtFile));
     });
 
-    test('handles uppercase extension (converted to lowercase)', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadFile.
+     *
+     * @function module:tests/io~jsontextloader-file-handles-uppercase
+     */
+    test('handles uppercase', () => {
       const jsonFile = new File(['test'], 'test.JSON');
       assert.ok(loader.canLoadFile(jsonFile));
     });
 
-    test('handles file with multiple extensions', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadFile.
+     *
+     * @function module:tests/io~jsontextloader-file-handles-multiple
+     */
+    test('handles multiple', () => {
       const file = new File(['test'], 'data.backup.json');
       assert.ok(loader.canLoadFile(file));
     });
 
-    test('handles file without extension', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadFile.
+     *
+     * @function module:tests/io~jsontextloader-file-handles-no-extension
+     */
+    test('handles no extension', () => {
       const file = new File(['test'], 'data');
       assert.notOk(loader.canLoadFile(file));
     });
   });
 
-  describe('JSONTextLoader - canLoadMemory', () => {
+  describe('JSONTextLoader-memory', () => {
     let loader;
 
     beforeEach(() => {
       loader = new JSONTextLoader();
     });
 
-    test('returns true for json content-type', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadMemory.
+     *
+     * @function module:tests/io~jsontextloader-memory-json-content-type
+     */
+    test('json content-type', () => {
       const mem = {
         'Content-Type': 'application/json',
         data: '{"test": true}'
@@ -178,14 +244,24 @@ describe('io', () => {
       assert.ok(loader.canLoadMemory(mem));
     });
 
-    test('returns true for json content-type with charset', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadMemory.
+     *
+     * @function module:tests/io~jsontextloader-memory-json-content-type-charset
+     */
+    test('json content-type charset', () => {
       const mem = {
         'Content-Type': 'application/json; charset=utf-8'
       };
       assert.ok(loader.canLoadMemory(mem));
     });
 
-    test('returns false for non-json content-type', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadMemory.
+     *
+     * @function module:tests/io~jsontextloader-memory-non-json-content-type
+     */
+    test('non-json content-type', () => {
       const mem = {
         'Content-Type': 'application/xml',
         data: '<test/>'
@@ -193,42 +269,72 @@ describe('io', () => {
       assert.notOk(loader.canLoadMemory(mem));
     });
 
-    test('checks filename if no content-type', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadMemory.
+     *
+     * @function module:tests/io~jsontextloader-memory-no-content-type
+     */
+    test('no content-type', () => {
       const mem = {
         filename: 'data.json'
       };
       assert.ok(loader.canLoadMemory(mem));
     });
 
-    test('returns false for non-json filename', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadMemory.
+     *
+     * @function module:tests/io~jsontextloader-memory-non-json-filename
+     */
+    test('non-json filename', () => {
       const mem = {
         filename: 'data.txt'
       };
       assert.notOk(loader.canLoadMemory(mem));
     });
 
-    test('returns false for empty object', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadMemory.
+     *
+     * @function module:tests/io~jsontextloader-memory-empty
+     */
+    test('empty', () => {
       const mem = {};
       assert.notOk(loader.canLoadMemory(mem));
     });
   });
 
-  describe('JSONTextLoader - loadFileAs', () => {
-    test('returns fileContentTypes.Text', () => {
+  describe('JSONTextLoader-loadFileAs', () => {
+    /**
+     * Tests for {@link JSONTextLoader} loadFileAs.
+     *
+     * @function module:tests/io~jsontextloader-loadfileas-returns-text
+     */
+    test('returns Text', () => {
       const loader = new JSONTextLoader();
       assert.equal(loader.loadFileAs(), fileContentTypes.Text);
     });
   });
 
-  describe('JSONTextLoader - loadUrlAs', () => {
-    test('returns urlContentTypes.Text', () => {
+  describe('JSONTextLoader-loadUrlAs', () => {
+    /**
+     * Tests for {@link JSONTextLoader} loadUrlAs.
+     *
+     * @function module:tests/io~jsontextloader-loadurlas-returns-text
+     */
+    test('returns Text', () => {
       const loader = new JSONTextLoader();
       assert.equal(loader.loadUrlAs(), urlContentTypes.Text);
     });
   });
 
-  describe('JSONTextLoader - canLoadUrl', () => {
-    test('canLoadUrl', () => {
+  describe('JSONTextLoader-canLoadUrl', () => {
+    /**
+     * Tests for {@link JSONTextLoader} canLoadUrl.
+     *
+     * @function module:tests/io~jsontextloader-canloadurl-patterns
+     */
+    test('patterns', () => {
       const loader = new JSONTextLoader();
 
       // 'ok' tests
@@ -314,4 +420,3 @@ describe('io', () => {
     });
   });
 });
-

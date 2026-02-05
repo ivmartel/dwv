@@ -21,7 +21,12 @@ describe('dicom', () => {
 
   describe('getManufacturer', () => {
 
-    test('returns manufacturer from dataElements', () => {
+    /**
+     * Tests for {@link getManufacturer}.
+     *
+     * @function module:tests/dicom~getmanufacturer-good-input
+     */
+    test('good input', () => {
       const de = new DataElement('LO');
       de.value = ['GE MEDICAL SYSTEMS'];
 
@@ -33,7 +38,12 @@ describe('dicom', () => {
       assert.equal(result, 'GE MEDICAL SYSTEMS');
     });
 
-    test('returns first value when multiple values present', () => {
+    /**
+     * Tests for {@link getManufacturer} returns first.
+     *
+     * @function module:tests/dicom~getmanufacturer-returns-first
+     */
+    test('returns first', () => {
       const de = new DataElement('LO');
       de.value = ['GE MEDICAL SYSTEMS', 'Other'];
 
@@ -45,13 +55,23 @@ describe('dicom', () => {
       assert.equal(result, 'GE MEDICAL SYSTEMS');
     });
 
-    test('returns undefined when manufacturer tag missing', () => {
+    /**
+     * Tests for {@link getManufacturer} with no tag.
+     *
+     * @function module:tests/dicom~getmanufacturer-no-tag
+     */
+    test('no tag', () => {
       const elements = {};
       const result = getManufacturer(elements);
       assert.isUndefined(result);
     });
 
-    test('returns undefined when manufacturer value is empty', () => {
+    /**
+     * Tests for {@link getManufacturer} with no value.
+     *
+     * @function module:tests/dicom~getmanufacturer-no-value
+     */
+    test('no value', () => {
       const de = new DataElement('LO');
       de.value = [];
 
@@ -63,7 +83,12 @@ describe('dicom', () => {
       assert.isUndefined(result);
     });
 
-    test('returns undefined when value property is undefined', () => {
+    /**
+     * Tests for {@link getManufacturer} with undefined value.
+     *
+     * @function module:tests/dicom~getmanufacturer-undefined-value
+     */
+    test('undefined value', () => {
       const de = new DataElement('LO');
 
       const elements = {
@@ -74,7 +99,12 @@ describe('dicom', () => {
       assert.isUndefined(result);
     });
 
-    test('returns undefined when element is undefined', () => {
+    /**
+     * Tests for {@link getManufacturer} with undefined tag.
+     *
+     * @function module:tests/dicom~getmanufacturer-undefined-tag
+     */
+    test('undefined tag', () => {
       const elements = {
         [TagKeys.Manufacturer]: undefined
       };
@@ -87,97 +117,142 @@ describe('dicom', () => {
 
   describe('getNormalisedManufacturer', () => {
 
-    test('returns normalised GE manufacturer', () => {
+    /**
+     * Tests for {@link getNormalisedManufacturer} for GE.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturer-ge
+     */
+    test('GE', () => {
       const de = new DataElement('LO');
       de.value = ['GE MEDICAL SYSTEMS'];
-
       const elements = {
         [TagKeys.Manufacturer]: de
       };
-
       const result = getNormalisedManufacturer(elements);
       assert.equal(result, NormalisedManufacturers.GE);
-    });
 
-    test('returns normalised Siemens manufacturer', () => {
-      const de = new DataElement('LO');
-      de.value = ['SIEMENS'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
+      const de1 = new DataElement('LO');
+      de1.value = ['ge'];
+      const elements1 = {
+        [TagKeys.Manufacturer]: de1
       };
+      const result1 = getNormalisedManufacturer(elements1);
+      // Should not match (requires uppercase GE or starting with GE)
+      assert.equal(result1, 'ge');
 
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, NormalisedManufacturers.SIEMENS);
-    });
-
-    test('returns normalised Siemens Healthineers', () => {
-      const de = new DataElement('LO');
-      de.value = ['Siemens Healthineers'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
+      const de2 = new DataElement('LO');
+      de2.value = ['GE Healthcare'];
+      const elements2 = {
+        [TagKeys.Manufacturer]: de2
       };
-
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, NormalisedManufacturers.SIEMENS);
+      const result2 = getNormalisedManufacturer(elements2);
+      assert.equal(result2, NormalisedManufacturers.GE);
     });
 
-    test('returns normalised Philips Healthcare', () => {
-      const de = new DataElement('LO');
-      de.value = ['Philips Healthcare'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
+    /**
+     * Tests for {@link getNormalisedManufacturer} for Siemens.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturer-siemens
+     */
+    test('Siemens', () => {
+      const de0 = new DataElement('LO');
+      de0.value = ['SIEMENS'];
+      const elements0 = {
+        [TagKeys.Manufacturer]: de0
       };
+      const result0 = getNormalisedManufacturer(elements0);
+      assert.equal(result0, NormalisedManufacturers.SIEMENS);
 
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, NormalisedManufacturers.PHILIPS);
-    });
-
-    test('returns normalised Philips Medical Systems', () => {
-      const de = new DataElement('LO');
-      de.value = ['Philips Medical Systems'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
+      const de1 = new DataElement('LO');
+      de1.value = ['Siemens Healthineers'];
+      const elements1 = {
+        [TagKeys.Manufacturer]: de1
       };
+      const result1 = getNormalisedManufacturer(elements1);
+      assert.equal(result1, NormalisedManufacturers.SIEMENS);
 
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, NormalisedManufacturers.PHILIPS);
-    });
-
-    test('returns lowercase for unknown manufacturer', () => {
-      const de = new DataElement('LO');
-      de.value = ['ACME Corporation'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
+      const de2 = new DataElement('LO');
+      de2.value = ['siemens'];
+      const elements2 = {
+        [TagKeys.Manufacturer]: de2
       };
+      const result2 = getNormalisedManufacturer(elements2);
+      assert.equal(result2, NormalisedManufacturers.SIEMENS);
 
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, 'acme corporation');
     });
 
-    test('handles mixed case for unknown manufacturer', () => {
-      const de = new DataElement('LO');
-      de.value = ['AcmE CoRp'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
+    /**
+     * Tests for {@link getNormalisedManufacturer} for Philipss.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturer-philips
+     */
+    test('Philips', () => {
+      const de0 = new DataElement('LO');
+      de0.value = ['Philips Healthcare'];
+      const elements0 = {
+        [TagKeys.Manufacturer]: de0
       };
+      const result0 = getNormalisedManufacturer(elements0);
+      assert.equal(result0, NormalisedManufacturers.PHILIPS);
 
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, 'acme corp');
+      const de1 = new DataElement('LO');
+      de1.value = ['Philips Medical Systems'];
+      const elements1 = {
+        [TagKeys.Manufacturer]: de1
+      };
+      const result1 = getNormalisedManufacturer(elements1);
+      assert.equal(result1, NormalisedManufacturers.PHILIPS);
+
+      const de2 = new DataElement('LO');
+      de2.value = ['philips'];
+      const elements2 = {
+        [TagKeys.Manufacturer]: de2
+      };
+      const result2 = getNormalisedManufacturer(elements2);
+      // Should be treated as unknown manufacturer and lowercased
+      assert.equal(result2, 'philips');
     });
 
-    test('returns undefined when manufacturer missing', () => {
+    /**
+     * Tests for {@link getNormalisedManufacturer} for unknown.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturer-unknown
+     */
+    test('unknown', () => {
+      const de0 = new DataElement('LO');
+      de0.value = ['ACME Corporation'];
+      const elements0 = {
+        [TagKeys.Manufacturer]: de0
+      };
+      const result0 = getNormalisedManufacturer(elements0);
+      assert.equal(result0, 'acme corporation');
+
+      const de1 = new DataElement('LO');
+      de1.value = ['AcmE CoRp'];
+      const elements1 = {
+        [TagKeys.Manufacturer]: de1
+      };
+      const result1 = getNormalisedManufacturer(elements1);
+      assert.equal(result1, 'acme corp');
+    });
+
+    /**
+     * Tests for {@link getNormalisedManufacturer} for empty.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturer-empty
+     */
+    test('empty', () => {
       const elements = {};
       const result = getNormalisedManufacturer(elements);
       assert.isUndefined(result);
     });
 
-    test('returns undefined when manufacturer value is empty', () => {
+    /**
+     * Tests for {@link getNormalisedManufacturer} no value.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturer-no-value
+     */
+    test('no value', () => {
       const de = new DataElement('LO');
       de.value = [];
 
@@ -189,57 +264,13 @@ describe('dicom', () => {
       assert.isUndefined(result);
     });
 
-    test('handles case-insensitive Siemens check', () => {
-      const de = new DataElement('LO');
-      de.value = ['siemens'];
 
-      const elements = {
-        [TagKeys.Manufacturer]: de
-      };
-
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, NormalisedManufacturers.SIEMENS);
-    });
-
-    test('case-sensitive Philips check requires capital P', () => {
-      const de = new DataElement('LO');
-      de.value = ['philips'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
-      };
-
-      const result = getNormalisedManufacturer(elements);
-      // Should be treated as unknown manufacturer and lowercased
-      assert.equal(result, 'philips');
-    });
-
-    test('case-sensitive GE check', () => {
-      const de = new DataElement('LO');
-      de.value = ['ge'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
-      };
-
-      const result = getNormalisedManufacturer(elements);
-      // Should not match (requires uppercase GE or starting with GE)
-      assert.equal(result, 'ge');
-    });
-
-    test('GE with various prefixes', () => {
-      const de = new DataElement('LO');
-      de.value = ['GE Healthcare'];
-
-      const elements = {
-        [TagKeys.Manufacturer]: de
-      };
-
-      const result = getNormalisedManufacturer(elements);
-      assert.equal(result, NormalisedManufacturers.GE);
-    });
-
-    test('returns first manufacturer when multiple tags present', () => {
+    /**
+     * Tests for {@link getNormalisedManufacturer} returns first.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturer-returns-first
+     */
+    test('returns first', () => {
       const de = new DataElement('LO');
       de.value = ['SIEMENS', 'GE'];
 

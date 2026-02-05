@@ -7,7 +7,7 @@ import {LabelingFilter} from '../../src/image/labelingFilter.js';
 import {generateWorkerMessage} from '../../src/image/labelingThread.js';
 
 /**
- * Tests for the 'image/LabelingFilter.js' file.
+ * Tests for the 'image/labelingFilter.js' file.
  */
 
 describe('image', () => {
@@ -27,7 +27,7 @@ describe('image', () => {
   /**
    * Tests for {@link LabelingFilter}.
    *
-   * @function module:tests/image~LabelingFilter-class
+   * @function module:tests/image~labelingfilter-class
    */
   test('LabelingFilter class', () => {
     const labelingFilter = new LabelingFilter();

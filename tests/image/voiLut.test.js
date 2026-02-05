@@ -13,7 +13,7 @@ describe('image', () => {
   /**
    * Tests for {@link VoiLutLinearFunction}.
    *
-   * @function module:tests/image~VoiLutLinearFunction
+   * @function module:tests/image~voilutlinearfunction-class
    */
   test('VoiLutLinearFunction class', () => {
     let isExact = false;
@@ -51,7 +51,7 @@ describe('image', () => {
   /**
    * Tests for {@link VoiLutSigmoidFunction}.
    *
-   * @function module:tests/image~VoiLutSigmoidFunction
+   * @function module:tests/image~voilutsigmoidfunction-class
    */
   test('VoiLutSigmoidFunction class', () => {
     const f00 = new VoiLutSigmoidFunction(5, 10);

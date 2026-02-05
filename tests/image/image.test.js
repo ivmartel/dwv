@@ -323,7 +323,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} convolute2D.
    *
-   * @function module:tests/image~image-convolute2D
+   * @function module:tests/image~image-convolute2d
    */
   test('Image convolute2D', () => {
     // create a simple image
@@ -460,7 +460,7 @@ describe('image', () => {
   /**
    * Tests for {@link ImageFactory}.
    *
-   * @function module:tests/image~imageFactory
+   * @function module:tests/image~imagefactory
    */
   test('ImageFactory', () => {
     const zeroStats = {min: 0, max: 0, mean: 0, stdDev: 0};
@@ -516,7 +516,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} hasValues and getOffsets.
    *
-   * @function module:tests/image~hasValues-getOffsets
+   * @function module:tests/image~hasvalues-getoffsets
    */
   test('hasValues getOffsets', () => {
     const size0 = 3;
@@ -582,7 +582,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} getContourDistance.
    *
-   * @function module:tests/image~image-getContourDistance
+   * @function module:tests/image~image-getcontourdistance
    */
   test('Image getContourDistance', () => {
 

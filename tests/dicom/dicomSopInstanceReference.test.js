@@ -22,13 +22,23 @@ describe('dicom', () => {
 
   describe('SopInstanceReference', () => {
 
-    test('constructor creates instance', () => {
+    /**
+     * Tests for {@link SopInstanceReference}.
+     *
+     * @function module:tests/dicom~sopinstancereference-good-input
+     */
+    test('good input', () => {
       const ref = new SopInstanceReference();
       assert.isUndefined(ref.referencedSOPClassUID);
       assert.isUndefined(ref.referencedSOPInstanceUID);
     });
 
-    test('toString with both properties set', () => {
+    /**
+     * Tests for {@link SopInstanceReference} toString.
+     *
+     * @function module:tests/dicom~sopinstancereference-tostring
+     */
+    test('toString', () => {
       const ref = new SopInstanceReference();
       ref.referencedSOPClassUID = '1.2.840.10008.5.1.4.1.1.2';
       ref.referencedSOPInstanceUID = '1.2.3.4.5';
@@ -40,7 +50,12 @@ describe('dicom', () => {
       );
     });
 
-    test('toString with only SOPInstanceUID set', () => {
+    /**
+     * Tests for {@link SopInstanceReference} toString only SOPInstanceUID.
+     *
+     * @function module:tests/dicom~sopinstancereference-tostring-sopinstance
+     */
+    test('toString SOPinstance', () => {
       const ref = new SopInstanceReference();
       ref.referencedSOPInstanceUID = '1.2.3.4.5';
 
@@ -48,7 +63,12 @@ describe('dicom', () => {
       assert.equal(result, '1.2.3.4.5 (class: undefined)');
     });
 
-    test('toString with only SOPClassUID set', () => {
+    /**
+     * Tests for {@link SopInstanceReference} toString only SOPClassUID.
+     *
+     * @function module:tests/dicom~sopinstancereference-tostring-sopclass
+     */
+    test('toString SOPClass', () => {
       const ref = new SopInstanceReference();
       ref.referencedSOPClassUID = '1.2.840.10008.5.1.4.1.1.2';
 
@@ -56,165 +76,23 @@ describe('dicom', () => {
       assert.equal(result, 'undefined (class: 1.2.840.10008.5.1.4.1.1.2)');
     });
 
-    test('toString with neither property set', () => {
+    /**
+     * Tests for {@link SopInstanceReference} undefined toString.
+     *
+     * @function module:tests/dicom~sopinstancereference-undefined-tostring
+     */
+    test('undefined toString', () => {
       const ref = new SopInstanceReference();
       const result = ref.toString();
       assert.equal(result, 'undefined (class: undefined)');
     });
 
-  });
-
-  describe('getSopInstanceReference', () => {
-
-    test('extracts both UIDs from dataElements', () => {
-      const de1 = new DataElement('UI');
-      de1.value = ['1.2.840.10008.5.1.4.1.1.2'];
-      const de2 = new DataElement('UI');
-      de2.value = ['1.2.3.4.5'];
-
-      const dataElements = {
-        [TagKeys.ReferencedSOPClassUID]: de1,
-        [TagKeys.ReferencedSOPInstanceUID]: de2
-      };
-
-      const ref = getSopInstanceReference(dataElements);
-
-      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
-      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
-    });
-
-    test('extracts only SOPClassUID when present', () => {
-      const de1 = new DataElement('UI');
-      de1.value = ['1.2.840.10008.5.1.4.1.1.2'];
-
-      const dataElements = {
-        [TagKeys.ReferencedSOPClassUID]: de1
-      };
-
-      const ref = getSopInstanceReference(dataElements);
-
-      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
-      assert.isUndefined(ref.referencedSOPInstanceUID);
-    });
-
-    test('extracts only SOPInstanceUID when present', () => {
-      const de2 = new DataElement('UI');
-      de2.value = ['1.2.3.4.5'];
-
-      const dataElements = {
-        [TagKeys.ReferencedSOPInstanceUID]: de2
-      };
-
-      const ref = getSopInstanceReference(dataElements);
-
-      assert.isUndefined(ref.referencedSOPClassUID);
-      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
-    });
-
-    test('handles empty dataElements', () => {
-      const dataElements = {};
-      const ref = getSopInstanceReference(dataElements);
-
-      assert.isUndefined(ref.referencedSOPClassUID);
-      assert.isUndefined(ref.referencedSOPInstanceUID);
-    });
-
-    test('handles dataElements with other tags', () => {
-      const de1 = new DataElement('UI');
-      de1.value = ['1.2.840.10008.5.1.4.1.1.2'];
-      const de2 = new DataElement('UI');
-      de2.value = ['1.2.3.4.5'];
-      const de3 = new DataElement('PN');
-      de3.value = ['Doe^John'];
-
-      const dataElements = {
-        [TagKeys.ReferencedSOPClassUID]: de1,
-        [TagKeys.ReferencedSOPInstanceUID]: de2,
-        '00100010': de3
-      };
-
-      const ref = getSopInstanceReference(dataElements);
-
-      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
-      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
-    });
-
-    test('takes first value when array has multiple values', () => {
-      const de1 = new DataElement('UI');
-      de1.value = ['1.2.840.10008.5.1.4.1.1.2', '1.2.3'];
-      const de2 = new DataElement('UI');
-      de2.value = ['1.2.3.4.5', '5.6.7.8.9'];
-
-      const dataElements = {
-        [TagKeys.ReferencedSOPClassUID]: de1,
-        [TagKeys.ReferencedSOPInstanceUID]: de2
-      };
-
-      const ref = getSopInstanceReference(dataElements);
-
-      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
-      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
-    });
-
-  });
-
-  describe('getDicomSopInstanceReferenceItem', () => {
-
-    test('converts both properties to item', () => {
-      const ref = new SopInstanceReference();
-      ref.referencedSOPClassUID = '1.2.840.10008.5.1.4.1.1.2';
-      ref.referencedSOPInstanceUID = '1.2.3.4.5';
-
-      const item = getDicomSopInstanceReferenceItem(ref);
-
-      assert.equal(item.ReferencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
-      assert.equal(item.ReferencedSOPInstanceUID, '1.2.3.4.5');
-    });
-
-    test('includes only defined SOPClassUID', () => {
-      const ref = new SopInstanceReference();
-      ref.referencedSOPClassUID = '1.2.840.10008.5.1.4.1.1.2';
-
-      const item = getDicomSopInstanceReferenceItem(ref);
-
-      assert.equal(item.ReferencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
-      assert.isUndefined(item.ReferencedSOPInstanceUID);
-    });
-
-    test('includes only defined SOPInstanceUID', () => {
-      const ref = new SopInstanceReference();
-      ref.referencedSOPInstanceUID = '1.2.3.4.5';
-
-      const item = getDicomSopInstanceReferenceItem(ref);
-
-      assert.isUndefined(item.ReferencedSOPClassUID);
-      assert.equal(item.ReferencedSOPInstanceUID, '1.2.3.4.5');
-    });
-
-    test('returns empty object when no properties set', () => {
-      const ref = new SopInstanceReference();
-      const item = getDicomSopInstanceReferenceItem(ref);
-
-      assert.deepEqual(item, {});
-    });
-
-    test('maintains property name mapping', () => {
-      const ref = new SopInstanceReference();
-      ref.referencedSOPClassUID = '1.2.3';
-      ref.referencedSOPInstanceUID = '4.5.6';
-
-      const item = getDicomSopInstanceReferenceItem(ref);
-
-      // Check that camelCase is converted to PascalCase
-      assert.ok('ReferencedSOPClassUID' in item);
-      assert.ok('ReferencedSOPInstanceUID' in item);
-    });
-
-  });
-
-  describe('round-trip conversion', () => {
-
-    test('dataElements -> ref -> item -> ref', () => {
+    /**
+     * Tests for {@link SopInstanceReference} round trip.
+     *
+     * @function module:tests/dicom~sopinstancereference-round-trip
+     */
+    test('round trip', () => {
       const de1 = new DataElement('UI');
       de1.value = ['1.2.840.10008.5.1.4.1.1.2'];
       const de2 = new DataElement('UI');
@@ -242,6 +120,209 @@ describe('dicom', () => {
       assert.equal(ref1.referencedSOPClassUID, ref2.referencedSOPClassUID);
       assert.equal(ref1.referencedSOPInstanceUID,
         ref2.referencedSOPInstanceUID);
+    });
+
+  });
+
+  describe('getSopInstanceReference', () => {
+
+    /**
+     * Tests for {@link getSopInstanceReference}.
+     *
+     * @function module:tests/dicom~getsopinstancereference-good-input
+     */
+    test('good input', () => {
+      const de1 = new DataElement('UI');
+      de1.value = ['1.2.840.10008.5.1.4.1.1.2'];
+      const de2 = new DataElement('UI');
+      de2.value = ['1.2.3.4.5'];
+
+      const dataElements = {
+        [TagKeys.ReferencedSOPClassUID]: de1,
+        [TagKeys.ReferencedSOPInstanceUID]: de2
+      };
+
+      const ref = getSopInstanceReference(dataElements);
+
+      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
+      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
+    });
+
+    /**
+     * Tests for {@link getSopInstanceReference} only SOPClassUID.
+     *
+     * @function module:tests/dicom~getsopinstancereference-sopclass
+     */
+    test('SOPClass', () => {
+      const de1 = new DataElement('UI');
+      de1.value = ['1.2.840.10008.5.1.4.1.1.2'];
+
+      const dataElements = {
+        [TagKeys.ReferencedSOPClassUID]: de1
+      };
+
+      const ref = getSopInstanceReference(dataElements);
+
+      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
+      assert.isUndefined(ref.referencedSOPInstanceUID);
+    });
+
+    /**
+     * Tests for {@link getSopInstanceReference} only SOPInstanceUID.
+     *
+     * @function module:tests/dicom~getsopinstancereference-sopinstance
+     */
+    test('SOPInstance', () => {
+      const de2 = new DataElement('UI');
+      de2.value = ['1.2.3.4.5'];
+
+      const dataElements = {
+        [TagKeys.ReferencedSOPInstanceUID]: de2
+      };
+
+      const ref = getSopInstanceReference(dataElements);
+
+      assert.isUndefined(ref.referencedSOPClassUID);
+      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
+    });
+
+    /**
+     * Tests for {@link getSopInstanceReference} empty.
+     *
+     * @function module:tests/dicom~getsopinstancereference-empty
+     */
+    test('empty', () => {
+      const dataElements = {};
+      const ref = getSopInstanceReference(dataElements);
+
+      assert.isUndefined(ref.referencedSOPClassUID);
+      assert.isUndefined(ref.referencedSOPInstanceUID);
+    });
+
+    /**
+     * Tests for {@link getSopInstanceReference} other tag.
+     *
+     * @function module:tests/dicom~getsopinstancereference-other-tag
+     */
+    test('other tag', () => {
+      const de1 = new DataElement('UI');
+      de1.value = ['1.2.840.10008.5.1.4.1.1.2'];
+      const de2 = new DataElement('UI');
+      de2.value = ['1.2.3.4.5'];
+      const de3 = new DataElement('PN');
+      de3.value = ['Doe^John'];
+
+      const dataElements = {
+        [TagKeys.ReferencedSOPClassUID]: de1,
+        [TagKeys.ReferencedSOPInstanceUID]: de2,
+        '00100010': de3
+      };
+
+      const ref = getSopInstanceReference(dataElements);
+
+      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
+      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
+    });
+
+    /**
+     * Tests for {@link getSopInstanceReference} multiple.
+     *
+     * @function module:tests/dicom~getsopinstancereference-multiple
+     */
+    test('multiple', () => {
+      const de1 = new DataElement('UI');
+      de1.value = ['1.2.840.10008.5.1.4.1.1.2', '1.2.3'];
+      const de2 = new DataElement('UI');
+      de2.value = ['1.2.3.4.5', '5.6.7.8.9'];
+
+      const dataElements = {
+        [TagKeys.ReferencedSOPClassUID]: de1,
+        [TagKeys.ReferencedSOPInstanceUID]: de2
+      };
+
+      const ref = getSopInstanceReference(dataElements);
+
+      assert.equal(ref.referencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
+      assert.equal(ref.referencedSOPInstanceUID, '1.2.3.4.5');
+    });
+
+  });
+
+  describe('getDicomSopInstanceReferenceItem', () => {
+
+    /**
+     * Tests for {@link getDicomSopInstanceReferenceItem}.
+     *
+     * @function module:tests/dicom~getdicomsopinstancereferenceitem-good-input
+     */
+    test('good input', () => {
+      const ref = new SopInstanceReference();
+      ref.referencedSOPClassUID = '1.2.840.10008.5.1.4.1.1.2';
+      ref.referencedSOPInstanceUID = '1.2.3.4.5';
+
+      const item = getDicomSopInstanceReferenceItem(ref);
+
+      assert.equal(item.ReferencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
+      assert.equal(item.ReferencedSOPInstanceUID, '1.2.3.4.5');
+    });
+
+    /**
+     * Tests for {@link getDicomSopInstanceReferenceItem} with SOPClassUID.
+     *
+     * @function module:tests/dicom~getdicomsopinstancereferenceitem-sopclass
+     */
+    test('SOPClass', () => {
+      const ref = new SopInstanceReference();
+      ref.referencedSOPClassUID = '1.2.840.10008.5.1.4.1.1.2';
+
+      const item = getDicomSopInstanceReferenceItem(ref);
+
+      assert.equal(item.ReferencedSOPClassUID, '1.2.840.10008.5.1.4.1.1.2');
+      assert.isUndefined(item.ReferencedSOPInstanceUID);
+    });
+
+    /**
+     * Tests for {@link getDicomSopInstanceReferenceItem} with SOPInstanceUID.
+     *
+     * @function module:tests/dicom~getdicomsopinstancereferenceitem-sopinstance
+     */
+    test('SOPInstance', () => {
+      const ref = new SopInstanceReference();
+      ref.referencedSOPInstanceUID = '1.2.3.4.5';
+
+      const item = getDicomSopInstanceReferenceItem(ref);
+
+      assert.isUndefined(item.ReferencedSOPClassUID);
+      assert.equal(item.ReferencedSOPInstanceUID, '1.2.3.4.5');
+    });
+
+    /**
+     * Tests for {@link getDicomSopInstanceReferenceItem} undefined.
+     *
+     * @function module:tests/dicom~getdicomsopinstancereferenceitem-undefined
+     */
+    test('undefined', () => {
+      const ref = new SopInstanceReference();
+      const item = getDicomSopInstanceReferenceItem(ref);
+
+      assert.deepEqual(item, {});
+    });
+
+    /**
+     * Tests for {@link getDicomSopInstanceReferenceItem} name mapping.
+     *
+     * @function module:tests/dicom~getdicomsopinstancereferenceitem-mapping
+     */
+    test('mapping', () => {
+      const ref = new SopInstanceReference();
+      ref.referencedSOPClassUID = '1.2.3';
+      ref.referencedSOPInstanceUID = '4.5.6';
+
+      const item = getDicomSopInstanceReferenceItem(ref);
+
+      // Check that camelCase is converted to PascalCase
+      assert.ok('ReferencedSOPClassUID' in item);
+      assert.ok('ReferencedSOPInstanceUID' in item);
     });
 
   });

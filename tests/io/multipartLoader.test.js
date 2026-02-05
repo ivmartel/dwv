@@ -10,7 +10,7 @@ describe('io', () => {
   /**
    * Tests for {@link MultipartLoader} events with single frame data.
    *
-   * @function module:tests/io~multipartLoader-canloadurl
+   * @function module:tests/io~multipart-loader-canloadurl
    */
   test(
     'Multipart loader canloadurl - #DWV-REQ-IO-02-002 Load DICOM multipart URL',

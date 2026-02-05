@@ -12,11 +12,12 @@ import {Geometry} from '../../src/image/geometry.js';
 /**
  * Tests for the 'app/dataController.js' file.
  */
+/** @module tests/app */
 
 describe('app', () => {
 
   /**
-   * Tests for {@link DataController} getValue.
+   * Tests for {@link DataController}.
    *
    * @function module:tests/app~datacontroller-class
    */
