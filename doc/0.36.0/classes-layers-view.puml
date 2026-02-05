@@ -1,0 +1,19 @@
+@startuml
+
+class View {
+  (mvc:model)
+}
+class ViewLayer {
+  (mvc:view)
+}
+class ViewController
+
+circle User
+
+View --> ViewLayer: updates
+ViewLayer -- User: sees
+User -up-> ViewController: uses
+ViewController -up-> View: manipulates
+
+
+@enduml

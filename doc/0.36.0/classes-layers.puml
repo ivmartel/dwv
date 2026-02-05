@@ -1,0 +1,19 @@
+@startuml
+
+class App {
+  getLayerGroupByDivId()
+}
+class Stage
+class LayerGroup {
+  getActiveViewLayer()
+  getActiveDrawLayer()
+}
+class ViewLayer
+class DrawLayer
+
+App --* "1" Stage
+Stage --* "0..*" LayerGroup
+LayerGroup --* "0..*" ViewLayer
+LayerGroup --* "0..*" DrawLayer
+
+@enduml
