@@ -205,9 +205,10 @@ export class AnnotationUI {
         const keys = Object.keys(annotation.quantification);
         for (const key of keys) {
           const quant = annotation.quantification[key];
-          qStr += '- ' + key + ': ' +
-            quant.value.toPrecision(4) +
-            i18n.t(quant.unit);
+          qStr += '- ' + key + ': ' + quant.value.toPrecision(4);
+          if (typeof quant.unit !== 'undefined') {
+            qStr += i18n.t(quant.unit);
+          }
           qStr += '\n';
         }
       } else {
