@@ -5211,7 +5211,7 @@ __metadata:
     magic-wand-tool: "npm:~1.1.7"
     typescript: "npm:5.6.3"
     vitest: "npm:^4.0.17"
-    webpack: "npm:^5.104.1"
+    webpack: "npm:^5.105.0"
     webpack-cli: "npm:^6.0.1"
     webpack-dev-server: "npm:^5.2.2"
     webpack-merge: "npm:^6.0.1"
@@ -13104,7 +13104,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.104.1":
+"webpack@npm:^5.105.0":
   version: 5.105.0
   resolution: "webpack@npm:5.105.0"
   dependencies:
