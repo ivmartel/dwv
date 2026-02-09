@@ -44,7 +44,7 @@ export class FilePixGenerator {
    * @param {number} sliceNumber The slice index.
    */
   generate(pixelBuffer, sliceNumber) {
-    let image = null;
+    let image;
     if (sliceNumber < this.images.length) {
       image = this.#images[sliceNumber];
     } else {

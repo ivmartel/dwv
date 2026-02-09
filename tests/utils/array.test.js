@@ -138,21 +138,18 @@ describe('utils', () => {
    * @function module:tests/utils~arraycontains
    */
   test('arrayContains', () => {
-    let arr00;
-    let arrTest000;
-    assert.notOk(arrayContains(arr00, arrTest000), 'contains test #000');
+    assert.notOk(arrayContains(undefined, undefined), 'contains test #000');
     const arrTest001 = null;
-    assert.notOk(arrayContains(arr00, arrTest001), 'contains test #001');
+    assert.notOk(arrayContains(undefined, arrTest001), 'contains test #001');
     const arrTest002 = [];
-    assert.notOk(arrayContains(arr00, arrTest002), 'contains test #002');
+    assert.notOk(arrayContains(undefined, arrTest002), 'contains test #002');
     const arrTest003 = [''];
-    assert.notOk(arrayContains(arr00, arrTest003), 'contains test #003');
+    assert.notOk(arrayContains(undefined, arrTest003), 'contains test #003');
     const arrTest004 = ['a'];
-    assert.notOk(arrayContains(arr00, arrTest004), 'contains test #004');
+    assert.notOk(arrayContains(undefined, arrTest004), 'contains test #004');
 
     const arr10 = null;
-    let arrTest100;
-    assert.notOk(arrayContains(arr10, arrTest100), 'contains test #100');
+    assert.notOk(arrayContains(arr10, undefined), 'contains test #100');
     const arrTest101 = null;
     assert.notOk(arrayContains(arr10, arrTest101), 'contains test #101');
     const arrTest102 = [];
@@ -163,8 +160,7 @@ describe('utils', () => {
     assert.notOk(arrayContains(arr10, arrTest104), 'contains test #104');
 
     const arr20 = [];
-    let arrTest200;
-    assert.notOk(arrayContains(arr20, arrTest200), 'contains test #200');
+    assert.notOk(arrayContains(arr20, undefined), 'contains test #200');
     const arrTest201 = null;
     assert.notOk(arrayContains(arr20, arrTest201), 'contains test #201');
     const arrTest202 = [];
@@ -183,8 +179,7 @@ describe('utils', () => {
     assert.ok(arrayContains(arr30, arrTest302), 'contains test #302');
     const arrTest303 = ['a', 'b', 'c'];
     assert.ok(arrayContains(arr30, arrTest303), 'contains test #303');
-    let arrTest310;
-    assert.notOk(arrayContains(arr30, arrTest310), 'contains test #310');
+    assert.notOk(arrayContains(arr30, undefined), 'contains test #310');
     const arrTest311 = null;
     assert.notOk(arrayContains(arr30, arrTest311), 'contains test #311');
     const arrTest312 = [];

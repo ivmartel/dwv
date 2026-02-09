@@ -74,10 +74,9 @@ function getBasicStats(array) {
   let max = min;
   let sum = 0;
   let sumSqr = 0;
-  let val = 0;
   const length = array.length;
   for (let i = 0; i < length; ++i) {
-    val = array[i];
+    const val = array[i];
     if (val < min) {
       min = val;
     } else if (val > max) {

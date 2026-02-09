@@ -37,10 +37,9 @@ describe('utils', () => {
    */
   test('isEqualRgb', () => {
     const rgb00 = {r: 0, g: 0, b: 0};
-    let rgb01;
-    assert.ok(!isEqualRgb(rgb00, rgb01), 'equal undefined #0');
-    assert.ok(!isEqualRgb(rgb01, rgb00), 'equal undefined #1');
-    assert.ok(!isEqualRgb(rgb01, rgb01), 'equal undefined #2');
+    assert.ok(!isEqualRgb(rgb00, undefined), 'equal undefined #0');
+    assert.ok(!isEqualRgb(undefined, rgb00), 'equal undefined #1');
+    assert.ok(!isEqualRgb(undefined, undefined), 'equal undefined #2');
     const rgb02 = null;
     assert.ok(!isEqualRgb(rgb00, rgb02), 'equal null #0');
     assert.ok(!isEqualRgb(rgb02, rgb00), 'equal null #0');

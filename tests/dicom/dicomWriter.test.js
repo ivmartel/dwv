@@ -523,7 +523,7 @@ describe('dicom', () => {
     }
 
     // create DICOM buffer
-    let dicomBuffer = null;
+    let dicomBuffer;
     try {
       dicomBuffer = writer.getBuffer(dicomElements);
     } catch (error) {
