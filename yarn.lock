@@ -1880,6 +1880,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@isaacs/brace-expansion@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "@isaacs/brace-expansion@npm:5.0.1"
+  dependencies:
+    "@isaacs/balanced-match": "npm:^4.0.1"
+  checksum: 10c0/e5d67c7bbf1f17b88132a35bc638af306d48acbb72810d48fa6e6edd8ab375854773108e8bf70f021f7ef6a8273455a6d1f0c3b5aa2aff06ce7894049ab77fb8
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -2089,8 +2098,8 @@ __metadata:
   linkType: hard
 
 "@microsoft/api-extractor@npm:^7.55.1":
-  version: 7.56.0
-  resolution: "@microsoft/api-extractor@npm:7.56.0"
+  version: 7.56.3
+  resolution: "@microsoft/api-extractor@npm:7.56.3"
   dependencies:
     "@microsoft/api-extractor-model": "npm:7.32.2"
     "@microsoft/tsdoc": "npm:~0.16.0"
@@ -2098,17 +2107,17 @@ __metadata:
     "@rushstack/node-core-library": "npm:5.19.1"
     "@rushstack/rig-package": "npm:0.6.0"
     "@rushstack/terminal": "npm:0.21.0"
-    "@rushstack/ts-command-line": "npm:5.1.7"
+    "@rushstack/ts-command-line": "npm:5.2.0"
     diff: "npm:~8.0.2"
-    lodash: "npm:~4.17.15"
-    minimatch: "npm:10.0.3"
+    lodash: "npm:~4.17.23"
+    minimatch: "npm:10.1.2"
     resolve: "npm:~1.22.1"
     semver: "npm:~7.5.4"
     source-map: "npm:~0.6.1"
     typescript: "npm:5.8.2"
   bin:
     api-extractor: bin/api-extractor
-  checksum: 10c0/18147cb9dd827377a8a7cbb4bc93b8d5984b5b746bb74f830d2fffe3d3a8ded3db313c423f679bba6fad7c32493aee6cdcf535dff0105f87e3fa336eb860cfc6
+  checksum: 10c0/1f81f7ce796bba3c4c698a7fe58df4bee5ef739d54591bef11cd4b6c079286b24b4fb086e6a73f296a13a938b061a9a2cc059863cd5f8bfd51d073adf7ee66ba
   languageName: node
   linkType: hard
 
@@ -2532,15 +2541,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rushstack/ts-command-line@npm:5.1.7":
-  version: 5.1.7
-  resolution: "@rushstack/ts-command-line@npm:5.1.7"
+"@rushstack/ts-command-line@npm:5.2.0":
+  version: 5.2.0
+  resolution: "@rushstack/ts-command-line@npm:5.2.0"
   dependencies:
     "@rushstack/terminal": "npm:0.21.0"
     "@types/argparse": "npm:1.0.38"
     argparse: "npm:~1.0.9"
     string-argv: "npm:~0.3.1"
-  checksum: 10c0/5ec13fcde7fe66ea0af6dac78908c9887810044656269c296db0c4311b703aa73ee7b4d5ace00c51062598da936f94695ce0d5caec0d1c0c6022040d335b77ac
+  checksum: 10c0/0b8b9ce38ebe0104739e2b67f0b4c75dae6f9bedda3cd95bddc7068c618e7c5945d383baa7b4cc5d88fe2662e6f8402cfd2bef060f0c846b2f37abe6d4bf600a
   languageName: node
   linkType: hard
 
@@ -8504,7 +8513,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.3.0, lodash@npm:~4.17.15":
+"lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.3.0, lodash@npm:~4.17.23":
   version: 4.17.23
   resolution: "lodash@npm:4.17.23"
   checksum: 10c0/1264a90469f5bb95d4739c43eb6277d15b6d9e186df4ac68c3620443160fc669e2f14c11e7d8b2ccf078b81d06147c01a8ccced9aab9f9f63d50dcf8cace6bf6
@@ -8820,12 +8829,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:10.0.3":
-  version: 10.0.3
-  resolution: "minimatch@npm:10.0.3"
+"minimatch@npm:10.1.2":
+  version: 10.1.2
+  resolution: "minimatch@npm:10.1.2"
   dependencies:
-    "@isaacs/brace-expansion": "npm:^5.0.0"
-  checksum: 10c0/e43e4a905c5d70ac4cec8530ceaeccb9c544b1ba8ac45238e2a78121a01c17ff0c373346472d221872563204eabe929ad02669bb575cb1f0cc30facab369f70f
+    "@isaacs/brace-expansion": "npm:^5.0.1"
+  checksum: 10c0/0cccef3622201703de6ecf9d772c0be1d5513dcc038ed9feb866c20cf798243e678ac35605dac3f1a054650c28037486713fe9e9a34b184b9097959114daf086
   languageName: node
   linkType: hard
 
