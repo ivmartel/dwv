@@ -46,7 +46,7 @@
     "benchmark": "^2.1.4",
     "canvas": "^3.2.1",
     "clean-jsdoc-theme": "^4.3.0",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "eslint-plugin-jsdoc": "^62.5.4",
     "github-release-notes": "0.17.2",
     "globals": "^17.0.0",
