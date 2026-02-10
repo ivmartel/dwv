@@ -60,7 +60,7 @@ export class State {
    */
   fromJSON(json) {
     const data = JSON.parse(json);
-    let res = null;
+    let res;
     if (data.version === '0.1') {
       res = this.#readV01(data);
     } else if (data.version === '0.2') {
@@ -98,8 +98,8 @@ export class State {
 
     // apply saved scale on top of current base one
     const baseScale = app.getActiveLayerGroup().getBaseScale();
-    let scale = null;
-    let offset = null;
+    let scale;
+    let offset;
     if (typeof data.scaleCenter !== 'undefined') {
       scale = {
         x: data.scale * baseScale.x,

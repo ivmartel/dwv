@@ -760,7 +760,7 @@ export class ViewController {
       const helper = this.getPositionHelper();
 
       this.#playerID = window.setInterval(() => {
-        let canDoMore = false;
+        let canDoMore;
         if (canScroll3D) {
           canDoMore = helper.incrementPositionAlongScroll();
         } else {

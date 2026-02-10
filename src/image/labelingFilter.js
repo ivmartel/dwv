@@ -270,7 +270,7 @@ export class LabelingFilter {
   #offsetToIndex(offset, unitVectors) {
     const values = new Array(unitVectors.length);
     let off = offset;
-    let dimSize = 0;
+    let dimSize;
     for (let i = unitVectors.length - 1; i > 0; --i) {
       dimSize = unitVectors[i];
       values[i] = Math.floor(off / dimSize);
@@ -385,8 +385,8 @@ export class LabelingFilter {
    * @returns {Point2D} Point on the slice, scaled.
    */
   #sliceOffsetToSliceWorld(sliceOffset, unitVectors, spacing) {
-    let x = 0;
-    let y = 0;
+    let x;
+    let y;
     if (unitVectors[0] > unitVectors[1]) {
       y = (sliceOffset % unitVectors[0]) / unitVectors[1];
       x = Math.floor(sliceOffset / unitVectors[0]);

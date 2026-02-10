@@ -389,7 +389,7 @@ export function getTagFromDictionary(tagName) {
   let element = null;
   const dict = dictionary;
   const keys0 = Object.keys(dict);
-  let keys1 = null;
+  let keys1;
   let foundTag = false;
   // search through dictionary
   for (let k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {

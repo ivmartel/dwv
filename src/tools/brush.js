@@ -831,24 +831,23 @@ export class Brush extends EventTarget {
    * @returns {string|undefined} The UID.
    */
   #getReferenceDataUID(meta) {
-    let dataUid;
     const customMeta = meta.custom;
     const frameInfos = customMeta.frameInfos;
     if (frameInfos.length === 0) {
-      return dataUid;
+      return;
     }
     // DerivationImageSequence (0008,9124)
     const derivationImages = frameInfos[0].derivationImages;
     if (typeof derivationImages === 'undefined') {
-      return dataUid;
+      return;
     }
     if (derivationImages.length === 0) {
-      return dataUid;
+      return;
     }
     // SourceImageSequence (0008,2112)
     const sourceImages = derivationImages[0].sourceImages;
     if (typeof sourceImages === 'undefined') {
-      return dataUid;
+      return;
     }
     if (sourceImages.length === 0) {
       return;

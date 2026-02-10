@@ -203,7 +203,7 @@ export function cielabToCiexyz(triplet) {
    * @returns {number} The result.
    */
   function invLabFunc(x) {
-    let res = null;
+    let res;
     // delta = 6 / 29 = 0.206896552
     if (x > 0.206896552) {
       res = Math.pow(x, 3);
@@ -241,7 +241,7 @@ export function ciexyzToCielab(triplet) {
    * @returns {number} The result.
    */
   function labFunc(x) {
-    let res = null;
+    let res;
     // delta = 6 / 29 = 0.206896552
     // delta^3 = 0.008856452
     if (x > 0.008856452) {
@@ -280,7 +280,7 @@ export function ciexyzToSrgb(triplet) {
    * @returns {number} The result.
    */
   function gammaFunc(x) {
-    let res = null;
+    let res;
     if (x <= 0.0031308) {
       res = 12.92 * x;
     } else {
@@ -318,7 +318,7 @@ export function srgbToCiexyz(triplet) {
    * @returns {number} The result.
    */
   function invGammaFunc(x) {
-    let res = null;
+    let res;
     if (x <= 0.04045) {
       res = x / 12.92;
     } else {

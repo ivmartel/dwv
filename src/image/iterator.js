@@ -397,7 +397,7 @@ export function getSliceIterator(
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  let dataAccessor = null;
+  let dataAccessor;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -427,7 +427,7 @@ export function getSliceIterator(
     }
   };
 
-  let rangeObj = null;
+  let rangeObj;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
     const dirMax0 = viewOrientation.getColAbsMax(0);
     const dirMax2 = viewOrientation.getColAbsMax(2);
@@ -436,10 +436,9 @@ export function getSliceIterator(
     const reverse1 = false;
     const reverse2 = false;
 
-    let maxIter = null;
     if (dirMax2.index === 2) {
       // axial
-      maxIter = ncols * nrows;
+      const maxIter = ncols * nrows;
       if (dirMax0.index === 0) {
         // xyz
         rangeObj = getRange(dataAccessor,
@@ -451,7 +450,7 @@ export function getSliceIterator(
       }
     } else if (dirMax2.index === 0) {
       // sagittal
-      maxIter = nslices * nrows;
+      const maxIter = nslices * nrows;
       if (dirMax0.index === 1) {
         // yzx
         rangeObj = getRange(dataAccessor,
@@ -463,7 +462,7 @@ export function getSliceIterator(
       }
     } else if (dirMax2.index === 1) {
       // coronal
-      maxIter = nslices * ncols;
+      const maxIter = nslices * ncols;
       if (dirMax0.index === 0) {
         // xzy
         rangeObj = getRange(dataAccessor,
@@ -515,7 +514,7 @@ export function getRegionSliceIterator(
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  let dataAccessor = null;
+  let dataAccessor;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -573,7 +572,7 @@ export function getVariableRegionSliceIterator(
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  let dataAccessor = null;
+  let dataAccessor;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);

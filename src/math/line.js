@@ -331,11 +331,11 @@ export function getLineFromEquation(slope, intercept, point, length, spacing) {
     spacing = {x: 1, y: 1};
   }
   // begin point
-  let beginX = 0;
-  let beginY = 0;
+  let beginX;
+  let beginY;
   // end point
-  let endX = 0;
-  let endY = 0;
+  let endX;
+  let endY;
 
   if (isSimilar(slope, 0, REAL_WORLD_EPSILON)) {
     // slope = ~0 -> horizontal input line

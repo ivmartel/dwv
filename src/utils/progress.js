@@ -84,7 +84,7 @@ export class MultiProgressHandler {
     this.#progresses[event.index][event.subindex] = percent;
 
     // item progress
-    let item = null;
+    let item;
     if (typeof event.item !== 'undefined') {
       item = event.item;
     } else {

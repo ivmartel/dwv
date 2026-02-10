@@ -31,7 +31,7 @@ export function splitUri(uri) {
   // result
   const result = {};
   // check if query string
-  let sepIndex = null;
+  let sepIndex;
   if (uri && (sepIndex = uri.indexOf('?')) !== -1) {
     // base: before the '?'
     result.base = uri.substring(0, sepIndex);

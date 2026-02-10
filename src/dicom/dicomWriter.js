@@ -882,7 +882,7 @@ export class DicomWriter {
 
     // calculate buffer size and split elements (meta and non meta)
     let totalSize = 128 + 4; // DICM
-    let localSize = 0;
+    let localSize;
     const metaElements = [];
     const rawElements = [];
     let element;
@@ -1187,7 +1187,6 @@ export class DicomWriter {
       }
 
       // calculate byte size
-      size = 0;
       if (element.vr === 'AT') {
         size = 4 * value.length;
       } else if (element.vr === 'xs') {

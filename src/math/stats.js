@@ -102,10 +102,7 @@ export function getBasicStats(values) {
   let max = min;
   let sum = 0;
   let sumSqr = 0;
-  let val = 0;
-  const length = values.length;
-  for (let i = 0; i < length; ++i) {
-    val = values[i];
+  for (const val of values) {
     if (val < min) {
       min = val;
     } else if (val > max) {
@@ -115,6 +112,7 @@ export function getBasicStats(values) {
     sumSqr += val * val;
   }
 
+  const length = values.length;
   const mean = sum / length;
   // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
   let variance = sumSqr / length - mean * mean;
