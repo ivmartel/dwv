@@ -235,10 +235,9 @@ describe('image', () => {
       const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
       const buffer0 = [];
       let index = 0;
-      let value = 0;
       // 0, 85, 170, 255
       for (let i = 0; i < size0 * size0; ++i) {
-        value = i * 255 / ((size0 * size0) - 1);
+        const value = i * 255 / ((size0 * size0) - 1);
         buffer0[index] = value;
         buffer0[index + 1] = value;
         buffer0[index + 2] = value;

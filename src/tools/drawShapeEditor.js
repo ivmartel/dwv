@@ -208,7 +208,7 @@ export class DrawShapeEditor {
    * @param {boolean} flag The active (on/off) flag.
    */
   setAnchorsActive(flag) {
-    let func = null;
+    let func;
     if (flag) {
       func = (anchor) => {
         this.#setAnchorOn(anchor);

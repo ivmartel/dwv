@@ -49,7 +49,7 @@ export const dataEventNames = [
  */
 function mergeMeta(meta0, meta1, meta1Id) {
   // update meta data
-  let idKey = '';
+  let idKey;
   if (typeof meta1['00020010'] !== 'undefined') {
     // dicom case, use 'InstanceNumber'
     idKey = '00200013';

@@ -25,7 +25,7 @@ function getPosDivId(pos) {
  * @returns {string} The ID.
  */
 function getLiId(data) {
-  let type = '';
+  let type;
   if (typeof data.tags !== 'undefined') {
     type = data.tags.join('');
   } else {

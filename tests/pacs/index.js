@@ -151,13 +151,13 @@ const _dataImg = [
  * @returns {string} The full dwv url.
  */
 function getDwvUrl(uri) {
-  let uricomp = null;
+  let uricomp;
   if (typeof uri.type !== 'undefined') {
     uricomp = uri.file;
     if (uri.type === 'dwvtest') {
       const localChk = document.getElementById('islocal');
       const islocal = localChk ? localChk.checked : true;
-      let uriroot = '';
+      let uriroot;
       if (islocal) {
         uriroot = '../';
       } else {

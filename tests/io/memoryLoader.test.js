@@ -84,15 +84,13 @@ describe('io', () => {
         assert.ok(loadStartDate <= loadEndDate,
           prefix + 'Received start before load end.');
 
-        let firstProgressDate = null;
         let lastProgressDate = null;
-        let firstLoadItemDate = null;
         let lastLoadItemDate = null;
 
         if (nDataOk !== 0) {
           // check progress sequence
           progressDates.sort();
-          firstProgressDate = progressDates[0];
+          const firstProgressDate = progressDates[0];
           lastProgressDate = progressDates[progressDates.length - 1];
           assert.ok(loadStartDate <= firstProgressDate,
             prefix + 'Received start before first progress.');
@@ -101,7 +99,7 @@ describe('io', () => {
 
           // check load item sequence
           loadItemDates.sort();
-          firstLoadItemDate = loadItemDates[0];
+          const firstLoadItemDate = loadItemDates[0];
           lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
           assert.ok(loadStartDate <= firstLoadItemDate,
             prefix + 'Received start before first load item.');

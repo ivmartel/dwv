@@ -606,9 +606,7 @@ export class View {
    */
   addWindowPresets(presets) {
     const keys = Object.keys(presets);
-    let key = null;
-    for (let i = 0; i < keys.length; ++i) {
-      key = keys[i];
+    for (const key of keys) {
       if (typeof this.#windowPresets[key] !== 'undefined') {
         if (typeof this.#windowPresets[key].perslice !== 'undefined' &&
           this.#windowPresets[key].perslice === true) {

@@ -182,8 +182,8 @@ export class DataReader {
       byteArrayLength = 8 * bitArray.length;
     }
     const data = new Uint8Array(byteArrayLength);
-    let bitNumber = 0;
-    let bitIndex = 0;
+    let bitNumber;
+    let bitIndex;
     for (let i = 0; i < byteArrayLength; ++i) {
       bitNumber = i % 8;
       bitIndex = Math.floor(i / 8);
@@ -226,7 +226,7 @@ export class DataReader {
   readUint16Array(byteOffset, size) {
     const bpe = Uint16Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of Uint16Array.BYTES_PER_ELEMENT (=2)
     if (byteOffset % bpe === 0) {
       data = new Uint16Array(this.#buffer, byteOffset, arraySize);
@@ -254,7 +254,7 @@ export class DataReader {
   readInt16Array(byteOffset, size) {
     const bpe = Int16Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of Int16Array.BYTES_PER_ELEMENT (=2)
     if (byteOffset % bpe === 0) {
       data = new Int16Array(this.#buffer, byteOffset, arraySize);
@@ -282,7 +282,7 @@ export class DataReader {
   readUint32Array(byteOffset, size) {
     const bpe = Uint32Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of Uint32Array.BYTES_PER_ELEMENT (=4)
     if (byteOffset % bpe === 0) {
       data = new Uint32Array(this.#buffer, byteOffset, arraySize);
@@ -310,7 +310,7 @@ export class DataReader {
   readUint64Array(byteOffset, size) {
     const bpe = BigUint64Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of BigUint64Array.BYTES_PER_ELEMENT (=8)
     if (byteOffset % bpe === 0) {
       data = new BigUint64Array(this.#buffer, byteOffset, arraySize);
@@ -338,7 +338,7 @@ export class DataReader {
   readInt32Array(byteOffset, size) {
     const bpe = Int32Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of Int32Array.BYTES_PER_ELEMENT (=4)
     if (byteOffset % bpe === 0) {
       data = new Int32Array(this.#buffer, byteOffset, arraySize);
@@ -366,7 +366,7 @@ export class DataReader {
   readInt64Array(byteOffset, size) {
     const bpe = BigInt64Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of BigInt64Array.BYTES_PER_ELEMENT (=8)
     if (byteOffset % bpe === 0) {
       data = new BigInt64Array(this.#buffer, byteOffset, arraySize);
@@ -394,7 +394,7 @@ export class DataReader {
   readFloat32Array(byteOffset, size) {
     const bpe = Float32Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of Float32Array.BYTES_PER_ELEMENT (=4)
     if (byteOffset % bpe === 0) {
       data = new Float32Array(this.#buffer, byteOffset, arraySize);
@@ -422,7 +422,7 @@ export class DataReader {
   readFloat64Array(byteOffset, size) {
     const bpe = Float64Array.BYTES_PER_ELEMENT;
     const arraySize = size / bpe;
-    let data = null;
+    let data;
     // byteOffset should be a multiple of Float64Array.BYTES_PER_ELEMENT (=8)
     if (byteOffset % bpe === 0) {
       data = new Float64Array(this.#buffer, byteOffset, arraySize);

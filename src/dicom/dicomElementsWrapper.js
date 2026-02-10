@@ -41,8 +41,8 @@ export function dcmdump(dicomElements) {
   } else {
     result += 'NOT Little Endian Explicit\n';
   }
-  let dicomElement = null;
-  let tag = null;
+  let dicomElement;
+  let tag;
   let checkHeader = true;
   for (let i = 0, leni = keys.length; i < leni; ++i) {
     dicomElement = dicomElements[keys[i]];
@@ -111,9 +111,8 @@ function getElementValueAsString(tag, dicomElement, pretty) {
     const isFloatNumberVR = (dicomElement.vr === 'FL' ||
       dicomElement.vr === 'FD' ||
       dicomElement.vr === 'DS');
-    let valueStr = '';
     for (let k = 0, lenk = dicomElement.value.length; k < lenk; ++k) {
-      valueStr = '';
+      let valueStr = '';
       if (k !== 0) {
         valueStr += '\\';
       }
@@ -179,10 +178,8 @@ function getElementAsString(tag, dicomElement, prefix) {
   const isPixSequence = (isAnyPixelDataTag(tag) &&
     dicomElement.undefinedLength);
 
-  let line = null;
-
   // (group,element)
-  line = '(';
+  let line = '(';
   line += tag.getGroup().toLowerCase();
   line += ',';
   line += tag.getElement().toLowerCase();
@@ -257,13 +254,11 @@ function getElementAsString(tag, dicomElement, prefix) {
     line += 'Unknown Tag & Data';
   }
 
-  let message = null;
+  let message;
 
   // continue for sequence
   if (dicomElement.vr === 'SQ') {
-    let item = null;
-    for (let l = 0, lenl = dicomElement.value.length; l < lenl; ++l) {
-      item = dicomElement.value[l];
+    for (const item of dicomElement.value) {
       const itemKeys = Object.keys(item);
       if (itemKeys.length === 0) {
         continue;
@@ -326,9 +321,7 @@ function getElementAsString(tag, dicomElement, prefix) {
     line += getElementAsString(sqDelimTag, sqDelimElement, prefix);
   } else if (isPixSequence) {
     // pixel sequence
-    let pixItem = null;
-    for (let n = 0, lenn = dicomElement.value.length; n < lenn; ++n) {
-      pixItem = dicomElement.value[n];
+    for (const pixItem of dicomElement.value) {
       line += '\n';
       pixItem.vr = 'pi';
       line += getElementAsString(

@@ -276,7 +276,7 @@ export class InfoData {
           let values = event.value;
           // optional number precision
           if (typeof infoDataItem.precision !== 'undefined') {
-            let mapFunc = null;
+            let mapFunc;
             if (infoDataItem.precision === 'round') {
               mapFunc = Math.round;
             } else {

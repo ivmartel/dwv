@@ -32,10 +32,9 @@ function createImage(colourMapName, colourMap) {
   const context = canvas.getContext('2d');
   // fill in the image data
   const imageData = context.createImageData(canvas.width, canvas.height);
-  let index = 0;
   for (let j = 0; j < canvas.height; ++j) {
     for (let i = 0; i < canvas.width; ++i) {
-      index = (i + j * imageData.width) * 4;
+      const index = (i + j * imageData.width) * 4;
       imageData.data[index] = colourMap.red[i];
       imageData.data[index + 1] = colourMap.green[i];
       imageData.data[index + 2] = colourMap.blue[i];

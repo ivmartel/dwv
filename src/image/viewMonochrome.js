@@ -20,7 +20,7 @@ export function generateImageDataMonochrome(
   windowLut,
   colourMap) {
   let index = 0;
-  let pxValue = 0;
+  let pxValue;
   let ival = iterator.next();
   while (!ival.done) {
     // pixel value

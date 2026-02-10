@@ -868,7 +868,8 @@ export class Image {
     // put old in new
     this.#buffer.set(tmpBuffer);
 
-    // clean
+    // force GC
+    // eslint-disable-next-line no-useless-assignment
     tmpBuffer = null;
   }
 
@@ -881,6 +882,8 @@ export class Image {
     let tmpBuffer = this.#contourBuffer;
     this.#contourBuffer = new Uint8Array(size);
     this.#contourBuffer.set(tmpBuffer);
+    // force GC
+    // eslint-disable-next-line no-useless-assignment
     tmpBuffer = null;
   }
 
@@ -1055,7 +1058,7 @@ export class Image {
       const windowPresets = this.#meta.windowPresets;
       const rhsPresets = rhs.getMeta().windowPresets;
       const keys = Object.keys(rhsPresets);
-      let pkey = null;
+      let pkey;
       for (let i = 0; i < keys.length; ++i) {
         pkey = keys[i];
         const rhsPreset = rhsPresets[pkey];
@@ -1503,7 +1506,7 @@ export class Image {
   calculateDataRange() {
     let min = this.getValueAtOffset(0);
     let max = min;
-    let value = 0;
+    let value;
     const size = this.getGeometry().getSize();
     let leni = size.getTotalSize();
     // max to 3D
@@ -1543,7 +1546,7 @@ export class Image {
     } else {
       let rmin = this.getRescaledValueAtOffset(0);
       let rmax = rmin;
-      let rvalue = 0;
+      let rvalue;
       const size = this.getGeometry().getSize();
       let leni = size.getTotalSize();
       // max to 3D
@@ -1574,10 +1577,10 @@ export class Image {
     const histo = [];
     let min = this.getValueAtOffset(0);
     let max = min;
-    let value = 0;
+    let value;
     let rmin = this.getRescaledValueAtOffset(0);
     let rmax = rmin;
-    let rvalue = 0;
+    let rvalue;
     for (let i = 0, leni = size.getTotalSize(); i < leni; ++i) {
       value = this.getValueAtOffset(i);
       if (value > max) {
@@ -1730,8 +1733,8 @@ export class Image {
 
     // loop vars
     let pixelOffset = startOffset;
-    let newValue = 0;
-    let wOffFinal = [];
+    let newValue;
+    let wOffFinal;
     for (let c = 0; c < ncomp; ++c) {
       // component offset
       pixelOffset += c * componentOffset;

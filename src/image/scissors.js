@@ -88,8 +88,8 @@ function computeGradient(greyscale) {
 
   let max = 0; // Maximum gradient found, for scaling purposes
 
-  let x = 0;
-  let y = 0;
+  let x;
+  let y;
 
   for (y = 0; y < greyscale.data.length - 1; y++) {
     gradient[y] = [];
@@ -504,7 +504,7 @@ export class Scissors {
 
   calculateTraining(
     buffer, granularity, input, output) {
-    let i = 0;
+    let i;
     // Build a map of raw-weights to trained-weights by favoring input values
     buffer.length = granularity;
     for (i = 0; i < granularity; i++) {
@@ -599,8 +599,8 @@ export class Scissors {
 
     this.curPoint = sp;
 
-    let x = 0;
-    let y = 0;
+    let x;
+    let y;
 
     this.visited = [];
     for (y = 0; y < this.height; y++) {

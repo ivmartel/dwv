@@ -184,7 +184,7 @@ export function hasDicomPrefix(buffer) {
   }
   const prefixArray = new Uint8Array(buffer, 128, 4);
   const stringReducer = function (previous, current) {
-    return previous += String.fromCharCode(current);
+    return previous + String.fromCharCode(current);
   };
   return prefixArray.reduce(stringReducer, '') === 'DICM';
 }
@@ -462,7 +462,7 @@ function guessTransferSyntax(firstDataElement) {
   const implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90)
     ? false : true;
   // guess transfer syntax
-  let syntax = null;
+  let syntax;
   if (group === oEightGroupLittleEndian) {
     if (implicit) {
       syntax = transferSyntaxKeywords.ImplicitVRLittleEndian;
@@ -870,8 +870,8 @@ export class DicomParser {
     offset = readTagRes.endOffset;
 
     // Value Representation (VR)
-    let vr = null;
-    let is32bitVL = false;
+    let vr = 'NONE';
+    let is32bitVL = true;
     if (tag.isWithVR()) {
       // implicit VR
       if (implicit) {
@@ -889,9 +889,6 @@ export class DicomParser {
           offset += 2 * Uint8Array.BYTES_PER_ELEMENT;
         }
       }
-    } else {
-      vr = 'NONE';
-      is32bitVL = true;
     }
 
     // check vr
@@ -902,7 +899,7 @@ export class DicomParser {
     }
 
     // Value Length (VL)
-    let vl = 0;
+    let vl;
     if (is32bitVL) {
       vl = reader.readUint32(offset);
       offset += Uint32Array.BYTES_PER_ELEMENT;
@@ -1009,7 +1006,7 @@ export class DicomParser {
     }
 
     // data
-    let data = null;
+    let data;
     const vrType = vrTypes[vr];
     if (isAnyPixelDataTag(tag)) {
       if (element.undefinedLength) {
@@ -1219,9 +1216,9 @@ export class DicomParser {
    * @param {Tag} [untilTag] Optional tag to stop the parsing once reached.
    */
   parse(buffer, untilTag) {
-    let offset = 0;
-    let syntax = '';
-    let dataElement = null;
+    let offset;
+    let syntax;
+    let dataElement;
     // default readers
     const metaReader = new DataReader(buffer);
     let dataReader = new DataReader(buffer);
@@ -1421,7 +1418,7 @@ export class DicomParser {
           // manual concat...
           const nItemPerFrame = pixItems.length / numberOfFrames;
           const newPixItems = [];
-          let index = 0;
+          let index;
           for (let f = 0; f < numberOfFrames; ++f) {
             index = f * nItemPerFrame;
             // calculate the size of a frame

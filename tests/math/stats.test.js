@@ -90,9 +90,8 @@ describe('math', () => {
       ids[ids.length] = guid();
     }
     // check duplicates
-    let id = 0;
     for (let i = 0; i < ids.length - 1; ++i) {
-      id = ids.pop();
+      const id = ids.pop();
       if (ids.indexOf(id) !== -1) {
         ++duplicates;
       }

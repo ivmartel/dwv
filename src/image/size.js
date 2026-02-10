@@ -265,7 +265,7 @@ export class Size {
   offsetToIndex(offset) {
     const values = new Array(this.length());
     let off = offset;
-    let dimSize = 0;
+    let dimSize;
     for (let i = this.length() - 1; i > 0; --i) {
       dimSize = this.getDimSize(i);
       values[i] = Math.floor(off / dimSize);

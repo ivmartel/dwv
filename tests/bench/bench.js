@@ -122,9 +122,8 @@ function setupParsers() {
   const divParsers = document.getElementById('parsers');
   const fieldsetElem = divParsers.getElementsByTagName('fieldset')[0];
 
-  let parserName = '';
   for (let i = 0; i < parserFunctions.length; ++i) {
-    parserName = parserFunctions[i].name;
+    const parserName = parserFunctions[i].name;
 
     const input = document.createElement('input');
     input.type = 'checkbox';
@@ -181,9 +180,8 @@ function setupTests() {
  */
 function setupData() {
   const dataLi = document.getElementById('data');
-  let data = null;
   for (let i = 0; i < defaultTestData.length; ++i) {
-    data = defaultTestData[i];
+    const data = defaultTestData[i];
 
     const input = document.createElement('input');
     input.type = 'checkbox';
@@ -302,11 +300,9 @@ document.addEventListener('DOMContentLoaded', function (/*event*/) {
 
 // iframe content is only available at window.onload time
 window.onload = function () {
-  let ifname = '';
-  let tests = null;
   for (let i = 0; i < parserFunctions.length; ++i) {
-    ifname = 'iframe-' + parserFunctions[i].name;
-    tests = document.getElementById(ifname).contentWindow.tests;
+    const ifname = 'iframe-' + parserFunctions[i].name;
+    const tests = document.getElementById(ifname).contentWindow.tests;
     if (typeof tests !== 'undefined') {
       if (tests.length !== numberOfTests) {
         throw new Error('Wrong number of tests for parser ' +
