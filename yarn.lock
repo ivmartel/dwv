@@ -2570,7 +2570,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stylistic/eslint-plugin@npm:^5.7.0":
+"@stylistic/eslint-plugin@npm:^5.8.0":
   version: 5.8.0
   resolution: "@stylistic/eslint-plugin@npm:5.8.0"
   dependencies:
@@ -5204,7 +5204,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.28.5"
     "@eslint/js": "npm:^10.0.1"
     "@microsoft/api-extractor": "npm:^7.55.1"
-    "@stylistic/eslint-plugin": "npm:^5.7.0"
+    "@stylistic/eslint-plugin": "npm:^5.8.0"
     "@vitest/coverage-v8": "npm:^4.0.17"
     babel-loader: "npm:^10.0.0"
     babel-plugin-istanbul: "npm:^7.0.1"

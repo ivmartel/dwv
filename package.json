@@ -39,7 +39,7 @@
     "@babel/preset-env": "^7.28.5",
     "@eslint/js": "^10.0.1",
     "@microsoft/api-extractor": "^7.55.1",
-    "@stylistic/eslint-plugin": "^5.7.0",
+    "@stylistic/eslint-plugin": "^5.8.0",
     "@vitest/coverage-v8": "^4.0.17",
     "babel-loader": "^10.0.0",
     "babel-plugin-istanbul": "^7.0.1",
