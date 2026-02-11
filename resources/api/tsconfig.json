@@ -4,6 +4,7 @@
     "module": "es2022",
     "moduleResolution": "node10",
     "lib": ["es2022", "dom"],
+    "types": [],
     "declaration": true,
     "allowJs": true,
     "checkJs": true,
