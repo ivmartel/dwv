@@ -667,6 +667,18 @@ export class ViewController {
   }
 
   /**
+   * Check if an input plane point is in the geometrys' bounds.
+   *
+   * @param {Point2D} point2D The point to check.
+   * @returns {boolean} True if in bounds.
+   */
+  validatePlanePoint(point2D) {
+    const pos = this.getPositionFromPlanePoint(point2D);
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.isInBounds(pos);
+  }
+
+  /**
    * Get a 2D plane position from a world position.
    *
    * @param {Point} point The 3D position.
