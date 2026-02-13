@@ -213,7 +213,8 @@ function viewerSetup() {
       'Ellipse',
       'Rectangle',
       'Protractor',
-      'Roi'
+      'Roi',
+      'Bidimensional'
     ]},
     Brush: {},
     Floodfill: {},

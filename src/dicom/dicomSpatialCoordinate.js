@@ -10,6 +10,7 @@ import {logger} from '../utils/logger.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement.js';
+import {BidimensionalLine} from '../math/bidimensionalLine.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -126,9 +127,13 @@ export function getDicomSpatialCoordinateItem(scoord) {
 
 /**
  * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
+ * Supports all standard shapes, including BidimensionalLine (exported as a
+ * polyline with 4 points).
  *
- * @param {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle} shape
- *   The math shape.
+ * @param {
+ *   Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|BidimensionalLine
+ * } shape
+ *   The math shape, including BidimensionalLine.
  * @returns {SpatialCoordinate} The DICOM scoord.
  */
 export function getScoordFromShape(shape) {
@@ -211,17 +216,75 @@ export function getScoordFromShape(shape) {
       begin.getY().toString()
     ];
     scoord.graphicType = GraphicTypes.polyline;
-  }
+  } else if (shape instanceof BidimensionalLine) {
+    let perpUnitX = 0;
+    let perpUnitY = 0;
+    const mainAxisStart = shape.getBegin();
+    const mainAxisEnd = shape.getEnd();
 
+    // Use the actual short axis center if available, otherwise use centroid
+    let shortAxisCenter;
+    if (
+      shape.shortAxisCenter &&
+      typeof shape.shortAxisCenter.x === 'number' &&
+      typeof shape.shortAxisCenter.y === 'number'
+    ) {
+      shortAxisCenter = new Point2D(
+        shape.shortAxisCenter.x,
+        shape.shortAxisCenter.y
+      );
+    } else {
+      shortAxisCenter = shape.getCentroid();
+    }
+
+    const mainDx = mainAxisEnd.getX() - mainAxisStart.getX();
+    const mainDy = mainAxisEnd.getY() - mainAxisStart.getY();
+    const mainLength = Math.sqrt(mainDx * mainDx + mainDy * mainDy);
+
+    // Perpendicular unit vector to main axis
+    if (mainLength !== 0) {
+      perpUnitX = -mainDy / mainLength;
+      perpUnitY = mainDx / mainLength;
+    }
+
+    const shortAxisL1 = shape.shortAxisL1 ?? (shape.shortAxisLength / 2);
+    const shortAxisL2 = shape.shortAxisL2 ?? (shape.shortAxisLength / 2);
+
+    const shortAxisEnd1 = new Point2D(
+      shortAxisCenter.getX() + perpUnitX * shortAxisL1,
+      shortAxisCenter.getY() + perpUnitY * shortAxisL1
+    );
+    const shortAxisEnd2 = new Point2D(
+      shortAxisCenter.getX() - perpUnitX * shortAxisL2,
+      shortAxisCenter.getY() - perpUnitY * shortAxisL2
+    );
+
+    scoord.graphicData = [
+      mainAxisStart.getX().toString(),
+      mainAxisStart.getY().toString(),
+      mainAxisEnd.getX().toString(),
+      mainAxisEnd.getY().toString(),
+      shortAxisEnd1.getX().toString(),
+      shortAxisEnd1.getY().toString(),
+      shortAxisEnd2.getX().toString(),
+      shortAxisEnd2.getY().toString()
+    ];
+    scoord.graphicType = GraphicTypes.polyline;
+  }
   return scoord;
 };
 
 /**
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
+ * Supports all standard shapes, including BidimensionalLine
+ * (polyline with 4 points).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|undefined}
- *   The math shape.
+ * @returns {
+ *   Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|
+ *   BidimensionalLine|undefined
+ * }
+ *   The reconstructed math shape, including BidimensionalLine if applicable.
  */
 export function getShapeFromScoord(scoord) {
   // no shape if no graphic data
@@ -290,6 +353,51 @@ export function getShapeFromScoord(scoord) {
         shape = new Line(points[0], points[1]);
       } else if (points.length === 3) {
         shape = new Protractor([points[0], points[1], points[2]]);
+      } else if (points.length === 4) {
+        // BidimensionalLine: points 0,1 = main axis; 2,3 = short axis
+        const mainAxisStart = points[0];
+        const mainAxisEnd = points[1];
+        const shortAxisEnd1 = points[2];
+        const shortAxisEnd2 = points[3];
+        let projection = 0.5;
+
+        shape = new BidimensionalLine(mainAxisStart, mainAxisEnd);
+
+        const shortAxisCenterX =
+          (shortAxisEnd1.getX() + shortAxisEnd2.getX()) / 2;
+        const shortAxisCenterY =
+          (shortAxisEnd1.getY() + shortAxisEnd2.getY()) / 2;
+
+        const l1Dx = shortAxisEnd1.getX() - shortAxisCenterX;
+        const l1Dy = shortAxisEnd1.getY() - shortAxisCenterY;
+        const l2Dx = shortAxisCenterX - shortAxisEnd2.getX();
+        const l2Dy = shortAxisCenterY - shortAxisEnd2.getY();
+
+        const shortAxisL1 = Math.sqrt(l1Dx * l1Dx + l1Dy * l1Dy);
+        const shortAxisL2 = Math.sqrt(l2Dx * l2Dx + l2Dy * l2Dy);
+        const shortAxisLength = shortAxisL1 + shortAxisL2;
+
+        const mainDx = mainAxisEnd.getX() - mainAxisStart.getX();
+        const mainDy = mainAxisEnd.getY() - mainAxisStart.getY();
+        const mainLength = Math.sqrt(mainDx * mainDx + mainDy * mainDy);
+
+        let shortAxisT = 0.5;
+        if (mainLength > 0) {
+          const centerVx = shortAxisCenterX - mainAxisStart.getX();
+          const centerVy = shortAxisCenterY - mainAxisStart.getY();
+          const numerator = centerVx * mainDx + centerVy * mainDy;
+          const denominator = mainLength * mainLength;
+          if (denominator !== 0) {
+            projection = numerator / denominator;
+          }
+          shortAxisT = Math.max(0, Math.min(1, projection));
+        }
+
+        shape.shortAxisLength = shortAxisLength;
+        shape.shortAxisT = shortAxisT;
+        shape.shortAxisL1 = shortAxisL1;
+        shape.shortAxisL2 = shortAxisL2;
+        shape.shortAxisCenter = {x: shortAxisCenterX, y: shortAxisCenterY};
       }
     } else {
       if (points.length === 5) {

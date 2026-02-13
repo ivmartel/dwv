@@ -19,6 +19,7 @@ import {Filter, Threshold, Sobel, Sharpen} from './filter.js';
 
 import {ScrollWheel} from './scrollWheel.js';
 import {DrawShapeHandler} from './drawShapeHandler.js';
+import {BidimensionalFactory} from './bidimensional.js';
 
 export {
   DrawShapeHandler,
@@ -159,7 +160,8 @@ export const defaultToolOptions = {
     ProtractorFactory,
     RectangleFactory,
     RoiFactory,
-    RulerFactory
+    RulerFactory,
+    BidimensionalFactory
   },
   filter: {
     Threshold,

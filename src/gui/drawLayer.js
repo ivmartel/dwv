@@ -35,6 +35,8 @@ import {PlaneHelper} from '../image/planeHelper.js';
 import {Annotation} from '../image/annotation.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
 import {DrawShapeHandler} from '../tools/drawShapeHandler.js';
+import {BidimensionalLine} from '../math/bidimensionalLine.js';
+import {BidimensionalFactory} from '../tools/bidimensional.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -1327,6 +1329,73 @@ function posGroupIdToArray(id) {
 }
 
 /**
+ * Restore all bidimensional (short axis) properties from quantification data
+ * and a BidimensionalLine instance to the annotation object.
+ * This ensures that after loading from a saved drawing, the annotation has
+ * all the properties needed for correct display and quantification.
+ *
+ * @param {Annotation} annotation The annotation to update.
+ * @param {BidimensionalLine} bidim The BidimensionalLine math shape.
+ * @param {object} quant The quantification object containing saved properties.
+ */
+function restoreBidimensionalProperties(annotation, bidim, quant) {
+  if (typeof quant.shortAxisLength === 'number') {
+    bidim.shortAxisLength = quant.shortAxisLength;
+  }
+  if (typeof quant.shortAxisT === 'number') {
+    bidim.shortAxisT = quant.shortAxisT;
+  }
+  if (typeof quant.shortAxisPoint1 === 'object') {
+    bidim.shortAxisPoint1 = new Point2D(
+      quant.shortAxisPoint1.x,
+      quant.shortAxisPoint1.y
+    );
+  }
+  if (typeof quant.shortAxisPoint2 === 'object') {
+    bidim.shortAxisPoint2 = new Point2D(
+      quant.shortAxisPoint2.x,
+      quant.shortAxisPoint2.y
+    );
+  }
+
+  annotation.mathShape = bidim;
+
+  if (bidim.shortAxisPoint1 && bidim.shortAxisPoint2) {
+    const main0 = bidim.getBegin();
+    const main1 = bidim.getEnd();
+    const sa1 = bidim.shortAxisPoint1;
+    const sa2 = bidim.shortAxisPoint2;
+
+    const centerX = (sa1.getX() + sa2.getX()) / 2;
+    const centerY = (sa1.getY() + sa2.getY()) / 2;
+    annotation.shortAxisCenter = {x: centerX, y: centerY};
+
+    const dx = main1.getX() - main0.getX();
+    const dy = main1.getY() - main0.getY();
+    const len = Math.sqrt(dx * dx + dy * dy);
+    let t = 0.5;
+    if (len > 0) {
+      const ux = dx / len;
+      const uy = dy / len;
+      const vx = centerX - main0.getX();
+      const vy = centerY - main0.getY();
+      t = Math.max(0, Math.min(1, (vx * ux + vy * uy) / len));
+    }
+    annotation.shortAxisT = t;
+
+    const l1 = Math.sqrt(
+      Math.pow(sa1.getX() - centerX, 2) + Math.pow(sa1.getY() - centerY, 2)
+    );
+    const l2 = Math.sqrt(
+      Math.pow(sa2.getX() - centerX, 2) + Math.pow(sa2.getY() - centerY, 2)
+    );
+    annotation.shortAxisL1 = l1;
+    annotation.shortAxisL2 = l2;
+    annotation.shortAxisLength = l1 + l2;
+  }
+}
+
+/**
  * Convert a KonvaLayer object to a list of annotations.
  *
  * @param {Array} drawings An array of drawings stored
@@ -1419,8 +1488,34 @@ export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
           new Point2D(absPosition.x, absPosition.y),
           shape.radius()
         );
-      }
+      } else if (stateGroup.name() === 'bidimensional-group') {
+        const points = shape.points();
+        const bidim = new BidimensionalLine(
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3])
+        );
 
+        const details = drawingsDetails && drawingsDetails[stateGroup.id()]
+          ? drawingsDetails[stateGroup.id()]
+          : undefined;
+        const quant = details && details.meta && details.meta.quantification
+          ? details.meta.quantification
+          : {};
+
+        restoreBidimensionalProperties(annotation, bidim, quant);
+
+        annotation.factory = BidimensionalFactory.instance ||
+          new BidimensionalFactory();
+
+        if (
+          typeof annotation.mathShape.quantify === 'function' &&
+          refImage.viewController
+        ) {
+          annotation.quantification = annotation.mathShape.quantify(
+            refImage.viewController
+          );
+        }
+      }
       // details
       if (drawingsDetails) {
         const details = drawingsDetails[stateGroup.id()];
