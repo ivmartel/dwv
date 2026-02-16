@@ -18,20 +18,24 @@ import {Annotation} from '../image/annotation.js';
  * Bidimensional (long/short axis) annotation factory.
  */
 export class BidimensionalFactory {
+
   /**
    * The name of the factory.
+   *
    * @type {string}
    */
   #name = 'bidimensional';
 
   /**
    * The associated label factory.
+   *
    * @type {LabelFactory}
    */
   #labelFactory = new LabelFactory(this.#getDefaultLabelPosition);
 
   /**
    * Does this factory support the input math shape.
+   * 
    * @param {object} mathShape The mathematical shape.
    * @returns {boolean} True if supported.
    */
@@ -41,6 +45,7 @@ export class BidimensionalFactory {
 
   /**
    * Get the name of the factory.
+   *
    * @returns {string} The name.
    */
   getName() {
@@ -49,6 +54,7 @@ export class BidimensionalFactory {
 
   /**
    * Get the name of the shape group.
+   *
    * @returns {string} The name.
    */
   getGroupName() {
@@ -57,6 +63,7 @@ export class BidimensionalFactory {
 
   /**
    * Get the number of points needed to build the shape.
+   *
    * @returns {number} The number of points.
    */
   getNPoints() {
@@ -65,6 +72,7 @@ export class BidimensionalFactory {
 
   /**
    * Get the timeout between point storage.
+   *
    * @returns {number} The timeout in milliseconds.
    */
   getTimeout() {
@@ -74,6 +82,7 @@ export class BidimensionalFactory {
   /**
    * Get the default label template for the annotation.
    * Returns the draft label if the short axis is not yet set.
+   *
    * @param {Annotation} annotation The annotation.
    * @returns {object} The label template object.
    */
@@ -97,6 +106,7 @@ export class BidimensionalFactory {
   /**
    * Set an annotation math shape from input points.
    * Initializes the short axis and related properties if needed.
+   *
    * @param {Annotation} annotation The annotation.
    * @param {Point2D[]} points The points.
    */
@@ -138,6 +148,7 @@ export class BidimensionalFactory {
 
   /**
    * Create a Konva group for the bidimensional annotation.
+   *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The drawing style.
    * @returns {Konva.Group} The Konva group.
@@ -215,6 +226,7 @@ export class BidimensionalFactory {
 
   /**
    * Create the main axis line shape.
+   *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The drawing style.
    * @returns {Konva.Line} The Konva line.
@@ -238,6 +250,7 @@ export class BidimensionalFactory {
 
   /**
    * Create extra shapes: main axis ticks, short axis, and short axis ticks.
+   *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The drawing style.
    * @returns {Array} The Konva shape extras.
@@ -350,6 +363,7 @@ export class BidimensionalFactory {
 
   /**
    * Get the connector positions for the label.
+   *
    * @param {Konva.Line} shape The main axis shape.
    * @returns {Point2D[]} The connector positions.
    */
@@ -364,6 +378,7 @@ export class BidimensionalFactory {
 
   /**
    * Get the anchor positions for the shape.
+   *
    * @param {Konva.Line} shape The main axis shape.
    * @param {Style} style The drawing style.
    * @returns {Point2D[]} The anchor positions.
@@ -392,6 +407,7 @@ export class BidimensionalFactory {
 
   /**
    * Get anchors for the shape.
+   *
    * @param {Konva.Line} shape The main axis shape.
    * @param {Style} style The drawing style.
    * @returns {Konva.Ellipse[]} The anchors.
@@ -415,6 +431,7 @@ export class BidimensionalFactory {
 
   /**
    * Constrain anchor movement for short axis anchors.
+   *
    * @param {Konva.Ellipse} anchor The active anchor.
    */
   constrainAnchorMove(anchor) {
@@ -477,6 +494,7 @@ export class BidimensionalFactory {
   }
   /**
    * Update shape and label on anchor move.
+   *
    * @param {Annotation} annotation The annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The drawing style.
@@ -505,6 +523,7 @@ export class BidimensionalFactory {
 
   /**
    * Update the shape and anchors after anchor move.
+   *
    * @param {Annotation} annotation The annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The drawing style.
@@ -592,6 +611,7 @@ export class BidimensionalFactory {
 
   /**
    * Update the label content.
+   *
    * @param {Annotation} annotation The annotation.
    * @param {Konva.Group} group The shape group.
    * @param {Style} _style The drawing style.
@@ -602,6 +622,7 @@ export class BidimensionalFactory {
 
   /**
    * Update the label connector.
+   *
    * @param {Konva.Group} group The shape group.
    */
   updateConnector(group) {
@@ -612,6 +633,7 @@ export class BidimensionalFactory {
 
   /**
    * Get the default label position (lowest point).
+   *
    * @param {Annotation} annotation The annotation.
    * @returns {Point2D} The label position.
    */
@@ -628,6 +650,7 @@ export class BidimensionalFactory {
 
   /**
    * Update annotation on translation (shape move).
+   *
    * @param {Annotation} annotation The annotation.
    * @param {object} translation The translation.
    */
@@ -660,11 +683,13 @@ export class BidimensionalFactory {
     annotation.mathShape = newLine;
     annotation.updateQuantification();
   }
+
   /**
-  * Update annotation on anchor move.
-  * @param {Annotation} annotation The annotation.
-  * @param {Konva.Shape} anchor The anchor.
-  */
+   * Update annotation on anchor move.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Konva.Shape} anchor The anchor.
+   */
   updateAnnotationOnAnchorMove(annotation, anchor) {
     const group = anchor.getParent();
     if (!(group instanceof Konva.Group)) {
@@ -695,6 +720,7 @@ export class BidimensionalFactory {
 
   /**
    * Set the short axis to solid (remove dash).
+   *
    * @param {Konva.Group} group The shape group.
    */
   updateShortAxisToSolid(group) {
@@ -708,6 +734,7 @@ export class BidimensionalFactory {
 
   /**
    * Update the short axis ticks.
+   *
    * @param {Konva.Group} group The shape group.
    * @param {Point2D} sa1 The first short axis endpoint.
    * @param {Point2D} sa2 The second short axis endpoint.
@@ -772,8 +799,9 @@ export class BidimensionalFactory {
 
   /**
    * Get the endpoints of the short axis.
+   *
    * @param {Annotation} annotation The annotation.
-   * @returns {[Point2D, Point2D]} The endpoints.
+   * @returns {Point2D[]} The endpoints as an array of two Point2D objects.
    */
   getShortAxisEndpoints(annotation) {
     const line = annotation.mathShape;
@@ -842,6 +870,7 @@ export class BidimensionalFactory {
 
   /**
    * Get a point along the main axis line.
+   *
    * @param {BidimensionalLine} line The main axis line.
    * @param {number} t The interpolation parameter [0, 1].
    * @returns {Point2D} The point along the line.

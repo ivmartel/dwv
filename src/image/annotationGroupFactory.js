@@ -1795,13 +1795,13 @@ export class AnnotationGroupFactory {
   }
 
   /**
- * Copy bidimensional (short axis) properties from the mathShape
- * to the annotation object. This ensures that after importing from
- * DICOM SR, the annotation has all the properties needed for display
- * and interaction in the UI.
- *
- * @param {Annotation} annotation The annotation to update.
- */
+   * Copy bidimensional (short axis) properties from the mathShape
+   * to the annotation object. This ensures that after importing from
+   * DICOM SR, the annotation has all the properties needed for display
+   * and interaction in the UI.
+   *
+   * @param {Annotation} annotation The annotation to update.
+   */
   syncBidimensionalAnnotationProperties(annotation) {
     // Only copy if the mathShape is a BidimensionalLine
     if (annotation.mathShape instanceof BidimensionalLine) {

@@ -10,26 +10,31 @@ import {ViewController} from '../app/viewController.js';
  * Represents a line with a main (long) axis and a perpendicular (short) axis.
  */
 export class BidimensionalLine {
+
   /**
    * Line begin point.
+   *
    * @type {Point2D}
    */
   #begin;
 
   /**
    * Line end point.
+   *
    * @type {Point2D}
    */
   #end;
 
   /**
    * Optional length of the short axis (perpendicular to main axis).
+   *
    * @type {number}
    */
   shortAxisLength;
 
   /**
    * Optional length of the short axis (perpendicular to main axis).
+   *
    * @type {number}
    */
   shortAxisCenter;
@@ -45,6 +50,7 @@ export class BidimensionalLine {
 
   /**
    * Get the begin point of the main axis.
+   *
    * @returns {Point2D} The beginning point.
    */
   getBegin() {
@@ -53,6 +59,7 @@ export class BidimensionalLine {
 
   /**
    * Get the end point of the main axis.
+   *
    * @returns {Point2D} The ending point.
    */
   getEnd() {
@@ -61,6 +68,7 @@ export class BidimensionalLine {
 
   /**
    * Get the centroid (midpoint) of the main axis.
+   *
    * @returns {Point2D} The centroid point.
    */
   getCentroid() {
@@ -72,6 +80,7 @@ export class BidimensionalLine {
 
   /**
    * Get the length of the main axis.
+   *
    * @returns {number} The length.
    */
   getLength() {
@@ -82,6 +91,7 @@ export class BidimensionalLine {
 
   /**
    * Get the slope of the main axis.
+   *
    * @returns {number} The slope.
    */
   getSlope() {
@@ -95,6 +105,7 @@ export class BidimensionalLine {
 
   /**
    * Get the delta in the X direction for the main axis.
+   *
    * @returns {number} The delta X.
    */
   getDeltaX() {
@@ -103,6 +114,7 @@ export class BidimensionalLine {
 
   /**
    * Get the delta in the Y direction for the main axis.
+   *
    * @returns {number} The delta Y.
    */
   getDeltaY() {
@@ -110,16 +122,16 @@ export class BidimensionalLine {
   }
 
   /**
- * Quantify the bidimensional line according to view information.
- * Returns the length (main axis) and width (short axis) if available.
- *
- * @param {ViewController} viewController The associated view controller.
- * @returns {{
- *   longAxis: { value: number, unit: string },
- *   shortAxis: { value: number, unit: string }
- * }}
- *   Quantification object.
- */
+   *  Quantify the bidimensional line according to view information.
+   *  Returns the length (main axis) and width (short axis) if available.
+   *
+   *  @param {ViewController} viewController The associated view controller.
+   *  @returns {{
+   *    longAxis: { value: number, unit: string },
+   *    shortAxis: { value: number, unit: string }
+   *  }}
+   *    Quantification object.
+   */
   quantify(viewController) {
     // Get pixel spacing (default to 1 if not provided)
     const spacing2D = viewController.get2DSpacing?.() ?? {x: 1, y: 1};
