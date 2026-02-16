@@ -1810,7 +1810,14 @@ export class AnnotationGroupFactory {
       annotation.shortAxisT = annotation.mathShape.shortAxisT;
       annotation.shortAxisL1 = annotation.mathShape.shortAxisL1;
       annotation.shortAxisL2 = annotation.mathShape.shortAxisL2;
-      annotation.shortAxisCenter = annotation.mathShape.shortAxisCenter;
+      if (annotation.mathShape.shortAxisCenter) {
+        annotation.shortAxisCenter = {
+          x: annotation.mathShape.shortAxisCenter.getX(),
+          y: annotation.mathShape.shortAxisCenter.getY()
+        };
+      } else {
+        annotation.shortAxisCenter = undefined;
+      }
       annotation.hasShortAxisInteraction = true;
     }
   }

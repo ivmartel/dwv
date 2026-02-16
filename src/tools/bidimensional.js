@@ -13,6 +13,7 @@ import {custom} from '../app/custom.js';
 /* eslint-disable no-unused-vars */
 import {Style} from '../gui/style.js';
 import {Annotation} from '../image/annotation.js';
+import {ViewController} from '../app/viewController.js';
 
 /**
  * Bidimensional (long/short axis) annotation factory.
@@ -88,8 +89,8 @@ export class BidimensionalFactory {
    */
   #getDefaultLabel(annotation) {
     if (
-      typeof custom.labelTexts !== 'undefined' &&
-      typeof custom.labelTexts[this.#name] !== 'undefined'
+      custom.labelTexts !== undefined &&
+      custom.labelTexts[this.#name] !== undefined
     ) {
       return custom.labelTexts[this.#name];
     } else {
@@ -97,9 +98,9 @@ export class BidimensionalFactory {
         annotation.hasShortAxisInteraction === true &&
         annotation.quantification?.shortAxis?.value !== null
       ) {
-        return defaultLabelTexts[this.#name].finalized;
+        return defaultLabelTexts[this.#name];
       }
-      return defaultLabelTexts[this.#name].drawing;
+      return defaultLabelTexts[this.#name + 'Drawing'];
     }
   }
 
@@ -259,7 +260,7 @@ export class BidimensionalFactory {
     const line = annotation.mathShape;
     const shortAxisTickLen = 10;
     const longAxisTickLen = 20;
-    const zoom = style.getZoomScale ? style.getZoomScale() : 1;
+    const zoom = style.getZoomScale ? style.getZoomScale() : {x: 1, y: 1};
 
     // Main axis ticks
     const linePerp0 = getPerpendicularLine(
@@ -302,7 +303,7 @@ export class BidimensionalFactory {
 
     // 2. Short axis - NOW USING INDEPENDENT ENDPOINTS
     // This ensures the line length matches the anchor positions exactly
-    const [sa1, sa2] = this.getShortAxisEndpoints(annotation, style);
+    const [sa1, sa2] = this.getShortAxisEndpoints(annotation);
 
     const shortAxis = new Konva.Line({
       points: [sa1.getX(), sa1.getY(), sa2.getX(), sa2.getY()],
@@ -319,7 +320,7 @@ export class BidimensionalFactory {
     // 3. Short axis ticks (perpendicular to the short axis line)
     const dx = sa2.getX() - sa1.getX();
     const dy = sa2.getY() - sa1.getY();
-    const len = Math.sqrt(dx * dx + dy * dy);
+    const len = Math.hypot(dx, dy);
 
     let nx, ny;
     if (len === 0) {
@@ -399,7 +400,7 @@ export class BidimensionalFactory {
     }
 
     // Always use the model to get the current short axis endpoints
-    const [sa1, sa2] = this.getShortAxisEndpoints(annotation, style);
+    const [sa1, sa2] = this.getShortAxisEndpoints(annotation);
 
     // Return all four anchor positions
     return [main0, main1, sa1, sa2];
@@ -421,9 +422,8 @@ export class BidimensionalFactory {
           positions[i].getX(),
           positions[i].getY(),
           'anchor' + i, // anchor0, anchor1, anchor2, anchor3
-          style,
-          4,
-        ),
+          style
+        )
       );
     }
     return anchors;
@@ -445,7 +445,7 @@ export class BidimensionalFactory {
       const end = mathShape.getEnd();
       const dx = end.getX() - begin.getX();
       const dy = end.getY() - begin.getY();
-      const len = Math.sqrt(dx * dx + dy * dy);
+      const len = Math.hypot(dx, dy);
 
       if (len === 0) {
         return;
@@ -513,7 +513,7 @@ export class BidimensionalFactory {
     this.updateLabelContent(annotation, group, style);
 
     // Update label position if default position
-    if (typeof annotation.labelPosition === 'undefined') {
+    if (annotation.labelPosition === undefined) {
       this.#labelFactory.updatePosition(annotation, group);
     }
 
@@ -538,13 +538,15 @@ export class BidimensionalFactory {
 
     // 1. Update Main Axis Line
     const kline = group.findOne('.shape');
-    kline.position({x: 0, y: 0});
-    kline.points([
-      line.getBegin().getX(),
-      line.getBegin().getY(),
-      line.getEnd().getX(),
-      line.getEnd().getY(),
-    ]);
+    if (kline && kline instanceof Konva.Line) {
+      kline.position({x: 0, y: 0});
+      kline.points([
+        line.getBegin().getX(),
+        line.getBegin().getY(),
+        line.getEnd().getX(),
+        line.getEnd().getY(),
+      ]);
+    }
 
     // 2. Update Main Axis Ticks (Ends of the long axis)
     const ktick0 = group.findOne('.shape-tick0');
@@ -558,22 +560,26 @@ export class BidimensionalFactory {
       tickLen,
       zoom,
     );
-    ktick0.position({x: 0, y: 0});
-    ktick0.points([
-      linePerp0.getBegin().getX(),
-      linePerp0.getBegin().getY(),
-      linePerp0.getEnd().getX(),
-      linePerp0.getEnd().getY(),
-    ]);
+    if (ktick0 && ktick0 instanceof Konva.Line) {
+      ktick0.position({x: 0, y: 0});
+      ktick0.points([
+        linePerp0.getBegin().getX(),
+        linePerp0.getBegin().getY(),
+        linePerp0.getEnd().getX(),
+        linePerp0.getEnd().getY(),
+      ]);
+    }
 
     const linePerp1 = getPerpendicularLine(line, line.getEnd(), tickLen, zoom);
-    ktick1.position({x: 0, y: 0});
-    ktick1.points([
-      linePerp1.getBegin().getX(),
-      linePerp1.getBegin().getY(),
-      linePerp1.getEnd().getX(),
-      linePerp1.getEnd().getY(),
-    ]);
+    if (ktick1 && ktick1 instanceof Konva.Line) {
+      ktick1.position({x: 0, y: 0});
+      ktick1.points([
+        linePerp1.getBegin().getX(),
+        linePerp1.getBegin().getY(),
+        linePerp1.getEnd().getX(),
+        linePerp1.getEnd().getY(),
+      ]);
+    }
 
     // 3. Handle Anchor interaction
     if (anchor.id() === 'anchor2' || anchor.id() === 'anchor3') {
@@ -582,18 +588,17 @@ export class BidimensionalFactory {
     }
 
     // 4. Get the Independent Endpoints
-    const [sa1, sa2] = this.getShortAxisEndpoints(annotation, style);
+    const [sa1, sa2] = this.getShortAxisEndpoints(annotation);
 
     // 5. Update Short Axis Line
     const shortAxis = group.findOne('.bidimensional-short-axis');
-    if (shortAxis) {
+    if (shortAxis && shortAxis instanceof Konva.Line) {
       shortAxis.position({x: 0, y: 0});
       shortAxis.points([sa1.getX(), sa1.getY(), sa2.getX(), sa2.getY()]);
     }
 
     // 6. Update Short Axis Ticks and Anchor Positions
     this.updateShortAxisTicks(group, sa1, sa2);
-
     const a2 = getAnchorShape(group, 2);
     const a3 = getAnchorShape(group, 3);
     if (a2 && a3) {
@@ -605,7 +610,7 @@ export class BidimensionalFactory {
 
     annotation.hasShortAxisInteraction = true;
     annotation.setTextExpr(this.#getDefaultLabel(annotation));
-    annotation.updateQuantification?.(viewController);
+    annotation.updateQuantification?.();
     group.getLayer()?.draw();
   }
 
@@ -627,8 +632,10 @@ export class BidimensionalFactory {
    */
   updateConnector(group) {
     const kshape = group.findOne('.shape');
-    const connectorsPos = this.#getConnectorsPositions(kshape);
-    this.#labelFactory.updateConnector(group, connectorsPos);
+    if (kshape && kshape instanceof Konva.Line) {
+      const connectorsPos = this.#getConnectorsPositions(kshape);
+      this.#labelFactory.updateConnector(group, connectorsPos);
+    }
   }
 
   /**
@@ -725,11 +732,10 @@ export class BidimensionalFactory {
    */
   updateShortAxisToSolid(group) {
     const shortAxis = group.findOne('.bidimensional-short-axis');
-    if (!shortAxis) {
-      return;
+    if (shortAxis && shortAxis instanceof Konva.Line) {
+      shortAxis.dash([]); // Always set to solid
+      shortAxis.getLayer()?.draw();
     }
-    shortAxis.dash([]); // Always set to solid
-    shortAxis.getLayer()?.draw();
   }
 
   /**
@@ -744,7 +750,7 @@ export class BidimensionalFactory {
     const tickLen = 10;
     const dx = sa2.getX() - sa1.getX();
     const dy = sa2.getY() - sa1.getY();
-    const len = Math.sqrt(dx * dx + dy * dy);
+    const len = Math.hypot(dx, dy);
 
     let nx, ny;
     if (len === 0) {
@@ -764,7 +770,7 @@ export class BidimensionalFactory {
       sa1.getY() + (ny * tickLen) / 2,
     );
     const saTick0 = group.findOne('.short-axis-tick0');
-    if (saTick0) {
+    if (saTick0 && saTick0 instanceof Konva.Line) {
       saTick0.position({x: 0, y: 0});
       saTick0.points([
         tickSA1Start.getX(),
@@ -785,7 +791,7 @@ export class BidimensionalFactory {
       sa2.getY() + (ny * tickLen) / 2,
     );
     const saTick1 = group.findOne('.short-axis-tick1');
-    if (saTick1) {
+    if (saTick1 && saTick1 instanceof Konva.Line) {
       saTick1.position({x: 0, y: 0});
       saTick1.points([
         tickSA2Start.getX(),
@@ -814,7 +820,7 @@ export class BidimensionalFactory {
       const end = line.getEnd();
       const dx = end.getX() - begin.getX();
       const dy = end.getY() - begin.getY();
-      const len = Math.sqrt(dx * dx + dy * dy);
+      const len = Math.hypot(dx, dy);
 
       if (len === 0) {
         const centerX = annotation.shortAxisCenter.x;
@@ -846,7 +852,7 @@ export class BidimensionalFactory {
     const end = line.getEnd();
     const dx = end.getX() - begin.getX();
     const dy = end.getY() - begin.getY();
-    const len = Math.sqrt(dx * dx + dy * dy);
+    const len = Math.hypot(dx, dy);
 
     if (len === 0) {
       return [mid, mid];

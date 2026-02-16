@@ -35,9 +35,31 @@ export class BidimensionalLine {
   /**
    * Optional length of the short axis (perpendicular to main axis).
    *
-   * @type {number}
+   * @type {Point2D | undefined}
    */
   shortAxisCenter;
+
+  /**
+   * Optional length from center to one end of the short axis.
+   *
+   * @type {number}
+   */
+  shortAxisL1;
+
+  /**
+   * Optional length from center to the other end of the short axis.
+   *
+   * @type {number}
+   */
+  shortAxisL2;
+
+  /**
+   * Optional relative position (0-1) of the short axis center
+   * along the main axis.
+   *
+   * @type {number}
+   */
+  shortAxisT;
 
   /**
    * @param {Point2D} begin The beginning point of the main axis.
@@ -180,7 +202,7 @@ export class BidimensionalLine {
 
         shortWorld = new Line(p1, p2).getWorldLength(spacing2D);
 
-        this.shortAxisCenter = {x: anchorPoint.getX(), y: anchorPoint.getY()};
+        this.shortAxisCenter = anchorPoint;
       }
     }
 

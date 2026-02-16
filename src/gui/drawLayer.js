@@ -1345,27 +1345,13 @@ function restoreBidimensionalProperties(annotation, bidim, quant) {
   if (typeof quant.shortAxisT === 'number') {
     bidim.shortAxisT = quant.shortAxisT;
   }
-  if (typeof quant.shortAxisPoint1 === 'object') {
-    bidim.shortAxisPoint1 = new Point2D(
-      quant.shortAxisPoint1.x,
-      quant.shortAxisPoint1.y
-    );
-  }
-  if (typeof quant.shortAxisPoint2 === 'object') {
-    bidim.shortAxisPoint2 = new Point2D(
-      quant.shortAxisPoint2.x,
-      quant.shortAxisPoint2.y
-    );
-  }
-
   annotation.mathShape = bidim;
 
-  if (bidim.shortAxisPoint1 && bidim.shortAxisPoint2) {
+  const factory = new BidimensionalFactory();
+  const [sa1, sa2] = factory.getShortAxisEndpoints(annotation);
+  if (sa1 && sa2) {
     const main0 = bidim.getBegin();
     const main1 = bidim.getEnd();
-    const sa1 = bidim.shortAxisPoint1;
-    const sa2 = bidim.shortAxisPoint2;
-
     const centerX = (sa1.getX() + sa2.getX()) / 2;
     const centerY = (sa1.getY() + sa2.getY()) / 2;
     annotation.shortAxisCenter = {x: centerX, y: centerY};
@@ -1504,17 +1490,6 @@ export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
 
         restoreBidimensionalProperties(annotation, bidim, quant);
 
-        annotation.factory = BidimensionalFactory.instance ||
-          new BidimensionalFactory();
-
-        if (
-          typeof annotation.mathShape.quantify === 'function' &&
-          refImage.viewController
-        ) {
-          annotation.quantification = annotation.mathShape.quantify(
-            refImage.viewController
-          );
-        }
       }
       // details
       if (drawingsDetails) {

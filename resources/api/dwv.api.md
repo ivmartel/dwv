@@ -22,6 +22,7 @@ export class Annotation {
     getMetaItem(conceptId: string): object | undefined;
     getOrientationName(): string | undefined;
     getText(): string;
+    hasShortAxisInteraction: boolean;
     init(viewController: ViewController): void;
     isCompatibleView(planeHelper: PlaneHelper): boolean;
     labelPosition: Point2D | undefined;
@@ -40,6 +41,14 @@ export class Annotation {
         [x: string]: string;
     }): void;
     setViewController(viewController: ViewController): void;
+    shortAxisCenter: {
+        x: number;
+        y: number;
+    } | undefined;
+    shortAxisL1: number | undefined;
+    shortAxisL2: number | undefined;
+    shortAxisLength: number | undefined;
+    shortAxisT: number | undefined;
     textExpr: string;
     trackingId: string;
     trackingUid: string;
@@ -82,6 +91,7 @@ export class AnnotationGroupFactory {
         [x: string]: DataElement;
     }): CADReport | undefined;
     getWarning(): string | undefined;
+    syncBidimensionalAnnotationProperties(annotation: Annotation): void;
     toDicom(annotationGroup: AnnotationGroup, extraTags?: {
         [x: string]: any;
     }): {
@@ -1412,6 +1422,7 @@ export class ViewController {
     stop(): void;
     unbindImageAndLayer(viewLayer: ViewLayer): void;
     updatePlaneHelper(): void;
+    validatePlanePoint(point2D: Point2D): boolean;
 }
 
 // @public

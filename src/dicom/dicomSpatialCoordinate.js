@@ -130,9 +130,8 @@ export function getDicomSpatialCoordinateItem(scoord) {
  * Supports all standard shapes, including BidimensionalLine (exported as a
  * polyline with 4 points).
  *
- * @param {
- *   Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|BidimensionalLine
- * } shape
+ * @param {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|
+ *   BidimensionalLine} shape
  *   The math shape, including BidimensionalLine.
  * @returns {SpatialCoordinate} The DICOM scoord.
  */
@@ -223,19 +222,10 @@ export function getScoordFromShape(shape) {
     const mainAxisEnd = shape.getEnd();
 
     // Use the actual short axis center if available, otherwise use centroid
-    let shortAxisCenter;
-    if (
-      shape.shortAxisCenter &&
-      typeof shape.shortAxisCenter.x === 'number' &&
-      typeof shape.shortAxisCenter.y === 'number'
-    ) {
-      shortAxisCenter = new Point2D(
-        shape.shortAxisCenter.x,
-        shape.shortAxisCenter.y
-      );
-    } else {
-      shortAxisCenter = shape.getCentroid();
-    }
+    const shortAxisCenter =
+      shape.shortAxisCenter instanceof Point2D
+        ? shape.shortAxisCenter
+        : shape.getCentroid();
 
     const mainDx = mainAxisEnd.getX() - mainAxisStart.getX();
     const mainDy = mainAxisEnd.getY() - mainAxisStart.getY();
@@ -280,10 +270,8 @@ export function getScoordFromShape(shape) {
  * (polyline with 4 points).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {
- *   Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|
- *   BidimensionalLine|undefined
- * }
+ * @returns {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|
+ *   BidimensionalLine|undefined}
  *   The reconstructed math shape, including BidimensionalLine if applicable.
  */
 export function getShapeFromScoord(scoord) {
@@ -397,7 +385,7 @@ export function getShapeFromScoord(scoord) {
         shape.shortAxisT = shortAxisT;
         shape.shortAxisL1 = shortAxisL1;
         shape.shortAxisL2 = shortAxisL2;
-        shape.shortAxisCenter = {x: shortAxisCenterX, y: shortAxisCenterY};
+        shape.shortAxisCenter = new Point2D(shortAxisCenterX, shortAxisCenterY);
       }
     } else {
       if (points.length === 5) {

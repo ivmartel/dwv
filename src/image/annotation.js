@@ -107,6 +107,48 @@ export class Annotation {
   planeOrigin;
 
   /**
+   * Center of the short axis.
+   *
+   * @type {{x: number, y: number}|undefined}
+   */
+  shortAxisCenter;
+
+  /**
+   * Short axis T value.
+   *
+   * @type {number|undefined}
+   */
+  shortAxisT;
+
+  /**
+   * Short axis L1 value.
+   *
+   * @type {number|undefined}
+   */
+  shortAxisL1;
+
+  /**
+   * Short axis L2 value.
+   *
+   * @type {number|undefined}
+   */
+  shortAxisL2;
+
+  /**
+   * Short axis length.
+   *
+   * @type {number|undefined}
+   */
+  shortAxisLength;
+
+  /**
+   * Indicates if the annotation has short axis interaction.
+   *
+   * @type {boolean}
+   */
+  hasShortAxisInteraction = false;
+
+  /**
    * A couple of points that help define the annotation plane.
    *
    * @type {Point3D[]|undefined}

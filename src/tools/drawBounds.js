@@ -36,8 +36,10 @@ export const defaultLabelTexts = {
     '*': '{length}'
   },
   bidimensional: {
-    drawing: {'*': '{longAxis}'},
-    finalized: {'*': '{longAxis} x {shortAxis}'}
+    '*': '{longAxis} x {shortAxis}'
+  },
+  bidimensionalDrawing: {
+    '*': '{longAxis}'
   }
 };
 
