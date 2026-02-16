@@ -83,9 +83,10 @@ describe('BidimensionalLine', () => {
       longAxis: {value: 20, unit: 'cm'},
       shortAxis: {value: 12, unit: 'cm'},
     });
-    // shortAxisCenter should be set
-    assert.closeTo(b.shortAxisCenter.x, 5, 1e-6);
-    assert.closeTo(b.shortAxisCenter.y, 0, 1e-6);
+    // shortAxisCenter should be set and is a Point2D
+    assert.ok(b.shortAxisCenter instanceof Point2D);
+    assert.closeTo(b.shortAxisCenter.getX(), 5, 1e-6);
+    assert.closeTo(b.shortAxisCenter.getY(), 0, 1e-6);
   });
 
   test('quantify handles missing viewController methods', () => {
