@@ -35,7 +35,7 @@ export class BidimensionalFactory {
 
   /**
    * Does this factory support the input math shape.
-   * 
+   *
    * @param {object} mathShape The mathematical shape.
    * @returns {boolean} True if supported.
    */
