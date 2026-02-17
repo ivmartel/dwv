@@ -106,7 +106,6 @@ export class Annotation {
    */
   planeOrigin;
 
-
   /**
    * A couple of points that help define the annotation plane.
    *

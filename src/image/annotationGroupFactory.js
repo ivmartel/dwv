@@ -52,7 +52,6 @@ import {Point2D, Point3D} from '../math/point.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from '../dicom/dataElement.js';
-import {BidimensionalLine} from '../math/bidimensionalLine.js';
 /* eslint-enable no-unused-vars */
 
 /**
