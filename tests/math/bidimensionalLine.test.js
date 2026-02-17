@@ -89,14 +89,12 @@ describe('BidimensionalLine', () => {
     assert.closeTo(b.shortAxisCenter.getY(), 0, 1e-6);
   });
 
-  test('quantify handles missing viewController methods', () => {
+  test('quantify throws if getLengthUnit missing', () => {
     const p1 = new Point2D(0, 0);
     const p2 = new Point2D(0, 10);
     const b = new BidimensionalLine(p1, p2);
     b.shortAxisLength = 4;
-    const viewController = {}; // no methods
-    const result = b.quantify(viewController);
-    assert.equal(result.longAxis.unit, 'mm');
-    assert.equal(result.shortAxis.unit, 'mm');
+    const viewController = {}; // no getLengthUnit
+    assert.throws(() => b.quantify(viewController), /getLengthUnit/);
   });
 });

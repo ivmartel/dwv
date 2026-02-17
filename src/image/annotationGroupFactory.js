@@ -633,7 +633,6 @@ export class AnnotationGroupFactory {
       annotation = new Annotation();
       // shape
       annotation.mathShape = getShapeFromScoord(scoord.value);
-      this.syncBidimensionalAnnotationProperties(annotation);
       // shape source image
       const fromImage = scoord.contentSequence.find(function (item) {
         return item.valueType === ValueTypes.image &&
@@ -739,7 +738,6 @@ export class AnnotationGroupFactory {
           subItem.relationshipType === RelationshipTypes.inferredFrom;
       });
       annotation.mathShape = getShapeFromScoord(scoord.value);
-      this.syncBidimensionalAnnotationProperties(annotation);
       // special point/arrow case
       // TODO: not very valid...
       if (annotation.mathShape instanceof Point2D &&
@@ -800,7 +798,6 @@ export class AnnotationGroupFactory {
           subItem.relationshipType === RelationshipTypes.inferredFrom;
       });
       annotation.mathShape = getShapeFromScoord(scoord.value);
-      this.syncBidimensionalAnnotationProperties(annotation);
       // special point/arrow case
       // TODO: not very valid...
       if (annotation.mathShape instanceof Point2D &&
@@ -936,7 +933,6 @@ export class AnnotationGroupFactory {
     const annotation = new Annotation();
     // shape
     annotation.mathShape = getShapeFromScoord(content.value);
-    this.syncBidimensionalAnnotationProperties(annotation);
 
     for (const item of content.contentSequence) {
       // shape source image
@@ -1792,34 +1788,6 @@ export class AnnotationGroupFactory {
     }
 
     return getElementsFromJSONTags(tags);
-  }
-
-  /**
-   * Copy bidimensional (short axis) properties from the mathShape
-   * to the annotation object. This ensures that after importing from
-   * DICOM SR, the annotation has all the properties needed for display
-   * and interaction in the UI.
-   *
-   * @param {Annotation} annotation The annotation to update.
-   */
-  syncBidimensionalAnnotationProperties(annotation) {
-    // Only copy if the mathShape is a BidimensionalLine
-    if (annotation.mathShape instanceof BidimensionalLine) {
-      // Copy all relevant short axis properties
-      annotation.shortAxisLength = annotation.mathShape.shortAxisLength;
-      annotation.shortAxisT = annotation.mathShape.shortAxisT;
-      annotation.shortAxisL1 = annotation.mathShape.shortAxisL1;
-      annotation.shortAxisL2 = annotation.mathShape.shortAxisL2;
-      if (annotation.mathShape.shortAxisCenter) {
-        annotation.shortAxisCenter = {
-          x: annotation.mathShape.shortAxisCenter.getX(),
-          y: annotation.mathShape.shortAxisCenter.getY()
-        };
-      } else {
-        annotation.shortAxisCenter = undefined;
-      }
-      annotation.hasShortAxisInteraction = true;
-    }
   }
 
 }

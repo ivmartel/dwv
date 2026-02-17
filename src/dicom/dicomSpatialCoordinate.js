@@ -386,6 +386,7 @@ export function getShapeFromScoord(scoord) {
         shape.shortAxisL1 = shortAxisL1;
         shape.shortAxisL2 = shortAxisL2;
         shape.shortAxisCenter = new Point2D(shortAxisCenterX, shortAxisCenterY);
+        shape.hasShortAxisInteraction = true;
       }
     } else {
       if (points.length === 5) {

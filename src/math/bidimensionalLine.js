@@ -4,6 +4,7 @@ import {Line} from './line.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {ViewController} from '../app/viewController.js';
+import {Annotation} from '../image/annotation.js';
 
 /**
  * BidimensionalLine shape.
@@ -68,6 +69,47 @@ export class BidimensionalLine {
   constructor(begin, end) {
     this.#begin = begin;
     this.#end = end;
+    /**
+     * Center of the short axis.
+     *
+     * @type {Point2D|undefined}
+     */
+    this.shortAxisCenter = undefined;
+
+    /**
+     * Short axis T value.
+     *
+     * @type {number|undefined}
+     */
+    this.shortAxisT = undefined;
+
+    /**
+     * Short axis L1 value.
+     *
+     * @type {number|undefined}
+     */
+    this.shortAxisL1 = undefined;
+
+    /**
+     * Short axis L2 value.
+     *
+     * @type {number|undefined}
+     */
+    this.shortAxisL2 = undefined;
+
+    /**
+     * Short axis length.
+     *
+     * @type {number|undefined}
+     */
+    this.shortAxisLength = undefined;
+
+    /**
+     * Indicates if the annotation has short axis interaction.
+     *
+     * @type {boolean}
+     */
+    this.hasShortAxisInteraction = false;
   }
 
   /**
@@ -108,7 +150,7 @@ export class BidimensionalLine {
   getLength() {
     const dx = this.getDeltaX();
     const dy = this.getDeltaY();
-    return Math.sqrt(dx * dx + dy * dy);
+    return Math.hypot(dx, dy);
   }
 
   /**
@@ -206,20 +248,82 @@ export class BidimensionalLine {
       }
     }
 
-    const unit = viewController.getLengthUnit?.() ?? 'mm';
-    const hasShort = typeof shortWorld === 'number' && !isNaN(shortWorld);
+    const hasShort =
+      typeof shortWorld === 'number' && !Number.isNaN(shortWorld);
 
-    return {
-      longAxis: {
-        value: hasShort
-          ? Math.max(longWorld, shortWorld)
-          : longWorld,
-        unit
-      },
-      shortAxis: {
-        value: hasShort ? Math.min(longWorld, shortWorld) : null,
-        unit
+    if (longWorld !== null) {
+      return {
+        longAxis: {
+          value: hasShort
+            ? Math.max(longWorld, shortWorld)
+            : longWorld,
+          unit: viewController.getLengthUnit()
+        },
+        shortAxis: {
+          value: hasShort ? Math.min(longWorld, shortWorld) : null,
+          unit: viewController.getLengthUnit()
+        }
+      };
+    }
+  }
+
+  /**
+   * Restore all bidimensional (short axis) properties from quantification data
+   * and a BidimensionalLine instance to the annotation object.
+   * This ensures that after loading from a saved drawing, the annotation has
+   * all the properties needed for correct display and quantification.
+   *
+   * @param {Annotation} annotation The annotation to update.
+   * @param {BidimensionalLine} bidim The BidimensionalLine math shape.
+   * @param {object} quant The quantification object containing
+   *   saved properties.
+   */
+  static restorePropertiesFromQuantification(annotation, bidim, quant) {
+    if (typeof quant.shortAxisLength === 'number') {
+      bidim.shortAxisLength = quant.shortAxisLength;
+    }
+    if (typeof quant.shortAxisT === 'number') {
+      bidim.shortAxisT = quant.shortAxisT;
+    }
+    annotation.mathShape = bidim;
+
+    // Recalculate endpoints and all derived properties
+    // This logic mirrors the previous restoreBidimensionalProperties
+    // (requires annotation to have mathShape set)
+    if (typeof annotation.getFactory === 'function' &&
+      typeof annotation.getFactory().getShortAxisEndpoints === 'function') {
+      const factory = annotation.getFactory();
+      const [sa1, sa2] = factory.getShortAxisEndpoints(annotation);
+      if (sa1 && sa2) {
+        const main0 = bidim.getBegin();
+        const main1 = bidim.getEnd();
+        const centerX = (sa1.getX() + sa2.getX()) / 2;
+        const centerY = (sa1.getY() + sa2.getY()) / 2;
+        annotation.mathShape.shortAxisCenter = {x: centerX, y: centerY};
+
+        const dx = main1.getX() - main0.getX();
+        const dy = main1.getY() - main0.getY();
+        const len = Math.sqrt(dx * dx + dy * dy);
+        let t = 0.5;
+        if (len > 0) {
+          const ux = dx / len;
+          const uy = dy / len;
+          const vx = centerX - main0.getX();
+          const vy = centerY - main0.getY();
+          t = Math.max(0, Math.min(1, (vx * ux + vy * uy) / len));
+        }
+        annotation.mathShape.shortAxisT = t;
+
+        const l1 = Math.sqrt(
+          Math.pow(sa1.getX() - centerX, 2) + Math.pow(sa1.getY() - centerY, 2)
+        );
+        const l2 = Math.sqrt(
+          Math.pow(sa2.getX() - centerX, 2) + Math.pow(sa2.getY() - centerY, 2)
+        );
+        annotation.mathShape.shortAxisL1 = l1;
+        annotation.mathShape.shortAxisL2 = l2;
+        annotation.mathShape.shortAxisLength = l1 + l2;
       }
-    };
+    }
   }
 }

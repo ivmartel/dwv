@@ -11,6 +11,11 @@ import {Point2D} from '../../src/math/point.js';
 import {Protractor} from '../../src/math/protractor.js';
 import {Rectangle} from '../../src/math/rectangle.js';
 import {ROI} from '../../src/math/roi.js';
+import {BidimensionalLine} from '../../src/math/bidimensionalLine.js';
+import {
+  getScoordFromShape,
+  getShapeFromScoord
+} from '../../src/dicom/dicomSpatialCoordinate.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -39,7 +44,6 @@ import tid1500v0Ruler from './tid1500-0/sr-ruler.dcm?inline';
 /** @module tests/annotation */
 
 describe('annotation', () => {
-
   /**
    * Get an annotation group from a buffer string.
    *
@@ -478,6 +482,70 @@ describe('annotation', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Ruler);
     checkGroupCommonProperties(annotationGroup, 'ruler');
     checkRulerGroup(annotationGroup);
+  });
+
+  /**
+   * Test BidimensionalLine DICOM SR import/export roundtrip.
+   */
+  test('BidimensionalLine DICOM SR import/export roundtrip', () => {
+    // Create a BidimensionalLine with all properties
+    const p1 = new Point2D(10, 20);
+    const p2 = new Point2D(30, 40);
+    const b = new BidimensionalLine(p1, p2);
+    b.shortAxisLength = 12;
+    b.shortAxisT = 0.6;
+    b.shortAxisL1 = 7;
+    b.shortAxisL2 = 5;
+    // Set shortAxisCenter for export
+    b.shortAxisCenter = new Point2D(22, 32);
+
+    // Export to DICOM SR (SCOORD)
+    const scoord = getScoordFromShape(b);
+    // Import back to BidimensionalLine
+    const b2 = getShapeFromScoord(scoord);
+
+    // Check type and main axis
+    assert.ok(
+      b2 instanceof BidimensionalLine,
+      'Imported shape is BidimensionalLine'
+    );
+    assert.equal(b2.getBegin().getX(), b.getBegin().getX(), 'Begin X matches');
+    assert.equal(b2.getBegin().getY(), b.getBegin().getY(), 'Begin Y matches');
+    assert.equal(b2.getEnd().getX(), b.getEnd().getX(), 'End X matches');
+    assert.equal(b2.getEnd().getY(), b.getEnd().getY(), 'End Y matches');
+
+    // Check short axis properties
+    assert.closeTo(
+      b2.shortAxisLength,
+      b.shortAxisLength,
+      1e-6,
+      'shortAxisLength matches'
+    );
+    // L1 and L2 may be swapped or recalculated, but their sum should match
+    assert.closeTo(
+      b2.shortAxisL1 + b2.shortAxisL2,
+      b.shortAxisLength,
+      1e-6,
+      'shortAxisL1 + shortAxisL2 matches shortAxisLength'
+    );
+    assert.ok(
+      b2.shortAxisL1 > 0 && b2.shortAxisL2 > 0,
+      'shortAxisL1 and L2 positive'
+    );
+    assert.closeTo(b2.shortAxisT, b.shortAxisT, 1e-2, 'shortAxisT matches');
+    // Center is recalculated, but should be close
+    assert.closeTo(
+      b2.shortAxisCenter.getX(),
+      b.shortAxisCenter.getX(),
+      1,
+      'shortAxisCenter X close'
+    );
+    assert.closeTo(
+      b2.shortAxisCenter.getY(),
+      b.shortAxisCenter.getY(),
+      1,
+      'shortAxisCenter Y close'
+    );
   });
 
 });

@@ -95,7 +95,7 @@ export class BidimensionalFactory {
       return custom.labelTexts[this.#name];
     } else {
       if (
-        annotation.hasShortAxisInteraction === true &&
+        annotation.mathShape.hasShortAxisInteraction === true &&
         annotation.quantification?.shortAxis?.value !== null
       ) {
         return defaultLabelTexts[this.#name];
@@ -116,33 +116,25 @@ export class BidimensionalFactory {
     const totalLength = line.getLength();
 
     // Initialize individual side lengths to half of the long axis (default)
-    if (typeof annotation.shortAxisL1 !== 'number') {
-      annotation.shortAxisL1 = totalLength / 2;
-      annotation.shortAxisL2 = totalLength / 2;
+    if (typeof line.shortAxisL1 !== 'number') {
+      line.shortAxisL1 = totalLength / 2;
+      line.shortAxisL2 = totalLength / 2;
     }
 
-    if (typeof annotation.shortAxisT !== 'number') {
-      annotation.shortAxisT = 0.5;
+    if (typeof line.shortAxisT !== 'number') {
+      line.shortAxisT = 0.5;
     }
 
-    // NEW: Store the absolute world position of short axis center
-    if (!annotation.shortAxisCenter) {
-      const mid = this.getPointAlongLine(line, annotation.shortAxisT);
-      annotation.shortAxisCenter = {
-        x: mid.getX(),
-        y: mid.getY()
-      };
+    // Store the absolute world position of short axis center
+    if (!line.shortAxisCenter) {
+      const mid = this.getPointAlongLine(line, line.shortAxisT);
+      line.shortAxisCenter = mid;
     }
 
     // Keep total length synced for quantification/labels
-    annotation.shortAxisLength =
-      annotation.shortAxisL1 + annotation.shortAxisL2;
+    line.shortAxisLength = line.shortAxisL1 + line.shortAxisL2;
 
-    // Sync model
-    line.shortAxisLength = annotation.shortAxisLength;
-    line.shortAxisT = annotation.shortAxisT;
     annotation.mathShape = line;
-
     annotation.setTextExpr(this.#getDefaultLabel(annotation));
     annotation.updateQuantification();
   }
@@ -234,7 +226,7 @@ export class BidimensionalFactory {
    */
   #createShape(annotation, style) {
     const line = annotation.mathShape;
-    return new Konva.Line({
+    const kline = new Konva.Line({
       points: [
         line.getBegin().getX(),
         line.getBegin().getY(),
@@ -247,6 +239,32 @@ export class BidimensionalFactory {
       opacity: 1,
       name: 'shape',
     });
+
+    // Add a larger hit zone using hitFunc (similar to ruler tool)
+    const tickLen = 20;
+    const linePerp0 = getPerpendicularLine(
+      line,
+      line.getBegin(),
+      tickLen,
+      style.getZoomScale ? style.getZoomScale() : {x: 1, y: 1}
+    );
+    const linePerp1 = getPerpendicularLine(
+      line,
+      line.getEnd(),
+      tickLen,
+      style.getZoomScale ? style.getZoomScale() : {x: 1, y: 1}
+    );
+    kline.hitFunc(function (context) {
+      context.beginPath();
+      context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
+      context.lineTo(linePerp0.getEnd().getX(), linePerp0.getEnd().getY());
+      context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
+      context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
+      context.closePath();
+      context.fillStrokeShape(kline);
+    });
+
+    return kline;
   }
 
   /**
@@ -310,7 +328,7 @@ export class BidimensionalFactory {
       stroke: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
-      dash: annotation.hasShortAxisInteraction
+      dash: annotation.mathShape.hasShortAxisInteraction
         ? []
         : [8, 8],
       opacity: 0.5,
@@ -461,33 +479,30 @@ export class BidimensionalFactory {
 
       // 1. Update position along the long axis (T)
       const tWorld = vx * ux + vy * uy;
-      annotation.shortAxisT = Math.max(0, Math.min(1, tWorld / len));
+      mathShape.shortAxisT = Math.max(0, Math.min(1, tWorld / len));
 
       // NEW: Update absolute center position
-      const center = this.getPointAlongLine(mathShape, annotation.shortAxisT);
-      annotation.shortAxisCenter = {
-        x: center.getX(),
-        y: center.getY()
-      };
+      const center = this.getPointAlongLine(mathShape, mathShape.shortAxisT);
+      mathShape.shortAxisCenter = center;
 
       // 2. Update specific side length with CLAMPING
       const distFromLongAxis = vx * px + vy * py;
 
       if (anchor.id() === 'anchor2') {
-        annotation.shortAxisL1 = Math.max(0.1, distFromLongAxis);
+        mathShape.shortAxisL1 = Math.max(0.1, distFromLongAxis);
       } else {
-        annotation.shortAxisL2 = Math.max(0.1, -distFromLongAxis);
+        mathShape.shortAxisL2 = Math.max(0.1, -distFromLongAxis);
       }
 
       // Update total length for labels/quantification
-      annotation.shortAxisLength =
-        annotation.shortAxisL1 + annotation.shortAxisL2;
+      mathShape.shortAxisLength =
+        mathShape.shortAxisL1 + mathShape.shortAxisL2;
 
       // 3. Re-lock anchor position to the clamped value
       const finalDist =
         (anchor.id() === 'anchor2')
-          ? annotation.shortAxisL1
-          : -annotation.shortAxisL2;
+          ? mathShape.shortAxisL1
+          : -mathShape.shortAxisL2;
       anchor.x(center.getX() + px * finalDist);
       anchor.y(center.getY() + py * finalDist);
     }
@@ -583,8 +598,8 @@ export class BidimensionalFactory {
 
     // 3. Handle Anchor interaction
     if (anchor.id() === 'anchor2' || anchor.id() === 'anchor3') {
-      line.shortAxisLength = annotation.shortAxisLength;
-      line.shortAxisT = annotation.shortAxisT;
+      line.shortAxisLength = annotation.mathShape.shortAxisLength;
+      line.shortAxisT = annotation.mathShape.shortAxisT;
     }
 
     // 4. Get the Independent Endpoints
@@ -608,7 +623,7 @@ export class BidimensionalFactory {
       a3.y(sa2.getY());
     }
 
-    annotation.hasShortAxisInteraction = true;
+    annotation.mathShape.hasShortAxisInteraction = true;
     annotation.setTextExpr(this.#getDefaultLabel(annotation));
     annotation.updateQuantification?.();
     group.getLayer()?.draw();
@@ -677,15 +692,21 @@ export class BidimensionalFactory {
     );
     const newLine = new BidimensionalLine(newBegin, newEnd);
 
-    newLine.shortAxisLength = annotation.shortAxisLength;
-    newLine.shortAxisT = annotation.shortAxisT;
-
-    if (annotation.shortAxisCenter) {
-      annotation.shortAxisCenter = {
-        x: annotation.shortAxisCenter.x + translation.x,
-        y: annotation.shortAxisCenter.y + translation.y
-      };
+    newLine.shortAxisLength = line.shortAxisLength;
+    newLine.shortAxisT = line.shortAxisT;
+    newLine.shortAxisL1 = line.shortAxisL1;
+    newLine.shortAxisL2 = line.shortAxisL2;
+    if (
+      line.shortAxisCenter instanceof Object &&
+      'getX' in line.shortAxisCenter &&
+      'getY' in line.shortAxisCenter
+    ) {
+      newLine.shortAxisCenter = new Point2D(
+        line.shortAxisCenter.getX() + translation.x,
+        line.shortAxisCenter.getY() + translation.y
+      );
     }
+    newLine.hasShortAxisInteraction = line.hasShortAxisInteraction;
 
     annotation.mathShape = newLine;
     annotation.updateQuantification();
@@ -719,8 +740,23 @@ export class BidimensionalFactory {
     const newLine = new BidimensionalLine(pointBegin, pointEnd);
 
     // Preserve all custom independent properties
-    newLine.shortAxisLength = annotation.shortAxisLength;
-    newLine.shortAxisT = annotation.shortAxisT;
+    const oldLine = annotation.mathShape;
+    newLine.shortAxisLength = oldLine.shortAxisLength;
+    newLine.shortAxisT = oldLine.shortAxisT;
+    newLine.shortAxisL1 = oldLine.shortAxisL1;
+    newLine.shortAxisL2 = oldLine.shortAxisL2;
+    if (
+      oldLine.shortAxisCenter instanceof Object &&
+      'getX' in oldLine.shortAxisCenter &&
+      'getY' in oldLine.shortAxisCenter
+    ) {
+      newLine.shortAxisCenter = new Point2D(
+        oldLine.shortAxisCenter.getX(),
+        oldLine.shortAxisCenter.getY()
+      );
+    }
+    newLine.hasShortAxisInteraction = oldLine.hasShortAxisInteraction;
+
     annotation.mathShape = newLine;
     annotation.updateQuantification();
   }
@@ -811,63 +847,73 @@ export class BidimensionalFactory {
    */
   getShortAxisEndpoints(annotation) {
     const line = annotation.mathShape;
-
-    // Use absolute center position if available
+    // Use absolute center position if available and valid
     let mid;
-    if (annotation.shortAxisCenter) {
+    if (annotation.mathShape.shortAxisCenter instanceof Point2D) {
       // Project the absolute center onto the current long axis
       const begin = line.getBegin();
       const end = line.getEnd();
       const dx = end.getX() - begin.getX();
       const dy = end.getY() - begin.getY();
       const len = Math.hypot(dx, dy);
-
       if (len === 0) {
-        const centerX = annotation.shortAxisCenter.x;
-        const centerY = annotation.shortAxisCenter.y;
-        mid = new Point2D(centerX, centerY);
+        mid = annotation.mathShape.shortAxisCenter;
       } else {
         const ux = dx / len;
         const uy = dy / len;
-
         // Vector from begin to absolute center
-        const vx = annotation.shortAxisCenter.x - begin.getX();
-        const vy = annotation.shortAxisCenter.y - begin.getY();
-
+        const vx = annotation.mathShape.shortAxisCenter.getX() - begin.getX();
+        const vy = annotation.mathShape.shortAxisCenter.getY() - begin.getY();
         // Project onto long axis
         const projection = vx * ux + vy * uy;
         const t = Math.max(0, Math.min(1, projection / len));
-
         // Update T to match the projection
-        annotation.shortAxisT = t;
-
+        annotation.mathShape.shortAxisT = t;
         mid = this.getPointAlongLine(line, t);
       }
     } else {
       // Fallback to T-based positioning
-      mid = this.getPointAlongLine(line, annotation.shortAxisT ?? 0.5);
+      const t =
+        typeof annotation.mathShape.shortAxisT === 'number'
+          ? annotation.mathShape.shortAxisT
+          : 0.5;
+      mid = this.getPointAlongLine(line, t);
     }
-
     const begin = line.getBegin();
     const end = line.getEnd();
     const dx = end.getX() - begin.getX();
     const dy = end.getY() - begin.getY();
     const len = Math.hypot(dx, dy);
-
-    if (len === 0) {
+    if (
+      len === 0 ||
+      Number.isNaN(mid.getX()) ||
+      Number.isNaN(mid.getY())
+    ) {
       return [mid, mid];
     }
-
     // Perpendicular unit vector
     const px = -dy / len;
     const py = dx / len;
-
     // Fallback to half length if L1/L2 aren't set yet (defensive coding)
-    const l1 = typeof annotation.shortAxisL1 === 'number'
-      ? annotation.shortAxisL1 : annotation.shortAxisLength / 2;
-    const l2 = typeof annotation.shortAxisL2 === 'number'
-      ? annotation.shortAxisL2 : annotation.shortAxisLength / 2;
-
+    let l1;
+    if (typeof annotation.mathShape.shortAxisL1 === 'number') {
+      l1 = annotation.mathShape.shortAxisL1;
+    } else if (typeof annotation.mathShape.shortAxisLength === 'number') {
+      l1 = annotation.mathShape.shortAxisLength / 2;
+    } else {
+      l1 = 0;
+    }
+    let l2;
+    if (typeof annotation.mathShape.shortAxisL2 === 'number') {
+      l2 = annotation.mathShape.shortAxisL2;
+    } else if (typeof annotation.mathShape.shortAxisLength === 'number') {
+      l2 = annotation.mathShape.shortAxisLength / 2;
+    } else {
+      l2 = 0;
+    }
+    if (Number.isNaN(l1) || Number.isNaN(l2)) {
+      return [mid, mid];
+    }
     return [
       new Point2D(mid.getX() + px * l1, mid.getY() + py * l1),
       new Point2D(mid.getX() - px * l2, mid.getY() - py * l2)
