@@ -35,6 +35,7 @@ import {PlaneHelper} from '../image/planeHelper.js';
 import {Annotation} from '../image/annotation.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
 import {DrawShapeHandler} from '../tools/drawShapeHandler.js';
+import {BidimensionalLine} from '../math/bidimensionalLine.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -1419,8 +1420,39 @@ export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
           new Point2D(absPosition.x, absPosition.y),
           shape.radius()
         );
-      }
+      } else if (stateGroup.name() === 'bidimensional-group') {
+        const points = shape.points();
+        const bidim = new BidimensionalLine(
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3])
+        );
 
+        const details = drawingsDetails && drawingsDetails[stateGroup.id()]
+          ? drawingsDetails[stateGroup.id()]
+          : undefined;
+        const quant = details && details.meta && details.meta.quantification
+          ? details.meta.quantification
+          : {};
+
+        if (
+          typeof BidimensionalLine.restorePropertiesFromQuantification ===
+          'function'
+        ) {
+          BidimensionalLine.restorePropertiesFromQuantification(
+            annotation,
+            bidim,
+            quant
+          );
+        } else {
+          if (typeof quant.shortAxisLength === 'number') {
+            bidim.shortAxisLength = quant.shortAxisLength;
+          }
+          if (typeof quant.shortAxisT === 'number') {
+            bidim.shortAxisT = quant.shortAxisT;
+          }
+          annotation.mathShape = bidim;
+        }
+      }
       // details
       if (drawingsDetails) {
         const details = drawingsDetails[stateGroup.id()];

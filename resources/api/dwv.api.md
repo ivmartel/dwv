@@ -1412,6 +1412,7 @@ export class ViewController {
     stop(): void;
     unbindImageAndLayer(viewLayer: ViewLayer): void;
     updatePlaneHelper(): void;
+    validatePlanePoint(point2D: Point2D): boolean;
 }
 
 // @public

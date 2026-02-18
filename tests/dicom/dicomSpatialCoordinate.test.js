@@ -15,6 +15,7 @@ import {ROI} from '../../src/math/roi.js';
 import {Circle} from '../../src/math/circle.js';
 import {Ellipse} from '../../src/math/ellipse.js';
 import {Rectangle} from '../../src/math/rectangle.js';
+import {BidimensionalLine} from '../../src/math/bidimensionalLine.js';
 
 /**
  * Related DICOM tag keys.
@@ -439,9 +440,73 @@ describe('dicom', () => {
       assert.equal(scoord.graphicData[9], '10');
     });
 
+    /**
+     * Tests for {@link getScoordFromShape} with BidimensionalLine.
+     *
+     * @function module:tests/dicom~getscoordfromshape-bidimensionalline
+     */
+    test('BidimensionalLine', () => {
+      // Main axis: (10,10)-(30,10), short axis center: (20,20), length: 10
+      const mainStart = new Point2D(10, 10);
+      const mainEnd = new Point2D(30, 10);
+      const shortAxisCenter = {x: 20, y: 20};
+      const shortAxisLength = 10;
+      const bline = new BidimensionalLine(mainStart, mainEnd);
+      bline.shortAxisCenter = shortAxisCenter;
+      bline.shortAxisLength = shortAxisLength;
+
+      const scoord = getScoordFromShape(bline);
+      assert.equal(scoord.graphicType, GraphicTypes.polyline);
+      assert.equal(scoord.graphicData.length, 8);
+      // Main axis
+      assert.equal(scoord.graphicData[0], '10');
+      assert.equal(scoord.graphicData[1], '10');
+      assert.equal(scoord.graphicData[2], '30');
+      assert.equal(scoord.graphicData[3], '10');
+      // Short axis endpoints (should be symmetric about shortAxisCenter)
+      // Just check they are numbers
+      assert.ok(!isNaN(Number(scoord.graphicData[4])));
+      assert.ok(!isNaN(Number(scoord.graphicData[5])));
+      assert.ok(!isNaN(Number(scoord.graphicData[6])));
+      assert.ok(!isNaN(Number(scoord.graphicData[7])));
+    });
+
   });
 
   describe('getShapeFromScoord', () => {
+    /**
+     * Tests for {@link getShapeFromScoord} with BidimensionalLine polyline.
+     *
+     * @function module:tests/dicom~getshapefromscoord-bidimensionalline
+     */
+    test('BidimensionalLine polyline', () => {
+      // 4 points: main axis (10,10)-(30,10), short axis endpoints
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.polyline;
+      // Use getScoordFromShape to generate valid data
+      const mainStart = new Point2D(10, 10);
+      const mainEnd = new Point2D(30, 10);
+      const shortAxisCenter = {x: 20, y: 20};
+      const shortAxisLength = 10;
+      const bline = new BidimensionalLine(mainStart, mainEnd);
+      bline.shortAxisCenter = shortAxisCenter;
+      bline.shortAxisLength = shortAxisLength;
+      const scoordData = getScoordFromShape(bline);
+      scoord.graphicData = scoordData.graphicData;
+
+      const shape = getShapeFromScoord(scoord);
+      assert.ok(shape instanceof BidimensionalLine);
+      assert.equal(shape.getBegin().getX(), 10);
+      assert.equal(shape.getBegin().getY(), 10);
+      assert.equal(shape.getEnd().getX(), 30);
+      assert.equal(shape.getEnd().getY(), 10);
+      // Check short axis properties
+      assert.ok(typeof shape.shortAxisLength === 'number');
+      assert.ok(typeof shape.shortAxisT === 'number');
+      assert.ok(typeof shape.shortAxisL1 === 'number');
+      assert.ok(typeof shape.shortAxisL2 === 'number');
+      assert.ok(typeof shape.shortAxisCenter === 'object');
+    });
 
     /**
      * Tests for {@link getShapeFromScoord} with no data.

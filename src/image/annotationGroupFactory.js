@@ -431,8 +431,20 @@ export class AnnotationGroupFactory {
     }
     if (content.valueType === ValueTypes.num &&
       content.relationshipType === relation) {
-      const quantifName =
-        getQuantificationName(content.conceptNameCode);
+      let quantifName = getQuantificationName(content.conceptNameCode);
+      // If quantifName is 'a' or 'b' and shape is BidimensionalLine,
+      // map to longAxis/shortAxis
+      if (
+        (quantifName === 'a' || quantifName === 'b') &&
+        annotation.mathShape && annotation.mathShape.constructor &&
+        annotation.mathShape.constructor.name === 'BidimensionalLine'
+      ) {
+        if (quantifName === 'a') {
+          quantifName = 'longAxis';
+        } else if (quantifName === 'b') {
+          quantifName = 'shortAxis';
+        }
+      }
       if (typeof quantifName !== 'undefined') {
         const measuredValue = content.value.measuredValue;
         const quantifUnit = getQuantificationUnit(

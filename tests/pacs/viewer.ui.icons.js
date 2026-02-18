@@ -28,7 +28,9 @@ const icons = {
   // triangular ruler
   protractor: '\u{1F4D0}',
   // wavy dash
-  roi: '\u{3030}'
+  roi: '\u{3030}',
+  //FALLING DIAGONAL CROSSING NORTH EAST ARROW
+  bidimensional: '\u{292F}',
 };
 
 /**
