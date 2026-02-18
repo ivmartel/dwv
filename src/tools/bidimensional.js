@@ -433,7 +433,7 @@ export class BidimensionalFactory {
    * @returns {Konva.Ellipse[]} The anchors.
    */
   getAnchors(shape, style) {
-    const positions = this.#getAnchorsPositions(shape, style);
+    const positions = this.#getAnchorsPositions(shape);
     const anchors = [];
     for (let i = 0; i < positions.length; ++i) {
       anchors.push(
@@ -514,16 +514,15 @@ export class BidimensionalFactory {
    * @param {Annotation} annotation The annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The view controller.
    */
-  updateShapeGroupOnAnchorMove(annotation, anchor, style, viewController) {
+  updateShapeGroupOnAnchorMove(annotation, anchor, style) {
     const group = anchor.getParent();
     if (!(group instanceof Konva.Group)) {
       return;
     }
 
     // Update shape and anchors
-    this.#updateShape(annotation, anchor, style, viewController);
+    this.#updateShape(annotation, anchor, style);
 
     // Update label
     this.updateLabelContent(annotation, group, style);
