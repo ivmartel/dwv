@@ -2,6 +2,9 @@ import {describe, test, assert} from 'vitest';
 import {BidimensionalLine} from '../../src/math/bidimensionalLine.js';
 import {Point2D} from '../../src/math/point.js';
 
+/**
+ * Tests for the 'math/bidimensionalLine.js' file.
+ */
 
 describe('BidimensionalLine', () => {
   test('constructor and getters', () => {
