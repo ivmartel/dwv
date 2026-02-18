@@ -9,11 +9,13 @@ import {
   defaultLabelTexts,
 } from './drawBounds.js';
 import {custom} from '../app/custom.js';
+
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Style} from '../gui/style.js';
 import {Annotation} from '../image/annotation.js';
 import {ViewController} from '../app/viewController.js';
+/* eslint-enable no-unused-vars */
 
 /**
  * Bidimensional (long/short axis) annotation factory.
@@ -399,10 +401,9 @@ export class BidimensionalFactory {
    * Get the anchor positions for the shape.
    *
    * @param {Konva.Line} shape The main axis shape.
-   * @param {Style} style The drawing style.
    * @returns {Point2D[]} The anchor positions.
    */
-  #getAnchorsPositions(shape, style) {
+  #getAnchorsPositions(shape) {
     // Main axis endpoints (from the shape)
     const points = shape.points();
     const sx = shape.x();
@@ -542,9 +543,8 @@ export class BidimensionalFactory {
    * @param {Annotation} annotation The annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The view controller.
    */
-  #updateShape(annotation, anchor, style, viewController) {
+  #updateShape(annotation, anchor, style) {
     const line = annotation.mathShape;
     const group = anchor.getParent();
     if (!(group instanceof Konva.Group)) {

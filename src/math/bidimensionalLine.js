@@ -5,6 +5,7 @@ import {Line} from './line.js';
 /* eslint-disable no-unused-vars */
 import {ViewController} from '../app/viewController.js';
 import {Annotation} from '../image/annotation.js';
+/* eslint-enable no-unused-vars */
 
 /**
  * BidimensionalLine shape.
@@ -251,8 +252,9 @@ export class BidimensionalLine {
     const hasShort =
       typeof shortWorld === 'number' && !Number.isNaN(shortWorld);
 
+    let res;
     if (longWorld !== null) {
-      return {
+      res = {
         longAxis: {
           value: hasShort
             ? Math.max(longWorld, shortWorld)
@@ -265,6 +267,7 @@ export class BidimensionalLine {
         }
       };
     }
+    return res;
   }
 
   /**
