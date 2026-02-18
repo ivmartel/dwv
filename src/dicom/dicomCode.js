@@ -372,7 +372,14 @@ const QuantificationName2DictItem = {
  * @returns {DicomCode|undefined} The code.
  */
 export function getConceptNameCode(name) {
-  const item = QuantificationName2DictItem[name];
+  // Map 'longAxis' to 'a' and 'shortAxis' to 'b' for DICOM export
+  let lookupName = name;
+  if (name === 'longAxis') {
+    lookupName = 'a';
+  } else if (name === 'shortAxis') {
+    lookupName = 'b';
+  }
+  const item = QuantificationName2DictItem[lookupName];
   let code;
   if (typeof item !== 'undefined') {
     code = getDicomCode(item.key, item.scheme);

@@ -37,6 +37,7 @@ import tid1500v0Protractor from './tid1500-0/sr-protractor.dcm?inline';
 import tid1500v0Rectangle from './tid1500-0/sr-rectangle.dcm?inline';
 import tid1500v0Roi from './tid1500-0/sr-roi.dcm?inline';
 import tid1500v0Ruler from './tid1500-0/sr-ruler.dcm?inline';
+import tid1500v0Bidimensional from './tid1500-0/sr-bidimensional.dcm?inline';
 
 /**
  * Tests for the annotation I/O.
@@ -322,6 +323,31 @@ describe('annotation', () => {
     }
   }
 
+  /**
+   * Check a bidimensional annotation group.
+   *
+   * @param {AnnotationGroup} annotationGroup The group to check.
+   */
+  function checkBidimensionalGroup(annotationGroup) {
+    const annotations = annotationGroup.getList();
+    for (let i = 0; i < annotations.length; ++i) {
+      const annotation = annotations[i];
+      const prefix = 'bidimensional annotation ' + i;
+      assert.ok(annotation.mathShape instanceof BidimensionalLine,
+        prefix + ' mathShape');
+      assert.ok(
+        annotation.textExpr === '{longAxis} x {shortAxis}' ||
+        annotation.textExpr === '{longAxis}',
+        prefix + ' annotation ' + i + ' good textExpr (' +
+        annotation.textExpr + ')'
+      );
+      assert.ok(typeof annotation.quantification.longAxis !== 'undefined',
+        prefix + ' quantification.longAxis');
+      assert.ok(typeof annotation.quantification.shortAxis !== 'undefined',
+        prefix + ' quantification.shortAxis');
+    }
+  }
+
   //----------------------------------------------------
   // dwv 0.34
   //----------------------------------------------------
@@ -549,134 +575,15 @@ describe('annotation', () => {
   });
 
   /**
-   * Test BidimensionalLine import from dicom-sr-1.dcm (external file).
-   * Skips the test if the file is not available.
+   * Tests for {@link Annotation} from tid1500 v0 containing a
+   * BidimensionalLine.
+   *
+   * @function module:tests/annotation~read-tid1500-v0-bidimensional
    */
-  test(
-    'Import BidimensionalLine from dicom-sr-1.dcm (external file, tolerant)',
-    () => {
-      const fs = require('fs');
-      const path = require('path');
-      const filePath = path.join(__dirname, 'dicom-sr-1.dcm');
-
-      if (!fs.existsSync(filePath)) {
-        console.warn(
-          'dicom-sr-1.dcm not found in tests/annotation, skipping test'
-        );
-        return;
-      }
-
-      const buffer = fs.readFileSync(filePath);
-      // Always convert Node.js Buffer to ArrayBuffer for DicomParser
-      const arrayBuffer = buffer.buffer.slice(
-        buffer.byteOffset,
-        buffer.byteOffset + buffer.byteLength
-      );
-
-      function tryParse(parser, buf) {
-        try {
-          parser.parse(buf);
-          return parser.getDicomElements();
-        } catch {
-          return undefined;
-        }
-      }
-
-      function findDicmOffset(arr) {
-        for (let i = 0; i < arr.length - 4; ++i) {
-          if (
-            arr[i] === 0x44 &&
-            arr[i + 1] === 0x49 &&
-            arr[i + 2] === 0x43 &&
-            arr[i + 3] === 0x4D
-          ) {
-            return i - 128;
-          }
-        }
-        return -1;
-      }
-
-      function tolerantDicomParse(arrayBuffer) {
-        const dicomParser = new DicomParser();
-        let tags = tryParse(dicomParser, arrayBuffer);
-        if (tags) {
-          return {tags, msg: null};
-        }
-
-        const arr = new Uint8Array(arrayBuffer);
-        const dicmOffset = findDicmOffset(arr);
-        if (dicmOffset >= 0 && dicmOffset < arr.length) {
-          const sliced = arr.slice(dicmOffset);
-          tags = tryParse(
-            dicomParser,
-            sliced.buffer.slice(
-              sliced.byteOffset,
-              sliced.byteOffset + sliced.byteLength
-            )
-          );
-          if (tags) {
-            return {
-              tags,
-              msg: 'Parsed from DICM offset at ' + dicmOffset,
-            };
-          }
-        }
-        // Try parsing as raw stream (no DICM preamble)
-        tags = tryParse(
-          dicomParser,
-          arr.buffer.slice(
-            arr.byteOffset,
-            arr.byteOffset + arr.byteLength
-          )
-        );
-        if (tags) {
-          return {
-            tags,
-            msg: 'Parsed as raw stream (no DICM preamble)',
-          };
-        }
-        return {tags: null, msg: null};
-      }
-
-      const {tags, msg} = tolerantDicomParse(arrayBuffer);
-      if (!tags) {
-        console.warn(
-          'dicom-sr-1.dcm is not a valid DICOM file for this parser,' +
-          ' skipping test'
-        );
-        return;
-      }
-      if (msg) {
-        console.warn(msg);
-      }
-
-      const fac = new AnnotationGroupFactory();
-      const warning = fac.checkElements(tags);
-      if (typeof warning !== 'undefined') {
-        console.warn(
-          warning + ' in dicom-sr-1.dcm, skipping test'
-        );
-        return;
-      }
-      let annotationGroup;
-      try {
-        annotationGroup = fac.create(tags);
-      } catch (e) {
-        console.warn(
-          'Failed to create annotation group from dicom-sr-1.dcm:',
-          e.message
-        );
-        return;
-      }
-      const annotations = annotationGroup.getList();
-      const found = annotations.some(
-        a => a.mathShape instanceof BidimensionalLine
-      );
-      assert.ok(
-        found,
-        'At least one annotation is a BidimensionalLine'
-      );
-    }
-  );
+  test('Read tid1500 v0 bidimensional', () => {
+    const annotationGroup = getAnnotationGroup(tid1500v0Bidimensional);
+    checkGroupCommonProperties(annotationGroup, 'bidimensional');
+    checkBidimensionalGroup(annotationGroup);
+  });
 
 });
