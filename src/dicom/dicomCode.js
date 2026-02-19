@@ -386,7 +386,7 @@ export function getConceptNameCode(name) {
       code = getDcmDicomCode({
         meaning: lookupName,
         value: item.key
-      })
+      });
     } else {
       code = getDicomCode(item.key, item.scheme);
     }
