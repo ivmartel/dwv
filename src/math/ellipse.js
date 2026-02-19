@@ -189,12 +189,14 @@ export class Ellipse {
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
     const lengthUnit = viewController.getLengthUnit();
-    const a = {
-      value: this.getA() * spacing2D.x,
+    const twoALength = 2 * this.getA() * spacing2D.x;
+    const twoBLength = 2 * this.getB() * spacing2D.y;
+    const longAxis = {
+      value: Math.max(twoALength, twoBLength),
       unit: lengthUnit
     };
-    const b = {
-      value: this.getB() * spacing2D.y,
+    const shortAxis = {
+      value: Math.min(twoALength, twoBLength),
       unit: lengthUnit
     };
     const worldSurface = this.getWorldSurface(spacing2D);
@@ -214,7 +216,7 @@ export class Ellipse {
     }
 
     // shape quantification
-    const quant = {a, b, surface};
+    const quant = {longAxis, shortAxis, surface};
 
     // pixel values quantification
     if (viewController.canQuantifyImage()) {

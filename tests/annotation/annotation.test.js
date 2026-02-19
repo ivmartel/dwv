@@ -202,18 +202,20 @@ describe('annotation', () => {
       assert.equal(annotation.textExpr, '{surface}',
         prefix + ' annotation ' + i + ' good textExpr');
 
-      assert.ok(typeof annotation.quantification.a !== 'undefined',
+      assert.ok(typeof annotation.quantification.longAxis !== 'undefined',
         prefix + ' quantification.a');
-      assert.ok(typeof annotation.quantification.b !== 'undefined',
+      assert.ok(typeof annotation.quantification.shortAxis !== 'undefined',
         prefix + ' quantification.b');
-      const radiusA = Math.round(parseFloat(annotation.quantification.a.value));
-      assert.equal(radiusA, 3, prefix + ' radiusA is ~3');
-      assert.equal(annotation.quantification.a.unit, 'unit.mm',
-        prefix + ' radiusA unit');
-      const radiusB = Math.round(parseFloat(annotation.quantification.b.value));
-      assert.equal(radiusB, 2, prefix + ' radiusB is ~2');
-      assert.equal(annotation.quantification.b.unit, 'unit.mm',
-        prefix + ' radiusB unit');
+      const longAxis = Math.round(parseFloat(
+        annotation.quantification.longAxis.value));
+      assert.equal(longAxis, 3, prefix + ' longAxis is ~3');
+      assert.equal(annotation.quantification.longAxis.unit, 'unit.mm',
+        prefix + ' longAxis unit');
+      const shortAxis = Math.round(parseFloat(
+        annotation.quantification.shortAxis.value));
+      assert.equal(shortAxis, 2, prefix + ' shortAxis is ~2');
+      assert.equal(annotation.quantification.shortAxis.unit, 'unit.mm',
+        prefix + ' shortAxis unit');
       checkQuantification(annotation.quantification, assert, prefix);
     }
   }

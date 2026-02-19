@@ -353,8 +353,8 @@ const QuantificationName2DictItem = {
   height: {key: '121207', scheme: 'DCM'},
   width: {key: '103355008', scheme: 'SCT'},
   radius: {key: '131190003', scheme: 'SCT'},
-  a: {key: '103339001', scheme: 'SCT'},
-  b: {key: '103340004', scheme: 'SCT'},
+  longAxis: {key: '103339001', scheme: 'SCT'},
+  shortAxis: {key: '103340004', scheme: 'SCT'},
   min: {key: '113051', scheme: 'DCM'},
   max: {key: '113048', scheme: 'DCM'},
   mean: {key: '113049', scheme: 'DCM'},
@@ -372,19 +372,12 @@ const QuantificationName2DictItem = {
  * @returns {DicomCode|undefined} The code.
  */
 export function getConceptNameCode(name) {
-  // Map 'longAxis' to 'a' and 'shortAxis' to 'b' for DICOM export
-  let lookupName = name;
-  if (name === 'longAxis') {
-    lookupName = 'a';
-  } else if (name === 'shortAxis') {
-    lookupName = 'b';
-  }
-  const item = QuantificationName2DictItem[lookupName];
+  const item = QuantificationName2DictItem[name];
   let code;
   if (typeof item !== 'undefined') {
     if (item.scheme === 'DCM') {
       code = getDcmDicomCode({
-        meaning: lookupName,
+        meaning: name,
         value: item.key
       });
     } else {

@@ -142,8 +142,8 @@ describe('dicom', () => {
     const code0 = getConceptNameCode('test');
     assert.equal(code0, undefined, 'getConceptNameCode #0');
 
-    const code1 = getConceptNameCode('a');
-    const theoCode1 = new DicomCode('a');
+    const code1 = getConceptNameCode('longAxis');
+    const theoCode1 = new DicomCode('longAxis');
     theoCode1.value = '103339001';
     theoCode1.schemeDesignator = 'SCT';
     assert.ok(isEqualCode(code1, theoCode1), 'getConceptNameCode #1');
