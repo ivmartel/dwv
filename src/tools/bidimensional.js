@@ -14,8 +14,6 @@ import {custom} from '../app/custom.js';
 /* eslint-disable no-unused-vars */
 import {Style} from '../gui/style.js';
 import {Annotation} from '../image/annotation.js';
-import {ViewController} from '../app/viewController.js';
-/* eslint-enable no-unused-vars */
 
 /**
  * Bidimensional (long/short axis) annotation factory.
@@ -736,24 +734,44 @@ export class BidimensionalFactory {
       anchor1.x() - kline.x(),
       anchor1.y() - kline.y()
     );
-    const newLine = new BidimensionalLine(pointBegin, pointEnd);
 
-    // Preserve all custom independent properties
+    const newLine = new BidimensionalLine(pointBegin, pointEnd);
     const oldLine = annotation.mathShape;
-    newLine.shortAxisLength = oldLine.shortAxisLength;
-    newLine.shortAxisT = oldLine.shortAxisT;
+
+    if (oldLine.shortAxisCenter instanceof Point2D) {
+      const center = oldLine.shortAxisCenter;
+
+      // 2. Project the existing center onto the NEW long axis to find the new T
+      const dx = pointEnd.getX() - pointBegin.getX();
+      const dy = pointEnd.getY() - pointBegin.getY();
+      const lenSq = dx * dx + dy * dy;
+
+      if (lenSq > 0) {
+        const vx = center.getX() - pointBegin.getX();
+        const vy = center.getY() - pointBegin.getY();
+        // Vector projection formula: (V dot U) / |U|^2
+        const t = (vx * dx + vy * dy) / lenSq;
+
+        // Clamp t between 0 and 1 so short axis doesn't slide off the line
+        newLine.shortAxisT = Math.max(0, Math.min(1, t));
+
+        // Re-sync the center to the clamped T on the new line
+        newLine.shortAxisCenter = new Point2D(
+          pointBegin.getX() + dx * newLine.shortAxisT,
+          pointBegin.getY() + dy * newLine.shortAxisT
+        );
+      } else {
+        newLine.shortAxisT = 0.5;
+        newLine.shortAxisCenter = center;
+      }
+    } else {
+      newLine.shortAxisT = oldLine.shortAxisT ?? 0.5;
+    }
+
+    // Preserve the perpendicular lengths
     newLine.shortAxisL1 = oldLine.shortAxisL1;
     newLine.shortAxisL2 = oldLine.shortAxisL2;
-    if (
-      oldLine.shortAxisCenter instanceof Object &&
-      'getX' in oldLine.shortAxisCenter &&
-      'getY' in oldLine.shortAxisCenter
-    ) {
-      newLine.shortAxisCenter = new Point2D(
-        oldLine.shortAxisCenter.getX(),
-        oldLine.shortAxisCenter.getY()
-      );
-    }
+    newLine.shortAxisLength = oldLine.shortAxisLength;
     newLine.hasShortAxisInteraction = oldLine.hasShortAxisInteraction;
 
     annotation.mathShape = newLine;
