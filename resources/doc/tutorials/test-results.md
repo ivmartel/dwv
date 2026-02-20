@@ -2,9 +2,9 @@
 
 ## Context
 
-Commit: [15e8722](https://github.com/ivmartel/dwv/commit/15e87229f378e26dc70b4b5bc1b8425baa732130)
+Commit: [df7a7bf](https://github.com/ivmartel/dwv/commit/df7a7bf25ea43603954fc01ad306f336dd9f450e)
 
-Date: Thu Feb 05 2026 17:32:08 GMT+0100 (Central European Standard Time)
+Date: Fri Feb 20 2026 12:50:29 GMT+0100 (Central European Standard Time)
 
 Environement: jsdom ^28.0.0
 
@@ -13,7 +13,7 @@ Success: 379 ✅
 
 Failed: 0 ❌
 
-(total: 379, skipped: 0, total time: 11234ms)
+(total: 379, skipped: 0, total time: 12286ms)
 
 ## Tests details
 
@@ -1343,3 +1343,4 @@ URS [#DWV-REQ-UI-09-001 (Livewire)](tutorial-user-stories.html#dwv-req-ui-09-001
 
 URS [#DWV-REQ-UI-09-002 (Floodfill)](tutorial-user-stories.html#dwv-req-ui-09-002-floodfill):
  ⚠️ No tests
+
