@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.36.1](https://github.com/ivmartel/dwv/releases/tag/v0.36.1) - 20/02/2026
+
+### Fixed
+
+- Close annotation on mouse out [#2088](https://github.com/ivmartel/dwv/issues/2088)
+- Bound annotation drawing to view [#2083](https://github.com/ivmartel/dwv/issues/2083)
+- Missing quantification in annotation SR [#2090](https://github.com/ivmartel/dwv/issues/2090)
+
+---
+
 ## [v0.36.0](https://github.com/ivmartel/dwv/releases/tag/v0.36.0) - 05/02/2026
 
 ### Added
