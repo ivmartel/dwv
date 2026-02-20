@@ -375,7 +375,14 @@ export function getConceptNameCode(name) {
   const item = QuantificationName2DictItem[name];
   let code;
   if (typeof item !== 'undefined') {
-    code = getDicomCode(item.key, item.scheme);
+    if (item.scheme === 'DCM') {
+      code = getDcmDicomCode({
+        meaning: name,
+        value: item.key
+      });
+    } else {
+      code = getDicomCode(item.key, item.scheme);
+    }
   }
   return code;
 }

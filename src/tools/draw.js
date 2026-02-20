@@ -443,6 +443,12 @@ export class Draw {
     }
     const pos = viewLayer.displayToPlanePos(point);
 
+    // validate position
+    const vc = viewLayer.getViewController();
+    if (!vc.validatePlanePoint(pos)) {
+      return;
+    }
+
     // draw line to current pos
     if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
       Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
@@ -550,6 +556,15 @@ export class Draw {
   };
 
   /**
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
+  mouseout = (event) => {
+    this.mouseup(event);
+  };
+
+  /**
    * Handle double click event: some tools use it to finish interaction.
    *
    * @param {object} event The double click event.
@@ -613,6 +628,12 @@ export class Draw {
       return;
     }
     const pos = viewLayer.displayToPlanePos(touchPoints[0]);
+
+    // validate position
+    const vc = viewLayer.getViewController();
+    if (!vc.validatePlanePoint(pos)) {
+      return;
+    }
 
     if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
       Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
