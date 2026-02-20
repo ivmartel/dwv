@@ -550,6 +550,15 @@ export class Draw {
   };
 
   /**
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
+  mouseout = (event) => {
+    this.mouseup(event);
+  };
+
+  /**
    * Handle double click event: some tools use it to finish interaction.
    *
    * @param {object} event The double click event.
