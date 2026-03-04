@@ -256,21 +256,21 @@ export class DicomSliceDataList {
    * @returns {{image, meta}} The result data.
    */
   buildData() {
-    // get and check the number of volumes
-    const numberOfVolumes = this.#getNumberOfVolumes();
-    if (typeof numberOfVolumes === 'undefined') {
-      throw new Error('Non constant number of volumes');
+    // get and check the number of slices per volumes
+    const numberOfSlicesPerVolumes = this.#getNumberOfSlicesPerVolumes();
+    if (typeof numberOfSlicesPerVolumes === 'undefined') {
+      throw new Error('Non constant number of slices per volumes');
     }
-    if (numberOfVolumes === 0) {
+    if (numberOfSlicesPerVolumes === 0) {
       throw new Error('Duplicate origins but no volumes');
     }
-    if (numberOfVolumes === 1) {
-      throw new Error('Duplicate origins but just one volume');
+    if (numberOfSlicesPerVolumes === 1) {
+      throw new Error('Duplicate origins but just one slice per volume');
     }
 
     // get indices per volumes
     const volsIndices = this.#getVolumesIndices(
-      numberOfVolumes, getPostLoadVolumeIdTagValue);
+      numberOfSlicesPerVolumes, getPostLoadVolumeIdTagValue);
 
     if (typeof volsIndices === 'undefined') {
       throw new Error('Cannot create image for multi-volume');
@@ -309,13 +309,14 @@ export class DicomSliceDataList {
   /**
    * Get the list of indices per volume.
    *
-   * @param {number} numberOfVolumes The number of expected volumes.
+   * @param {number} numberOfSlicesPerVolumes The number of
+   *   expected slices per volumes.
    * @param {Function} volumeIndexGetter A function to get the volume index from
    *   meta data.
    * @returns {number[][]|undefined} List of indices per volume or
    *   undefined if something went wrong.
    */
-  #getVolumesIndices(numberOfVolumes, volumeIndexGetter) {
+  #getVolumesIndices(numberOfSlicesPerVolumes, volumeIndexGetter) {
     const originList = this.#getOriginList();
     const volumesIndices = [];
     const volIndexValues = [];
@@ -332,7 +333,7 @@ export class DicomSliceDataList {
             volIndexValues.push(volumeIndex);
           }
         }
-        if (volIndexValues.length !== numberOfVolumes) {
+        if (volIndexValues.length !== numberOfSlicesPerVolumes) {
           // too many indices
           return;
         }
@@ -368,12 +369,12 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Get the number of volumes of a data.
+   * Get the number of slices per volumes of a data.
    *
-   * @returns {number|undefined} The number of volumes or
-   *   undefined if non constant.
+   * @returns {number|undefined} The number of slices per volumes or
+   *   undefined if non constant between volumes.
    */
-  #getNumberOfVolumes() {
+  #getNumberOfSlicesPerVolumes() {
     const originList = this.#getOriginList();
     if (originList.length === 0) {
       return 0;
