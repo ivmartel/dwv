@@ -668,7 +668,7 @@ export class DicomWriter {
           writer, byteOffset, value, isImplicit);
       } else if (element.vr === 'AT') {
         for (const valueItem of value) {
-          const hexString = valueItem + '';
+          const hexString = String(valueItem);
           const hexString1 = hexString.substring(1, 5);
           const hexString2 = hexString.substring(6, 10);
           const dec1 = parseInt(hexString1, 16);

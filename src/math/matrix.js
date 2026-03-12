@@ -328,7 +328,7 @@ export class Matrix33 {
       const sign = max.value > 0 ? 1 : -1;
       for (let i = 0; i < 3; ++i) {
         if (i === max.index) {
-          res.push(1 * sign);
+          res.push(sign);
         } else {
           res.push(0);
         }

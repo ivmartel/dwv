@@ -29,7 +29,7 @@ export default [
       'prefer-const': 'error',
       // disallow implicit type conversions
       // https://eslint.org/docs/rules/no-implicit-coercion
-      'no-implicit-coercion': 'warn',
+      'no-implicit-coercion': 'error',
       // require parseInt radix argument
       // https://eslint.org/docs/rules/radix
       radix: 'warn',

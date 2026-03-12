@@ -1675,7 +1675,7 @@ export class Image {
     wOff[2] = (-ncols + 1) * factor;
     wOff[3] = -factor;
     wOff[4] = 0;
-    wOff[5] = 1 * factor;
+    wOff[5] = factor;
     wOff[6] = (ncols - 1) * factor;
     wOff[7] = (ncols) * factor;
     wOff[8] = (ncols + 1) * factor;

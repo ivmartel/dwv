@@ -437,7 +437,7 @@ export class ResamplingThread {
     // We can't just pass in an Image or we would get a circular dependency
 
     // Just needs to be resonably unique
-    const jobId = Date.now() + '' + Math.random();
+    const jobId = String(Date.now()) + Math.random();
 
     const targetImageGeometry =
       generateResampledGeometry(
