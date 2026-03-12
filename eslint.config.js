@@ -27,6 +27,30 @@ export default [
       // prefer const
       // https://eslint.org/docs/rules/prefer-const
       'prefer-const': 'error',
+      // disallow implicit type conversions
+      // https://eslint.org/docs/rules/no-implicit-coercion
+      'no-implicit-coercion': 'warn',
+      // require parseInt radix argument
+      // https://eslint.org/docs/rules/radix
+      radix: 'warn',
+      // throw Error objects, not literals
+      // https://eslint.org/docs/rules/no-throw-literal
+      'no-throw-literal': 'warn',
+      // require default case in switch statements
+      // https://eslint.org/docs/rules/default-case
+      'default-case': 'warn',
+      // enforce default clauses to be last
+      // https://eslint.org/docs/rules/default-case-last
+      'default-case-last': 'warn',
+      // enforce consistent return values from functions
+      // https://eslint.org/docs/rules/consistent-return
+      'consistent-return': 'warn',
+      // disallow unnecessary return statements
+      // https://eslint.org/docs/rules/no-useless-return
+      'no-useless-return': 'warn',
+      // disallow loops that can never iterate more than once
+      // https://eslint.org/docs/rules/no-unreachable-loop
+      'no-unreachable-loop': 'warn',
       // allow for some unused args
       // https://eslint.org/docs/rules/no-unused-vars
       'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
@@ -123,7 +147,10 @@ export default [
       '@stylistic/js/operator-linebreak': 'error',
       // quotes around object property names
       // https://eslint.style/rules/js/quote-props
-      '@stylistic/js/quote-props': ['error', 'as-needed']
+      '@stylistic/js/quote-props': ['error', 'as-needed'],
+      // disallow leading/trailing decimal points in numeric literals
+      // https://eslint.style/rules/js/no-floating-decimal
+      '@stylistic/js/no-floating-decimal': 'warn'
     },
   }
 ];
