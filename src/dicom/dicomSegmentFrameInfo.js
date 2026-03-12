@@ -206,7 +206,7 @@ export function getSegmentFrameInfo(dataElements) {
   const segmentIdSq = dataElements[TagKeys.SegmentIdentificationSequence].value;
   // Referenced Segment Number
   const refSegmentNumber =
-    parseInt(segmentIdSq[0][TagKeys.ReferencedSegmentNumber].value[0], 0);
+    parseInt(segmentIdSq[0][TagKeys.ReferencedSegmentNumber].value[0], 10);
   // Plane Position Sequence (required, only one)
   const planePosSq = dataElements[TagKeys.PlanePositionSequence].value;
   // Image Position (Patient) (conditionally required)

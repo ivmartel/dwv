@@ -32,7 +32,7 @@ export default [
       'no-implicit-coercion': 'error',
       // require parseInt radix argument
       // https://eslint.org/docs/rules/radix
-      radix: 'warn',
+      radix: 'error',
       // throw Error objects, not literals
       // https://eslint.org/docs/rules/no-throw-literal
       'no-throw-literal': 'warn',
