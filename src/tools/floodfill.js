@@ -315,7 +315,9 @@ export class Floodfill {
   extend(ini, end, layerGroup) {
     //avoid errors
     if (!this.#initialpoint) {
-      throw '\'initialpoint\' not found. User must click before use extend!';
+      throw new Error(
+        '\'initialpoint\' not found. User must click before use extend!'
+      );
     }
 
     const positionHelper = layerGroup.getPositionHelper();

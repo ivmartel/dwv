@@ -35,7 +35,7 @@ export default [
       radix: 'error',
       // throw Error objects, not literals
       // https://eslint.org/docs/rules/no-throw-literal
-      'no-throw-literal': 'warn',
+      'no-throw-literal': 'error',
       // require default case in switch statements
       // https://eslint.org/docs/rules/default-case
       'default-case': 'warn',
