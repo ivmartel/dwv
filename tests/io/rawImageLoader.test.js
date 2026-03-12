@@ -146,8 +146,12 @@ describe('io', () => {
    */
   test('RAW image loader canloadfile', () => {
     const loader = new RawImageLoader();
-    assert.ok(loader.canLoadFile(new File(['a'], 'a.png', {type: 'image/png'})));
-    assert.notOk(loader.canLoadFile(new File(['a'], 'a.dcm', {type: 'application/dicom'})));
+    assert.ok(
+      loader.canLoadFile(new File(['a'], 'a.png', {type: 'image/png'}))
+    );
+    assert.notOk(
+      loader.canLoadFile(new File(['a'], 'a.dcm', {type: 'application/dicom'}))
+    );
   });
 
   /**

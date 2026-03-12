@@ -133,8 +133,12 @@ describe('io', () => {
    */
   test('RAW video loader canloadfile', () => {
     const loader = new RawVideoLoader();
-    assert.ok(loader.canLoadFile(new File(['a'], 'a.mp4', {type: 'video/mp4'})));
-    assert.notOk(loader.canLoadFile(new File(['a'], 'a.png', {type: 'image/png'})));
+    assert.ok(
+      loader.canLoadFile(new File(['a'], 'a.mp4', {type: 'video/mp4'}))
+    );
+    assert.notOk(
+      loader.canLoadFile(new File(['a'], 'a.png', {type: 'image/png'}))
+    );
   });
 
   /**
