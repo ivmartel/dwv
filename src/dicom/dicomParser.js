@@ -1358,7 +1358,8 @@ export class DicomParser {
       pixelTags = {
         pixelRepresentation,
         bitsAllocated,
-        numberOfFrames
+        numberOfFrames,
+        imageBufferSize: undefined
       };
 
       // image buffer size
@@ -1376,7 +1377,7 @@ export class DicomParser {
       }
       if (typeof rows !== 'undefined' &&
         typeof cols !== 'undefined') {
-        pixelTags['imageBufferSize'] = rows * cols * numberOfFrames;
+        pixelTags.imageBufferSize = rows * cols * numberOfFrames;
       }
     }
 

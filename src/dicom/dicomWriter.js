@@ -526,7 +526,7 @@ export class DicomWriter {
       rule = this.#rules[groupName];
     } else {
       // 4. default
-      rule = this.#rules['default'];
+      rule = this.#rules.default;
     }
     // apply action on element and return
     return writerActions[rule.action](element, rule.value);

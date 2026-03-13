@@ -266,7 +266,7 @@ function getElementAsString(tag, dicomElement, prefix) {
 
       // get the item element
       const itemTag = getItemTag();
-      const itemElement = item['FFFEE000'];
+      const itemElement = item.FFFEE000;
       message = '(Item with';
       if (itemElement.undefinedLength) {
         message += ' undefined';

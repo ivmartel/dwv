@@ -92,7 +92,7 @@ export default [
       'prefer-spread': 'error',
       // require dot notation when possible
       // https://eslint.org/docs/rules/dot-notation
-      'dot-notation': 'warn',
+      'dot-notation': 'error',
 
       // flow clarity
 

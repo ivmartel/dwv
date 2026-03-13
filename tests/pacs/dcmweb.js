@@ -541,7 +541,7 @@ function qidoResponseToTable() {
       };
       const token = getToken();
       if (typeof token !== 'undefined') {
-        options.headers['Authorization'] = `Bearer ${token}`;
+        options.headers.Authorization = `Bearer ${token}`;
       }
 
       fetch(thumbUrl, options)

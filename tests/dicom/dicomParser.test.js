@@ -303,7 +303,7 @@ describe('dicom', () => {
 
       // ReferringPhysicianIdentificationSequence: explicit empty item
       const seq12 = tags['00080096'].value;
-      assert.equal(seq12[0]['FFFEE000'].value.length, 0,
+      assert.equal(seq12[0].FFFEE000.value.length, 0,
         'ReferringPhysicianIdentificationSequence item length');
 
       // ConsultingPhysicianIdentificationSequence: implicit empty item

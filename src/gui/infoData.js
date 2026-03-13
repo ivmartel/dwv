@@ -213,8 +213,8 @@ export class InfoData {
       }
     } else {
       // image file case
-      if (typeof data['imageUid'] !== 'undefined') {
-        dataUid = data['imageUid'].value[0];
+      if (typeof data.imageUid !== 'undefined') {
+        dataUid = data.imageUid.value[0];
         this.#infoData[dataUid] = createInfoDataForDom(data, this.#infoConfigs);
       } else {
         logger.warn('Missing DOM image UID for info data indexing');
