@@ -86,7 +86,7 @@ export default [
       'object-shorthand': 'error',
       // prefer rest params over arguments
       // https://eslint.org/docs/rules/prefer-rest-params
-      'prefer-rest-params': 'warn',
+      'prefer-rest-params': 'error',
       // prefer spread over Function.prototype.apply
       // https://eslint.org/docs/rules/prefer-spread
       'prefer-spread': 'warn',
