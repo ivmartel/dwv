@@ -183,7 +183,7 @@ export function arrayEquals(arr0, arr1) {
  * @returns {string} The array as string.
  */
 export function uint8ArrayToString(arr) {
-  return String.fromCharCode.apply(String, arr);
+  return String.fromCharCode(...arr);
 }
 
 /**
