@@ -35,7 +35,7 @@ export class Annotation {
   trackingUid;
 
   /**
-   * Referenced image SOP isntance UID.
+   * Referenced image SOP instance UID.
    *
    * @type {string}
    */

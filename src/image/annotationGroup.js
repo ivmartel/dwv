@@ -151,7 +151,7 @@ export class AnnotationGroup {
      * @event AnnotationGroup#annotationadd
      * @type {object}
      * @property {string} type The event type.
-     * @property {Annotation} data The added annnotation.
+     * @property {Annotation} data The added annotation.
      */
     this.#fireEvent({
       type: 'annotationadd',
@@ -185,7 +185,7 @@ export class AnnotationGroup {
        * @event AnnotationGroup#annotationupdate
        * @type {object}
        * @property {string} type The event type.
-       * @property {Annotation} data The added annnotation.
+       * @property {Annotation} data The updated annotation.
        * @property {string[]} keys The properties that were updated.
        */
       this.#fireEvent({
@@ -212,13 +212,12 @@ export class AnnotationGroup {
     if (index !== -1) {
       const annotation = this.#list.splice(index, 1)[0];
       /**
-       * Annotation update event.
+       * Annotation remove event.
        *
        * @event AnnotationGroup#annotationremove
        * @type {object}
        * @property {string} type The event type.
-       * @property {Annotation} data The added annnotation.
-       * @property {string[]} keys The properties that were updated.
+       * @property {Annotation} data The removed annotation.
        */
       this.#fireEvent({
         type: 'annotationremove',
