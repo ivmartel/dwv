@@ -227,7 +227,6 @@ export class LoadController {
       this.onloadend({
         dataid: dataId
       });
-      return;
     }
   }
 

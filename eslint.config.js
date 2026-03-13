@@ -47,7 +47,7 @@ export default [
       'consistent-return': 'warn',
       // disallow unnecessary return statements
       // https://eslint.org/docs/rules/no-useless-return
-      'no-useless-return': 'warn',
+      'no-useless-return': 'error',
       // disallow loops that can never iterate more than once
       // https://eslint.org/docs/rules/no-unreachable-loop
       'no-unreachable-loop': 'error',

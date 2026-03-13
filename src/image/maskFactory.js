@@ -385,8 +385,7 @@ export class MaskFactory {
    * @returns {string|undefined} A possible warning.
    */
   checkElements(_dicomElements) {
-    // does nothing
-    return;
+    return undefined;
   }
 
   /**

@@ -540,7 +540,7 @@ export class ArrowFactory {
    * @returns {Konva.Group|undefined} The shadow konva group.
    */
   #getDebugShadow(_annotation, _group) {
-    return;
+    return undefined;
   }
 
   /**

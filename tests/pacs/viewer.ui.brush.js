@@ -38,7 +38,7 @@ export class BrushToolUI {
    * @returns {object|undefined} The value.
    */
   getValue() {
-    return;
+    return undefined;
   };
 
   /**
