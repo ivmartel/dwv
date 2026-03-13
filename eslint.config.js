@@ -42,10 +42,6 @@ export default [
       // enforce default clauses to be last
       // https://eslint.org/docs/rules/default-case-last
       'default-case-last': 'error',
-      // enforce consistent return values from functions
-      // https://eslint.org/docs/rules/consistent-return
-      // TODO activate
-      //'consistent-return': 'error',
       // disallow unnecessary return statements
       // https://eslint.org/docs/rules/no-useless-return
       'no-useless-return': 'error',
@@ -55,6 +51,11 @@ export default [
       // allow for some unused args
       // https://eslint.org/docs/rules/no-unused-vars
       'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
+
+      // TODO activate
+      // enforce consistent return values from functions
+      // https://eslint.org/docs/rules/consistent-return
+      //'consistent-return': 'error',
 
       // code quality / correctness
 
