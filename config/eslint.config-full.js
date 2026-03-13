@@ -38,7 +38,19 @@ export default [
       'jsdoc/reject-function-type': 'off',
       // allow any type
       // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/reject-any-type.md
-      'jsdoc/reject-any-type': 'off'
+      'jsdoc/reject-any-type': 'off',
+      // verify @returns description matches actual return presence
+      // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-returns-check.md
+      'jsdoc/require-returns-check': 'warn',
+      // verify @param names match function parameter names
+      // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/check-param-names.md
+      'jsdoc/check-param-names': 'warn',
+      // require @returns for functions that return a value
+      // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-returns.md
+      'jsdoc/require-returns': 'warn',
+      // require @param for all function parameters
+      // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-param.md
+      'jsdoc/require-param': 'warn'
     }
   }
 ];
