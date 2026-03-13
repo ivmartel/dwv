@@ -63,6 +63,7 @@ export default [
       // -> used when param in undefined
       // https://eslint.org/docs/rules/no-param-reassign
       //'no-param-reassign': 'warn',
+
       // disallow variable declarations that shadow outer scope variables
       // https://eslint.org/docs/rules/no-shadow
       'no-shadow': 'error',
@@ -104,7 +105,7 @@ export default [
       'no-lonely-if': 'error',
       // disallow yoda conditions
       // https://eslint.org/docs/rules/yoda
-      yoda: 'warn',
+      yoda: 'error',
 
       // formatting rules
 
@@ -201,7 +202,7 @@ export default [
       '@stylistic/js/quote-props': ['error', 'as-needed'],
       // disallow leading/trailing decimal points in numeric literals
       // https://eslint.style/rules/js/no-floating-decimal
-      '@stylistic/js/no-floating-decimal': 'warn'
+      '@stylistic/js/no-floating-decimal': 'error'
     },
   }
 ];
