@@ -2,6 +2,7 @@ import {Line, getAngle} from '../math/line.js';
 import {Protractor} from '../math/protractor.js';
 import {Point2D} from '../math/point.js';
 import {custom} from '../app/custom.js';
+import {logger} from '../utils/logger.js';
 import {
   defaultLabelTexts,
   getLineShape,
@@ -512,6 +513,8 @@ export class ProtractorFactory {
         end.x(anchor.x());
         end.y(anchor.y());
         break;
+      default:
+        logger.debug('Unexpected anchor id');
     }
 
     // angle

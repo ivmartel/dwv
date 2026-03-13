@@ -38,7 +38,7 @@ export default [
       'no-throw-literal': 'error',
       // require default case in switch statements
       // https://eslint.org/docs/rules/default-case
-      'default-case': 'warn',
+      'default-case': 'error',
       // enforce default clauses to be last
       // https://eslint.org/docs/rules/default-case-last
       'default-case-last': 'warn',
