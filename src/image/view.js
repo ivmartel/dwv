@@ -225,25 +225,24 @@ export class View {
     // transparent: 0 (background) and hidden
     if (value === 0 || this.#segmentViewHelper.isHidden(value)) {
       return 0;
-    } else {
-      if (this.getContourThickness() !== 0) {
-        // ideally getContourDistance would be passed in by an
-        // iterator, but that would require a large change to a
-        // lot of components for this one edge case.
-        const contourDistance =
-          this.#image.getContourDistance(
-            index,
-            this.getOrientation()
-          );
-        if (contourDistance <= this.getContourThickness()) {
-          return 0xff;
-        } else {
-          return 0xff * this.getFillOpacity();
-        }
-      } else {
-        return 0xff * this.getFillOpacity();
-      }
     }
+
+    if (this.getContourThickness() !== 0) {
+      // ideally getContourDistance would be passed in by an
+      // iterator, but that would require a large change to a
+      // lot of components for this one edge case.
+      const contourDistance =
+        this.#image.getContourDistance(
+          index,
+          this.getOrientation()
+        );
+      if (contourDistance <= this.getContourThickness()) {
+        return 0xff;
+      }
+      return 0xff * this.getFillOpacity();
+    }
+
+    return 0xff * this.getFillOpacity();
   };
 
   /**

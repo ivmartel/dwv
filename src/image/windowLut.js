@@ -120,9 +120,8 @@ export class WindowLut {
   getValue(offset) {
     if (this.#isDiscrete) {
       return this.#lut[offset + this.#signedShift];
-    } else {
-      return Math.floor(this.#voiLut.apply(offset + this.#signedShift));
     }
+    return Math.floor(this.#voiLut.apply(offset + this.#signedShift));
   }
 
 } // class WindowLut

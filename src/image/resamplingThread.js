@@ -112,20 +112,20 @@ export function generateWorkerMessages(
 
   if (targetNDims <= 3) {
     return [generateMessage(0, 0, 0)];
-  } else {
-    const frames = targetSize.get(3);
-    const sourceFrameSize = sourceSize.getDimSize(3);
-    const targetFrameSize = targetSize.getDimSize(3);
-
-    const messages = [];
-    for (let f = 0; f < frames; f++) {
-      const sourceOffset = sourceFrameSize * f;
-      const targetOffset = targetFrameSize * f;
-      messages.push(generateMessage(sourceOffset, targetOffset, f));
-    }
-
-    return messages;
   }
+
+  const frames = targetSize.get(3);
+  const sourceFrameSize = sourceSize.getDimSize(3);
+  const targetFrameSize = targetSize.getDimSize(3);
+
+  const messages = [];
+  for (let f = 0; f < frames; f++) {
+    const sourceOffset = sourceFrameSize * f;
+    const targetOffset = targetFrameSize * f;
+    messages.push(generateMessage(sourceOffset, targetOffset, f));
+  }
+
+  return messages;
 }
 
 /**

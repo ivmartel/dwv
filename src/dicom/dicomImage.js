@@ -249,9 +249,8 @@ export function getSpacingFromMeasure(dataElements) {
 export function getTagPixelUnit(elements) {
   if (typeof custom.getTagPixelUnit !== 'undefined') {
     return custom.getTagPixelUnit(elements);
-  } else {
-    return defaultGetTagPixelUnit(elements);
   }
+  return defaultGetTagPixelUnit(elements);
 }
 
 /**

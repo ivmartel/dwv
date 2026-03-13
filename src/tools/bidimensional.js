@@ -93,15 +93,14 @@ export class BidimensionalFactory {
       custom.labelTexts[this.#name] !== undefined
     ) {
       return custom.labelTexts[this.#name];
-    } else {
-      if (
-        annotation.mathShape.hasShortAxisInteraction === true &&
-        annotation.quantification?.shortAxis?.value !== null
-      ) {
-        return defaultLabelTexts[this.#name];
-      }
-      return defaultLabelTexts[`${this.#name}Drawing`];
     }
+    if (
+      annotation.mathShape.hasShortAxisInteraction === true &&
+      annotation.quantification?.shortAxis?.value !== null
+    ) {
+      return defaultLabelTexts[this.#name];
+    }
+    return defaultLabelTexts[`${this.#name}Drawing`];
   }
 
   /**

@@ -351,14 +351,12 @@ export class LabelingFilter {
               ) => {
                 if (currentCount > largestCount) {
                   return [currentSlice, currentCount];
-                } else {
-                  return [largestSlice, largestCount];
                 }
+                return [largestSlice, largestCount];
               })[0];
           return Number(largest);
-        } else {
-          return Number(sliceCounts[0][0]);
         }
+        return Number(sliceCounts[0][0]);
       })();
 
       labelsInfo[label] = {

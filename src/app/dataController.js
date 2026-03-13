@@ -329,9 +329,8 @@ export class DicomSliceDataList {
           if (volIndexValues.includes(volumeIndex)) {
             // duplicate volume index
             return;
-          } else {
-            volIndexValues.push(volumeIndex);
           }
+          volIndexValues.push(volumeIndex);
         }
         if (volIndexValues.length !== numberOfSlicesPerVolumes) {
           // too many indices

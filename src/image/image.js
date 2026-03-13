@@ -1543,28 +1543,28 @@ export class Image {
         min: ((resmin < resmax) ? resmin : resmax),
         max: ((resmin > resmax) ? resmin : resmax)
       };
-    } else {
-      let rmin = this.getRescaledValueAtOffset(0);
-      let rmax = rmin;
-      let rvalue;
-      const size = this.getGeometry().getSize();
-      let leni = size.getTotalSize();
-      // max to 3D
-      if (size.length() === 3) {
-        leni = size.getDimSize(3);
-      }
-      for (let i = 0; i < leni; ++i) {
-        rvalue = this.getRescaledValueAtOffset(i);
-        if (rvalue > rmax) {
-          rmax = rvalue;
-        }
-        if (rvalue < rmin) {
-          rmin = rvalue;
-        }
-      }
-      // return
-      return {min: rmin, max: rmax};
     }
+
+    let rmin = this.getRescaledValueAtOffset(0);
+    let rmax = rmin;
+    let rvalue;
+    const size = this.getGeometry().getSize();
+    let leni = size.getTotalSize();
+    // max to 3D
+    if (size.length() === 3) {
+      leni = size.getDimSize(3);
+    }
+    for (let i = 0; i < leni; ++i) {
+      rvalue = this.getRescaledValueAtOffset(i);
+      if (rvalue > rmax) {
+        rmax = rvalue;
+      }
+      if (rvalue < rmin) {
+        rmin = rvalue;
+      }
+    }
+    // return
+    return {min: rmin, max: rmax};
   }
 
   /**
@@ -1867,18 +1867,18 @@ export class Image {
 
       if (this.#buffer[newIndex] !== checkValue) {
         return newDistance;
-      } else {
-        queue.push(this.#recursiveDistanceCheckX(
-          newDistance,
-          newIndex,
-          direction,
-          dim,
-          checkValue,
-          queue
-        ));
-
-        return 0;
       }
+
+      queue.push(this.#recursiveDistanceCheckX(
+        newDistance,
+        newIndex,
+        direction,
+        dim,
+        checkValue,
+        queue
+      ));
+
+      return 0;
     };
   }
 
@@ -1930,38 +1930,38 @@ export class Image {
 
       if (this.#buffer[newIndex] !== checkValue) {
         return newDistance;
-      } else {
-        queue.push(this.#recursiveDistanceCheckX(
-          newDistance,
-          newIndex,
-          xDirection,
-          xDim,
-          checkValue,
-          queue
-        ));
-
-        queue.push(this.#recursiveDistanceCheckX(
-          newDistance,
-          newIndex,
-          -xDirection,
-          xDim,
-          checkValue,
-          queue
-        ));
-
-        queue.push(this.#recursiveDistanceCheckY(
-          newDistance,
-          newIndex,
-          yDirection,
-          xDirection,
-          yDim,
-          xDim,
-          checkValue,
-          queue
-        ));
-
-        return 0;
       }
+
+      queue.push(this.#recursiveDistanceCheckX(
+        newDistance,
+        newIndex,
+        xDirection,
+        xDim,
+        checkValue,
+        queue
+      ));
+
+      queue.push(this.#recursiveDistanceCheckX(
+        newDistance,
+        newIndex,
+        -xDirection,
+        xDim,
+        checkValue,
+        queue
+      ));
+
+      queue.push(this.#recursiveDistanceCheckY(
+        newDistance,
+        newIndex,
+        yDirection,
+        xDirection,
+        yDim,
+        xDim,
+        checkValue,
+        queue
+      ));
+
+      return 0;
     };
   }
 

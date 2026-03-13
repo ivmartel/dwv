@@ -36,16 +36,14 @@ function getSpinY(event) {
   if (typeof event.wheelDeltaY === 'undefined') {
     //logger.warn('No wheel delta, scroll could be tricky...);
     return -event.deltaY;
-  } else {
-    const threshold = 45;
-    if (event.wheelDeltaY > threshold) {
-      return 1;
-    } else if (event.wheelDeltaY < -threshold) {
-      return -1;
-    } else {
-      return -event.deltaY / 60;
-    }
   }
+  const threshold = 45;
+  if (event.wheelDeltaY > threshold) {
+    return 1;
+  } else if (event.wheelDeltaY < -threshold) {
+    return -1;
+  }
+  return -event.deltaY / 60;
 }
 
 /**
@@ -133,9 +131,8 @@ export class ScrollWheel {
     // exit if no tick
     if (!this.#scrollSum.isTick()) {
       return;
-    } else {
-      this.#scrollSum.clear();
     }
+    this.#scrollSum.clear();
 
     // prevent default page scroll
     event.preventDefault();

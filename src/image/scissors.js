@@ -564,10 +564,9 @@ export class Scissors {
       const outsideT = this.getTrainedOutside(this.outside[py][px]);
 
       return 0.3 * gradT + 0.3 * lap + 0.1 * (dir + edgeT + insideT + outsideT);
-    } else {
-      // Normal weights
-      return 0.43 * grad + 0.43 * lap + 0.11 * dir;
     }
+    // Normal weights
+    return 0.43 * grad + 0.43 * lap + 0.11 * dir;
   }
 
   adj(p) {

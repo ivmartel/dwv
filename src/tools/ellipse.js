@@ -364,9 +364,8 @@ export class EllipseFactory {
       typeof custom.labelTexts[this.#name] !== 'undefined'
     ) {
       return custom.labelTexts[this.#name];
-    } else {
-      return defaultLabelTexts[this.#name];
     }
+    return defaultLabelTexts[this.#name];
   }
 
   /**

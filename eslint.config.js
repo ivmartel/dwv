@@ -98,7 +98,7 @@ export default [
 
       // disallow else after a return
       // https://eslint.org/docs/rules/no-else-return
-      'no-else-return': 'warn',
+      'no-else-return': 'error',
       // disallow if as the only statement in an else block
       // https://eslint.org/docs/rules/no-lonely-if
       'no-lonely-if': 'warn',

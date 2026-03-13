@@ -384,9 +384,8 @@ describe('image', () => {
     const func0 = function (value) {
       if (value < 3 || value > 5) {
         return 0;
-      } else {
-        return value;
       }
+      return value;
     };
     const resImage0 = image0.transform(func0);
     const theoResImage0 = [0, 0, 0, 3, 4, 5, 0, 0, 0];

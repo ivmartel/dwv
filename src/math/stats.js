@@ -71,9 +71,8 @@ export class Statistics {
 export function getStats(values, flags) {
   if (includesFullStatsFlags(flags)) {
     return getFullStats(values);
-  } else {
-    return getBasicStats(values);
   }
+  return getBasicStats(values);
 }
 
 /**

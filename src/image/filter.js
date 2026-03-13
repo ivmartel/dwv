@@ -102,9 +102,8 @@ export class ThresholdFilter {
     const threshFunction = (value) => {
       if (value < this.getMin() || value > this.getMax()) {
         return imageMin;
-      } else {
-        return value;
       }
+      return value;
     };
     return image.transform(threshFunction);
   }

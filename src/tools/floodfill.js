@@ -238,9 +238,9 @@ export class Floodfill {
         ));
       }
       return this.#parentPoints;
-    } else {
-      return [];
     }
+
+    return [];
   }
 
   /**
