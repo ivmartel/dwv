@@ -545,24 +545,22 @@ export class Image {
           'Cannot store non constant RSI with empty slice index.');
       }
       this.#rsis.splice(offset, 0, inRsi);
-    } else {
-      if (!this.#rsi.equals(inRsi)) {
-        if (typeof offset === 'undefined') {
-          // no slice index, replace existing
-          this.#rsi = inRsi;
-        } else {
-          // first non constant rsi
-          this.#isConstantRSI = false;
-          // switch to non constant mode
-          this.#rsis = [];
-          // initialise RSIs
-          for (let i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
-            this.#rsis.push(this.#rsi);
-          }
-          // store
-          this.#rsi = null;
-          this.#rsis.splice(offset, 0, inRsi);
+    } else if (!this.#rsi.equals(inRsi)) {
+      if (typeof offset === 'undefined') {
+        // no slice index, replace existing
+        this.#rsi = inRsi;
+      } else {
+        // first non constant rsi
+        this.#isConstantRSI = false;
+        // switch to non constant mode
+        this.#rsis = [];
+        // initialise RSIs
+        for (let i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
+          this.#rsis.push(this.#rsi);
         }
+        // store
+        this.#rsi = null;
+        this.#rsis.splice(offset, 0, inRsi);
       }
     }
   }

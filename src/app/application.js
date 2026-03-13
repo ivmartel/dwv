@@ -2235,14 +2235,12 @@ export class App {
     let opacity = 1;
     if (typeof viewConfig.opacity !== 'undefined') {
       opacity = viewConfig.opacity;
-    } else {
-      if (!isBaseLayer) {
-        if (view.isMask()) {
-          // Assuming contours are enabled be default
-          opacity = 0.8;
-        } else {
-          opacity = 0.5;
-        }
+    } else if (!isBaseLayer) {
+      if (view.isMask()) {
+        // Assuming contours are enabled be default
+        opacity = 0.8;
+      } else {
+        opacity = 0.5;
       }
     }
 
@@ -2267,13 +2265,11 @@ export class App {
     // colour map
     if (typeof viewConfig.colourMap !== 'undefined') {
       viewController.setColourMap(viewConfig.colourMap);
-    } else {
-      if (!isBaseLayer) {
-        if (data.image.getMeta().Modality === 'PT') {
-          viewController.setColourMap('hot');
-        } else {
-          viewController.setColourMap('rainbow');
-        }
+    } else if (!isBaseLayer) {
+      if (data.image.getMeta().Modality === 'PT') {
+        viewController.setColourMap('hot');
+      } else {
+        viewController.setColourMap('rainbow');
       }
     }
 
@@ -2680,12 +2676,10 @@ export class App {
       } else if (isViewCoronal) {
         flipScale.z = true;
       }
-    } else {
+    } else if (orientationCode !== 'LIP') {
       // LIP uses default scale and offset
-      if (orientationCode !== 'LIP') {
-        logger.warn(`Unsupported orientation code: ${
-          orientationCode }, display could be incorrect`);
-      }
+      logger.warn(`Unsupported orientation code: ${
+        orientationCode }, display could be incorrect`);
     }
 
     return {

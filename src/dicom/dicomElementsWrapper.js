@@ -192,42 +192,40 @@ function getElementAsString(tag, dicomElement, prefix) {
     dicomElement.value[0] === '') {
     line += ' (no value available)';
     deSize = 0;
-  } else {
+  } else if (dicomElement.vr === 'na') {
     // simple number display
-    if (dicomElement.vr === 'na') {
-      line += ' ';
-      line += dicomElement.value[0];
-    } else if (isPixSequence) {
-      // pixel sequence
-      line += ` (PixelSequence #=${deSize})`;
-    } else if (dicomElement.vr === 'SQ') {
-      line += ' (Sequence with';
-      if (dicomElement.undefinedLength) {
-        line += ' undefined';
-      } else {
-        line += ' explicit';
-      }
-      line += ' length #=';
-      line += dicomElement.value.length;
-      line += ')';
-    } else if (isOtherVR ||
-      dicomElement.vr === 'pi' ||
-      dicomElement.vr === 'UL' ||
-      dicomElement.vr === 'US' ||
-      dicomElement.vr === 'SL' ||
-      dicomElement.vr === 'SS' ||
-      dicomElement.vr === 'FL' ||
-      dicomElement.vr === 'FD' ||
-      dicomElement.vr === 'AT') {
-      // 'O'ther array, limited display length
-      line += ' ';
-      line += getElementValueAsString(tag, dicomElement, false);
+    line += ' ';
+    line += dicomElement.value[0];
+  } else if (isPixSequence) {
+    // pixel sequence
+    line += ` (PixelSequence #=${deSize})`;
+  } else if (dicomElement.vr === 'SQ') {
+    line += ' (Sequence with';
+    if (dicomElement.undefinedLength) {
+      line += ' undefined';
     } else {
-      // default
-      line += ' [';
-      line += getElementValueAsString(tag, dicomElement, false);
-      line += ']';
+      line += ' explicit';
     }
+    line += ' length #=';
+    line += dicomElement.value.length;
+    line += ')';
+  } else if (isOtherVR ||
+    dicomElement.vr === 'pi' ||
+    dicomElement.vr === 'UL' ||
+    dicomElement.vr === 'US' ||
+    dicomElement.vr === 'SL' ||
+    dicomElement.vr === 'SS' ||
+    dicomElement.vr === 'FL' ||
+    dicomElement.vr === 'FD' ||
+    dicomElement.vr === 'AT') {
+    // 'O'ther array, limited display length
+    line += ' ';
+    line += getElementValueAsString(tag, dicomElement, false);
+  } else {
+    // default
+    line += ' [';
+    line += getElementValueAsString(tag, dicomElement, false);
+    line += ']';
   }
 
   // align #

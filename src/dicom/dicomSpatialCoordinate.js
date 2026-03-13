@@ -387,24 +387,22 @@ export function getShapeFromScoord(scoord) {
         shape.shortAxisCenter = new Point2D(shortAxisCenterX, shortAxisCenterY);
         shape.hasShortAxisInteraction = true;
       }
-    } else {
-      if (points.length === 5) {
-        const line0 = new Line(points[0], points[1]);
-        const line1 = new Line(points[1], points[2]);
-        const line2 = new Line(points[2], points[3]);
-        const line3 = new Line(points[3], points[4]);
-        if (areOrthogonal(line0, line1) &&
-          areOrthogonal(line1, line2) &&
-          areOrthogonal(line2, line3)) {
-          shape = new Rectangle(points[0], points[2]);
-        } else {
-          // remove last=first point for closed shape
-          shape = new ROI(points.slice(0, -1));
-        }
+    } else if (points.length === 5) {
+      const line0 = new Line(points[0], points[1]);
+      const line1 = new Line(points[1], points[2]);
+      const line2 = new Line(points[2], points[3]);
+      const line3 = new Line(points[3], points[4]);
+      if (areOrthogonal(line0, line1) &&
+        areOrthogonal(line1, line2) &&
+        areOrthogonal(line2, line3)) {
+        shape = new Rectangle(points[0], points[2]);
       } else {
         // remove last=first point for closed shape
         shape = new ROI(points.slice(0, -1));
       }
+    } else {
+      // remove last=first point for closed shape
+      shape = new ROI(points.slice(0, -1));
     }
   }
 

@@ -239,10 +239,8 @@ function padOBValue(value) {
         value[value.length - 1] = uint8ArrayPush(
           value[value.length - 1], [0]);
       }
-    } else {
-      if (!isEven(value.length)) {
-        value = uint8ArrayPush(value, [0]);
-      }
+    } else if (!isEven(value.length)) {
+      value = uint8ArrayPush(value, [0]);
     }
   } else {
     throw new Error('Cannot pad undefined or null OB value.');
@@ -1214,17 +1212,15 @@ export class DicomWriter {
             size += itemPrefixSize * value.length;
             // add sequence delimitation size
             size += itemPrefixSize;
-          } else {
+          } else if (typeof bitsAllocated !== 'undefined') {
             // use bitsAllocated for pixel data
             // no need to multiply for 8 bits
-            if (typeof bitsAllocated !== 'undefined') {
-              if (bitsAllocated === 1) {
-                // binary data
-                // (ceil to get integer)
-                size = Math.ceil(size / 8);
-              } else if (bitsAllocated === 16) {
-                size *= Uint16Array.BYTES_PER_ELEMENT;
-              }
+            if (bitsAllocated === 1) {
+              // binary data
+              // (ceil to get integer)
+              size = Math.ceil(size / 8);
+            } else if (bitsAllocated === 16) {
+              size *= Uint16Array.BYTES_PER_ELEMENT;
             }
           }
         } else if (typeof vrType !== 'undefined') {
@@ -1400,12 +1396,10 @@ export function getElementsFromJSONTags(simpleTags) {
         logger.debug('Non array simpleTag SQ value');
       }
       value = items;
+    } else if (Array.isArray(simpleTag)) {
+      value = simpleTag;
     } else {
-      if (Array.isArray(simpleTag)) {
-        value = simpleTag;
-      } else {
-        value = [simpleTag];
-      }
+      value = [simpleTag];
     }
     // create element
     const dataElement = new DataElement(vr);

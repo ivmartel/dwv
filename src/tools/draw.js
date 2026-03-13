@@ -294,16 +294,14 @@ export class Draw {
       }
       // create draw layer
       drawLayer = this.#createDrawLayer(layerGroup);
-    } else {
+    } else if (!this.#canCreateDraw(drawLayer)) {
       // draw creation check
-      if (!this.#canCreateDraw(drawLayer)) {
-        // fire warn if not possible
-        this.#fireEvent({
-          type: 'warn',
-          message: 'Cannot create draw, data meta is invalid'
-        });
-        return;
-      }
+      // fire warn if not possible
+      this.#fireEvent({
+        type: 'warn',
+        message: 'Cannot create draw, data meta is invalid'
+      });
+      return;
     }
 
     // data should exist / be created

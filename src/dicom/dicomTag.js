@@ -447,12 +447,10 @@ function getSimpleElementReducer(dataElements) {
         tagValue.value.push(Object.keys(item).reduce(
           getSimpleElementReducer(item), {}));
       }
+    } else if (currentMeta.value.length === 1) {
+      tagValue = currentMeta.value[0];
     } else {
-      if (currentMeta.value.length === 1) {
-        tagValue = currentMeta.value[0];
-      } else {
-        tagValue = currentMeta.value;
-      }
+      tagValue = currentMeta.value;
     }
     accumulator[tagName] = tagValue;
     return accumulator;

@@ -82,12 +82,10 @@ export function range(dataAccessor, start, maxIter, increment,
     } else {
       increment *= -1;
     }
-  } else {
-    if (reverse2) {
-      // start at end of line
-      nextIndex += (blockMaxIter - 1) * increment;
-      increment *= -1;
-    }
+  } else if (reverse2) {
+    // start at end of line
+    nextIndex += (blockMaxIter - 1) * increment;
+    increment *= -1;
   }
   const finalBlockIncrement = blockIncrement - blockMaxIter * increment;
 
@@ -475,19 +473,17 @@ export function getSliceIterator(
     } else {
       throw new Error(`Unknown direction: ${dirMax2.index}`);
     }
+  } else if (image.getNumberOfComponents() === 1) {
+    rangeObj = simpleRange(dataAccessor, start, start + sliceSize);
+  } else if (image.getNumberOfComponents() === 3) {
+    // 3 times bigger...
+    start *= 3;
+    sliceSize *= 3;
+    rangeObj = simpleRange3d(
+      dataAccessor, start, start + sliceSize, 1, isPlanar);
   } else {
-    if (image.getNumberOfComponents() === 1) {
-      rangeObj = simpleRange(dataAccessor, start, start + sliceSize);
-    } else if (image.getNumberOfComponents() === 3) {
-      // 3 times bigger...
-      start *= 3;
-      sliceSize *= 3;
-      rangeObj = simpleRange3d(
-        dataAccessor, start, start + sliceSize, 1, isPlanar);
-    } else {
-      throw new Error(`Unsupported number of components: ${
-        image.getNumberOfComponents()}`);
-    }
+    throw new Error(`Unsupported number of components: ${
+      image.getNumberOfComponents()}`);
   }
 
   return rangeObj;

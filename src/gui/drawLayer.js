@@ -394,32 +394,30 @@ export class DrawLayer {
       // store new offset
       this.#zoomOffset = {x: 0, y: 0};
       this.#konvaStage.offset(resetOffset);
-    } else {
-      if (typeof center !== 'undefined') {
-        let worldCenter = this.#planeHelper.getPlaneOffsetFromOffset3D({
-          x: center.getX(),
-          y: center.getY(),
-          z: center.getZ()
-        });
-        // center was obtained with viewLayer.displayToMainPlanePos
-        // compensated for baseOffset
-        // TODO: justify...
-        worldCenter = {
-          x: worldCenter.x + this.#baseOffset.x,
-          y: worldCenter.y + this.#baseOffset.y
-        };
+    } else if (typeof center !== 'undefined') {
+      let worldCenter = this.#planeHelper.getPlaneOffsetFromOffset3D({
+        x: center.getX(),
+        y: center.getY(),
+        z: center.getZ()
+      });
+      // center was obtained with viewLayer.displayToMainPlanePos
+      // compensated for baseOffset
+      // TODO: justify...
+      worldCenter = {
+        x: worldCenter.x + this.#baseOffset.x,
+        y: worldCenter.y + this.#baseOffset.y
+      };
 
-        const newOffset = getScaledOffset(
-          offset, this.#konvaStage.scale(), finalNewScale, worldCenter);
+      const newOffset = getScaledOffset(
+        offset, this.#konvaStage.scale(), finalNewScale, worldCenter);
 
-        const newZoomOffset = {
-          x: this.#zoomOffset.x + newOffset.x - offset.x,
-          y: this.#zoomOffset.y + newOffset.y - offset.y
-        };
-        // store new offset
-        this.#zoomOffset = newZoomOffset;
-        this.#konvaStage.offset(newOffset);
-      }
+      const newZoomOffset = {
+        x: this.#zoomOffset.x + newOffset.x - offset.x,
+        y: this.#zoomOffset.y + newOffset.y - offset.y
+      };
+      // store new offset
+      this.#zoomOffset = newZoomOffset;
+      this.#konvaStage.offset(newOffset);
     }
 
     this.#konvaStage.scale(finalNewScale);

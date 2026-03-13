@@ -367,12 +367,10 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
           ktexts[0].remove();
           // use it
           ktext = ktexts[0];
-        } else {
+        } else if (kshape.points().length !== 0) {
           // use shape position if no text
-          if (kshape.points().length !== 0) {
-            pos = {x: kshape.points()[0],
-              y: kshape.points()[1]};
-          }
+          pos = {x: kshape.points()[0],
+            y: kshape.points()[1]};
         }
         // create new label with text and tag
         const klabel = new Konva.Label({

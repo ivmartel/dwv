@@ -469,16 +469,14 @@ function guessTransferSyntax(firstDataElement) {
     } else {
       syntax = transferSyntaxKeywords.ExplicitVRLittleEndian;
     }
+  } else if (implicit) {
+    // ImplicitVRBigEndian: impossible
+    throw new Error(
+      'Not a valid DICOM file (no magic DICM word found' +
+      'and implicit VR big endian detected)'
+    );
   } else {
-    if (implicit) {
-      // ImplicitVRBigEndian: impossible
-      throw new Error(
-        'Not a valid DICOM file (no magic DICM word found' +
-        'and implicit VR big endian detected)'
-      );
-    } else {
-      syntax = transferSyntaxKeywords.ExplicitVRBigEndian;
-    }
+    syntax = transferSyntaxKeywords.ExplicitVRBigEndian;
   }
   // set transfer syntax data element
   const dataElement = new DataElement('UI');
@@ -1102,12 +1100,10 @@ export class DicomParser {
         } else {
           data = Array.from(reader.readInt8Array(offset, vl));
         }
+      } else if (pixelRepresentation === 0) {
+        data = Array.from(reader.readUint16Array(offset, vl));
       } else {
-        if (pixelRepresentation === 0) {
-          data = Array.from(reader.readUint16Array(offset, vl));
-        } else {
-          data = Array.from(reader.readInt16Array(offset, vl));
-        }
+        data = Array.from(reader.readInt16Array(offset, vl));
       }
     } else if (vr === 'xs') {
       // (US or SS) or (US or SS or OW)

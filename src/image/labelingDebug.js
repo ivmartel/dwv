@@ -144,24 +144,22 @@ export class LabelingDebug {
           z
         );
       }
+    } else if (p0.getY() < p1.getY()) {
+      this.#plotLineHigh(
+        imageBuffer,
+        unitVectors,
+        spacing,
+        line,
+        z
+      );
     } else {
-      if (p0.getY() < p1.getY()) {
-        this.#plotLineHigh(
-          imageBuffer,
-          unitVectors,
-          spacing,
-          line,
-          z
-        );
-      } else {
-        this.#plotLineHigh(
-          imageBuffer,
-          unitVectors,
-          spacing,
-          line.getFlipped(),
-          z
-        );
-      }
+      this.#plotLineHigh(
+        imageBuffer,
+        unitVectors,
+        spacing,
+        line.getFlipped(),
+        z
+      );
     }
   }
 

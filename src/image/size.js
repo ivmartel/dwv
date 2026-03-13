@@ -130,10 +130,8 @@ export class Size {
     }
     if (typeof start === 'undefined') {
       start = 0;
-    } else {
-      if (start < 0 || start > dimension) {
-        throw new Error('Invalid start value for getDimSize');
-      }
+    } else if (start < 0 || start > dimension) {
+      throw new Error('Invalid start value for getDimSize');
     }
     let size = 1;
     for (let i = start; i < dimension; ++i) {
@@ -236,10 +234,8 @@ export class Size {
     }
     if (typeof start === 'undefined') {
       start = 0;
-    } else {
-      if (start < 0 || start > this.length() - 1) {
-        throw new Error('Invalid start value for indexToOffset');
-      }
+    } else if (start < 0 || start > this.length() - 1) {
+      throw new Error('Invalid start value for indexToOffset');
     }
     let offset = 0;
     for (let i = start; i < index.length(); ++i) {

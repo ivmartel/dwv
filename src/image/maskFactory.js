@@ -158,11 +158,9 @@ function checkTag(dataElements, tagDefinition) {
     if (typeof element === 'undefined') {
       throw new Error(`Missing or empty ${tagDefinition.name}`);
     }
-  } else {
-    if (typeof element === 'undefined') {
-      // non mandatory value, exit
-      return;
-    }
+  } else if (typeof element === 'undefined') {
+    // non mandatory value, exit
+    return;
   }
   let includes = false;
   let tagValue;
@@ -539,21 +537,17 @@ export class MaskFactory {
       if (typeof frameInfos[ii].imageOrientationPatient !== 'undefined') {
         if (typeof imageOrientationPatient === 'undefined') {
           imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
-        } else {
-          if (!arraySortEquals(
-            imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
-            throw new Error('Unsupported multi orientation dicom seg.');
-          }
+        } else if (!arraySortEquals(
+          imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
+          throw new Error('Unsupported multi orientation dicom seg.');
         }
       }
       // store spacing if needed, avoid multi
       if (typeof frameInfos[ii].spacing !== 'undefined') {
         if (typeof spacing === 'undefined') {
           spacing = frameInfos[ii].spacing;
-        } else {
-          if (!spacing.equals(frameInfos[ii].spacing)) {
-            throw new Error('Unsupported multi resolution dicom seg.');
-          }
+        } else if (!spacing.equals(frameInfos[ii].spacing)) {
+          throw new Error('Unsupported multi resolution dicom seg.');
         }
       }
     }

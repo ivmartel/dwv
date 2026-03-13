@@ -269,12 +269,10 @@ export class Livewire {
       this.#currentPath.addPoint(new Point2D(p.x, p.y));
       if (!this.#parentPoints[p.y]) {
         stop = true;
+      } else if (!this.#parentPoints[p.y][p.x]) {
+        stop = true;
       } else {
-        if (!this.#parentPoints[p.y][p.x]) {
-          stop = true;
-        } else {
-          p = this.#parentPoints[p.y][p.x];
-        }
+        p = this.#parentPoints[p.y][p.x];
       }
     }
     this.#currentPath.appenPath(this.#path);

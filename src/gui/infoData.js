@@ -211,14 +211,12 @@ export class InfoData {
       } else {
         logger.warn('Missing DICOM SOP instance UID for info data indexing');
       }
-    } else {
+    } else if (typeof data.imageUid !== 'undefined') {
       // image file case
-      if (typeof data.imageUid !== 'undefined') {
-        dataUid = data.imageUid.value[0];
-        this.#infoData[dataUid] = createInfoDataForDom(data, this.#infoConfigs);
-      } else {
-        logger.warn('Missing DOM image UID for info data indexing');
-      }
+      dataUid = data.imageUid.value[0];
+      this.#infoData[dataUid] = createInfoDataForDom(data, this.#infoConfigs);
+    } else {
+      logger.warn('Missing DOM image UID for info data indexing');
     }
     // store uid
     if (typeof dataUid !== 'undefined') {
@@ -268,26 +266,25 @@ export class InfoData {
         if (event.type === 'positionchange') {
           text = infoDataItem.value;
         }
-      } else {
+      } else if (typeof infoDataItem.event !== 'undefined' &&
+        infoDataItem.event === event.type) {
         // update text if the value is an event type
-        if (typeof infoDataItem.event !== 'undefined' &&
-          infoDataItem.event === event.type) {
-          const format = infoDataItem.format;
-          let values = event.value;
-          // optional number precision
-          if (typeof infoDataItem.precision !== 'undefined') {
-            let mapFunc;
-            if (infoDataItem.precision === 'round') {
-              mapFunc = Math.round;
-            } else {
-              mapFunc = getNumberToPrecision(
-                parseInt(infoDataItem.precision, 10)
-              );
-            }
-            values = values.map(mapFunc);
+
+        const format = infoDataItem.format;
+        let values = event.value;
+        // optional number precision
+        if (typeof infoDataItem.precision !== 'undefined') {
+          let mapFunc;
+          if (infoDataItem.precision === 'round') {
+            mapFunc = Math.round;
+          } else {
+            mapFunc = getNumberToPrecision(
+              parseInt(infoDataItem.precision, 10)
+            );
           }
-          text = replaceFlags(format, values);
+          values = values.map(mapFunc);
         }
+        text = replaceFlags(format, values);
       }
       if (typeof text !== 'undefined') {
         infoDataItem.value = text;

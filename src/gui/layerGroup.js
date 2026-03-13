@@ -1329,17 +1329,15 @@ export class LayerGroup {
           // no offset
           scrollOffset = new Vector3D(0, 0, 0);
           planeOffset = new Vector3D(0, 0, 0);
-        } else {
-          if (vc.isPositionInBounds(position) &&
-            typeof origin !== 'undefined') {
-            // TODO: compensate for possible different orientation between views
-            const scrollDiff = baseViewLayerOrigin0.minus(origin0);
-            scrollOffset = new Vector3D(
-              scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
-            const planeDiff = baseViewLayerOrigin.minus(origin);
-            planeOffset = new Vector3D(
-              planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
-          }
+        } else if (vc.isPositionInBounds(position) &&
+          typeof origin !== 'undefined') {
+          // TODO: compensate for possible different orientation between views
+          const scrollDiff = baseViewLayerOrigin0.minus(origin0);
+          scrollOffset = new Vector3D(
+            scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
+          const planeDiff = baseViewLayerOrigin.minus(origin);
+          planeOffset = new Vector3D(
+            planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
         }
 
         // set and store offsets

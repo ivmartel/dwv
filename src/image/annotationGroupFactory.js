@@ -874,12 +874,10 @@ export class AnnotationGroupFactory {
     let annotationGroup;
     if (!hasMeasGroup) {
       logger.warn('No measurement groups in TID 1500 SR');
+    } else if (annotations.length !== 0) {
+      annotationGroup = new AnnotationGroup(annotations);
     } else {
-      if (annotations.length !== 0) {
-        annotationGroup = new AnnotationGroup(annotations);
-      } else {
-        logger.warn('No valid measurement groups in TID 1500 SR');
-      }
+      logger.warn('No valid measurement groups in TID 1500 SR');
     }
     return annotationGroup;
   }
@@ -911,12 +909,10 @@ export class AnnotationGroupFactory {
     const annotationGroups = [];
     if (!hasMeasGroup) {
       logger.warn('No image findings in TID 4100 SR');
+    } else if (annotations.length !== 0) {
+      annotationGroups.push(new AnnotationGroup(annotations));
     } else {
-      if (annotations.length !== 0) {
-        annotationGroups.push(new AnnotationGroup(annotations));
-      } else {
-        logger.warn('No valid measurement groups in TID 4100 SR');
-      }
+      logger.warn('No valid measurement groups in TID 4100 SR');
     }
     return annotationGroups;
   }

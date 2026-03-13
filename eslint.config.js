@@ -101,7 +101,7 @@ export default [
       'no-else-return': 'error',
       // disallow if as the only statement in an else block
       // https://eslint.org/docs/rules/no-lonely-if
-      'no-lonely-if': 'warn',
+      'no-lonely-if': 'error',
       // disallow yoda conditions
       // https://eslint.org/docs/rules/yoda
       yoda: 'warn',

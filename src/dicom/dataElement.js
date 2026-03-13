@@ -140,13 +140,11 @@ export function checkDataElement(element, name, values) {
     warning += ` ${name} has undefined value,`;
   } else if (element.value.length === 0) {
     warning += ` ${name} is empty,`;
-  } else {
-    if (typeof values !== 'undefined') {
-      for (let i = 0; i < values.length; ++i) {
-        if (!element.value.includes(values[i])) {
-          warning += ` ${name} does not contain ${ values[i]
-          } (value: ${element.value}),`;
-        }
+  } else if (typeof values !== 'undefined') {
+    for (let i = 0; i < values.length; ++i) {
+      if (!element.value.includes(values[i])) {
+        warning += ` ${name} does not contain ${ values[i]
+        } (value: ${element.value}),`;
       }
     }
   }

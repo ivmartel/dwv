@@ -607,32 +607,30 @@ export class ViewLayer {
       // store new offset
       this.#zoomOffset = {x: 0, y: 0};
       this.#offset = resetOffset;
-    } else {
-      if (typeof center !== 'undefined') {
-        let worldCenter = helper.getPlaneOffsetFromOffset3D({
-          x: center.getX(),
-          y: center.getY(),
-          z: center.getZ()
-        });
-        // center was obtained with viewLayer.displayToMainPlanePos
-        // compensated for baseOffset
-        // TODO: justify...
-        worldCenter = {
-          x: worldCenter.x + this.#baseOffset.x,
-          y: worldCenter.y + this.#baseOffset.y
-        };
+    } else if (typeof center !== 'undefined') {
+      let worldCenter = helper.getPlaneOffsetFromOffset3D({
+        x: center.getX(),
+        y: center.getY(),
+        z: center.getZ()
+      });
+      // center was obtained with viewLayer.displayToMainPlanePos
+      // compensated for baseOffset
+      // TODO: justify...
+      worldCenter = {
+        x: worldCenter.x + this.#baseOffset.x,
+        y: worldCenter.y + this.#baseOffset.y
+      };
 
-        const newOffset = getScaledOffset(
-          this.#offset, this.#scale, finalNewScale, worldCenter);
+      const newOffset = getScaledOffset(
+        this.#offset, this.#scale, finalNewScale, worldCenter);
 
-        const newZoomOffset = {
-          x: this.#zoomOffset.x + newOffset.x - this.#offset.x,
-          y: this.#zoomOffset.y + newOffset.y - this.#offset.y
-        };
-        // store new offset
-        this.#zoomOffset = newZoomOffset;
-        this.#offset = newOffset;
-      }
+      const newZoomOffset = {
+        x: this.#zoomOffset.x + newOffset.x - this.#offset.x,
+        y: this.#zoomOffset.y + newOffset.y - this.#offset.y
+      };
+      // store new offset
+      this.#zoomOffset = newZoomOffset;
+      this.#offset = newOffset;
     }
 
     // store new scale
