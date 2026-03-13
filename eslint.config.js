@@ -56,6 +56,54 @@ export default [
       // https://eslint.org/docs/rules/no-unused-vars
       'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
 
+      // code quality / correctness
+
+      // disallow reassigning function parameters
+      // https://eslint.org/docs/rules/no-param-reassign
+      'no-param-reassign': 'warn',
+      // disallow variable declarations that shadow outer scope variables
+      // https://eslint.org/docs/rules/no-shadow
+      'no-shadow': 'warn',
+      // disallow returning from Promise executors
+      // https://eslint.org/docs/rules/no-promise-executor-return
+      'no-promise-executor-return': 'warn',
+      // disallow await inside loops
+      // https://eslint.org/docs/rules/no-await-in-loop
+      'no-await-in-loop': 'warn',
+      // disallow useless string concatenation
+      // https://eslint.org/docs/rules/no-useless-concat
+      'no-useless-concat': 'warn',
+
+      // modern js idioms
+
+      // prefer template literals over string concatenation
+      // https://eslint.org/docs/rules/prefer-template
+      'prefer-template': 'warn',
+      // require object literal shorthand syntax
+      // https://eslint.org/docs/rules/object-shorthand
+      'object-shorthand': 'warn',
+      // prefer rest params over arguments
+      // https://eslint.org/docs/rules/prefer-rest-params
+      'prefer-rest-params': 'warn',
+      // prefer spread over Function.prototype.apply
+      // https://eslint.org/docs/rules/prefer-spread
+      'prefer-spread': 'warn',
+      // require dot notation when possible
+      // https://eslint.org/docs/rules/dot-notation
+      'dot-notation': 'warn',
+
+      // flow clarity
+
+      // disallow else after a return
+      // https://eslint.org/docs/rules/no-else-return
+      'no-else-return': 'warn',
+      // disallow if as the only statement in an else block
+      // https://eslint.org/docs/rules/no-lonely-if
+      'no-lonely-if': 'warn',
+      // disallow yoda conditions
+      // https://eslint.org/docs/rules/yoda
+      yoda: 'warn',
+
       // formatting rules
 
       // force semi colon
@@ -140,7 +188,7 @@ export default [
       // no multi spaces
       // https://eslint.style/rules/js/no-multi-spaces
       '@stylistic/js/no-multi-spaces': 'error',
-      // no space for named functions (default {'max': 2})
+      // disallow multiple consecutive empty lines (default {'max': 2})
       // https://eslint.style/rules/js/no-multiple-empty-lines
       '@stylistic/js/no-multiple-empty-lines': 'error',
       // linebreak after operator
