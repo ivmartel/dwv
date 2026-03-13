@@ -678,8 +678,8 @@ export class MaskFactory {
     meta.DimensionIndexSequence = dimension.indices;
     // custom
     meta.custom = {
-      segments: segments,
-      frameInfos: frameInfos,
+      segments,
+      frameInfos,
       SOPInstanceUID: safeGetLocal(TagKeys.SOPInstanceUID)
     };
 

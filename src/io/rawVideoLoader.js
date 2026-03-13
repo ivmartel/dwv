@@ -76,7 +76,7 @@ export class RawVideoLoader {
           origin, index);
       } catch (error) {
         this.onerror({
-          error: error,
+          error,
           source: origin
         });
         this.onloadend({

@@ -154,13 +154,13 @@ export function generatePixelDataFromJSONTags(
   }
   const GeneratorClass = _pixelGenerators[pixGeneratorName].generator;
   const generator = new GeneratorClass({
-    numberOfColumns: numberOfColumns,
-    numberOfRows: numberOfRows,
-    numberOfSlices: numberOfSlices,
-    numberOfFrames: numberOfFrames,
-    numberOfSamples: numberOfSamples,
-    numberOfColourPlanes: numberOfColourPlanes,
-    photometricInterpretation: photometricInterpretation,
+    numberOfColumns,
+    numberOfRows,
+    numberOfSlices,
+    numberOfFrames,
+    numberOfSamples,
+    numberOfColourPlanes,
+    photometricInterpretation,
     imageOrientationPatient: tags.ImageOrientationPatient
   });
   if (typeof generator.setImages !== 'undefined') {
@@ -179,7 +179,7 @@ export function generatePixelDataFromJSONTags(
   const pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
     tag: getPixelDataTag(),
-    vr: vr,
+    vr,
     vl: pixVL,
     value: pixels
   };

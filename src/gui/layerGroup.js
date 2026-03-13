@@ -1560,7 +1560,7 @@ export class LayerGroup {
      */
     this.#fireEvent({
       type: 'zoomchange',
-      value: value
+      value
     });
   }
 

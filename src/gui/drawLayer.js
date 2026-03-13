@@ -762,7 +762,7 @@ export class DrawLayer {
       posGroup = new Konva.Group({
         id: posGroupId,
         name: 'position-group',
-        visible: visible
+        visible
       });
       this.getKonvaLayer().add(posGroup);
     }

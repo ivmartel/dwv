@@ -64,7 +64,7 @@ export class ZipLoader {
       lengthComputable: true,
       loaded: (unzipPercent / 2),
       total: 100,
-      index: index,
+      index,
       item: {
         loaded: unzipPercent,
         total: 100,

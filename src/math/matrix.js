@@ -291,7 +291,7 @@ export class Matrix33 {
     const index = values.indexOf(absMax);
     return {
       value: this.get(row, index),
-      index: index
+      index
     };
   }
 
@@ -311,7 +311,7 @@ export class Matrix33 {
     const index = values.indexOf(absMax);
     return {
       value: this.get(index, col),
-      index: index
+      index
     };
   }
 

@@ -143,8 +143,8 @@ export function getDefaultAnchor(x, y, id, style) {
     y: Math.abs(radius.y)
   };
   return new Konva.Ellipse({
-    x: x,
-    y: y,
+    x,
+    y,
     stroke: '#999',
     fill: 'rgba(100,100,100,0.7',
     strokeWidth: style.getStrokeWidth(),
@@ -212,7 +212,7 @@ export function getShapePositionRange(stageSize, shape) {
     stageSize.y - Math.abs(shape.height())
   );
 
-  return {min: min, max: max};
+  return {min, max};
 }
 
 /**

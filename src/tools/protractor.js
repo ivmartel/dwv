@@ -354,7 +354,7 @@ export class ProtractorFactory {
 
     // konva line
     const kshape = new Konva.Line({
-      points: points,
+      points,
       stroke: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
@@ -417,7 +417,7 @@ export class ProtractorFactory {
       stroke: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
-      angle: angle,
+      angle,
       rotation: -inclination,
       x: protractor.getPoint(1).getX(),
       y: protractor.getPoint(1).getY(),

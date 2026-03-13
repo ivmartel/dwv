@@ -58,19 +58,19 @@ describe('math', () => {
       const e0 = new Ellipse(center0, 1, 2);
       // view controller
       const mockVc0 = {
-        canQuantifyImage: function () {
+        canQuantifyImage() {
           return true;
         },
-        get2DSpacing: function () {
+        get2DSpacing() {
           return {x: 1, y: 1};
         },
-        getImageVariableRegionValues: function () {
+        getImageVariableRegionValues() {
           return [0, 1, 1, 0, 0, 1, 1, 0];
         },
-        getPixelUnit: function () {
+        getPixelUnit() {
           return '';
         },
-        getLengthUnit: function () {
+        getLengthUnit() {
           return 'unit.mm';
         }
       };

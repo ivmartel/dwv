@@ -100,7 +100,7 @@ export class MultiProgressHandler {
       lengthComputable: true,
       loaded: this.#getGlobalPercent(),
       total: 100,
-      item: item
+      item
     });
   };
 

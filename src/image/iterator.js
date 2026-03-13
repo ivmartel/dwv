@@ -25,7 +25,7 @@ export function simpleRange(dataAccessor, start, end, increment) {
   let nextIndex = start;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -96,7 +96,7 @@ export function range(dataAccessor, start, maxIter, increment,
   let blockCount = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (mainCount < maxIter) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -139,7 +139,7 @@ export function rangeRegion(
   let regionElementCount = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -181,7 +181,7 @@ export function rangeRegions(
   let regionElementCount = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -245,7 +245,7 @@ export function simpleRange3d(
 
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: [
@@ -325,7 +325,7 @@ export function range3d(dataAccessor, start, maxIter, increment,
 
   // result
   return {
-    next: function () {
+    next() {
       const r0 = iters[0].next();
       const r1 = iters[1].next();
       const r2 = iters[2].next();
@@ -641,7 +641,7 @@ export function valueRange(values, end) {
   let nextValueIndex = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         if (nextValueIndex + 1 < values.length &&
           nextIndex >= values[nextValueIndex + 1].index) {

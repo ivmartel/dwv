@@ -839,7 +839,7 @@ export class DicomParser {
     return {
       data: itemData,
       endOffset: offset,
-      offsetTableVl: offsetTableVl
+      offsetTableVl
     };
   }
 

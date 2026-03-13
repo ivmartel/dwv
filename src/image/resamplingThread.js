@@ -84,29 +84,29 @@ export function generateWorkerMessages(
 
   const generateMessage = (sourceStartOffset, targetStartOffset, frame) => {
     return {
-      sourceImageBuffer: sourceImageBuffer,
+      sourceImageBuffer,
       sourceOrigin: sourceImageGeometry.getOrigin().getValues(),
       sourceSize: sourceImageGeometry.getSize().getValues(),
       sourceSpacing: sourceImageGeometry.getSpacing().getValues(),
       sourceOrientation: sourceImageGeometry.getOrientation().getValues(),
-      sourceUnitVectors: sourceUnitVectors,
-      sourceTotalSize: sourceTotalSize,
+      sourceUnitVectors,
+      sourceTotalSize,
 
       // targetImageBuffer: targetImageBuffer,
       targetOrigin: targetImageGeometry.getOrigin().getValues(),
       targetSize: targetImageGeometry.getSize().getValues(),
       targetSpacing: targetImageGeometry.getSpacing().getValues(),
       targetOrientation: targetImageGeometry.getOrientation().getValues(),
-      targetUnitVectors: targetUnitVectors,
-      targetTotalSize: targetTotalSize,
+      targetUnitVectors,
+      targetTotalSize,
 
-      pixelRepresentation: pixelRepresentation,
+      pixelRepresentation,
       interpolate: interpolated,
-      sourceStartOffset: sourceStartOffset,
-      targetStartOffset: targetStartOffset,
+      sourceStartOffset,
+      targetStartOffset,
 
-      jobId: jobId,
-      frame: frame
+      jobId,
+      frame
     };
   };
 
@@ -475,7 +475,7 @@ export class ResamplingThread {
     return {
       buffer: targetImageBuffer,
       geometry: targetImageGeometry,
-      jobId: jobId
+      jobId
     };
   }
 

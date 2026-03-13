@@ -249,10 +249,10 @@ export class ResamplingFilter {
     }
 
     return {
-      targetImageBuffer: targetImageBuffer,
+      targetImageBuffer,
       startOffset: targetStartOffset,
-      jobId: jobId,
-      frame: frame
+      jobId,
+      frame
     };
   }
 }

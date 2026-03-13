@@ -194,7 +194,7 @@ export function getSegmentFrameInfo(dataElements) {
         }
       }
       derivationImages.push({
-        sourceImages: sourceImages
+        sourceImages
       });
     }
   }

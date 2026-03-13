@@ -63,17 +63,17 @@ export class WriterRule {
  * @type {Object<string, Function>}
  */
 const writerActions = {
-  copy: function (item) {
+  copy(item) {
     return item;
   },
-  remove: function () {
+  remove() {
     return null;
   },
-  clear: function (item) {
+  clear(item) {
     item.value = [];
     return item;
   },
-  replace: function (item, value) {
+  replace(item, value) {
     item.value = [value];
     return item;
   }

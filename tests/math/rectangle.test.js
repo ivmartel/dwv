@@ -70,19 +70,19 @@ describe('math', () => {
       const r00 = new Rectangle(p00, p01);
       // view controller
       const mockVc0 = {
-        canQuantifyImage: function () {
+        canQuantifyImage() {
           return true;
         },
-        get2DSpacing: function () {
+        get2DSpacing() {
           return {x: 1, y: 1};
         },
-        getImageRegionValues: function () {
+        getImageRegionValues() {
           return [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0];
         },
-        getPixelUnit: function () {
+        getPixelUnit() {
           return '';
         },
-        getLengthUnit: function () {
+        getLengthUnit() {
           return 'unit.mm';
         }
       };

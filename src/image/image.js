@@ -1383,7 +1383,7 @@ export class Image {
       } else {
         // input value is a simple color
         iterator = valueRange(
-          [{index: 0, value: value}], offsets.length);
+          [{index: 0, value}], offsets.length);
       }
 
       // set values
@@ -1523,7 +1523,7 @@ export class Image {
       }
     }
     // return
-    return {min: min, max: max};
+    return {min, max};
   }
 
   /**
@@ -1599,7 +1599,7 @@ export class Image {
       histo[rvalue] = (histo[rvalue] || 0) + 1;
     }
     // set data range
-    const dataRange = {min: min, max: max};
+    const dataRange = {min, max};
     const rescaledDataRange = {min: rmin, max: rmax};
     // generate data for plotting
     const histogram = [];
@@ -1608,9 +1608,9 @@ export class Image {
     }
     // return
     return {
-      dataRange: dataRange,
-      rescaledDataRange: rescaledDataRange,
-      histogram: histogram
+      dataRange,
+      rescaledDataRange,
+      histogram
     };
   }
 

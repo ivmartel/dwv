@@ -387,7 +387,7 @@ export class EllipseFactory {
     return new Konva.Ellipse({
       x: center.getX(),
       y: center.getY(),
-      radius: radius,
+      radius,
       radiusX: radius.x,
       radiusY: radius.y,
       stroke: annotation.colour,

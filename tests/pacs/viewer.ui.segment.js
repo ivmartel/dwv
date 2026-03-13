@@ -359,7 +359,7 @@ export class SegmentationUI {
           segHelper.addSegment(segment);
           // default segmentation
           const segmentation = {
-            dataId: dataId,
+            dataId,
             labels: [],
             hasNewSegments: false,
             segments: [segment],
@@ -389,7 +389,7 @@ export class SegmentationUI {
         if (typeof imgMeta !== 'undefined') {
           // loaded segmentation
           const segmentation = {
-            dataId: dataId,
+            dataId,
             labels: [],
             hasNewSegments: true,
             segments: imgMeta.custom.segments,

@@ -191,7 +191,7 @@ function getDecayedDose(elements) {
 
   return {
     value: decayedDose,
-    warning: warning
+    warning
   };
 }
 

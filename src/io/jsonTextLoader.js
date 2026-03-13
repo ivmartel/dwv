@@ -52,7 +52,7 @@ export class JSONTextLoader {
         lengthComputable: true,
         loaded: 100,
         total: 100,
-        index: index,
+        index,
         source: origin
       });
       const data = {
@@ -64,7 +64,7 @@ export class JSONTextLoader {
       this.onload(data);
     } catch (error) {
       this.onerror({
-        error: error,
+        error,
         source: origin
       });
     } finally {

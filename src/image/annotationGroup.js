@@ -156,7 +156,7 @@ export class AnnotationGroup {
     this.#fireEvent({
       type: 'annotationadd',
       data: annotation,
-      propagate: propagate
+      propagate
     });
   }
 
@@ -192,7 +192,7 @@ export class AnnotationGroup {
         type: 'annotationupdate',
         data: annotation,
         keys: propKeys,
-        propagate: propagate
+        propagate
       });
     } else {
       logger.warn('Cannot find annotation to update');
@@ -223,7 +223,7 @@ export class AnnotationGroup {
       this.#fireEvent({
         type: 'annotationremove',
         data: annotation,
-        propagate: propagate
+        propagate
       });
     } else {
       logger.warn('Cannot find annotation to remove');

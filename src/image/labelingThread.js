@@ -45,11 +45,11 @@ export function generateWorkerMessage(imageBuffer, imageGeometry) {
   const totalSize = imageSize.getTotalSize();
 
   return {
-    imageBuffer: imageBuffer,
-    unitVectors: unitVectors,
-    sizes: sizes,
+    imageBuffer,
+    unitVectors,
+    sizes,
     spacing: imageSpacing.getValues(),
-    totalSize: totalSize
+    totalSize
   };
 }
 

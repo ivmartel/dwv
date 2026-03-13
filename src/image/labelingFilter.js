@@ -312,7 +312,7 @@ export class LabelingFilter {
             id: buffer[o],
             sum: index,
             count: 1,
-            sliceCounts: sliceCounts,
+            sliceCounts,
             maxZ: index[2],
             minZ: index[2]
           };
@@ -365,7 +365,7 @@ export class LabelingFilter {
         id: detailledInfo.id,
         centroidIndex: index,
         count: detailledInfo.count,
-        largestSliceZ: largestSliceZ,
+        largestSliceZ,
         height: (detailledInfo.maxZ - detailledInfo.minZ + 1) * spacing[2]
       };
     }
@@ -484,8 +484,8 @@ export class LabelingFilter {
                   major: {
                     diameter: distance,
                     line: sliceLine,
-                    offset1: offset1,
-                    offset2: offset2,
+                    offset1,
+                    offset2,
                   },
                   zIndex: z
                 };
@@ -579,8 +579,8 @@ export class LabelingFilter {
               diameter.minor = {
                 diameter: distance,
                 line: sliceLine,
-                offset1: offset1,
-                offset2: offset2,
+                offset1,
+                offset2,
                 angleDiff: angleDifference
               };
             }

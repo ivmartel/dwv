@@ -167,10 +167,7 @@ export class Annotation {
     if (typeof this.#meta[conceptId] !== 'undefined') {
       logger.warn(`Overwriting annotation meta with id=${conceptId}`);
     }
-    this.#meta[concept.value] = {
-      concept: concept,
-      value: value
-    };
+    this.#meta[concept.value] = {concept, value};
   }
 
   /**

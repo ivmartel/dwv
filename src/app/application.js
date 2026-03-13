@@ -1965,7 +1965,7 @@ export class App {
       } catch (error) {
         this.#onloaderror({
           dataid: event.dataid,
-          error: error,
+          error,
           source: event.source
         });
         this.#onloadend({
@@ -2293,7 +2293,7 @@ export class App {
       viewController.getCurrentPosition().getValues()
     ];
     layerGroup.updateLayersToPositionChange({
-      value: value,
+      value,
       srclayerid: viewLayer.getId()
     });
 
@@ -2482,7 +2482,7 @@ export class App {
       refViewController.getCurrentPosition().getValues()
     ];
     layerGroup.updateLayersToPositionChange({
-      value: value,
+      value,
       srclayerid: drawLayer.getId()
     });
 

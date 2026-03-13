@@ -107,7 +107,7 @@ export class DicomBufferToData {
 
     // call onloaditem
     this.onloaditem({
-      data: data,
+      data,
       source: origin
     });
   }
@@ -127,7 +127,7 @@ export class DicomBufferToData {
       lengthComputable: true,
       loaded: 100,
       total: 100,
-      index: index,
+      index,
       source: origin
     });
     // send load event
@@ -256,7 +256,7 @@ export class DicomBufferToData {
       this.#pixelDecoder.decode(pixelBuffer[i], pixelMeta,
         {
           itemNumber: i,
-          numberOfItems: numberOfItems,
+          numberOfItems,
           index: dataIndex,
           indexOrigin: origin
         }
@@ -305,7 +305,7 @@ export class DicomBufferToData {
           this.#pixelDecoder.abort();
           // send events
           this.onerror({
-            error: error,
+            error,
             source: origin
           });
           this.onloadend({
@@ -363,7 +363,7 @@ export class DicomBufferToData {
       // check elements
     } catch (error) {
       this.onerror({
-        error: error,
+        error,
         source: origin
       });
       this.onloadend({

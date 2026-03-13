@@ -592,7 +592,7 @@ describe('dicom', () => {
           value: result.tags.ReferringPhysicianIdentificationSequence
         }
       },
-      result: result
+      result
     };
   }
 

@@ -225,7 +225,7 @@ function getWindowPresets(dataElements, intensityFactor) {
             center * intensityFactor,
             width
           )],
-          name: name
+          name
         };
       }
       if (width === 0) {
@@ -453,7 +453,7 @@ export class ImageFactory {
 
     // meta information
     const meta = {
-      numberOfFiles: numberOfFiles
+      numberOfFiles
     };
 
     // defaults

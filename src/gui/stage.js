@@ -645,7 +645,7 @@ export class Stage {
     if (typeof binderObj === 'undefined') {
       // create new callback object
       binderObj = {
-        binder: binder,
+        binder,
         callback: (event) => {
           // stop listeners
           this.#removeEventListeners(index, binder);

@@ -877,7 +877,7 @@ export class View {
           index.getValues(),
           inPosition.getValues(),
         ],
-        diffDims: diffDims,
+        diffDims,
         data: {
           imageUid: this.#image.getImageUid(index)
         }

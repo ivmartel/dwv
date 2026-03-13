@@ -81,7 +81,7 @@ describe('state', () => {
   function checkStateHeader(jsonData, version) {
     // header data
     const headerData = {
-      version: version,
+      version,
       'window-center': 441,
       'window-width': 911,
     };

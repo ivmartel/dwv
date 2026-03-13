@@ -181,7 +181,7 @@ export class LoadController {
     loader.onloadstart = (event) => {
       // store loader to allow abort
       this.#currentLoaders[dataId] = {
-        loader: loader,
+        loader,
         isFirstItem: true
       };
       // callback
@@ -221,7 +221,7 @@ export class LoadController {
       loader.load(data, options);
     } catch (error) {
       this.onerror({
-        error: error,
+        error,
         dataid: dataId
       });
       this.onloadend({

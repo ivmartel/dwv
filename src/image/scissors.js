@@ -582,7 +582,7 @@ export class Scissors {
     for (let y = sy; y <= ey; y++) {
       for (let x = sx; x <= ex; x++) {
         if (x !== p.x || y !== p.y) {
-          list[idx++] = {x: x, y: y};
+          list[idx++] = {x, y};
         }
       }
     }

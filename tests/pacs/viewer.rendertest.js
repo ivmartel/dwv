@@ -91,10 +91,5 @@ function getBasicStats(array) {
   const variance = sumSqr / length - mean * mean;
   const stdDev = Math.sqrt(variance);
 
-  return {
-    min: min,
-    max: max,
-    mean: mean,
-    stdDev: stdDev
-  };
+  return {min, max, mean, stdDev};
 }

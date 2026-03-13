@@ -71,7 +71,7 @@ export class RawImageLoader {
             lengthComputable: true,
             loaded: 100,
             total: 100,
-            index: index,
+            index,
             source: origin
           });
           const data = getViewFromDOMImage(image, origin, index);
@@ -81,7 +81,7 @@ export class RawImageLoader {
         }
       } catch (error) {
         this.onerror({
-          error: error,
+          error,
           source: origin
         });
       } finally {

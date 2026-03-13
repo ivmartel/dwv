@@ -83,7 +83,7 @@ export default [
       'prefer-template': 'error',
       // require object literal shorthand syntax
       // https://eslint.org/docs/rules/object-shorthand
-      'object-shorthand': 'warn',
+      'object-shorthand': 'error',
       // prefer rest params over arguments
       // https://eslint.org/docs/rules/prefer-rest-params
       'prefer-rest-params': 'warn',

@@ -421,9 +421,9 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
         }
         // set details
         drawingsDetails[drawGroup.id()] = {
-          textExpr: textExpr,
+          textExpr,
           longText: '',
-          quant: quant
+          quant
         };
 
       }
@@ -431,7 +431,7 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
     }
   }
 
-  return {drawings: newDrawings, drawingsDetails: drawingsDetails};
+  return {drawings: newDrawings, drawingsDetails};
 }
 
 /**

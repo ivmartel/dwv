@@ -1089,7 +1089,7 @@ export class ViewLayer {
       const eventName = names[i];
       const passive = eventName !== 'wheel';
       this.#containerDiv.addEventListener(
-        eventName, this.#fireEvent, {passive: passive});
+        eventName, this.#fireEvent, {passive});
     }
   }
 

@@ -88,7 +88,7 @@ dcmb.parseData = function (data) {
     value = parseFloat(split.splice(0, 1));
     extra = ` ${split.join(' ')}`;
   }
-  return {value: value, extra: extra};
+  return {value, extra};
 };
 
 /**
