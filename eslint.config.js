@@ -41,7 +41,7 @@ export default [
       'default-case': 'error',
       // enforce default clauses to be last
       // https://eslint.org/docs/rules/default-case-last
-      'default-case-last': 'warn',
+      'default-case-last': 'error',
       // enforce consistent return values from functions
       // https://eslint.org/docs/rules/consistent-return
       'consistent-return': 'warn',
@@ -50,7 +50,7 @@ export default [
       'no-useless-return': 'warn',
       // disallow loops that can never iterate more than once
       // https://eslint.org/docs/rules/no-unreachable-loop
-      'no-unreachable-loop': 'warn',
+      'no-unreachable-loop': 'error',
       // allow for some unused args
       // https://eslint.org/docs/rules/no-unused-vars
       'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
