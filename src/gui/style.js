@@ -236,7 +236,7 @@ export class Style {
    * @returns {string} The font definition string.
    */
   getFontStr() {
-    return ('normal ' + this.getFontSize() + 'px sans-serif');
+    return (`normal ${this.getFontSize()}px sans-serif`);
   }
 
   /**

@@ -68,8 +68,7 @@ export class SpatialCoordinate {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.graphicType +
-      ' {' + this.graphicData + '}';
+    return `${this.graphicType} {${this.graphicData}}`;
   };
 };
 
@@ -306,15 +305,15 @@ export function getShapeFromScoord(scoord) {
   let shape;
   if (scoord.graphicType === GraphicTypes.point) {
     if (points.length > 1) {
-      logger.warn('Expecting 1 point for point, got ' + numberOfPoints);
+      logger.warn(`Expecting 1 point for point, got ${numberOfPoints}`);
     }
     shape = points[0];
   } else if (scoord.graphicType === GraphicTypes.circle) {
     if (points.length < 2) {
-      throw new Error('Expecting 2 points for circles, got ' + numberOfPoints);
+      throw new Error(`Expecting 2 points for circles, got ${numberOfPoints}`);
     }
     if (points.length > 2) {
-      logger.warn('Expecting 2 points for circles, got ' + numberOfPoints);
+      logger.warn(`Expecting 2 points for circles, got ${numberOfPoints}`);
     }
     const center = points[0];
     const pointPerimeter = points[1];
@@ -322,10 +321,10 @@ export function getShapeFromScoord(scoord) {
     shape = new Circle(center, radius);
   } else if (scoord.graphicType === GraphicTypes.ellipse) {
     if (points.length < 4) {
-      throw new Error('Expecting 4 points for ellipses, got ' + numberOfPoints);
+      throw new Error(`Expecting 4 points for ellipses, got ${numberOfPoints}`);
     }
     if (points.length > 4) {
-      logger.warn('Expecting 4 points for ellipses, got ' + numberOfPoints);
+      logger.warn(`Expecting 4 points for ellipses, got ${numberOfPoints}`);
     }
     // TODO: make more generic
     const radiusX = points[0].getDistance(points[1]) / 2;

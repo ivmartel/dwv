@@ -64,7 +64,7 @@ export class RectangleFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return this.#name + '-group';
+    return `${this.#name}-group`;
   }
 
   /**
@@ -181,7 +181,7 @@ export class RectangleFactory {
       anchors.push(getDefaultAnchor(
         positions[i].getX(),
         positions[i].getY(),
-        'anchor' + i,
+        `anchor${i}`,
         style
       ));
     }
@@ -448,7 +448,7 @@ export class RectangleFactory {
         topLeft.x(anchor.x());
         break;
       default :
-        logger.error('Unhandled anchor id: ' + anchor.id());
+        logger.error(`Unhandled anchor id: ${anchor.id()}`);
         break;
     }
   }

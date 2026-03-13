@@ -79,7 +79,7 @@ export class LayoutProtocol {
     const sets =
       this.#displaySets.filter((elem) => elem.dataSelector(dataId));
     if (sets.length === 0) {
-      console.warn('Data not selected for display: ' + dataId);
+      console.warn(`Data not selected for display: ${dataId}`);
     }
     const res = [];
     for (const set of sets) {
@@ -148,7 +148,7 @@ export function getControlDiv(
   precision,
   step) {
   const range = document.createElement('input');
-  range.id = id + '-range';
+  range.id = `${id}-range`;
   range.className = 'ctrl-range';
   range.type = 'range';
   range.min = min.toPrecision(precision);
@@ -161,13 +161,13 @@ export function getControlDiv(
   range.value = value.toString();
 
   const label = document.createElement('label');
-  label.id = id + '-label';
+  label.id = `${id}-label`;
   label.className = 'ctrl-label';
   label.htmlFor = range.id;
   label.appendChild(document.createTextNode(name));
 
   const number = document.createElement('input');
-  number.id = id + '-number';
+  number.id = `${id}-number`;
   number.className = 'ctrl-number';
   number.type = 'number';
   number.min = range.min;
@@ -188,7 +188,7 @@ export function getControlDiv(
   };
 
   const div = document.createElement('div');
-  div.id = id + '-ctrl';
+  div.id = `${id}-ctrl`;
   div.className = 'ctrl';
   div.appendChild(label);
   div.appendChild(range);

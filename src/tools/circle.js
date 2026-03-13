@@ -64,7 +64,7 @@ export class CircleFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return this.#name + '-group';
+    return `${this.#name}-group`;
   }
 
   /**
@@ -179,7 +179,7 @@ export class CircleFactory {
       anchors.push(getDefaultAnchor(
         positions[i].getX(),
         positions[i].getY(),
-        'anchor' + i,
+        `anchor${i}`,
         style
       ));
     }
@@ -223,7 +223,7 @@ export class CircleFactory {
         top.x(bottom.x());
         break;
       default :
-        logger.error('Unhandled anchor id: ' + anchor.id());
+        logger.error(`Unhandled anchor id: ${anchor.id()}`);
         break;
     }
   }
@@ -469,7 +469,7 @@ export class CircleFactory {
         bottom.y(center.getY() + swapY * radius);
         break;
       default :
-        logger.error('Unhandled anchor id: ' + anchor.id());
+        logger.error(`Unhandled anchor id: ${anchor.id()}`);
         break;
     }
   }

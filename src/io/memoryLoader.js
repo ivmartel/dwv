@@ -183,7 +183,7 @@ export class MemoryLoader {
       }
     }
     if (!foundLoader) {
-      throw new Error('No loader found for data: ' + dataElement.filename);
+      throw new Error(`No loader found for data: ${dataElement.filename}`);
     }
 
     // loop on I/O elements
@@ -191,8 +191,8 @@ export class MemoryLoader {
       dataElement = data[i];
       // check loader
       if (!loader.canLoadMemory(dataElement)) {
-        throw new Error('Input data of different type: ' +
-          dataElement.filename);
+        throw new Error(`Input data of different type: ${
+          dataElement.filename }`);
       }
       // read
       loader.load(dataElement.data, dataElement.filename, i);

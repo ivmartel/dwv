@@ -72,7 +72,7 @@ function createDefaultReplaceFormat(length) {
     if (i !== 0) {
       res += ', ';
     }
-    res += '{v' + i + '}';
+    res += `{v${i}}`;
   }
   return res;
 }
@@ -93,7 +93,7 @@ function createDefaultReplaceFormat(length) {
 function replaceFlags(inputStr, values) {
   let res = inputStr;
   for (let i = 0; i < values.length; ++i) {
-    res = res.replace('{v' + i + '}', values[i]);
+    res = res.replace(`{v${i}`, values[i]);
   }
   return res;
 }
@@ -257,7 +257,7 @@ export class InfoData {
 
     const sliceInfoData = this.#infoData[this.#currentDataUid];
     if (typeof sliceInfoData === 'undefined') {
-      console.warn('No slice info data for: ' + this.#currentDataUid);
+      console.warn(`No slice info data for: ${this.#currentDataUid}`);
       return;
     }
 

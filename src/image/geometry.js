@@ -244,8 +244,8 @@ export class Geometry {
       // 1 is default
       if (this.#spacing.get(2) !== 1 &&
         this.#spacing.get(2) !== geoSliceSpacing) {
-        logger.debug('Using geometric spacing ' + geoSliceSpacing +
-          ' instead of tag spacing ' + this.#spacing.get(2));
+        logger.debug(`Using geometric spacing ${ geoSliceSpacing
+        } instead of tag spacing ${this.#spacing.get(2)}`);
       }
       const values = this.#spacing.getValues();
       values[2] = geoSliceSpacing;
@@ -483,10 +483,10 @@ export class Geometry {
    * @returns {string} The geometry as a string.
    */
   toString() {
-    return 'Origin: ' + this.getOrigin() +
-      ', Size: ' + this.getSize() +
-      ', Spacing: ' + this.getSpacing() +
-      ', Orientation: ' + this.getOrientation();
+    return `Origin: ${ this.getOrigin()
+    }, Size: ${ this.getSize()
+    }, Spacing: ${ this.getSpacing()
+    }, Orientation: ${this.getOrientation()}`;
   }
 
   /**
@@ -712,8 +712,8 @@ export function getSliceGeometrySpacing(origins) {
     const origin2 = origins[i + 1];
     const sliceSpacing = origin1.getDistance(origin2);
     if (sliceSpacing === 0) {
-      throw new Error('Zero slice spacing ' +
-        origin1.toString() + ' ' + origin2.toString());
+      throw new Error(`Zero slice spacing ${
+        origin1.toString() } ${origin2.toString()}`);
     }
     spacings.push(sliceSpacing);
   }
@@ -724,11 +724,11 @@ export function getSliceGeometrySpacing(origins) {
 
   // warn if non constant
   if (stats.stdDev > REAL_WORLD_EPSILON) {
-    logger.warn('Varying slice spacing, value: ' + spacing +
-      ' (mean: ' + stats.mean +
-      ', min: ' + stats.min +
-      ', max: ' + stats.max +
-      ', stdDev: ' + stats.stdDev + ')');
+    logger.warn(`Varying slice spacing, value: ${ spacing
+    } (mean: ${ stats.mean
+    }, min: ${ stats.min
+    }, max: ${ stats.max
+    }, stdDev: ${stats.stdDev})`);
   }
 
   return spacing;

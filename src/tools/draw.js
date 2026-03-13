@@ -961,7 +961,7 @@ export class Draw {
     if (typeof features.shapeName !== 'undefined') {
       // check if we have it
       if (!this.hasShape(features.shapeName)) {
-        throw new Error('Unknown shape: \'' + features.shapeName + '\'');
+        throw new Error(`Unknown shape: '${features.shapeName}'`);
       }
       this.#shapeName = features.shapeName;
     }

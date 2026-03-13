@@ -110,7 +110,7 @@ function onGenerate() {
       alert(error.message);
       return;
     }
-    zip.file('dwv-generated-slice' + k + '.dcm', blob);
+    zip.file(`dwv-generated-slice${k}.dcm`, blob);
   }
 
   zip.generateAsync({type: 'blob'}).then(function (zipBlob) {
@@ -165,7 +165,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
     tags.ImagePositionPatient = [sliceNumber * sliceSpacing, 0, 0];
   }
   // instance number
-  tags.SOPInstanceUID = tags.SOPInstanceUID + '.' + sliceNumber;
+  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${sliceNumber}`;
   tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromJSONTags(tags);
@@ -219,7 +219,7 @@ function isValidTags() {
  */
 function launchJSONLint() {
   const text = document.getElementById('tags').value;
-  const link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
+  const link = `http://jsonlint.com/?json=${encodeURIComponent(text)}`;
   window.open(link);
 }
 
@@ -286,15 +286,15 @@ function onInputImageFiles(event) {
           // check all images have equal sizes
           let message;
           if (this.width !== _images[0].width) {
-            message = 'Image width mismatch between input files: ' +
-              this.width + ' != ' + _images[0].width;
+            message = `Image width mismatch between input files: ${
+              this.width } != ${_images[0].width}`;
             console.error(message);
             alert(message);
             return;
           }
           if (this.height !== _images[0].height) {
-            message = 'Image height mismatch between input files: ' +
-              this.height + ' != ' + _images[0].height;
+            message = `Image height mismatch between input files: ${
+              this.height } != ${_images[0].height}`;
             console.error(message);
             alert(message);
             return;

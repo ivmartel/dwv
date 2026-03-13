@@ -64,7 +64,7 @@ export class AddAnnotationCommand extends Command {
    * @returns {string} The command name.
    */
   getName() {
-    return 'AddAnnotation-' + this.#annotation.trackingUid;
+    return `AddAnnotation-${this.#annotation.trackingUid}`;
   }
 
   /**
@@ -112,7 +112,7 @@ export class RemoveAnnotationCommand extends Command {
    * @returns {string} The command name.
    */
   getName() {
-    return 'RemoveAnnotation-' + this.#annotation.trackingUid;
+    return `RemoveAnnotation-${this.#annotation.trackingUid}`;
   }
 
   /**
@@ -178,7 +178,7 @@ export class UpdateAnnotationCommand extends Command {
    * @returns {string} The command name.
    */
   getName() {
-    return 'UpdateAnnotation-' + this.#annotation.trackingUid;
+    return `UpdateAnnotation-${this.#annotation.trackingUid}`;
   }
 
   /**

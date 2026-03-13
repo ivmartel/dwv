@@ -72,8 +72,8 @@ export class State {
     } else if (data.version === '0.5') {
       res = this.#readV05(data);
     } else {
-      throw new Error('Unknown state file format version: \'' +
-        data.version + '\'.');
+      throw new Error(`Unknown state file format version: '${
+        data.version }'.`);
     }
     return res;
   }
@@ -241,7 +241,7 @@ function v02Tov03Drawings(drawings) {
     const sliceNumber = currentPosition.get(2);
     const frameNumber = currentPosition.length() === 4
       ? currentPosition.get(3) : 0;
-    return 'slice-' + sliceNumber + '_frame-' + frameNumber;
+    return `slice-${sliceNumber}_frame-${frameNumber}`;
   }
 
   const drawLayer = new Konva.Layer({

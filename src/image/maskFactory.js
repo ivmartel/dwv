@@ -139,7 +139,7 @@ function mergeTags(tags1, tags2) {
   const keys2 = Object.keys(tags2);
   for (const tagName2 of keys2) {
     if (tags1[tagName2] !== undefined) {
-      logger.debug('Overwritting tag: ' + tagName2);
+      logger.debug(`Overwritting tag: ${tagName2}`);
     }
     tags1[tagName2] = tags2[tagName2];
   }
@@ -156,7 +156,7 @@ function checkTag(dataElements, tagDefinition) {
   // check null and undefined
   if (tagDefinition.type === 1 || tagDefinition.type === 2) {
     if (typeof element === 'undefined') {
-      throw new Error('Missing or empty ' + tagDefinition.name);
+      throw new Error(`Missing or empty ${tagDefinition.name}`);
     }
   } else {
     if (typeof element === 'undefined') {
@@ -186,7 +186,7 @@ function checkTag(dataElements, tagDefinition) {
   }
   if (!includes) {
     throw new Error(
-      'Unsupported ' + tagDefinition.name + ' value: ' + tagValue);
+      `Unsupported ${tagDefinition.name} value: ${tagValue}`);
   }
 }
 
@@ -430,8 +430,8 @@ export class MaskFactory {
 
     if (numberOfFrames !== pixelBuffer.length / sliceSize) {
       throw new Error(
-        'Buffer and numberOfFrames meta are not equal ' +
-        numberOfFrames + ' ' + pixelBuffer.length / sliceSize);
+        `Buffer and numberOfFrames meta are not equal ${
+          numberOfFrames } ${pixelBuffer.length / sliceSize}`);
     }
 
     // Dimension Organization and Index
@@ -723,7 +723,7 @@ export class MaskFactory {
       const frameOrigin = frameOrigins[i];
       const currentIndex = findPointIndex(refOrigins, frameOrigin);
       if (currentIndex === -1) {
-        throw new Error('No index for frame origin ' + i);
+        throw new Error(`No index for frame origin ${i}`);
       }
       if (currentIndex !== previousIndex + 1) {
         for (let j = previousIndex + 1; j < currentIndex; ++j) {
@@ -800,8 +800,8 @@ export class MaskFactory {
       const distPrevious = dist;
       // TODO: good threshold?
       while (isAboveEpsilon(dist)) {
-        logger.debug('Adding intermediate pos pats for DICOM seg at ' +
-          point.toString());
+        logger.debug(`Adding intermediate pos pats for DICOM seg at ${
+          point.toString() }`);
         maskOrigins.push(point);
         ++sliceIndex;
         index = new Index([0, 0, sliceIndex]);

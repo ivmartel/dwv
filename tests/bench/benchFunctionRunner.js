@@ -44,7 +44,7 @@ dcmb.BenchFunctionRunner = function () {
       const opsPerSec = event.target.hz;
       const rme = event.target.stats.rme;
       const rmeTxt = rme.toFixed(rme < 100 ? 2 : 0);
-      const text = opsPerSec + ' \u00B1' + rmeTxt + '%';
+      const text = `${opsPerSec} \u00B1${rmeTxt}%`;
       results.push(text);
     });
 

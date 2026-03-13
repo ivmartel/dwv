@@ -71,7 +71,7 @@ function generate() {
   // update generate button
   const element = document.getElementById('generate');
   element.href = URL.createObjectURL(blob);
-  element.download = 'anonym-' + _dicomFile.name;
+  element.download = `anonym-${_dicomFile.name}`;
 }
 
 /**
@@ -112,7 +112,7 @@ function isValidRules() {
  */
 function launchJSONLint() {
   const text = document.getElementById('rules').value;
-  const link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
+  const link = `http://jsonlint.com/?json=${encodeURIComponent(text)}`;
   window.open(link);
 }
 

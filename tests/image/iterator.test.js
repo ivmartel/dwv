@@ -189,7 +189,7 @@ describe('image', () => {
     for (let i = 0; i < theoValues.length; ++i) {
       const res = runIterator(getIter(i));
       const theo = theoValues[i];
-      assert.deepEqual(res, theo, 'range ' + name + ' #' + i);
+      assert.deepEqual(res, theo, `range ${name} #${i}`);
     }
   }
 

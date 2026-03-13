@@ -5,7 +5,7 @@
 
 self.addEventListener('message', function (event) {
 
-  const res = event.data.input + ' papagena';
+  const res = `${event.data.input} papagena`;
   self.postMessage([res]);
 
 }, false);

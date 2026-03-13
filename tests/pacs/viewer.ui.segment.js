@@ -116,7 +116,7 @@ function getNewSegment(number) {
     number,
     algorithmType: 'MANUAL',
     algorithmName: undefined,
-    label: 's' + number,
+    label: `s${number}`,
     displayRGBValue: nextColour(),
     displayValue: undefined,
     propertyCategoryCode: getSegmentationCode(),
@@ -177,7 +177,7 @@ function splitSegmentationHtmlId(segmentationName) {
 function getSegmentHtmlId(segmentNumber, segmentationIndex) {
   const segmentName = getHtmlId(prefixes.segment, segmentNumber);
   const segmentationName = getSegmentationHtmlId(segmentationIndex);
-  return segmentName + '-' + segmentationName;
+  return `${segmentName}-${segmentationName}`;
 }
 
 /**
@@ -282,7 +282,7 @@ export class SegmentationUI {
     const maskData = this.#app.getData(dataId);
     if (!maskData) {
       throw new Error(
-        'No data to calculate labels for dataId: ' + dataId
+        `No data to calculate labels for dataId: ${dataId}`
       );
     }
     const image = maskData.image;
@@ -791,13 +791,13 @@ export class SegmentationUI {
       let qStr = 'Quantification:\n';
       let i = 0;
       for (const labelInfo of labelsInfo) {
-        qStr += '- label #' + i + '\n';
+        qStr += `- label #${i}\n`;
         const keys = Object.keys(labelInfo);
         for (const key of keys) {
           const quant = labelInfo[key];
-          qStr += '  - ' + key + ': ' +
-            quant.value.toPrecision(4) +
-            i18n.t(quant.unit);
+          qStr += `  - ${key}: ${
+            quant.value.toPrecision(4)
+          }${i18n.t(quant.unit)}`;
           qStr += '\n';
         }
         ++i;
@@ -905,7 +905,7 @@ export class SegmentationUI {
     segmentation.hasNewSegments = true;
 
     // add item to list
-    const listDivId = getSegmentationHtmlId(segmentationIndex) + '-list';
+    const listDivId = `${getSegmentationHtmlId(segmentationIndex)}-list`;
     const listDiv = this.#rootDoc.getElementById(listDivId);
     listDiv.appendChild(this.#getSegmentHtml(newSegment, segmentationIndex));
   };
@@ -969,7 +969,7 @@ export class SegmentationUI {
       // update generate button
       const element = document.createElement('a');
       element.href = window.URL.createObjectURL(blob);
-      element.download = segmentationName + '.dcm';
+      element.download = `${segmentationName}.dcm`;
       // trigger download
       element.click();
       URL.revokeObjectURL(element.href);
@@ -1022,7 +1022,7 @@ export class SegmentationUI {
 
     // name
     const nameDiv = document.createElement('span');
-    nameDiv.id = segmentationName + '-name';
+    nameDiv.id = `${segmentationName}-name`;
     nameDiv.className = 'data-item-name';
     nameDiv.appendChild(document.createTextNode(segmentationName));
 
@@ -1040,14 +1040,14 @@ export class SegmentationUI {
 
     // actions
     const actionGroupDiv = document.createElement('div');
-    actionGroupDiv.id = segmentationName + '-actions';
+    actionGroupDiv.id = `${segmentationName}-actions`;
     actionGroupDiv.className = 'data-item-actions';
     actionGroupDiv.appendChild(saveButton);
     actionGroupDiv.appendChild(addButton);
 
     // segment list
     const listDiv = document.createElement('ul');
-    listDiv.id = segmentationName + '-list';
+    listDiv.id = `${segmentationName}-list`;
     listDiv.className = 'data-item-list';
     for (const segment of segmentation.segments) {
       listDiv.appendChild(this.#getSegmentHtml(segment, segmentationIndex));
@@ -1055,14 +1055,14 @@ export class SegmentationUI {
 
     // data-item-header
     const headerDiv = document.createElement('div');
-    headerDiv.id = segmentationName + '-header';
+    headerDiv.id = `${segmentationName}-header`;
     headerDiv.className = 'data-item-header';
     headerDiv.appendChild(nameDiv);
     headerDiv.appendChild(actionGroupDiv);
 
     // data-item-content
     const contentDiv = document.createElement('div');
-    contentDiv.id = segmentationName + '-content';
+    contentDiv.id = `${segmentationName}-content`;
     contentDiv.className = 'data-item-content';
     contentDiv.appendChild(listDiv);
 
@@ -1081,7 +1081,7 @@ export class SegmentationUI {
 
     // action span
     const postActionsDiv = document.createElement('span');
-    postActionsDiv.id = 'span-action-' + segmentationName;
+    postActionsDiv.id = `span-action-${segmentationName}`;
     postActionsDiv.appendChild(eraserInput);
     postActionsDiv.appendChild(eraserLabel);
 
@@ -1171,8 +1171,8 @@ export class SegmentationUI {
       ) {
         // title (segment that these overlaps are for)
         const segmentLi = document.createElement('li');
-        segmentLi.innerHTML = segmentOverlap.label +
-          ' (' + segmentOverlap.count + ' voxels): ';
+        segmentLi.innerHTML = `${ segmentOverlap.label
+        } (${segmentOverlap.count} voxels): `;
 
         // list of overlaps
         let first = true;
@@ -1185,9 +1185,9 @@ export class SegmentationUI {
           } else {
             segmentLi.innerHTML += ', ';
           }
-          segmentLi.innerHTML += count.label + ' (' +
-            count.count + ' voxels, ' +
-            (count.percentage).toPrecision(4) + '%)';
+          segmentLi.innerHTML += `${count.label} (${
+            count.count } voxels, ${
+            (count.percentage).toPrecision(4) }%)`;
         }
 
         overlapList.appendChild(segmentLi);

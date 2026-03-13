@@ -91,7 +91,7 @@ dcmb.DataRunner = function () {
     const data = dataList[dataIndex];
 
     // console output
-    console.log('Launch with: \'' + data.name + '\'');
+    console.log(`Launch with: '${data.name}'`);
     // status
     setStatus('running');
 

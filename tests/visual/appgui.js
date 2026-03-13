@@ -35,10 +35,10 @@ function addDataLine(id, doc) {
 
   // dwv container
   const dwvDiv = document.createElement('div');
-  dwvDiv.id = 'dwv' + id;
+  dwvDiv.id = `dwv${id}`;
   dwvDiv.className = 'dwv';
   const layConDiv = document.createElement('div');
-  layConDiv.id = 'layerGroup' + id;
+  layConDiv.id = `layerGroup${id}`;
   layConDiv.className = 'layerGroup';
   dwvDiv.appendChild(layConDiv);
   mainDiv.appendChild(dwvDiv);
@@ -47,12 +47,12 @@ function addDataLine(id, doc) {
   const viewConfig0 = new ViewConfig(layConDiv.id);
   const viewConfigs = {0: [viewConfig0]};
   const options = new AppOptions(viewConfigs);
-  const url = '../data/' + fileroot + '.dcm';
+  const url = `../data/${fileroot}.dcm`;
   const app = new App();
   app.init(options);
   // display loading time
   const listener = function (event) {
-    const timerLabel = 'load-data[' + fileroot + ']';
+    const timerLabel = `load-data[${fileroot}]`;
     if (event.type === 'loadstart') {
       console.time(timerLabel);
     } else if (event.type === 'loadend') {
@@ -66,7 +66,7 @@ function addDataLine(id, doc) {
 
   // image
   const image = document.createElement('img');
-  image.src = './images/' + fileroot + '.jpg';
+  image.src = `./images/${fileroot}.jpg`;
   image.setAttribute('class', 'snapshot');
   mainDiv.appendChild(image);
 

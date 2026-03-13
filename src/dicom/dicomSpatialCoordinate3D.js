@@ -45,8 +45,7 @@ export class SpatialCoordinate3D {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.graphicType +
-      ' {' + this.graphicData + '}';
+    return `${this.graphicType} {${this.graphicData}}`;
   };
 };
 

@@ -253,9 +253,9 @@ function viewerSetup() {
   });
   _app.addEventListener('loadstart', function (event) {
     console.log('%c----------------', 'color: teal;');
-    console.log('load source data:' + event.dataid, event.source);
+    console.log(`load source data:${event.dataid}`, event.source);
     // timer
-    console.time('load-data-' + event.dataid);
+    console.time(`load-data-${event.dataid}`);
     // update load counters
     if (numberOfDataToLoad === numberOfLoadendData) {
       numberOfDataToLoad = 0;
@@ -294,7 +294,7 @@ function viewerSetup() {
     addNewDataViewConfig(event.dataid);
   });
   _app.addEventListener('loadend', function (event) {
-    console.timeEnd('load-data-' + event.dataid);
+    console.timeEnd(`load-data-${event.dataid}`);
     // update load counter
     ++numberOfLoadendData;
     // remove abort shortcut
@@ -348,9 +348,9 @@ function viewerSetup() {
   _app.addEventListener('positionchange', function (event) {
     const input = document.getElementById('position');
     const values = event.value[1];
-    let text = '(index: ' + event.value[0] + ')';
+    let text = `(index: ${event.value[0]})`;
     if (event.value.length > 2) {
-      text += ' value: ' + event.value[2];
+      text += ` value: ${event.value[2]}`;
     }
     input.value = values.map(getPrecisionRound(2));
     // index as small text
@@ -370,17 +370,17 @@ function viewerSetup() {
   });
   // labels
   _app.addEventListener('labelingstart', function (event) {
-    console.time('label-data-' + event.dataid);
+    console.time(`label-data-${event.dataid}`);
   });
   _app.addEventListener('labelschanged', function (event) {
-    console.timeEnd('label-data-' + event.dataid);
+    console.timeEnd(`label-data-${event.dataid}`);
   });
   // resampling
   _app.addEventListener('imageresamplingstart', function (event) {
-    console.time('resample-data-' + event.dataid);
+    console.time(`resample-data-${event.dataid}`);
   });
   _app.addEventListener('imageresamplingcomplete', function (event) {
-    console.timeEnd('resample-data-' + event.dataid);
+    console.timeEnd(`resample-data-${event.dataid}`);
   });
 
   _app.addEventListener('warn', function (event) {
@@ -464,7 +464,7 @@ function viewerSetup() {
         }
         uriOptions.requestHeaders.push({
           name: 'Authorization',
-          value: 'Bearer ' + token
+          value: `Bearer ${token}`
         });
       }
       // clean up
@@ -490,9 +490,9 @@ function logMetaData(dataId, loadType) {
 
   // log tags for data with transfer syntax (dicom)
   if (typeof meta['00020010'] !== 'undefined') {
-    console.log('metadata data:' + dataId, getAsSimpleElements(meta));
+    console.log(`metadata data:${dataId}`, getAsSimpleElements(meta));
   } else {
-    console.log('metadata data:' + dataId, meta);
+    console.log(`metadata data:${dataId}`, meta);
   }
 
   // get modality
@@ -589,7 +589,7 @@ function getSlider(layerGroupDivId) {
   const range = document.createElement('input');
   range.type = 'range';
   range.className = 'vertical-slider';
-  range.id = layerGroupDivId + '-slider';
+  range.id = `${layerGroupDivId}-slider`;
   range.min = 0;
   range.max = 0;
   range.disabled = true;
@@ -621,7 +621,7 @@ function initSliders(layout) {
  * @param {string} layerGroupId The id of the layer group.
  */
 function initSlider(layerGroupId) {
-  const slider = document.getElementById(layerGroupId + '-slider');
+  const slider = document.getElementById(`${layerGroupId}-slider`);
   if (slider) {
     // disabled by default
     slider.disabled = true;
@@ -648,7 +648,7 @@ function initSlider(layerGroupId) {
  */
 function updateSliders(layout) {
   for (const divId of layout.getLayerGroupDivIds()) {
-    const slider = document.getElementById(divId + '-slider');
+    const slider = document.getElementById(`${divId}-slider`);
     if (slider) {
       const lg = _app.getLayerGroupByDivId(divId);
       if (typeof lg !== 'undefined') {
@@ -765,7 +765,7 @@ function setupLayoutLine(dataTable) {
       (elem) => elem.getId() === layoutId
     );
     if (layoutIndex === -1) {
-      throw new Error('Unknown layout: ' + layoutId);
+      throw new Error(`Unknown layout: ${layoutId}`);
     } else {
       _selectedLayoutIndex = layoutIndex;
     }
@@ -938,7 +938,7 @@ function setupBindersCheckboxes() {
   const binders = [];
   // add all binders at startup
   for (let b = 0; b < propList.length; ++b) {
-    binders.push(propList[b] + 'Binder');
+    binders.push(`${propList[b]}Binder`);
   }
   _app.setLayerGroupsBinders(binders);
 
@@ -948,7 +948,7 @@ function setupBindersCheckboxes() {
    * @param {string} propName The name of the property to bind.
    */
   function addBinder(propName) {
-    binders.push(propName + 'Binder');
+    binders.push(`${propName}Binder`);
     _app.setLayerGroupsBinders(binders);
   }
   /**
@@ -957,7 +957,7 @@ function setupBindersCheckboxes() {
    * @param {string} propName The name of the property to bind.
    */
   function removeBinder(propName) {
-    const index = binders.indexOf(propName + 'Binder');
+    const index = binders.indexOf(`${propName}Binder`);
     if (index !== -1) {
       binders.splice(index, 1);
     }
@@ -987,7 +987,7 @@ function setupBindersCheckboxes() {
     const propName = propList[i];
 
     const input = document.createElement('input');
-    input.id = 'binder-' + i;
+    input.id = `binder-${i}`;
     input.type = 'checkbox';
     input.checked = true;
     input.onchange = getOnInputChange(propName);
@@ -1007,7 +1007,7 @@ function setupBindersCheckboxes() {
   allInput.checked = true;
   allInput.onchange = function () {
     for (let j = 0; j < propList.length; ++j) {
-      document.getElementById('binder-' + j).click();
+      document.getElementById(`binder-${j}`).click();
     }
   };
   const allLabel = document.createElement('label');
@@ -1046,7 +1046,7 @@ function setupToolsCheckboxes() {
     const input = document.createElement('input');
     input.name = 'tools';
     input.type = 'radio';
-    input.id = 'tool-' + i;
+    input.id = `tool-${i}`;
     input.title = key;
     input.onchange = getChangeTool(key);
 
@@ -1224,8 +1224,8 @@ function setupAbout() {
   link.href = 'https://github.com/ivmartel/dwv';
   link.appendChild(document.createTextNode('dwv'));
   const text = document.createTextNode(
-    ' v' + getDwvVersion() +
-    ' on ' + navigator.userAgent);
+    ` v${ getDwvVersion()
+    } on ${navigator.userAgent}`);
 
   testsDiv.appendChild(link);
   testsDiv.appendChild(text);

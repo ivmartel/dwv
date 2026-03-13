@@ -80,7 +80,7 @@ export default [
 
       // prefer template literals over string concatenation
       // https://eslint.org/docs/rules/prefer-template
-      'prefer-template': 'warn',
+      'prefer-template': 'error',
       // require object literal shorthand syntax
       // https://eslint.org/docs/rules/object-shorthand
       'object-shorthand': 'warn',

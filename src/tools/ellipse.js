@@ -64,7 +64,7 @@ export class EllipseFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return this.#name + '-group';
+    return `${this.#name}-group`;
   }
 
   /**
@@ -180,7 +180,7 @@ export class EllipseFactory {
       anchors.push(getDefaultAnchor(
         positions[i].getX(),
         positions[i].getY(),
-        'anchor' + i,
+        `anchor${i}`,
         style
       ));
     }
@@ -224,7 +224,7 @@ export class EllipseFactory {
         top.x(bottom.x());
         break;
       default :
-        logger.error('Unhandled anchor id: ' + anchor.id());
+        logger.error(`Unhandled anchor id: ${anchor.id()}`);
         break;
     }
   }
@@ -288,7 +288,7 @@ export class EllipseFactory {
         radiusY = center.getY() - anchor.y();
         break;
       default :
-        logger.error('Unhandled anchor id: ' + anchor.id());
+        logger.error(`Unhandled anchor id: ${anchor.id()}`);
         break;
     }
 
@@ -496,7 +496,7 @@ export class EllipseFactory {
         bottom.y(center.getY() + swapY * radiusY);
         break;
       default :
-        logger.error('Unhandled anchor id: ' + anchor.id());
+        logger.error(`Unhandled anchor id: ${anchor.id()}`);
         break;
     }
   }

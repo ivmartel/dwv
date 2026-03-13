@@ -248,7 +248,7 @@ export class FilesLoader {
       }
     }
     if (!foundLoader) {
-      throw new Error('No loader found for file: ' + dataElement.name);
+      throw new Error(`No loader found for file: ${dataElement.name}`);
     }
 
     // loop on I/O elements
@@ -257,7 +257,7 @@ export class FilesLoader {
 
       // check loader
       if (!loader.canLoadFile(dataElement)) {
-        throw new Error('Input file of different type: ' + dataElement);
+        throw new Error(`Input file of different type: ${dataElement}`);
       }
 
       /**

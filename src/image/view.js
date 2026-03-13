@@ -671,7 +671,7 @@ export class View {
   setColourMap(name) {
     // check if we have it
     if (!luts[name]) {
-      throw new Error('Unknown colour map: \'' + name + '\'');
+      throw new Error(`Unknown colour map: '${name}'`);
     }
 
     this.#colourMapName = name;
@@ -913,7 +913,7 @@ export class View {
     }
     if (name !== 'manual' &&
       typeof this.#windowPresets[name] === 'undefined') {
-      throw new Error('Unknown window level preset: \'' + name + '\'');
+      throw new Error(`Unknown window level preset: '${name}'`);
     }
     if (typeof silent === 'undefined') {
       silent = false;
@@ -993,7 +993,7 @@ export class View {
   setWindowLevelPreset(name, silent) {
     const preset = this.getWindowPresets()[name];
     if (typeof preset === 'undefined') {
-      throw new Error('Unknown window level preset: \'' + name + '\'');
+      throw new Error(`Unknown window level preset: '${name}'`);
     }
     // special min/max
     if (name === 'minmax' && typeof preset.wl === 'undefined') {
@@ -1148,7 +1148,7 @@ export class View {
 
       default:
         throw new Error(
-          'Unsupported photometric interpretation: ' + photoInterpretation);
+          `Unsupported photometric interpretation: ${photoInterpretation}`);
     }
   }
 

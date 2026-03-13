@@ -163,7 +163,7 @@ function getPercentile(values, ratio) {
   }
   if (ratio < 0 || ratio > 1) {
     throw new Error(
-      'Invalid ratio provided for percentile calculation: ' + ratio);
+      `Invalid ratio provided for percentile calculation: ${ratio}`);
   }
   // return min for ratio=0 amd max for ratio=1
   if (ratio === 0) {

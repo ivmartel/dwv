@@ -78,13 +78,13 @@ function getConfigsHtmlList(configs) {
       console.log('data:', configs[i].name);
       console.error(error);
     }
-    const fileName = 'dwv-generated-' + configs[i].name + '.dcm';
+    const fileName = `dwv-generated-${configs[i].name}.dcm`;
     link.download = fileName;
     link.appendChild(document.createTextNode(fileName));
     // list element
     const li = document.createElement('li');
     li.append(link);
-    li.appendChild(document.createTextNode(': ' + configs[i].description));
+    li.appendChild(document.createTextNode(`: ${configs[i].description}`));
     // append to list
     ul.append(li);
   }
@@ -97,7 +97,7 @@ function getConfigsHtmlList(configs) {
  * @param {string} fileName The input file name.
  */
 function getFileConfigsHtmlList(fileName) {
-  const url = '/tests/dicom/' + fileName + '.json';
+  const url = `/tests/dicom/${fileName}.json`;
   const request = new XMLHttpRequest();
   request.open('GET', url, true);
   request.onerror = function (event) {

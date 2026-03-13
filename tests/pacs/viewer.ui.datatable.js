@@ -118,7 +118,7 @@ export class DataTableUI {
    */
   #onWLChange = (event) => {
     // width number
-    let elemId = 'width-' + event.dataid + '-number';
+    let elemId = `width-${event.dataid}-number`;
     let elem = document.getElementById(elemId);
     if (elem) {
       elem.value = event.value[1];
@@ -126,25 +126,25 @@ export class DataTableUI {
       console.warn('wl change: HTML not ready?');
     }
     // width range
-    elemId = 'width-' + event.dataid + '-range';
+    elemId = `width-${event.dataid}-range`;
     elem = document.getElementById(elemId);
     if (elem) {
       elem.value = event.value[1];
     }
     // center number
-    elemId = 'center-' + event.dataid + '-number';
+    elemId = `center-${event.dataid}-number`;
     elem = document.getElementById(elemId);
     if (elem) {
       elem.value = event.value[0];
     }
     // center range
-    elemId = 'center-' + event.dataid + '-range';
+    elemId = `center-${event.dataid}-range`;
     elem = document.getElementById(elemId);
     if (elem) {
       elem.value = event.value[0];
     }
     // preset select
-    elemId = 'preset-' + event.dataid + '-select';
+    elemId = `preset-${event.dataid}-select`;
     const selectElem = document.getElementById(elemId);
     if (selectElem) {
       const ids = this.#getDataLayerGroupDivIds(event.dataid);
@@ -180,7 +180,7 @@ export class DataTableUI {
   #onOpacityChange = (event) => {
     const value = parseFloat(event.value[0]).toPrecision(3);
     // number
-    let elemId = 'opacity-' + event.dataid + '-number';
+    let elemId = `opacity-${event.dataid}-number`;
     let elem = document.getElementById(elemId);
     if (elem) {
       elem.value = value;
@@ -188,7 +188,7 @@ export class DataTableUI {
       console.warn('opacity change: HTML not ready?');
     }
     // range
-    elemId = 'opacity-' + event.dataid + '-range';
+    elemId = `opacity-${event.dataid}-range`;
     elem = document.getElementById(elemId);
     if (elem) {
       elem.value = value;
@@ -226,7 +226,7 @@ export class DataTableUI {
    * @param {string} dataId The associated data id.
    */
   #clearDataTableRow(dataId) {
-    const row = document.getElementById('data-' + dataId);
+    const row = document.getElementById(`data-${dataId}`);
     if (row) {
       row.remove();
     }
@@ -253,7 +253,7 @@ export class DataTableUI {
       };
       insertTCell('Id');
       for (let j = 0; j < numberOfLayerGroups; ++j) {
-        insertTCell('LG' + j);
+        insertTCell(`LG${j}`);
       }
       insertTCell('Contrast');
       insertTCell('Preset');
@@ -286,7 +286,7 @@ export class DataTableUI {
 
     // add new layer row
     const row = body.insertRow();
-    row.id = 'data-' + dataId;
+    row.id = `data-${dataId}`;
 
     let cell;
 
@@ -294,7 +294,7 @@ export class DataTableUI {
     const getSelectedLayerGroupIds = function () {
       const res = [];
       for (const divId of allLayerGroupDivIds) {
-        const elemId = 'layerselect-' + divId + '-' + dataId;
+        const elemId = `layerselect-${divId}-${dataId}`;
         const elem = document.getElementById(elemId);
         if (elem && elem.checked) {
           res.push(divId);
@@ -307,8 +307,8 @@ export class DataTableUI {
     const getLayerRadio = (index, divId) => {
       const radio = document.createElement('input');
       radio.type = 'radio';
-      radio.name = 'layerselect-' + index;
-      radio.id = 'layerselect-' + divId + '-' + dataId;
+      radio.name = `layerselect-${index}`;
+      radio.id = `layerselect-${divId}-${dataId}`;
       radio.checked = true;
       radio.onchange = (event) => {
         const element = event.target;
@@ -325,8 +325,8 @@ export class DataTableUI {
     // get a layer add button
     const getLayerAdd = (index, divId) => {
       const button = document.createElement('button');
-      button.name = 'layeradd-' + index;
-      button.id = 'layeradd-' + divId + '-' + dataId;
+      button.name = `layeradd-${index}`;
+      button.id = `layeradd-${divId}-${dataId}`;
       button.title = 'Add layer';
       button.appendChild(document.createTextNode('+'));
       button.onclick = () => {
@@ -353,8 +353,8 @@ export class DataTableUI {
     // get a layer remove button
     const getLayerRem = (index, divId) => {
       const button = document.createElement('button');
-      button.name = 'layerrem-' + index;
-      button.id = 'layerrem-' + divId + '-' + dataId;
+      button.name = `layerrem-${index}`;
+      button.id = `layerrem-${divId}-${dataId}`;
       button.title = 'Remove layer';
       button.appendChild(document.createTextNode('-'));
       button.onclick = () => {
@@ -372,9 +372,9 @@ export class DataTableUI {
     const getLayerUpdate = (index, divId, orientation) => {
       const button = document.createElement('button');
       const letter = orientation[0].toUpperCase();
-      button.name = 'layerupd-' + index + '_' + letter;
-      button.id = 'layerupd-' + divId + '-' + dataId + '_' + letter;
-      button.title = 'Change layer orientation to ' + orientation;
+      button.name = `layerupd-${index }_${letter}`;
+      button.id = `layerupd-${divId}-${dataId}_${letter}`;
+      button.title = `Change layer orientation to ${orientation}`;
       button.style.borderStyle = 'outset';
       button.appendChild(document.createTextNode(letter));
       button.onclick = () => {
@@ -437,13 +437,13 @@ export class DataTableUI {
 
     // cell: contrast
     cell = row.insertCell();
-    const widthId = 'width-' + dataId;
-    const centerId = 'center-' + dataId;
+    const widthId = `width-${dataId}`;
+    const centerId = `center-${dataId}`;
     // callback
     const onChangeContrast = () => {
-      const wElement = document.getElementById(widthId + '-number');
+      const wElement = document.getElementById(`${widthId}-number`);
       const width = parseFloat(wElement.value);
-      const cElement = document.getElementById(centerId + '-number');
+      const cElement = document.getElementById(`${centerId}-number`);
       const center = parseFloat(cElement.value);
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
@@ -492,7 +492,7 @@ export class DataTableUI {
     };
     if (isMonochrome) {
       const selectPreset = document.createElement('select');
-      selectPreset.id = 'preset-' + dataId + '-select';
+      selectPreset.id = `preset-${dataId}-select`;
       const initialVc = initialLayer.getViewController();
       const presets = initialVc.getWindowLevelPresetsNames();
       const currentPresetName = initialVc.getCurrentWindowPresetName();
@@ -534,7 +534,7 @@ export class DataTableUI {
     };
     if (isMonochrome) {
       const selectColourMap = document.createElement('select');
-      selectColourMap.id = 'colourmap-' + dataId + '-select';
+      selectColourMap.id = `colourmap-${dataId}-select`;
       const initialVc = initialLayer.getViewController();
       const colourMaps = Object.keys(luts);
       const currentColourMap = initialVc.getColourMap();
@@ -557,7 +557,7 @@ export class DataTableUI {
 
     // cell: opactiy
     cell = row.insertCell();
-    const opacityId = 'opacity-' + dataId;
+    const opacityId = `opacity-${dataId}`;
     // callback
     const onChangeOpacity = (value) => {
       // update selected layers
@@ -579,7 +579,7 @@ export class DataTableUI {
       initialLayer.getViewController &&
       initialLayer.getViewController().getModality() === 'SEG'
     ) {
-      const fillOpacityId = 'fill-opacity-' + dataId;
+      const fillOpacityId = `fill-opacity-${dataId}`;
       // callback
       const onChangeFillOpacity = (value) => {
         // update selected layers
@@ -603,7 +603,7 @@ export class DataTableUI {
         floatPrecision
       ));
 
-      const contourThicknessId = 'contour-thickness-' + dataId;
+      const contourThicknessId = `contour-thickness-${dataId}`;
       // callback
       const onChangeContourThickness = (value) => {
         // update selected layers
@@ -631,13 +631,13 @@ export class DataTableUI {
 
     // cell: alpha range
     cell = row.insertCell();
-    const minId = 'value-min-' + dataId;
-    const maxId = 'value-max-' + dataId;
+    const minId = `value-min-${dataId}`;
+    const maxId = `value-max-${dataId}`;
     // callback
     const onChangeAlphaFunc = () => {
-      const minElement = document.getElementById(minId + '-number');
+      const minElement = document.getElementById(`${minId}-number`);
       const min = parseFloat(minElement.value);
-      const maxElement = document.getElementById(maxId + '-number');
+      const maxElement = document.getElementById(`${maxId}-number`);
       const max = parseFloat(maxElement.value);
       const func = function (value, _index) {
         if (value >= min && value <= max) {

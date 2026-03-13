@@ -103,7 +103,7 @@ export class MaskSegmentHelper {
           values.push(segment.number);
         }
       } else {
-        logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
+        logger.warn(`Unknown segment in maskHasSegments: ${numbers[i]}`);
         unknowns.push(i);
       }
     }
@@ -146,8 +146,8 @@ export class MaskSegmentHelper {
       }
     } else {
       logger.warn(
-        'Not adding segment, it is allready in the segments list: ' +
-        segment.number);
+        `Not adding segment, it is allready in the segments list: ${
+          segment.number }`);
     }
   }
 
@@ -162,8 +162,8 @@ export class MaskSegmentHelper {
       this.#segments.splice(index, 1);
     } else {
       logger.warn(
-        'Cannot remove segment, it is not in the segments list: ' +
-        segmentNumber);
+        `Cannot remove segment, it is not in the segments list: ${
+          segmentNumber }`);
     }
   }
 
@@ -178,8 +178,8 @@ export class MaskSegmentHelper {
       this.#segments[index] = segment;
     } else {
       logger.warn(
-        'Cannot update segment, it is not in the segments list: ' +
-        segment.number);
+        `Cannot update segment, it is not in the segments list: ${
+          segment.number }`);
     }
   }
 

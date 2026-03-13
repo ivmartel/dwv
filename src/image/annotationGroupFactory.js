@@ -81,7 +81,7 @@ function mergeTags(tags1, tags2) {
   const keys2 = Object.keys(tags2);
   for (const tagName2 of keys2) {
     if (tags1[tagName2] !== undefined) {
-      logger.debug('Overwritting tag: ' + tagName2);
+      logger.debug(`Overwritting tag: ${tagName2}`);
     }
     tags1[tagName2] = tags2[tagName2];
   }
@@ -1117,7 +1117,7 @@ export class AnnotationGroupFactory {
     }
 
     if (typeof annotationGroup === 'undefined') {
-      throw new Error('Cannot create annotation group from ' + srType);
+      throw new Error(`Cannot create annotation group from ${srType}`);
     }
 
     // add dicom meta

@@ -142,7 +142,7 @@ function getIndexCompareFunction(direction) {
  */
 function getDimensionOrganization() {
   // 681051091011101: first 15 of charCode('DimensionOrganizationUID')
-  const organizationUID = getDwvUIDPrefix() + '681051091011101.1';
+  const organizationUID = `${getDwvUIDPrefix()}681051091011101.1`;
   return {
     indices: {
       value: [
@@ -229,7 +229,7 @@ function getOriginIndexRangeFromMaskIndices(geometry, indices) {
   const d0 = origin0.get3D().getDistance(originStart);
   if (d0 > threshold) {
     logger.warn(
-      'Large distance between origin and origin for first index: ' + d0);
+      `Large distance between origin and origin for first index: ${d0}`);
   }
 
   // index of origin closest to highest point
@@ -238,7 +238,7 @@ function getOriginIndexRangeFromMaskIndices(geometry, indices) {
   const d1 = origin1.get3D().getDistance(originEnd);
   if (d1 > threshold) {
     logger.warn(
-      'Large distance between origin and origin for last index: ' + d1);
+      `Large distance between origin and origin for last index: ${d1}`);
   }
 
   return [indexStart, indexEnd];
@@ -1396,10 +1396,10 @@ export class Brush extends EventTarget {
       //this.#setSelectedSegment2(number);
     } else if (!ctrlOrAlt && event.key === 'a') {
       this.#brushMode = _BrushMode.Add;
-      logger.debug('Brush mode: ' + this.#brushMode);
+      logger.debug(`Brush mode: ${this.#brushMode}`);
     } else if (!ctrlOrAlt && event.key === 'd') {
       this.#brushMode = _BrushMode.Del;
-      logger.debug('Brush mode: ' + this.#brushMode);
+      logger.debug(`Brush mode: ${this.#brushMode}`);
     }
   };
 
@@ -1427,7 +1427,7 @@ export class Brush extends EventTarget {
    */
   #deactivateDivIdsContextMenu(divIds) {
     for (const divId of divIds) {
-      const element = document.querySelector('#' + divId);
+      const element = document.querySelector(`#${divId}`);
       if (!element) {
         return;
       }
@@ -1446,7 +1446,7 @@ export class Brush extends EventTarget {
    */
   #reactivateDivIdsContextMenu(divIds) {
     for (const divId of divIds) {
-      const element = document.querySelector('#' + divId);
+      const element = document.querySelector(`#${divId}`);
       if (!element) {
         return;
       }

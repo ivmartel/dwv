@@ -131,8 +131,8 @@ function getDecayedDose(elements) {
 
     if (scanStart > acqDate) {
       const diff = scanStart.getTime() - acqDate.getTime();
-      const logWarn = 'Series date/time is after Aquisition date/time (diff=' +
-        diff.toString() + 'ms) ';
+      const logWarn = `Series date/time is after Aquisition date/time (diff=${
+        diff.toString() }ms) `;
       logger.debug(logWarn);
 
       // back compute from center (average count rate) of time window
@@ -247,7 +247,7 @@ export function getSuvFactor(elements) {
 
 
   if (warning.length !== 0) {
-    result.warning = 'Cannot calculate PET SUV:' + warning;
+    result.warning = `Cannot calculate PET SUV: ${warning}`;
   } else {
     // SUV factor (grams/Bq)
     result.value = (patWeight * 1000) / decayedDose.value;

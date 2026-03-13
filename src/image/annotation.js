@@ -165,7 +165,7 @@ export class Annotation {
   addMetaItem(concept, value) {
     const conceptId = concept.value;
     if (typeof this.#meta[conceptId] !== 'undefined') {
-      logger.warn('Overwriting annotation meta with id=' + conceptId);
+      logger.warn(`Overwriting annotation meta with id=${conceptId}`);
     }
     this.#meta[concept.value] = {
       concept: concept,
@@ -278,8 +278,8 @@ export class Annotation {
   setViewController(viewController) {
     // check uid
     if (!viewController.includesImageUid(this.referencedSopInstanceUID)) {
-      logger.warn('Cannot view annotation with reference UID: ' +
-        this.referencedSopInstanceUID);
+      logger.warn(`Cannot view annotation with reference UID: ${
+        this.referencedSopInstanceUID }`);
       return;
     }
     // check if same view

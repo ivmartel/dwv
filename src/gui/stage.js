@@ -334,8 +334,8 @@ export class Stage {
     if (typeof this.getLayerGroup(index) !== 'undefined') {
       this.#activeLayerGroupIndex = index;
     } else {
-      logger.warn('No layer group to set as active with index: ' +
-        index);
+      logger.warn(`No layer group to set as active with index: ${
+        index }`);
     }
   }
 

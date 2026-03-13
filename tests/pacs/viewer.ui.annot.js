@@ -28,7 +28,7 @@ import {AnnotationGroup} from '../../src/image/annotationGroup.js';
  * @returns {string} The divId.
  */
 function getAnnotationGroupDivId(dataId) {
-  return 'annotationgroup' + dataId;
+  return `annotationgroup${dataId}`;
 }
 
 /**
@@ -40,8 +40,8 @@ function getAnnotationGroupDivId(dataId) {
  */
 function getAnnotationDivId(annotation, dataId) {
   const prefix = getAnnotationGroupDivId(dataId);
-  const suffix = 'annotation' + annotation.trackingUid;
-  return prefix + '-' + suffix;
+  const suffix = `annotation${annotation.trackingUid}`;
+  return `${prefix}-${suffix}`;
 }
 
 /**
@@ -205,7 +205,7 @@ export class AnnotationUI {
         const keys = Object.keys(clkAnnotation.quantification);
         for (const key of keys) {
           const quant = clkAnnotation.quantification[key];
-          qStr += '- ' + key + ': ' + quant.value.toPrecision(4);
+          qStr += `- ${key}: ${quant.value.toPrecision(4)}`;
           if (typeof quant.unit !== 'undefined') {
             qStr += i18n.t(quant.unit);
           }
@@ -320,7 +320,7 @@ export class AnnotationUI {
     }
     contentDiv.appendChild(getIconElement(factoryName));
     contentDiv.appendChild(document.createTextNode(
-      ' ' + annotation.trackingId));
+      ` ${annotation.trackingId}`));
 
     // actions
     const actionsDiv = document.createElement('div');
@@ -379,14 +379,14 @@ export class AnnotationUI {
   #getAnnotationGroupHtml(annotationGroup, dataId) {
     // name
     const nameDiv = document.createElement('span');
-    nameDiv.id = getAnnotationGroupDivId(dataId) + '-name';
+    nameDiv.id = `${getAnnotationGroupDivId(dataId)}-name`;
     nameDiv.className = 'data-item-name';
-    nameDiv.appendChild(document.createTextNode('group #' + dataId));
+    nameDiv.appendChild(document.createTextNode(`group #${dataId}`));
 
     // lock button
     const lockButton = getButton('Lock');
     setButtonPressed(lockButton, false);
-    lockButton.id = 'lockb-' + getAnnotationGroupDivId(dataId);
+    lockButton.id = `lockb-${getAnnotationGroupDivId(dataId)}`;
     lockButton.onclick = function (event) {
       const target = event.target;
       // toggle hidden
@@ -433,7 +433,7 @@ export class AnnotationUI {
       // temporary link to download
       const element = document.createElement('a');
       element.href = window.URL.createObjectURL(blob);
-      element.download = 'dicom-sr-' + dataId + '.dcm';
+      element.download = `dicom-sr-${dataId}.dcm`;
       // trigger download
       element.click();
       URL.revokeObjectURL(element.href);
@@ -448,7 +448,7 @@ export class AnnotationUI {
       const target = event.target;
       const drawLayer = this.#app.getDrawLayersByDataId(dataId)[0];
       if (typeof drawLayer === 'undefined') {
-        console.warn('Cannot find draw layer with id ' + dataId);
+        console.warn(`Cannot find draw layer with id ${dataId}`);
       }
       if (isButtonPressed(target)) {
         setButtonPressed(target, false);
@@ -461,7 +461,7 @@ export class AnnotationUI {
 
     // actions
     const actionGroupDiv = document.createElement('div');
-    actionGroupDiv.id = getAnnotationGroupDivId(dataId) + '-actions';
+    actionGroupDiv.id = `${getAnnotationGroupDivId(dataId)}-actions`;
     actionGroupDiv.className = 'data-item-actions';
     actionGroupDiv.appendChild(lockButton);
     actionGroupDiv.appendChild(saveButton);
@@ -469,7 +469,7 @@ export class AnnotationUI {
 
     // annotation list
     const listDiv = document.createElement('ul');
-    listDiv.id = getAnnotationGroupDivId(dataId) + '-list';
+    listDiv.id = `${getAnnotationGroupDivId(dataId)}-list`;
     listDiv.className = 'data-item-list';
     for (const annotation of annotationGroup.getList()) {
       listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
@@ -477,14 +477,14 @@ export class AnnotationUI {
 
     // data-item-header
     const headerDiv = document.createElement('div');
-    headerDiv.id = getAnnotationGroupDivId(dataId) + '-header';
+    headerDiv.id = `${getAnnotationGroupDivId(dataId)}-header`;
     headerDiv.className = 'data-item-header';
     headerDiv.appendChild(nameDiv);
     headerDiv.appendChild(actionGroupDiv);
 
     // data-item-content
     const contentDiv = document.createElement('div');
-    contentDiv.id = getAnnotationGroupDivId(dataId) + '-content';
+    contentDiv.id = `${getAnnotationGroupDivId(dataId)}-content`;
     contentDiv.className = 'data-item-content';
     contentDiv.appendChild(listDiv);
 
@@ -556,7 +556,7 @@ export class AnnotationUI {
     const annotation = event.data;
     const dataId = event.dataid;
     // add item to list
-    const listDivId = getAnnotationGroupDivId(dataId) + '-list';
+    const listDivId = `${getAnnotationGroupDivId(dataId)}-list`;
     const listDiv = this.#rootDoc.getElementById(listDivId);
     listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
   };
@@ -576,7 +576,7 @@ export class AnnotationUI {
       // update colour input
       if (keys.includes('colour')) {
         const inputColour = this.#rootDoc.getElementById(
-          'cb-' + annotationDivId);
+          `cb-${annotationDivId}`);
         inputColour.value = annotation.colour;
       }
     }

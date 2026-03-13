@@ -65,7 +65,7 @@ export class ProtractorFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return this.#name + '-group';
+    return `${this.#name}-group`;
   }
 
   /**
@@ -184,7 +184,7 @@ export class ProtractorFactory {
       anchors.push(getDefaultAnchor(
         positions[i].getX(),
         positions[i].getY(),
-        'anchor' + i,
+        `anchor${i}`,
         style
       ));
     }

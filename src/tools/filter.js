@@ -172,7 +172,7 @@ export class Filter {
     if (typeof features.filterName !== 'undefined') {
       // check if we have it
       if (!this.hasFilter(features.filterName)) {
-        throw new Error('Unknown filter: \'' + features.filterName + '\'');
+        throw new Error(`Unknown filter: '${features.filterName}'`);
       }
       // de-activate last selected
       if (this.#selectedFilter) {
@@ -561,7 +561,7 @@ export class RunFilterCommand extends Command {
    * @returns {string} The command name.
    */
   getName() {
-    return 'Filter-' + this.#filter.getName();
+    return `Filter-${this.#filter.getName()}`;
   }
 
   /**

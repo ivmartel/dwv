@@ -29,7 +29,7 @@ describe('io', () => {
 
     return new Promise((resolve) => {
 
-      const prefix = '[' + id + '] ';
+      const prefix = `[${id}] `;
       const nDataError = nData - nDataOk;
 
       // checks
@@ -59,30 +59,30 @@ describe('io', () => {
       loader.onloadend = function (/*event*/) {
         const loadEndDate = new Date();
         assert.notOk(gotLoadEnd,
-          prefix + 'Received first load end.');
+          `${prefix}Received first load end.`);
         gotLoadEnd = true;
 
         // check number of events
         assert.equal(loadStartDates.length, 1,
-          prefix + 'Received one load start.');
+          `${prefix}Received one load start.`);
         if (nDataOk !== 0) {
           assert.ok(progressDates.length > 0,
-            prefix + 'Received at least one progress.');
+            `${prefix}Received at least one progress.`);
         }
         assert.equal(loadItemDates.length, nDataOk,
-          prefix + 'Received loaditem.');
+          `${prefix}Received loaditem.`);
         const nLoad = nDataError === 0 ? 1 : 0;
         assert.equal(loadDates.length, nLoad,
-          prefix + 'Received load.');
+          `${prefix}Received load.`);
         assert.equal(errorDates.length, nDataError,
-          prefix + 'Received error(s).');
+          `${prefix}Received error(s).`);
         assert.equal(abortDates.length, 0,
-          prefix + 'Received abort(s).');
+          `${prefix}Received abort(s).`);
 
         // check start/end sequence
         const loadStartDate = loadStartDates[0];
         assert.ok(loadStartDate <= loadEndDate,
-          prefix + 'Received start before load end.');
+          `${prefix}Received start before load end.`);
 
         let lastProgressDate = null;
         let lastLoadItemDate = null;
@@ -93,18 +93,18 @@ describe('io', () => {
           const firstProgressDate = progressDates[0];
           lastProgressDate = progressDates[progressDates.length - 1];
           assert.ok(loadStartDate <= firstProgressDate,
-            prefix + 'Received start before first progress.');
+            `${prefix}Received start before first progress.`);
           assert.ok(loadEndDate >= lastProgressDate,
-            prefix + 'Received end after last progress.');
+            `${prefix}Received end after last progress.`);
 
           // check load item sequence
           loadItemDates.sort();
           const firstLoadItemDate = loadItemDates[0];
           lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
           assert.ok(loadStartDate <= firstLoadItemDate,
-            prefix + 'Received start before first load item.');
+            `${prefix}Received start before first load item.`);
           assert.ok(loadEndDate >= lastLoadItemDate,
-            prefix + 'Received end after last load item.');
+            `${prefix}Received end after last load item.`);
         }
 
         // check load or error event sequence
@@ -112,21 +112,21 @@ describe('io', () => {
           // load is sent if no error happened
           const loadDate = loadDates[0];
           assert.ok(loadStartDate <= loadDate,
-            prefix + 'Received start before load.');
+            `${prefix}Received start before load.`);
           assert.ok(loadDate >= lastProgressDate,
-            prefix + 'Received load after last progress.');
+            `${prefix}Received load after last progress.`);
           assert.ok(loadDate >= lastLoadItemDate,
-            prefix + 'Received load after last load item.');
+            `${prefix}Received load after last load item.`);
           assert.ok(loadEndDate >= loadDate,
-            prefix + 'Received end after load.');
+            `${prefix}Received end after load.`);
         } else {
           errorDates.sort();
           const firstErrorDate = errorDates[0];
           const lastErrorDate = errorDates[errorDates.length - 1];
           assert.ok(loadStartDate <= firstErrorDate,
-            prefix + 'Received start before first error.');
+            `${prefix}Received start before first error.`);
           assert.ok(loadEndDate >= lastErrorDate,
-            prefix + 'Received end after last error.');
+            `${prefix}Received end after last error.`);
         }
         resolve(true);
       };
@@ -207,7 +207,7 @@ describe('io', () => {
         1, 'Invalid DICM prefix (DIMC), trying to guess tansfer syntax.');
       const vr = String.fromCharCode(0, 0);
       expect(consoleSpy).toHaveBeenNthCalledWith(
-        2, 'Unknown VR: ' + vr + ' (for tag 00000000), treating as \'UN\'');
+        2, `Unknown VR: ${vr} (for tag 00000000), treating as 'UN'`);
       // reset spy
       consoleSpy.mockReset();
     }

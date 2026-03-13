@@ -55,12 +55,12 @@ export class MPRPixGenerator {
     for (let i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== this.#halfNCols) {
-        throw new Error('Image width mismatch: ' +
-          img.width + '!=' + this.#halfNCols);
+        throw new Error(`Image width mismatch: ${
+          img.width }!=${this.#halfNCols}`);
       }
       if (img.height !== this.#halfNRows) {
-        throw new Error('Image height mismatch: ' +
-          img.height + '!=' + this.#halfNRows);
+        throw new Error(`Image height mismatch: ${
+          img.height }!=${this.#halfNRows}`);
       }
     }
     // store
@@ -74,8 +74,8 @@ export class MPRPixGenerator {
 
   generate(pixelBuffer, sliceNumber) {
     if (sliceNumber > this.#numberOfSlices) {
-      throw new Error('Cannot generate slice, number is above size: ' +
-        sliceNumber + ', ' + this.#numberOfSlices);
+      throw new Error(`Cannot generate slice, number is above size: ${
+        sliceNumber }, ${this.#numberOfSlices}`);
     }
     if (this.#orientationName === Orientation.Axial) {
       this.#generateAsAxial(pixelBuffer, sliceNumber);

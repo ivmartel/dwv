@@ -47,7 +47,7 @@ export class ImageReference {
   toString() {
     let res = this.referencedSOPSequence.toString();
     if (typeof this.referencedFrameNumber !== 'undefined') {
-      res += ', frame: ' + this.referencedFrameNumber;
+      res += `, frame: ${this.referencedFrameNumber}`;
     }
     return res;
   };

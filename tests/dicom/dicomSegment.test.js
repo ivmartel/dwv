@@ -65,7 +65,7 @@ describe('dicom', () => {
         segmentSimpleElements.SegmentedPropertyTypeCodeSequence.value[0]),
     };
     assert.ok(isEqualSegment(segment1, segment),
-      testName + ' segment from simple element');
+      `${testName} segment from simple element`);
 
     // simple dicom element -> dicom element
     const segmentElements = getElementsFromJSONTags(segmentSimpleElements);
@@ -73,7 +73,7 @@ describe('dicom', () => {
     const segment2 = getSegment(segmentElements);
     // compare
     assert.ok(isEqualSegment(segment2, segment),
-      testName + ' segment from element');
+      `${testName} segment from element`);
   }
 
   /**

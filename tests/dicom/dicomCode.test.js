@@ -36,7 +36,7 @@ describe('dicom', () => {
       urnValue: codeSimpleElements.URNCodeValue
     };
     assert.ok(isEqualCode(code1, code),
-      testName + ' code from simple element');
+      `${testName} code from simple element`);
 
     // simple dicom element -> dicom element
     const codeElements = getElementsFromJSONTags(codeSimpleElements);
@@ -44,7 +44,7 @@ describe('dicom', () => {
     const code2 = getCode(codeElements);
     // compare
     assert.ok(isEqualCode(code2, code),
-      testName + ' code from element');
+      `${testName} code from element`);
   }
 
   /**

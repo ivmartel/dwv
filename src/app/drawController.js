@@ -99,7 +99,7 @@ export class DrawController {
     const annotation = this.getAnnotation(uid);
     if (typeof annotation === 'undefined') {
       logger.warn(
-        'Cannot create remove command for undefined annotation: ' + uid);
+        `Cannot create remove command for undefined annotation: ${uid}`);
       return;
     }
     // create remove annotation command
@@ -124,7 +124,7 @@ export class DrawController {
     const annotation = this.getAnnotation(uid);
     if (typeof annotation === 'undefined') {
       logger.warn(
-        'Cannot create update command for undefined annotation: ' + uid);
+        `Cannot create update command for undefined annotation: ${uid}`);
       return;
     }
     // create remove annotation command

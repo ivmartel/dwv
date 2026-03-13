@@ -42,8 +42,8 @@ export class MaskSegmentViewHelper {
       this.#hiddenNumbers.push(segmentNumber);
     } else {
       logger.warn(
-        'Not hidding segment, it is allready in the hidden list: ' +
-        segmentNumber);
+        `Not hidding segment, it is allready in the hidden list: ${
+          segmentNumber }`);
     }
   }
 
@@ -58,8 +58,8 @@ export class MaskSegmentViewHelper {
       this.#hiddenNumbers.splice(index, 1);
     } else {
       logger.warn(
-        'Cannot remove segment, it is not in the hidden list: ' +
-        segmentNumber);
+        `Cannot remove segment, it is not in the hidden list: ${
+          segmentNumber }`);
     }
   }
 }

@@ -59,7 +59,7 @@ export class BidimensionalFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return this.#name + '-group';
+    return `${this.#name}-group`;
   }
 
   /**
@@ -100,7 +100,7 @@ export class BidimensionalFactory {
       ) {
         return defaultLabelTexts[this.#name];
       }
-      return defaultLabelTexts[this.#name + 'Drawing'];
+      return defaultLabelTexts[`${this.#name}Drawing`];
     }
   }
 
@@ -438,7 +438,7 @@ export class BidimensionalFactory {
         getDefaultAnchor(
           positions[i].getX(),
           positions[i].getY(),
-          'anchor' + i, // anchor0, anchor1, anchor2, anchor3
+          `anchor${i}`, // anchor0, anchor1, anchor2, anchor3
           style
         )
       );

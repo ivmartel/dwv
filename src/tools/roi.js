@@ -63,7 +63,7 @@ export class RoiFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return this.#name + '-group';
+    return `${this.#name}-group`;
   }
 
   /**
@@ -181,7 +181,7 @@ export class RoiFactory {
       anchors.push(getDefaultAnchor(
         positions[i].getX(),
         positions[i].getY(),
-        'anchor' + i,
+        `anchor${i}`,
         style
       ));
     }

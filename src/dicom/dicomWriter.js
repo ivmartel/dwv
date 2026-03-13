@@ -110,13 +110,13 @@ export function getDefaultAnonymisationRules() {
  * @returns {string} The corresponding UID.
  */
 export function getUID(tagName) {
-  const prefix = getDwvUIDPrefix() + '.';
+  const prefix = `${getDwvUIDPrefix()}.`;
   // date (only numbers), do not keep milliseconds
   const date = (new Date()).toISOString().replace(/\D/g, '');
-  const datePart = '.' + date.substring(0, 14);
+  const datePart = `.${ date.substring(0, 14)}`;
   // count
   _uidCount += 1;
-  const countPart = '.' + _uidCount;
+  const countPart = `.${_uidCount}`;
 
   // uid = prefix . tag . date . count
   let uid = prefix;
@@ -661,7 +661,7 @@ export class DicomWriter {
         } else if (vrType === 'string') {
           byteOffset = writer.writeUint8Array(byteOffset, value);
         } else {
-          throw new Error('Unknown VR type: ' + vrType);
+          throw new Error(`Unknown VR type: ${vrType}`);
         }
       } else if (element.vr === 'SQ') {
         byteOffset = this.#writeDataElementItems(
@@ -684,20 +684,20 @@ export class DicomWriter {
           byteOffset = writer.writeUint16Array(byteOffset, value);
         }
       } else {
-        logger.warn('Unknown VR: ' + element.vr);
+        logger.warn(`Unknown VR: ${element.vr}`);
       }
     }
 
     if (element.vr !== 'SQ' && element.vr !== 'NONE') {
       const diff = byteOffset - startOffset;
       if (diff !== element.vl) {
-        let message = 'Offset difference and VL are not equal: ' +
-          diff + ' != ' + element.vl;
+        let message = `Offset difference and VL are not equal: ${
+          diff } != ${element.vl}`;
         message += ' (';
         if (typeof element.tag !== 'undefined') {
-          message += element.tag + ', ';
+          message += `${element.tag}, `;
         }
-        message += 'vr:' + element.vr + ')';
+        message += `vr:${element.vr})`;
         logger.warn(message);
       }
     }
@@ -869,7 +869,7 @@ export class DicomWriter {
       const oldscs = dataElements[TagKeys.SpecificCharacterSet].value[0];
       // force UTF-8 if not default character set
       if (typeof oldscs !== 'undefined' && oldscs !== 'ISO-IR 6') {
-        logger.debug('Change charset to UTF, was: ' + oldscs);
+        logger.debug(`Change charset to UTF, was: ${oldscs}`);
         this.useSpecialTextEncoder();
         dataElements[TagKeys.SpecificCharacterSet].value = ['ISO_IR 192'];
       }
@@ -1037,9 +1037,9 @@ export class DicomWriter {
     const preambleSize = 128 + 4;
     const metaOffset = preambleSize + fmiglSize + metaLength;
     if (offset !== metaOffset) {
-      logger.warn('Bad size calculation... meta offset: ' + offset +
-        ', calculated size:' + metaOffset +
-        ' (diff:' + (offset - metaOffset) + ')');
+      logger.warn(`Bad size calculation... meta offset: ${offset
+      }, calculated size:${ metaOffset
+      } (diff:${offset - metaOffset})`);
     }
 
     // write non meta
@@ -1050,9 +1050,9 @@ export class DicomWriter {
 
     // check final position
     if (offset !== totalSize) {
-      logger.warn('Bad size calculation... final offset: ' + offset +
-        ', calculated size:' + totalSize +
-        ' (diff:' + (offset - totalSize) + ')');
+      logger.warn(`Bad size calculation... final offset: ${ offset
+      }, calculated size:${ totalSize
+      } (diff:${offset - totalSize})`);
     }
     // return
     return buffer;
@@ -1232,10 +1232,10 @@ export class DicomWriter {
           if (typeof bpe !== 'undefined') {
             size *= bpe;
           } else {
-            throw new Error('Unknown bytes per element for VR type: ' + vrType);
+            throw new Error(`Unknown bytes per element for VR type: ${vrType}`);
           }
         } else {
-          throw new Error('Unsupported element: ' + element.vr);
+          throw new Error(`Unsupported element: ${element.vr}`);
         }
       } else {
         size = value.length;
@@ -1275,9 +1275,9 @@ function checkAndFixUnknownVR(element, isLittleEndian) {
           element.value = data;
         }
       }
-      logger.info('Element ' + element.tag.getGroup() +
-        ' ' + element.tag.getElement() +
-        ' VR changed from UN to ' + element.vr);
+      logger.info(`Element ${ element.tag.getGroup()
+      } ${ element.tag.getElement()
+      } VR changed from UN to ${element.vr}`);
     }
   }
 }

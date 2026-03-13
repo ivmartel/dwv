@@ -27,7 +27,7 @@ dcmb.getDiffSpan = function (base, current) {
   const percent = diff * 100 / base;
   const percentTxt = percent.toFixed(percent < 100 ? 2 : 0);
 
-  const span = dcmb.getDomSpan('(' + sign + percentTxt + '%)');
+  const span = dcmb.getDomSpan(`(${sign}${percentTxt}%)`);
   span.className = 'stats';
   span.className += diff >= 0 ? ' positive' : ' negative';
   return span;
@@ -41,7 +41,7 @@ dcmb.getDiffSpan = function (base, current) {
  */
 dcmb.getRmeSpan = function (rme) {
   const rmeTxt = rme.toFixed(rme < 100 ? 2 : 0);
-  const span = dcmb.getDomSpan('\u00B1' + rmeTxt + '%');
+  const span = dcmb.getDomSpan(`\u00B1${rmeTxt}%`);
   span.className = 'stats';
   span.className += Math.abs(rme) >= 10 ? ' red' : ' green';
   return span;
@@ -86,7 +86,7 @@ dcmb.parseData = function (data) {
   if (typeof data === 'string') {
     const split = data.split(' ');
     value = parseFloat(split.splice(0, 1));
-    extra = ' ' + split.join(' ');
+    extra = ` ${split.join(' ')}`;
   }
   return {value: value, extra: extra};
 };

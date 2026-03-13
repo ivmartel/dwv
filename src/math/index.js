@@ -56,7 +56,7 @@ export class Index {
    * @returns {string} The Index as a string.
    */
   toString() {
-    return '(' + this.#values.toString() + ')';
+    return `(${this.#values.toString()})`;
   }
 
   /**

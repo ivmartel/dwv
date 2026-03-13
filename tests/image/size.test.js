@@ -158,14 +158,14 @@ describe('image', () => {
       const index = new Index(values);
       const offset = testData00[i].offset;
       assert.equal(
-        size00.indexToOffset(index), offset, 'indexToOffset #' + i);
+        size00.indexToOffset(index), offset, `indexToOffset #${i}`);
       assert.ok(
-        size00.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
+        size00.offsetToIndex(offset).equals(index), `offsetToIndex #${i}`);
       // index wiht less dims than size
       if (values[2] === 0) {
         const index1 = new Index(values.slice(0, 2));
         assert.equal(
-          size00.indexToOffset(index1), offset, 'indexToOffset small #' + i);
+          size00.indexToOffset(index1), offset, `indexToOffset small #${i}`);
       }
     }
 

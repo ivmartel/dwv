@@ -294,7 +294,7 @@ describe('dicom', () => {
         comparator.equal(
           value.join(),
           jsonTag,
-          name + ' - ' + tagName);
+          `${name} - ${tagName}`);
       } else {
         // check content
         if (jsonTags[tagName] === null || jsonTags[tagName] === 0) {
@@ -527,7 +527,7 @@ describe('dicom', () => {
     try {
       dicomBuffer = writer.getBuffer(dicomElements);
     } catch (error) {
-      assert.ok(false, 'Caught error: ' + error);
+      assert.ok(false, `Caught error: ${error}`);
       return;
     }
 

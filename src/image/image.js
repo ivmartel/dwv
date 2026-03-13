@@ -512,7 +512,7 @@ export class Image {
       if (typeof this.#rsis[offset] !== 'undefined') {
         res = this.#rsis[offset];
       } else {
-        logger.warn('undefined non constant rsi at ' + offset);
+        logger.warn(`undefined non constant rsi at ${offset}`);
       }
     }
     return res;
@@ -928,8 +928,8 @@ export class Image {
       }
 
       if (this.#meta[key] !== rhs.getMeta()[key]) {
-        const message = 'Cannot append a slice with different ' + key +
-          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key];
+        const message = `Cannot append a slice with different ${ key
+        }: ${this.#meta[key]} != ${rhs.getMeta()[key]}`;
         return {
           success: false,
           message
@@ -1125,8 +1125,8 @@ export class Image {
     }
     // check index
     if (frameIndex >= this.#meta.numberOfFiles) {
-      logger.warn('Ignoring frame at index ' + frameIndex +
-        ' (size: ' + this.#meta.numberOfFiles + ')');
+      logger.warn(`Ignoring frame at index ${ frameIndex
+      } (size: ${this.#meta.numberOfFiles})`);
       return;
     }
     // append
@@ -1625,8 +1625,8 @@ export class Image {
   convolute2D(weights) {
     if (weights.length !== 9) {
       throw new Error(
-        'The convolution matrix does not have a length of 9; it has ' +
-        weights.length);
+        `The convolution matrix does not have a length of 9; it has ${
+          weights.length }`);
     }
 
     const newImage = this.clone();

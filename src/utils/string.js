@@ -144,7 +144,7 @@ export function replaceFlags(inputStr, values) {
         valueStr += i18n.t(valueObj.unit);
       }
       // flag to replace
-      const flag = '{' + keys[i] + '}';
+      const flag = `{${keys[i]}}`;
       // replace
       res = res.replace(flag, valueStr);
     }

@@ -56,8 +56,8 @@ export function checkTags(tags, requiredTags, withLog) {
   for (let i = 0; i < requiredTags.length; ++i) {
     if (typeof tags[requiredTags[i]] === 'undefined') {
       if (withLog) {
-        console.log('Missing ' +
-          requiredTags[i] + ' for pixel generation.');
+        console.log(`Missing ${
+          requiredTags[i] } for pixel generation.`);
       }
       check = false;
       break;
@@ -114,15 +114,15 @@ export function generatePixelDataFromJSONTags(
   // check values
   if (samplesPerPixel !== 1 && samplesPerPixel !== 3) {
     throw new Error(
-      'Unsupported SamplesPerPixel for pixel generation: ' +
-      samplesPerPixel);
+      `Unsupported SamplesPerPixel for pixel generation: ${
+        samplesPerPixel }`);
   }
   if ((samplesPerPixel === 1 && !(photometricInterpretation === 'MONOCHROME1' ||
     photometricInterpretation === 'MONOCHROME2')) ||
     (samplesPerPixel === 3 && photometricInterpretation !== 'RGB')) {
     throw new Error(
-      'Unsupported PhotometricInterpretation for pixel generation: ' +
-      photometricInterpretation + ' with SamplesPerPixel: ' + samplesPerPixel);
+      `Unsupported PhotometricInterpretation for pixel generation: ${
+        photometricInterpretation } with SamplesPerPixel: ${samplesPerPixel}`);
   }
 
   let numberOfSamples = 1;
@@ -134,8 +134,8 @@ export function generatePixelDataFromJSONTags(
     const planarConfiguration = tags.PlanarConfiguration;
     if (planarConfiguration !== 0 && planarConfiguration !== 1) {
       throw new Error(
-        'Unsupported PlanarConfiguration for pixel generation: ' +
-        planarConfiguration);
+        `Unsupported PlanarConfiguration for pixel generation: ${
+          planarConfiguration }`);
     }
     if (planarConfiguration === 0) {
       numberOfSamples = 3;
@@ -150,7 +150,7 @@ export function generatePixelDataFromJSONTags(
 
   // pixels generator
   if (typeof _pixelGenerators[pixGeneratorName] === 'undefined') {
-    throw new Error('Unknown PixelData generator: ' + pixGeneratorName);
+    throw new Error(`Unknown PixelData generator: ${pixGeneratorName}`);
   }
   const GeneratorClass = _pixelGenerators[pixGeneratorName].generator;
   const generator = new GeneratorClass({

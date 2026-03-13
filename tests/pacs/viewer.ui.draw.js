@@ -92,7 +92,7 @@ export class DrawToolUI {
 
     for (const shapeName of shapeNames) {
       const opt = document.createElement('option');
-      opt.id = 'shape-' + shapeName;
+      opt.id = `shape-${shapeName}`;
       opt.value = shapeName;
       opt.appendChild(document.createTextNode(shapeName));
       shapeSelect.appendChild(opt);

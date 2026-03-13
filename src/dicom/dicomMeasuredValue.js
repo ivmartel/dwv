@@ -57,8 +57,8 @@ export class MeasuredValue {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.numericValue + ' ' +
-      this.measurementUnitsCode.toString();
+    return `${this.numericValue} ${
+      this.measurementUnitsCode.toString()}`;
   };
 
 };

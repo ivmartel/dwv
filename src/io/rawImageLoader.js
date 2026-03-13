@@ -48,7 +48,7 @@ export class RawImageLoader {
       imageType = 'jpeg';
     }
     // create uri
-    const file = new Blob([response], {type: 'image/' + imageType});
+    const file = new Blob([response], {type: `image/${imageType}`});
     return window.URL.createObjectURL(file);
   }
 

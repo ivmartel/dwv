@@ -56,7 +56,7 @@ export function dcmdump(dicomElements) {
       result += '\n';
       checkHeader = false;
     }
-    result += getElementAsString(tag, dicomElement) + '\n';
+    result += `${getElementAsString(tag, dicomElement)}\n`;
   }
   return result;
 }
@@ -102,7 +102,7 @@ function getElementValueAsString(tag, dicomElement, pretty) {
     str = da.toLocaleDateString();
   } else if (dicomElement.vr === 'TM' && pretty) {
     const tmObj = getTimeObj(dicomElement);
-    str = tmObj.hours + ':' + tmObj.minutes + ':' + tmObj.seconds;
+    str = `${tmObj.hours}:${tmObj.minutes}:${tmObj.seconds}`;
   } else {
     let isOtherVR = false;
     if (dicomElement.vr.length !== 0) {
@@ -199,7 +199,7 @@ function getElementAsString(tag, dicomElement, prefix) {
       line += dicomElement.value[0];
     } else if (isPixSequence) {
       // pixel sequence
-      line += ' (PixelSequence #=' + deSize + ')';
+      line += ` (PixelSequence #=${deSize})`;
     } else if (dicomElement.vr === 'SQ') {
       line += ' (Sequence with';
       if (dicomElement.undefinedLength) {
@@ -273,19 +273,19 @@ function getElementAsString(tag, dicomElement, prefix) {
       } else {
         message += ' explicit';
       }
-      message += ' length #=' + (itemKeys.length - 1) + ')';
+      message += ` length #=${itemKeys.length - 1})`;
       itemElement.value = [message];
       itemElement.vr = 'na';
 
       line += '\n';
-      line += getElementAsString(itemTag, itemElement, prefix + '  ');
+      line += getElementAsString(itemTag, itemElement, `${prefix}  `);
 
       for (let m = 0, lenm = itemKeys.length; m < lenm; ++m) {
         const itemTag2 = getTagFromKey(itemKeys[m]);
         if (itemKeys[m] !== 'xFFFEE000') {
           line += '\n';
           line += getElementAsString(itemTag2, item[itemKeys[m]],
-            prefix + '    ');
+            `${prefix}    `);
         }
       }
 
@@ -302,7 +302,7 @@ function getElementAsString(tag, dicomElement, prefix) {
       };
       line += '\n';
       line += getElementAsString(
-        itemDelimTag, itemDelimElement, prefix + '  ');
+        itemDelimTag, itemDelimElement, `${prefix}  `);
 
     }
 
@@ -325,7 +325,7 @@ function getElementAsString(tag, dicomElement, prefix) {
       line += '\n';
       pixItem.vr = 'pi';
       line += getElementAsString(
-        getPixelDataTag(), pixItem, prefix + '  ');
+        getPixelDataTag(), pixItem, `${prefix}  `);
     }
 
     const pixDelimTag = getSequenceDelimitationItemTag();

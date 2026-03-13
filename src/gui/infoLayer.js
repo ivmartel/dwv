@@ -15,7 +15,7 @@ import {InfoDataItem} from './infoData.js';
  * @returns {string} The div id.
  */
 function getPosDivId(pos) {
-  return 'info-' + pos;
+  return `info-${pos}`;
 }
 
 /**
@@ -34,7 +34,7 @@ function getLiId(data) {
   let format = encodeURIComponent(data.format.toLowerCase());
   format = format.replace(/%[0-9A-F]{2}/gi, '');
 
-  return getPosDivId(data.pos) + '-' + type + '-' + format;
+  return `${getPosDivId(data.pos)}-${type}-${format}`;
 }
 
 /**
@@ -120,7 +120,7 @@ export class InfoLayer {
       // position element
       const posElement = document.createElement('div');
       posElement.id = getPosDivId(pos);
-      posElement.className = 'info-' + pos + ' info';
+      posElement.className = `info-${pos} info`;
       posElement.appendChild(ul);
       // append to main div
       this.#containerDiv.appendChild(posElement);
@@ -138,7 +138,7 @@ export class InfoLayer {
   #update(data) {
     // updates all the data
     for (const item of data) {
-      const id = '#' + getLiId(item);
+      const id = `#${getLiId(item)}`;
       const li = this.#containerDiv.querySelector(id);
       const text = item.value;
       if (text && li) {

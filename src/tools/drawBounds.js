@@ -96,7 +96,7 @@ export function getLineShape(group) {
  */
 export function getAnchorShape(group, index) {
   const kshape = group.getChildren(function (node) {
-    return node.id() === 'anchor' + index;
+    return node.id() === `anchor${index}`;
   })[0];
   if (!(kshape instanceof Konva.Ellipse)) {
     return;

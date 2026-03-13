@@ -42,7 +42,7 @@ describe('dicom', () => {
           .value[0].ReferencedSegmentNumber,
     };
     assert.ok(isEqualSegmentFrameInfo(frameInfo1, frameInfo),
-      testName + ' frame info from simple element');
+      `${testName} frame info from simple element`);
 
     // simple dicom element -> dicom element
     const segmentElements = getElementsFromJSONTags(frameInfoSimpleElements);
@@ -50,7 +50,7 @@ describe('dicom', () => {
     const frameInfo2 = getSegmentFrameInfo(segmentElements);
     // compare
     assert.ok(isEqualSegmentFrameInfo(frameInfo2, frameInfo),
-      testName + ' frame info from element');
+      `${testName} frame info from element`);
   }
 
   /**

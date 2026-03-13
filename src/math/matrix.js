@@ -184,8 +184,8 @@ export class Matrix33 {
    */
   multiplyArray3D(array3D) {
     if (array3D.length !== 3) {
-      throw new Error('Cannot multiply 3x3 matrix with non 3D array: ' +
-        array3D.length);
+      throw new Error(`Cannot multiply 3x3 matrix with non 3D array: ${
+        array3D.length }`);
     }
     // (no loop for speedup)
     const a0 = array3D[0];

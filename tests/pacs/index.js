@@ -163,7 +163,7 @@ function getDwvUrl(uri) {
       } else {
         uriroot = _githubRaw;
       }
-      uricomp = uriroot + 'data/' + uri.file;
+      uricomp = `${uriroot}data/${uri.file}`;
     }
   } else {
     uricomp = uri;
@@ -176,7 +176,7 @@ function getDwvUrl(uri) {
 
   let url = 'viewer.html';
   if (typeof uri !== 'undefined') {
-    url += '?input=' + encodeURIComponent(uricomp) + uriargs;
+    url += `?input=${encodeURIComponent(uricomp)}${uriargs}`;
   }
   return url;
 }
@@ -191,7 +191,7 @@ function createAndPutHtml(data, id) {
   for (let i = 0; i < data.length; ++i) {
     // image
     const image = document.createElement('img');
-    image.src = './images/' + data[i].img;
+    image.src = `./images/${data[i].img}`;
     // title
     const title = document.createElement('h2');
     title.appendChild(document.createTextNode(data[i].title));
@@ -200,7 +200,7 @@ function createAndPutHtml(data, id) {
     desc.appendChild(document.createTextNode(data[i].desc));
     if (data[i].comment) {
       const comment = document.createElement('b');
-      comment.appendChild(document.createTextNode(' ' + data[i].comment));
+      comment.appendChild(document.createTextNode(` ${data[i].comment}`));
       desc.appendChild(comment);
     }
 
@@ -208,7 +208,7 @@ function createAndPutHtml(data, id) {
     const link = document.createElement('a');
     link.href = getDwvUrl(data[i].uri);
     link.id = i;
-    link.className = 'dwvlink ' + id;
+    link.className = `dwvlink ${id}`;
     link.appendChild(image);
 
     // list item
@@ -216,7 +216,7 @@ function createAndPutHtml(data, id) {
     li.appendChild(link);
     li.appendChild(title);
     li.appendChild(desc);
-    const ul = document.getElementById('ul_' + id);
+    const ul = document.getElementById(`ul_${id}`);
     ul.appendChild(li);
   }
 }
@@ -256,7 +256,7 @@ function onViewGithubHosted() {
   files = files.filter(element => {
     return element !== '';
   });
-  const filesStr = '?file=' + files.join('&file=');
+  const filesStr = `?file=${files.join('&file=')}`;
 
   // dwv args
   const args = '&dwvReplaceMode=void';

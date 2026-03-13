@@ -61,7 +61,7 @@ export class Spacing {
    * @returns {string} The spacing as a string.
    */
   toString() {
-    return '(' + this.#values.toString() + ')';
+    return `(${this.#values.toString()})`;
   }
 
   /**

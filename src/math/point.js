@@ -84,7 +84,7 @@ export class Point2D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.#x + ', ' + this.#y + ')';
+    return `(${this.#x}, ${this.#y})`;
   }
 
   /**
@@ -208,9 +208,9 @@ export class Point3D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.#x +
-      ', ' + this.#y +
-      ', ' + this.#z + ')';
+    return `(${ this.#x
+    }, ${ this.#y
+    }, ${this.#z})`;
   }
 
   /**
@@ -343,7 +343,7 @@ export class Point {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.#values.toString() + ')';
+    return `(${this.#values.toString()})`;
   }
 
   /**

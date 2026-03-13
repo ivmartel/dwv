@@ -46,21 +46,21 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
   const res = {};
   // check id key
   if (!idKey) {
-    throw new Error('Cannot merge object with an undefined id key: ' + idKey);
+    throw new Error(`Cannot merge object with an undefined id key: ${idKey}`);
   } else {
     if (!Object.prototype.hasOwnProperty.call(obj1, idKey)) {
-      throw new Error('Id key not found in first object while merging: ' +
-        idKey + ', obj: ' + obj1);
+      throw new Error(`Id key not found in first object while merging: ${
+        idKey }, obj: ${obj1}`);
     }
     if (!Object.prototype.hasOwnProperty.call(obj2, idKey)) {
-      throw new Error('Id key not found in second object while merging: ' +
-        idKey + ', obj: ' + obj2);
+      throw new Error(`Id key not found in second object while merging: ${
+        idKey }, obj: ${obj2}`);
     }
   }
   // check value key
   if (!valueKey) {
-    throw new Error('Cannot merge object with an undefined value key: ' +
-      valueKey);
+    throw new Error(`Cannot merge object with an undefined value key: ${
+      valueKey }`);
   }
 
   // check if merged object
@@ -71,12 +71,12 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
   }
   // handle the id part
   if (!Object.prototype.hasOwnProperty.call(obj1[idKey], valueKey)) {
-    throw new Error('Id value not found in first object while merging: ' +
-      idKey + ', valueKey: ' + valueKey + ', ojb: ' + obj1);
+    throw new Error(`Id value not found in first object while merging: ${
+      idKey }, valueKey: ${valueKey}, ojb: ${obj1}`);
   }
   if (!Object.prototype.hasOwnProperty.call(obj2[idKey], valueKey)) {
-    throw new Error('Id value not found in second object while merging: ' +
-      idKey + ', valueKey: ' + valueKey + ', ojb: ' + obj2);
+    throw new Error(`Id value not found in second object while merging: ${
+      idKey }, valueKey: ${valueKey}, ojb: ${obj2}`);
   }
   let id1 = obj1[idKey][valueKey];
   const id2 = obj2[idKey][valueKey][0] + idSuffix;
@@ -86,16 +86,16 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
     // check if array does not include id2
     for (let k = 0; k < id1.length; ++k) {
       if (id1[k] === id2) {
-        throw new Error('The first object already contains id2: ' +
-          id2 + ', id1: ' + id1);
+        throw new Error(`The first object already contains id2: ${
+          id2 }, id1: ${id1}`);
       }
     }
     res[idKey][valueKey].push(id2);
   } else {
     id1 = id1[0] + idSuffix;
     if (id1 === id2) {
-      throw new Error('Cannot merge object with same ids: ' +
-        id1 + ', id2: ' + id2);
+      throw new Error(`Cannot merge object with same ids: ${
+        id1 }, id2: ${id2}`);
     }
     // add suffix to first key
     res[idKey][valueKey][0] = id1;

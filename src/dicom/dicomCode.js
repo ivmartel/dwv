@@ -64,9 +64,9 @@ export class DicomCode {
    * @returns {string} The code as string.
    */
   toString() {
-    return '(' + this.value + ', ' +
-      this.schemeDesignator + ', \'' +
-      this.meaning + '\')';
+    return `(${this.value}, ${
+      this.schemeDesignator }, '${
+      this.meaning }')`;
   }
 }
 

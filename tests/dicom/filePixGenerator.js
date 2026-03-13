@@ -27,12 +27,12 @@ export class FilePixGenerator {
     for (let i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== this.#numberOfColumns) {
-        throw new Error('Image width mismatch: ' +
-          img.width + '!=' + this.#numberOfColumns);
+        throw new Error(`Image width mismatch: ${
+          img.width }!=${this.#numberOfColumns}`);
       }
       if (img.height !== this.#numberOfRows) {
-        throw new Error('Image height mismatch: ' +
-          img.height + '!=' + this.#numberOfRows);
+        throw new Error(`Image height mismatch: ${
+          img.height }!=${this.#numberOfRows}`);
       }
     }
     // store

@@ -239,8 +239,8 @@ export class DicomBufferToData {
       this.#pixelDecoder.abort();
       // send events
       this.onerror({
-        error: new Error('Missing tags to decompress data:' +
-          pixelMeta.missing.toString()),
+        error: new Error(`Missing tags to decompress data:${
+          pixelMeta.missing.toString() }`),
         source: origin
       });
       this.onloadend({
@@ -296,10 +296,10 @@ export class DicomBufferToData {
         } catch (error) {
           if (error instanceof RangeError) {
             const powerOf2 = Math.floor(Math.log(fullSize) / Math.log(2));
-            logger.error('Cannot allocate ' +
-              decodedData.constructor.name +
-              ' of size: ' +
-              fullSize + ' (>2^' + powerOf2 + ') for decompressed data.');
+            logger.error(`Cannot allocate ${
+              decodedData.constructor.name
+            } of size: ${
+              fullSize } (>2^${powerOf2}) for decompressed data.`);
           }
           // abort
           this.#pixelDecoder.abort();
@@ -317,8 +317,8 @@ export class DicomBufferToData {
       }
       // hoping for all items to have the same size...
       if (decodedData.length !== this.#decompressedSizes[dataIndex]) {
-        logger.warn('Unsupported varying decompressed data size: ' +
-          decodedData.length + ' != ' + this.#decompressedSizes[dataIndex]);
+        logger.warn(`Unsupported varying decompressed data size: ${
+          decodedData.length } != ${this.#decompressedSizes[dataIndex]}`);
       }
       // set buffer item data
       this.#finalBufferStore[dataIndex].set(

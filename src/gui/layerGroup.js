@@ -27,7 +27,7 @@ import {InfoData} from './infoData.js';
  * @returns {string} A string id.
  */
 export function getLayerDivId(groupDivId, layerIndex) {
-  return groupDivId + '-layer-' + layerIndex;
+  return `${groupDivId}-layer-${layerIndex}`;
 }
 
 /**
@@ -57,7 +57,7 @@ export function getLayerDetailsFromLayerDivId(idString) {
  * @returns {string} A string id.
  */
 export function getInfoLayerDivId(groupDivId) {
-  return groupDivId + '-infolayer';
+  return `${groupDivId}-infolayer`;
 }
 
 /**
@@ -795,8 +795,7 @@ export class LayerGroup {
     if (typeof index !== 'undefined') {
       this.setActiveLayer(index);
     } else {
-      logger.warn('No layer to set as active with id: ' +
-        id);
+      logger.warn(`No layer to set as active with id: ${id}`);
     }
   }
 
@@ -818,8 +817,8 @@ export class LayerGroup {
     if (typeof index !== 'undefined') {
       this.setActiveLayer(index);
     } else {
-      logger.warn('No layer to set as active with dataId: ' +
-        dataId);
+      logger.warn(`No layer to set as active with dataId: ${
+        dataId }`);
     }
   }
 
@@ -1108,11 +1107,11 @@ export class LayerGroup {
     // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
       const lineH = document.createElement('hr');
-      lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
+      lineH.id = `${this.getDivId()}-scroll-crosshair-horizontal`;
       lineH.className = 'horizontal';
-      lineH.style.width = this.#containerDiv.offsetWidth + 'px';
+      lineH.style.width = `${this.#containerDiv.offsetWidth}px`;
       lineH.style.left = '0px';
-      lineH.style.top = displayPos.getY() + 'px';
+      lineH.style.top = `${displayPos.getY()}px`;
       // add to local array
       this.#crosshairHtmlElements.push(lineH);
       // add to html
@@ -1122,10 +1121,10 @@ export class LayerGroup {
     // vertical line
     if (typeof displayPos.getX() !== 'undefined') {
       const lineV = document.createElement('hr');
-      lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
+      lineV.id = `${this.getDivId()}-scroll-crosshair-vertical`;
       lineV.className = 'vertical';
-      lineV.style.width = this.#containerDiv.offsetHeight + 'px';
-      lineV.style.left = (displayPos.getX()) + 'px';
+      lineV.style.width = `${this.#containerDiv.offsetHeight}px`;
+      lineV.style.left = `${displayPos.getX()}px`;
       lineV.style.top = '0px';
       // add to local array
       this.#crosshairHtmlElements.push(lineV);
@@ -1165,11 +1164,11 @@ export class LayerGroup {
       const span = document.createElement('span');
       span.id = 'scroll-tooltip';
       // tooltip position
-      span.style.left = (point.getX() + 10) + 'px';
-      span.style.top = (point.getY() + 10) + 'px';
+      span.style.left = `${point.getX() + 10}px`;
+      span.style.top = `${point.getY() + 10}px`;
       let text = precisionRound(value, 3).toString();
       if (typeof viewController.getPixelUnit() !== 'undefined') {
-        text += ' ' + viewController.getPixelUnit();
+        text += ` ${viewController.getPixelUnit()}`;
       }
       span.appendChild(document.createTextNode(text));
       // add to local var
@@ -1414,8 +1413,8 @@ export class LayerGroup {
     // check container
     if (this.#containerDiv.offsetWidth === 0 &&
       this.#containerDiv.offsetHeight === 0) {
-      throw new Error('Cannot fit to zero sized container with id \'' +
-        this.#containerDiv.id + '\'.'
+      throw new Error(`Cannot fit to zero sized container with id '${
+        this.#containerDiv.id }'.`
       );
     }
     // get max world size
@@ -1429,7 +1428,7 @@ export class LayerGroup {
     if (this.#containerDiv.offsetHeight === 0) {
       const ratioX = this.#containerDiv.offsetWidth / maxWorldSize.x;
       const height = maxWorldSize.y * ratioX;
-      this.#containerDiv.style.height = height + 'px';
+      this.#containerDiv.style.height = `${height}px`;
     }
     // return best fit
     return Math.min(

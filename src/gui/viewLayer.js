@@ -937,8 +937,8 @@ export class ViewLayer {
   #setBaseSize(size) {
     // check canvas creation
     if (!canCreateCanvas(size.x, size.y)) {
-      throw new Error('Cannot create canvas with size ' +
-        size.x + ', ' + size.y);
+      throw new Error(`Cannot create canvas with size ${
+        size.x }, ${size.y}`);
     }
 
     // set local
@@ -997,8 +997,8 @@ export class ViewLayer {
     if (this.#canvas.width !== containerSize.x ||
       this.#canvas.height !== containerSize.y) {
       if (!canCreateCanvas(containerSize.x, containerSize.y)) {
-        throw new Error('Cannot resize canvas ' +
-          containerSize.x + ', ' + containerSize.y);
+        throw new Error(`Cannot resize canvas ${
+          containerSize.x }, ${containerSize.y}`);
       }
       // canvas size change triggers canvas reset
       this.#canvas.width = containerSize.x;

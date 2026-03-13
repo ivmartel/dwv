@@ -21,7 +21,7 @@ function setup() {
  */
 function showMessage(text, type) {
   const p = document.createElement('p');
-  p.className = 'message ' + type;
+  p.className = `message ${type}`;
   p.appendChild(document.createTextNode(text));
 
   const div = document.getElementById('result');
@@ -74,15 +74,15 @@ function checkResponseEvent(event, reqName) {
   let message;
   const status = event.currentTarget.status;
   if (status !== 200 && status !== 202 && status !== 204) {
-    message = 'Bad status for request ' + reqName + ': ' +
-      status + ' (' + event.currentTarget.statusText + ') "' +
-      event.currentTarget.responseText + '"';
+    message = `Bad status for request ${reqName}: ${
+      status } (${event.currentTarget.statusText}) "${
+      event.currentTarget.responseText }"`;
     showMessage(message, 'error');
     res = false;
   } else if (status === 204 ||
     !event.target.response ||
     typeof event.target.response === 'undefined') {
-    message = 'No content for request ' + reqName;
+    message = `No content for request ${reqName}`;
     showMessage(message);
     res = false;
   }
@@ -97,7 +97,7 @@ function checkResponseEvent(event, reqName) {
  */
 function getOnLoadError(reqName) {
   // message
-  const message = 'Error in request ' + reqName + ', see console for details.';
+  const message = `Error in request ${reqName}, see console for details.`;
 
   return function (event) {
     console.error(message, event);
@@ -145,16 +145,16 @@ function onSeriesLoad(json) {
     }
     _studiesJson[studyUID].push(json[i]);
     // load instances
-    const url = rootUrl +
-      '/studies/' + studyUID +
-      '/series/' + seriesUID +
-      '/instances?';
+    const url = `${rootUrl
+    }/studies/${ studyUID
+    }/series/${ seriesUID
+    }/instances?`;
     // you can limit the number of answers with 'limit=number'
     // azure has a default limit a 100...
     launchQido(
       url,
       getOnInstancesLoad(seriesUID, json.length),
-      'QIDO-RS[' + i + ']'
+      `QIDO-RS[${i}]`
     );
   }
 }
@@ -170,7 +170,7 @@ function getOnInstancesLoad(seriesUID, numberOfSeries) {
   return function (json) {
     // store
     if (typeof _seriesJson[seriesUID] !== 'undefined') {
-      console.warn('Overwrite series json for ' + seriesUID);
+      console.warn(`Overwrite series json for ${seriesUID}`);
     }
     _seriesJson[seriesUID] = json;
     // display table once all loaded
@@ -230,7 +230,7 @@ function launchQido(url, loadCallback, reqName) {
     // parse json
     const json = JSON.parse(event.target.response);
     if (json.length === 0) {
-      showMessage('Empty result for request ' + reqName);
+      showMessage(`Empty result for request ${reqName}`);
       return;
     }
     // callback
@@ -242,7 +242,7 @@ function launchQido(url, loadCallback, reqName) {
   qidoReq.setRequestHeader('Accept', 'application/dicom+json');
   const token = getToken();
   if (typeof token !== 'undefined') {
-    qidoReq.setRequestHeader('Authorization', 'Bearer ' + token);
+    qidoReq.setRequestHeader('Authorization', `Bearer ${token}`);
   }
   qidoReq.send();
 }
@@ -260,7 +260,7 @@ function launchStowMultipart() {
   // clear result div
   const div = document.getElementById('result');
   div.innerHTML = '';
-  showMessage('RUNNING ' + reqName + ' (multipart) request...', 'info');
+  showMessage(`RUNNING ${reqName} (multipart) request...`, 'info');
 
   const stowReq = new XMLHttpRequest();
   let message;
@@ -270,13 +270,13 @@ function launchStowMultipart() {
       return;
     }
     // show success message
-    message = reqName + ' (multipart) successful!!';
+    message = `${reqName} (multipart) successful!!`;
     showMessage(message, 'success');
   });
   stowReq.addEventListener('error', getOnLoadError(reqName));
   stowReq.addEventListener('progress', function (event) {
     if (event.lengthComputable) {
-      const progMessage = event.loaded + '/' + event.total;
+      const progMessage = `${event.loaded}/${event.total}`;
       showProgress(progMessage);
     }
   });
@@ -305,13 +305,13 @@ function launchStowMultipart() {
 
       // STOW request
       const rootUrl = document.getElementById('rooturl').value;
-      stowReq.open('POST', rootUrl + '/studies');
+      stowReq.open('POST', `${rootUrl}/studies`);
       stowReq.setRequestHeader('Accept', 'application/dicom+json');
       stowReq.setRequestHeader('Content-Type',
-        'multipart/related; type="application/dicom"; boundary=' + boundary);
+        `multipart/related; type="application/dicom"; boundary=${boundary}`);
       const token = getToken();
       if (typeof token !== 'undefined') {
-        stowReq.setRequestHeader('Authorization', 'Bearer ' + token);
+        stowReq.setRequestHeader('Authorization', `Bearer ${token}`);
       }
       stowReq.send(content);
     }
@@ -338,8 +338,8 @@ function launchStowInstances() {
   // clear result div
   const div = document.getElementById('result');
   div.innerHTML = '';
-  showMessage('RUNNING ' + reqName +
-    ' (instances) ' + files.length + ' requests...', 'info');
+  showMessage(`RUNNING ${ reqName
+  } (instances) ${files.length} requests...`, 'info');
 
   // load handler: store data and, when all data is received, launch STOW
   const onload = function (event) {
@@ -353,22 +353,22 @@ function launchStowInstances() {
       }
       // show success message
       ++numberOfStowed;
-      const progress = numberOfStowed + '/' + files.length;
+      const progress = `${numberOfStowed}/${files.length}`;
       showProgress(progress);
       if (numberOfStowed === files.length) {
-        message = reqName + ' (instances) successful!!';
+        message = `${reqName} (instances) successful!!`;
         showMessage(message, 'success');
       }
     });
     stowReq.addEventListener('error', getOnLoadError(reqName));
 
     const rootUrl = document.getElementById('rooturl').value;
-    stowReq.open('POST', rootUrl + '/studies');
+    stowReq.open('POST', `${rootUrl}/studies`);
     stowReq.setRequestHeader('Accept', 'application/dicom+json');
     stowReq.setRequestHeader('Content-Type', 'application/dicom');
     const token = getToken();
     if (typeof token !== 'undefined') {
-      stowReq.setRequestHeader('Authorization', 'Bearer ' + token);
+      stowReq.setRequestHeader('Authorization', `Bearer ${token}`);
     }
     stowReq.send(event.target.result);
   };
@@ -445,7 +445,7 @@ function qidoResponseToTable() {
       const row = body.insertRow();
       // number
       cell = row.insertCell();
-      cell.appendChild(document.createTextNode(i + '-' + j));
+      cell.appendChild(document.createTextNode(`${i}-${j}`));
       // study
       cell = row.insertCell();
       const studyUID = serieJson['0020000D'].Value[0];
@@ -465,13 +465,13 @@ function qidoResponseToTable() {
       cell = row.insertCell();
 
       const rootUrl = document.getElementById('rooturl').value;
-      const seriesUrl = rootUrl +
-        '/studies/' + studyUID +
-        '/series/' + seriesUID;
+      const seriesUrl = `${ rootUrl
+      }/studies/${ studyUID
+      }/series/${seriesUID}`;
       const thumbInstanceUID = getThumbInstanceUID(_seriesJson[seriesUID]);
-      const thumbUrl = seriesUrl +
-        '/instances/' + thumbInstanceUID +
-        '/rendered?viewport=64,64';
+      const thumbUrl = `${ seriesUrl
+      }/instances/${ thumbInstanceUID
+      }/rendered?viewport=64,64`;
 
       // multipart link
       const multipartLink = document.createElement('a');
@@ -481,12 +481,12 @@ function qidoResponseToTable() {
       // store a cookie with accept and token to allow opening in viewer
       // (should be deleted in viewer.js...)
       multipartLink.onclick = function () {
-        document.cookie = 'accept=' +
+        document.cookie = `accept=${
           encodeURIComponent(
             'multipart/related; type="application/dicom"; transfer-syntax=*;'
-          ) + '; ';
+          ) }; `;
         if (typeof token !== 'undefined') {
-          document.cookie = 'access_token=' + token + '; ';
+          document.cookie = `access_token=${token}; `;
         }
         document.cookie = 'samesite=strict; ';
       };
@@ -502,23 +502,23 @@ function qidoResponseToTable() {
         instancesUIDs.push(instancesJson[k]['00080018'].Value[0]);
       }
       const prefix = getCommonPrefix(instancesUIDs);
-      let instanceUrl = seriesUrl + '/instances/' + prefix + '?';
+      let instanceUrl = `${seriesUrl}/instances/${prefix}?`;
       for (let k = 0; k < instancesUIDs.length; ++k) {
         if (k !== 0) {
           instanceUrl += '&';
         }
-        instanceUrl += 'file=' + instancesUIDs[k].substring(prefix.length);
+        instanceUrl += `file=${instancesUIDs[k].substring(prefix.length)}`;
       }
       const instanceLink = document.createElement('a');
-      instanceLink.href = viewerUrl +
-        encodeURIComponent(instanceUrl) +
-        '&dwvReplaceMode=void';
+      instanceLink.href = `${ viewerUrl +
+      encodeURIComponent(instanceUrl)
+      }&dwvReplaceMode=void`;
       instanceLink.appendChild(document.createTextNode('instances'));
       cell.appendChild(instanceLink);
 
       const spanAfter = document.createElement('span');
       spanAfter.appendChild(document.createTextNode(
-        ' (' + instancesJson.length + ')'));
+        ` (${instancesJson.length})`));
       cell.appendChild(spanAfter);
 
       // store a cookie with accept and token to allow opening in viewer
@@ -526,7 +526,7 @@ function qidoResponseToTable() {
       instanceLink.onclick = function () {
         document.cookie = 'accept=application/dicom; ';
         if (typeof token !== 'undefined') {
-          document.cookie = 'access_token=' + token + '; ';
+          document.cookie = `access_token=${token}; `;
         }
         document.cookie = 'samesite=strict; ';
       };
@@ -541,7 +541,7 @@ function qidoResponseToTable() {
       };
       const token = getToken();
       if (typeof token !== 'undefined') {
-        options.headers['Authorization'] = 'Bearer ' + token;
+        options.headers['Authorization'] = `Bearer ${token}`;
       }
 
       fetch(thumbUrl, options)

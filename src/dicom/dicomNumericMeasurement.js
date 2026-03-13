@@ -49,7 +49,7 @@ export class NumericMeasurement {
       res += this.measuredValue.toString();
     }
     if (typeof this.numericValueQualifierCode !== 'undefined') {
-      res += ' ' + this.numericValueQualifierCode.toString();
+      res += ` ${this.numericValueQualifierCode.toString()}`;
     }
     return res;
   }

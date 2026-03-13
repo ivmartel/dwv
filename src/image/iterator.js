@@ -473,7 +473,7 @@ export function getSliceIterator(
           start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
       }
     } else {
-      throw new Error('Unknown direction: ' + dirMax2.index);
+      throw new Error(`Unknown direction: ${dirMax2.index}`);
     }
   } else {
     if (image.getNumberOfComponents() === 1) {
@@ -485,8 +485,8 @@ export function getSliceIterator(
       rangeObj = simpleRange3d(
         dataAccessor, start, start + sliceSize, 1, isPlanar);
     } else {
-      throw new Error('Unsupported number of components: ' +
-        image.getNumberOfComponents());
+      throw new Error(`Unsupported number of components: ${
+        image.getNumberOfComponents()}`);
     }
   }
 
@@ -506,8 +506,8 @@ export function getSliceIterator(
 export function getRegionSliceIterator(
   image, index, isRescaled, min, max) {
   if (image.getNumberOfComponents() !== 1) {
-    throw new Error('Unsupported number of components for region iterator: ' +
-      image.getNumberOfComponents());
+    throw new Error(`Unsupported number of components for region iterator: ${
+      image.getNumberOfComponents() }`);
   }
 
   // default to non rescaled data
@@ -564,8 +564,8 @@ export function getRegionSliceIterator(
 export function getVariableRegionSliceIterator(
   image, index, isRescaled, regions) {
   if (image.getNumberOfComponents() !== 1) {
-    throw new Error('Unsupported number of components for region iterator: ' +
-      image.getNumberOfComponents());
+    throw new Error(`Unsupported number of components for region iterator: ${
+      image.getNumberOfComponents() }`);
   }
 
   // default to non rescaled data

@@ -64,7 +64,7 @@ export class RulerFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return this.#name + '-group';
+    return `${this.#name}-group`;
   }
 
   /**
@@ -176,7 +176,7 @@ export class RulerFactory {
       anchors.push(getDefaultAnchor(
         positions[i].getX(),
         positions[i].getY(),
-        'anchor' + i,
+        `anchor${i}`,
         style
       ));
     }
@@ -503,7 +503,7 @@ export class RulerFactory {
         end.y(anchor.y());
         break;
       default:
-        logger.error('Unhandled anchor id: ' + anchor.id());
+        logger.error(`Unhandled anchor id: ${anchor.id()}`);
         break;
     }
 

@@ -64,7 +64,7 @@ export function getDwvUIDPrefix() {
  * @returns {string} The name.
  */
 export function getImplementationVersionName() {
-  return 'DWV_' + getDwvVersion();
+  return `DWV_${getDwvVersion()}`;
 }
 
 /**
@@ -73,7 +73,7 @@ export function getImplementationVersionName() {
  * @returns {string} The uid.
  */
 export function getImplementationClassUID() {
-  return getDwvUIDPrefix() + '.' + getDwvVersionUI();
+  return `${getDwvUIDPrefix()}.${getDwvVersionUI()}`;
 }
 
 /**
@@ -527,8 +527,8 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
   } catch (error) {
     if (error instanceof RangeError) {
       const powerOf2 = Math.floor(Math.log(size) / Math.log(2));
-      logger.error('Cannot allocate array of size: ' +
-        size + ' (>2^' + powerOf2 + ').');
+      logger.error(`Cannot allocate array of size: ${
+        size } (>2^${powerOf2}).`);
     }
   }
   return res;
@@ -893,8 +893,8 @@ export class DicomParser {
 
     // check vr
     if (!isKnownVR(vr)) {
-      logger.warn('Unknown VR: ' + vr +
-        ' (for tag ' + tag.getKey() + '), treating as \'UN\'');
+      logger.warn(`Unknown VR: ${ vr
+      } (for tag ${tag.getKey()}), treating as 'UN'`);
       vr = 'UN';
     }
 
@@ -1050,7 +1050,7 @@ export class DicomParser {
         } else if (bitsAllocated === 64) {
           data.push(reader.readFloat64Array(offset, vl));
         } else {
-          throw new Error('Unsupported bits allocated: ' + bitsAllocated);
+          throw new Error(`Unsupported bits allocated: ${bitsAllocated}`);
         }
       }
     } else if (typeof vrType !== 'undefined') {
@@ -1089,7 +1089,7 @@ export class DicomParser {
         }
         data = cleanString(data).split('\\');
       } else {
-        throw new Error('Unknown VR type: ' + vrType);
+        throw new Error(`Unknown VR type: ${vrType}`);
       }
     } else if (vr === 'xx') {
       // US or OW
@@ -1175,8 +1175,8 @@ export class DicomParser {
       // no VR -> no data
       data = [];
     } else {
-      logger.warn('Unknown VR: ' + vr +
-        ' (for tag ' + element.tag.getKey() + ')');
+      logger.warn(`Unknown VR: ${ vr
+      } (for tag ${element.tag.getKey()})`);
       // empty data...
       data = [];
     }
@@ -1257,8 +1257,8 @@ export class DicomParser {
       syntax = dataElement.value[0];
 
     } else {
-      logger.warn('Invalid DICM prefix (' + magicword +
-        '), trying to guess tansfer syntax.');
+      logger.warn(`Invalid DICM prefix (${ magicword
+      }), trying to guess tansfer syntax.`);
       // read first element
       dataElement = this.#readDataElement(dataReader, 0, false);
       // guess transfer syntax
@@ -1272,8 +1272,8 @@ export class DicomParser {
 
     // check transfer syntax support
     if (!isReadSupportedTransferSyntax(syntax)) {
-      throw new Error('Unsupported DICOM transfer syntax: \'' + syntax +
-        '\' (' + getTransferSyntaxName(syntax) + ')');
+      throw new Error(`Unsupported DICOM transfer syntax: '${ syntax
+      }' (${getTransferSyntaxName(syntax)})`);
     }
 
     // set implicit flag
@@ -1307,7 +1307,7 @@ export class DicomParser {
       if (typeof this.#dataElements[key] === 'undefined') {
         this.#dataElements[key] = dataElement;
       } else {
-        logger.warn('Not saving duplicate tag: ' + key);
+        logger.warn(`Not saving duplicate tag: ${key}`);
       }
     }
 
@@ -1316,8 +1316,8 @@ export class DicomParser {
       throw new Error('Problem while parsing, bad offset');
     }
     if (!reachedUntilTag && buffer.byteLength !== offset) {
-      logger.warn('Did not reach the end of the buffer: ' +
-        offset + ' != ' + buffer.byteLength);
+      logger.warn(`Did not reach the end of the buffer: ${
+        offset } != ${buffer.byteLength}`);
     }
 
     //-------------------------------------------------
@@ -1394,8 +1394,8 @@ export class DicomParser {
         charSetTerm = dataElement.value[0];
       } else {
         charSetTerm = dataElement.value[1];
-        logger.warn('Unsupported character set with code extensions: \'' +
-          charSetTerm + '\'.');
+        logger.warn(`Unsupported character set with code extensions: '${
+          charSetTerm }'.`);
       }
       this.setDecoderCharacterSet(getUtfLabel(charSetTerm));
     }

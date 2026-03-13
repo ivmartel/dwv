@@ -8,42 +8,42 @@ const githubRaw = '../data/';
 const defaultTestData = [
   {
     name: 'bbmri',
-    url: githubRaw + 'bbmri-53323131.dcm',
+    url: `${githubRaw}bbmri-53323131.dcm`,
     selected: true
   },
   {
     name: 'osirix-toutatix-100',
-    url: githubRaw + 'osirix-toutatix-100.dcm',
+    url: `${githubRaw}osirix-toutatix-100.dcm`,
     selected: false
   },
   {
     name: 'osirix-goudurix',
-    url: githubRaw + 'osirix-goudurix.dcm',
+    url: `${githubRaw}osirix-goudurix.dcm`,
     selected: false
   },
   {
     name: 'dicompyler-ct.0',
-    url: githubRaw + 'dicompyler-ct.0.dcm',
+    url: `${githubRaw}dicompyler-ct.0.dcm`,
     selected: false
   },
   {
     name: 'gdcm-CR-MONO1-10-chest',
-    url: githubRaw + 'gdcm-CR-MONO1-10-chest.dcm',
+    url: `${githubRaw}gdcm-CR-MONO1-10-chest.dcm`,
     selected: false
   },
   {
     name: 'gdcm-CT-MONO2-8-abdo',
-    url: githubRaw + 'gdcm-CT-MONO2-8-abdo.dcm',
+    url: `${githubRaw}gdcm-CT-MONO2-8-abdo.dcm`,
     selected: false
   },
   {
     name: 'gdcm-US-RGB-8-epicard',
-    url: githubRaw + 'gdcm-US-RGB-8-epicard.dcm',
+    url: `${githubRaw}gdcm-US-RGB-8-epicard.dcm`,
     selected: false
   },
   {
     name: 'gdcm-US-RGB-8-esopecho',
-    url: githubRaw + 'gdcm-US-RGB-8-esopecho.dcm',
+    url: `${githubRaw}gdcm-US-RGB-8-esopecho.dcm`,
     selected: false
   }
 ];
@@ -153,7 +153,7 @@ function setupTests() {
   const names = ['parser', 'render'];
 
   for (let i = 0; i < numberOfTests; ++i) {
-    const testId = 'test-' + i;
+    const testId = `test-${i}`;
     const input = document.createElement('input');
     input.type = 'radio';
     input.name = 'tests';
@@ -301,12 +301,12 @@ document.addEventListener('DOMContentLoaded', function (/*event*/) {
 // iframe content is only available at window.onload time
 window.onload = function () {
   for (let i = 0; i < parserFunctions.length; ++i) {
-    const ifname = 'iframe-' + parserFunctions[i].name;
+    const ifname = `iframe-${parserFunctions[i].name}`;
     const tests = document.getElementById(ifname).contentWindow.tests;
     if (typeof tests !== 'undefined') {
       if (tests.length !== numberOfTests) {
-        throw new Error('Wrong number of tests for parser ' +
-          parserFunctions[i].name);
+        throw new Error(`Wrong number of tests for parser ${
+          parserFunctions[i].name }`);
       }
       parserFunctions[i].tests = tests;
       parserFunctions[i].test = tests[0];

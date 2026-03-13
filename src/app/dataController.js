@@ -287,8 +287,8 @@ export class DicomSliceDataList {
       if (typeof meta === 'undefined') {
         meta = sliceMeta;
       } else {
-        const sliceMetaId = i + ':' +
-          getPostLoadVolumeIdTagValue(sliceMeta);
+        const sliceMetaId = `${i}:${
+          getPostLoadVolumeIdTagValue(sliceMeta) }`;
         meta = mergeMeta(
           meta, sliceMeta, sliceMetaId);
       }
@@ -791,7 +791,7 @@ export class DataController {
    */
   update(dataId, data) {
     if (typeof this.#dataList[dataId] === 'undefined') {
-      throw new Error('Cannot find data to update: ' + dataId);
+      throw new Error(`Cannot find data to update: ${dataId}`);
     }
     const dataToUpdate = this.#dataList[dataId];
 
@@ -833,7 +833,7 @@ export class DataController {
   markDataAsComplete(dataId) {
     const data = this.#dataList[dataId];
     if (typeof data === 'undefined') {
-      throw new Error('Cannot find data to mark as complete: ' + dataId);
+      throw new Error(`Cannot find data to mark as complete: ${dataId}`);
     }
 
     const res = {imageHasChanged: false};

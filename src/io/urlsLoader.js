@@ -226,9 +226,9 @@ export class UrlsLoader {
       if (status !== 200 && status !== 0) {
         this.onerror({
           source: dataElement,
-          error: 'GET ' + event.target.responseURL +
-            ' ' + event.target.status +
-            ' (' + event.target.statusText + ')',
+          error: `GET ${ event.target.responseURL
+          } ${ event.target.status
+          } (${event.target.statusText})`,
           target: event.target
         });
         this.#addLoadend();
@@ -294,7 +294,7 @@ export class UrlsLoader {
       }
     }
     if (!foundLoader) {
-      throw new Error('No loader found for url: ' + dataElement);
+      throw new Error(`No loader found for url: ${dataElement}`);
     }
 
     // store last run request index
@@ -313,7 +313,7 @@ export class UrlsLoader {
 
       // check loader
       if (!loader.canLoadUrl(dataElement, options)) {
-        throw new Error('Input url of different type: ' + dataElement);
+        throw new Error(`Input url of different type: ${dataElement}`);
       }
       /**
        * The http request.
@@ -415,9 +415,9 @@ export class UrlsLoader {
       if (status !== 200 && status !== 0) {
         this.onerror({
           source: dicomDirUrl,
-          error: 'GET ' + event.target.responseURL +
-            ' ' + event.target.status +
-            ' (' + event.target.statusText + ')',
+          error: `GET ${ event.target.responseURL
+          } ${ event.target.status
+          } (${event.target.statusText})`,
           target: event.target
         });
         this.onloadend({});
@@ -430,7 +430,7 @@ export class UrlsLoader {
         const rootUrl = getRootPath(dicomDirUrl);
         const fullUrls = [];
         for (let i = 0; i < urls.length; ++i) {
-          fullUrls.push(rootUrl + '/' + urls[i]);
+          fullUrls.push(`${rootUrl}/${urls[i]}`);
         }
         // load urls
         this.#loadUrls(fullUrls, options);

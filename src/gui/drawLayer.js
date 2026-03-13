@@ -708,7 +708,7 @@ export class DrawLayer {
       res += toStringId(posValues);
     }
     if (typeof frameNumber !== 'undefined') {
-      res += '-' + frameNumber;
+      res += `-${frameNumber}`;
     }
     return res;
   }
@@ -1187,7 +1187,7 @@ export class DrawLayer {
    * @returns {Konva.Group|undefined} The Konva group.
    */
   #getGroup(id) {
-    return this.getKonvaLayer().findOne('#' + id);
+    return this.getKonvaLayer().findOne(`#${id}`);
   }
 
   /**

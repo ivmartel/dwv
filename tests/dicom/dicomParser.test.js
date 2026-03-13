@@ -49,13 +49,13 @@ describe('dicom', () => {
 
     // test #1: basic
     const version10 = '1.2.3';
-    const classUID10 = getDwvUIDPrefix() + '.' + version10;
+    const classUID10 = `${getDwvUIDPrefix()}.${ version10}`;
     const version11 = getDwvVersionFromImplementationClassUID(classUID10);
     assert.deepEqual(version10, version11, 'Implementation class test #1');
 
     // test #2: with beta
     const version20 = '4.5.6-beta.19';
-    const classUID20 = getDwvUIDPrefix() + '.4.5.6.99.19';
+    const classUID20 = `${getDwvUIDPrefix()}.4.5.6.99.19`;
     const version21 = getDwvVersionFromImplementationClassUID(classUID20);
     assert.deepEqual(version20, version21, 'Implementation class test #2');
   });
@@ -73,9 +73,9 @@ describe('dicom', () => {
     const testVersions = function (version0, versions, id) {
       for (let i = 0; i < versions.length; ++i) {
         assert.equal(compareVersions(version0, versions[i]), -1,
-          'compare version #' + id + '-' + i + '0');
+          `compare version #${id}-${i}0`);
         assert.equal(compareVersions(versions[i], version0), 1,
-          'compare version #' + id + '-' + i + '1');
+          `compare version #${id}-${i}1`);
       }
     };
     const versions01 = [
@@ -378,12 +378,12 @@ describe('dicom', () => {
     let refStr = 'El cielo azul';
     assert.equal(cleanString(str), refStr, 'Clean regular');
     // regular with special
-    str = ' El cielo azul' + special;
+    str = ` El cielo azul${special}`;
     refStr = 'El cielo azul';
     assert.equal(
       cleanString(str), refStr, 'Clean regular with special');
     // regular with special and ending space (not trimmed)
-    str = ' El cielo azul ' + special;
+    str = ` El cielo azul ${special}`;
     refStr = 'El cielo azul';
     assert.equal(
       cleanString(str), refStr, 'Clean regular with special 2');
@@ -428,21 +428,21 @@ describe('dicom', () => {
       let iStart = 0;
       let iEnd = nFilesSeries0Study0;
       for (let i = iStart; i < iEnd; ++i) {
-        files00.push('IMAGES/IM' + i);
+        files00.push(`IMAGES/IM${i}`);
       }
       assert.deepEqual(list[0][0], files00, 'Study#0:Series#0 file names');
       const files01 = [];
       iStart = iEnd;
       iEnd += nFilesSeries1Study0;
       for (let i = iStart; i < iEnd; ++i) {
-        files01.push('IMAGES/IM' + i);
+        files01.push(`IMAGES/IM${i}`);
       }
       assert.deepEqual(list[0][0], files00, 'Study#0:Series#1 file names');
       const files10 = [];
       iStart = iEnd;
       iEnd += nFilesSeries0Study1;
       for (let i = iStart; i < iEnd; ++i) {
-        files10.push('IMAGES/IM' + i);
+        files10.push(`IMAGES/IM${i}`);
       }
       assert.deepEqual(list[0][0], files00, 'Study#1:Series#0 file names');
     }

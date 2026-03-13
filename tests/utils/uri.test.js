@@ -271,8 +271,8 @@ describe('utils', () => {
       // simple test: no root
       const root24 = 'file:///test.html?input=';
       const uri24 = '?a=0&a=1&a=2';
-      const full24 = root24 + encodeURIComponent(uri24) +
-        '&dwvReplaceMode=void';
+      const full24 = `${ root24 + encodeURIComponent(uri24)
+      }&dwvReplaceMode=void`;
       params = getUriQuery(full24);
       const res24 = decodeKeyValueUri(params.input, params.dwvReplaceMode);
       const theo24 = ['0', '1', '2'];
@@ -297,8 +297,8 @@ describe('utils', () => {
       // babymri: test for replaceMode
       const root31 = 'http://ivmartel.github.io/dwv/demo/static/index.html?input=';
       const uri31 = 'http://x.babymri.org/?key=53320924&key=53320925&key=53320926';
-      const full31 = root31 + encodeURIComponent(uri31) +
-        '&dwvReplaceMode=void';
+      const full31 = `${ root31 + encodeURIComponent(uri31)
+      }&dwvReplaceMode=void`;
       params = getUriQuery(full31);
       const res31 = decodeKeyValueUri(params.input, params.dwvReplaceMode);
       const theo31 = [
@@ -312,8 +312,8 @@ describe('utils', () => {
       // babymri: test for replaceMode and no root
       const root32 = 'http://ivmartel.github.io/dwv/demo/static/index.html?input=';
       const uri32 = '?key=http://x.babymri.org/?53320924&key=http://x.babymri.org/?53320925&key=http://x.babymri.org/?53320926';
-      const full32 = root32 + encodeURIComponent(uri32) +
-        '&dwvReplaceMode=void';
+      const full32 = `${ root32 + encodeURIComponent(uri32)
+      }&dwvReplaceMode=void`;
       params = getUriQuery(full32);
       const res32 = decodeKeyValueUri(params.input, params.dwvReplaceMode);
       const theo32 = [
@@ -332,8 +332,8 @@ describe('utils', () => {
       // simple test: plenty arguments
       const root40 = 'file:///test.html?input=';
       const uri40 = 'web/path/to/file/?file=0.dcm&file=1.dcm&file=2.dcm';
-      const full40 = root40 + encodeURIComponent(uri40) +
-        '&dwvReplaceMode=void';
+      const full40 = `${ root40 + encodeURIComponent(uri40)
+      }&dwvReplaceMode=void`;
       params = getUriQuery(full40);
       const res40 = decodeKeyValueUri(params.input, params.dwvReplaceMode);
       const theo40 = [
@@ -420,10 +420,10 @@ describe('utils', () => {
 
       // theoretical test decode result
       const middle = '?requestType=WADO&contentType=application/dicom&';
-      const theoLinkRoot = wadoUrl + middle + '&studyUID=' + studyInstanceUID +
-        '&seriesUID=' + seriesInstanceUID0;
-      const theoLink = [theoLinkRoot + '&objectUID=' + sOPInstanceUID00,
-        theoLinkRoot + '&objectUID=' + sOPInstanceUID01];
+      const theoLinkRoot = `${wadoUrl + middle}&studyUID=${ studyInstanceUID
+      }&seriesUID=${seriesInstanceUID0}`;
+      const theoLink = [`${theoLinkRoot}&objectUID=${sOPInstanceUID00}`,
+        `${theoLinkRoot}&objectUID=${sOPInstanceUID01}`];
 
       assert.equal(res[0], theoLink[0], 'Read regular manifest link0');
       assert.equal(res[1], theoLink[1], 'Read regular manifest link1');

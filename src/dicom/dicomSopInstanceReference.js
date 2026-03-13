@@ -33,8 +33,8 @@ export class SopInstanceReference {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.referencedSOPInstanceUID + ' (class: ' +
-      this.referencedSOPClassUID + ')';
+    return `${this.referencedSOPInstanceUID } (class: ${
+      this.referencedSOPClassUID })`;
   };
 };
 

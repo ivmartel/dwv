@@ -145,8 +145,8 @@ function getPaletteColourMap(dataElements) {
       // check double size
       if (vlSize !== 2 * descSize) {
         doScale = true;
-        logger.info('16bits lut but size is not double. desc: ' +
-          descSize + ' vl: ' + vlSize);
+        logger.info(`16bits lut but size is not double. desc: ${
+          descSize } vl: ${vlSize}`);
       }
       // (C.7.6.3.1.6 Palette Color Lookup Table Data)
       // Palette color values must always be scaled across the full
@@ -214,7 +214,7 @@ function getWindowPresets(dataElements, intensityFactor) {
           name = windowCWExplanation[j];
         }
         if (name === '') {
-          name = 'Default' + j;
+          name = `Default${j}`;
         }
         width *= intensityFactor;
         if (width < 1) {
@@ -386,8 +386,8 @@ export class ImageFactory {
     // check buffer size
     const bufferSize = size.getTotalSize() * samplesPerPixel;
     if (bufferSize !== pixelBuffer.length) {
-      logger.warn('Badly sized pixel buffer: ' +
-        pixelBuffer.length + ' != ' + bufferSize);
+      logger.warn(`Badly sized pixel buffer: ${
+        pixelBuffer.length } != ${bufferSize}`);
       if (bufferSize < pixelBuffer.length) {
         pixelBuffer = pixelBuffer.slice(0, size.getTotalSize());
       } else {
@@ -436,7 +436,7 @@ export class ImageFactory {
     if (typeof this.#suvFactor !== 'undefined') {
       isPetWithSuv = true;
       intensityFactor = this.#suvFactor;
-      logger.info('Applying PET SUV calibration: ' + intensityFactor);
+      logger.info(`Applying PET SUV calibration: ${intensityFactor}`);
       slope *= intensityFactor;
       intercept *= intensityFactor;
     }

@@ -65,7 +65,7 @@ export class Size {
    * @returns {string} The Size as a string.
    */
   toString() {
-    return '(' + this.#values.toString() + ')';
+    return `(${this.#values.toString()})`;
   }
 
   /**
@@ -204,7 +204,7 @@ export class Size {
     } else {
       for (let k = 0; k < length; ++k) {
         if (dirs[k] > length - 1) {
-          throw new Error('Wrong input dir value: ' + dirs[k]);
+          throw new Error(`Wrong input dir value: ${dirs[k]}`);
         }
       }
     }

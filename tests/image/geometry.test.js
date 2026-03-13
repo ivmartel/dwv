@@ -51,9 +51,9 @@ describe('image', () => {
         testData0[i].vals[0], testData0[i].vals[1], testData0[i].vals[2]
       ]);
       const resPoint = imgGeometry0.indexToWorld(index);
-      assert.ok(theoPoint.equals(resPoint), 'indexToWorld #0-' + i);
+      assert.ok(theoPoint.equals(resPoint), `indexToWorld #0-${i}`);
       const resPoint2 = imgGeometry0.worldToIndex(theoPoint);
-      assert.ok(index.equals(resPoint2), 'worldToIndex #0-' + i);
+      assert.ok(index.equals(resPoint2), `worldToIndex #0-${i}`);
     }
 
     // case #1
@@ -89,9 +89,9 @@ describe('image', () => {
         testData1[i].pvals[0], testData1[i].pvals[1], testData1[i].pvals[2]
       ]);
       const resPoint = imgGeometry1.indexToWorld(index);
-      assert.ok(theoPoint.equals(resPoint), 'indexToWorld #1-' + i);
+      assert.ok(theoPoint.equals(resPoint), `indexToWorld #1-${i}`);
       const resPoint2 = imgGeometry1.worldToIndex(theoPoint);
-      assert.ok(index.equals(resPoint2), 'worldToIndex #1-' + i);
+      assert.ok(index.equals(resPoint2), `worldToIndex #1-${i}`);
     }
   });
 

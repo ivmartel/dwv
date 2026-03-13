@@ -358,7 +358,7 @@ describe('image', () => {
       // time taken
       const time0 = (new Date()) - start0;
       // check time taken
-      assert.ok(time0 < 90, 'First generateImageData: ' + time0 + 'ms.');
+      assert.ok(time0 < 90, `First generateImageData: ${time0}ms.`);
 
       // Change the window level
       view0.setWindowLevel(new WindowLevel(4000, 200));
@@ -370,7 +370,7 @@ describe('image', () => {
       // time taken
       const time1 = (new Date()).getMilliseconds() - start1;
       // check time taken
-      assert.ok(time1 < 90, 'Second generateImageData: ' + time1 + 'ms.');
+      assert.ok(time1 < 90, `Second generateImageData: ${time1}ms.`);
     }
   );
 

@@ -686,8 +686,8 @@ export class App {
                 if (typeof optionClass !== 'undefined') {
                   appToolOptions[optionName] = optionClass;
                 } else {
-                  logger.warn('Could not find option class for: ' +
-                    optionName);
+                  logger.warn(`Could not find option class for: ${
+                    optionName }`);
                 }
               }
             } else {
@@ -696,7 +696,7 @@ export class App {
             appToolList[toolName].setOptions(appToolOptions);
           }
         } else {
-          logger.warn('Could not initialise unknown tool: ' + toolName);
+          logger.warn(`Could not initialise unknown tool: ${toolName}`);
         }
       }
       // add tools to the controller
@@ -1040,8 +1040,8 @@ export class App {
     if (itemIndex === -1) {
       this.#options.dataViewConfigs[dataId].push(config);
     } else {
-      throw new Error('Duplicate view config for data ' + dataId +
-        ' and div ' + config.divId);
+      throw new Error(`Duplicate view config for data ${ dataId
+      } and div ${config.divId}`);
     }
 
     // add layer group if not done
@@ -1118,7 +1118,7 @@ export class App {
     const configs = this.#options.dataViewConfigs;
     // check data id
     if (typeof configs[dataId] === 'undefined') {
-      throw new Error('No config for dataId: ' + dataId);
+      throw new Error(`No config for dataId: ${dataId}`);
     }
     // check div id
     const equalDivId = function (item) {
@@ -1126,8 +1126,8 @@ export class App {
     };
     const itemIndex = configs[dataId].findIndex(equalDivId);
     if (itemIndex === -1) {
-      throw new Error('No config for dataId: ' +
-        dataId + ' and divId: ' + divId);
+      throw new Error(`No config for dataId: ${
+        dataId } and divId: ${divId}`);
     }
 
     // update config
@@ -1274,8 +1274,8 @@ export class App {
 
     // nothing to do if no view config
     if (viewConfigs.length === 0) {
-      logger.info('Not rendering data: ' + dataId +
-        ' (no data view config)');
+      logger.info(`Not rendering data: ${dataId
+      } (no data view config)`);
       return;
     }
 
@@ -1286,7 +1286,7 @@ export class App {
         this.#stage.getLayerGroupByDivId(config.divId);
       // layer group must exist
       if (!layerGroup) {
-        throw new Error('No layer group for ' + config.divId);
+        throw new Error(`No layer group for ${config.divId}`);
       }
       // check compatibility
       if (isImage && !this.#canRenderData(dataId, layerGroup)) {
@@ -1354,28 +1354,28 @@ export class App {
     const targetData = this.#dataController.get(dataIdTarget);
     if (typeof targetData === 'undefined') {
       logger.debug(
-        'Cannot resample match, target data \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample match, target data '${
+          dataIdTarget}' is undefined`);
       return;
     }
     if (typeof targetData.image === 'undefined') {
       logger.debug(
-        'Cannot resample match, target image \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample match, target image '${
+          dataIdTarget}' is undefined`);
       return;
     }
     // source
     const sourceData = this.#dataController.get(dataIdSource);
     if (typeof sourceData === 'undefined') {
       logger.debug(
-        'Cannot resample match, source data \'' +
-        dataIdSource + '\' is undefined');
+        `Cannot resample match, source data '${
+          dataIdSource}' is undefined`);
       return;
     }
     if (typeof sourceData.image === 'undefined') {
       logger.debug(
-        'Cannot resample match, source image \'' +
-        dataIdSource + '\' is undefined');
+        `Cannot resample match, source image '${
+          dataIdSource}' is undefined`);
       return;
     }
     // check orientation
@@ -1385,8 +1385,8 @@ export class App {
       sourceData.image.getGeometry().getOrientation();
     if (targetOrientation.equals(sourceOrientation)) {
       logger.info(
-        'Same orientation, no resample match for data \'' +
-        dataIdTarget + '\' and \'' + dataIdSource + '\'');
+        `Same orientation, no resample match for data '${
+          dataIdTarget }' and '${dataIdSource}'`);
       return;
     }
     // resample
@@ -1404,14 +1404,14 @@ export class App {
     const targetData = this.#dataController.get(dataIdTarget);
     if (typeof targetData === 'undefined') {
       logger.debug(
-        'Cannot resample, target data \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample, target data '${
+          dataIdTarget }' is undefined`);
       return;
     }
     if (typeof targetData.image === 'undefined') {
       logger.debug(
-        'Cannot resample, target image \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample, target image '${
+          dataIdTarget }' is undefined`);
       return;
     }
     // check orientation
@@ -1419,8 +1419,8 @@ export class App {
       targetData.image.getGeometry().getOrientation();
     if (targetOrientation.equals(orientation)) {
       logger.info(
-        'Same orientation, no resample for data \'' +
-        dataIdTarget + '\'');
+        `Same orientation, no resample for data '${
+          dataIdTarget }'`);
       return;
     }
 
@@ -1463,21 +1463,21 @@ export class App {
     const targetData = this.#dataController.get(dataIdTarget);
     if (typeof targetData === 'undefined') {
       logger.debug(
-        'Cannot revert resample, target data \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot revert resample, target data '${
+          dataIdTarget }' is undefined`);
       return;
     }
     if (typeof targetData.image === 'undefined') {
       logger.debug(
-        'Cannot revert resample, target image \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot revert resample, target image '${
+          dataIdTarget }' is undefined`);
       return;
     }
     // exit if not resampled
     if (!targetData.image.isResampled()) {
       logger.info(
-        'No revert resample needed for data \'' +
-        dataIdTarget + '\'');
+        `No revert resample needed for data '${
+          dataIdTarget }'`);
       return;
     }
 
@@ -2193,13 +2193,13 @@ export class App {
   #addViewLayer(dataId, viewConfig) {
     const data = this.#dataController.get(dataId);
     if (!data) {
-      throw new Error('Cannot initialise layer with missing data, id: ' +
-        dataId);
+      throw new Error(`Cannot initialise layer with missing data, id: ${
+        dataId }`);
     }
     const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
     if (!layerGroup) {
-      throw new Error('Cannot initialise layer with missing group, id: ' +
-        viewConfig.divId);
+      throw new Error(`Cannot initialise layer with missing group, id: ${
+        viewConfig.divId }`);
     }
     const imageGeometry = data.image.getGeometry();
 
@@ -2424,14 +2424,14 @@ export class App {
   addDrawLayer(dataId, viewConfig) {
     const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
     if (!layerGroup) {
-      throw new Error('Cannot initialise layer with missing group, id: ' +
-        viewConfig.divId);
+      throw new Error(`Cannot initialise layer with missing group, id: ${
+        viewConfig.divId }`);
     }
 
     const data = this.#dataController.get(dataId);
     if (!data) {
-      throw new Error('Cannot initialise layer with missing data, id: ' +
-        dataId);
+      throw new Error(`Cannot initialise layer with missing data, id: ${
+        dataId }`);
     }
     const annotationGroup = data.annotationGroup;
 
@@ -2455,8 +2455,8 @@ export class App {
     const refData = this.#dataController.get(refDataId);
     if (!refData) {
       throw new Error(
-        'Cannot initialise layer without reference data, id: ' +
-        refDataId);
+        `Cannot initialise layer without reference data, id: ${
+          refDataId }`);
     }
     const imageGeometry = refData.image.getGeometry();
 
@@ -2683,8 +2683,8 @@ export class App {
     } else {
       // LIP uses default scale and offset
       if (orientationCode !== 'LIP') {
-        logger.warn('Unsupported orientation code: ' +
-          orientationCode + ', display could be incorrect');
+        logger.warn(`Unsupported orientation code: ${
+          orientationCode }, display could be incorrect`);
       }
     }
 

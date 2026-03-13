@@ -118,7 +118,7 @@ class MockXMLHttpRequest {
     this.status = 200;
     this.statusText = 'OK';
     this.response = this.responseType === 'arraybuffer'
-      ? new ArrayBuffer(8) : 'body:' + this.url;
+      ? new ArrayBuffer(8) : `body:${this.url}`;
     this.readyState = 4;
     if (typeof this.onload === 'function') {
       this.onload({target: this});

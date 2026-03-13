@@ -94,31 +94,31 @@ describe('annotation', () => {
     const colours = ['#ffff80', '#ffa348', '#ed333b'];
 
     assert.ok(annotationGroup.getLength() === 3,
-      prefix + ' annotationGroup length');
+      `${prefix} annotationGroup length`);
     assert.ok(annotations.length === 3,
-      prefix + ' annotations length');
+      `${prefix} annotations length`);
 
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
       assert.ok(typeof annotation.trackingId !== 'undefined',
-        prefix + ' annotation ' + i + ' trackingId');
+        `${prefix} annotation ${i} trackingId`);
       assert.ok(typeof annotation.trackingUid !== 'undefined',
-        prefix + ' annotation ' + i + ' trackingUid');
+        `${prefix} annotation ${i} trackingUid`);
       assert.ok(typeof annotation.referencedSopClassUID !== 'undefined',
-        prefix + ' annotation ' + i + ' referencedSopClassUID');
+        `${prefix} annotation ${i} referencedSopClassUID`);
       assert.ok(typeof annotation.referencedSopInstanceUID !== 'undefined',
-        prefix + ' annotation ' + i + ' referencedSopInstanceUID');
+        `${prefix} annotation ${i} referencedSopInstanceUID`);
 
       assert.ok(typeof annotation.colour !== 'undefined',
-        prefix + ' annotation ' + i + ' colour');
+        `${prefix} annotation ${i} colour`);
       assert.equal(annotation.colour, colours[i],
-        prefix + ' annotation ' + i + ' good colour');
+        `${prefix} annotation ${i} good colour`);
 
       assert.ok(typeof annotation.textExpr !== 'undefined',
-        prefix + ' annotation ' + i + ' textExpr');
+        `${prefix} annotation ${i} textExpr`);
       if (i === 2) {
         assert.ok(typeof annotation.labelPosition !== 'undefined',
-          prefix + ' annotation ' + i + ' labelPosition');
+          `${prefix} annotation ${i} labelPosition`);
       }
     }
   }
@@ -131,13 +131,13 @@ describe('annotation', () => {
    */
   function checkQuantification(quantification, prefix) {
     assert.ok(typeof quantification.min !== 'undefined',
-      prefix + ' quantification.min');
+      `${prefix} quantification.min`);
     assert.ok(typeof quantification.max !== 'undefined',
-      prefix + ' quantification.max');
+      `${prefix} quantification.max`);
     assert.ok(typeof quantification.mean !== 'undefined',
-      prefix + ' quantification.mean');
+      `${prefix} quantification.mean`);
     assert.ok(typeof quantification.surface !== 'undefined',
-      prefix + ' quantification.surface');
+      `${prefix} quantification.surface`);
   }
 
   /**
@@ -149,14 +149,14 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'arrow annotation ' + i;
+      const prefix = `arrow annotation ${i}`;
       assert.ok(annotation.mathShape instanceof Point2D,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       assert.ok(typeof annotation.quantification === 'undefined',
-        prefix + ' quantification');
+        `${prefix} quantification`);
       if (i !== 0) {
         assert.equal(annotation.textExpr, 'label',
-          prefix + ' annotation ' + i + ' good textExpr');
+          `${prefix} annotation ${i} good textExpr`);
       }
     }
   }
@@ -170,19 +170,19 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'circle annotation ' + i;
+      const prefix = `circle annotation ${i}`;
       assert.ok(annotation.mathShape instanceof Circle,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       assert.equal(annotation.textExpr, '{surface}',
-        prefix + ' annotation ' + i + ' good textExpr');
+        `${prefix} annotation ${i} good textExpr`);
 
       assert.ok(typeof annotation.quantification.radius !== 'undefined',
-        prefix + ' quantification.radius');
+        `${prefix} quantification.radius`);
       const radius = Math.round(
         parseFloat(annotation.quantification.radius.value));
-      assert.equal(radius, 2, prefix + ' radius is ~2');
+      assert.equal(radius, 2, `${prefix} radius is ~2`);
       assert.equal(annotation.quantification.radius.unit, 'unit.mm',
-        prefix + ' radius unit');
+        `${prefix} radius unit`);
       checkQuantification(annotation.quantification, assert, prefix);
     }
   }
@@ -196,26 +196,26 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'ellipse annotation ' + i;
+      const prefix = `ellipse annotation ${i}`;
       assert.ok(annotation.mathShape instanceof Ellipse,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       assert.equal(annotation.textExpr, '{surface}',
-        prefix + ' annotation ' + i + ' good textExpr');
+        `${prefix} annotation ${i} good textExpr`);
 
       assert.ok(typeof annotation.quantification.longAxis !== 'undefined',
-        prefix + ' quantification.a');
+        `${prefix} quantification.a`);
       assert.ok(typeof annotation.quantification.shortAxis !== 'undefined',
-        prefix + ' quantification.b');
+        `${prefix} quantification.b`);
       const longAxis = Math.round(parseFloat(
         annotation.quantification.longAxis.value));
-      assert.equal(longAxis, 3, prefix + ' longAxis is ~3');
+      assert.equal(longAxis, 3, `${prefix} longAxis is ~3`);
       assert.equal(annotation.quantification.longAxis.unit, 'unit.mm',
-        prefix + ' longAxis unit');
+        `${prefix} longAxis unit`);
       const shortAxis = Math.round(parseFloat(
         annotation.quantification.shortAxis.value));
-      assert.equal(shortAxis, 2, prefix + ' shortAxis is ~2');
+      assert.equal(shortAxis, 2, `${prefix} shortAxis is ~2`);
       assert.equal(annotation.quantification.shortAxis.unit, 'unit.mm',
-        prefix + ' shortAxis unit');
+        `${prefix} shortAxis unit`);
       checkQuantification(annotation.quantification, assert, prefix);
     }
   }
@@ -229,19 +229,19 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'protractor annotation ' + i;
+      const prefix = `protractor annotation ${i}`;
       assert.ok(annotation.mathShape instanceof Protractor,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       assert.equal(annotation.textExpr, '{angle}',
-        prefix + ' annotation ' + i + ' good textExpr');
+        `${prefix} annotation ${i} good textExpr`);
 
       assert.ok(typeof annotation.quantification.angle !== 'undefined',
-        prefix + ' quantification.angle');
+        `${prefix} quantification.angle`);
       const angle = Math.round(parseFloat(
         annotation.quantification.angle.value));
-      assert.equal(angle, 90, prefix + ' angle is ~90');
+      assert.equal(angle, 90, `${prefix} angle is ~90`);
       assert.equal(annotation.quantification.angle.unit, 'unit.degree',
-        prefix + ' angle unit');
+        `${prefix} angle unit`);
     }
   }
 
@@ -254,26 +254,26 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'rectangle annotation ' + i;
+      const prefix = `rectangle annotation ${i}`;
       assert.ok(annotation.mathShape instanceof Rectangle,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       assert.equal(annotation.textExpr, '{surface}',
-        prefix + ' annotation ' + i + ' good textExpr');
+        `${prefix} annotation ${i} good textExpr`);
 
       assert.ok(typeof annotation.quantification.width !== 'undefined',
-        prefix + ' quantification.width');
+        `${prefix} quantification.width`);
       assert.ok(typeof annotation.quantification.height !== 'undefined',
-        prefix + ' quantification.height');
+        `${prefix} quantification.height`);
       const width = Math.round(parseFloat(
         annotation.quantification.width.value));
-      assert.equal(width, 6, prefix + ' width is ~6');
+      assert.equal(width, 6, `${prefix} width is ~6`);
       assert.equal(annotation.quantification.width.unit, 'unit.mm',
-        prefix + ' width unit');
+        `${prefix} width unit`);
       const height = Math.round(parseFloat(
         annotation.quantification.height.value));
-      assert.equal(height, 4, prefix + ' height is ~4');
+      assert.equal(height, 4, `${prefix} height is ~4`);
       assert.equal(annotation.quantification.height.unit, 'unit.mm',
-        prefix + ' height unit');
+        `${prefix} height unit`);
       checkQuantification(annotation.quantification, assert, prefix);
     }
   }
@@ -287,16 +287,16 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'roi annotation ' + i;
+      const prefix = `roi annotation ${i}`;
       assert.ok(annotation.mathShape instanceof ROI,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       if (i !== 0) {
         assert.equal(annotation.textExpr, 'label',
-          prefix + ' annotation ' + i + ' good textExpr');
+          `${prefix} annotation ${i} good textExpr`);
       }
 
       assert.ok(typeof annotation.quantification === 'undefined',
-        prefix + ' quantification');
+        `${prefix} quantification`);
     }
   }
 
@@ -309,19 +309,19 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'ruler annotation ' + i;
+      const prefix = `ruler annotation ${i}`;
       assert.ok(annotation.mathShape instanceof Line,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       assert.equal(annotation.textExpr, '{length}',
-        prefix + ' annotation ' + i + ' good textExpr');
+        `${prefix} annotation ${i} good textExpr`);
 
       assert.ok(typeof annotation.quantification.length !== 'undefined',
-        prefix + ' quantification.length');
+        `${prefix} quantification.length`);
       const length = Math.round(
         parseInt(annotation.quantification.length.value, 10));
-      assert.equal(length, 4, prefix + ' length is ~4');
+      assert.equal(length, 4, `${prefix} length is ~4`);
       assert.equal(annotation.quantification.length.unit, 'unit.mm',
-        prefix + ' length unit');
+        `${prefix} length unit`);
     }
   }
 
@@ -334,19 +334,19 @@ describe('annotation', () => {
     const annotations = annotationGroup.getList();
     for (let i = 0; i < annotations.length; ++i) {
       const annotation = annotations[i];
-      const prefix = 'bidimensional annotation ' + i;
+      const prefix = `bidimensional annotation ${i}`;
       assert.ok(annotation.mathShape instanceof BidimensionalLine,
-        prefix + ' mathShape');
+        `${prefix} mathShape`);
       assert.ok(
         annotation.textExpr === '{longAxis} x {shortAxis}' ||
         annotation.textExpr === '{longAxis}',
-        prefix + ' annotation ' + i + ' good textExpr (' +
-        annotation.textExpr + ')'
+        `${prefix} annotation ${i} good textExpr (${
+          annotation.textExpr })`
       );
       assert.ok(typeof annotation.quantification.longAxis !== 'undefined',
-        prefix + ' quantification.longAxis');
+        `${prefix} quantification.longAxis`);
       assert.ok(typeof annotation.quantification.shortAxis !== 'undefined',
-        prefix + ' quantification.shortAxis');
+        `${prefix} quantification.shortAxis`);
     }
   }
 

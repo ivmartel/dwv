@@ -27,7 +27,7 @@ export function toStringId(arr, dims) {
     if (i !== 0) {
       res += '_';
     }
-    res += '#' + dims[i] + '-' + arr[dims[i]];
+    res += `#${dims[i]}-${arr[dims[i]]}`;
   }
   return res;
 }
@@ -362,12 +362,12 @@ export function buildMultipart(parts, boundary) {
     if (i !== 0) {
       headerStr += lineBreak;
     }
-    headerStr += '--' + boundary + lineBreak;
+    headerStr += `--${boundary}${lineBreak}`;
     const partKeys = Object.keys(parts[i]);
     for (let k = 0; k < partKeys.length; ++k) {
       const key = partKeys[k];
       if (key !== 'data') {
-        headerStr += key + ': ' + parts[i][key] + lineBreak;
+        headerStr += `${key}: ${parts[i][key]}${lineBreak}`;
       }
     }
     headerStr += lineBreak;
@@ -376,7 +376,7 @@ export function buildMultipart(parts, boundary) {
     partsSize += header.byteLength + parts[i].data.byteLength;
   }
   // build trailer
-  const trailerStr = lineBreak + '--' + boundary + '--' + lineBreak;
+  const trailerStr = `${lineBreak}--${boundary}--${lineBreak}`;
   const trailer = stringToUint8Array(trailerStr);
 
   // final buffer

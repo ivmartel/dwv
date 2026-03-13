@@ -139,7 +139,7 @@ export function getContentTemplate(dataElements) {
     const templateId = safeGet(templateItem, TagKeys.TemplateIdentifier);
     if (typeof mappingResource !== 'undefined' &&
       typeof templateId !== 'undefined') {
-      template = mappingResource + '-' + templateId;
+      template = `${mappingResource}-${templateId}`;
     }
   }
   return template;
@@ -205,19 +205,19 @@ export class DicomSRContent {
     let res = '';
 
     if (typeof this.relationshipType !== 'undefined') {
-      res += '(' + this.relationshipType + ') ';
+      res += `(${this.relationshipType}) `;
     }
 
-    res += this.valueType + ': ';
+    res += `${this.valueType}: `;
 
     if (typeof this.conceptNameCode !== 'undefined') {
       res += this.conceptNameCode.toString();
     }
 
-    res += ' = ' + this.value.toString();
+    res += ` = ${this.value.toString()}`;
 
     for (const item of this.contentSequence) {
-      res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
+      res += `\n${prefix}- ${item.toString(`${prefix}`)}  `;
     }
 
     return res;
@@ -302,7 +302,7 @@ export function getSRContent(dataElements) {
       content.value =
         safeGet(dataElements, TagKeys[valueTagName]);
     } else {
-      console.warn('Unsupported input ValueType: ' + valueType);
+      console.warn(`Unsupported input ValueType: ${valueType}`);
     }
   }
 
@@ -373,7 +373,7 @@ export function getDicomSRContentItem(content) {
     if (typeof valueTagName !== 'undefined') {
       contentItem[valueTagName] = content.value;
     } else {
-      console.warn('Unsupported output ValueType: ' + content.valueType);
+      console.warn(`Unsupported output ValueType: ${content.valueType}`);
     }
   }
 

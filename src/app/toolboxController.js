@@ -121,7 +121,7 @@ export class ToolboxController {
   setSelectedTool(name) {
     // check if we have it
     if (!this.hasTool(name)) {
-      throw new Error('Unknown tool: \'' + name + '\'');
+      throw new Error(`Unknown tool: '${name}'`);
     }
     // de-activate previous
     if (this.#selectedTool) {

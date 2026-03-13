@@ -179,7 +179,7 @@ export function decodeKeyValueUri(uri, replaceMode) {
           if (gotOneArg) {
             baseUrl += '&';
           }
-          baseUrl += keys[j] + '=' + inputQueryPairs.query[keys[j]];
+          baseUrl += `${keys[j]}=${inputQueryPairs.query[keys[j]]}`;
           gotOneArg = true;
         }
       }
@@ -191,7 +191,7 @@ export function decodeKeyValueUri(uri, replaceMode) {
           url += '&';
         }
         if (repeatKeyReplaceMode === 'key') {
-          url += repeatKey + '=';
+          url += `${repeatKey}=`;
         }
         // other than 'key' mode: do nothing
         url += repeatList[k];
@@ -214,7 +214,7 @@ export function decodeKeyValueUri(uri, replaceMode) {
 export function decodeWeasisXMLManifest(manifestUri, nslices, callback) {
   let uri = '';
   if (manifestUri[0] === '/') {
-    uri = window.location.protocol + '//' + window.location.host;
+    uri = `${window.location.protocol}//${window.location.host}`;
   }
   // TODO: needs to be decoded (decodeURIComponent?
   uri += manifestUri;
@@ -225,8 +225,8 @@ export function decodeWeasisXMLManifest(manifestUri, nslices, callback) {
    * @param {object} event The error event.
    */
   function onError(event) {
-    logger.warn('RequestError while receiving manifest: ' +
-      event.target.status);
+    logger.warn(`RequestError while receiving manifest: ${
+      event.target.status }`);
   }
 
   /**
@@ -259,7 +259,7 @@ export function parseWeasisXMLManifest(manifest, nslices) {
   // wado url
   const wadoElement = manifest.getElementsByTagName('wado_query');
   const wadoURL = wadoElement[0].getAttribute('wadoURL');
-  const rootURL = wadoURL + '?requestType=WADO&contentType=application/dicom&';
+  const rootURL = `${wadoURL}?requestType=WADO&contentType=application/dicom&`;
   // patient list
   const patientList = manifest.getElementsByTagName('Patient');
   if (patientList.length > 1) {
@@ -286,10 +286,10 @@ export function parseWeasisXMLManifest(manifest, nslices) {
   }
   for (let i = 0; i < max; ++i) {
     const sopInstanceUID = instanceList[i].getAttribute('SOPInstanceUID');
-    const link = rootURL +
-      '&studyUID=' + studyUID +
-      '&seriesUID=' + seriesUID +
-      '&objectUID=' + sopInstanceUID;
+    const link = `${rootURL
+    }&studyUID=${ studyUID
+    }&seriesUID=${ seriesUID
+    }&objectUID=${sopInstanceUID}`;
     result.push(link);
   }
   // return

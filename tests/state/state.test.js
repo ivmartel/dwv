@@ -149,7 +149,7 @@ describe('state', () => {
           id: '4gvkz8v6wzw',
           points: [51, 135, 216, 134],
           colour: '#ffff80',
-          text: '165.0' + unit,
+          text: `165.0${unit}`,
           textExpr: '{length}',
           longText: 'What a ruler!'
         };
@@ -160,7 +160,7 @@ describe('state', () => {
           id: '4gvkz8v6wzw',
           points: [51, 135, 216, 134],
           colour: '#ffff00',
-          text: '165.0' + unit,
+          text: `165.0${unit}`,
           textExpr: '{length}',
           longText: ''
         };
@@ -380,7 +380,7 @@ describe('state', () => {
   function checkRulerDrawings(layerKids, details, version) {
 
     const ndraws = 5;
-    assert.equal(layerKids.length, ndraws, 'Layer has ' + ndraws + ' kids.');
+    assert.equal(layerKids.length, ndraws, `Layer has ${ndraws} kids.`);
 
     const unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
     const refRulers = [
@@ -388,7 +388,7 @@ describe('state', () => {
         id: 'onzlkbs8p',
         points: [120, 110, 120, 60],
         colour: '#ffff00',
-        text: '50.00' + unit,
+        text: `50.00${unit}`,
         textExpr: '{length}',
         longText: (version === '0.1' ? '' : 'First ruler.')
       },
@@ -396,7 +396,7 @@ describe('state', () => {
         id: 'u9bvidgkjc9',
         points: [120, 110, 170, 110],
         colour: '#ff0000',
-        text: '50.00' + unit,
+        text: `50.00${unit}`,
         textExpr: '{length}',
         longText: (version === '0.1' ? '' : 'Second ruler.')
       },
@@ -404,7 +404,7 @@ describe('state', () => {
         id: 'c9abkegq62j',
         points: [120, 110, 120, 160],
         colour: '#ffffff',
-        text: '50.00' + unit,
+        text: `50.00${unit}`,
         textExpr: '{length}',
         longText: (version === '0.1' ? '' : 'Third ruler.')
       },
@@ -412,7 +412,7 @@ describe('state', () => {
         id: 'uiav43zjw1',
         points: [120, 110, 60, 110],
         colour: '#00ff00',
-        text: '50.00' + unit,
+        text: `50.00${unit}`,
         textExpr: '{length}',
         longText: (version === '0.1' ? '' : 'Fourth ruler.')
       },
@@ -420,7 +420,7 @@ describe('state', () => {
         id: '26ir11b9ugl',
         points: [120, 110, 120, 60],
         colour: '#ff00ff',
-        text: '50.00' + unit,
+        text: `50.00${unit}`,
         textExpr: '{length}',
         longText: (version === '0.1' ? '' : 'Fifth ruler.')
       }
@@ -431,12 +431,12 @@ describe('state', () => {
       assert.equal(
         layerKid.className,
         'Group',
-        'Layer first level is a group for slice ' + i + '.');
+        `Layer first level is a group for slice ${i}.`);
       assert.equal(
         layerKid.attrs.name,
         'position-group',
         'Layer first level is a position group.');
-      const groupId = '#2-' + (i + 1);
+      const groupId = `#2-${i + 1}`;
       assert.equal(
         layerKid.attrs.id,
         groupId,
@@ -722,7 +722,7 @@ describe('state', () => {
         const unit = parseFloat(version) <= 0.3 ? 'cm2' : ' cm²';
         assert.equal(
           labelGroupKid0.attrs.text,
-          '53.28' + unit,
+          `53.28${unit}`,
           'Text has the proper value.');
         const labelGroupKid1 = shapeGroupKid.children[1];
         assert.equal(
@@ -813,7 +813,7 @@ describe('state', () => {
         const unit = parseFloat(version) <= 0.3 ? '°' : ' °';
         assert.equal(
           labelGroupKid0.attrs.text,
-          '80.15' + unit,
+          `80.15${unit}`,
           'Text has the proper value.');
         const labelGroupKid1 = shapeGroupKid.children[1];
         assert.equal(
@@ -921,7 +921,7 @@ describe('state', () => {
         const unit = parseFloat(version, 10) <= 0.3 ? 'cm2' : ' cm²';
         assert.equal(
           labelGroupKid0.attrs.text,
-          '66.56' + unit,
+          `66.56${unit}`,
           'Text has the proper value.');
         const labelGroupKid1 = shapeGroupKid.children[1];
         assert.equal(

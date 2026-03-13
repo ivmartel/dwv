@@ -45,8 +45,8 @@ export class RawVideoLoader {
       videoDataStr += String.fromCharCode(bytes[i]);
     }
     // create uri
-    const uri = 'data:video/' + dataType +
-      ';base64,' + window.btoa(videoDataStr);
+    const uri = `data:video/${ dataType
+    };base64,${window.btoa(videoDataStr)}`;
     return uri;
   }
 

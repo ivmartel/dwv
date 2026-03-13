@@ -33,7 +33,7 @@ class MockFileReader {
    */
   readAsText(file) {
     this.mode = 'text';
-    this.#runRead(file, 'text:' + file.name);
+    this.#runRead(file, `text:${file.name}`);
   }
 
   /**
@@ -43,7 +43,7 @@ class MockFileReader {
    */
   readAsDataURL(file) {
     this.mode = 'dataurl';
-    this.#runRead(file, 'dataurl:' + file.name);
+    this.#runRead(file, `dataurl:${file.name}`);
   }
 
   /**

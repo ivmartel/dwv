@@ -50,7 +50,7 @@ export class ListenerHandler {
       }
     }
     if (nFound === 0) {
-      logger.debug('No callback found on remove listener for type ' + type);
+      logger.debug(`No callback found on remove listener for type ${type}`);
     }
   }
 
