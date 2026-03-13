@@ -55,7 +55,7 @@ describe('dicom', () => {
 
     // test #2: with beta
     const version20 = '4.5.6-beta.19';
-    const classUID20 = getDwvUIDPrefix() + '.' + '4.5.6.99.19';
+    const classUID20 = getDwvUIDPrefix() + '.4.5.6.99.19';
     const version21 = getDwvVersionFromImplementationClassUID(classUID20);
     assert.deepEqual(version20, version21, 'Implementation class test #2');
   });

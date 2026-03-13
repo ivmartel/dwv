@@ -68,13 +68,13 @@ export default [
       'no-shadow': 'error',
       // disallow returning from Promise executors
       // https://eslint.org/docs/rules/no-promise-executor-return
-      'no-promise-executor-return': 'warn',
+      'no-promise-executor-return': 'error',
       // disallow await inside loops
       // https://eslint.org/docs/rules/no-await-in-loop
-      'no-await-in-loop': 'warn',
+      'no-await-in-loop': 'error',
       // disallow useless string concatenation
       // https://eslint.org/docs/rules/no-useless-concat
-      'no-useless-concat': 'warn',
+      'no-useless-concat': 'error',
 
       // modern js idioms
 
