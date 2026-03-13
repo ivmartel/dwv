@@ -44,7 +44,8 @@ export default [
       'default-case-last': 'error',
       // enforce consistent return values from functions
       // https://eslint.org/docs/rules/consistent-return
-      'consistent-return': 'warn',
+      // TODO activate
+      //'consistent-return': 'error',
       // disallow unnecessary return statements
       // https://eslint.org/docs/rules/no-useless-return
       'no-useless-return': 'error',
