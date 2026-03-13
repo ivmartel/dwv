@@ -272,26 +272,26 @@ export class DrawShapeEditor {
     });
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
-      const anchor = event.target;
-      if (!(anchor instanceof Konva.Shape)) {
+      const evAnchor = event.target;
+      if (!(evAnchor instanceof Konva.Shape)) {
         return;
       }
       // validate the anchor position
-      validateAnchorPosition(this.#drawLayer.getBaseSize(), anchor);
+      validateAnchorPosition(this.#drawLayer.getBaseSize(), evAnchor);
       if (typeof this.#currentFactory.constrainAnchorMove !== 'undefined') {
-        this.#currentFactory.constrainAnchorMove(anchor);
+        this.#currentFactory.constrainAnchorMove(evAnchor);
       }
 
       // udpate annotation
       this.#currentFactory.updateAnnotationOnAnchorMove(
-        this.#annotation, anchor);
+        this.#annotation, evAnchor);
       // udpate shape
       this.#currentFactory.updateShapeGroupOnAnchorMove(
-        this.#annotation, anchor, this.#app.getStyle());
+        this.#annotation, evAnchor, this.#app.getStyle());
 
       // redraw
-      if (anchor.getLayer()) {
-        anchor.getLayer().draw();
+      if (evAnchor.getLayer()) {
+        evAnchor.getLayer().draw();
       } else {
         logger.warn('No layer to draw the anchor!');
       }
@@ -331,33 +331,33 @@ export class DrawShapeEditor {
     });
     // mouse down listener
     anchor.on('mousedown touchstart', (event) => {
-      const anchor = event.target;
-      anchor.moveToTop();
+      const evAnchor = event.target;
+      evAnchor.moveToTop();
     });
     // mouse over styling
     anchor.on('mouseover.edit', (event) => {
-      const anchor = event.target;
-      if (!(anchor instanceof Konva.Shape)) {
+      const evAnchor = event.target;
+      if (!(evAnchor instanceof Konva.Shape)) {
         return;
       }
       // style is handled by the group
-      anchor.stroke('#ddd');
-      if (anchor.getLayer()) {
-        anchor.getLayer().draw();
+      evAnchor.stroke('#ddd');
+      if (evAnchor.getLayer()) {
+        evAnchor.getLayer().draw();
       } else {
         logger.warn('No layer to draw the anchor!');
       }
     });
     // mouse out styling
     anchor.on('mouseout.edit', (event) => {
-      const anchor = event.target;
-      if (!(anchor instanceof Konva.Shape)) {
+      const evAnchor = event.target;
+      if (!(evAnchor instanceof Konva.Shape)) {
         return;
       }
       // style is handled by the group
-      anchor.stroke('#999');
-      if (anchor.getLayer()) {
-        anchor.getLayer().draw();
+      evAnchor.stroke('#999');
+      if (evAnchor.getLayer()) {
+        evAnchor.getLayer().draw();
       } else {
         logger.warn('No layer to draw the anchor!');
       }

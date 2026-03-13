@@ -914,12 +914,12 @@ export class Draw {
     }
     // activate newly added layers
     this.#app.addEventListener('drawlayeradd', (event) => {
-      const drawLayers = this.#app.getDrawLayers(function (item) {
+      const newDrawLayers = this.#app.getDrawLayers(function (item) {
         return item.getId() === event.layerid;
       });
       // should be just one
-      if (drawLayers.length === 1) {
-        this.#activateLayer(drawLayers[0], flag);
+      if (newDrawLayers.length === 1) {
+        this.#activateLayer(newDrawLayers[0], flag);
       }
     });
 

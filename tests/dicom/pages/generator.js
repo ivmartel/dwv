@@ -113,11 +113,11 @@ function onGenerate() {
     zip.file('dwv-generated-slice' + k + '.dcm', blob);
   }
 
-  zip.generateAsync({type: 'blob'}).then(function (blob) {
+  zip.generateAsync({type: 'blob'}).then(function (zipBlob) {
     console.log('Zipping data...');
     const element = document.getElementById('generate');
     element.download = 'dwv-generated.zip';
-    element.href = URL.createObjectURL(blob);
+    element.href = URL.createObjectURL(zipBlob);
 
     // simultate a click event to trigger download
     // (avoid infinte loop with generating flag)
@@ -234,8 +234,8 @@ function onInputTagsFile(event) {
   }
   _tagsFile = event.target.files[0];
   const reader = new FileReader();
-  reader.onload = function (event) {
-    document.getElementById('tags').value = event.target.result;
+  reader.onload = function (readerEvent) {
+    document.getElementById('tags').value = readerEvent.target.result;
   };
   reader.readAsText(_tagsFile);
 }
@@ -269,7 +269,7 @@ function onInputImageFiles(event) {
    * @returns {Function} The load handler.
    */
   function getOnReaderLoad(file) {
-    return function (event) {
+    return function (loadEvent) {
       const image = new Image();
       image.origin = file.name;
       // check size
@@ -304,7 +304,7 @@ function onInputImageFiles(event) {
         _images.push(this);
       };
       // set src (triggers load)
-      image.src = event.target.result;
+      image.src = loadEvent.target.result;
     };
   }
 

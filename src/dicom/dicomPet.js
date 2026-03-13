@@ -131,9 +131,9 @@ function getDecayedDose(elements) {
 
     if (scanStart > acqDate) {
       const diff = scanStart.getTime() - acqDate.getTime();
-      const warn = 'Series date/time is after Aquisition date/time (diff=' +
+      const logWarn = 'Series date/time is after Aquisition date/time (diff=' +
         diff.toString() + 'ms) ';
-      logger.debug(warn);
+      logger.debug(logWarn);
 
       // back compute from center (average count rate) of time window
       // for bed position (frame) in series (reliable in all cases)

@@ -195,16 +195,16 @@ export class AnnotationUI {
       // get annotatio
       const indices =
         splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
-      const dataId = indices.dataId;
+      const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const annotationGroup = this.#app.getData(dataId).annotationGroup;
-      const annotation = annotationGroup.find(annotationId);
+      const annotationGroup = this.#app.getData(clkDataId).annotationGroup;
+      const clkAnnotation = annotationGroup.find(annotationId);
 
       let qStr = 'Quantification:\n';
-      if (typeof annotation.quantification !== 'undefined') {
-        const keys = Object.keys(annotation.quantification);
+      if (typeof clkAnnotation.quantification !== 'undefined') {
+        const keys = Object.keys(clkAnnotation.quantification);
         for (const key of keys) {
-          const quant = annotation.quantification[key];
+          const quant = clkAnnotation.quantification[key];
           qStr += '- ' + key + ': ' + quant.value.toPrecision(4);
           if (typeof quant.unit !== 'undefined') {
             qStr += i18n.t(quant.unit);
@@ -233,16 +233,16 @@ export class AnnotationUI {
       // get annotation
       const indices =
         splitAnnotationDivId(target.id.substring(inputColourPrefix.length));
-      const dataId = indices.dataId;
+      const chgDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const annotationGroup = this.#app.getData(dataId).annotationGroup;
-      const annotation = annotationGroup.find(annotationId);
+      const annotationGroup = this.#app.getData(chgDataId).annotationGroup;
+      const chgAnnotation = annotationGroup.find(annotationId);
       // update
-      if (newColour !== annotation.colour) {
+      if (newColour !== chgAnnotation.colour) {
         const drawController = new DrawController(annotationGroup);
         drawController.updateAnnotationWithCommand(
           annotationId,
-          {colour: annotation.colour},
+          {colour: chgAnnotation.colour},
           {colour: newColour},
           this.#app.addToUndoStack
         );
@@ -261,9 +261,9 @@ export class AnnotationUI {
       // get annotatio
       const indices =
         splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
-      const dataId = indices.dataId;
+      const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const drawLayers = this.#app.getDrawLayersByDataId(dataId);
+      const drawLayers = this.#app.getDrawLayersByDataId(clkDataId);
       // toggle hidden
       if (isButtonPressed(target)) {
         setButtonPressed(target, false);
@@ -289,11 +289,11 @@ export class AnnotationUI {
       // get segment and mask
       const indices =
         splitAnnotationDivId(target.id.substring(dbIdPrefix.length));
-      const dataId = indices.dataId;
+      const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
       // delete if possible
       const drawController = new DrawController(
-        this.#app.getData(dataId).annotationGroup);
+        this.#app.getData(clkDataId).annotationGroup);
       // TODO reposition div at same position after delete undo?
       drawController.removeAnnotationWithCommand(
         annotationId,
@@ -345,19 +345,19 @@ export class AnnotationUI {
       // remove selected class from other rows
       const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
       const items = mainlist.querySelectorAll('.data-item-list-item');
-      items.forEach(item => item.classList.remove('selected'));
+      items.forEach(item2 => item2.classList.remove('selected'));
       // mark this row as selected
       target.classList.add('selected');
 
       // get annotation
       const indices = splitAnnotationDivId(target.id);
-      const dataId = indices.dataId;
+      const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const annotationGroup = this.#app.getData(dataId).annotationGroup;
-      const annotation = annotationGroup.find(annotationId);
-      const annotCentroid = annotation.getCentroid();
+      const clkAnnotationGroup = this.#app.getData(clkDataId).annotationGroup;
+      const clkAnnotation = clkAnnotationGroup.find(annotationId);
+      const annotCentroid = clkAnnotation.getCentroid();
       if (typeof annotCentroid !== 'undefined') {
-        const drawLayers = this.#app.getDrawLayersByDataId(dataId);
+        const drawLayers = this.#app.getDrawLayersByDataId(clkDataId);
         for (const layer of drawLayers) {
           layer.setCurrentPosition(annotCentroid);
         }

@@ -1388,16 +1388,16 @@ export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
       } else if (stateGroup.name() === 'roi-group') {
         const points = shape.points();
         const pointsArray = [];
-        for (let i = 0; i < points.length; i = i + 2) {
-          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        for (let p = 0; p < points.length; p = p + 2) {
+          pointsArray.push(new Point2D(points[p], points[p + 1]));
         }
         annotation.mathShape = new ROI(pointsArray);
       } else if (stateGroup.name() === 'freeHand-group') {
         logger.warn('Converting freehand into ROI shape');
         const points = shape.points();
         const pointsArray = [];
-        for (let i = 0; i < points.length; i = i + 2) {
-          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        for (let p = 0; p < points.length; p = p + 2) {
+          pointsArray.push(new Point2D(points[p], points[p + 1]));
         }
         annotation.mathShape = new ROI(pointsArray);
       } else if (stateGroup.name() === 'protractor-group') {

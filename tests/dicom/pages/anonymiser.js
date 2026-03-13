@@ -142,8 +142,8 @@ function onInputRulesFile(event) {
   }
   _rulesFile = event.target.files[0];
   const reader = new FileReader();
-  reader.onload = function (event) {
-    document.getElementById('rules').value = event.target.result;
+  reader.onload = function (readerEvent) {
+    document.getElementById('rules').value = readerEvent.target.result;
   };
   reader.readAsText(_rulesFile);
 }

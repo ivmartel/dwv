@@ -276,8 +276,8 @@ function launchStowMultipart() {
   stowReq.addEventListener('error', getOnLoadError(reqName));
   stowReq.addEventListener('progress', function (event) {
     if (event.lengthComputable) {
-      const message = event.loaded + '/' + event.total;
-      showProgress(message);
+      const progMessage = event.loaded + '/' + event.total;
+      showProgress(progMessage);
     }
   });
 
@@ -346,9 +346,9 @@ function launchStowInstances() {
     // STOW request
     const stowReq = new XMLHttpRequest();
     let message;
-    stowReq.addEventListener('load', function (event) {
+    stowReq.addEventListener('load', function (stowEvent) {
       // check
-      if (!checkResponseEvent(event, reqName)) {
+      if (!checkResponseEvent(stowEvent, reqName)) {
         return;
       }
       // show success message

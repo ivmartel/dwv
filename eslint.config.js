@@ -65,7 +65,7 @@ export default [
       //'no-param-reassign': 'warn',
       // disallow variable declarations that shadow outer scope variables
       // https://eslint.org/docs/rules/no-shadow
-      'no-shadow': 'warn',
+      'no-shadow': 'error',
       // disallow returning from Promise executors
       // https://eslint.org/docs/rules/no-promise-executor-return
       'no-promise-executor-return': 'warn',

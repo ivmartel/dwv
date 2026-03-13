@@ -76,8 +76,8 @@ export class ZipLoader {
     if (this.#files.length < this.#zobjs.length) {
       const num = this.#files.length;
       this.#filename = this.#zobjs[num].name;
-      this.#zobjs[num].async('arrayBuffer').then((content) => {
-        this.#zipAsyncCallback(content, origin, index);
+      this.#zobjs[num].async('arrayBuffer').then((bufContent) => {
+        this.#zipAsyncCallback(bufContent, origin, index);
       });
     } else {
       const memoryIO = new MemoryLoader();

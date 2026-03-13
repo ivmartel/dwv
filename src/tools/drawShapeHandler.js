@@ -275,12 +275,12 @@ export class DrawShapeHandler {
       // original text expr
       const originalTextExpr = annotation.textExpr;
 
-      const onSaveCallback = (annotation) => {
+      const onSaveCallback = (newAnnotation) => {
         // new text expr
-        const newTextExpr = annotation.textExpr;
+        const newTextExpr = newAnnotation.textExpr;
         // create annotation update command
         const command = new UpdateAnnotationCommand(
-          annotation,
+          newAnnotation,
           {textExpr: originalTextExpr},
           {textExpr: newTextExpr},
           drawLayer.getDrawController()

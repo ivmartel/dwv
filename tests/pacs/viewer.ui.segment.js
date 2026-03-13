@@ -785,9 +785,8 @@ export class SegmentationUI {
       const indices = splitSegmentHtmlId(
         getRootFromHtmlId(prefixes.info, target.id));
       const segmentation = _segmentations[indices.segmentationIndex];
-      const segment = getSegment(indices.segmentNumber, segmentation.segments);
-
-      const labelsInfo = this.#getLabelsInfo(segment, segmentationIndex);
+      const segment2 = getSegment(indices.segmentNumber, segmentation.segments);
+      const labelsInfo = this.#getLabelsInfo(segment2, segmentationIndex);
 
       let qStr = 'Quantification:\n';
       let i = 0;
@@ -860,7 +859,7 @@ export class SegmentationUI {
       // remove selected class from other rows
       const mainlist = this.#rootDoc.getElementById('segmentation-list');
       const items = mainlist.querySelectorAll('.data-item-list-item');
-      items.forEach(item => item.classList.remove('selected'));
+      items.forEach(item2 => item2.classList.remove('selected'));
       // mark this row as selected
       target.classList.add('selected');
 

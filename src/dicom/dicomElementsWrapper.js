@@ -281,10 +281,10 @@ function getElementAsString(tag, dicomElement, prefix) {
       line += getElementAsString(itemTag, itemElement, prefix + '  ');
 
       for (let m = 0, lenm = itemKeys.length; m < lenm; ++m) {
-        const itemTag = getTagFromKey(itemKeys[m]);
+        const itemTag2 = getTagFromKey(itemKeys[m]);
         if (itemKeys[m] !== 'xFFFEE000') {
           line += '\n';
-          line += getElementAsString(itemTag, item[itemKeys[m]],
+          line += getElementAsString(itemTag2, item[itemKeys[m]],
             prefix + '    ');
         }
       }

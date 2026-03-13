@@ -314,10 +314,10 @@ export class DataTableUI {
         const element = event.target;
         const fullId = element.id;
         const split = fullId.split('-');
-        const groupDivId = split[1];
-        const dataId = split[2];
-        const lg = this.#app.getLayerGroupByDivId(groupDivId);
-        lg.setActiveLayerByDataId(dataId);
+        const chgGroupDivId = split[1];
+        const chgDataId = split[2];
+        const lg = this.#app.getLayerGroupByDivId(chgGroupDivId);
+        lg.setActiveLayerByDataId(chgDataId);
       };
       return radio;
     };

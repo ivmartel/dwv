@@ -416,13 +416,13 @@ export function getSliceIterator(
   const ncomp = image.getNumberOfComponents();
   const isPlanar = image.getPlanarConfiguration() === 1;
   const getRange = function (
-    dataAccessor, start, maxIter, increment,
+    dataAccessor2, start2, maxIter, increment,
     blockMaxIter, blockIncrement, reverse1, reverse2) {
     if (ncomp === 1) {
-      return range(dataAccessor, start, maxIter, increment,
+      return range(dataAccessor2, start2, maxIter, increment,
         blockMaxIter, blockIncrement, reverse1, reverse2);
     } else if (ncomp === 3) {
-      return range3d(dataAccessor, 3 * start, maxIter, increment,
+      return range3d(dataAccessor2, 3 * start2, maxIter, increment,
         blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar);
     }
   };
