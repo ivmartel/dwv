@@ -60,8 +60,9 @@ export default [
       // code quality / correctness
 
       // disallow reassigning function parameters
+      // -> used when param in undefined
       // https://eslint.org/docs/rules/no-param-reassign
-      'no-param-reassign': 'warn',
+      //'no-param-reassign': 'warn',
       // disallow variable declarations that shadow outer scope variables
       // https://eslint.org/docs/rules/no-shadow
       'no-shadow': 'warn',
