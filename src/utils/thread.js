@@ -8,35 +8,43 @@ export class ThreadPool {
   /**
    * @type {number}
    */
-  poolSize;
+  #poolSize;
   /**
    * @type {WorkerTask[]}
    */
-  taskQueue;
+  #taskQueue;
   /**
    * @type {WorkerThread[]}
    */
-  freeThreads;
+  #freeThreads;
   /**
    * @type {WorkerThread[]}
    */
-  runningThreads;
+  #runningThreads;
 
   /**
    * @param {number} poolSize The size of the pool.
    */
   constructor(poolSize) {
-    this.poolSize = poolSize;
+    this.#poolSize = poolSize;
+    // initialize members
+    this.#init();
+  }
+
+  /**
+   * Initialize the thread pool.
+   */
+  #init() {
     // task queue
-    this.taskQueue = [];
+    this.#taskQueue = [];
     // list of available threads
-    this.freeThreads = [];
+    this.#freeThreads = [];
     // create 'poolSize' number of worker threads
-    for (let i = 0; i < poolSize; ++i) {
-      this.freeThreads.push(new WorkerThread(this));
+    for (let i = 0; i < this.#poolSize; ++i) {
+      this.#freeThreads.push(new WorkerThread(this));
     }
     // list of running threads (used in abort)
-    this.runningThreads = [];
+    this.#runningThreads = [];
   }
 
   /**
@@ -47,20 +55,20 @@ export class ThreadPool {
    */
   addWorkerTask(workerTask) {
     // send work start if first task
-    if (this.freeThreads.length === this.poolSize) {
+    if (this.#freeThreads.length === this.#poolSize) {
       this.onworkstart({type: 'work-start'});
     }
     // launch task or queue
-    if (this.freeThreads.length > 0) {
+    if (this.#freeThreads.length > 0) {
       // get the first free worker thread
-      const workerThread = this.freeThreads.shift();
+      const workerThread = this.#freeThreads.shift();
       // add the thread to the running list
-      this.runningThreads.push(workerThread);
+      this.#runningThreads.push(workerThread);
       // run the input task
       workerThread.run(workerTask);
     } else {
       // no free thread, add task to queue
-      this.taskQueue.push(workerTask);
+      this.#taskQueue.push(workerTask);
     }
   }
 
@@ -70,6 +78,8 @@ export class ThreadPool {
   abort() {
     // stop all threads
     this.#stop();
+    // reinitialize so the pool can be reused
+    this.#init();
     // callback
     this.onabort({type: 'work-abort'});
     this.onworkend({type: 'work-end'});
@@ -82,24 +92,22 @@ export class ThreadPool {
    */
   onTaskEnd(workerThread) {
     // launch next task in queue or finish
-    if (this.taskQueue.length > 0) {
+    if (this.#taskQueue.length > 0) {
       // get waiting task
-      const workerTask = this.taskQueue.shift();
+      const workerTask = this.#taskQueue.shift();
       // use input thread to run the waiting task
       workerThread.run(workerTask);
     } else {
       // stop the worker
       workerThread.stop();
       // no task to run, add to free list
-      this.freeThreads.push(workerThread);
+      this.#freeThreads.push(workerThread);
       // remove from running list
-      for (let i = 0; i < this.runningThreads.length; ++i) {
-        if (this.runningThreads[i].getId() === workerThread.getId()) {
-          this.runningThreads.splice(i, 1);
-        }
-      }
+      this.#runningThreads = this.#runningThreads.filter(
+        (thread) => thread.getId() !== workerThread.getId()
+      );
       // the work is done when the queue is back to its initial size
-      if (this.freeThreads.length === this.poolSize) {
+      if (this.#freeThreads.length === this.#poolSize) {
         this.onwork({type: 'work'});
         this.onworkend({type: 'work-end'});
       }
@@ -123,18 +131,13 @@ export class ThreadPool {
 
   /**
    * Stop the pool: stop all running threads.
-   *
    */
   #stop() {
-    // clear tasks
-    this.taskQueue = [];
-    // cancel running workers
-    for (let i = 0; i < this.runningThreads.length; ++i) {
-      this.runningThreads[i].stop();
+    for (const thread of this.#runningThreads) {
+      thread.stop();
     }
-    this.runningThreads = [];
+    this.#runningThreads = [];
   }
-
 
   /**
    * Handle a work start event.
@@ -256,7 +259,7 @@ class WorkerThread {
   }
 
   /**
-   * Finish a task and tell the parent.
+   * Finish a task.
    */
   stop() {
     // stop the worker
@@ -264,6 +267,7 @@ class WorkerThread {
       this.worker.terminate();
       // force create at next run
       this.worker = undefined;
+      this.runningTask = undefined;
     }
   }
 

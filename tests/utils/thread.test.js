@@ -87,23 +87,6 @@ describe('utils', () => {
     assert.isUndefined(task.getWorker());
   });
 
-  // -------------------------------------------------------------------------
-  // ThreadPool — constructor
-  // -------------------------------------------------------------------------
-
-  /**
-   * Tests for {@link ThreadPool} constructor.
-   *
-   * @function module:tests/utils~thread-pool-constructor
-   */
-  test('ThreadPool constructor initialises pool with correct sizes', () => {
-    const pool = new ThreadPool(3);
-    assert.equal(pool.poolSize, 3);
-    assert.equal(pool.freeThreads.length, 3, 'all threads free initially');
-    assert.equal(pool.runningThreads.length, 0);
-    assert.equal(pool.taskQueue.length, 0);
-  });
-
   /**
    * Tests that default event handlers are no-ops.
    *
@@ -165,9 +148,6 @@ describe('utils', () => {
         msg,
         'correct message forwarded'
       );
-      assert.equal(pool.freeThreads.length, 0, 'thread moved to running');
-      assert.equal(pool.runningThreads.length, 1);
-      assert.equal(pool.taskQueue.length, 0);
     }
   );
 
@@ -184,7 +164,6 @@ describe('utils', () => {
     pool.addWorkerTask(t1); // occupies the only thread
     pool.addWorkerTask(t2); // should be queued
 
-    assert.equal(pool.taskQueue.length, 1, 'second task queued');
     assert.equal(t2.mockWorker.postMessage.mock.calls.length, 0,
       'second task not yet dispatched');
   });
@@ -239,8 +218,6 @@ describe('utils', () => {
 
     assert.equal(events.work.mock.calls.length, 1, 'onwork fired');
     assert.equal(events.workend.mock.calls.length, 1, 'onworkend fired');
-    assert.equal(pool.freeThreads.length, 1, 'thread returned to free list');
-    assert.equal(pool.runningThreads.length, 0);
   });
 
   /**
@@ -292,8 +269,8 @@ describe('utils', () => {
     pool.addWorkerTask(t1);
     pool.addWorkerTask(t2);
 
-    assert.equal(pool.runningThreads.length, 2, 'both threads running');
-    assert.equal(pool.freeThreads.length, 0);
+    assert.equal(t1.mockWorker.postMessage.mock.calls.length, 1, 't1 dispatched');
+    assert.equal(t2.mockWorker.postMessage.mock.calls.length, 1, 't2 dispatched');
 
     // t1 finishes
     t1.mockWorker.onmessage({});
@@ -305,7 +282,6 @@ describe('utils', () => {
     assert.equal(events.work.mock.calls.length, 1, 'onwork after both done');
     assert.equal(events.workend.mock.calls.length, 1,
       'onworkend after both done');
-    assert.equal(pool.freeThreads.length, 2, 'all threads free again');
   });
 
   // -------------------------------------------------------------------------
@@ -329,9 +305,40 @@ describe('utils', () => {
 
     assert.equal(t1.mockWorker.terminate.mock.calls.length, 1,
       'running worker terminated');
-    assert.equal(pool.taskQueue.length, 0, 'queue cleared');
-    assert.equal(pool.runningThreads.length, 0, 'running list cleared');
     assert.equal(events.abort.mock.calls.length, 1, 'onabort fired');
+    assert.equal(events.workend.mock.calls.length, 1, 'onworkend fired');
+  });
+
+  /**
+   * Tests that the pool is fully operational after an abort.
+   *
+   * @function module:tests/utils~thread-pool-reuse-after-abort
+   */
+  test('ThreadPool is reusable after abort', () => {
+    const {pool, events} = makePool(1);
+    pool.addWorkerTask(makeTask());
+    pool.abort();
+
+    // reset spies so counts start from zero
+    vi.clearAllMocks();
+    // re-attach handlers (cleared by vi.clearAllMocks)
+    pool.onworkstart = events.workstart;
+    pool.onworkitem = events.workitem;
+    pool.onwork = events.work;
+    pool.onworkend = events.workend;
+    pool.onerror = events.error;
+    pool.onabort = events.abort;
+
+    const t2 = makeTask({}, {itemNumber: 0, numberOfItems: 1});
+    pool.addWorkerTask(t2);
+
+    assert.equal(events.workstart.mock.calls.length, 1,
+      'onworkstart fired after reuse');
+    assert.equal(t2.mockWorker.postMessage.mock.calls.length, 1,
+      'task dispatched after reuse');
+
+    t2.mockWorker.onmessage({});
+    assert.equal(events.work.mock.calls.length, 1, 'onwork fired');
     assert.equal(events.workend.mock.calls.length, 1, 'onworkend fired');
   });
 
@@ -361,7 +368,6 @@ describe('utils', () => {
       't1 worker terminated');
     assert.equal(t2.mockWorker.terminate.mock.calls.length, 1,
       't2 worker terminated');
-    assert.equal(pool.runningThreads.length, 0, 'running list cleared');
   });
 
 });
