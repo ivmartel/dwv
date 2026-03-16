@@ -269,8 +269,10 @@ describe('utils', () => {
     pool.addWorkerTask(t1);
     pool.addWorkerTask(t2);
 
-    assert.equal(t1.mockWorker.postMessage.mock.calls.length, 1, 't1 dispatched');
-    assert.equal(t2.mockWorker.postMessage.mock.calls.length, 1, 't2 dispatched');
+    assert.equal(t1.mockWorker.postMessage.mock.calls.length, 1,
+      't1 dispatched');
+    assert.equal(t2.mockWorker.postMessage.mock.calls.length, 1,
+      't2 dispatched');
 
     // t1 finishes
     t1.mockWorker.onmessage({});
