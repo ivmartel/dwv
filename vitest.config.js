@@ -6,7 +6,7 @@ export default defineConfig({
       './tests/**/*.test.js'
     ],
     outputFile: './build/test-results.json',
-    environment: 'jsdom',
+    environment: 'node',
     coverage: {
       provider: 'v8',
       reporter: ['text-summary', 'html'],

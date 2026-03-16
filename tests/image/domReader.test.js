@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, vi, beforeEach, afterEach} from 'vitest';
 import {
   getViewFromDOMImage,

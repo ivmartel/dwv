@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert} from 'vitest';
 import {ZipLoader} from '../../src/io/zipLoader.js';
 

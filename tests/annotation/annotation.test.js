@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, vi, expect} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {b64urlToArrayBuffer} from '../dicom/utils.js';

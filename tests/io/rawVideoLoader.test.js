@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, vi, beforeEach, afterEach} from 'vitest';
 import * as domReader from '../../src/image/domReader.js';
 import {RawVideoLoader} from '../../src/io/rawVideoLoader.js';

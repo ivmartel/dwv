@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert} from 'vitest';
 import {canCreateCanvas} from '../../src/gui/generic.js';
 

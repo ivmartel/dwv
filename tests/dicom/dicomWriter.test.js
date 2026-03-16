@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, vi} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, beforeEach, afterEach} from 'vitest';
 import {FilesLoader, fileContentTypes} from '../../src/io/filesLoader.js';
 import {loaderList} from '../../src/io/loaderList.js';

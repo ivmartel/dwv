@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, beforeEach} from 'vitest';
 import {JSONTextLoader} from '../../src/io/jsonTextLoader.js';
 import {fileContentTypes} from '../../src/io/filesLoader.js';

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, beforeEach, afterEach} from 'vitest';
 import {UrlsLoader, urlContentTypes} from '../../src/io/urlsLoader.js';
 import {loaderList} from '../../src/io/loaderList.js';

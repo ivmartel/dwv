@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, vi, expect} from 'vitest';
 import {MemoryLoader} from '../../src/io/memoryLoader.js';
 import {b64urlToArrayBuffer} from '../dicom/utils.js';
