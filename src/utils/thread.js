@@ -29,13 +29,13 @@ export class ThreadPool {
     this.poolSize = poolSize;
     // task queue
     this.taskQueue = [];
-    // lsit of available threads
+    // list of available threads
     this.freeThreads = [];
     // create 'poolSize' number of worker threads
     for (let i = 0; i < poolSize; ++i) {
       this.freeThreads.push(new WorkerThread(this));
     }
-    // list of running threads (unsed in abort)
+    // list of running threads (used in abort)
     this.runningThreads = [];
   }
 
@@ -54,7 +54,7 @@ export class ThreadPool {
     if (this.freeThreads.length > 0) {
       // get the first free worker thread
       const workerThread = this.freeThreads.shift();
-      // add the thread to the runnning list
+      // add the thread to the running list
       this.runningThreads.push(workerThread);
       // run the input task
       workerThread.run(workerTask);
