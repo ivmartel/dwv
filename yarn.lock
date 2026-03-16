@@ -92,7 +92,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.23.9, @babel/core@npm:^7.28.5":
+"@babel/core@npm:^7.23.9, @babel/core@npm:^7.29.0":
   version: 7.29.0
   resolution: "@babel/core@npm:7.29.0"
   dependencies:
@@ -1220,7 +1220,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-env@npm:^7.28.5":
+"@babel/preset-env@npm:^7.29.0":
   version: 7.29.0
   resolution: "@babel/preset-env@npm:7.29.0"
   dependencies:
@@ -1952,7 +1952,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@microsoft/api-extractor@npm:^7.55.1":
+"@microsoft/api-extractor@npm:^7.57.7":
   version: 7.57.7
   resolution: "@microsoft/api-extractor@npm:7.57.7"
   dependencies:
@@ -2407,7 +2407,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stylistic/eslint-plugin@npm:^5.8.0":
+"@stylistic/eslint-plugin@npm:^5.10.0":
   version: 5.10.0
   resolution: "@stylistic/eslint-plugin@npm:5.10.0"
   dependencies:
@@ -2756,7 +2756,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:^4.0.17":
+"@vitest/coverage-v8@npm:^4.1.0":
   version: 4.1.0
   resolution: "@vitest/coverage-v8@npm:4.1.0"
   dependencies:
@@ -3555,7 +3555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-loader@npm:^10.0.0":
+"babel-loader@npm:^10.1.1":
   version: 10.1.1
   resolution: "babel-loader@npm:10.1.1"
   dependencies:
@@ -5041,32 +5041,32 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "dwv@workspace:."
   dependencies:
-    "@babel/core": "npm:^7.28.5"
-    "@babel/preset-env": "npm:^7.28.5"
+    "@babel/core": "npm:^7.29.0"
+    "@babel/preset-env": "npm:^7.29.0"
     "@eslint/js": "npm:^10.0.1"
-    "@microsoft/api-extractor": "npm:^7.55.1"
-    "@stylistic/eslint-plugin": "npm:^5.8.0"
-    "@vitest/coverage-v8": "npm:^4.0.17"
-    babel-loader: "npm:^10.0.0"
+    "@microsoft/api-extractor": "npm:^7.57.7"
+    "@stylistic/eslint-plugin": "npm:^5.10.0"
+    "@vitest/coverage-v8": "npm:^4.1.0"
+    babel-loader: "npm:^10.1.1"
     babel-plugin-istanbul: "npm:^7.0.1"
     benchmark: "npm:^2.1.4"
     canvas: "npm:^3.2.1"
     clean-jsdoc-theme: "npm:^4.3.0"
-    eslint: "npm:^10.0.0"
-    eslint-plugin-jsdoc: "npm:^62.5.4"
+    eslint: "npm:^10.0.3"
+    eslint-plugin-jsdoc: "npm:^62.8.0"
     github-release-notes: "npm:0.17.2"
-    globals: "npm:^17.0.0"
-    html-webpack-plugin: "npm:^5.6.5"
+    globals: "npm:^17.4.0"
+    html-webpack-plugin: "npm:^5.6.6"
     jsdoc: "npm:^4.0.5"
     jsdom: "npm:^29.0.0"
     jszip: "npm:^3.10.1"
-    konva: "npm:~10.2.0"
+    konva: "npm:~10.2.1"
     magic-wand-tool: "npm:~1.1.7"
     typescript: "npm:5.6.3"
-    vitest: "npm:^4.0.17"
-    webpack: "npm:^5.105.0"
+    vitest: "npm:^4.1.0"
+    webpack: "npm:^5.105.4"
     webpack-cli: "npm:^7.0.0"
-    webpack-dev-server: "npm:^5.2.2"
+    webpack-dev-server: "npm:^5.2.3"
     webpack-merge: "npm:^6.0.1"
   languageName: unknown
   linkType: soft
@@ -5439,7 +5439,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^62.5.4":
+"eslint-plugin-jsdoc@npm:^62.8.0":
   version: 62.8.0
   resolution: "eslint-plugin-jsdoc@npm:62.8.0"
   dependencies:
@@ -5513,7 +5513,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^10.0.0":
+"eslint@npm:^10.0.3":
   version: 10.0.3
   resolution: "eslint@npm:10.0.3"
   dependencies:
@@ -6436,7 +6436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^17.0.0":
+"globals@npm:^17.4.0":
   version: 17.4.0
   resolution: "globals@npm:17.4.0"
   checksum: 10c0/2be9e8c2b9035836f13d420b22f0247a328db82967d3bebfc01126d888ed609305f06c05895914e969653af5c6ba35fd7a0920f3e6c869afa60666c810630feb
@@ -6680,7 +6680,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-webpack-plugin@npm:^5.6.5":
+"html-webpack-plugin@npm:^5.6.6":
   version: 5.6.6
   resolution: "html-webpack-plugin@npm:5.6.6"
   dependencies:
@@ -7877,7 +7877,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"konva@npm:~10.2.0":
+"konva@npm:~10.2.1":
   version: 10.2.1
   resolution: "konva@npm:10.2.1"
   checksum: 10c0/6f7f18a7c8cef66eec99a6b7e30db41ffc82d234d7ec3ec29a309789fca1014b8b53cf6abe43aaf59e6200dbc1aad36da2a3b1f08639da9e0b8cfec9bff18c93
@@ -12748,7 +12748,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:^4.0.17":
+"vitest@npm:^4.1.0":
   version: 4.1.0
   resolution: "vitest@npm:4.1.0"
   dependencies:
@@ -12901,7 +12901,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:^5.2.2":
+"webpack-dev-server@npm:^5.2.3":
   version: 5.2.3
   resolution: "webpack-dev-server@npm:5.2.3"
   dependencies:
@@ -12964,7 +12964,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.105.0":
+"webpack@npm:^5.105.4":
   version: 5.105.4
   resolution: "webpack@npm:5.105.4"
   dependencies:
