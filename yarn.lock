@@ -8178,9 +8178,9 @@ __metadata:
   linkType: hard
 
 "konva@npm:~10.2.0":
-  version: 10.2.0
-  resolution: "konva@npm:10.2.0"
-  checksum: 10c0/afbb59a8a83c41c75f6e3103aa7f2ddb7f4f2132dab612d54e7dcefcd50f9b28b6b02fb88ce1387fe2b33905e67dc73ba2dba2cd1cb01abfc47250798f61c88f
+  version: 10.2.1
+  resolution: "konva@npm:10.2.1"
+  checksum: 10c0/6f7f18a7c8cef66eec99a6b7e30db41ffc82d234d7ec3ec29a309789fca1014b8b53cf6abe43aaf59e6200dbc1aad36da2a3b1f08639da9e0b8cfec9bff18c93
   languageName: node
   linkType: hard
 
