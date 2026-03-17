@@ -391,7 +391,7 @@ describe('image', () => {
       assert.equal(warnSpy.mock.calls.length, 1, 'warning on maskHasSegments');
       assert.ok(warnSpy.mock.calls[0][0].includes('99'),
         'warning mentions the segment number');
-      }
+    }
   );
 
   // -------------------------------------------------------------------------
