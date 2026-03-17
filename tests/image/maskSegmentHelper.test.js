@@ -1,4 +1,4 @@
-import {describe, test, assert, vi, beforeEach} from 'vitest';
+import {describe, test, assert, vi, beforeEach, afterEach} from 'vitest';
 import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
 import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 import {Size} from '../../src/image/size.js';
@@ -7,6 +7,7 @@ import {Geometry} from '../../src/image/geometry.js';
 import {Matrix33} from '../../src/math/matrix.js';
 import {Image} from '../../src/image/image.js';
 import {Point3D} from '../../src/math/point.js';
+import * as loggerModule from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'image/maskSegmentHelper.js' file.
@@ -155,6 +156,10 @@ describe('image', () => {
     helper = new MaskSegmentHelper(makeMockMask());
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   /**
    * Tests hasSegment and getSegment for present and absent segments.
    *
@@ -223,11 +228,18 @@ describe('image', () => {
    * @function module:tests/image~mask-segment-helper-add-duplicate
    */
   test('MaskSegmentHelper addSegment ignores duplicate segment number', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
+
     helper.addSegment(makeSeg(1));
     helper.addSegment(makeSeg(1)); // duplicate
     assert.equal(
       helper.getNumberOfSegments(), 1, 'still one segment after duplicate add'
     );
+
+    assert.equal(warnSpy.mock.calls.length, 1, 'warning on addSegment');
+    assert.ok(warnSpy.mock.calls[0][0].includes('1'),
+      'warning mentions the segment number');
   });
 
   // -------------------------------------------------------------------------
@@ -253,9 +265,16 @@ describe('image', () => {
    * @function module:tests/image~mask-segment-helper-remove-unknown
    */
   test('MaskSegmentHelper removeSegment is a no-op for unknown number', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
+
     helper.addSegment(makeSeg(1));
     helper.removeSegment(99); // no-op
     assert.equal(helper.getNumberOfSegments(), 1, 'count unchanged');
+
+    assert.equal(warnSpy.mock.calls.length, 1, 'warning on removeSegment');
+    assert.ok(warnSpy.mock.calls[0][0].includes('99'),
+      'warning mentions the segment number');
   });
 
   // -------------------------------------------------------------------------
@@ -281,9 +300,16 @@ describe('image', () => {
    * @function module:tests/image~mask-segment-helper-update-unknown
    */
   test('MaskSegmentHelper updateSegment is a no-op for unknown number', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
+
     helper.addSegment(makeSeg(1));
     helper.updateSegment(makeSeg(99)); // no-op
     assert.equal(helper.getNumberOfSegments(), 1, 'count unchanged');
+
+    assert.equal(warnSpy.mock.calls.length, 1, 'warning on updateSegment');
+    assert.ok(warnSpy.mock.calls[0][0].includes('99'),
+      'warning mentions the segment number');
   });
 
   // -------------------------------------------------------------------------
@@ -348,6 +374,9 @@ describe('image', () => {
   test(
     'MaskSegmentHelper maskHasSegments returns false for unknown segments',
     () => {
+      const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+        .mockImplementation(() => {});
+
       const mask = makeMockMask();
       mask.hasValues.mockReturnValue([true]);
       const h = new MaskSegmentHelper(mask);
@@ -358,7 +387,11 @@ describe('image', () => {
 
       assert.equal(result[0], false, 'unknown segment → false');
       assert.equal(result[1], true, 'known segment → forwarded from hasValues');
-    }
+
+      assert.equal(warnSpy.mock.calls.length, 1, 'warning on maskHasSegments');
+      assert.ok(warnSpy.mock.calls[0][0].includes('99'),
+        'warning mentions the segment number');
+      }
   );
 
   // -------------------------------------------------------------------------

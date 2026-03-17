@@ -1,7 +1,8 @@
-import {describe, test, assert, beforeEach} from 'vitest';
+import {describe, test, assert, beforeEach, vi, afterEach} from 'vitest';
 import {
   MaskSegmentViewHelper
 } from '../../src/image/maskSegmentViewHelper.js';
+import * as loggerModule from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'image/maskSegmentViewHelper.js' file.
@@ -13,6 +14,10 @@ describe('image', () => {
 
   beforeEach(() => {
     helper = new MaskSegmentViewHelper();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   /**
@@ -42,10 +47,17 @@ describe('image', () => {
    * @function module:tests/image~mask-segment-view-helper-add-duplicate
    */
   test('MaskSegmentViewHelper addToHidden ignores duplicate', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
+
     helper.addToHidden(1);
     helper.addToHidden(1); // duplicate — should not throw or double-add
     helper.removeFromHidden(1);
     assert.notOk(helper.isHidden(1), 'single remove is enough');
+
+    assert.equal(warnSpy.mock.calls.length, 1, 'warning on addToHidden');
+    assert.ok(warnSpy.mock.calls[0][0].includes('1'),
+      'warning mentions the segment number');
   });
 
   /**
@@ -67,9 +79,16 @@ describe('image', () => {
    * @function module:tests/image~mask-segment-view-helper-remove-unknown
    */
   test('MaskSegmentViewHelper removeFromHidden is a no-op for unknown', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
+
     helper.addToHidden(1);
     helper.removeFromHidden(99); // no-op
     assert.ok(helper.isHidden(1), 'existing segment unaffected');
+
+    assert.equal(warnSpy.mock.calls.length, 1, 'warning on removeFromHidden');
+    assert.ok(warnSpy.mock.calls[0][0].includes('99'),
+      'warning mentions the segment number');
   });
 
   /**
