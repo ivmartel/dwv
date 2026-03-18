@@ -14,15 +14,6 @@ import {LoaderBase} from './loaderBase.js';
 export class RawVideoLoader extends LoaderBase {
 
   /**
-   * Is the load ongoing? TODO...
-   *
-   * @returns {boolean} True if loading.
-   */
-  isLoading() {
-    return true;
-  }
-
-  /**
    * Create a Data URI from an HTTP request response.
    *
    * @param {object} response The HTTP request response.
@@ -50,6 +41,7 @@ export class RawVideoLoader extends LoaderBase {
    * @param {number} index The data index.
    */
   load(buffer, origin, index) {
+    this.setLoading(true);
     // create a DOM video
     const video = document.createElement('video');
     if (typeof origin === 'string') {
@@ -62,10 +54,12 @@ export class RawVideoLoader extends LoaderBase {
     // onload handler
     video.onloadedmetadata = (event) => {
       try {
-        getViewFromDOMVideo(event.target,
-          this.onloaditem, this.onload,
-          this.onprogress, this.onloadend,
-          origin, index);
+        if (this.isLoading()) {
+          getViewFromDOMVideo(event.target,
+            this.onloaditem, this.onload,
+            this.onprogress, this.onloadend,
+            origin, index);
+        }
       } catch (error) {
         this.onerror({
           error,
@@ -82,6 +76,7 @@ export class RawVideoLoader extends LoaderBase {
    * Abort load.
    */
   abort() {
+    this.setLoading(false);
     this.onabort({});
     this.onloadend({});
   }

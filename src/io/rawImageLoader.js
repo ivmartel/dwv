@@ -11,22 +11,6 @@ import {LoaderBase} from './loaderBase.js';
 export class RawImageLoader extends LoaderBase {
 
   /**
-   * If abort is triggered, all image.onload callbacks have to be cancelled.
-   *
-   * @type {boolean}
-   */
-  #aborted = false;
-
-  /**
-   * Is the load ongoing? TODO...
-   *
-   * @returns {boolean} True if loading.
-   */
-  isLoading() {
-    return true;
-  }
-
-  /**
    * Create a Data URI from an HTTP request response.
    *
    * @param {ArrayBuffer} response The HTTP request response.
@@ -52,13 +36,13 @@ export class RawImageLoader extends LoaderBase {
    * @param {number} index The data index.
    */
   load(buffer, origin, index) {
-    this.#aborted = false;
+    this.setLoading(true);
     // create a DOM image
     const image = new Image();
     // triggered by ctx.drawImage
     image.onload = (/*event*/) => {
       try {
-        if (!this.#aborted) {
+        if (this.isLoading()) {
           this.onprogress({
             lengthComputable: true,
             loaded: 100,
@@ -97,7 +81,7 @@ export class RawImageLoader extends LoaderBase {
    * Abort load.
    */
   abort() {
-    this.#aborted = true;
+    this.setLoading(false);
     this.onabort({});
     this.onloadend({});
   }
