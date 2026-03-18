@@ -78,7 +78,7 @@ export class DicomDataLoader extends LoaderBase {
   /**
    * Check if the loader supports the input extension.
    *
-   * @param {string} value The extensione.
+   * @param {string} value The extension.
    * @returns {boolean} True if it can be loaded.
    */
   canLoadExtension(value) {
