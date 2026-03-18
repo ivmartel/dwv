@@ -19,15 +19,32 @@ import JSZip from 'jszip';
  */
 export class ZipLoader extends LoaderBase {
 
+  /**
+   * Current file name.
+   *
+   * @type {string}
+   */
   #filename = '';
+
+  /**
+   * List of files.
+   *
+   * @type {object[]}
+   */
   #files = [];
+
+  /**
+   * Zip file objects.
+   *
+   * @type {object[]}
+   */
   #zobjs = null;
 
   /**
    * JSZip.async callback.
    *
    * @param {ArrayBuffer} content Unzipped file image.
-   * @param {object} origin The origin of the file.
+   * @param {string} origin The origin of the file.
    * @param {number} index The data index.
    */
   #zipAsyncCallback(content, origin, index) {
