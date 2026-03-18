@@ -1,4 +1,4 @@
-import {startsWith, getFileExtension} from '../utils/string.js';
+import {getFileExtension} from '../utils/string.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {LoaderBase} from './loaderBase.js';
@@ -101,8 +101,8 @@ export class JSONTextLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadAcceptHeader(value) {
-    return startsWith(value, 'application/json') ||
-      startsWith(value, 'application/dicom+json');
+    return value === 'application/json' ||
+      value === 'application/dicom+json';
   }
 
   /**

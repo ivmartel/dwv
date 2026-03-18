@@ -1,4 +1,4 @@
-import {startsWith, getFileExtension} from '../utils/string.js';
+import {getFileExtension} from '../utils/string.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {DicomBufferToData} from '../image/dicomBufferToData.js';
@@ -103,10 +103,7 @@ export class DicomDataLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadAcceptHeader(value) {
-    // starts with 'application/dicom' and no '+'
-    const acceptValue = 'application/dicom';
-    return startsWith(value, acceptValue) &&
-      value[acceptValue.length] !== '+';
+    return value === 'application/dicom';
   }
 
   /**

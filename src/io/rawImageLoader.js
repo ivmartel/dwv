@@ -1,4 +1,3 @@
-import {startsWith} from '../utils/string.js';
 import {getViewFromDOMImage} from '../image/domReader.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
@@ -127,8 +126,7 @@ export class RawImageLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadAcceptHeader(value) {
-    // starts with 'image/'
-    return startsWith(value, 'image/');
+    return value.startsWith('image/');
   }
 
   /**

@@ -1,4 +1,4 @@
-import {startsWith, getFileExtension} from '../utils/string.js';
+import {getFileExtension} from '../utils/string.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {MemoryLoader} from './memoryLoader.js';
@@ -173,8 +173,7 @@ export class ZipLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadAcceptHeader(value) {
-    // starts with 'application/zip'
-    return startsWith(value, 'application/zip');
+    return value === 'application/zip';
   }
 
   /**

@@ -97,12 +97,18 @@ export class LoaderBase {
       // check options.requestHeaders for 'Accept'
       // -> fail if wrong header
       if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        const acceptHeader = options.requestHeaders.find(
+          (element) => element.name === 'Accept'
+        );
         if (typeof acceptHeader !== 'undefined') {
-          return this.canLoadAcceptHeader(acceptHeader.value);
+          // split comma-separated media types,
+          // strip parameters (e.g. ;q=0.9) and whitespace
+          const mediaTypes = acceptHeader.value.split(',').map(
+            (entry) => entry.split(';')[0].trim()
+          );
+          return mediaTypes.some(
+            (mediaType) => this.canLoadAcceptHeader(mediaType)
+          );
         }
       }
     }

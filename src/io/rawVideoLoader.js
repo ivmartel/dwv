@@ -1,4 +1,3 @@
-import {startsWith} from '../utils/string.js';
 import {getViewFromDOMVideo} from '../image/domReader.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
@@ -121,8 +120,7 @@ export class RawVideoLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadAcceptHeader(value) {
-    // starts with 'video/'
-    return startsWith(value, 'video/');
+    return value.startsWith('video/');
   }
 
   /**

@@ -1,4 +1,3 @@
-import {startsWith} from '../utils/string.js';
 import {parseMultipart} from '../utils/array.js';
 import {MemoryLoader} from './memoryLoader.js';
 import {fileContentTypes} from './filesLoader.js';
@@ -76,8 +75,7 @@ export class MultipartLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadAcceptHeader(value) {
-    // starts with 'multipart/related'
-    return startsWith(value, 'multipart/related');
+    return value === 'multipart/related';
   }
 
   /**
