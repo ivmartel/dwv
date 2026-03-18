@@ -58,6 +58,45 @@ export class LoaderBase {
   }
 
   /**
+   * Check if the loader can load the provided file.
+   * Default returns false.
+   *
+   * @param {File} _file The file to check.
+   * @returns {boolean} True if the file can be loaded.
+   */
+  canLoadFile(_file) {
+    return false;
+  }
+
+  /**
+   * Check if the loader can load the provided url.
+   * Default returns false.
+   *
+   * @param {string} _url The url to check.
+   * @param {object} [_options] Optional url request options.
+   * @returns {boolean} True if the url can be loaded.
+   */
+  canLoadUrl(_url, _options) {
+    return false;
+  }
+
+  /**
+   * Check if the loader can load the provided memory object.
+   * Default checks if the memory object has a filename that
+   * this loader can handle via canLoadFile.
+   *
+   * @param {object} mem The memory object.
+   * @returns {boolean} True if the object can be loaded.
+   */
+  canLoadMemory(mem) {
+    if (typeof mem.filename !== 'undefined') {
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
+    }
+    return false;
+  }
+
+  /**
    * Handle a load start event.
    * Default does nothing.
    *

@@ -60,17 +60,6 @@ export class MultipartLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader can load the provided file.
-   * Always returns false.
-   *
-   * @param {File} _file The file to check.
-   * @returns {boolean} True if the file can be loaded.
-   */
-  canLoadFile(_file) {
-    return false;
-  }
-
-  /**
    * Check if the loader can load the provided url.
    * True if one of the folowing conditions is true:
    * - the `options.forceLoader` is 'multipart',
@@ -101,16 +90,6 @@ export class MultipartLoader extends LoaderBase {
       }
     }
 
-    return false;
-  }
-
-  /**
-   * Check if the loader can load the provided memory object.
-   *
-   * @param {object} _mem The memory object.
-   * @returns {boolean} True if the url can be loaded.
-   */
-  canLoadMemory(_mem) {
     return false;
   }
 

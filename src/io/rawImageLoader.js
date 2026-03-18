@@ -151,20 +151,6 @@ export class RawImageLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader can load the provided memory object.
-   *
-   * @param {object} mem The memory object.
-   * @returns {boolean} True if the object can be loaded.
-   */
-  canLoadMemory(mem) {
-    if (typeof mem.filename !== 'undefined') {
-      const tmpFile = new File(['from memory'], mem.filename);
-      return this.canLoadFile(tmpFile);
-    }
-    return false;
-  }
-
-  /**
    * Get the file content type needed by the loader.
    *
    * @returns {number} One of the 'fileContentTypes'.

@@ -126,11 +126,7 @@ export class JSONTextLoader extends LoaderBase {
       contentType.startsWith('application/json')) {
       return true;
     }
-    if (typeof mem.filename !== 'undefined') {
-      const tmpFile = new File(['from memory'], mem.filename);
-      return this.canLoadFile(tmpFile);
-    }
-    return false;
+    return super.canLoadMemory(mem);
   }
 
   /**

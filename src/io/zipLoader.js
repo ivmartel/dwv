@@ -197,11 +197,7 @@ export class ZipLoader extends LoaderBase {
       contentType.startsWith('application/zip')) {
       return true;
     }
-    if (typeof mem.filename !== 'undefined') {
-      const tmpFile = new File(['from memory'], mem.filename);
-      return this.canLoadFile(tmpFile);
-    }
-    return false;
+    return super.canLoadMemory(mem);
   }
 
   /**
