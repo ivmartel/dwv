@@ -260,7 +260,7 @@ describe('utils', () => {
     // no extension
     assert.equal(
       getFileExtension('filename'),
-      null, 'getFileExtension no extension');
+      undefined, 'getFileExtension no extension');
     // test #00
     const test00 = 'image.png';
     const res00 = 'png';
@@ -280,13 +280,13 @@ describe('utils', () => {
       'getFileExtension 02: multiple dots');
     // test #03
     const test03 = '.profile';
-    const res03 = null;
+    const res03 = undefined;
     assert.equal(
       getFileExtension(test03), res03,
       'getFileExtension 04: start with dot');
     // test #04
     const test04 = 'MR.1.3.12.123456.123456789';
-    const res04 = null;
+    const res04 = undefined;
     assert.equal(
       getFileExtension(test04), res04,
       'getFileExtension 03: dots and numbers');
@@ -303,7 +303,7 @@ describe('utils', () => {
       getFileExtension(test11), res11, 'getFileExtension 11');
     // test #12
     const test12 = 'domain.org/path/to/file/IMAGE';
-    const res12 = null;
+    const res12 = undefined;
     assert.equal(
       getFileExtension(test12), res12, 'getFileExtension 12');
   });
