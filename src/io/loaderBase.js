@@ -117,12 +117,15 @@ export class LoaderBase {
     // extension
     const ext = getFileExtension(urlObjext.pathname);
     const calLoadExt = this.canLoadExtension(ext);
-    // content type (for wado url)
+    // content type (for wado url): strip parameters before testing
     const contentType = urlObjext.searchParams.get('contentType');
     const hasContentType = contentType !== null &&
       typeof contentType !== 'undefined';
+    const mediaType = hasContentType
+      ? contentType.split(';')[0].trim()
+      : undefined;
     const canLoadContentType =
-      hasContentType && this.canLoadContentType(contentType);
+      hasContentType && this.canLoadContentType(mediaType);
 
     return hasContentType ? canLoadContentType : calLoadExt;
   }
@@ -179,11 +182,13 @@ export class LoaderBase {
    * @returns {boolean} True if the object can be loaded.
    */
   canLoadMemory(mem) {
-    // content type
+    // content type: strip parameters (e.g. ; boundary=...) before testing
     const contentType = mem['Content-Type'];
-    if (typeof contentType !== 'undefined' &&
-      this.canLoadContentType(contentType)) {
-      return true;
+    if (typeof contentType !== 'undefined') {
+      const mediaType = contentType.split(';')[0].trim();
+      if (this.canLoadContentType(mediaType)) {
+        return true;
+      }
     }
     // file
     if (typeof mem.filename !== 'undefined') {

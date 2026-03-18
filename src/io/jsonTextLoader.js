@@ -112,7 +112,7 @@ export class JSONTextLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadContentType(value) {
-    return value.startsWith('application/json');
+    return value === 'application/json';
   }
 
   /**

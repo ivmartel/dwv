@@ -183,7 +183,7 @@ export class ZipLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadContentType(value) {
-    return value.startsWith('application/zip');
+    return value === 'application/zip';
   }
 
   /**

@@ -113,7 +113,7 @@ export class DicomDataLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadContentType(value) {
-    return value.startsWith('application/dicom');
+    return value === 'application/dicom';
   }
 
   /**
