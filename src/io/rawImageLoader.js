@@ -118,7 +118,7 @@ export class RawImageLoader extends LoaderBase {
     if (typeof options !== 'undefined') {
       // check options.forceLoader
       if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'rawimage') {
+        this.isLoaderName(options.forceLoader)) {
         return true;
       }
       // check options.requestHeaders for 'Accept'
@@ -136,8 +136,7 @@ export class RawImageLoader extends LoaderBase {
     const urlObjext = getUrlFromUri(url);
     // extension
     const ext = getFileExtension(urlObjext.pathname);
-    const hasImageExt = (ext === 'jpeg') || (ext === 'jpg') ||
-      (ext === 'png') || (ext === 'gif');
+    const hasImageExt = this.canLoadExtension(ext);
     // content type (for wado url)
     const contentType = urlObjext.searchParams.get('contentType');
     const hasContentType = contentType !== null &&
@@ -148,6 +147,28 @@ export class RawImageLoader extends LoaderBase {
     return hasContentType ? hasImageContentType : hasImageExt;
   }
 
+  /**
+   * Check if the loader supports the input extension.
+   *
+   * @param {string} value The extensione.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadExtension(value) {
+    return value === 'jpeg' ||
+      value === 'jpg' ||
+      value === 'png' ||
+      value === 'gif';
+  }
+
+  /**
+   * Check if the input is the loader name.
+   *
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
+   */
+  isLoaderName(value) {
+    return value === 'rawimage';
+  }
 
   /**
    * Check if the loader supports the input accept header.

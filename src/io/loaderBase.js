@@ -81,6 +81,28 @@ export class LoaderBase {
   }
 
   /**
+   * Check if the loader supports the input extension.
+   * Default returns false.
+   *
+   * @param {string} _value The extensione.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadExtension(_value) {
+    return false;
+  }
+
+  /**
+   * Check if the input is the loader name.
+   * Default returns false.
+   *
+   * @param {string} _value The test name.
+   * @returns {boolean} True if input is the loader name.
+   */
+  isLoaderName(_value) {
+    return false;
+  }
+
+  /**
    * Check if the loader supports the input accept header.
    * Default returns false.
    *

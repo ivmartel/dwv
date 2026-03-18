@@ -74,7 +74,7 @@ export class MultipartLoader extends LoaderBase {
     if (typeof options !== 'undefined') {
       // check options.forceLoader
       if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'multipart') {
+        this.isLoaderName(options.forceLoader)) {
         return true;
       }
       // check options.requestHeaders for 'Accept'
@@ -90,6 +90,16 @@ export class MultipartLoader extends LoaderBase {
     }
 
     return false;
+  }
+
+  /**
+   * Check if the input is the loader name.
+   *
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
+   */
+  isLoaderName(value) {
+    return value === 'multipart';
   }
 
   /**

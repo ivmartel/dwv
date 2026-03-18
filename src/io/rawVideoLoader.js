@@ -110,7 +110,7 @@ export class RawVideoLoader extends LoaderBase {
     if (typeof options !== 'undefined') {
       // check options.forceLoader
       if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'rawvideo') {
+        this.isLoaderName(options.forceLoader)) {
         return true;
       }
       // check options.requestHeaders for 'Accept'
@@ -127,9 +127,29 @@ export class RawVideoLoader extends LoaderBase {
 
     const urlObjext = getUrlFromUri(url);
     const ext = getFileExtension(urlObjext.pathname);
-    return (ext === 'mp4') ||
-      (ext === 'ogg') ||
-      (ext === 'webm');
+    return this.canLoadExtension(ext);
+  }
+
+  /**
+   * Check if the loader supports the input extension.
+   *
+   * @param {string} value The extensione.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadExtension(value) {
+    return value === 'mp4' ||
+      value === 'ogg' ||
+      value === 'webm';
+  }
+
+  /**
+   * Check if the input is the loader name.
+   *
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
+   */
+  isLoaderName(value) {
+    return value === 'rawvideo';
   }
 
   /**

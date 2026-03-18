@@ -73,9 +73,7 @@ export class DicomDataLoader extends LoaderBase {
    */
   canLoadFile(file) {
     const ext = getFileExtension(file.name);
-    const hasNoExt = (ext === null);
-    const hasDcmExt = (ext === 'dcm');
-    return hasNoExt || hasDcmExt;
+    return this.canLoadExtension(ext);
   }
 
   /**
@@ -96,7 +94,7 @@ export class DicomDataLoader extends LoaderBase {
     if (typeof options !== 'undefined') {
       // check options.forceLoader
       if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'dicom') {
+        this.isLoaderName(options.forceLoader)) {
         return true;
       }
       // check options.requestHeaders for 'Accept'
@@ -114,8 +112,7 @@ export class DicomDataLoader extends LoaderBase {
     const urlObjext = getUrlFromUri(url);
     // extension
     const ext = getFileExtension(urlObjext.pathname);
-    const hasNoExt = (ext === null);
-    const hasDcmExt = (ext === 'dcm');
+    const hasDcmExt = this.canLoadExtension(ext);
     // content type (for wado url)
     const contentType = urlObjext.searchParams.get('contentType');
     const hasContentType = contentType !== null &&
@@ -123,7 +120,28 @@ export class DicomDataLoader extends LoaderBase {
     const hasDicomContentType =
       hasContentType && this.canLoadContentType(contentType);
 
-    return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
+    return hasContentType ? hasDicomContentType : hasDcmExt;
+  }
+
+  /**
+   * Check if the loader supports the input extension.
+   *
+   * @param {string} value The extensione.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadExtension(value) {
+    return value === null ||
+      value === 'dcm';
+  }
+
+  /**
+   * Check if the input is the loader name.
+   *
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
+   */
+  isLoaderName(value) {
+    return value === 'dicom';
   }
 
   /**
