@@ -120,8 +120,7 @@ export class RawVideoLoader extends LoaderBase {
         };
         const acceptHeader = options.requestHeaders.find(isNameAccept);
         if (typeof acceptHeader !== 'undefined') {
-          // starts with 'video/'
-          return startsWith(acceptHeader.value, 'video/');
+          return this.canLoadAcceptHeader(acceptHeader.value);
         }
       }
     }
@@ -131,6 +130,29 @@ export class RawVideoLoader extends LoaderBase {
     return (ext === 'mp4') ||
       (ext === 'ogg') ||
       (ext === 'webm');
+  }
+
+  /**
+   * Check if the loader supports the input accept header.
+   *
+   * @param {string} value The accept header value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadAcceptHeader(value) {
+    // starts with 'video/'
+    return startsWith(value, 'video/');
+  }
+
+  /**
+   * Check if the loader supports the input content type.
+   *
+   * @param {string} value The content type value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadContentType(value) {
+    return value === 'image/jpeg' ||
+      value === 'image/png' ||
+      value === 'image/gif';
   }
 
   /**

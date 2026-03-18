@@ -8,7 +8,7 @@
 export class LoaderBase {
 
   /**
-   * Loader options.
+   * Loader options: {numberOfFiles, defaultCharacterSet}.
    *
    * @type {object}
    */
@@ -81,14 +81,42 @@ export class LoaderBase {
   }
 
   /**
+   * Check if the loader supports the input accept header.
+   * Default returns false.
+   *
+   * @param {string} _value The accept header value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadAcceptHeader(_value) {
+    return false;
+  }
+
+  /**
+   * Check if the loader supports the input content type.
+   * Default returns false.
+   *
+   * @param {string} _value The content type value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadContentType(_value) {
+    return false;
+  }
+
+  /**
    * Check if the loader can load the provided memory object.
-   * Default checks if the memory object has a filename that
-   * this loader can handle via canLoadFile.
+   * Default checks content type or filename.
    *
    * @param {object} mem The memory object.
    * @returns {boolean} True if the object can be loaded.
    */
   canLoadMemory(mem) {
+    // content type
+    const contentType = mem['Content-Type'];
+    if (typeof contentType !== 'undefined' &&
+      this.canLoadContentType(contentType)) {
+      return true;
+    }
+    // file
     if (typeof mem.filename !== 'undefined') {
       const tmpFile = new File(['from memory'], mem.filename);
       return this.canLoadFile(tmpFile);

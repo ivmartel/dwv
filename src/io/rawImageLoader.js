@@ -128,8 +128,7 @@ export class RawImageLoader extends LoaderBase {
         };
         const acceptHeader = options.requestHeaders.find(isNameAccept);
         if (typeof acceptHeader !== 'undefined') {
-          // starts with 'image/'
-          return startsWith(acceptHeader.value, 'image/');
+          return this.canLoadAcceptHeader(acceptHeader.value);
         }
       }
     }
@@ -143,11 +142,33 @@ export class RawImageLoader extends LoaderBase {
     const contentType = urlObjext.searchParams.get('contentType');
     const hasContentType = contentType !== null &&
       typeof contentType !== 'undefined';
-    const hasImageContentType = (contentType === 'image/jpeg') ||
-      (contentType === 'image/png') ||
-      (contentType === 'image/gif');
+    const hasImageContentType = hasContentType && this.canLoadContentType(contentType);
 
     return hasContentType ? hasImageContentType : hasImageExt;
+  }
+
+
+  /**
+   * Check if the loader supports the input accept header.
+   *
+   * @param {string} value The accept header value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadAcceptHeader(value) {
+    // starts with 'image/'
+    return startsWith(value, 'image/');
+  }
+
+  /**
+   * Check if the loader supports the input content type.
+   *
+   * @param {string} value The content type value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadContentType(value) {
+    return value === 'image/jpeg' ||
+      value === 'image/png' ||
+      value === 'image/gif';
   }
 
   /**

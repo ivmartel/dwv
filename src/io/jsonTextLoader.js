@@ -102,9 +102,7 @@ export class JSONTextLoader extends LoaderBase {
         };
         const acceptHeader = options.requestHeaders.find(isNameAccept);
         if (typeof acceptHeader !== 'undefined') {
-          // starts with 'application/json' or 'application/dicom+json
-          return startsWith(acceptHeader.value, 'application/json') ||
-            startsWith(acceptHeader.value, 'application/dicom+json');
+          return this.canLoadAcceptHeader(acceptHeader.value);
         }
       }
     }
@@ -115,18 +113,24 @@ export class JSONTextLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader can load the provided memory object.
+   * Check if the loader supports the input accept header.
    *
-   * @param {object} mem The memory object.
-   * @returns {boolean} True if the object can be loaded.
+   * @param {string} value The accept header value.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadMemory(mem) {
-    const contentType = mem['Content-Type'];
-    if (typeof contentType !== 'undefined' &&
-      contentType.startsWith('application/json')) {
-      return true;
-    }
-    return super.canLoadMemory(mem);
+  canLoadAcceptHeader(value) {
+    return startsWith(value, 'application/json') ||
+      startsWith(value, 'application/dicom+json');
+  }
+
+  /**
+   * Check if the loader supports the input content type.
+   *
+   * @param {string} value The content type value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadContentType(value) {
+    return value.startsWith('application/json');
   }
 
   /**

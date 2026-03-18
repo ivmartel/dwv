@@ -106,10 +106,7 @@ export class DicomDataLoader extends LoaderBase {
         };
         const acceptHeader = options.requestHeaders.find(isNameAccept);
         if (typeof acceptHeader !== 'undefined') {
-          // starts with 'application/dicom' and no '+'
-          const acceptValue = 'application/dicom';
-          return startsWith(acceptHeader.value, acceptValue) &&
-            acceptHeader.value[acceptValue.length] !== '+';
+          return this.canLoadAcceptHeader(acceptHeader.value);
         }
       }
     }
@@ -123,24 +120,32 @@ export class DicomDataLoader extends LoaderBase {
     const contentType = urlObjext.searchParams.get('contentType');
     const hasContentType = contentType !== null &&
       typeof contentType !== 'undefined';
-    const hasDicomContentType = (contentType === 'application/dicom');
+    const hasDicomContentType = hasContentType && this.canLoadContentType(contentType);
 
     return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
   }
 
   /**
-   * Check if the loader can load the provided memory object.
+   * Check if the loader supports the input accept header.
    *
-   * @param {object} mem The memory object.
-   * @returns {boolean} True if the object can be loaded.
+   * @param {string} value The accept header value.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadMemory(mem) {
-    const contentType = mem['Content-Type'];
-    if (typeof contentType !== 'undefined' &&
-      contentType.startsWith('application/dicom')) {
-      return true;
-    }
-    return super.canLoadMemory(mem);
+  canLoadAcceptHeader(value) {
+    // starts with 'application/dicom' and no '+'
+    const acceptValue = 'application/dicom';
+    return startsWith(value, acceptValue) &&
+      value[acceptValue.length] !== '+';
+  }
+
+  /**
+   * Check if the loader supports the input content type.
+   *
+   * @param {string} value The content type value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadContentType(value) {
+    return value.startsWith('application/dicom');
   }
 
   /**

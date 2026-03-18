@@ -84,13 +84,23 @@ export class MultipartLoader extends LoaderBase {
         };
         const acceptHeader = options.requestHeaders.find(isNameAccept);
         if (typeof acceptHeader !== 'undefined') {
-          // starts with 'multipart/related'
-          return startsWith(acceptHeader.value, 'multipart/related');
+          return this.canLoadAcceptHeader(acceptHeader.value);
         }
       }
     }
 
     return false;
+  }
+
+  /**
+   * Check if the loader supports the input accept header.
+   *
+   * @param {string} value The accept header value.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadAcceptHeader(value) {
+    // starts with 'multipart/related'
+    return startsWith(value, 'multipart/related');
   }
 
   /**
