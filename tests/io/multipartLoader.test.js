@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert} from 'vitest';
 import {MultipartLoader} from '../../src/io/multipartLoader.js';
 

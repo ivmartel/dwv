@@ -1,5 +1,4 @@
-import {startsWith, getFileExtension} from '../utils/string.js';
-import {getUrlFromUri} from '../utils/uri.js';
+import {startsWith} from '../utils/string.js';
 import {getViewFromDOMImage} from '../image/domReader.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
@@ -96,55 +95,6 @@ export class RawImageLoader extends LoaderBase {
   canLoadFile(file) {
     return (typeof file.type !== 'undefined' &&
       file.type.match('image.*') !== null);
-  }
-
-  /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'rawimage',
-   * - the `options.requestHeaders` contains an item
-   *   starting with 'Accept: image/'.
-   * - the url has a 'contentType' and it is 'image/jpeg', 'image/png'
-   *   or 'image/gif' (as in wado urls),
-   * - the url has no 'contentType' and the extension is 'jpeg', 'jpg',
-   *   'png' or 'gif'.
-   *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
-   */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        this.isLoaderName(options.forceLoader)) {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          return this.canLoadAcceptHeader(acceptHeader.value);
-        }
-      }
-    }
-
-    const urlObjext = getUrlFromUri(url);
-    // extension
-    const ext = getFileExtension(urlObjext.pathname);
-    const hasImageExt = this.canLoadExtension(ext);
-    // content type (for wado url)
-    const contentType = urlObjext.searchParams.get('contentType');
-    const hasContentType = contentType !== null &&
-      typeof contentType !== 'undefined';
-    const hasImageContentType =
-      hasContentType && this.canLoadContentType(contentType);
-
-    return hasContentType ? hasImageContentType : hasImageExt;
   }
 
   /**

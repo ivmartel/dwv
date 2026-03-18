@@ -60,39 +60,6 @@ export class MultipartLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'multipart',
-   * - the `options.requestHeaders` contains a 'Accept: multipart/related'.
-   *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
-   */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        this.isLoaderName(options.forceLoader)) {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          return this.canLoadAcceptHeader(acceptHeader.value);
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
    * Check if the input is the loader name.
    *
    * @param {string} value The test name.

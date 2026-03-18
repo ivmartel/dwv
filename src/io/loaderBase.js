@@ -1,3 +1,6 @@
+import {getUrlFromUri} from '../utils/uri.js';
+import {getFileExtension} from '../utils/string.js';
+
 /**
  * Base class for single data loaders.
  *
@@ -70,14 +73,52 @@ export class LoaderBase {
 
   /**
    * Check if the loader can load the provided url.
-   * Default returns false.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is the name of the loader,
+   * - the `options.requestHeaders` contains a 'Accept' with
+   *   a compatible MIME type,
+   * - the url has a 'contentType' and it is a compatible MIME type
+   *   (as in wado urls),
+   * - the url has no 'contentType' and it has a compatible file extention.
    *
-   * @param {string} _url The url to check.
-   * @param {object} [_options] Optional url request options.
+   * @param {string} url The url to check.
+   * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
-  canLoadUrl(_url, _options) {
-    return false;
+  canLoadUrl(url, options) {
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      // -> pass through if false
+      if (typeof options.forceLoader !== 'undefined' &&
+        this.isLoaderName(options.forceLoader)) {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      // -> fail if wrong header
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          return this.canLoadAcceptHeader(acceptHeader.value);
+        }
+      }
+    }
+
+    const urlObjext = getUrlFromUri(url);
+    // extension
+    const ext = getFileExtension(urlObjext.pathname);
+    const calLoadExt = this.canLoadExtension(ext);
+    // content type (for wado url)
+    const contentType = urlObjext.searchParams.get('contentType');
+    const hasContentType = contentType !== null &&
+      typeof contentType !== 'undefined';
+    const canLoadContentType =
+      hasContentType && this.canLoadContentType(contentType);
+
+    return hasContentType ? canLoadContentType : calLoadExt;
   }
 
   /**

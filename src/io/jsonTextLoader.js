@@ -1,5 +1,4 @@
 import {startsWith, getFileExtension} from '../utils/string.js';
-import {getUrlFromUri} from '../utils/uri.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {LoaderBase} from './loaderBase.js';
@@ -72,43 +71,6 @@ export class JSONTextLoader extends LoaderBase {
    */
   canLoadFile(file) {
     const ext = getFileExtension(file.name);
-    return this.canLoadExtension(ext);
-  }
-
-  /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'json',
-   * - the `options.requestHeaders` contains a 'Accept: application/json' or
-   *   'Accept: application/dicom+json',
-   * - the url has a 'json' extension.
-   *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
-   */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        this.isLoaderName(options.forceLoader)) {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          return this.canLoadAcceptHeader(acceptHeader.value);
-        }
-      }
-    }
-
-    const urlObjext = getUrlFromUri(url);
-    const ext = getFileExtension(urlObjext.pathname);
     return this.canLoadExtension(ext);
   }
 

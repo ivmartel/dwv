@@ -1,5 +1,4 @@
 import {startsWith, getFileExtension} from '../utils/string.js';
-import {getUrlFromUri} from '../utils/uri.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {DicomBufferToData} from '../image/dicomBufferToData.js';
@@ -74,53 +73,6 @@ export class DicomDataLoader extends LoaderBase {
   canLoadFile(file) {
     const ext = getFileExtension(file.name);
     return this.canLoadExtension(ext);
-  }
-
-  /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'dicom',
-   * - the `options.requestHeaders` contains a 'Accept: application/dicom',
-   * - the url has a 'contentType' and it is 'application/dicom'
-   *   (as in wado urls),
-   * - the url has no 'contentType' and no extension or the extension is 'dcm'.
-   *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
-   */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        this.isLoaderName(options.forceLoader)) {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          return this.canLoadAcceptHeader(acceptHeader.value);
-        }
-      }
-    }
-
-    const urlObjext = getUrlFromUri(url);
-    // extension
-    const ext = getFileExtension(urlObjext.pathname);
-    const hasDcmExt = this.canLoadExtension(ext);
-    // content type (for wado url)
-    const contentType = urlObjext.searchParams.get('contentType');
-    const hasContentType = contentType !== null &&
-      typeof contentType !== 'undefined';
-    const hasDicomContentType =
-      hasContentType && this.canLoadContentType(contentType);
-
-    return hasContentType ? hasDicomContentType : hasDcmExt;
   }
 
   /**
