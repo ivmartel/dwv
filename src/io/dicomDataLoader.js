@@ -67,7 +67,7 @@ export class DicomDataLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadExtension(value) {
-    return value === null ||
+    return typeof value === 'undefined' ||
       value === 'dcm';
   }
 

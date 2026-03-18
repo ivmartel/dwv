@@ -170,10 +170,11 @@ export function getRootPath(path) {
  * Extensions are expected to contain at least one letter.
  *
  * @param {string} filePath The file path containing the file name.
- * @returns {string} The lower case file extension or null for none.
+ * @returns {string|undefined} The lower case file extension or
+ * undefined for none.
  */
 export function getFileExtension(filePath) {
-  let ext = null;
+  let ext;
   if (typeof filePath !== 'undefined' &&
     filePath !== null &&
     filePath[0] !== '.') {
@@ -183,7 +184,7 @@ export function getFileExtension(filePath) {
       // extension should contain at least one letter and no slash
       const regExp = /[a-z]/;
       if (!regExp.test(ext) || ext.includes('/')) {
-        ext = null;
+        ext = undefined;
       }
     }
   }

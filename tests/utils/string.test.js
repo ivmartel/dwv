@@ -250,13 +250,13 @@ describe('utils', () => {
   test('getFileExtension', () => {
     // undefined
     assert.equal(
-      getFileExtension(), null, 'getFileExtension undefined');
+      getFileExtension(), undefined, 'getFileExtension undefined');
     // null
-    assert.equal(getFileExtension(null), null, 'getFileExtension null');
+    assert.equal(getFileExtension(null), undefined, 'getFileExtension null');
     // empty
-    assert.equal(getFileExtension(''), null, 'getFileExtension empty');
+    assert.equal(getFileExtension(''), undefined, 'getFileExtension empty');
     // dot
-    assert.equal(getFileExtension('.'), null, 'getFileExtension dot');
+    assert.equal(getFileExtension('.'), undefined, 'getFileExtension dot');
     // no extension
     assert.equal(
       getFileExtension('filename'),
