@@ -163,8 +163,7 @@ describe('io', () => {
   test('RAW image loader canloadmemory', () => {
     const loader = new RawImageLoader();
     assert.notOk(loader.canLoadMemory({}));
-    // Current implementation rebuilds a File with no type, so this is false.
-    assert.notOk(loader.canLoadMemory({filename: 'image.png'}));
+    assert.ok(loader.canLoadMemory({filename: 'image.png'}));
   });
 
   /**

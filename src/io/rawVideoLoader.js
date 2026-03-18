@@ -80,18 +80,6 @@ export class RawVideoLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader can load the provided file.
-   * True for files with type 'video.*'.
-   *
-   * @param {File} file The file to check.
-   * @returns {boolean} True if the file can be loaded.
-   */
-  canLoadFile(file) {
-    return (typeof file.type !== 'undefined' &&
-      file.type.match('video.*') !== null);
-  }
-
-  /**
    * Check if the loader supports the input extension.
    *
    * @param {string} value The extensione.

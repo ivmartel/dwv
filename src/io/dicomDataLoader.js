@@ -1,4 +1,3 @@
-import {getFileExtension} from '../utils/string.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {DicomBufferToData} from '../image/dicomBufferToData.js';
@@ -59,20 +58,6 @@ export class DicomDataLoader extends LoaderBase {
     this.setLoading(false);
     // abort conversion, will trigger db2d.onabort
     this.#db2d.abort();
-  }
-
-  /**
-   * Check if the loader can load the provided file.
-   * True if one of the folowing conditions is true:
-   * - the file has a 'dcm' extension,
-   * - the file has no extension.
-   *
-   * @param {File} file The file to check.
-   * @returns {boolean} True if the file can be loaded.
-   */
-  canLoadFile(file) {
-    const ext = getFileExtension(file.name);
-    return this.canLoadExtension(ext);
   }
 
   /**

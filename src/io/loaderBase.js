@@ -62,13 +62,23 @@ export class LoaderBase {
 
   /**
    * Check if the loader can load the provided file.
-   * Default returns false.
+   * True if one of the folowing conditions is true:
+   * - the file.type is a supported media type,
+   * - the file.name extension is a supported extension.
    *
-   * @param {File} _file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
-  canLoadFile(_file) {
-    return false;
+  canLoadFile(file) {
+    // check file type
+    // -> pass through if false
+    if (typeof file.type !== 'undefined' &&
+      this.canLoadMediaType(file.type)) {
+      return true;
+    }
+    // check file name extension
+    const ext = getFileExtension(file.name);
+    return this.canLoadExtension(ext);
   }
 
   /**

@@ -1,4 +1,3 @@
-import {getFileExtension} from '../utils/string.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {MemoryLoader} from './memoryLoader.js';
@@ -132,18 +131,6 @@ export class ZipLoader extends LoaderBase {
     // call listeners
     this.onabort({});
     this.onloadend({});
-  }
-
-  /**
-   * Check if the loader can load the provided file.
-   * True if the file has a 'zip' extension.
-   *
-   * @param {File} file The file to check.
-   * @returns {boolean} True if the file can be loaded.
-   */
-  canLoadFile(file) {
-    const ext = getFileExtension(file.name);
-    return this.canLoadExtension(ext);
   }
 
   /**

@@ -150,8 +150,7 @@ describe('io', () => {
   test('RAW video loader canloadmemory', () => {
     const loader = new RawVideoLoader();
     assert.notOk(loader.canLoadMemory({}));
-    // Current implementation rebuilds a File with no type, so this is false.
-    assert.notOk(loader.canLoadMemory({filename: 'clip.mp4'}));
+    assert.ok(loader.canLoadMemory({filename: 'clip.mp4'}));
   });
 
   /**
