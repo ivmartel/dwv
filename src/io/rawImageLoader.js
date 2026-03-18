@@ -142,7 +142,8 @@ export class RawImageLoader extends LoaderBase {
     const contentType = urlObjext.searchParams.get('contentType');
     const hasContentType = contentType !== null &&
       typeof contentType !== 'undefined';
-    const hasImageContentType = hasContentType && this.canLoadContentType(contentType);
+    const hasImageContentType =
+      hasContentType && this.canLoadContentType(contentType);
 
     return hasContentType ? hasImageContentType : hasImageExt;
   }

@@ -120,7 +120,8 @@ export class DicomDataLoader extends LoaderBase {
     const contentType = urlObjext.searchParams.get('contentType');
     const hasContentType = contentType !== null &&
       typeof contentType !== 'undefined';
-    const hasDicomContentType = hasContentType && this.canLoadContentType(contentType);
+    const hasDicomContentType =
+      hasContentType && this.canLoadContentType(contentType);
 
     return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
   }
