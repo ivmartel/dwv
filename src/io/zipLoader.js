@@ -167,22 +167,12 @@ export class ZipLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader supports the input accept header.
+   * Check if the loader supports the input media type.
    *
-   * @param {string} value The accept header value.
+   * @param {string} value The media type.
    * @returns {boolean} True if it can be loaded.
    */
-  canLoadAcceptHeader(value) {
-    return value === 'application/zip';
-  }
-
-  /**
-   * Check if the loader supports the input content type.
-   *
-   * @param {string} value The content type value.
-   * @returns {boolean} True if it can be loaded.
-   */
-  canLoadContentType(value) {
+  canLoadMediaType(value) {
     return value === 'application/zip';
   }
 

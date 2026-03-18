@@ -69,12 +69,12 @@ export class MultipartLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader supports the input accept header.
+   * Check if the loader supports the input media type.
    *
-   * @param {string} value The accept header value.
+   * @param {string} value The media type.
    * @returns {boolean} True if it can be loaded.
    */
-  canLoadAcceptHeader(value) {
+  canLoadMediaType(value) {
     return value === 'multipart/related';
   }
 

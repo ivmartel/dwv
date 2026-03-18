@@ -107,7 +107,7 @@ export class LoaderBase {
             (entry) => entry.split(';')[0].trim()
           );
           return mediaTypes.some(
-            (mediaType) => this.canLoadAcceptHeader(mediaType)
+            (mediaType) => this.canLoadMediaType(mediaType)
           );
         }
       }
@@ -125,7 +125,7 @@ export class LoaderBase {
       ? contentType.split(';')[0].trim()
       : undefined;
     const canLoadContentType =
-      hasContentType && this.canLoadContentType(mediaType);
+      hasContentType && this.canLoadMediaType(mediaType);
 
     return hasContentType ? canLoadContentType : calLoadExt;
   }
@@ -153,24 +153,15 @@ export class LoaderBase {
   }
 
   /**
-   * Check if the loader supports the input accept header.
+   * Check if the loader supports the input media type.
+   * Called for both the Accept request header and the Content-Type of the
+   * response (or memory object), after parameters have been stripped.
    * Default returns false.
    *
-   * @param {string} _value The accept header value.
+   * @param {string} _value The media type (e.g. 'application/dicom').
    * @returns {boolean} True if it can be loaded.
    */
-  canLoadAcceptHeader(_value) {
-    return false;
-  }
-
-  /**
-   * Check if the loader supports the input content type.
-   * Default returns false.
-   *
-   * @param {string} _value The content type value.
-   * @returns {boolean} True if it can be loaded.
-   */
-  canLoadContentType(_value) {
+  canLoadMediaType(_value) {
     return false;
   }
 
@@ -186,7 +177,7 @@ export class LoaderBase {
     const contentType = mem['Content-Type'];
     if (typeof contentType !== 'undefined') {
       const mediaType = contentType.split(';')[0].trim();
-      if (this.canLoadContentType(mediaType)) {
+      if (this.canLoadMediaType(mediaType)) {
         return true;
       }
     }

@@ -120,25 +120,13 @@ export class RawImageLoader extends LoaderBase {
   }
 
   /**
-   * Check if the loader supports the input accept header.
+   * Check if the loader supports the input media type.
    *
-   * @param {string} value The accept header value.
+   * @param {string} value The media type.
    * @returns {boolean} True if it can be loaded.
    */
-  canLoadAcceptHeader(value) {
+  canLoadMediaType(value) {
     return value.startsWith('image/');
-  }
-
-  /**
-   * Check if the loader supports the input content type.
-   *
-   * @param {string} value The content type value.
-   * @returns {boolean} True if it can be loaded.
-   */
-  canLoadContentType(value) {
-    return value === 'image/jpeg' ||
-      value === 'image/png' ||
-      value === 'image/gif';
   }
 
   /**
