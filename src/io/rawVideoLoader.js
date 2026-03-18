@@ -150,9 +150,9 @@ export class RawVideoLoader extends LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadContentType(value) {
-    return value === 'image/jpeg' ||
-      value === 'image/png' ||
-      value === 'image/gif';
+    return value === 'video/mp4' ||
+      value === 'video/ogg' ||
+      value === 'video/webm';
   }
 
   /**
