@@ -141,13 +141,27 @@ export class LoaderBase {
   }
 
   /**
-   * Check if the loader supports the input extension.
-   * Default returns false.
+   * Check if the loader can load the provided memory object.
+   * Default checks content type or filename.
    *
-   * @param {string} _value The extensione.
-   * @returns {boolean} True if it can be loaded.
+   * @param {object} mem The memory object.
+   * @returns {boolean} True if the object can be loaded.
    */
-  canLoadExtension(_value) {
+  canLoadMemory(mem) {
+    // content type: strip parameters (e.g. ; boundary=...) before testing
+    // -> pass through if false
+    const contentType = mem['Content-Type'];
+    if (typeof contentType !== 'undefined') {
+      const mediaType = contentType.split(';')[0].trim();
+      if (this.canLoadMediaType(mediaType)) {
+        return true;
+      }
+    }
+    // file
+    if (typeof mem.filename !== 'undefined') {
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
+    }
     return false;
   }
 
@@ -163,6 +177,17 @@ export class LoaderBase {
   }
 
   /**
+   * Check if the loader supports the input extension.
+   * Default returns false.
+   *
+   * @param {string} _value The extensione.
+   * @returns {boolean} True if it can be loaded.
+   */
+  canLoadExtension(_value) {
+    return false;
+  }
+
+  /**
    * Check if the loader supports the input media type.
    * Called for both the Accept request header and the Content-Type of the
    * response (or memory object), after parameters have been stripped.
@@ -172,30 +197,6 @@ export class LoaderBase {
    * @returns {boolean} True if it can be loaded.
    */
   canLoadMediaType(_value) {
-    return false;
-  }
-
-  /**
-   * Check if the loader can load the provided memory object.
-   * Default checks content type or filename.
-   *
-   * @param {object} mem The memory object.
-   * @returns {boolean} True if the object can be loaded.
-   */
-  canLoadMemory(mem) {
-    // content type: strip parameters (e.g. ; boundary=...) before testing
-    const contentType = mem['Content-Type'];
-    if (typeof contentType !== 'undefined') {
-      const mediaType = contentType.split(';')[0].trim();
-      if (this.canLoadMediaType(mediaType)) {
-        return true;
-      }
-    }
-    // file
-    if (typeof mem.filename !== 'undefined') {
-      const tmpFile = new File(['from memory'], mem.filename);
-      return this.canLoadFile(tmpFile);
-    }
     return false;
   }
 
