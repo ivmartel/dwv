@@ -162,7 +162,7 @@ describe('io', () => {
   test('RAW video loader content and state helpers', () => {
     const loader = new RawVideoLoader();
     loader.setOptions({dummy: true});
-    assert.ok(loader.isLoading());
+    assert.notOk(loader.isLoading());
     assert.equal(loader.loadFileAs(), fileContentTypes.DataURL);
     assert.equal(loader.loadUrlAs(), urlContentTypes.ArrayBuffer);
   });

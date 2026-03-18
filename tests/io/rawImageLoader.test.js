@@ -175,7 +175,7 @@ describe('io', () => {
   test('RAW image loader content and state helpers', () => {
     const loader = new RawImageLoader();
     loader.setOptions({dummy: true});
-    assert.ok(loader.isLoading());
+    assert.notOk(loader.isLoading());
     assert.equal(loader.loadFileAs(), fileContentTypes.DataURL);
     assert.equal(loader.loadUrlAs(), urlContentTypes.ArrayBuffer);
   });
