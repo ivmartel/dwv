@@ -17,8 +17,8 @@ let _loaderList = null;
 
 /**
  * Get the list of available data-loader constructors.
- * Always returns the same array instance so callers can mutate it (e.g. in
- * tests) and have those mutations visible to all consumers.
+ * Always returns the same array instance so callers can mutate it (for
+ * example in tests) and have those mutations visible to all consumers.
  *
  * @returns {Array} The list of loader constructors.
  */
