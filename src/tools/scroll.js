@@ -110,7 +110,7 @@ export class Scroll {
    *
    * @type {ScrollWheel}
    */
-  #scrollWhell;
+  #scrollWheel;
 
   /**
    * Touch timer ID (created by setTimeout).
@@ -138,7 +138,7 @@ export class Scroll {
    */
   constructor(app) {
     this.#app = app;
-    this.#scrollWhell = new ScrollWheel(app);
+    this.#scrollWheel = new ScrollWheel(app);
   }
 
   /**
@@ -349,7 +349,7 @@ export class Scroll {
    * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#scrollWhell.wheel(event);
+    this.#scrollWheel.wheel(event);
   };
 
   /**

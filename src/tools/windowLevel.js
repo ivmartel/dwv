@@ -66,7 +66,7 @@ export class WindowLevel {
    *
    * @type {ScrollWheel}
    */
-  #scrollWhell;
+  #scrollWheel;
 
   /**
    * Strict view layer flag: if true, use the active layer
@@ -83,7 +83,7 @@ export class WindowLevel {
    */
   constructor(app) {
     this.#app = app;
-    this.#scrollWhell = new ScrollWheel(app);
+    this.#scrollWheel = new ScrollWheel(app);
   }
 
   /**
@@ -291,7 +291,7 @@ export class WindowLevel {
    * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#scrollWhell.wheel(event);
+    this.#scrollWheel.wheel(event);
   };
 
   /**
