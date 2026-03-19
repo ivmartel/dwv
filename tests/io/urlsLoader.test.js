@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import {describe, test, assert, beforeEach, afterEach} from 'vitest';
 import {UrlsLoader, urlContentTypes} from '../../src/io/urlsLoader.js';
-import {loaderList} from '../../src/io/loaderList.js';
+import {getLoaderList} from '../../src/io/loaderList.js';
 import {MockIoLoader} from './utils/mockIoLoader.js';
 
 /**
@@ -146,6 +146,7 @@ class MockXMLHttpRequest {
 
 describe('io', () => {
   const originalXHR = globalThis.XMLHttpRequest;
+  const loaderList = getLoaderList();
   const originalLoaderList = [...loaderList];
 
   beforeEach(() => {

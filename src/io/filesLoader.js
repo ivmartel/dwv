@@ -1,5 +1,5 @@
 import {MultiProgressHandler} from '../utils/progress.js';
-import {loaderList} from './loaderList.js';
+import {getLoaderList} from './loaderList.js';
 import {LoadHandlers} from './loadHandlers.js';
 
 // file content types
@@ -215,6 +215,7 @@ export class FilesLoader extends LoadHandlers {
     mproghandler.setNToLoad(data.length);
 
     // create loaders
+    const loaderList = getLoaderList();
     const loaders = [];
     for (let m = 0; m < loaderList.length; ++m) {
       loaders.push(new loaderList[m]());

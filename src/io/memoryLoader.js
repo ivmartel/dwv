@@ -1,5 +1,5 @@
 import {MultiProgressHandler} from '../utils/progress.js';
-import {loaderList} from './loaderList.js';
+import {getLoaderList} from './loaderList.js';
 import {LoadHandlers} from './loadHandlers.js';
 
 /**
@@ -150,6 +150,7 @@ export class MemoryLoader extends LoadHandlers {
     mproghandler.setNumberOfDimensions(1);
 
     // create loaders
+    const loaderList = getLoaderList();
     const loaders = [];
     for (let m = 0; m < loaderList.length; ++m) {
       loaders.push(new loaderList[m]());
