@@ -115,7 +115,7 @@ export class ProtractorFactory {
     group.id(annotation.trackingUid);
     // konva shape
     const shape = this.#createShape(annotation, style);
-    group.add(this.#createShape(annotation, style));
+    group.add(shape);
 
     if (protractor.getLength() === this.getNPoints()) {
       // extras
@@ -125,7 +125,7 @@ export class ProtractorFactory {
       }
       // konva label
       const label = this.#labelFactory.create(annotation, style);
-      group.add(this.#labelFactory.create(annotation, style));
+      group.add(label);
       // label-shape connector
       const connectorsPos = this.#getConnectorsPositions(shape);
       group.add(this.#labelFactory.getConnector(connectorsPos, label, style));

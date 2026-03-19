@@ -112,7 +112,7 @@ export class RulerFactory {
     group.id(annotation.trackingUid);
     // konva shape
     const shape = this.#createShape(annotation, style);
-    group.add(this.#createShape(annotation, style));
+    group.add(shape);
     // extras
     const extras = this.#createShapeExtras(annotation, style);
     for (const extra of extras) {
@@ -120,7 +120,7 @@ export class RulerFactory {
     }
     // konva label
     const label = this.#labelFactory.create(annotation, style);
-    group.add(this.#labelFactory.create(annotation, style));
+    group.add(label);
     // label-shape connector
     const connectorsPos = this.#getConnectorsPositions(shape);
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
