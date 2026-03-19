@@ -13,9 +13,12 @@ import {
 /**
  * Convenience: build a triangular ROI from 3 plain number pairs.
  *
- * @param {number} x0 @param {number} y0
- * @param {number} x1 @param {number} y1
- * @param {number} x2 @param {number} y2
+ * @param {number} x0 X of point 0.
+ * @param {number} y0 Y of point 0.
+ * @param {number} x1 X of point 1.
+ * @param {number} y1 Y of point 1.
+ * @param {number} x2 X of point 2.
+ * @param {number} y2 Y of point 2.
  * @returns {ROI} The ROI.
  */
 function makeTriangleRoi(x0, y0, x1, y1, x2, y2) {

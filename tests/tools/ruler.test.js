@@ -11,10 +11,12 @@ import {
 } from './utils/toolTestHelpers.js';
 
 /**
- * Build a horizontal ruler Line from (x0,y0) to (x1,y1).
+ * Build a ruler Line from (x0,y0) to (x1,y1).
  *
- * @param {number} x0 @param {number} y0
- * @param {number} x1 @param {number} y1
+ * @param {number} x0 X of the begin point.
+ * @param {number} y0 Y of the begin point.
+ * @param {number} x1 X of the end point.
+ * @param {number} y1 Y of the end point.
  * @returns {Line} The Line.
  */
 function makeLine(x0, y0, x1, y1) {

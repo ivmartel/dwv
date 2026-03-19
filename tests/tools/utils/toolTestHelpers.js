@@ -8,23 +8,14 @@ import {vi} from 'vitest';
  */
 export function makeStyle() {
   return {
-    /** @returns {number} Stroke width. */
     getStrokeWidth: () => 2,
-    /** @returns {{x: number, y: number}} Zoom scale. */
     getZoomScale: () => ({x: 1, y: 1}),
-    /** @param {number} n Value to scale. @returns {{x: number, y: number}} */
     applyZoomScale: (n) => ({x: n, y: n}),
-    /** @returns {number} Font size in pixels. */
     getFontSize: () => 12,
-    /** @returns {string} Font family name. */
     getFontFamily: () => 'Arial',
-    /** @returns {number} Text padding in pixels. */
     getTextPadding: () => 2,
-    /** @returns {string} Shadow line colour. */
     getShadowLineColour: () => '#000',
-    /** @returns {{x: number, y: number}} Shadow offset. */
     getShadowOffset: () => ({x: 1, y: 1}),
-    /** @returns {number} Tag background opacity. */
     getTagOpacity: () => 0.5,
   };
 }
@@ -62,8 +53,7 @@ export function makeAnnotation(mathShape) {
  * @param {object} factory The shape factory under test.
  * @param {object} ann The annotation mock.
  * @param {object} style The style mock.
- * @returns {{group: import('konva').Group, anchors: import('konva').Ellipse[]}}
- *   The Konva group and the anchor list.
+ * @returns {object} The Konva group and anchor list.
  */
 export function makeShapeGroupWithAnchors(factory, ann, style) {
   const group = factory.createShapeGroup(ann, style);

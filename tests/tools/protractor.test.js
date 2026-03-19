@@ -14,9 +14,12 @@ import {
  * Convenience: build a full 3-point Protractor.
  * The vertex (angle point) is p1.
  *
- * @param {number} x0 Begin x. @param {number} y0 Begin y.
- * @param {number} x1 Vertex x. @param {number} y1 Vertex y.
- * @param {number} x2 End x. @param {number} y2 End y.
+ * @param {number} x0 Begin x.
+ * @param {number} y0 Begin y.
+ * @param {number} x1 Vertex x.
+ * @param {number} y1 Vertex y.
+ * @param {number} x2 End x.
+ * @param {number} y2 End y.
  * @returns {Protractor} The protractor.
  */
 function makeProtractor(x0, y0, x1, y1, x2, y2) {
