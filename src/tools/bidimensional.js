@@ -181,7 +181,6 @@ export class BidimensionalFactory {
     });
 
     // Attach annotation to group for anchor logic
-    group?.setAttr('annotation', annotation);
     group.on('dragend', () => {
       const pos = group.position();
       if (pos.x !== 0 || pos.y !== 0) {
@@ -421,10 +420,10 @@ export class BidimensionalFactory {
    * Constrain anchor movement for short axis anchors.
    *
    * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
    */
-  constrainAnchorMove(anchor) {
+  constrainAnchorMove(anchor, annotation) {
     const group = anchor.getParent();
-    const annotation = group?.getAttr('annotation');
     const mathShape = annotation.mathShape;
 
     // Handle SHORT AXIS anchors (anchor2 and anchor3)
@@ -502,7 +501,7 @@ export class BidimensionalFactory {
     }
 
     // Update connector
-    this.updateConnector(group);
+    this.updateConnector(annotation, group);
   }
 
   /**
@@ -616,9 +615,10 @@ export class BidimensionalFactory {
   /**
    * Update the label connector.
    *
+   * @param {Annotation} annotation The annotation.
    * @param {Konva.Group} group The shape group.
    */
-  updateConnector(group) {
+  updateConnector(annotation, group) {
     const kshape = group.findOne('.shape');
     if (kshape && kshape instanceof Konva.Line) {
       const connectorsPos = this.#getConnectorsPositions(kshape);

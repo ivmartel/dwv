@@ -106,10 +106,11 @@ export class ProtractorFactory {
   /**
    * Constrain anchor movement.
    *
-   * @param {Konva.Ellipse} anchor The active anchor.
+    * @param {Konva.Ellipse} anchor The active anchor.
+  * @param {Annotation} annotation The associated annotation.
    */
-  constrainAnchorMove(anchor) {
-    this.#renderer.constrainAnchorMove(anchor);
+  constrainAnchorMove(anchor, annotation) {
+    this.#renderer.constrainAnchorMove(anchor, annotation);
   }
 
   /**
@@ -158,10 +159,10 @@ export class ProtractorFactory {
   /**
    * Update the shape connector.
    *
+   * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Group} group The shape group.
    */
-  updateConnector(group) {
-    const annotation = group.getAttr('annotation');
+  updateConnector(annotation, group) {
     this.#renderer.updateConnector(annotation, group);
   }
 

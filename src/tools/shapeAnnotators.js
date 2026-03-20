@@ -150,10 +150,10 @@ export class RectangleAnnotator {
   /**
    * Constrain the anchor movement (no constraints for rectangle).
    *
-   * @param {Anchor} _anchor The active anchor.
    * @param {Annotation} _annotation The annotation (unused).
+   * @param {Anchor} _anchor The active anchor.
    */
-  constrainAnchorMove(_anchor, _annotation) {
+  constrainAnchorMove(_annotation, _anchor,) {
     // no constraints
   }
 
@@ -738,10 +738,10 @@ export class RulerAnnotator {
   /**
    * Constrain the anchor movement (no constraints for ruler).
    *
-   * @param {Anchor} _anchor The active anchor.
    * @param {Annotation} _annotation The annotation (unused).
+   * @param {Anchor} _anchor The active anchor.
    */
-  constrainAnchorMove(_anchor, _annotation) {
+  constrainAnchorMove(_annotation, _anchor) {
     // no constraints
   }
 
@@ -907,10 +907,10 @@ export class ArrowAnnotator {
   /**
    * Constrain the anchor movement (no constraints for arrow).
    *
-   * @param {Anchor} _anchor The active anchor.
    * @param {Annotation} _annotation The annotation (unused).
+   * @param {Anchor} _anchor The active anchor.
    */
-  constrainAnchorMove(_anchor, _annotation) {
+  constrainAnchorMove(_annotation, _anchor) {
     // no constraints
   }
 
@@ -1071,10 +1071,10 @@ export class RoiAnnotator {
   /**
    * Constrain the anchor movement (no constraints for ROI).
    *
-   * @param {Anchor} _anchor The active anchor.
    * @param {Annotation} _annotation The annotation (unused).
+   * @param {Anchor} _anchor The active anchor.
    */
-  constrainAnchorMove(_anchor, _annotation) {
+  constrainAnchorMove(_annotation, _anchor) {
     // no constraints
   }
 
@@ -1247,10 +1247,10 @@ export class ProtractorAnnotator {
   /**
    * Constrain the anchor movement (no constraints for protractor).
    *
-   * @param {Anchor} _anchor The active anchor.
    * @param {Annotation} _annotation The annotation (unused).
+   * @param {Anchor} _anchor The active anchor.
    */
-  constrainAnchorMove(_anchor, _annotation) {
+  constrainAnchorMove(_annotation, _anchor) {
     // no constraints
   }
 

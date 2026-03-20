@@ -107,9 +107,10 @@ export class RectangleFactory {
    * Constrain anchor movement.
    *
    * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
    */
-  constrainAnchorMove(anchor) {
-    this.#annotator.constrainAnchorMove(anchor);
+  constrainAnchorMove(anchor, annotation) {
+    this.#annotator.constrainAnchorMove(anchor, annotation);
   }
 
   /**
@@ -158,10 +159,10 @@ export class RectangleFactory {
   /**
    * Update the shape connector.
    *
+   * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Group} group The shape group.
    */
-  updateConnector(group) {
-    const annotation = group.getAttr('annotation');
+  updateConnector(annotation, group) {
     this.#renderer.updateConnector(annotation, group);
   }
 

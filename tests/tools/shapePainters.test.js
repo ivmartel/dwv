@@ -467,8 +467,9 @@ describe('tools', () => {
 
       test('updateConnector does not throw', () => {
         const f = new RectangleFactory();
+        const ann = makeAnn(0, 0, 10, 10);
         const group = f.createShapeGroup(makeAnn(0, 0, 10, 10), style);
-        assert.doesNotThrow(() => f.updateConnector(group));
+        assert.doesNotThrow(() => f.updateConnector(ann, group));
       });
 
     }); // Rectangle ShapeRenderer

@@ -263,12 +263,6 @@ describe('tools', () => {
         assert.deepEqual(sa.dash(), []);
       });
 
-      test('createShapeGroup stores annotation as group attribute', () => {
-        const ann = makeBiDimAnnotation(0, 0, 100, 0);
-        const group = factory.createShapeGroup(ann, style);
-        assert.strictEqual(group.getAttr('annotation'), ann);
-      });
-
       test('getAnchors returns 4 anchors', () => {
         const ann = makeBiDimAnnotation(0, 0, 100, 0);
         const {anchors} = makeShapeGroupWithAnchors(factory, ann, style);
@@ -304,7 +298,7 @@ describe('tools', () => {
         const a0 = anchors.find((a) => a.id() === 'anchor0');
         a0.x(15);
         a0.y(25);
-        factory.constrainAnchorMove(a0);
+        factory.constrainAnchorMove(a0, ann);
         // position is not changed by the factory
         assert.equal(a0.x(), 15);
         assert.equal(a0.y(), 25);
@@ -318,7 +312,7 @@ describe('tools', () => {
         const a2 = anchors.find((a) => a.id() === 'anchor2');
         a2.x(20);
         a2.y(70);
-        factory.constrainAnchorMove(a2);
+        factory.constrainAnchorMove(a2, ann);
         assert.closeTo(ann.mathShape.shortAxisT, 0.2, 1e-10);
         assert.closeTo(ann.mathShape.shortAxisL1, 70, 1e-10);
       });
@@ -331,7 +325,7 @@ describe('tools', () => {
         const a3 = anchors.find((a) => a.id() === 'anchor3');
         a3.x(80);
         a3.y(-30);
-        factory.constrainAnchorMove(a3);
+        factory.constrainAnchorMove(a3, ann);
         assert.closeTo(ann.mathShape.shortAxisT, 0.8, 1e-10);
         assert.closeTo(ann.mathShape.shortAxisL2, 30, 1e-10);
       });
@@ -409,7 +403,7 @@ describe('tools', () => {
         const ann = makeBiDimAnnotation(0, 0, 100, 0);
         const group = factory.createShapeGroup(ann, style);
         // Should not throw when connector node exists
-        factory.updateConnector(group);
+        factory.updateConnector(ann, group);
       });
 
     }); // Tier 2

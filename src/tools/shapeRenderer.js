@@ -65,7 +65,6 @@ export class ShapeRenderer {
     group.name(this.#annotator.getGroupName());
     group.visible(true);
     group.id(annotation.trackingUid);
-    group.setAttr('annotation', annotation);
 
     // main shape (always present)
     group.add(painter.createShape(annotation, style));
@@ -109,13 +108,9 @@ export class ShapeRenderer {
    * annotator (which may mutate its position), then writes the result back.
    *
    * @param {object} konvaAnchor The active Konva anchor.
+   * @param {Annotation} annotation The annotation.
    */
-  constrainAnchorMove(konvaAnchor) {
-    const group = konvaAnchor.getParent();
-    if (!group) {
-      return;
-    }
-    const annotation = group.getAttr('annotation');
+  constrainAnchorMove(konvaAnchor, annotation) {
     const anchor = new Anchor(
       konvaAnchor.id(), konvaAnchor.x(), konvaAnchor.y());
     this.#annotator.constrainAnchorMove(anchor, annotation);
