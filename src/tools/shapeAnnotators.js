@@ -150,10 +150,10 @@ export class RectangleAnnotator {
   /**
    * Constrain the anchor movement (no constraints for rectangle).
    *
-   * @param {Annotation} _annotation The annotation (unused).
    * @param {Anchor} _anchor The active anchor.
+   * @param {Annotation} _annotation The annotation (unused).
    */
-  constrainAnchorMove(_annotation, _anchor,) {
+  constrainAnchorMove(_anchor, _annotation) {
     // no constraints
   }
 
@@ -738,10 +738,10 @@ export class RulerAnnotator {
   /**
    * Constrain the anchor movement (no constraints for ruler).
    *
-   * @param {Annotation} _annotation The annotation (unused).
    * @param {Anchor} _anchor The active anchor.
+   * @param {Annotation} _annotation The annotation (unused).
    */
-  constrainAnchorMove(_annotation, _anchor) {
+  constrainAnchorMove(_anchor, _annotation) {
     // no constraints
   }
 
@@ -905,12 +905,12 @@ export class ArrowAnnotator {
   }
 
   /**
-   * Constrain the anchor movement (no constraints for arrow).
+   * Constrain the anchor movement (no constraints for ruler).
    *
-   * @param {Annotation} _annotation The annotation (unused).
    * @param {Anchor} _anchor The active anchor.
+   * @param {Annotation} _annotation The annotation (unused).
    */
-  constrainAnchorMove(_annotation, _anchor) {
+  constrainAnchorMove(_anchor, _annotation) {
     // no constraints
   }
 
@@ -1069,12 +1069,12 @@ export class RoiAnnotator {
   }
 
   /**
-   * Constrain the anchor movement (no constraints for ROI).
+   * Constrain the anchor movement (no constraints for ruler).
    *
-   * @param {Annotation} _annotation The annotation (unused).
    * @param {Anchor} _anchor The active anchor.
+   * @param {Annotation} _annotation The annotation (unused).
    */
-  constrainAnchorMove(_annotation, _anchor) {
+  constrainAnchorMove(_anchor, _annotation) {
     // no constraints
   }
 
@@ -1245,12 +1245,12 @@ export class ProtractorAnnotator {
   }
 
   /**
-   * Constrain the anchor movement (no constraints for protractor).
+   * Constrain the anchor movement (no constraints for ruler).
    *
-   * @param {Annotation} _annotation The annotation (unused).
    * @param {Anchor} _anchor The active anchor.
+   * @param {Annotation} _annotation The annotation (unused).
    */
-  constrainAnchorMove(_annotation, _anchor) {
+  constrainAnchorMove(_anchor, _annotation) {
     // no constraints
   }
 

@@ -3,8 +3,11 @@ import {ShapeRenderer} from './shapeRenderer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
+import Konva from 'konva';
 import {Style} from '../gui/style.js';
 import {Annotation} from '../image/annotation.js';
+import {Point2D} from '../math/point.js';
+import {Anchor} from './anchor.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -110,7 +113,7 @@ export class RectangleFactory {
    * @param {Annotation} annotation The associated annotation.
    */
   constrainAnchorMove(anchor, annotation) {
-    this.#annotator.constrainAnchorMove(anchor, annotation);
+    this.#renderer.constrainAnchorMove(anchor, annotation);
   }
 
   /**
@@ -129,10 +132,10 @@ export class RectangleFactory {
    * Update an annotation on anchor move.
    *
    * @param {Annotation} annotation The annotation.
-   * @param {Konva.Shape} anchor The anchor.
+   * @param {Konva.Ellipse} anchor The anchor.
    */
   updateAnnotationOnAnchorMove(annotation, anchor) {
-    this.#annotator.updateAnnotationOnAnchorMove(annotation, anchor);
+    this.#renderer.updateAnnotationOnAnchorMove(annotation, anchor);
   }
 
   /**

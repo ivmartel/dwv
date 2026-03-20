@@ -32,6 +32,7 @@ class KonvaShapePainter {
    *
    * @param {Annotation} _annotation The annotation.
    * @param {Style} _style The drawing style.
+   * @returns {Konva.Shape} The created shape.
    */
   createShape(_annotation, _style) {
     throw new Error('KonvaShapePainter.createShape not implemented');
@@ -55,7 +56,7 @@ class KonvaShapePainter {
    *
    * @param {Annotation} _annotation The annotation.
    * @param {Style} _style The drawing style.
-   * @returns {Konva.Node[]} Empty array.
+   * @returns {Konva.Shape[]} Empty array.
    */
   createExtras(_annotation, _style) {
     return [];
@@ -230,7 +231,7 @@ class RulerKonvaPainter extends KonvaShapePainter {
   /**
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The drawing style.
-   * @returns {Konva.Line[]} The tick lines at begin and end.
+   * @returns {Konva.Shape[]} The tick lines at begin and end.
    */
   createExtras(annotation, style) {
     const line = annotation.mathShape;
@@ -352,7 +353,7 @@ class ArrowKonvaPainter extends KonvaShapePainter {
   /**
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The drawing style.
-   * @returns {Konva.Line[]} The arrowhead triangle.
+   * @returns {Konva.Shape[]} The arrowhead triangle.
    */
   createExtras(annotation, style) {
     const tip = annotation.mathShape;
@@ -500,7 +501,7 @@ class ProtractorKonvaPainter extends KonvaShapePainter {
    *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The drawing style.
-   * @returns {Konva.Arc[]} The arc node (or empty when incomplete).
+   * @returns {Konva.Shape[]} The arc node (or empty when incomplete).
    */
   createExtras(annotation, style) {
     const protractor = annotation.mathShape;
