@@ -243,7 +243,7 @@ export class DrawShapeEditor {
 
     // activate and add anchors to group
     const anchors =
-      this.#currentFactory.getAnchors(this.#shape, this.#app.getStyle());
+      this.#currentFactory.getAnchors(this.#annotation, this.#app.getStyle());
     for (let i = 0; i < anchors.length; ++i) {
       // set anchor on
       this.#setAnchorOn(anchors[i]);

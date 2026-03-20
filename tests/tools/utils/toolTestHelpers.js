@@ -57,8 +57,7 @@ export function makeAnnotation(mathShape) {
  */
 export function makeShapeGroupWithAnchors(factory, ann, style) {
   const group = factory.createShapeGroup(ann, style);
-  const shape = group.getChildren((n) => n.name() === 'shape')[0];
-  const anchors = factory.getAnchors(shape, style);
+  const anchors = factory.getAnchors(ann, style);
   for (const anchor of anchors) {
     group.add(anchor);
   }
