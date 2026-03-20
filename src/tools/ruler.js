@@ -10,6 +10,7 @@ import {
   getAnchorShape
 } from './drawBounds.js';
 import {LabelFactory} from './labelFactory.js';
+import {setLineHitFunc} from './lineHitFunc.js';
 
 // external
 import Konva from 'konva';
@@ -351,20 +352,7 @@ export class RulerFactory {
     });
 
     // larger hitfunc
-    const tickLen = 20;
-    const linePerp0 = getPerpendicularLine(
-      line, line.getBegin(), tickLen, style.getZoomScale());
-    const linePerp1 = getPerpendicularLine(
-      line, line.getEnd(), tickLen, style.getZoomScale());
-    kshape.hitFunc(function (context) {
-      context.beginPath();
-      context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
-      context.lineTo(linePerp0.getEnd().getX(), linePerp0.getEnd().getY());
-      context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
-      context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
-      context.closePath();
-      context.fillStrokeShape(kshape);
-    });
+    setLineHitFunc(kshape, line, style.getZoomScale());
 
     return kshape;
   }
@@ -524,15 +512,7 @@ export class RulerFactory {
       linePerp1.getEnd().getY()]);
 
     // larger hitfunc
-    kline.hitFunc(function (context) {
-      context.beginPath();
-      context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
-      context.lineTo(linePerp0.getEnd().getX(), linePerp0.getEnd().getY());
-      context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
-      context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
-      context.closePath();
-      context.fillStrokeShape(kline);
-    });
+    setLineHitFunc(kline, line, style.getZoomScale());
   }
 
   /**

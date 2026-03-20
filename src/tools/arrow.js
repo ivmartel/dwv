@@ -1,6 +1,5 @@
 import {
   Line,
-  getPerpendicularLine,
   getPerpendicularLineAtDistance
 } from '../math/line.js';
 import {Point2D} from '../math/point.js';
@@ -14,6 +13,7 @@ import {
   getAnchorShape
 } from './drawBounds.js';
 import {LabelFactory} from './labelFactory.js';
+import {setLineHitFunc} from './lineHitFunc.js';
 
 // external
 import Konva from 'konva';
@@ -367,20 +367,7 @@ export class ArrowFactory {
     });
 
     // larger hitfunc
-    const tickLen = 20;
-    const linePerp0 = getPerpendicularLine(
-      line, point, tickLen, style.getZoomScale());
-    const linePerp1 = getPerpendicularLine(
-      line, endPoint, tickLen, style.getZoomScale());
-    kshape.hitFunc(function (context) {
-      context.beginPath();
-      context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
-      context.lineTo(linePerp0.getEnd().getX(), linePerp0.getEnd().getY());
-      context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
-      context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
-      context.closePath();
-      context.fillStrokeShape(kshape);
-    });
+    setLineHitFunc(kshape, line, style.getZoomScale());
 
     return kshape;
   }
@@ -516,19 +503,7 @@ export class ArrowFactory {
     ]);
 
     // larger hitfunc
-    const linePerp0 = getPerpendicularLine(
-      line, point, tickLen, style.getZoomScale());
-    const linePerp1 = getPerpendicularLine(
-      line, endPoint, tickLen, style.getZoomScale());
-    kline.hitFunc(function (context) {
-      context.beginPath();
-      context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
-      context.lineTo(linePerp0.getEnd().getX(), linePerp0.getEnd().getY());
-      context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
-      context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
-      context.closePath();
-      context.fillStrokeShape(kline);
-    });
+    setLineHitFunc(kline, line, style.getZoomScale());
   }
 
   /**

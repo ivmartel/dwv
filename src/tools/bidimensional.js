@@ -3,6 +3,7 @@ import {BidimensionalLine} from '../math/bidimensionalLine.js';
 import {getPerpendicularLine} from '../math/line.js';
 import {Point2D} from '../math/point.js';
 import {LabelFactory} from './labelFactory.js';
+import {setLineHitFunc} from './lineHitFunc.js';
 import {
   getDefaultAnchor,
   getAnchorShape,
@@ -239,29 +240,11 @@ export class BidimensionalFactory {
       name: 'shape',
     });
 
-    // Add a larger hit zone using hitFunc (similar to ruler tool)
-    const tickLen = 20;
-    const linePerp0 = getPerpendicularLine(
-      line,
-      line.getBegin(),
-      tickLen,
+    // larger hitfunc
+    setLineHitFunc(
+      kline, line,
       style.getZoomScale ? style.getZoomScale() : {x: 1, y: 1}
     );
-    const linePerp1 = getPerpendicularLine(
-      line,
-      line.getEnd(),
-      tickLen,
-      style.getZoomScale ? style.getZoomScale() : {x: 1, y: 1}
-    );
-    kline.hitFunc(function (context) {
-      context.beginPath();
-      context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
-      context.lineTo(linePerp0.getEnd().getX(), linePerp0.getEnd().getY());
-      context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
-      context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
-      context.closePath();
-      context.fillStrokeShape(kline);
-    });
 
     return kline;
   }
@@ -557,6 +540,11 @@ export class BidimensionalFactory {
         line.getEnd().getX(),
         line.getEnd().getY(),
       ]);
+      // keep hit area in sync with the updated line position
+      setLineHitFunc(
+        kline, line,
+        style.getZoomScale ? style.getZoomScale() : {x: 1, y: 1}
+      );
     }
 
     // 2. Update Main Axis Ticks (Ends of the long axis)
