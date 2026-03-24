@@ -108,8 +108,8 @@ export class ProtractorFactory {
   /**
    * Constrain anchor movement.
    *
-    * @param {Konva.Ellipse} anchor The active anchor.
-  * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
    */
   constrainAnchorMove(anchor, annotation) {
     this.#renderer.constrainAnchorMove(anchor, annotation);
