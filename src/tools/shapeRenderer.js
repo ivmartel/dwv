@@ -107,7 +107,7 @@ export class ShapeRenderer {
    * Converts the active Konva anchor to a generic Anchor, calls the
    * annotator (which may mutate its position), then writes the result back.
    *
-   * @param {object} konvaAnchor The active Konva anchor.
+   * @param {Konva.Ellipse} konvaAnchor The active Konva anchor.
    * @param {Annotation} annotation The annotation.
    */
   constrainAnchorMove(konvaAnchor, annotation) {
