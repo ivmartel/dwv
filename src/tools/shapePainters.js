@@ -23,6 +23,8 @@ import {Annotation} from '../image/annotation.js';
  *
  * Provides default no-op implementations of `createExtras` and `updateExtras`
  * so that subclasses only override what they need.
+ *
+ * @interface
  */
 class KonvaShapePainter {
 
