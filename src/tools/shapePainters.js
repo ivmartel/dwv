@@ -109,7 +109,10 @@ class RectangleKonvaPainter extends KonvaShapePainter {
    */
   updateShape(node, annotation) {
     const r = annotation.mathShape;
-    node.position({x: r.getBegin().getX(), y: r.getBegin().getY()});
+    node.position({
+      x: r.getBegin().getX(),
+      y: r.getBegin().getY()
+    });
     node.size({width: r.getWidth(), height: r.getHeight()});
   }
 }
@@ -218,7 +221,9 @@ class RulerKonvaPainter extends KonvaShapePainter {
    */
   updateShape(node, annotation, style) {
     const line = annotation.mathShape;
+    // force Line position to 0 to store position with points
     node.position({x: 0, y: 0});
+    // update points
     node.points([
       line.getBegin().getX(),
       line.getBegin().getY(),
@@ -340,7 +345,9 @@ class ArrowKonvaPainter extends KonvaShapePainter {
     const tip = annotation.mathShape;
     const tail = annotation.referencePoints[0];
     const line = new Line(tip, tail);
+    // force Line position to 0 to store position with points
     node.position({x: 0, y: 0});
+    // update points
     node.points([
       tip.getX(),
       tip.getY(),
@@ -487,7 +494,9 @@ class ProtractorKonvaPainter extends KonvaShapePainter {
    */
   updateShape(node, annotation) {
     const protractor = annotation.mathShape;
+    // force Line position to 0 to store position with points
     node.position({x: 0, y: 0});
+    // update points
     node.points([
       protractor.getPoint(0).getX(),
       protractor.getPoint(0).getY(),
