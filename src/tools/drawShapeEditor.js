@@ -280,7 +280,7 @@ export class DrawShapeEditor {
       validateAnchorPosition(this.#drawLayer.getBaseSize(), evAnchor);
       if (typeof this.#currentFactory.constrainAnchorMove !== 'undefined') {
         this.#currentFactory.constrainAnchorMove(
-          this.#annotation, evAnchor);
+          evAnchor, this.#annotation);
       }
 
       // udpate annotation

@@ -395,7 +395,7 @@ export class DrawShapeHandler {
       // update label
       factory.updateLabelContent(annotation, shapeGroup, this.#app.getStyle());
       // update connector
-      factory.updateConnector(shapeGroup);
+      factory.updateConnector(annotation, shapeGroup);
       // highlight trash when on it
       const mousePoint = getMousePoint(event.evt);
       const offset = {
@@ -533,7 +533,7 @@ export class DrawShapeHandler {
         throw new Error('Cannot udpate connector without factory');
       }
       // update label
-      factory.updateConnector(shapeGroup);
+      factory.updateConnector(annotation, shapeGroup);
     });
 
     // drag end event handling
