@@ -478,7 +478,7 @@ export class BidimensionalFactory {
   }
 
   /**
-   * Hande anchor movement end.
+   * Handle anchor movement end.
    *
    * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Annotation} annotation The associated annotation.
