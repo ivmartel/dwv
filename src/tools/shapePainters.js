@@ -442,6 +442,9 @@ class RoiKonvaPainter extends KonvaShapePainter {
   updateShape(node, annotation) {
     const roi = annotation.mathShape;
     const pts = [];
+    // force Line position to 0 to store position with points
+    node.position({x: 0, y: 0});
+    // update points
     for (let i = 0; i < roi.getLength(); ++i) {
       pts.push(roi.getPoint(i).getX(), roi.getPoint(i).getY());
     }
