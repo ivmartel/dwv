@@ -124,7 +124,7 @@ export class ShapeRenderer {
    * annotator.
    *
    * @param {Annotation} annotation The annotation.
-   * @param {object} konvaAnchor The active Konva anchor.
+   * @param {Konva.Shape} konvaAnchor The active Konva anchor.
    */
   updateAnnotationOnAnchorMove(annotation, konvaAnchor) {
     const anchor = new Anchor(
@@ -139,7 +139,7 @@ export class ShapeRenderer {
    * the new geometry.
    *
    * @param {Annotation} annotation The updated annotation.
-   * @param {object} anchor The active Konva anchor.
+   * @param {Konva.Shape} anchor The active Konva anchor.
    * @param {Style} style The drawing style.
    */
   updateShapeGroupOnAnchorMove(annotation, anchor, style) {
