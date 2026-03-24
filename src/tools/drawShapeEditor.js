@@ -301,6 +301,14 @@ export class DrawShapeEditor {
     });
     // drag end listener
     anchor.on('dragend.edit', (event) => {
+      // tell factory
+      const evAnchor = event.target;
+      if (!(evAnchor instanceof Konva.Shape)) {
+        return;
+      }
+      this.#currentFactory.onAnchorMoveEnd(
+        evAnchor, this.#annotation);
+
       // update annotation command
       const newProps = {
         mathShape: this.#annotation.mathShape,

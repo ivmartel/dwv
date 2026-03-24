@@ -116,6 +116,16 @@ export class ProtractorFactory {
   }
 
   /**
+   * Hande anchor movement end.
+   *
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
+   */
+  onAnchorMoveEnd(anchor, annotation) {
+    this.#renderer.onAnchorMoveEnd(anchor, annotation);
+  }
+
+  /**
    * Update shape and label on anchor move taking the updated
    *   annotation as input.
    *

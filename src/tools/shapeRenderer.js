@@ -119,6 +119,32 @@ export class ShapeRenderer {
   }
 
   /**
+   * Hande anchor movement end.
+   *
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
+   */
+  onAnchorMoveEnd(konvaAnchor, annotation) {
+    // tell annotator
+    this.#annotator.onAnchorMoveEnd();
+
+    // update anchors if they were switched
+    const group = konvaAnchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
+    // update ALL anchor positions from the refreshed math shape
+    const updatedAnchors = this.#annotator.getAnchors(annotation);
+    for (const ua of updatedAnchors) {
+      const ka = group.getChildren((n) => n.id() === ua.getId())[0];
+      if (ka) {
+        ka.x(ua.getX());
+        ka.y(ua.getY());
+      }
+    }
+  }
+
+  /**
    * Update the annotation math shape after a Konva anchor move.
    * Converts the Konva anchor to a generic Anchor before delegating to the
    * annotator.

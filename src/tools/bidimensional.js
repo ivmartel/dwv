@@ -476,6 +476,17 @@ export class BidimensionalFactory {
       anchor.y(center.getY() + py * finalDist);
     }
   }
+
+  /**
+   * Hande anchor movement end.
+   *
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
+   */
+  onAnchorMoveEnd(anchor, annotation) {
+    // does nothing
+  }
+
   /**
    * Update shape and label on anchor move.
    *

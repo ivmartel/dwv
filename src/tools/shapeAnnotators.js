@@ -44,6 +44,11 @@ export class RectangleAnnotator {
   #name = 'rectangle';
 
   /**
+   * @type {Anchor[]}
+   */
+  #anchorsWhileMove;
+
+  /**
    * Does this annotator support the input math shape.
    *
    * @param {object} mathShape The math shape.
@@ -117,13 +122,33 @@ export class RectangleAnnotator {
    * @param {Anchor} anchor The active anchor.
    */
   updateAnnotationOnAnchorMove(annotation, anchor) {
-    const allAnchors = this.getAnchors(annotation);
-    allAnchors[Anchor.indexFromId(anchor.getId())] = anchor;
-    const topLeft = allAnchors[0];
-    const bottomRight = allAnchors[2];
+    const movedIndex = Anchor.indexFromId(anchor.getId());
+    const nextIndex = (movedIndex + 1) % 4;
+    const opposIndex = (movedIndex + 2) % 4;
+    const prevIndex = (movedIndex + 3) % 4;
+
+    // should be reset after move ends
+    if (typeof this.#anchorsWhileMove === 'undefined') {
+      this.#anchorsWhileMove = this.getAnchors(annotation);
+    }
+    const oppos = this.#anchorsWhileMove[opposIndex];
+
+    // Anchor 0:  new "moved" anchor
+    this.#anchorsWhileMove[movedIndex] = anchor;
+    // Anchor 2: opposite - stays put!
+    // Anchor 1 (next) and Anchor 3 (previous)
+    if (movedIndex % 2 === 0) {
+      this.#anchorsWhileMove[prevIndex].setX(anchor.getX());
+      this.#anchorsWhileMove[nextIndex].setY(anchor.getY());
+    } else {
+      this.#anchorsWhileMove[prevIndex].setY(anchor.getY());
+      this.#anchorsWhileMove[nextIndex].setX(anchor.getX());
+    }
+
+    // update math shape
     annotation.mathShape = new Rectangle(
-      new Point2D(topLeft.getX(), topLeft.getY()),
-      new Point2D(bottomRight.getX(), bottomRight.getY())
+      new Point2D(oppos.getX(), oppos.getY()),
+      new Point2D(anchor.getX(), anchor.getY()),
     );
     annotation.updateQuantification();
   }
@@ -158,6 +183,13 @@ export class RectangleAnnotator {
   }
 
   /**
+   * Handle anchor movement end.
+   */
+  onAnchorMoveEnd() {
+    this.#anchorsWhileMove = undefined;
+  }
+
+  /**
    * Get the anchors for the current math shape
    * (topLeft, topRight, bottomRight, bottomLeft).
    *
@@ -165,6 +197,12 @@ export class RectangleAnnotator {
    * @returns {Anchor[]} The anchors.
    */
   getAnchors(annotation) {
+    // while moving, return fixed list to maintain
+    // anchor numbering
+    if (typeof this.#anchorsWhileMove !== 'undefined') {
+      return this.#anchorsWhileMove;
+    }
+
     const rect = annotation.mathShape;
     const sx = rect.getBegin().getX();
     const sy = rect.getBegin().getY();
@@ -351,6 +389,13 @@ export class CircleAnnotator {
       default:
         logger.error(`Unhandled anchor id: ${anchor.getId()}`);
     }
+  }
+
+  /**
+   * Handle anchor movement end.
+   */
+  onAnchorMoveEnd() {
+    // nohting to do
   }
 
   /**
@@ -565,6 +610,13 @@ export class EllipseAnnotator {
   }
 
   /**
+   * Handle anchor movement end.
+   */
+  onAnchorMoveEnd() {
+    // nohting to do
+  }
+
+  /**
    * Get the anchors (left, right, bottom, top).
    *
    * @param {Annotation} annotation The annotation.
@@ -746,6 +798,13 @@ export class RulerAnnotator {
   }
 
   /**
+   * Handle anchor movement end.
+   */
+  onAnchorMoveEnd() {
+    // nohting to do
+  }
+
+  /**
    * Get the anchors (begin, end).
    *
    * @param {Annotation} annotation The annotation.
@@ -915,6 +974,13 @@ export class ArrowAnnotator {
   }
 
   /**
+   * Handle anchor movement end.
+   */
+  onAnchorMoveEnd() {
+    // nohting to do
+  }
+
+  /**
    * Get the anchors (tip, tail).
    *
    * @param {Annotation} annotation The annotation.
@@ -1076,6 +1142,13 @@ export class RoiAnnotator {
    */
   constrainAnchorMove(_anchor, _annotation) {
     // no constraints
+  }
+
+  /**
+   * Handle anchor movement end.
+   */
+  onAnchorMoveEnd() {
+    // nohting to do
   }
 
   /**
@@ -1252,6 +1325,13 @@ export class ProtractorAnnotator {
    */
   constrainAnchorMove(_anchor, _annotation) {
     // no constraints
+  }
+
+  /**
+   * Handle anchor movement end.
+   */
+  onAnchorMoveEnd() {
+    // nohting to do
   }
 
   /**
