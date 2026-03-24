@@ -119,7 +119,7 @@ export class ShapeRenderer {
   }
 
   /**
-   * Hande anchor movement end.
+   * Handle anchor movement end.
    *
    * @param {Konva.Ellipse} konvaAnchor The active anchor.
    * @param {Annotation} annotation The associated annotation.
