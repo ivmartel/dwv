@@ -243,7 +243,7 @@ export class DrawShapeEditor {
 
     // activate and add anchors to group
     const anchors =
-      this.#currentFactory.getAnchors(this.#shape, this.#app.getStyle());
+      this.#currentFactory.getAnchors(this.#annotation, this.#app.getStyle());
     for (let i = 0; i < anchors.length; ++i) {
       // set anchor on
       this.#setAnchorOn(anchors[i]);
@@ -279,7 +279,8 @@ export class DrawShapeEditor {
       // validate the anchor position
       validateAnchorPosition(this.#drawLayer.getBaseSize(), evAnchor);
       if (typeof this.#currentFactory.constrainAnchorMove !== 'undefined') {
-        this.#currentFactory.constrainAnchorMove(evAnchor);
+        this.#currentFactory.constrainAnchorMove(
+          evAnchor, this.#annotation);
       }
 
       // udpate annotation
@@ -300,6 +301,14 @@ export class DrawShapeEditor {
     });
     // drag end listener
     anchor.on('dragend.edit', (event) => {
+      // tell factory
+      const evAnchor = event.target;
+      if (!(evAnchor instanceof Konva.Shape)) {
+        return;
+      }
+      this.#currentFactory.onAnchorMoveEnd(
+        evAnchor, this.#annotation);
+
       // update annotation command
       const newProps = {
         mathShape: this.#annotation.mathShape,

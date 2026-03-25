@@ -181,7 +181,6 @@ export class BidimensionalFactory {
     });
 
     // Attach annotation to group for anchor logic
-    group?.setAttr('annotation', annotation);
     group.on('dragend', () => {
       const pos = group.position();
       if (pos.x !== 0 || pos.y !== 0) {
@@ -378,42 +377,31 @@ export class BidimensionalFactory {
   }
 
   /**
-   * Get the anchor positions for the shape.
+   * Get the anchor positions for an annotation.
    *
-   * @param {Konva.Line} shape The main axis shape.
+   * @param {Annotation} annotation The annotation.
    * @returns {Point2D[]} The anchor positions.
    */
-  #getAnchorsPositions(shape) {
-    // Main axis endpoints (from the shape)
-    const points = shape.points();
-    const sx = shape.x();
-    const sy = shape.y();
-    const main0 = new Point2D(points[0] + sx, points[1] + sy);
-    const main1 = new Point2D(points[2] + sx, points[3] + sy);
-
-    // Short axis endpoints (from the model)
-    const group = shape.getParent();
-    const annotation = group?.getAttr('annotation');
+  #getAnchorsPositions(annotation) {
     if (!annotation || !annotation.mathShape) {
-      return [main0, main1, main0, main1];
+      return [];
     }
-
-    // Always use the model to get the current short axis endpoints
+    const line = annotation.mathShape;
+    const main0 = line.getBegin();
+    const main1 = line.getEnd();
     const [sa1, sa2] = this.getShortAxisEndpoints(annotation);
-
-    // Return all four anchor positions
     return [main0, main1, sa1, sa2];
   }
 
   /**
-   * Get anchors for the shape.
+   * Get anchors for an annotation.
    *
-   * @param {Konva.Line} shape The main axis shape.
+   * @param {Annotation} annotation The annotation.
    * @param {Style} style The drawing style.
    * @returns {Konva.Ellipse[]} The anchors.
    */
-  getAnchors(shape, style) {
-    const positions = this.#getAnchorsPositions(shape);
+  getAnchors(annotation, style) {
+    const positions = this.#getAnchorsPositions(annotation);
     const anchors = [];
     for (let i = 0; i < positions.length; ++i) {
       anchors.push(
@@ -432,10 +420,10 @@ export class BidimensionalFactory {
    * Constrain anchor movement for short axis anchors.
    *
    * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
    */
-  constrainAnchorMove(anchor) {
+  constrainAnchorMove(anchor, annotation) {
     const group = anchor.getParent();
-    const annotation = group?.getAttr('annotation');
     const mathShape = annotation.mathShape;
 
     // Handle SHORT AXIS anchors (anchor2 and anchor3)
@@ -488,6 +476,17 @@ export class BidimensionalFactory {
       anchor.y(center.getY() + py * finalDist);
     }
   }
+
+  /**
+   * Handle anchor movement end.
+   *
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Annotation} annotation The associated annotation.
+   */
+  onAnchorMoveEnd(anchor, annotation) {
+    // does nothing
+  }
+
   /**
    * Update shape and label on anchor move.
    *
@@ -513,7 +512,7 @@ export class BidimensionalFactory {
     }
 
     // Update connector
-    this.updateConnector(group);
+    this.updateConnector(annotation, group);
   }
 
   /**
@@ -627,9 +626,10 @@ export class BidimensionalFactory {
   /**
    * Update the label connector.
    *
+   * @param {Annotation} annotation The annotation.
    * @param {Konva.Group} group The shape group.
    */
-  updateConnector(group) {
+  updateConnector(annotation, group) {
     const kshape = group.findOne('.shape');
     if (kshape && kshape instanceof Konva.Line) {
       const connectorsPos = this.#getConnectorsPositions(kshape);
