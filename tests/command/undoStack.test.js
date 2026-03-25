@@ -2,7 +2,7 @@ import {describe, test, assert} from 'vitest';
 import {UndoStack} from '../../src/command/undoStack.js';
 
 /**
- * Tests for the 'utils/undoStack' file.
+ * Tests for the 'command/undoStack' file.
  */
 
 describe('utils', () => {

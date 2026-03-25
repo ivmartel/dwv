@@ -12,10 +12,10 @@ import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
 import {
   ChangeSegmentColourCommand
-} from '../../src/image/changeSegmentColourCommand.js';
+} from '../../src/command/changeSegmentColourCommand.js';
 import {
   DeleteSegmentCommand
-} from '../../src/image/deleteSegmentCommand.js';
+} from '../../src/command/deleteSegmentCommand.js';
 
 import {
   getHtmlId,

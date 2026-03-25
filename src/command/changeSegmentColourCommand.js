@@ -1,4 +1,4 @@
-import {Command} from '../utils/undoStack.js';
+import {Command} from './undoStack.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
