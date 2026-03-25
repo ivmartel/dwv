@@ -1,5 +1,5 @@
 import {describe, test, assert} from 'vitest';
-import {UndoStack} from '../../src/utils/undoStack.js';
+import {UndoStack} from '../../src/command/undoStack.js';
 
 /**
  * Tests for the 'utils/undoStack' file.

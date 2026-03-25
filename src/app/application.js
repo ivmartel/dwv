@@ -17,7 +17,7 @@ import {ListenerHandler} from '../utils/listen.js';
 import {State} from '../io/state.js';
 import {logger} from '../utils/logger.js';
 import {getUriQuery, decodeQuery} from '../utils/uri.js';
-import {UndoStack} from '../utils/undoStack.js';
+import {UndoStack} from '../command/undoStack.js';
 import {ToolboxController} from './toolboxController.js';
 import {LoadController} from './loadController.js';
 import {DataController} from './dataController.js';
@@ -44,7 +44,7 @@ import {Matrix33} from '../math/matrix.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {Scalar3D} from '../math/scalar.js';
 import {DicomData} from './dataController.js';
-import {Command} from '../utils/undoStack.js';
+import {Command} from '../command/undoStack.js';
 /* eslint-enable no-unused-vars */
 
 /**

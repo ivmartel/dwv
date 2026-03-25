@@ -2,7 +2,7 @@ import {Annotation} from '../image/annotation.js';
 import {
   AddAnnotationCommand,
   UpdateAnnotationCommand
-} from './shapes/drawCommands.js';
+} from '../command/drawCommands.js';
 //import {RoiFactory} from '../tools/roi.js';
 import {ROI} from '../math/roi.js';
 import {Point2D} from '../math/point.js';

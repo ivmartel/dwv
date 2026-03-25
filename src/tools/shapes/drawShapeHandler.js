@@ -5,7 +5,7 @@ import {
 import {
   RemoveAnnotationCommand,
   UpdateAnnotationCommand
-} from './drawCommands.js';
+} from '../../command/drawCommands.js';
 import {
   isNodeNameShape,
   isNodeNameLabel,

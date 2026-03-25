@@ -1,9 +1,9 @@
-import {MaskSegmentHelper} from './maskSegmentHelper.js';
+import {MaskSegmentHelper} from '../image/maskSegmentHelper.js';
 import {Command} from '../utils/undoStack.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image.js';
+import {Image} from '../image/image.js';
 import {MaskSegment} from '../dicom/dicomSegment.js';
 /* eslint-enable no-unused-vars */
 

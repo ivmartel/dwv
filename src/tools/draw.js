@@ -7,7 +7,7 @@ import {logger} from '../utils/logger.js';
 import {
   AddAnnotationCommand,
   RemoveAnnotationCommand
-} from './shapes/drawCommands.js';
+} from '../command/drawCommands.js';
 import {
   isNodeNameShape,
 } from './shapes/drawBounds.js';

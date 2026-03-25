@@ -33,10 +33,6 @@ import {
 } from './maskFactory.js';
 import {PositionHelper} from './positionHelper.js';
 import {PlaneHelper} from './planeHelper.js';
-import {DeleteSegmentCommand} from './deleteSegmentCommand.js';
-import {
-  ChangeSegmentColourCommand
-} from './changeSegmentColourCommand.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
 import {Diameter, Diameters, Label} from './label.js';
@@ -47,9 +43,7 @@ export {
   AnnotationGroup,
   AnnotationGroupFactory,
   CADReport,
-  ChangeSegmentColourCommand,
   ColourMap,
-  DeleteSegmentCommand,
   Diameter,
   Diameters,
   Geometry,

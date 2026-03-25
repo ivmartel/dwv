@@ -1,5 +1,5 @@
 import {logger} from '../../utils/logger.js';
-import {UpdateAnnotationCommand} from './drawCommands.js';
+import {UpdateAnnotationCommand} from '../../command/drawCommands.js';
 import {validateAnchorPosition} from './drawBounds.js';
 // external
 import Konva from 'konva';

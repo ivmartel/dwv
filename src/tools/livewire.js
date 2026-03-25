@@ -13,7 +13,7 @@ import {Annotation} from '../image/annotation.js';
 import {
   AddAnnotationCommand,
   UpdateAnnotationCommand
-} from './shapes/drawCommands.js';
+} from '../command/drawCommands.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
