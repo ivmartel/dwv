@@ -1,38 +1,10 @@
 import {Command} from '../../utils/undoStack.js';
 
-// external
-import Konva from 'konva';
-
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Annotation} from '../../image/annotation.js';
 import {DrawController} from '../../app/drawController.js';
 /* eslint-enable no-unused-vars */
-
-/**
- * Get the display name of the input shape.
- *
- * @param {Konva.Shape} shape The Konva shape.
- * @returns {string} The display name.
- */
-export function getShapeDisplayName(shape) {
-  let displayName = 'shape';
-  if (shape instanceof Konva.Line) {
-    if (shape.points().length === 4) {
-      displayName = 'line';
-    } else if (shape.points().length === 6) {
-      displayName = 'protractor';
-    } else {
-      displayName = 'roi';
-    }
-  } else if (shape instanceof Konva.Rect) {
-    displayName = 'rectangle';
-  } else if (shape instanceof Konva.Ellipse) {
-    displayName = 'ellipse';
-  }
-  // return
-  return displayName;
-}
 
 /**
  * Add annotation command.
