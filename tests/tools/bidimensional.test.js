@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import {describe, test, assert, beforeEach} from 'vitest';
-import {BidimensionalFactory} from '../../src/tools/bidimensional.js';
+import {BidimensionalFactory} from '../../src/tools/shapes/bidimensional.js';
 import {BidimensionalLine} from '../../src/math/bidimensionalLine.js';
 import {Point2D} from '../../src/math/point.js';
 import Konva from 'konva';

@@ -4,14 +4,14 @@ import {
   getAngle,
   getPerpendicularLine,
   getPerpendicularLineAtDistance
-} from '../math/line.js';
+} from '../../math/line.js';
 import {setLineHitFunc} from './lineHitFunc.js';
-import {logger} from '../utils/logger.js';
+import {logger} from '../../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 // ---------------------------------------------------------------------------

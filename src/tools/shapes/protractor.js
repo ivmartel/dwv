@@ -1,26 +1,26 @@
-import {RulerAnnotator} from './shapeAnnotators.js';
+import {ProtractorAnnotator} from './shapeAnnotators.js';
 import {ShapeRenderer} from './shapeRenderer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import Konva from 'konva';
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
-import {Point2D} from '../math/point.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
+import {Point2D} from '../../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * Ruler factory.
+ * Protractor factory.
  *
- * Thin adapter that delegates annotation logic to {@link RulerAnnotator}
+ * Thin adapter that delegates annotation logic to {@link ProtractorAnnotator}
  * and Konva rendering to {@link ShapeRenderer}.
  */
-export class RulerFactory {
+export class ProtractorFactory {
 
   /**
-   * @type {RulerAnnotator}
+   * @type {ProtractorAnnotator}
    */
-  #annotator = new RulerAnnotator();
+  #annotator = new ProtractorAnnotator();
 
   /**
    * @type {ShapeRenderer}
@@ -34,7 +34,7 @@ export class RulerFactory {
    * @returns {boolean} True if supported.
    */
   static supports(mathShape) {
-    return RulerAnnotator.supports(mathShape);
+    return ProtractorAnnotator.supports(mathShape);
   }
 
   /**
@@ -84,7 +84,7 @@ export class RulerFactory {
   }
 
   /**
-   * Create a line shape to be displayed.
+   * Create a protractor shape to be displayed.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
@@ -95,7 +95,7 @@ export class RulerFactory {
   }
 
   /**
-   * Get anchors to update a line shape.
+   * Get anchors to update a protractor shape.
    *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The application style.
@@ -178,4 +178,4 @@ export class RulerFactory {
     this.#renderer.updateConnector(annotation, group);
   }
 
-} // RulerFactory
+} // ProtractorFactory

@@ -1,26 +1,26 @@
-import {CircleAnnotator} from './shapeAnnotators.js';
+import {EllipseAnnotator} from './shapeAnnotators.js';
 import {ShapeRenderer} from './shapeRenderer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import Konva from 'konva';
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
-import {Point2D} from '../math/point.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
+import {Point2D} from '../../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * Circle factory.
+ * Ellipse factory.
  *
- * Thin adapter that delegates annotation logic to {@link CircleAnnotator}
+ * Thin adapter that delegates annotation logic to {@link EllipseAnnotator}
  * and Konva rendering to {@link ShapeRenderer}.
  */
-export class CircleFactory {
+export class EllipseFactory {
 
   /**
-   * @type {CircleAnnotator}
+   * @type {EllipseAnnotator}
    */
-  #annotator = new CircleAnnotator();
+  #annotator = new EllipseAnnotator();
 
   /**
    * @type {ShapeRenderer}
@@ -34,7 +34,7 @@ export class CircleFactory {
    * @returns {boolean} True if supported.
    */
   static supports(mathShape) {
-    return CircleAnnotator.supports(mathShape);
+    return EllipseAnnotator.supports(mathShape);
   }
 
   /**
@@ -84,7 +84,7 @@ export class CircleFactory {
   }
 
   /**
-   * Create a circle shape to be displayed.
+   * Create an ellipse shape to be displayed.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
@@ -95,7 +95,7 @@ export class CircleFactory {
   }
 
   /**
-   * Get anchors to update a circle shape.
+   * Get anchors to update an ellipse shape.
    *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The application style.
@@ -178,4 +178,4 @@ export class CircleFactory {
     this.#renderer.updateConnector(annotation, group);
   }
 
-} // CircleFactory
+} // EllipseFactory

@@ -1,26 +1,26 @@
-import {RoiAnnotator} from './shapeAnnotators.js';
+import {RulerAnnotator} from './shapeAnnotators.js';
 import {ShapeRenderer} from './shapeRenderer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import Konva from 'konva';
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
-import {Point2D} from '../math/point.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
+import {Point2D} from '../../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * ROI factory.
+ * Ruler factory.
  *
- * Thin adapter that delegates annotation logic to {@link RoiAnnotator}
+ * Thin adapter that delegates annotation logic to {@link RulerAnnotator}
  * and Konva rendering to {@link ShapeRenderer}.
  */
-export class RoiFactory {
+export class RulerFactory {
 
   /**
-   * @type {RoiAnnotator}
+   * @type {RulerAnnotator}
    */
-  #annotator = new RoiAnnotator();
+  #annotator = new RulerAnnotator();
 
   /**
    * @type {ShapeRenderer}
@@ -34,7 +34,7 @@ export class RoiFactory {
    * @returns {boolean} True if supported.
    */
   static supports(mathShape) {
-    return RoiAnnotator.supports(mathShape);
+    return RulerAnnotator.supports(mathShape);
   }
 
   /**
@@ -58,7 +58,7 @@ export class RoiFactory {
   /**
    * Get the number of points needed to build the shape.
    *
-   * @returns {number|undefined} The number of points.
+   * @returns {number} The number of points.
    */
   getNPoints() {
     return this.#annotator.getNPoints();
@@ -84,7 +84,7 @@ export class RoiFactory {
   }
 
   /**
-   * Create a roi shape to be displayed.
+   * Create a line shape to be displayed.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
@@ -95,7 +95,7 @@ export class RoiFactory {
   }
 
   /**
-   * Get anchors to update a roi shape.
+   * Get anchors to update a line shape.
    *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The application style.
@@ -178,4 +178,4 @@ export class RoiFactory {
     this.#renderer.updateConnector(annotation, group);
   }
 
-} // RoiFactory
+} // RulerFactory

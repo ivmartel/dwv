@@ -1,18 +1,18 @@
-import {Rectangle} from '../math/rectangle.js';
-import {Circle} from '../math/circle.js';
-import {Ellipse} from '../math/ellipse.js';
-import {Line} from '../math/line.js';
-import {Protractor} from '../math/protractor.js';
-import {ROI} from '../math/roi.js';
-import {Point2D} from '../math/point.js';
-import {custom} from '../app/custom.js';
-import {logger} from '../utils/logger.js';
+import {Rectangle} from '../../math/rectangle.js';
+import {Circle} from '../../math/circle.js';
+import {Ellipse} from '../../math/ellipse.js';
+import {Line} from '../../math/line.js';
+import {Protractor} from '../../math/protractor.js';
+import {ROI} from '../../math/roi.js';
+import {Point2D} from '../../math/point.js';
+import {custom} from '../../app/custom.js';
+import {logger} from '../../utils/logger.js';
 import {Anchor} from './anchor.js';
 import {defaultLabelTexts} from './drawBounds.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation.js';
+import {Annotation} from '../../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 /**

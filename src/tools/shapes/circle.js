@@ -1,26 +1,26 @@
-import {ArrowAnnotator} from './shapeAnnotators.js';
+import {CircleAnnotator} from './shapeAnnotators.js';
 import {ShapeRenderer} from './shapeRenderer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import Konva from 'konva';
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
-import {Point2D} from '../math/point.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
+import {Point2D} from '../../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * Arrow factory.
+ * Circle factory.
  *
- * Thin adapter that delegates annotation logic to {@link ArrowAnnotator}
+ * Thin adapter that delegates annotation logic to {@link CircleAnnotator}
  * and Konva rendering to {@link ShapeRenderer}.
  */
-export class ArrowFactory {
+export class CircleFactory {
 
   /**
-   * @type {ArrowAnnotator}
+   * @type {CircleAnnotator}
    */
-  #annotator = new ArrowAnnotator();
+  #annotator = new CircleAnnotator();
 
   /**
    * @type {ShapeRenderer}
@@ -34,7 +34,7 @@ export class ArrowFactory {
    * @returns {boolean} True if supported.
    */
   static supports(mathShape) {
-    return ArrowAnnotator.supports(mathShape);
+    return CircleAnnotator.supports(mathShape);
   }
 
   /**
@@ -84,7 +84,7 @@ export class ArrowFactory {
   }
 
   /**
-   * Create a line shape to be displayed.
+   * Create a circle shape to be displayed.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
@@ -95,7 +95,7 @@ export class ArrowFactory {
   }
 
   /**
-   * Get anchors to update an arrow shape.
+   * Get anchors to update a circle shape.
    *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The application style.
@@ -178,4 +178,4 @@ export class ArrowFactory {
     this.#renderer.updateConnector(annotation, group);
   }
 
-} // ArrowFactory
+} // CircleFactory

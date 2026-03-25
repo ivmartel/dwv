@@ -7,8 +7,8 @@ import {
   ArrowAnnotator,
   RoiAnnotator,
   ProtractorAnnotator,
-} from '../../src/tools/shapeAnnotators.js';
-import {Anchor} from '../../src/tools/anchor.js';
+} from '../../src/tools/shapes/shapeAnnotators.js';
+import {Anchor} from '../../src/tools/shapes/anchor.js';
 import {Rectangle} from '../../src/math/rectangle.js';
 import {Circle} from '../../src/math/circle.js';
 import {Ellipse} from '../../src/math/ellipse.js';

@@ -2,7 +2,7 @@ import {AnnotationGroup} from '../image/annotationGroup.js';
 import {
   RemoveAnnotationCommand,
   UpdateAnnotationCommand
-} from '../tools/drawCommands.js';
+} from '../tools/shapes/drawCommands.js';
 import {logger} from '../utils/logger.js';
 
 // doc imports

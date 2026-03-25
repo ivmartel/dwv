@@ -7,19 +7,19 @@ import {Brush} from './brush.js';
 import {Floodfill} from './floodfill.js';
 import {Livewire} from './livewire.js';
 
-import {ArrowFactory} from './arrow.js';
-import {CircleFactory} from './circle.js';
-import {EllipseFactory} from './ellipse.js';
-import {ProtractorFactory} from './protractor.js';
-import {RectangleFactory} from './rectangle.js';
-import {RoiFactory} from './roi.js';
-import {RulerFactory} from './ruler.js';
+import {ArrowFactory} from './shapes/arrow.js';
+import {CircleFactory} from './shapes/circle.js';
+import {EllipseFactory} from './shapes/ellipse.js';
+import {ProtractorFactory} from './shapes/protractor.js';
+import {RectangleFactory} from './shapes/rectangle.js';
+import {RoiFactory} from './shapes/roi.js';
+import {RulerFactory} from './shapes/ruler.js';
+import {BidimensionalFactory} from './shapes/bidimensional.js';
+import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 
 import {Filter, Threshold, Sobel, Sharpen} from './filter.js';
 
 import {ScrollWheel} from './scrollWheel.js';
-import {DrawShapeHandler} from './drawShapeHandler.js';
-import {BidimensionalFactory} from './bidimensional.js';
 
 export {
   DrawShapeHandler,

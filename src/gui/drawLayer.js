@@ -5,13 +5,13 @@ import {InteractionEventNames} from './generic.js';
 import {logger} from '../utils/logger.js';
 import {toStringId} from '../utils/array.js';
 import {precisionRound} from '../utils/string.js';
-import {AddAnnotationCommand} from '../tools/drawCommands.js';
+import {AddAnnotationCommand} from '../tools/shapes/drawCommands.js';
 import {
   isNodeWithId,
   isPositionNode,
   isNodeNameShape,
   isNodeNameLabel
-} from '../tools/drawBounds.js';
+} from '../tools/shapes/drawBounds.js';
 import {Style} from '../gui/style.js';
 import {Line} from '../math/line.js';
 import {Rectangle} from '../math/rectangle.js';
@@ -34,7 +34,7 @@ import {Image} from '../image/image.js';
 import {PlaneHelper} from '../image/planeHelper.js';
 import {Annotation} from '../image/annotation.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
-import {DrawShapeHandler} from '../tools/drawShapeHandler.js';
+import {DrawShapeHandler} from '../tools/shapes/drawShapeHandler.js';
 import {BidimensionalLine} from '../math/bidimensionalLine.js';
 /* eslint-enable no-unused-vars */
 

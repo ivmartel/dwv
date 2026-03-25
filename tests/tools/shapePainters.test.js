@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import {describe, test, assert, beforeEach} from 'vitest';
-import {getPainter} from '../../src/tools/shapePainters.js';
+import {getPainter} from '../../src/tools/shapes/shapePainters.js';
 import {Rectangle} from '../../src/math/rectangle.js';
 import {Circle} from '../../src/math/circle.js';
 import {Ellipse} from '../../src/math/ellipse.js';

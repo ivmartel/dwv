@@ -1,12 +1,12 @@
-import {Command} from '../utils/undoStack.js';
+import {Command} from '../../utils/undoStack.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation.js';
-import {DrawController} from '../app/drawController.js';
+import {Annotation} from '../../image/annotation.js';
+import {DrawController} from '../../app/drawController.js';
 /* eslint-enable no-unused-vars */
 
 /**

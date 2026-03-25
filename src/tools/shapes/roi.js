@@ -1,27 +1,26 @@
-import {RectangleAnnotator} from './shapeAnnotators.js';
+import {RoiAnnotator} from './shapeAnnotators.js';
 import {ShapeRenderer} from './shapeRenderer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import Konva from 'konva';
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
-import {Point2D} from '../math/point.js';
-import {Anchor} from './anchor.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
+import {Point2D} from '../../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * Rectangle factory.
+ * ROI factory.
  *
- * Thin adapter that delegates annotation logic to {@link RectangleAnnotator}
+ * Thin adapter that delegates annotation logic to {@link RoiAnnotator}
  * and Konva rendering to {@link ShapeRenderer}.
  */
-export class RectangleFactory {
+export class RoiFactory {
 
   /**
-   * @type {RectangleAnnotator}
+   * @type {RoiAnnotator}
    */
-  #annotator = new RectangleAnnotator();
+  #annotator = new RoiAnnotator();
 
   /**
    * @type {ShapeRenderer}
@@ -35,7 +34,7 @@ export class RectangleFactory {
    * @returns {boolean} True if supported.
    */
   static supports(mathShape) {
-    return RectangleAnnotator.supports(mathShape);
+    return RoiAnnotator.supports(mathShape);
   }
 
   /**
@@ -59,7 +58,7 @@ export class RectangleFactory {
   /**
    * Get the number of points needed to build the shape.
    *
-   * @returns {number} The number of points.
+   * @returns {number|undefined} The number of points.
    */
   getNPoints() {
     return this.#annotator.getNPoints();
@@ -85,7 +84,7 @@ export class RectangleFactory {
   }
 
   /**
-   * Create a rectangle shape to be displayed.
+   * Create a roi shape to be displayed.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
@@ -96,7 +95,7 @@ export class RectangleFactory {
   }
 
   /**
-   * Get anchors to update a rectangle shape.
+   * Get anchors to update a roi shape.
    *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The application style.
@@ -142,7 +141,7 @@ export class RectangleFactory {
    * Update an annotation on anchor move.
    *
    * @param {Annotation} annotation The annotation.
-   * @param {Konva.Ellipse} anchor The anchor.
+   * @param {Konva.Shape} anchor The anchor.
    */
   updateAnnotationOnAnchorMove(annotation, anchor) {
     this.#renderer.updateAnnotationOnAnchorMove(annotation, anchor);
@@ -159,7 +158,7 @@ export class RectangleFactory {
   }
 
   /**
-   * Update the shape label content.
+   * Update the shape label.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Group} group The shape group.
@@ -179,4 +178,4 @@ export class RectangleFactory {
     this.#renderer.updateConnector(annotation, group);
   }
 
-} // RectangleFactory
+} // RoiFactory

@@ -7,10 +7,10 @@ import {logger} from '../utils/logger.js';
 import {
   AddAnnotationCommand,
   RemoveAnnotationCommand
-} from './drawCommands.js';
+} from './shapes/drawCommands.js';
 import {
   isNodeNameShape,
-} from './drawBounds.js';
+} from './shapes/drawBounds.js';
 import {Annotation} from '../image/annotation.js';
 import {ScrollWheel} from './scrollWheel.js';
 
@@ -25,7 +25,7 @@ import {LayerGroup} from '../gui/layerGroup.js';
 import {Point2D} from '../math/point.js';
 import {DrawLayer} from '../gui/drawLayer.js';
 import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawShapeHandler} from './drawShapeHandler.js';
+import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,26 +1,27 @@
-import {ProtractorAnnotator} from './shapeAnnotators.js';
+import {RectangleAnnotator} from './shapeAnnotators.js';
 import {ShapeRenderer} from './shapeRenderer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import Konva from 'konva';
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
-import {Point2D} from '../math/point.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
+import {Point2D} from '../../math/point.js';
+import {Anchor} from './anchor.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * Protractor factory.
+ * Rectangle factory.
  *
- * Thin adapter that delegates annotation logic to {@link ProtractorAnnotator}
+ * Thin adapter that delegates annotation logic to {@link RectangleAnnotator}
  * and Konva rendering to {@link ShapeRenderer}.
  */
-export class ProtractorFactory {
+export class RectangleFactory {
 
   /**
-   * @type {ProtractorAnnotator}
+   * @type {RectangleAnnotator}
    */
-  #annotator = new ProtractorAnnotator();
+  #annotator = new RectangleAnnotator();
 
   /**
    * @type {ShapeRenderer}
@@ -34,7 +35,7 @@ export class ProtractorFactory {
    * @returns {boolean} True if supported.
    */
   static supports(mathShape) {
-    return ProtractorAnnotator.supports(mathShape);
+    return RectangleAnnotator.supports(mathShape);
   }
 
   /**
@@ -84,7 +85,7 @@ export class ProtractorFactory {
   }
 
   /**
-   * Create a protractor shape to be displayed.
+   * Create a rectangle shape to be displayed.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
@@ -95,7 +96,7 @@ export class ProtractorFactory {
   }
 
   /**
-   * Get anchors to update a protractor shape.
+   * Get anchors to update a rectangle shape.
    *
    * @param {Annotation} annotation The annotation.
    * @param {Style} style The application style.
@@ -141,7 +142,7 @@ export class ProtractorFactory {
    * Update an annotation on anchor move.
    *
    * @param {Annotation} annotation The annotation.
-   * @param {Konva.Shape} anchor The anchor.
+   * @param {Konva.Ellipse} anchor The anchor.
    */
   updateAnnotationOnAnchorMove(annotation, anchor) {
     this.#renderer.updateAnnotationOnAnchorMove(annotation, anchor);
@@ -158,7 +159,7 @@ export class ProtractorFactory {
   }
 
   /**
-   * Update the shape label.
+   * Update the shape label content.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Group} group The shape group.
@@ -178,4 +179,4 @@ export class ProtractorFactory {
     this.#renderer.updateConnector(annotation, group);
   }
 
-} // ProtractorFactory
+} // RectangleFactory

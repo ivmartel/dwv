@@ -1,7 +1,7 @@
 import Konva from 'konva';
-import {BidimensionalLine} from '../math/bidimensionalLine.js';
-import {getPerpendicularLine} from '../math/line.js';
-import {Point2D} from '../math/point.js';
+import {BidimensionalLine} from '../../math/bidimensionalLine.js';
+import {getPerpendicularLine} from '../../math/line.js';
+import {Point2D} from '../../math/point.js';
 import {LabelFactory} from './labelFactory.js';
 import {setLineHitFunc} from './lineHitFunc.js';
 import {
@@ -9,12 +9,12 @@ import {
   getAnchorShape,
   defaultLabelTexts,
 } from './drawBounds.js';
-import {custom} from '../app/custom.js';
+import {custom} from '../../app/custom.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Style} from '../gui/style.js';
-import {Annotation} from '../image/annotation.js';
+import {Style} from '../../gui/style.js';
+import {Annotation} from '../../image/annotation.js';
 
 /**
  * Bidimensional (long/short axis) annotation factory.
