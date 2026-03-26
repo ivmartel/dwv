@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.36.2](https://github.com/ivmartel/dwv/releases/tag/v0.36.2) - 26/03/2026
+
+### Fixed
+
+- Wrong output typed array for jpeg 2000 and baseline compressed data [#2127](https://github.com/ivmartel/dwv/issues/2127)
+
+---
+
 ## [v0.36.1](https://github.com/ivmartel/dwv/releases/tag/v0.36.1) - 20/02/2026
 
 ### Fixed
