@@ -1,14 +1,10 @@
-import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {ScrollWheel} from './scrollWheel.js';
-import {
-  getMousePoint,
-  getTouchPoints
-} from '../gui/generic.js';
+import {LayerGroupPointer} from './layerGroupPointer.js';
+import {OpacityDragBehavior} from './behaviors/opacityDragBehavior.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application.js';
-import {Point2D} from '../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -34,6 +30,7 @@ import {Point2D} from '../math/point.js';
  * ]);
  */
 export class Opacity {
+
   /**
    * Associated app.
    *
@@ -42,78 +39,24 @@ export class Opacity {
   #app;
 
   /**
-   * Interaction start flag.
+   * Drag lifecycle (mouse / single touch).
    *
-   * @type {boolean}
+   * @type {LayerGroupPointer}
    */
-  #started = false;
-
-  /**
-   * Start point.
-   *
-   * @type {Point2D}
-   */
-  #startPoint;
-
-  /**
-   * Scroll wheel handler.
-   *
-   * @type {ScrollWheel}
-   */
-  #scrollWhell;
+  #pointer;
 
   /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
-    this.#scrollWhell = new ScrollWheel(app);
-  }
-
-  /**
-   * Start tool interaction.
-   *
-   * @param {Point2D} point The start point.
-   */
-  #start(point) {
-    this.#started = true;
-    this.#startPoint = point;
-  }
-
-  /**
-   * Update tool interaction.
-   *
-   * @param {Point2D} point The update point.
-   * @param {string} divId The layer group divId.
-   */
-  #update(point, divId) {
-    if (!this.#started) {
-      return;
-    }
-
-    // difference to last X position
-    const diffX = point.getX() - this.#startPoint.getX();
-    const xMove = (Math.abs(diffX) > 15);
-    // do not trigger for small moves
-    if (xMove) {
-      const layerGroup = this.#app.getLayerGroupByDivId(divId);
-      const layer = layerGroup.getActiveLayer();
-      const op = layer.getOpacity();
-      layer.setOpacity(op + (diffX / 200));
-      layer.draw();
-
-      // reset origin point
-      this.#startPoint = point;
-    }
-  }
-
-  /**
-   * Finish tool interaction.
-   */
-  #finish() {
-    if (this.#started) {
-      this.#started = false;
-    }
+    const scrollWheel = new ScrollWheel(app);
+    const opacityDrag = new OpacityDragBehavior();
+    this.#pointer = new LayerGroupPointer({
+      app: this.#app,
+      dragBehavior: opacityDrag,
+      wheelBehavior: scrollWheel
+    });
   }
 
   /**
@@ -122,8 +65,7 @@ export class Opacity {
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    const mousePoint = getMousePoint(event);
-    this.#start(mousePoint);
+    this.#pointer.handleMouseDown(event);
   };
 
   /**
@@ -132,27 +74,25 @@ export class Opacity {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    const mousePoint = getMousePoint(event);
-    const layerDetails = getLayerDetailsFromEvent(event);
-    this.#update(mousePoint, layerDetails.groupDivId);
+    this.#pointer.handleMouseMove(event);
   };
 
   /**
    * Handle mouse up event.
    *
-   * @param {object} _event The mouse up event.
+   * @param {object} event The mouse up event.
    */
-  mouseup = (_event) => {
-    this.#finish();
+  mouseup = (event) => {
+    this.#pointer.handleMouseUp(event);
   };
 
   /**
    * Handle mouse out event.
    *
-   * @param {object} _event The mouse out event.
+   * @param {object} event The mouse out event.
    */
-  mouseout = (_event) => {
-    this.#finish();
+  mouseout = (event) => {
+    this.#pointer.handleMouseOut(event);
   };
 
   /**
@@ -161,8 +101,7 @@ export class Opacity {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    const touchPoints = getTouchPoints(event);
-    this.#start(touchPoints[0]);
+    this.#pointer.handleTouchStart(event);
   };
 
   /**
@@ -171,18 +110,16 @@ export class Opacity {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    const touchPoints = getTouchPoints(event);
-    const layerDetails = getLayerDetailsFromEvent(event);
-    this.#update(touchPoints[0], layerDetails.groupDivId);
+    this.#pointer.handleTouchMove(event);
   };
 
   /**
    * Handle touch end event.
    *
-   * @param {object} _event The touch end event.
+   * @param {object} event The touch end event.
    */
-  touchend = (_event) => {
-    this.#finish();
+  touchend = (event) => {
+    this.#pointer.handleTouchEnd(event);
   };
 
   /**
@@ -191,7 +128,7 @@ export class Opacity {
    * @param {object} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#scrollWhell.wheel(event);
+    this.#pointer.handleWheel(event);
   };
 
   /**

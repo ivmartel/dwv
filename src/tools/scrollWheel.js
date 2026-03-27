@@ -1,4 +1,5 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {WheelBehavior} from './behaviors/wheelBehavior.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -97,7 +98,7 @@ class ScrollSum {
  * Scroll wheel class: provides a wheel event handler
  *   that scroll the corresponding data.
  */
-export class ScrollWheel {
+export class ScrollWheel extends WheelBehavior {
   /**
    * Associated app.
    *
@@ -116,6 +117,7 @@ export class ScrollWheel {
    * @param {App} app The associated application.
    */
   constructor(app) {
+    super();
     this.#app = app;
   }
 

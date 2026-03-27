@@ -1,10 +1,13 @@
 import {Point2D} from '../math/point.js';
 import {Line} from '../math/line.js';
-import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {
   getMousePoint,
   getTouchPoints
 } from '../gui/generic.js';
+import {
+  getMouseLayerContext,
+  getPrimaryTouchLayerContext
+} from './layerGroupPointer.js';
 import {logger} from '../utils/logger.js';
 
 // doc imports
@@ -136,9 +139,9 @@ export class ZoomAndPan {
    * Update tool interaction.
    *
    * @param {Point2D} point The update point.
-   * @param {string} divId The layer group divId.
+   * @param {LayerGroup} layerGroup The layer group.
    */
-  #update(point, divId) {
+  #update(point, layerGroup) {
     if (!this.#started) {
       return;
     }
@@ -148,7 +151,6 @@ export class ZoomAndPan {
     const tx = point.getX() - this.#startPoint.getX();
     const ty = point.getY() - this.#startPoint.getY();
     // apply translation
-    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = this.#getViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       logger.warn('No view layer to update zoom/pan');
@@ -176,9 +178,9 @@ export class ZoomAndPan {
    * Two touch update.
    *
    * @param {Point2D[]} points The update points.
-   * @param {string} divId The layer group divId.
+   * @param {LayerGroup} layerGroup The layer group.
    */
-  #twoTouchUpdate = (points, divId) => {
+  #twoTouchUpdate = (points, layerGroup) => {
     if (!this.#started) {
       return;
     }
@@ -187,7 +189,6 @@ export class ZoomAndPan {
     const newLine = new Line(points[0], points[1]);
     const lineRatio = newLine.getLength() / this.#pointsLine.getLength();
 
-    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const positionHelper = layerGroup.getPositionHelper();
 
     if (lineRatio === 1) {
@@ -229,10 +230,9 @@ export class ZoomAndPan {
    * Set the current position.
    *
    * @param {Point2D} point The update point.
-   * @param {string} divId The layer group divId.
+   * @param {LayerGroup} layerGroup The layer group.
    */
-  #setCurrentPosition(point, divId) {
-    const layerGroup = this.#app.getLayerGroupByDivId(divId);
+  #setCurrentPosition(point, layerGroup) {
     const viewLayer = this.#getViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       logger.warn('No view layer to set current position');
@@ -269,9 +269,8 @@ export class ZoomAndPan {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    const mousePoint = getMousePoint(event);
-    const layerDetails = getLayerDetailsFromEvent(event);
-    this.#update(mousePoint, layerDetails.groupDivId);
+    const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+    this.#update(point, layerGroup);
   };
 
   /**
@@ -280,11 +279,9 @@ export class ZoomAndPan {
    * @param {object} event The mouse up event.
    */
   mouseup = (event) => {
-    // update position if no move
     if (!this.#hasMoved) {
-      const mousePoint = getMousePoint(event);
-      const layerDetails = getLayerDetailsFromEvent(event);
-      this.#setCurrentPosition(mousePoint, layerDetails.groupDivId);
+      const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+      this.#setCurrentPosition(point, layerGroup);
     }
     this.#finish();
   };
@@ -319,11 +316,11 @@ export class ZoomAndPan {
    */
   touchmove = (event) => {
     const touchPoints = getTouchPoints(event);
-    const layerDetails = getLayerDetailsFromEvent(event);
+    const {layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
     if (touchPoints.length === 1) {
-      this.#update(touchPoints[0], layerDetails.groupDivId);
+      this.#update(touchPoints[0], layerGroup);
     } else if (touchPoints.length === 2) {
-      this.#twoTouchUpdate(touchPoints, layerDetails.groupDivId);
+      this.#twoTouchUpdate(touchPoints, layerGroup);
     }
   };
 
@@ -333,11 +330,9 @@ export class ZoomAndPan {
    * @param {object} event The touch end event.
    */
   touchend = (event) => {
-    // update position if no move
     if (!this.#hasMoved) {
-      const mousePoint = getMousePoint(event);
-      const layerDetails = getLayerDetailsFromEvent(event);
-      this.#setCurrentPosition(mousePoint, layerDetails.groupDivId);
+      const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+      this.#setCurrentPosition(point, layerGroup);
     }
     this.#finish();
   };
@@ -353,10 +348,9 @@ export class ZoomAndPan {
 
     const step = -event.deltaY / 500;
 
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const mousePoint = getMousePoint(event);
+    const ctx = getMouseLayerContext(event, this.#app);
+    const {point: mousePoint, layerGroup} = ctx;
 
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = this.#getViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       logger.warn('No view layer to do wheel zoom/pan');
