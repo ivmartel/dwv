@@ -1,0 +1,100 @@
+import {Line} from '../../math/line.js';
+import {logger} from '../../utils/logger.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {LayerGroup} from '../../gui/layerGroup.js';
+import {Point2D} from '../../math/point.js';
+/* eslint-enable no-unused-vars */
+
+import {getActiveOrDrawRefViewLayer} from './panDragBehavior.js';
+
+/**
+ * Two-finger pinch zoom and vertical scroll on the stack (zoom/pan tool).
+ * Gesture move state is owned by the layer group pointer.
+ */
+export class ZoomScrollTwoTouchBehavior {
+
+  /**
+   * @type {Line|undefined}
+   */
+  #pointsLine;
+
+  /**
+   * @type {Point2D|undefined}
+   */
+  #midPoint;
+
+  /**
+   * @returns {boolean} True after {@link ZoomScrollTwoTouchBehavior#onStart}.
+   */
+  isActive() {
+    return typeof this.#pointsLine !== 'undefined';
+  }
+
+  /**
+   * Begin or reset two-finger tracking.
+   *
+   * @param {Point2D[]} points Two touch points.
+   */
+  onStart(points) {
+    this.#pointsLine = new Line(points[0], points[1]);
+    this.#midPoint = this.#pointsLine.getCentroid();
+  }
+
+  /**
+   * @param {Point2D[]} points Two touch points.
+   * @param {LayerGroup} layerGroup The layer group under the touch.
+   * @returns {boolean} False when tracking is inactive; true after an update
+   *   that counts as gesture movement (for tap detection).
+   */
+  onUpdate(points, layerGroup) {
+    if (this.#pointsLine === undefined) {
+      return false;
+    }
+
+    const newLine = new Line(points[0], points[1]);
+    const lineRatio = newLine.getLength() / this.#pointsLine.getLength();
+
+    const positionHelper = layerGroup.getPositionHelper();
+
+    if (lineRatio === 1) {
+      const diffY = points[0].getY() - this.#pointsLine.getBegin().getY();
+      if (Math.abs(diffY) < 15) {
+        return true;
+      }
+      if (layerGroup.canScroll()) {
+        if (diffY > 0) {
+          positionHelper.incrementPositionAlongScroll();
+        } else {
+          positionHelper.decrementPositionAlongScroll();
+        }
+      }
+    } else {
+      const zoom = (lineRatio - 1) / 10;
+      if (Math.abs(zoom) % 0.1 <= 0.05 &&
+        typeof this.#midPoint !== 'undefined') {
+        const viewLayer = getActiveOrDrawRefViewLayer(layerGroup);
+        if (typeof viewLayer === 'undefined') {
+          logger.warn('No view layer to do touch zoom behavior');
+          return true;
+        }
+        const viewController = viewLayer.getViewController();
+        const planePos = viewLayer.displayToMainPlanePos(this.#midPoint);
+        const center = viewController.getPlanePositionFromPlanePoint(planePos);
+        layerGroup.addScale(zoom, center);
+        layerGroup.draw();
+      }
+    }
+    return true;
+  }
+
+  /**
+   * End two-touch tracking (touch end or pointer cancel).
+   */
+  onEnd() {
+    this.#pointsLine = undefined;
+    this.#midPoint = undefined;
+  }
+
+}

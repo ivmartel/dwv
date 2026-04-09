@@ -1,6 +1,6 @@
-import {ScrollWheel} from './scrollWheel.js';
+import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
-import {OpacityDragBehavior} from './behaviors/opacityDragBehavior.js';
+import {OpacityDragBehavior} from './behaviors/dragBehavior.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -50,12 +50,10 @@ export class Opacity {
    */
   constructor(app) {
     this.#app = app;
-    const scrollWheel = new ScrollWheel(app);
-    const opacityDrag = new OpacityDragBehavior();
     this.#pointer = new LayerGroupPointer({
       app: this.#app,
-      dragBehavior: opacityDrag,
-      wheelBehavior: scrollWheel
+      dragBehavior: new OpacityDragBehavior(),
+      wheelBehavior: new ScrollWheelBehavior()
     });
   }
 
@@ -65,7 +63,7 @@ export class Opacity {
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    this.#pointer.handleMouseDown(event);
+    this.#pointer.mousedown(event);
   };
 
   /**
@@ -74,7 +72,7 @@ export class Opacity {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    this.#pointer.handleMouseMove(event);
+    this.#pointer.mousemove(event);
   };
 
   /**
@@ -83,7 +81,7 @@ export class Opacity {
    * @param {object} event The mouse up event.
    */
   mouseup = (event) => {
-    this.#pointer.handleMouseUp(event);
+    this.#pointer.mouseup(event);
   };
 
   /**
@@ -92,7 +90,7 @@ export class Opacity {
    * @param {object} event The mouse out event.
    */
   mouseout = (event) => {
-    this.#pointer.handleMouseOut(event);
+    this.#pointer.mouseout(event);
   };
 
   /**
@@ -101,7 +99,7 @@ export class Opacity {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    this.#pointer.handleTouchStart(event);
+    this.#pointer.touchstart(event);
   };
 
   /**
@@ -110,7 +108,7 @@ export class Opacity {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    this.#pointer.handleTouchMove(event);
+    this.#pointer.touchmove(event);
   };
 
   /**
@@ -119,7 +117,7 @@ export class Opacity {
    * @param {object} event The touch end event.
    */
   touchend = (event) => {
-    this.#pointer.handleTouchEnd(event);
+    this.#pointer.touchend(event);
   };
 
   /**
@@ -128,7 +126,7 @@ export class Opacity {
    * @param {object} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#pointer.handleWheel(event);
+    this.#pointer.wheel(event);
   };
 
   /**

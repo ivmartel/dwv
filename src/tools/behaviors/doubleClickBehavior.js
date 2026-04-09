@@ -1,6 +1,7 @@
 import {
   WindowLevel as WindowLevelValues
 } from '../../image/windowLevel.js';
+import {getActiveOrDrawRefViewLayer} from './panDragBehavior.js';
 import {logger} from '../../utils/logger.js';
 
 // doc imports
@@ -13,7 +14,7 @@ import {ViewLayer} from '../../gui/viewLayer.js';
 
 /**
  * Optional double-click handling for tools that forward `dblclick` into
- * `LayerGroupPointer.handleDoubleClick`.
+ * `LayerGroupPointer.dblclick`.
  */
 export class DoubleClickBehavior {
 
@@ -51,7 +52,7 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
    * @param {App} options.app The application.
    * @param {boolean} [options.strictViewLayer] Strict active layer mode.
    */
-  constructor({app, strictViewLayer = true} = {}) {
+  constructor({app, strictViewLayer = true}) {
     super();
     this.#app = app;
     this.#strictViewLayer = strictViewLayer;
@@ -68,7 +69,7 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
    * @param {LayerGroup} layerGroup The layer group of the view layer.
    * @returns {ViewLayer|undefined} The layer.
    */
-  #getActiveViewLayer(layerGroup) {
+  #getViewLayer(layerGroup) {
     let layer;
     if (this.#strictViewLayer) {
       layer = layerGroup.getActiveViewLayer();
@@ -86,7 +87,7 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   onDoubleClick(point, layerGroup) {
-    const viewLayer = this.#getActiveViewLayer(layerGroup);
+    const viewLayer = this.#getViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
     }
@@ -117,33 +118,17 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
 export class PlayDoubleClickBehavior extends DoubleClickBehavior {
 
   /**
-   * @param {LayerGroup} layerGroup The layer group to search.
-   * @returns {ViewLayer|undefined} The view layer.
-   */
-  #getViewLayer(layerGroup) {
-    let viewLayer = layerGroup.getActiveViewLayer();
-    if (typeof viewLayer === 'undefined') {
-      const drawLayer = layerGroup.getActiveDrawLayer();
-      if (typeof drawLayer === 'undefined') {
-        logger.warn('No draw layer to do scroll');
-        return;
-      }
-      viewLayer = layerGroup.getViewLayerById(
-        drawLayer.getReferenceLayerId());
-    }
-    return viewLayer;
-  }
-
-  /**
    * @param {Point2D} _point The click position (unused).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   onDoubleClick(_point, layerGroup) {
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer !== 'undefined') {
-      const viewController = viewLayer.getViewController();
-      viewController.play();
+    const viewLayer = getActiveOrDrawRefViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to play double click behavior');
+      return;
     }
+    const viewController = viewLayer.getViewController();
+    viewController.play();
   }
 
 }

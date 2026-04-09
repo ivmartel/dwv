@@ -12,7 +12,9 @@ import {
   isNodeNameShape,
 } from './shapes/drawBounds.js';
 import {Annotation} from '../image/annotation.js';
-import {ScrollWheel} from './scrollWheel.js';
+import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
+import {WheelTick} from './behaviors/wheelTick.js';
+import {runWheelTickPipeline} from './behaviors/wheelTickPipeline.js';
 
 // external
 import Konva from 'konva';
@@ -43,9 +45,14 @@ export class Draw {
   /**
    * Scroll wheel handler.
    *
-   * @type {ScrollWheel}
+   * @type {ScrollWheelBehavior}
    */
   #scrollWhell;
+
+  /**
+   * @type {WheelTick}
+   */
+  #wheelTick = new WheelTick();
 
   /**
    * Drawing style.
@@ -182,7 +189,7 @@ export class Draw {
    */
   constructor(app) {
     this.#app = app;
-    this.#scrollWhell = new ScrollWheel(app);
+    this.#scrollWhell = new ScrollWheelBehavior();
     this.#shapeHandler = new DrawShapeHandler(app, this.#fireEvent);
 
     this.#style = app.getStyle();
@@ -671,7 +678,8 @@ export class Draw {
    */
   wheel = (event) => {
     if (this.#withScroll) {
-      this.#scrollWhell.wheel(event);
+      runWheelTickPipeline(
+        event, this.#app, this.#wheelTick, this.#scrollWhell);
     }
   };
 

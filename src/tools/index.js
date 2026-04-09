@@ -19,11 +19,11 @@ import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 
 import {Filter, Threshold, Sobel, Sharpen} from './filter.js';
 
-import {ScrollWheel} from './scrollWheel.js';
+import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 
 export {
   DrawShapeHandler,
-  ScrollWheel,
+  ScrollWheelBehavior,
 };
 
 /**

@@ -1,4 +1,4 @@
-import {ScrollWheel} from './scrollWheel.js';
+import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {WindowLevelDragBehavior} from './behaviors/dragBehavior.js';
 import {
@@ -67,14 +67,12 @@ export class WindowLevel {
    */
   constructor(app) {
     this.#app = app;
-    const scrollWheel = new ScrollWheel(app);
-    const wlBehavior = new WindowLevelDragBehavior();
-    this.#dragBehavior = wlBehavior;
+    this.#dragBehavior = new WindowLevelDragBehavior();
     this.#doubleClickBehavior = new WindowLevelDoubleClickBehavior({app});
     this.#pointer = new LayerGroupPointer({
       app: this.#app,
-      dragBehavior: wlBehavior,
-      wheelBehavior: scrollWheel,
+      dragBehavior: this.#dragBehavior,
+      wheelBehavior: new ScrollWheelBehavior(),
       doubleClickBehavior: this.#doubleClickBehavior
     });
   }
@@ -85,7 +83,7 @@ export class WindowLevel {
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    this.#pointer.handleMouseDown(event);
+    this.#pointer.mousedown(event);
   };
 
   /**
@@ -94,7 +92,7 @@ export class WindowLevel {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    this.#pointer.handleMouseMove(event);
+    this.#pointer.mousemove(event);
   };
 
   /**
@@ -103,7 +101,7 @@ export class WindowLevel {
    * @param {object} event The mouse up event.
    */
   mouseup = (event) => {
-    this.#pointer.handleMouseUp(event);
+    this.#pointer.mouseup(event);
   };
 
   /**
@@ -112,7 +110,7 @@ export class WindowLevel {
    * @param {object} event The mouse out event.
    */
   mouseout = (event) => {
-    this.#pointer.handleMouseOut(event);
+    this.#pointer.mouseout(event);
   };
 
   /**
@@ -121,7 +119,7 @@ export class WindowLevel {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    this.#pointer.handleTouchStart(event);
+    this.#pointer.touchstart(event);
   };
 
   /**
@@ -130,7 +128,7 @@ export class WindowLevel {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    this.#pointer.handleTouchMove(event);
+    this.#pointer.touchmove(event);
   };
 
   /**
@@ -139,7 +137,7 @@ export class WindowLevel {
    * @param {object} event The touch end event.
    */
   touchend = (event) => {
-    this.#pointer.handleTouchEnd(event);
+    this.#pointer.touchend(event);
   };
 
   /**
@@ -148,7 +146,7 @@ export class WindowLevel {
    * @param {object} event The double click event.
    */
   dblclick = (event) => {
-    this.#pointer.handleDoubleClick(event);
+    this.#pointer.dblclick(event);
   };
 
   /**
@@ -157,7 +155,7 @@ export class WindowLevel {
    * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#pointer.handleWheel(event);
+    this.#pointer.wheel(event);
   };
 
   /**

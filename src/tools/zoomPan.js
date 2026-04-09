@@ -1,20 +1,14 @@
-import {Point2D} from '../math/point.js';
-import {Line} from '../math/line.js';
+import {PanDragBehavior} from './behaviors/panDragBehavior.js';
+import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
 import {
-  getMousePoint,
-  getTouchPoints
-} from '../gui/generic.js';
-import {
-  getMouseLayerContext,
-  getPrimaryTouchLayerContext
-} from './layerGroupPointer.js';
-import {logger} from '../utils/logger.js';
+  ZoomScrollTwoTouchBehavior
+} from './behaviors/zoomScrollTwoTouchBehavior.js';
+import {ZoomWheelBehavior} from './behaviors/wheelBehavior.js';
+import {LayerGroupPointer} from './layerGroupPointer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application.js';
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -49,208 +43,24 @@ export class ZoomAndPan {
   #app;
 
   /**
-   * Interaction start flag.
+   * Pointer session (pan, wheel zoom, two-finger pinch/scroll, tap).
    *
-   * @type {boolean}
+   * @type {LayerGroupPointer}
    */
-  #started = false;
-
-  /**
-   * Start point.
-   *
-   * @type {Point2D}
-   */
-  #startPoint;
-
-  /**
-   * Move flag: true if mouse or touch move.
-   *
-   * @type {boolean}
-   */
-  #hasMoved;
-
-  /**
-   * Line between input points.
-   *
-   * @type {Line}
-   */
-  #pointsLine;
-
-  /**
-   * PointsLine midpoint.
-   *
-   * @type {Point2D}
-   */
-  #midPoint;
+  #pointer;
 
   /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
-  }
-
-  /**
-   * Get the associated view layer.
-   *
-   * @param {LayerGroup} layerGroup The layer group to search.
-   * @returns {ViewLayer|undefined} The view layer.
-   */
-  #getViewLayer(layerGroup) {
-    let viewLayer = layerGroup.getActiveViewLayer();
-    if (typeof viewLayer === 'undefined') {
-      const drawLayer = layerGroup.getActiveDrawLayer();
-      if (typeof drawLayer === 'undefined') {
-        logger.warn('No draw layer to do zoom/pan');
-        return;
-      }
-      viewLayer = layerGroup.getViewLayerById(
-        drawLayer.getReferenceLayerId());
-    }
-    return viewLayer;
-  }
-
-  /**
-   * Start tool interaction.
-   *
-   * @param {Point2D} point The start point.
-   */
-  #start(point) {
-    this.#started = true;
-    this.#startPoint = point;
-    this.#hasMoved = false;
-  }
-
-  /**
-   * Two touch start.
-   *
-   * @param {Point2D[]} points The start points.
-   */
-  #twoTouchStart = (points) => {
-    this.#started = true;
-    this.#startPoint = points[0];
-    this.#hasMoved = false;
-    // points line
-    this.#pointsLine = new Line(points[0], points[1]);
-    this.#midPoint = this.#pointsLine.getCentroid();
-  };
-
-  /**
-   * Update tool interaction.
-   *
-   * @param {Point2D} point The update point.
-   * @param {LayerGroup} layerGroup The layer group.
-   */
-  #update(point, layerGroup) {
-    if (!this.#started) {
-      return;
-    }
-    this.#hasMoved = true;
-
-    // calculate translation
-    const tx = point.getX() - this.#startPoint.getX();
-    const ty = point.getY() - this.#startPoint.getY();
-    // apply translation
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to update zoom/pan');
-      return;
-    }
-    const viewController = viewLayer.getViewController();
-    const planeOffset = viewLayer.displayToPlaneScale(
-      new Point2D(tx, ty)
-    );
-    const offset3D = viewController.getOffset3DFromPlaneOffset({
-      x: planeOffset.getX(),
-      y: planeOffset.getY()
+    this.#pointer = new LayerGroupPointer({
+      app: this.#app,
+      dragBehavior: new PanDragBehavior(),
+      wheelBehavior: new ZoomWheelBehavior(),
+      twoTouchBehavior: new ZoomScrollTwoTouchBehavior(),
+      tapBehavior: new PositionSetTapBehavior()
     });
-    layerGroup.addTranslation({
-      x: offset3D.getX(),
-      y: offset3D.getY(),
-      z: offset3D.getZ()
-    });
-    layerGroup.draw();
-    // reset origin point
-    this.#startPoint = point;
-  }
-
-  /**
-   * Two touch update.
-   *
-   * @param {Point2D[]} points The update points.
-   * @param {LayerGroup} layerGroup The layer group.
-   */
-  #twoTouchUpdate = (points, layerGroup) => {
-    if (!this.#started) {
-      return;
-    }
-    this.#hasMoved = true;
-
-    const newLine = new Line(points[0], points[1]);
-    const lineRatio = newLine.getLength() / this.#pointsLine.getLength();
-
-    const positionHelper = layerGroup.getPositionHelper();
-
-    if (lineRatio === 1) {
-      // scroll mode
-      // difference  to last position
-      const diffY = points[0].getY() - this.#startPoint.getY();
-      // do not trigger for small moves
-      if (Math.abs(diffY) < 15) {
-        return;
-      }
-      // update view controller
-      if (layerGroup.canScroll()) {
-        if (diffY > 0) {
-          positionHelper.incrementPositionAlongScroll();
-        } else {
-          positionHelper.decrementPositionAlongScroll();
-        }
-      }
-    } else {
-      // zoom mode
-      const zoom = (lineRatio - 1) / 10;
-      if (Math.abs(zoom) % 0.1 <= 0.05 &&
-        typeof this.#midPoint !== 'undefined') {
-        const viewLayer = this.#getViewLayer(layerGroup);
-        if (typeof viewLayer === 'undefined') {
-          logger.warn('No view layer to do touch zoom/pan');
-          return;
-        }
-        const viewController = viewLayer.getViewController();
-        const planePos = viewLayer.displayToMainPlanePos(this.#midPoint);
-        const center = viewController.getPlanePositionFromPlanePoint(planePos);
-        layerGroup.addScale(zoom, center);
-        layerGroup.draw();
-      }
-    }
-  };
-
-  /**
-   * Set the current position.
-   *
-   * @param {Point2D} point The update point.
-   * @param {LayerGroup} layerGroup The layer group.
-   */
-  #setCurrentPosition(point, layerGroup) {
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to set current position');
-      return;
-    }
-    const viewController = viewLayer.getViewController();
-    const planePos = viewLayer.displayToPlanePos(point);
-    const position = viewController.getPositionFromPlanePoint(planePos);
-    viewController.setCurrentPosition(position);
-  }
-
-  /**
-   * Finish tool interaction.
-   */
-  #finish() {
-    if (this.#started) {
-      this.#started = false;
-    }
   }
 
   /**
@@ -259,8 +69,7 @@ export class ZoomAndPan {
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    const mousePoint = getMousePoint(event);
-    this.#start(mousePoint);
+    this.#pointer.mousedown(event);
   };
 
   /**
@@ -269,8 +78,7 @@ export class ZoomAndPan {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-    this.#update(point, layerGroup);
+    this.#pointer.mousemove(event);
   };
 
   /**
@@ -279,20 +87,16 @@ export class ZoomAndPan {
    * @param {object} event The mouse up event.
    */
   mouseup = (event) => {
-    if (!this.#hasMoved) {
-      const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-      this.#setCurrentPosition(point, layerGroup);
-    }
-    this.#finish();
+    this.#pointer.mouseup(event);
   };
 
   /**
    * Handle mouse out event.
    *
-   * @param {object} _event The mouse out event.
+   * @param {object} event The mouse out event.
    */
-  mouseout = (_event) => {
-    this.#finish();
+  mouseout = (event) => {
+    this.#pointer.mouseout(event);
   };
 
   /**
@@ -301,12 +105,7 @@ export class ZoomAndPan {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    const touchPoints = getTouchPoints(event);
-    if (touchPoints.length === 1) {
-      this.#start(touchPoints[0]);
-    } else if (touchPoints.length === 2) {
-      this.#twoTouchStart(touchPoints);
-    }
+    this.#pointer.touchstart(event);
   };
 
   /**
@@ -315,13 +114,7 @@ export class ZoomAndPan {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    const touchPoints = getTouchPoints(event);
-    const {layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
-    if (touchPoints.length === 1) {
-      this.#update(touchPoints[0], layerGroup);
-    } else if (touchPoints.length === 2) {
-      this.#twoTouchUpdate(touchPoints, layerGroup);
-    }
+    this.#pointer.touchmove(event);
   };
 
   /**
@@ -330,11 +123,7 @@ export class ZoomAndPan {
    * @param {object} event The touch end event.
    */
   touchend = (event) => {
-    if (!this.#hasMoved) {
-      const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-      this.#setCurrentPosition(point, layerGroup);
-    }
-    this.#finish();
+    this.#pointer.touchend(event);
   };
 
   /**
@@ -343,24 +132,7 @@ export class ZoomAndPan {
    * @param {object} event The mouse wheel event.
    */
   wheel = (event) => {
-    // prevent default page scroll
-    event.preventDefault();
-
-    const step = -event.deltaY / 500;
-
-    const ctx = getMouseLayerContext(event, this.#app);
-    const {point: mousePoint, layerGroup} = ctx;
-
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to do wheel zoom/pan');
-      return;
-    }
-    const viewController = viewLayer.getViewController();
-    const planePos = viewLayer.displayToMainPlanePos(mousePoint);
-    const center = viewController.getPlanePositionFromPlanePoint(planePos);
-    layerGroup.addScale(step, center);
-    layerGroup.draw();
+    this.#pointer.wheel(event);
   };
 
   /**
@@ -379,7 +151,9 @@ export class ZoomAndPan {
    * @param {boolean} _bool The flag to activate or not.
    */
   activate(_bool) {
-    // does nothing
+    if (!_bool) {
+      this.#pointer.cancel();
+    }
   }
 
   /**

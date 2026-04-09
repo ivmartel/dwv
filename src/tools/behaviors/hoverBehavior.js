@@ -13,11 +13,11 @@ export class HoverBehavior {
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    */
-  onHoverMove(_point, _layerGroup) {
+  onUpdate(_point, _layerGroup) {
     // override in subclass
   }
 
-  onHoverEnd() {
+  onEnd() {
     // override in subclass
   }
 
@@ -29,9 +29,9 @@ export class HoverBehavior {
 export class TooltipHoverBehavior extends HoverBehavior {
 
   /**
-   * @type {() => boolean}
+   * @type {boolean}
    */
-  #isTooltipEnabled;
+  #tooltipEnabled = false;
 
   /**
    * @type {LayerGroup|undefined}
@@ -39,20 +39,27 @@ export class TooltipHoverBehavior extends HoverBehavior {
   #currentLayerGroup;
 
   /**
-   * @param {object} options
-   * @param {() => boolean} options.isTooltipEnabled Whether to show tooltip.
+   * @param {object} [options] Constructor options.
+   * @param {boolean} [options.tooltipEnabled] Whether to show tooltip on hover.
    */
-  constructor({isTooltipEnabled}) {
+  constructor({tooltipEnabled = true} = {}) {
     super();
-    this.#isTooltipEnabled = isTooltipEnabled;
+    this.#tooltipEnabled = tooltipEnabled;
+  }
+
+  /**
+   * @param {boolean} tooltipEnabled Whether to show tooltip on hover.
+   */
+  setTooltipEnabled(tooltipEnabled) {
+    this.#tooltipEnabled = tooltipEnabled;
   }
 
   /**
    * @param {Point2D} point The update point.
    * @param {LayerGroup} layerGroup The layer group.
    */
-  onHoverMove(point, layerGroup) {
-    if (this.#isTooltipEnabled()) {
+  onUpdate(point, layerGroup) {
+    if (this.#tooltipEnabled) {
       this.#showTooltip(point, layerGroup);
     }
   }
@@ -60,7 +67,7 @@ export class TooltipHoverBehavior extends HoverBehavior {
   /**
    * Invoked when hover ends; removes the last tooltip html div.
    */
-  onHoverEnd() {
+  onEnd() {
     if (typeof this.#currentLayerGroup !== 'undefined') {
       this.#currentLayerGroup.removeTooltipDiv();
       this.#currentLayerGroup = undefined;

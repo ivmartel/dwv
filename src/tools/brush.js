@@ -13,7 +13,9 @@ import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
 import {DicomData} from '../app/dataController.js';
 import {ViewConfig} from '../app/application.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
-import {ScrollWheel} from './scrollWheel.js';
+import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
+import {WheelTick} from './behaviors/wheelTick.js';
+import {runWheelTickPipeline} from './behaviors/wheelTickPipeline.js';
 import {
   DrawBrushCommandProperties,
   DrawBrushCommand
@@ -277,9 +279,14 @@ export class Brush extends EventTarget {
   /**
    * Scroll wheel handler.
    *
-   * @type {ScrollWheel}
+   * @type {ScrollWheelBehavior}
    */
   #scrollWhell;
+
+  /**
+   * @type {WheelTick}
+   */
+  #wheelTick = new WheelTick();
 
   /**
    * @param {App} app The associated application.
@@ -287,7 +294,7 @@ export class Brush extends EventTarget {
   constructor(app) {
     super();
     this.#app = app;
-    this.#scrollWhell = new ScrollWheel(app);
+    this.#scrollWhell = new ScrollWheelBehavior();
   }
 
   /**
@@ -1160,7 +1167,8 @@ export class Brush extends EventTarget {
    * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#scrollWhell.wheel(event);
+    runWheelTickPipeline(
+      event, this.#app, this.#wheelTick, this.#scrollWhell);
   };
 
   /**

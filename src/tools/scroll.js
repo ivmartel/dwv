@@ -1,4 +1,4 @@
-import {ScrollWheel} from './scrollWheel.js';
+import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {ScrollDragBehavior} from './behaviors/dragBehavior.js';
 import {PlayDoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
@@ -96,36 +96,25 @@ export class Scroll {
   #pointer;
 
   /**
-   * Touch timer ID (created by setTimeout), or null when idle.
+   * Hover tooltip behaviour (slice index tooltip when enabled).
    *
-   * @type {number|null}
+   * @type {TooltipHoverBehavior}
    */
-  #touchTimerID = null;
-
-  /**
-   * Option to show or not a value tooltip on mousemove.
-   *
-   * @type {boolean}
-   */
-  #displayTooltip = false;
+  #tooltipHover;
 
   /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
-    const scrollWheel = new ScrollWheel(app);
-    const scrollBehavior = new ScrollDragBehavior();
-    const playDoubleClick = new PlayDoubleClickBehavior();
-    const tooltipHover = new TooltipHoverBehavior({
-      isTooltipEnabled: () => this.#displayTooltip
-    });
+    this.#tooltipHover = new TooltipHoverBehavior();
     this.#pointer = new LayerGroupPointer({
       app: this.#app,
-      dragBehavior: scrollBehavior,
-      hoverBehavior: tooltipHover,
-      wheelBehavior: scrollWheel,
-      doubleClickBehavior: playDoubleClick
+      dragBehavior: new ScrollDragBehavior(),
+      hoverBehavior: this.#tooltipHover,
+      wheelBehavior: new ScrollWheelBehavior(),
+      doubleClickBehavior: new PlayDoubleClickBehavior(),
+      longTouchToDblClickMs: 500
     });
   }
 
@@ -135,7 +124,7 @@ export class Scroll {
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    this.#pointer.handleMouseDown(event);
+    this.#pointer.mousedown(event);
   };
 
   /**
@@ -144,7 +133,7 @@ export class Scroll {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    this.#pointer.handleMouseMove(event);
+    this.#pointer.mousemove(event);
   };
 
   /**
@@ -153,7 +142,7 @@ export class Scroll {
    * @param {object} event The mouse up event.
    */
   mouseup = (event) => {
-    this.#pointer.handleMouseUp(event);
+    this.#pointer.mouseup(event);
   };
 
   /**
@@ -162,7 +151,7 @@ export class Scroll {
    * @param {object} event The mouse out event.
    */
   mouseout = (event) => {
-    this.#pointer.handleMouseOut(event);
+    this.#pointer.mouseout(event);
   };
 
   /**
@@ -171,12 +160,7 @@ export class Scroll {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    // long touch triggers the dblclick
-    // @ts-ignore
-    this.#touchTimerID = setTimeout(() => {
-      this.dblclick(event);
-    }, 500);
-    this.#pointer.handleTouchStart(event);
+    this.#pointer.touchstart(event);
   };
 
   /**
@@ -185,11 +169,7 @@ export class Scroll {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    if (this.#touchTimerID !== null) {
-      clearTimeout(this.#touchTimerID);
-      this.#touchTimerID = null;
-    }
-    this.#pointer.handleTouchMove(event);
+    this.#pointer.touchmove(event);
   };
 
   /**
@@ -198,11 +178,7 @@ export class Scroll {
    * @param {object} event The touch end event.
    */
   touchend = (event) => {
-    if (this.#touchTimerID !== null) {
-      clearTimeout(this.#touchTimerID);
-      this.#touchTimerID = null;
-    }
-    this.#pointer.handleTouchEnd(event);
+    this.#pointer.touchend(event);
   };
 
   /**
@@ -211,7 +187,7 @@ export class Scroll {
    * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#pointer.handleWheel(event);
+    this.#pointer.wheel(event);
   };
 
   /**
@@ -230,7 +206,7 @@ export class Scroll {
    * @param {object} event The key down event.
    */
   dblclick = (event) => {
-    this.#pointer.handleDoubleClick(event);
+    this.#pointer.dblclick(event);
   };
 
   /**
@@ -245,13 +221,14 @@ export class Scroll {
   }
 
   /**
-   * Set the tool live features: disaply tooltip.
+   * Set the tool live features: slice tooltip on hover.
    *
    * @param {object} features The list of features.
+   * @param {boolean} [features.displayTooltip] Show tooltip on mouse move.
    */
   setFeatures(features) {
     if (typeof features.displayTooltip !== 'undefined') {
-      this.#displayTooltip = features.displayTooltip;
+      this.#tooltipHover.setTooltipEnabled(Boolean(features.displayTooltip));
     }
   }
 
