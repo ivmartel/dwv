@@ -132,7 +132,7 @@ export class LayerGroupPointer {
   #longTouchToDblClickMs;
 
   /**
-   * @type {number|null}
+   * @type {ReturnType<typeof setTimeout>|null}
    */
   #longTouchTimerId = null;
 
