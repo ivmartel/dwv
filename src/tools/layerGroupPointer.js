@@ -282,7 +282,8 @@ export class LayerGroupPointer {
     }
     if (typeof this.#longTouchToDblClickMs === 'number') {
       this.#clearLongTouchTimer();
-      // recommended type is ReturnType<typeof setTimeout> but lint does not like it
+      // recommended type is ReturnType<typeof setTimeout> but
+      // lint does not like it
       // @ts-ignore
       this.#longTouchTimerId = setTimeout(() => {
         this.#longTouchTimerId = null;
