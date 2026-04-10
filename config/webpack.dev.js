@@ -25,6 +25,14 @@ export default merge(webpackCommon, {
   },
   devServer: {
     open: '/tests',
+    proxy: [
+      {
+        context: ['/dicom-web'],
+        target: 'http://localhost:8042',
+        changeOrigin: true,
+        auth: 'orthanc:orthanc', // Orthanc username:password
+      },
+    ],
     static: [
       {
         directory: './tests',
