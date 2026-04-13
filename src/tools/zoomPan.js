@@ -1,8 +1,8 @@
-import {PanDragBehavior} from './behaviors/panDragBehavior.js';
+import {PanDragBehavior} from './behaviors/dragBehavior.js';
 import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
 import {
   ZoomScrollTwoTouchBehavior
-} from './behaviors/zoomScrollTwoTouchBehavior.js';
+} from './behaviors/twoTouchBehavior.js';
 import {ZoomWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 

@@ -23,17 +23,15 @@ import {TapBehavior} from './behaviors/tapBehavior.js';
  *
  * @param {MouseEvent|TouchEvent} event The mouse or touch event.
  * @param {App} app The application (resolves the layer group).
- * @returns {{point: Point2D, layerGroup: LayerGroup, groupDivId: string}}
- *   Pointer position, layer group, and group div id.
+ * @returns {{point: Point2D, layerGroup: LayerGroup}}
+ *   Pointer position and layer group.
  */
-export function getMouseLayerContext(event, app) {
+function getMouseLayerContext(event, app) {
   const layerDetails = getLayerDetailsFromEvent(event);
-  const groupDivId = layerDetails.groupDivId;
-  const layerGroup = app.getLayerGroupByDivId(groupDivId);
+  const layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
   return {
     point: getMousePoint(event),
-    layerGroup,
-    groupDivId
+    layerGroup
   };
 }
 
@@ -42,17 +40,15 @@ export function getMouseLayerContext(event, app) {
  *
  * @param {TouchEvent} event The touch event.
  * @param {App} app The application (resolves the layer group).
- * @returns {{point: Point2D, layerGroup: LayerGroup, groupDivId: string}}
- *   Primary touch point, layer group, and group div id.
+ * @returns {{point: Point2D, layerGroup: LayerGroup}}
+ *   Primary touch point and layer group.
  */
-export function getPrimaryTouchLayerContext(event, app) {
+function getPrimaryTouchLayerContext(event, app) {
   const layerDetails = getLayerDetailsFromEvent(event);
-  const groupDivId = layerDetails.groupDivId;
-  const layerGroup = app.getLayerGroupByDivId(groupDivId);
+  const layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
   return {
     point: getTouchPoints(event)[0],
-    layerGroup,
-    groupDivId
+    layerGroup
   };
 }
 

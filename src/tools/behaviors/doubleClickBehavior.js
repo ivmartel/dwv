@@ -1,7 +1,7 @@
 import {
   WindowLevel as WindowLevelValues
 } from '../../image/windowLevel.js';
-import {getActiveOrDrawRefViewLayer} from './panDragBehavior.js';
+import {getActiveOrDrawRefViewLayer} from './utils.js';
 import {logger} from '../../utils/logger.js';
 
 // doc imports

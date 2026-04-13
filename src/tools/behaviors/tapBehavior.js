@@ -1,5 +1,5 @@
 import {logger} from '../../utils/logger.js';
-import {getActiveOrDrawRefViewLayer} from './panDragBehavior.js';
+import {getActiveOrDrawRefViewLayer} from './utils.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */

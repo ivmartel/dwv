@@ -2,7 +2,7 @@ import {
   WindowLevel as WindowLevelValues
 } from '../../image/windowLevel.js';
 import {logger} from '../../utils/logger.js';
-import {getActiveOrDrawRefViewLayer} from './panDragBehavior.js';
+import {getActiveOrDrawRefViewLayer} from './utils.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -298,6 +298,39 @@ export class OpacityDragBehavior extends DragBehavior {
 
   onEnd() {
     this.#stepOrigin = null;
+  }
+
+}
+
+/**
+ * Single-pointer pan drag: translates using display deltas in plane space.
+ */
+export class PanDragBehavior extends DragBehavior {
+
+  /**
+   * @param {object} drag Step with `dx`/`dy` (same shape as DragStep).
+   * @param {LayerGroup} layerGroup The layer group under the pointer.
+   */
+  onUpdate(drag, layerGroup) {
+    const viewLayer = getActiveOrDrawRefViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to update pan drag behavior');
+      return;
+    }
+    const viewController = viewLayer.getViewController();
+    const planeOffset = viewLayer.displayToPlaneScale(
+      new Point2D(drag.dx, drag.dy)
+    );
+    const offset3D = viewController.getOffset3DFromPlaneOffset({
+      x: planeOffset.getX(),
+      y: planeOffset.getY()
+    });
+    layerGroup.addTranslation({
+      x: offset3D.getX(),
+      y: offset3D.getY(),
+      z: offset3D.getZ()
+    });
+    layerGroup.draw();
   }
 
 }

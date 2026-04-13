@@ -7,7 +7,7 @@ import {LayerGroup} from '../../gui/layerGroup.js';
 import {Point2D} from '../../math/point.js';
 /* eslint-enable no-unused-vars */
 
-import {getActiveOrDrawRefViewLayer} from './panDragBehavior.js';
+import {getActiveOrDrawRefViewLayer} from './utils.js';
 
 /**
  * Two-finger pinch zoom and vertical scroll on the stack (zoom/pan tool).
