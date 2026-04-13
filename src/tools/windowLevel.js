@@ -32,7 +32,7 @@ import {App} from '../app/application.js';
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  */
-export class WindowLevel {
+export class WindowLevel extends LayerGroupPointer {
 
   /**
    * Associated app.
@@ -40,13 +40,6 @@ export class WindowLevel {
    * @type {App}
    */
   #app;
-
-  /**
-   * Drag lifecycle (mouse / single touch).
-   *
-   * @type {LayerGroupPointer}
-   */
-  #pointer;
 
   /**
    * Window/level drag behavior.
@@ -66,97 +59,18 @@ export class WindowLevel {
    * @param {App} app The associated application.
    */
   constructor(app) {
-    this.#app = app;
-    this.#dragBehavior = new WindowLevelDragBehavior();
-    this.#doubleClickBehavior = new WindowLevelDoubleClickBehavior({app});
-    this.#pointer = new LayerGroupPointer({
-      app: this.#app,
-      dragBehavior: this.#dragBehavior,
+    const dragBehavior = new WindowLevelDragBehavior();
+    const doubleClickBehavior = new WindowLevelDoubleClickBehavior({app});
+    super({
+      app,
+      dragBehavior,
       wheelBehavior: new ScrollWheelBehavior(),
-      doubleClickBehavior: this.#doubleClickBehavior
+      doubleClickBehavior
     });
+    this.#app = app;
+    this.#dragBehavior = dragBehavior;
+    this.#doubleClickBehavior = doubleClickBehavior;
   }
-
-  /**
-   * Handle mouse down event.
-   *
-   * @param {object} event The mouse down event.
-   */
-  mousedown = (event) => {
-    this.#pointer.mousedown(event);
-  };
-
-  /**
-   * Handle mouse move event.
-   *
-   * @param {object} event The mouse move event.
-   */
-  mousemove = (event) => {
-    this.#pointer.mousemove(event);
-  };
-
-  /**
-   * Handle mouse up event.
-   *
-   * @param {object} event The mouse up event.
-   */
-  mouseup = (event) => {
-    this.#pointer.mouseup(event);
-  };
-
-  /**
-   * Handle mouse out event.
-   *
-   * @param {object} event The mouse out event.
-   */
-  mouseout = (event) => {
-    this.#pointer.mouseout(event);
-  };
-
-  /**
-   * Handle touch start event.
-   *
-   * @param {object} event The touch start event.
-   */
-  touchstart = (event) => {
-    this.#pointer.touchstart(event);
-  };
-
-  /**
-   * Handle touch move event.
-   *
-   * @param {object} event The touch move event.
-   */
-  touchmove = (event) => {
-    this.#pointer.touchmove(event);
-  };
-
-  /**
-   * Handle touch end event.
-   *
-   * @param {object} event The touch end event.
-   */
-  touchend = (event) => {
-    this.#pointer.touchend(event);
-  };
-
-  /**
-   * Handle double click event.
-   *
-   * @param {object} event The double click event.
-   */
-  dblclick = (event) => {
-    this.#pointer.dblclick(event);
-  };
-
-  /**
-   * Handle mouse wheel event.
-   *
-   * @param {WheelEvent} event The mouse wheel event.
-   */
-  wheel = (event) => {
-    this.#pointer.wheel(event);
-  };
 
   /**
    * Handle key down event.

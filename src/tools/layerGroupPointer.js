@@ -78,7 +78,8 @@ function getPrimaryTouchLayerContext(event, app) {
  * `layerGroup` to `onUpdate`.
  *
  * Event entry points use the same names as tools (`mousedown`, `mousemove`,
- * `wheel`, `dblclick`, …).
+ * `wheel`, `dblclick`, …). Those handlers are arrow functions so they stay
+ * bound when the toolbox invokes them as bare callbacks (`func(event)`).
  */
 export class LayerGroupPointer {
 
@@ -178,7 +179,7 @@ export class LayerGroupPointer {
    * @param {WheelEvent} event The mouse wheel event.
    *   Calls `preventDefault` once before `onWheel` / tick handling.
    */
-  wheel(event) {
+  wheel = (event) => {
     if (typeof this.#wheelBehavior === 'undefined') {
       return;
     }
@@ -195,15 +196,15 @@ export class LayerGroupPointer {
     this.#wheelTick.clear();
 
     this.#wheelBehavior.onWheelTick(up, layerGroup);
-  }
+  };
 
   /**
    * @param {MouseEvent|TouchEvent} event The double click event.
    */
-  dblclick(event) {
+  dblclick = (event) => {
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
     this.#doubleClickBehavior?.onDoubleClick(point, layerGroup);
-  }
+  };
 
   /**
    * End drag if active; does not call onEnd if already idle.
@@ -218,16 +219,16 @@ export class LayerGroupPointer {
   /**
    * @param {MouseEvent} event The mouse down event.
    */
-  mousedown(event) {
+  mousedown = (event) => {
     this.#endHover();
     const getContext = (e) => getMouseLayerContext(e, this.#app);
     this.#beginDrag(event, getContext);
-  }
+  };
 
   /**
    * @param {MouseEvent} event The mouse move event.
    */
-  mousemove(event) {
+  mousemove = (event) => {
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
     if (!this.#active) {
       this.#hoverBehavior?.onUpdate(point, layerGroup);
@@ -237,12 +238,12 @@ export class LayerGroupPointer {
       this.#dragStepFromTo(point, this.#prevPoint), layerGroup);
     this.#moved = true;
     this.#prevPoint = point;
-  }
+  };
 
   /**
    * @param {MouseEvent} event The mouse up event.
    */
-  mouseup(event) {
+  mouseup = (event) => {
     if (typeof this.#tapBehavior !== 'undefined' &&
       this.#active &&
       !this.#moved) {
@@ -250,20 +251,20 @@ export class LayerGroupPointer {
       this.#tapBehavior.onTap(point, layerGroup);
     }
     this.#endDrag();
-  }
+  };
 
   /**
    * @param {MouseEvent} _event The mouse out event.
    */
-  mouseout(_event) {
+  mouseout = (_event) => {
     this.#endDrag();
     this.#endHover();
-  }
+  };
 
   /**
    * @param {TouchEvent} event The touch start event.
    */
-  touchstart(event) {
+  touchstart = (event) => {
     const touchPoints = getTouchPoints(event);
     if (this.#twoTouchBehavior && touchPoints.length === 2) {
       this.#clearLongTouchTimer();
@@ -289,12 +290,12 @@ export class LayerGroupPointer {
     this.#endHover();
     const getContext = (e) => getPrimaryTouchLayerContext(e, this.#app);
     this.#beginDrag(event, getContext);
-  }
+  };
 
   /**
    * @param {TouchEvent} event The touch move event.
    */
-  touchmove(event) {
+  touchmove = (event) => {
     this.#clearLongTouchTimer();
     const touchPoints = getTouchPoints(event);
     if (this.#twoTouchBehavior && touchPoints.length === 2) {
@@ -321,12 +322,12 @@ export class LayerGroupPointer {
       this.#dragStepFromTo(point, this.#prevPoint), layerGroup);
     this.#moved = true;
     this.#prevPoint = point;
-  }
+  };
 
   /**
    * @param {TouchEvent} event The touch end event.
    */
-  touchend(event) {
+  touchend = (event) => {
     this.#clearLongTouchTimer();
     if (typeof this.#tapBehavior !== 'undefined' &&
       !this.#moved) {
@@ -335,7 +336,7 @@ export class LayerGroupPointer {
     }
     this.#twoTouchBehavior?.onEnd();
     this.#endDrag();
-  }
+  };
 
   /**
    * @param {MouseEvent|TouchEvent} event The event.

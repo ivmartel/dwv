@@ -29,7 +29,7 @@ import {App} from '../app/application.js';
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  */
-export class Opacity {
+export class Opacity extends LayerGroupPointer {
 
   /**
    * Associated app.
@@ -39,95 +39,16 @@ export class Opacity {
   #app;
 
   /**
-   * Drag lifecycle (mouse / single touch).
-   *
-   * @type {LayerGroupPointer}
-   */
-  #pointer;
-
-  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
-    this.#app = app;
-    this.#pointer = new LayerGroupPointer({
-      app: this.#app,
+    super({
+      app,
       dragBehavior: new OpacityDragBehavior(),
       wheelBehavior: new ScrollWheelBehavior()
     });
+    this.#app = app;
   }
-
-  /**
-   * Handle mouse down event.
-   *
-   * @param {object} event The mouse down event.
-   */
-  mousedown = (event) => {
-    this.#pointer.mousedown(event);
-  };
-
-  /**
-   * Handle mouse move event.
-   *
-   * @param {object} event The mouse move event.
-   */
-  mousemove = (event) => {
-    this.#pointer.mousemove(event);
-  };
-
-  /**
-   * Handle mouse up event.
-   *
-   * @param {object} event The mouse up event.
-   */
-  mouseup = (event) => {
-    this.#pointer.mouseup(event);
-  };
-
-  /**
-   * Handle mouse out event.
-   *
-   * @param {object} event The mouse out event.
-   */
-  mouseout = (event) => {
-    this.#pointer.mouseout(event);
-  };
-
-  /**
-   * Handle touch start event.
-   *
-   * @param {object} event The touch start event.
-   */
-  touchstart = (event) => {
-    this.#pointer.touchstart(event);
-  };
-
-  /**
-   * Handle touch move event.
-   *
-   * @param {object} event The touch move event.
-   */
-  touchmove = (event) => {
-    this.#pointer.touchmove(event);
-  };
-
-  /**
-   * Handle touch end event.
-   *
-   * @param {object} event The touch end event.
-   */
-  touchend = (event) => {
-    this.#pointer.touchend(event);
-  };
-
-  /**
-   * Handle mouse wheel event.
-   *
-   * @param {object} event The mouse wheel event.
-   */
-  wheel = (event) => {
-    this.#pointer.wheel(event);
-  };
 
   /**
    * Handle key down event.
