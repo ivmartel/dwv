@@ -108,12 +108,13 @@ export class WindowLevel extends LayerGroupPointer {
    */
   setFeatures(features) {
     if (typeof features.strictViewLayer !== 'undefined') {
-      logger.warn('strictViewLayer is deprecated, use activeViewLayerOnly instead');
+      logger.warn(
+        'strictViewLayer is deprecated, use activeViewLayerOnly instead');
       this.#dragBehavior.setActiveViewLayerOnly(features.strictViewLayer);
       this.#doubleClickBehavior.setActiveViewLayerOnly(
         features.strictViewLayer);
     }
-   if (typeof features.activeViewLayerOnly !== 'undefined') {
+    if (typeof features.activeViewLayerOnly !== 'undefined') {
       this.#dragBehavior.setActiveViewLayerOnly(features.activeViewLayerOnly);
       this.#doubleClickBehavior.setActiveViewLayerOnly(
         features.activeViewLayerOnly);
