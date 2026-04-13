@@ -10,10 +10,48 @@ import {Point2D} from '../../math/point.js';
 import {getActiveOrDrawRefViewLayer} from './utils.js';
 
 /**
+ * Two-finger gesture handling for tools that forward into
+ * {@link LayerGroupPointer} two-touch paths.
+ */
+export class TwoTouchBehavior {
+
+  /**
+   * @returns {boolean} True when a two-finger gesture is in progress.
+   */
+  isActive() {
+    return false;
+  }
+
+  /**
+   * @param {Point2D[]} _points Two touch points.
+   */
+  onStart(_points) {
+    // override in subclass
+  }
+
+  /**
+   * @param {Point2D[]} _points Two touch points.
+   * @param {LayerGroup} _layerGroup The layer group under the touch.
+   * @returns {boolean} True when the gesture counts as movement (for tap).
+   */
+  onUpdate(_points, _layerGroup) {
+    return false;
+  }
+
+  /**
+   * End two-touch tracking (touch end or pointer cancel).
+   */
+  onEnd() {
+    // override in subclass
+  }
+
+}
+
+/**
  * Two-finger pinch zoom and vertical scroll on the stack (zoom/pan tool).
  * Gesture move state is owned by the layer group pointer.
  */
-export class ZoomScrollTwoTouchBehavior {
+export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
 
   /**
    * @type {Line|undefined}

@@ -16,6 +16,7 @@ import {WheelBehavior} from './behaviors/wheelBehavior.js';
 import {WheelTick} from './behaviors/wheelTick.js';
 import {DoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
 import {TapBehavior} from './behaviors/tapBehavior.js';
+import {TwoTouchBehavior} from './behaviors/twoTouchBehavior.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -62,8 +63,8 @@ function getPrimaryTouchLayerContext(event, app) {
  * @property {WheelBehavior} [wheelBehavior] Mouse wheel handling.
  * @property {DoubleClickBehavior} [doubleClickBehavior]
  *   Double-click handling.
- * @property {object} [twoTouchBehavior] Two-finger gestures: `isActive`,
- *   `onStart(points)`, `onUpdate(points, layerGroup)`, `onEnd`.
+ * @property {TwoTouchBehavior} [twoTouchBehavior] Two-finger gestures
+ *   ({@link TwoTouchBehavior}).
  * @property {TapBehavior} [tapBehavior] Tap when the pointer did not move
  *   (internal moved flag).
  * @property {number} [longTouchToDblClickMs] If set, after a touchstart on the
@@ -114,7 +115,7 @@ export class LayerGroupPointer {
   #doubleClickBehavior;
 
   /**
-   * @type {object|undefined}
+   * @type {TwoTouchBehavior|undefined}
    */
   #twoTouchBehavior;
 
