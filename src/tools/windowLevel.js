@@ -4,6 +4,7 @@ import {WindowLevelDragBehavior} from './behaviors/dragBehavior.js';
 import {
   WindowLevelDoubleClickBehavior
 } from './behaviors/doubleClickBehavior.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -49,7 +50,7 @@ export class WindowLevel extends LayerGroupPointer {
   #dragBehavior;
 
   /**
-   * Double-click W/L behavior (strict view layer mirrors drag behavior).
+   * Double-click W/L behavior (active-view-layer policy mirrors drag behavior).
    *
    * @type {WindowLevelDoubleClickBehavior}
    */
@@ -102,11 +103,20 @@ export class WindowLevel extends LayerGroupPointer {
    * Set the tool live features.
    *
    * @param {object} features The list of features.
+   * @param {boolean} [features.activeViewLayerOnly] Active view layer only
+   *   for W/L drag and double-click (see {@link WindowLevelDragBehavior}).
    */
   setFeatures(features) {
     if (typeof features.strictViewLayer !== 'undefined') {
-      this.#dragBehavior.setStrictViewLayer(features.strictViewLayer);
-      this.#doubleClickBehavior.setStrictViewLayer(features.strictViewLayer);
+      logger.warn('strictViewLayer is deprecated, use activeViewLayerOnly instead');
+      this.#dragBehavior.setActiveViewLayerOnly(features.strictViewLayer);
+      this.#doubleClickBehavior.setActiveViewLayerOnly(
+        features.strictViewLayer);
+    }
+   if (typeof features.activeViewLayerOnly !== 'undefined') {
+      this.#dragBehavior.setActiveViewLayerOnly(features.activeViewLayerOnly);
+      this.#doubleClickBehavior.setActiveViewLayerOnly(
+        features.activeViewLayerOnly);
     }
   }
 

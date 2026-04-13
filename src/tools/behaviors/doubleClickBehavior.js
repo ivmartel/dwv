@@ -1,7 +1,10 @@
 import {
   WindowLevel as WindowLevelValues
 } from '../../image/windowLevel.js';
-import {getActiveOrDrawRefViewLayer} from './utils.js';
+import {
+  getActiveOrDrawRefViewLayer,
+  getActiveOrFirstMonochromeViewLayer
+} from './utils.js';
 import {logger} from '../../utils/logger.js';
 
 // doc imports
@@ -39,47 +42,29 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
   #app;
 
   /**
-   * Strict view layer flag: if true, use the active layer
-   * (that could be undefined, ie bail) or, if false,
-   * try to find the active monochrome view layer.
+   * If true, use only the active view layer; if false, resolve to the first
+   * monochrome view layer among active layers.
    *
    * @type {boolean}
    */
-  #strictViewLayer;
+  #activeViewLayerOnly;
 
   /**
    * @param {object} options Constructor options.
    * @param {App} options.app The application.
-   * @param {boolean} [options.strictViewLayer] Strict active layer mode.
+   * @param {boolean} [options.activeViewLayerOnly] Active view layer only.
    */
-  constructor({app, strictViewLayer = true}) {
+  constructor({app, activeViewLayerOnly = true}) {
     super();
     this.#app = app;
-    this.#strictViewLayer = strictViewLayer;
+    this.#activeViewLayerOnly = activeViewLayerOnly;
   }
 
   /**
-   * @param {boolean} strictViewLayer Strict active layer mode.
+   * @param {boolean} activeViewLayerOnly Active view layer only.
    */
-  setStrictViewLayer(strictViewLayer) {
-    this.#strictViewLayer = strictViewLayer;
-  }
-
-  /**
-   * @param {LayerGroup} layerGroup The layer group of the view layer.
-   * @returns {ViewLayer|undefined} The layer.
-   */
-  #getViewLayer(layerGroup) {
-    let layer;
-    if (this.#strictViewLayer) {
-      layer = layerGroup.getActiveViewLayer();
-    } else {
-      const callbackFn = function (cbLayer) {
-        return cbLayer.getViewController().isMonochrome();
-      };
-      layer = layerGroup.getViewLayersFromActive(callbackFn)[0];
-    }
-    return layer;
+  setActiveViewLayerOnly(activeViewLayerOnly) {
+    this.#activeViewLayerOnly = activeViewLayerOnly;
   }
 
   /**
@@ -87,7 +72,8 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   onDoubleClick(point, layerGroup) {
-    const viewLayer = this.#getViewLayer(layerGroup);
+    const viewLayer = getActiveOrFirstMonochromeViewLayer(
+      layerGroup, this.#activeViewLayerOnly);
     if (typeof viewLayer === 'undefined') {
       return;
     }
