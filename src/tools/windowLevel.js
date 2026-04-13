@@ -103,6 +103,8 @@ export class WindowLevel extends LayerGroupPointer {
    * Set the tool live features.
    *
    * @param {object} features The list of features.
+   * @param {boolean} [features.strictViewLayer] Deprecated active view layer only
+   *   for W/L drag and double-click (see {@link WindowLevelDragBehavior}).
    * @param {boolean} [features.activeViewLayerOnly] Active view layer only
    *   for W/L drag and double-click (see {@link WindowLevelDragBehavior}).
    */
