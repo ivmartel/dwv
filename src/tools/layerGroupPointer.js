@@ -3,7 +3,6 @@ import {
   getTouchPoints
 } from '../gui/generic.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
-import {DragStep} from './behaviors/dragBehavior.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -75,8 +74,7 @@ function getPrimaryTouchLayerContext(event, app) {
 
 /**
  * Normalises layer mouse/touch input into a single-pointer drag lifecycle.
- * Computes per-move deltas and passes a {@link DragStep} and
- * `layerGroup` to `onUpdate`.
+ * Per-move deltas are computed inside {@link DragBehavior#onUpdate}.
  *
  * Event entry points use the same names as tools (`mousedown`, `mousemove`,
  * `wheel`, `dblclick`, …). Those handlers are arrow functions so they stay
@@ -147,11 +145,6 @@ export class LayerGroupPointer {
    * @type {boolean}
    */
   #moved = false;
-
-  /**
-   * @type {Point2D|null}
-   */
-  #prevPoint = null;
 
   /**
    * @param {LayerGroupPointerOptions} options Constructor options.
@@ -235,10 +228,8 @@ export class LayerGroupPointer {
       this.#hoverBehavior?.onUpdate(point, layerGroup);
       return;
     }
-    this.#dragBehavior.onUpdate(
-      this.#dragStepFromTo(point, this.#prevPoint), layerGroup);
+    this.#dragBehavior.onUpdate(point, layerGroup);
     this.#moved = true;
-    this.#prevPoint = point;
   };
 
   /**
@@ -319,10 +310,8 @@ export class LayerGroupPointer {
       this.#hoverBehavior?.onUpdate(point, layerGroup);
       return;
     }
-    this.#dragBehavior.onUpdate(
-      this.#dragStepFromTo(point, this.#prevPoint), layerGroup);
+    this.#dragBehavior.onUpdate(point, layerGroup);
     this.#moved = true;
-    this.#prevPoint = point;
   };
 
   /**
@@ -351,23 +340,12 @@ export class LayerGroupPointer {
     this.#dragBehavior.onStart(point, layerGroup);
     this.#moved = false;
     this.#active = true;
-    this.#prevPoint = point;
-  }
-
-  /**
-   * @param {Point2D} point Current position.
-   * @param {Point2D} prevPoint Previous position.
-   * @returns {DragStep} Drag step for the behaviour.
-   */
-  #dragStepFromTo(point, prevPoint) {
-    return new DragStep(point, prevPoint);
   }
 
   #endDrag() {
     if (this.#active) {
       this.#dragBehavior.onEnd();
       this.#active = false;
-      this.#prevPoint = null;
     }
   }
 
