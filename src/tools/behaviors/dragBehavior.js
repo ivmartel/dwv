@@ -115,6 +115,13 @@ export class DragBehavior {
   }
 
   /**
+   * @returns {boolean} True after {@link onStart} until {@link onEnd}.
+   */
+  isActive() {
+    return this.#prevPoint !== null;
+  }
+
+  /**
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    * @returns {boolean} Whether a drag may begin.
