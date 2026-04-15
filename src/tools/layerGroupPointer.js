@@ -269,6 +269,9 @@ export class LayerGroupPointer {
     }
 
     // long touch to dblclick
+    // recommended type is ReturnType<typeof setTimeout> but
+    //   lint does not like it
+    // @ts-ignore
     this.#longTouchTimerId = setTimeout(() => {
       this.#longTouchTimerId = null;
       this.dblclick(event);
