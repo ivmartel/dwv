@@ -8,8 +8,6 @@ import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application.js';
-import {Point2D} from '../math/point.js';
-import {LayerGroup} from '../gui/layerGroup.js';
 /* eslint-enable no-unused-vars */
 
 /**
