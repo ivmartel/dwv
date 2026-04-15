@@ -105,8 +105,7 @@ export class Scroll extends LayerGroupPointer {
       hoverBehavior: tooltipHover,
       wheelBehavior: new ScrollWheelBehavior(),
       doubleClickBehavior: new PlayDoubleClickBehavior(),
-      tapBehavior: new PositionSetTapBehavior(),
-      longTouchToDblClickMs: 500
+      tapBehavior: new PositionSetTapBehavior()
     });
     this.#app = app;
     this.#tooltipHover = tooltipHover;

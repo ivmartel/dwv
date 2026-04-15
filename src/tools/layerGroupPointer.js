@@ -64,17 +64,19 @@ function getPrimaryTouchLayerContext(event, app) {
  *   Double-click handling.
  * @property {TwoTouchBehavior} [twoTouchBehavior] Two-finger gestures
  *   ({@link TwoTouchBehavior}).
- * @property {TapBehavior} [tapBehavior] Tap when the pointer did not move
- *   (internal moved flag).
- * @property {number} [longTouchToDblClickMs] If set, after a touchstart on the
+ * @property {TapBehavior} [tapBehavior] Tap when the gesture did not move
+ *   (internal `#gestureMoved` flag).
+ * @property {number|null} [longTouchToDblClickMs] After a touchstart on the
  *   single-touch path, schedule {@link LayerGroupPointer#dblclick} after this
- *   many milliseconds; cleared on touchmove, touchend, or
+ *   many milliseconds (defaults to 500); use `0` or `null` to skip the timer.
+ *   Cleared on touchmove, touchend, or
  *   {@link LayerGroupPointer#cancel}.
  */
 
 /**
  * Normalises layer mouse/touch input into a single-pointer drag lifecycle.
  * Per-move deltas are computed inside {@link DragBehavior#onUpdate}.
+ * Hover ({@link HoverBehavior}) is driven from mouse events only, not touch.
  *
  * Event entry points use the same names as tools (`mousedown`, `mousemove`,
  * `wheel`, `dblclick`, …). Those handlers are arrow functions so they stay
@@ -123,7 +125,7 @@ export class LayerGroupPointer {
   #tapBehavior;
 
   /**
-   * @type {number|undefined}
+   * @type {number|null}
    */
   #longTouchToDblClickMs;
 
@@ -133,18 +135,12 @@ export class LayerGroupPointer {
   #longTouchTimerId = null;
 
   /**
-   * Whether the current gesture is active (drag or two-touch).
+   * True after a drag move, or after two-touch {@link TwoTouchBehavior} reports
+   * movement — suppresses tap on mouseup/touchend when set.
    *
    * @type {boolean}
    */
-  #active = false;
-
-  /**
-   * Whether the current gesture moved (drag or two-touch).
-   *
-   * @type {boolean}
-   */
-  #moved = false;
+  #gestureMoved = false;
 
   /**
    * @param {LayerGroupPointerOptions} options Constructor options.
@@ -157,7 +153,7 @@ export class LayerGroupPointer {
     doubleClickBehavior,
     twoTouchBehavior,
     tapBehavior,
-    longTouchToDblClickMs
+    longTouchToDblClickMs = 500
   }) {
     this.#app = app;
     this.#dragBehavior = dragBehavior;
@@ -214,9 +210,9 @@ export class LayerGroupPointer {
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
-    this.#endHover();
-    const getContext = (e) => getMouseLayerContext(e, this.#app);
-    this.#beginDrag(event, getContext);
+    this.#gestureMoved = false;
+    const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+    this.#beginDrag(point, layerGroup);
   };
 
   /**
@@ -224,12 +220,13 @@ export class LayerGroupPointer {
    */
   mousemove = (event) => {
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-    if (!this.#active) {
+    if (this.#dragBehavior.isActive()) {
+      this.#endHover();
+      this.#dragBehavior.onUpdate(point, layerGroup);
+      this.#gestureMoved = true;
+    } else {
       this.#hoverBehavior?.onUpdate(point, layerGroup);
-      return;
     }
-    this.#dragBehavior.onUpdate(point, layerGroup);
-    this.#moved = true;
   };
 
   /**
@@ -237,8 +234,8 @@ export class LayerGroupPointer {
    */
   mouseup = (event) => {
     if (typeof this.#tapBehavior !== 'undefined' &&
-      this.#active &&
-      !this.#moved) {
+      this.#dragBehavior.isActive() &&
+      !this.#gestureMoved) {
       const {point, layerGroup} = getMouseLayerContext(event, this.#app);
       this.#tapBehavior.onTap(point, layerGroup);
     }
@@ -257,31 +254,28 @@ export class LayerGroupPointer {
    * @param {TouchEvent} event The touch start event.
    */
   touchstart = (event) => {
+    this.#clearLongTouchTimer();
+    this.#gestureMoved = false;
+
+    // two-touch gesture
     const touchPoints = getTouchPoints(event);
-    if (this.#twoTouchBehavior && touchPoints.length === 2) {
-      this.#clearLongTouchTimer();
-      this.#endHover();
-      if (this.#active) {
+    const twoTouch = this.#twoTouchBehavior && touchPoints.length === 2;
+    if (twoTouch) {
+      if (this.#dragBehavior.isActive()) {
         this.#endDrag();
-        this.#endHover();
       }
-      this.#moved = false;
       this.#twoTouchBehavior.onStart(touchPoints);
       return;
     }
-    if (typeof this.#longTouchToDblClickMs === 'number') {
-      this.#clearLongTouchTimer();
-      // recommended type is ReturnType<typeof setTimeout> but
-      // lint does not like it
-      // @ts-ignore
-      this.#longTouchTimerId = setTimeout(() => {
-        this.#longTouchTimerId = null;
-        this.dblclick(event);
-      }, this.#longTouchToDblClickMs);
-    }
-    this.#endHover();
-    const getContext = (e) => getPrimaryTouchLayerContext(e, this.#app);
-    this.#beginDrag(event, getContext);
+
+    // long touch to dblclick
+    this.#longTouchTimerId = setTimeout(() => {
+      this.#longTouchTimerId = null;
+      this.dblclick(event);
+    }, this.#longTouchToDblClickMs);
+
+    const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
+    this.#beginDrag(point, layerGroup);
   };
 
   /**
@@ -289,29 +283,29 @@ export class LayerGroupPointer {
    */
   touchmove = (event) => {
     this.#clearLongTouchTimer();
+    const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
+
+    // two-touch gesture
     const touchPoints = getTouchPoints(event);
-    if (this.#twoTouchBehavior && touchPoints.length === 2) {
-      const {layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
+    const twoTouch = this.#twoTouchBehavior && touchPoints.length === 2;
+    if (twoTouch) {
       if (!this.#twoTouchBehavior.isActive()) {
-        if (this.#active) {
+        if (this.#dragBehavior.isActive()) {
           this.#endDrag();
-          this.#endHover();
         }
-        this.#moved = false;
+        this.#gestureMoved = false;
         this.#twoTouchBehavior.onStart(touchPoints);
       }
       if (this.#twoTouchBehavior.onUpdate(touchPoints, layerGroup)) {
-        this.#moved = true;
+        this.#gestureMoved = true;
       }
       return;
     }
-    const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
-    if (!this.#active) {
-      this.#hoverBehavior?.onUpdate(point, layerGroup);
-      return;
+
+    if (this.#dragBehavior.isActive()) {
+      this.#dragBehavior.onUpdate(point, layerGroup);
+      this.#gestureMoved = true;
     }
-    this.#dragBehavior.onUpdate(point, layerGroup);
-    this.#moved = true;
   };
 
   /**
@@ -320,7 +314,7 @@ export class LayerGroupPointer {
   touchend = (event) => {
     this.#clearLongTouchTimer();
     if (typeof this.#tapBehavior !== 'undefined' &&
-      !this.#moved) {
+      !this.#gestureMoved) {
       const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
       this.#tapBehavior.onTap(point, layerGroup);
     }
@@ -329,23 +323,18 @@ export class LayerGroupPointer {
   };
 
   /**
-   * @param {MouseEvent|TouchEvent} event The event.
-   * @param {function(Event): object} getContext Returns point and layerGroup.
+   * @param {Point2D} point Pointer position in display space.
+   * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
-  #beginDrag(event, getContext) {
-    const {point, layerGroup} = getContext(event);
-    if (!this.#dragBehavior.canStart(point, layerGroup)) {
-      return;
+  #beginDrag(point, layerGroup) {
+    if (this.#dragBehavior?.canStart(point, layerGroup)) {
+      this.#dragBehavior.onStart(point, layerGroup);
     }
-    this.#dragBehavior.onStart(point, layerGroup);
-    this.#moved = false;
-    this.#active = true;
   }
 
   #endDrag() {
-    if (this.#active) {
+    if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.onEnd();
-      this.#active = false;
     }
   }
 
