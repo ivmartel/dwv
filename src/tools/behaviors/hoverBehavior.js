@@ -42,7 +42,7 @@ export class TooltipHoverBehavior extends HoverBehavior {
    * @param {object} [options] Constructor options.
    * @param {boolean} [options.tooltipEnabled] Whether to show tooltip on hover.
    */
-  constructor({tooltipEnabled = true} = {}) {
+  constructor({tooltipEnabled = false} = {}) {
     super();
     this.#tooltipEnabled = tooltipEnabled;
   }
