@@ -272,26 +272,6 @@ export class ScrollDragBehavior extends DragBehavior {
   }
 
   /**
-   * @param {Point2D} point The pointer position.
-   * @param {LayerGroup} layerGroup The layer group.
-   */
-  onStart(point, layerGroup) {
-    super.onStart(point, layerGroup);
-    const viewLayer = getActiveOrDrawRefViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to update scroll drag behavior');
-      return;
-    }
-    const viewController = viewLayer.getViewController();
-    if (viewController.isPlaying()) {
-      viewController.stop();
-    }
-    const planePos = viewLayer.displayToPlanePos(point);
-    const position = viewController.getPositionFromPlanePoint(planePos);
-    viewController.setCurrentPosition(position);
-  }
-
-  /**
    * @param {DragStep} drag Step with 15×15 thresholds from this behavior.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */

@@ -3,6 +3,7 @@ import {LayerGroupPointer} from './layerGroupPointer.js';
 import {ScrollDragBehavior} from './behaviors/dragBehavior.js';
 import {PlayDoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
 import {TooltipHoverBehavior} from './behaviors/hoverBehavior.js';
+import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -106,6 +107,7 @@ export class Scroll extends LayerGroupPointer {
       hoverBehavior: tooltipHover,
       wheelBehavior: new ScrollWheelBehavior(),
       doubleClickBehavior: new PlayDoubleClickBehavior(),
+      tapBehavior: new PositionSetTapBehavior(),
       longTouchToDblClickMs: 500
     });
     this.#app = app;
