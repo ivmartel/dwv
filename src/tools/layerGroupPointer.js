@@ -206,6 +206,7 @@ export class LayerGroupPointer {
    * End behaviors that have end method.
    */
   cancel() {
+    this.#downed = false;
     this.#moved = false;
     this.#clearLongTouchTimer();
 
