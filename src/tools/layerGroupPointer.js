@@ -65,10 +65,10 @@ function getPrimaryTouchLayerContext(event, app) {
  * @property {TwoTouchBehavior} [twoTouchBehavior] Two-finger gestures
  *   ({@link TwoTouchBehavior}).
  * @property {TapBehavior} [tapBehavior] Tap when the gesture did not move
- *   (internal `#gestureMoved` flag).
+ *   (internal `#moved` flag).
  * @property {number|null} [longTouchToDblClickMs] After a touchstart on the
  *   single-touch path, schedule {@link LayerGroupPointer#dblclick} after this
- *   many milliseconds (defaults to 500); use `0` or `null` to skip the timer.
+ *   many milliseconds (defaults to 500).
  *   Cleared on touchmove, touchend, or
  *   {@link LayerGroupPointer#cancel}.
  */
