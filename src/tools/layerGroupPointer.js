@@ -135,7 +135,14 @@ export class LayerGroupPointer {
   #longTouchTimerId = null;
 
   /**
-   * True after a mouse or touch move, reset at end.
+   * True after a mouse down, reset at mouse up.
+   *
+   * @type {boolean}
+   */
+  #downed = false;
+
+  /**
+   * True after a mouse or touch move, reset at mousedown or touchstart.
    *
    * @type {boolean}
    */
@@ -218,6 +225,7 @@ export class LayerGroupPointer {
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
+    this.#downed = true;
     this.#moved = false;
 
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
@@ -233,11 +241,13 @@ export class LayerGroupPointer {
     this.#moved = true;
 
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-    if (this.#dragBehavior?.isActive()) {
+    if (this.#downed) {
       // remove hover while dragging
       this.#hoverBehavior?.onEnd();
       // update drag
-      this.#dragBehavior.onUpdate(point, layerGroup);
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.onUpdate(point, layerGroup);
+      }
     } else {
       // update hover
       this.#hoverBehavior?.onUpdate(point, layerGroup);
@@ -248,6 +258,8 @@ export class LayerGroupPointer {
    * @param {MouseEvent} event The mouse up event.
    */
   mouseup = (event) => {
+    this.#downed = false;
+
     if (this.#moved) {
       // end drag
       if (this.#dragBehavior?.isActive()) {
