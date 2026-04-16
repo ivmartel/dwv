@@ -268,7 +268,7 @@ describe('tools/behaviors', () => {
         .mockImplementation(() => {});
 
       const result = behavior.canStart(new Point2D(0, 0), layerGroup);
-        assert.notOk(result);
+      assert.notOk(result);
 
       assert.equal(warnSpy.mock.calls.length, 1, 'warning emitted');
     });

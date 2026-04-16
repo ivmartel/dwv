@@ -124,8 +124,8 @@ export function makeMockApp() {
 /**
  * Create a minimal Wheel Event mock.
  *
- * @param {number} [deltaY=120] The deltaY value.
- * @param {number} [wheelDeltaY=120] The wheelDeltaY value.
+ * @param {number} [deltaY] The deltaY value.
+ * @param {number} [wheelDeltaY] The wheelDeltaY value.
  * @returns {object} The wheel event mock.
  */
 export function makeMockWheelEvent(deltaY = 120, wheelDeltaY = 120) {

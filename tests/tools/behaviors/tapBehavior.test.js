@@ -58,7 +58,7 @@ describe('tools/behaviors', () => {
       const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
         .mockImplementation(() => {});
 
-        const point = new Point2D(10, 20);
+      const point = new Point2D(10, 20);
       behavior.onTap(point, layerGroup);
 
       // Should handle gracefully without throwing
