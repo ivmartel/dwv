@@ -28,21 +28,17 @@ DICOM-web support since `v0.31.0`. Check it using this example 'unsafe' dicom we
         "HasDelete": true
       }
     }
-  },
-  "ServeFolders": {
-    "/dwv": "/usr/local/dwv"
   }
 }
 ```
 
-DWV is served via the `ServeFolders` to allow it to request files (and not create CORS errors).
 This configuration is then passed (as `orthanc-config.json`) to the folowing example docker compose (yaml):
 
 ```yaml
 version: "3.1"
 services:
   orthanc:
-    image: jodogne/orthanc-plugins:1.9.7
+    image: jodogne/orthanc-plugins:1.12.10
     command: [/run/secrets/, --trace-dicom]
     ports:
       - 4242:4242
@@ -51,18 +47,17 @@ services:
       - orthanc.json
     environment:
       - ORTHANC_NAME=OrthancTest
-    volumes:
-      - /home/yves/dev/src/github/dwv:/usr/local/dwv
 secrets:
   orthanc.json:
     file: orthanc-config.json
 ```
 
-Adapt this to the folder containing the dwv code under the `volumes` setting.
+Launch it with: `docker compose up`
 
-Launch it with: `sudo docker-compose up`
+You can then access orthanc at [explorer](http://localhost:8042/app/explorer.html).
 
-You can then access orthanc at [explorer](http://localhost:8042/app/explorer.html). DWV provides a test page to do QIDO and launch the viewer: [dcmweb](http://localhost:8042/dwv/tests/pacs/dcmweb.html) (do not forget to modify the test viewer for it to set the multipart header with the `_dicomWeb` flag).
+DWV provides a test page to do QIDO and launch the viewer: [dcmweb](http://localhost:8080/dwv/tests/pacs/dcmweb.html). Launch it via a `yarn run start`. The webpack dev server exposes a proxy to avoid CORS errors, update it if you change
+the Orthanc configuration.
 
 ## Google
 

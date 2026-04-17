@@ -25,9 +25,11 @@ import {InfoData} from '../gui/infoData.js';
 import {
   toolList,
   defaultToolList,
+} from '../tools/toolList.js';
+import {
   toolOptions,
   defaultToolOptions
-} from '../tools/index.js';
+} from '../tools/toolOptions.js';
 import {binderList} from '../gui/stage.js';
 import {WindowLevel} from '../image/windowLevel.js';
 import {PlaneHelper} from '../image/planeHelper.js';

@@ -2,7 +2,7 @@ import {logger} from '../utils/logger.js';
 import {getFlags, replaceFlags} from '../utils/string.js';
 import {Point} from '../math/point.js';
 import {getOrientationName} from '../math/orientation.js';
-import {defaultToolOptions, toolOptions} from '../tools/index.js';
+import {defaultToolOptions, toolOptions} from '../tools/toolOptions.js';
 import {guid} from '../math/stats.js';
 import {getUID} from '../dicom/dicomWriter.js';
 

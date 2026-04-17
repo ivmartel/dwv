@@ -93,7 +93,7 @@ function createDefaultReplaceFormat(length) {
 function replaceFlags(inputStr, values) {
   let res = inputStr;
   for (let i = 0; i < values.length; ++i) {
-    res = res.replace(`{v${i}`, values[i]);
+    res = res.replace(`{v${i}}`, values[i]);
   }
   return res;
 }

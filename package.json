@@ -42,7 +42,7 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@vitest/coverage-v8": "^4.1.0",
     "babel-loader": "^10.1.1",
-    "babel-plugin-istanbul": "^7.0.1",
+    "babel-plugin-istanbul": "^8.0.0",
     "benchmark": "^2.1.4",
     "canvas": "^3.2.1",
     "clean-jsdoc-theme": "^4.3.0",
