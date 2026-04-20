@@ -1,10 +1,9 @@
 import {Command} from './undoStack.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation.js';
-import {DrawController} from '../app/drawController.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Annotation} from '../image/annotation.js';
+ * @import {DrawController} from '../app/drawController.js';
+ */
 
 /**
  * Add annotation command.

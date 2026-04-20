@@ -13,12 +13,11 @@ import {
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 import {getReferencedSeriesUID} from '../dicom/dicomImage.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from '../image/image.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {AnnotationGroup} from '../image/annotationGroup.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from '../image/image.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {AnnotationGroup} from '../image/annotationGroup.js';
+ */
 
 /**
  * Related DICOM tag keys.

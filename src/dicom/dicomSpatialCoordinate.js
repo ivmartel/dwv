@@ -6,12 +6,11 @@ import {Circle} from '../math/circle.js';
 import {Ellipse} from '../math/ellipse.js';
 import {Rectangle} from '../math/rectangle.js';
 import {logger} from '../utils/logger.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
 import {BidimensionalLine} from '../math/bidimensionalLine.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {DataElement} from './dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.

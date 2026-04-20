@@ -27,10 +27,9 @@ import {
   isButtonPressed
 } from './viewer.ui.icons.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../../src/app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../../src/app/application.js';
+ */
 
 /**
  * Segmentation type.

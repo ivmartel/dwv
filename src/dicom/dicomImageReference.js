@@ -3,11 +3,10 @@ import {
   getDicomSopInstanceReferenceItem
 } from './dicomSopInstanceReference.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-import {SopInstanceReference} from './dicomSopInstanceReference.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {SopInstanceReference} from './dicomSopInstanceReference.js';
+ */
 
 /**
  * Related DICOM tag keys.

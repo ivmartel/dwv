@@ -8,11 +8,10 @@ import {
 import {setLineHitFunc} from './lineHitFunc.js';
 import {logger} from '../../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Style} from '../../gui/style.js';
-import {Annotation} from '../../image/annotation.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Style} from '../../gui/style.js';
+ * @import {Annotation} from '../../image/annotation.js';
+ */
 
 // ---------------------------------------------------------------------------
 // Base class

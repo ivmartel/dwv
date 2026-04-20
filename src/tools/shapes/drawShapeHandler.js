@@ -14,18 +14,17 @@ import {
 } from './drawBounds.js';
 import {DrawShapeEditor} from './drawShapeEditor.js';
 import {DrawTrash} from './drawTrash.js';
+import {Point2D} from '../../math/point.js';
 
 // external
 import Konva from 'konva';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../../app/application.js';
-import {Scalar2D} from '../../math/scalar.js';
-import {DrawLayer} from '../../gui/drawLayer.js';
-import {Annotation} from '../../image/annotation.js';
-import {Point2D} from '../../math/point.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../../app/application.js';
+ * @import {Scalar2D} from '../../math/scalar.js';
+ * @import {DrawLayer} from '../../gui/drawLayer.js';
+ * @import {Annotation} from '../../image/annotation.js';
+ */
 
 /**
  * Open a dialogue to edit roi data. Defaults to window.prompt.

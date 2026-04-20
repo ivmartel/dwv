@@ -15,17 +15,16 @@ import {MAX_CONTOUR_SIZE} from './view.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Geometry} from './geometry.js';
-import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix.js';
-import {NumberRange} from '../math/stats.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {RGB} from '../utils/colour.js';
-import {ColourMap} from './luts.js';
-import {Point} from '../math/point.js';
-import {Label} from './label.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Geometry} from './geometry.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {NumberRange} from '../math/stats.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {RGB} from '../utils/colour.js';
+ * @import {ColourMap} from './luts.js';
+ * @import {Point} from '../math/point.js';
+ * @import {Label} from './label.js';
+ */
 
 const ML_PER_MM = 0.001; // ml/mm^3
 

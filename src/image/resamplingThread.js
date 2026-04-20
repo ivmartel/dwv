@@ -5,11 +5,10 @@ import {Size} from './size.js';
 import {getTypedArray} from '../dicom/dicomParser.js';
 import {Spacing} from './spacing.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {Point} from '../math/point.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Point} from '../math/point.js';
+ */
 
 /**
  * List of compatible typed arrays.

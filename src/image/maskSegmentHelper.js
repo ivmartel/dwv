@@ -1,10 +1,9 @@
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
-import {MaskSegment} from '../dicom/dicomSegment.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from './image.js';
+ * @import {MaskSegment} from '../dicom/dicomSegment.js';
+ */
 
 /**
  * Mask segment helper: helps handling the segments list,

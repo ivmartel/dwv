@@ -1,11 +1,10 @@
 import {logger} from '../utils/logger.js';
 import {ListenerHandler} from '../utils/listen.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Annotation} from './annotation.js';
-import {ViewController} from '../app/viewController.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Annotation} from './annotation.js';
+ * @import {ViewController} from '../app/viewController.js';
+ */
 
 /**
  * List of annotation group event names.

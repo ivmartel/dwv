@@ -12,6 +12,7 @@ import {
   isNodeNameShape,
   isNodeNameLabel
 } from '../tools/shapes/drawBounds.js';
+import {Index} from '../math/index.js';
 import {Style} from '../gui/style.js';
 import {Line} from '../math/line.js';
 import {Rectangle} from '../math/rectangle.js';
@@ -20,23 +21,21 @@ import {Protractor} from '../math/protractor.js';
 import {Ellipse} from '../math/ellipse.js';
 import {Circle} from '../math/circle.js';
 import {Point2D} from '../math/point.js';
+import {BidimensionalLine} from '../math/bidimensionalLine.js';
+import {Annotation} from '../image/annotation.js';
 
 // external
 import Konva from 'konva';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point, Point3D} from '../math/point.js';
-import {Index} from '../math/index.js';
-import {Vector3D} from '../math/vector.js';
-import {Scalar2D, Scalar3D} from '../math/scalar.js';
-import {Image} from '../image/image.js';
-import {PlaneHelper} from '../image/planeHelper.js';
-import {Annotation} from '../image/annotation.js';
-import {AnnotationGroup} from '../image/annotationGroup.js';
-import {DrawShapeHandler} from '../tools/shapes/drawShapeHandler.js';
-import {BidimensionalLine} from '../math/bidimensionalLine.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point, Point3D} from '../math/point.js';
+ * @import {Vector3D} from '../math/vector.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ * @import {Image} from '../image/image.js';
+ * @import {PlaneHelper} from '../image/planeHelper.js';
+ * @import {AnnotationGroup} from '../image/annotationGroup.js';
+ * @import {DrawShapeHandler} from '../tools/shapes/drawShapeHandler.js';
+ */
 
 /**
  * Debug function to output the layer hierarchy as text.

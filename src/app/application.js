@@ -35,19 +35,18 @@ import {WindowLevel} from '../image/windowLevel.js';
 import {PlaneHelper} from '../image/planeHelper.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
 import {konvaToAnnotation} from '../gui/drawLayer.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawLayer} from '../gui/drawLayer.js';
-import {Image} from '../image/image.js';
-import {Matrix33} from '../math/matrix.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {Scalar3D} from '../math/scalar.js';
 import {DicomData} from './dataController.js';
-import {Command} from '../command/undoStack.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {DrawLayer} from '../gui/drawLayer.js';
+ * @import {Image} from '../image/image.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {Scalar3D} from '../math/scalar.js';
+ * @import {Command} from '../command/undoStack.js';
+ */
 
 /**
  * View configuration: mainly defines the ´divId´

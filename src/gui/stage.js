@@ -3,11 +3,10 @@ import {WindowLevel} from '../image/windowLevel.js';
 import {LayerGroup} from './layerGroup.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawLayer} from '../gui/drawLayer.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {DrawLayer} from '../gui/drawLayer.js';
+ */
 
 /**
  * Window/level binder.

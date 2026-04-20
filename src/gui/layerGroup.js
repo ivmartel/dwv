@@ -10,13 +10,12 @@ import {DrawLayer} from './drawLayer.js';
 import {SOPClassUIDs} from '../dicom/dictionary.js';
 import {InfoLayer} from './infoLayer.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D, Point3D} from '../math/point.js';
-import {Scalar2D, Scalar3D} from '../math/scalar.js';
-import {PositionHelper} from '../image/positionHelper.js';
-import {InfoData} from './infoData.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D, Point3D} from '../math/point.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ * @import {PositionHelper} from '../image/positionHelper.js';
+ * @import {InfoData} from './infoData.js';
+ */
 
 /**
  * Get the layer div id.

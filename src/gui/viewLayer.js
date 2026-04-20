@@ -9,12 +9,11 @@ import {
 } from './generic.js';
 import {getScaledOffset} from './layerGroup.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Vector3D} from '../math/vector.js';
-import {Point, Point3D} from '../math/point.js';
-import {Scalar2D, Scalar3D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Vector3D} from '../math/vector.js';
+ * @import {Point, Point3D} from '../math/point.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ */
 
 /**
  * View layer.

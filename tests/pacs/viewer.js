@@ -22,10 +22,9 @@ import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
 import {overlayConfig} from './overlays.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewConfig} from '../../src/app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewConfig} from '../../src/app/application.js';
+ */
 
 
 // global vars

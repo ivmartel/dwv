@@ -4,12 +4,11 @@ import {
   REAL_WORLD_EPSILON,
 } from './matrix.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController.js';
-import {Scalar2D} from './scalar.js';
-import {Value} from './value.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Scalar2D} from './scalar.js';
+ * @import {Value} from './value.js';
+ */
 
 /**
  * Line shape.

@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Tag} from './dicomTag.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Tag} from './dicomTag.js';
+ */
 
 /**
  * DICOM data element.

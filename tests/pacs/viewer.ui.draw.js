@@ -1,9 +1,8 @@
 import {DicomCode} from '../../src/dicom/dicomCode.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../../src/app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../../src/app/application.js';
+ */
 
 /**
  * Draw tool UI.

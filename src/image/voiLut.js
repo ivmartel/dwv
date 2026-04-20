@@ -1,9 +1,8 @@
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WindowLevel} from './windowLevel.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WindowLevel} from './windowLevel.js';
+ */
 
 export const VoiLutFunctionNames = {
   linear: 'LINEAR',

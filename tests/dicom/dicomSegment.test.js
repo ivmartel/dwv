@@ -8,11 +8,10 @@ import {
 import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
 import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../../src/dicom/dataElement.js';
-import {DicomCode} from '../../src/dicom/dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../../src/dicom/dataElement.js';
+ * @import {DicomCode} from '../../src/dicom/dicomCode.js';
+ */
 
 /**
  * Tests for the 'dicom/dicomSegment.js' file.

@@ -49,10 +49,9 @@ import {Annotation} from './annotation.js';
 import {AnnotationGroup} from './annotationGroup.js';
 import {Point2D, Point3D} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.

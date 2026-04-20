@@ -10,13 +10,12 @@ import {
   getDicomCodeItem
 } from './dicomCode.js';
 import {logger} from '../utils/logger.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
 import {RGB} from '../utils/colour.js';
-import {DataElement} from './dataElement.js';
-import {DicomCode} from './dicomCode.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {DicomCode} from './dicomCode.js';
+ */
 
 /**
  * Related DICOM tag keys.

@@ -7,11 +7,10 @@ import {
 } from '../dicom/dicomDate.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Info data item class.

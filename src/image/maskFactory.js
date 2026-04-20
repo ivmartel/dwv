@@ -36,14 +36,13 @@ import {logger} from '../utils/logger.js';
 import {arraySortEquals} from '../utils/array.js';
 import {Size} from './size.js';
 import {ColourMap} from './luts.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {Spacing} from '../image/spacing.js';
 import {DataElement} from '../dicom/dataElement.js';
-import {MaskSegment} from '../dicom/dicomSegment.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Spacing} from '../image/spacing.js';
+ * @import {MaskSegment} from '../dicom/dicomSegment.js';
+ */
 
 /**
  * @typedef {Record<string, DataElement>} DataElements

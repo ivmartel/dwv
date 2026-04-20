@@ -1,12 +1,11 @@
 import {Point2D} from '../../math/point.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Scalar2D} from '../../math/scalar.js';
-import {Style} from '../../gui/style.js';
 // external
 import Konva from 'konva';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {Scalar2D} from '../../math/scalar.js';
+ * @import {Style} from '../../gui/style.js';
+ */
 
 /**
  * List of default label texts.

@@ -26,17 +26,13 @@ import {
   getSpatialCoordinate3D,
   getDicomSpatialCoordinate3DItem
 } from './dicomSpatialCoordinate3D.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {
-  safeGet,
-  safeGetAll,
-  DataElement
-} from './dataElement.js';
-import {DicomCode} from './dicomCode.js';
+import {safeGet, safeGetAll} from './dataElement.js';
 import {MeasuredValue} from './dicomMeasuredValue.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {DicomCode} from './dicomCode.js';
+ */
 
 /**
  * Related DICOM tag keys.

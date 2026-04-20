@@ -2,11 +2,10 @@ import {custom} from '../app/custom.js';
 import {View} from './view.js';
 import {WindowLevel} from './windowLevel.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from './image.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * List of default window level presets.

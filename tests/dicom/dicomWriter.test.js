@@ -16,10 +16,9 @@ import {
 } from '../../src/dicom/dictionary.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WriterRule} from '../../src/dicom/dicomWriter.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WriterRule} from '../../src/dicom/dicomWriter.js';
+ */
 
 // test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm?inline';

@@ -18,10 +18,9 @@ import {
   getShapeFromScoord
 } from '../../src/dicom/dicomSpatialCoordinate.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {AnnotationGroup} from '../../src/image/annotationGroup.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {AnnotationGroup} from '../../src/image/annotationGroup.js';
+ */
 
 import dwv034Arrow from './dwv034/sr-arrow.dcm?inline';
 import dwv034Circle from './dwv034/sr-circle.dcm?inline';

@@ -15,10 +15,9 @@ import {
   UpdateAnnotationCommand
 } from '../command/drawCommands.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ */
 
 /**
  * Livewire painting tool.

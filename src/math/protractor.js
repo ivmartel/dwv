@@ -1,11 +1,10 @@
 import {Line, getAngle} from './line.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point.js';
-import {Value} from './value.js';
-import {ViewController} from '../app/viewController.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D} from '../math/point.js';
+ * @import {Value} from './value.js';
+ * @import {ViewController} from '../app/viewController.js';
+ */
 
 /**
  * Protractor shape: 3 points from which to calculate an angle.

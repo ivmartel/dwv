@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WindowLevel} from '../image/windowLevel.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WindowLevel} from '../image/windowLevel.js';
+ */
 
 /**
  * Overridalbe custom object for client defined items.

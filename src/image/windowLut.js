@@ -1,8 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ModalityLut} from './modalityLut.js';
-import {VoiLut} from './voiLut.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ModalityLut} from './modalityLut.js';
+ * @import {VoiLut} from './voiLut.js';
+ */
 
 /**
  * Window LUT class: combines a modality LUT and a VOI LUT.

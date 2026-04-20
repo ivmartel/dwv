@@ -7,15 +7,14 @@ import {
 } from '../math/orientation.js';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point} from '../math/point.js';
-import {Index} from '../math/index.js';
-import {Geometry} from '../image/geometry.js';
-import {Matrix33} from '../math/matrix.js';
-import {Spacing} from './spacing.js';
-import {Scalar2D, Scalar3D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point} from '../math/point.js';
+ * @import {Index} from '../math/index.js';
+ * @import {Geometry} from '../image/geometry.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Spacing} from './spacing.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ */
 
 /**
  * Plane geometry helper.

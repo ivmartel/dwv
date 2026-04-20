@@ -9,11 +9,10 @@ import {getOrientationFromCosines} from '../math/orientation.js';
 import {Spacing} from '../image/spacing.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {DataElement} from './dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.

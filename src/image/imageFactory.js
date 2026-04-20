@@ -22,10 +22,9 @@ import {getSuvFactor} from '../dicom/dicomPet.js';
 import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * @typedef {Record<string, DataElement>} DataElements

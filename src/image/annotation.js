@@ -1,20 +1,19 @@
 import {logger} from '../utils/logger.js';
 import {getFlags, replaceFlags} from '../utils/string.js';
-import {Point} from '../math/point.js';
+import {Point, Point3D} from '../math/point.js';
 import {getOrientationName} from '../math/orientation.js';
 import {defaultToolOptions, toolOptions} from '../tools/toolOptions.js';
 import {guid} from '../math/stats.js';
 import {getUID} from '../dicom/dicomWriter.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D, Point3D} from '../math/point.js';
-import {Index} from '../math/index.js';
-import {Value} from '../math/value.js';
-import {ViewController} from '../app/viewController.js';
-import {PlaneHelper} from './planeHelper.js';
-import {DicomCode} from '../dicom/dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D} from '../math/point.js';
+ * @import {Index} from '../math/index.js';
+ * @import {Value} from '../math/value.js';
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {PlaneHelper} from './planeHelper.js';
+ * @import {DicomCode} from '../dicom/dicomCode.js';
+ */
 
 /**
  * Image annotation.
