@@ -4158,8 +4158,8 @@ __metadata:
   linkType: hard
 
 "clean-jsdoc-theme@npm:^4.3.0":
-  version: 4.3.0
-  resolution: "clean-jsdoc-theme@npm:4.3.0"
+  version: 4.3.2
+  resolution: "clean-jsdoc-theme@npm:4.3.2"
   dependencies:
     "@jsdoc/salty": "npm:^0.2.4"
     fs-extra: "npm:^10.1.0"
@@ -4169,7 +4169,7 @@ __metadata:
     showdown: "npm:^2.1.0"
   peerDependencies:
     jsdoc: ">=3.x <=4.x"
-  checksum: 10c0/b7cfb5c702b9868c9a9978d04558f19a7ced15c70849747eec500ab23518fac00c79f98039ad4ac2a38cac860497875a80e08025dee2d43dd67ae0455ae7de16
+  checksum: 10c0/01ea1885f452e64e84378a8bd30271b8b9ef5fc424db5eaa1c59b5416aa4632e165c4c312e834aecede6648103dfe2a0c33e4c21c60c30080839bee93b7e0693
   languageName: node
   linkType: hard
 
