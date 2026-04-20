@@ -3,20 +3,19 @@ import {
   getTouchPoints
 } from '../gui/generic.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {DragBehavior} from './behaviors/dragBehavior.js';
-import {HoverBehavior} from './behaviors/hoverBehavior.js';
-import {Point2D} from '../math/point.js';
-import {LayerGroup} from '../gui/layerGroup.js';
-import {WheelBehavior} from './behaviors/wheelBehavior.js';
 import {WheelTick} from './behaviors/wheelTick.js';
-import {DoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
-import {TapBehavior} from './behaviors/tapBehavior.js';
-import {TwoTouchBehavior} from './behaviors/twoTouchBehavior.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {App} from '../app/application.js';
+ * @import {DragBehavior} from './behaviors/dragBehavior.js';
+ * @import {HoverBehavior} from './behaviors/hoverBehavior.js';
+ * @import {Point2D} from '../math/point.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {WheelBehavior} from './behaviors/wheelBehavior.js';
+ * @import {DoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
+ * @import {TapBehavior} from './behaviors/tapBehavior.js';
+ * @import {TwoTouchBehavior} from './behaviors/twoTouchBehavior.js';
+ */
 
 /**
  * Mouse position and layer group from a DOM event targeting a view layer.

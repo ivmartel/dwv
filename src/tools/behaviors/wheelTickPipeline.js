@@ -1,11 +1,10 @@
 import {getLayerDetailsFromEvent} from '../../gui/layerGroup.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../../app/application.js';
-import {WheelBehavior} from './wheelBehavior.js';
-import {WheelTick} from './wheelTick.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../../app/application.js';
+ * @import {WheelBehavior} from './wheelBehavior.js';
+ * @import {WheelTick} from './wheelTick.js';
+ */
 
 /**
  * Wheel tick accumulation, `preventDefault`, then `behavior.onWheelTick`.

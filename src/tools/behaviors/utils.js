@@ -1,8 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {LayerGroup} from '../../gui/layerGroup.js';
-import {ViewLayer} from '../../gui/viewLayer.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {LayerGroup} from '../../gui/layerGroup.js';
+ * @import {ViewLayer} from '../../gui/viewLayer.js';
+ */
 
 /**
  * Active view layer, or the first monochrome view layer among active layers

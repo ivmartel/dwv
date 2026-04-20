@@ -1,8 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D} from '../../math/point.js';
-import {LayerGroup} from '../../gui/layerGroup.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D} from '../../math/point.js';
+ * @import {LayerGroup} from '../../gui/layerGroup.js';
+ */
 
 /**
  * Hover-only behaviour while the pointer is not dragging.

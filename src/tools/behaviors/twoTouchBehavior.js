@@ -1,11 +1,10 @@
 import {Line} from '../../math/line.js';
 import {logger} from '../../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {LayerGroup} from '../../gui/layerGroup.js';
-import {Point2D} from '../../math/point.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {LayerGroup} from '../../gui/layerGroup.js';
+ * @import {Point2D} from '../../math/point.js';
+ */
 
 import {getActiveOrDrawRefViewLayer} from './utils.js';
 

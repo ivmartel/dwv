@@ -4,10 +4,9 @@ import {
 import {logger} from '../../utils/logger.js';
 import {getActiveOrDrawRefViewLayer} from './utils.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {LayerGroup} from '../../gui/layerGroup.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {LayerGroup} from '../../gui/layerGroup.js';
+ */
 
 /**
  * Mouse wheel handling: subclasses may override {@link WheelBehavior#onWheel}

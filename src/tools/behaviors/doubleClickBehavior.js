@@ -7,13 +7,11 @@ import {
 } from './utils.js';
 import {logger} from '../../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../../app/application.js';
-import {LayerGroup} from '../../gui/layerGroup.js';
-import {Point2D} from '../../math/point.js';
-import {ViewLayer} from '../../gui/viewLayer.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../../app/application.js';
+ * @import {LayerGroup} from '../../gui/layerGroup.js';
+ * @import {Point2D} from '../../math/point.js';
+ */
 
 /**
  * Optional double-click handling for tools that forward `dblclick` into
