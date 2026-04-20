@@ -35,7 +35,7 @@ export class WheelBehavior {
 }
 
 /**
- * Slice / dimension scrolling on wheel ticks (extends {@link WheelBehavior}).
+ * Slice / dimension scrolling on wheel ticks.
  */
 export class ScrollWheelBehavior extends WheelBehavior {
 
