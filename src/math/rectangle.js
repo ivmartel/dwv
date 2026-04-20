@@ -2,12 +2,11 @@ import {Point2D} from './point.js';
 import {getStats} from './stats.js';
 import {Index} from './index.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController.js';
-import {Scalar2D} from './scalar.js';
-import {Value} from './value.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Scalar2D} from './scalar.js';
+ * @import {Value} from './value.js';
+ */
 
 /**
  * Mulitply the three inputs if the last two are not null.
@@ -190,7 +189,7 @@ export class Rectangle {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, Value>} A quantification object.
    */
   quantify(viewController, index, flags) {
     const spacing2D = viewController.get2DSpacing();

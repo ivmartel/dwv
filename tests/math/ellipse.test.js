@@ -12,7 +12,7 @@ describe('math', () => {
   /**
    * Tests for {@link Ellipse}.
    *
-   * @function module:tests/math~ellipse-class
+   * @function module:tests/math~ellipseClass
    */
   test('Ellipse class - #DWV-REQ-UI-07-003 Draw ellipse',
     () => {
@@ -50,7 +50,7 @@ describe('math', () => {
   /**
    * Tests for {@link Ellipse} quantification.
    *
-   * @function module:tests/math~ellipse-quantification
+   * @function module:tests/math~ellipseQuantification
    */
   test('Ellipse quantification - #DWV-REQ-UI-07-003 Draw ellipse',
     () => {

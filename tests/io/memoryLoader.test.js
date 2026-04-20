@@ -146,7 +146,7 @@ describe('io', () => {
   /**
    * Tests for {@link MemoryLoader} events with single frame data.
    *
-   * @function module:tests/io~memoryloader-events-single-frame
+   * @function module:tests/io~memoryloaderEventsSingleFrame
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -217,7 +217,7 @@ describe('io', () => {
   /**
    * Tests for {@link MemoryLoader} events with multi frame data.
    *
-   * @function module:tests/io~memoryloader-events-multi-frame
+   * @function module:tests/io~memoryloaderEventsMultiFrame
    */
   test(
     'MemoryLoader events multi frame - ' +
@@ -249,7 +249,7 @@ describe('io', () => {
    * Tests for {@link MemoryLoader} events with zipped data.
    * TODO check all good...
    *
-   * @function module:tests/io~memoryloader-events-zip
+   * @function module:tests/io~memoryloaderEventsZip
    */
   test(
     'MemoryLoader events zip - #DWV-REQ-IO-04-001 DICOM load start event',
@@ -298,7 +298,7 @@ describe('io', () => {
   /**
    * Tests for {@link UrlsLoader} events with DCMDIR data.
    *
-   * @function module:tests/io~urlsloader-events
+   * @function module:tests/io~urlsloaderEvents
    */
   // TODO...
   // test('Test UrlsLoader events for DCMDIR data.', () => {

@@ -1,10 +1,9 @@
 // example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Scalar3D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Scalar3D} from '../math/scalar.js';
+ */
 
 /**
  * RGB colour class.

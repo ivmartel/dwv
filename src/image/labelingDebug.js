@@ -1,9 +1,8 @@
 import {Point2D} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Line} from '../math/line.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Line} from '../math/line.js';
+ */
 
 /**
  * Helper for the LabelingFilter, provides a debug display for diameters and

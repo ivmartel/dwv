@@ -27,7 +27,7 @@ describe('image', () => {
   /**
    * Tests for {@link LabelingFilter}.
    *
-   * @function module:tests/image~labelingfilter-class
+   * @function module:tests/image~labelingfilterClass
    */
   test('LabelingFilter class', () => {
     const labelingFilter = new LabelingFilter();

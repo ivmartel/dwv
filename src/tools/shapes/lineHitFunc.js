@@ -1,11 +1,10 @@
 import {getPerpendicularLine} from '../../math/line.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import Konva from 'konva';
-import {Line} from '../../math/line.js';
-import {Scalar2D} from '../../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import Konva from 'konva';
+ * @import {Line} from '../../math/line.js';
+ * @import {Scalar2D} from '../../math/scalar.js';
+ */
 
 /**
  * Apply a wider quadrilateral hit area to an open Konva.Line.

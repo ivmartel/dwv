@@ -3,11 +3,10 @@ import {
   getDicomSopInstanceReferenceItem
 } from './dicomSopInstanceReference.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-import {SopInstanceReference} from './dicomSopInstanceReference.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {SopInstanceReference} from './dicomSopInstanceReference.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -56,7 +55,7 @@ export class ImageReference {
 /**
  * Get a reference object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {ImageReference} A reference object.
  */
 export function getImageReference(dataElements) {
@@ -82,7 +81,7 @@ export function getImageReference(dataElements) {
  * Get a simple dicom element item from a reference object.
  *
  * @param {ImageReference} ref The reference object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomImageReferenceItem(ref) {
   // dicom item (tags are in group/element order)

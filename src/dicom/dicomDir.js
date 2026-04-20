@@ -1,10 +1,9 @@
 import {DicomParser} from './dicomParser.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -43,7 +42,7 @@ export function getFileListFromDicomDir(data) {
 /**
  * Get a DICOMDIR file list.
  *
- * @param {Object<string, DataElement>} dicomElements The dicom elements.
+ * @param {Record<string, DataElement>} dicomElements The dicom elements.
  * @returns {Array|undefined} The file list as an array ordered by
  *   STUDY > SERIES > IMAGES.
  */

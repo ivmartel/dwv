@@ -6,10 +6,9 @@ import {
 } from './behaviors/doubleClickBehavior.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ */
 
 /**
  * WindowLevel tool: handle window/level related events.

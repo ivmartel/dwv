@@ -2,10 +2,9 @@ import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {OpacityDragBehavior} from './behaviors/dragBehavior.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ */
 
 /**
  * Opacity class.

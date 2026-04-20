@@ -196,7 +196,7 @@ describe('image', () => {
   /**
    * Tests for {@link simpleRange}.
    *
-   * @function module:tests/image~simplerange-iterator
+   * @function module:tests/image~simplerangeIterator
    */
   test('simpleRange iterator', () => {
     const dataAccessor = function (offset) {
@@ -234,7 +234,7 @@ describe('image', () => {
   /**
    * Tests for {@link range}.
    *
-   * @function module:tests/image~range-iterator-axial
+   * @function module:tests/image~rangeIteratorAxial
    */
   test('Range iterator axial', () => {
     // test data
@@ -285,7 +285,7 @@ describe('image', () => {
   /**
    * Tests for {@link range}.
    *
-   * @function module:tests/image~range-iterator-coronal
+   * @function module:tests/image~rangeIteratorCoronal
    */
   test('Range iterator coronal', () => {
     // test data
@@ -341,7 +341,7 @@ describe('image', () => {
   /**
    * Tests for {@link range}.
    *
-   * @function module:tests/image~range-iterator-sagittal
+   * @function module:tests/image~rangeIteratorSagittal
    */
   test('Range iterator sagittal', () => {
     // test data
@@ -396,7 +396,7 @@ describe('image', () => {
   /**
    * Tests for {@link simpleRange3d}.
    *
-   * @function module:tests/image~rgb-iterator
+   * @function module:tests/image~rgbIterator
    */
   test('RGB iterator', () => {
     const dataAccessor = function (offset) {
@@ -571,7 +571,7 @@ describe('image', () => {
   /**
    * Tests for {@link rangeRegion}.
    *
-   * @function module:tests/image~region-iterator
+   * @function module:tests/image~regionIterator
    */
   test('Region iterator', () => {
     const dataAccessor = function (offset) {

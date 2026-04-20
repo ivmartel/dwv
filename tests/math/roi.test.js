@@ -11,7 +11,7 @@ describe('math', () => {
   /**
    * Tests for {@link ROI}.
    *
-   * @function module:tests/math~roi-class
+   * @function module:tests/math~roiClass
    */
   test('ROI class - #DWV-REQ-UI-07-008 Draw ROI', () => {
     const r0 = new ROI();

@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -52,7 +51,7 @@ export class SpatialCoordinate3D {
 /**
  * Get a scoord3d object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {SpatialCoordinate3D} A scoord3d object.
  */
 export function getSpatialCoordinate3D(dataElements) {
@@ -79,7 +78,7 @@ export function getSpatialCoordinate3D(dataElements) {
  * Get a simple dicom element item from a scoord3d object.
  *
  * @param {SpatialCoordinate3D} scoord The scoord3d object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomSpatialCoordinate3DItem(scoord) {
   // dicom item (tags are in group/element order)

@@ -16,20 +16,16 @@ import {ViewFactory} from './viewFactory.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {getSliceIterator} from '../image/iterator.js';
 import {ListenerHandler} from '../utils/listen.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
-import {ColourMap} from './luts.js';
-import {Matrix33} from '../math/matrix.js';
-import {
-  Point,
-  Point3D
-} from '../math/point.js';
-import {DataElement} from '../dicom/dataElement.js';
 import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {Image} from './image.js';
+ * @import {ColourMap} from './luts.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Point, Point3D} from '../math/point.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 export const MAX_CONTOUR_SIZE = 10;
 
@@ -51,7 +47,7 @@ export const viewEventNames = [
 /**
  * Create a View from DICOM elements and image.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @param {Image} image The associated image.
  * @returns {View} The View object.
  */

@@ -50,7 +50,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link DicomCode} using simple DICOM data.
    *
-   * @function module:tests/dicom~dicom-code-class
+   * @function module:tests/dicom~dicomCodeClass
    */
   test('DICOM code class', () => {
     const meaning0 = 'code0';

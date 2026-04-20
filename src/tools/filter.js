@@ -6,10 +6,9 @@ import {
 } from '../image/filter.js';
 import {RunFilterCommand} from '../command/runFilterCommand.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ */
 
 /**
  * Filter tool.

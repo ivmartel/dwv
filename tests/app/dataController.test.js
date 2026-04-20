@@ -19,7 +19,7 @@ describe('app', () => {
   /**
    * Tests for {@link DataController}.
    *
-   * @function module:tests/app~datacontroller-class
+   * @function module:tests/app~datacontrollerClass
    */
   test('DataController class', () => {
     const dc0 = new DataController();

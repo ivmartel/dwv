@@ -14,13 +14,12 @@ import {
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {Scalar2D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {Scalar2D} from '../math/scalar.js';
+ */
 
 /**
  * The magic wand namespace.

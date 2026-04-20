@@ -1,5 +1,6 @@
 import {Index} from '../math/index.js';
 import {Vector3D} from '../math/vector.js';
+import {Point2D} from '../math/point.js';
 import {Point3D} from '../math/point.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {Size} from '../image/size.js';
@@ -15,16 +16,15 @@ import {
 } from '../image/iterator.js';
 import {PositionHelper} from '../image/positionHelper.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {View} from '../image/view.js';
-import {WindowLevel} from '../image/windowLevel.js';
-import {Point, Point2D} from '../math/point.js';
-import {Scalar2D} from '../math/scalar.js';
-import {Matrix33} from '../math/matrix.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {View} from '../image/view.js';
+ * @import {WindowLevel} from '../image/windowLevel.js';
+ * @import {Point} from '../math/point.js';
+ * @import {Scalar2D} from '../math/scalar.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
+ */
 
 /**
  * View controller.

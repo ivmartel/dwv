@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WindowLevel} from '../image/windowLevel.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WindowLevel} from '../image/windowLevel.js';
+ */
 
 /**
  * Overridalbe custom object for client defined items.
@@ -13,7 +12,7 @@ export const custom = {
    * No need to redefine all, just overrides is enough. Defaults
    * are used if `custom.wlPresets[modality]` is undefined.
    *
-   * @type {Object.<string, Object.<string, WindowLevel>>}
+   * @type {Record<string, Record<string, WindowLevel>>}
    */
   wlPresets: undefined,
 
@@ -23,7 +22,7 @@ export const custom = {
    * No need to redefine all, just overrides is enough. Defaults
    * are used if `custom.labelTexts[shapeName]` is undefined.
    *
-   * @type {Object.<string, Object.<string, string>>}
+   * @type {Record<string, Record<string, string>>}
    */
   labelTexts: undefined,
 
@@ -47,7 +46,7 @@ export const custom = {
   /**
    * Get the volume id from a list of dicom tags.
    *
-   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {number|undefined} The id value if available.
    */
   getVolumeIdTagValue: undefined,
@@ -55,7 +54,7 @@ export const custom = {
   /**
    * Get the volume id from a list of dicom tags parsed after load finishes.
    *
-   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {number|undefined} The id value if available.
    */
   getPostLoadVolumeIdTagValue: undefined,
@@ -64,7 +63,7 @@ export const custom = {
    * Get the pixel data unit from a list of dicom tags.
    * Not used for PET data with SUV values.
    *
-   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {string|undefined} The unit value if available.
    */
   getTagPixelUnit: undefined,

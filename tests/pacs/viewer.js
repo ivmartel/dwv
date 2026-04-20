@@ -22,10 +22,9 @@ import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
 import {overlayConfig} from './overlays.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewConfig} from '../../src/app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewConfig} from '../../src/app/application.js';
+ */
 
 
 // global vars
@@ -545,7 +544,7 @@ function removePostLoadListeners() {
 /**
  * Merge with first app config.
  *
- * @param {Object<string, ViewConfig[]>} dataViewConfigs A list
+ * @param {Record<string, ViewConfig[]>} dataViewConfigs A list
  *   of data view configs.
  */
 function mergeAppConfig(dataViewConfigs) {

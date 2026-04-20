@@ -49,10 +49,9 @@ import {Annotation} from './annotation.js';
 import {AnnotationGroup} from './annotationGroup.js';
 import {Point2D, Point3D} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -150,7 +149,7 @@ export class AnnotationGroupFactory {
   /**
    * Check if input elements contain a dwv 0.34 annotation.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a dwv 0.34 annotation.
    */
   #isDwv034AnnotationDicomSR(dataElements) {
@@ -181,7 +180,7 @@ export class AnnotationGroupFactory {
    * Check if input elements contain a TID 1500 annotation.
    * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1500}.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 1500 annotation.
    */
   #isTid1500AnnotationDicomSR(dataElements) {
@@ -233,7 +232,7 @@ export class AnnotationGroupFactory {
    * Check if input elements contain a TID 4100 template.
    * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_4100}.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 4100 template.
    */
   #isTid4100DicomSR(dataElements) {
@@ -245,7 +244,7 @@ export class AnnotationGroupFactory {
   /**
    * Check dicom elements.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
    */
   checkElements(dataElements) {
@@ -1034,7 +1033,7 @@ export class AnnotationGroupFactory {
    * Add root meta data to an annotation group.
    *
    * @param {AnnotationGroup} annotationGroup The group to add meta to.
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    */
   #addMetaToAnnotationGroup(annotationGroup, dataElements) {
     const safeGetLocal = function (key) {
@@ -1082,7 +1081,7 @@ export class AnnotationGroupFactory {
   /**
    * Get an {@link AnnotationGroup} object from the read DICOM file.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @returns {AnnotationGroup} A new annotation group.
    * @throws {Error} Error for missing or wrong data.
    */
@@ -1125,7 +1124,7 @@ export class AnnotationGroupFactory {
   /**
    * Get an {@link CADReport} object from the read DICOM file.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @returns {CADReport|undefined} A new CAD report.
    */
   createCADReport(dataElements) {
@@ -1409,8 +1408,8 @@ export class AnnotationGroupFactory {
    * TID 1500 template.
    *
    * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {Object<string, any>} [extraTags] Optional list of extra tags.
-   * @returns {Object<string, DataElement>} A list of dicom elements.
+   * @param {Record<string, any>} [extraTags] Optional list of extra tags.
+   * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(annotationGroup, extraTags) {
     let tags = annotationGroup.getMeta();
@@ -1665,8 +1664,8 @@ export class AnnotationGroupFactory {
    *   the TID 4100 template.
    *
    * @param {CADReport} report The CAD report.
-   * @param {Object<string, any>} [extraTags] Optional list of extra tags.
-   * @returns {Object<string, DataElement>} A list of dicom elements.
+   * @param {Record<string, any>} [extraTags] Optional list of extra tags.
+   * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicomCADReport(report, extraTags) {
     // first group as tag base

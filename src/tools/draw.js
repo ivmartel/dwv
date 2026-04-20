@@ -19,16 +19,14 @@ import {runWheelTickPipeline} from './behaviors/wheelTickPipeline.js';
 // external
 import Konva from 'konva';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {Style} from '../gui/style.js';
-import {LayerGroup} from '../gui/layerGroup.js';
-import {Point2D} from '../math/point.js';
-import {DrawLayer} from '../gui/drawLayer.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {Style} from '../gui/style.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {Point2D} from '../math/point.js';
+ * @import {DrawLayer} from '../gui/drawLayer.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ */
 
 /**
  * Drawing tool.

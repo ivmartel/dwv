@@ -6,10 +6,9 @@ import {
 import {ZoomWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ */
 
 /**
  * ZoomAndPan class.

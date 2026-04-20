@@ -5,10 +5,9 @@ import {PlayDoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
 import {TooltipHoverBehavior} from './behaviors/hoverBehavior.js';
 import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ */
 
 /**
  * Scroll class.

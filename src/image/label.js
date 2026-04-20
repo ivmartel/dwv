@@ -1,8 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point} from '../math/point.js';
-import {Value} from '../math/value.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point} from '../math/point.js';
+ * @import {Value} from '../math/value.js';
+ */
 
 /**
  * Diameter type.

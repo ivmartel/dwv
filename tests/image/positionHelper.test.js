@@ -81,7 +81,7 @@ describe('image', () => {
   /**
    * Tests that getGeometry returns the image geometry.
    *
-   * @function module:tests/image~position-helper-get-geometry
+   * @function module:tests/image~positionHelperGetGeometry
    */
   test('PositionHelper getGeometry returns the image geometry', () => {
     assert.equal(helper.getGeometry(), geometry);
@@ -90,7 +90,7 @@ describe('image', () => {
   /**
    * Tests that getScrollDimIndex returns the view scroll dim.
    *
-   * @function module:tests/image~position-helper-get-scroll-dim
+   * @function module:tests/image~positionHelperGetScrollDim
    */
   test('PositionHelper getScrollDimIndex returns scroll dim from view', () => {
     assert.equal(helper.getScrollDimIndex(), 2);
@@ -99,7 +99,7 @@ describe('image', () => {
   /**
    * Tests getMaximumDimValue for each axis.
    *
-   * @function module:tests/image~position-helper-get-max-dim-value
+   * @function module:tests/image~positionHelperGetMaxDimValue
    */
   test('PositionHelper getMaximumDimValue returns size - 1', () => {
     assert.equal(helper.getMaximumDimValue(0), 2, 'x: 3-1');
@@ -110,7 +110,7 @@ describe('image', () => {
   /**
    * Tests that getMaximumScrollValue returns the max along the scroll dim.
    *
-   * @function module:tests/image~position-helper-get-max-scroll-value
+   * @function module:tests/image~positionHelperGetMaxScrollValue
    */
   test('PositionHelper getMaximumScrollValue returns max scroll index', () => {
     assert.equal(helper.getMaximumScrollValue(), 4, 'z max = 5-1');
@@ -123,7 +123,7 @@ describe('image', () => {
   /**
    * Tests that getCurrentPosition matches the initial position.
    *
-   * @function module:tests/image~position-helper-get-current-position
+   * @function module:tests/image~positionHelperGetCurrentPosition
    */
   test('PositionHelper getCurrentPosition reflects initial index', () => {
     const pos = helper.getCurrentPosition();
@@ -136,7 +136,7 @@ describe('image', () => {
   /**
    * Tests that getCurrentIndex matches the initial index.
    *
-   * @function module:tests/image~position-helper-get-current-index
+   * @function module:tests/image~positionHelperGetCurrentIndex
    */
   test('PositionHelper getCurrentIndex matches initial index', () => {
     const idx = helper.getCurrentIndex();
@@ -148,7 +148,7 @@ describe('image', () => {
   /**
    * Tests getCurrentPositionDimValue for each axis.
    *
-   * @function module:tests/image~position-helper-get-current-dim-value
+   * @function module:tests/image~positionHelperGetCurrentDimValue
    */
   test(
     'PositionHelper getCurrentPositionDimValue returns index per axis',
@@ -162,7 +162,7 @@ describe('image', () => {
   /**
    * Tests that getCurrentPositionScrollValue returns the scroll-axis index.
    *
-   * @function module:tests/image~position-helper-get-current-scroll-value
+   * @function module:tests/image~positionHelperGetCurrentScrollValue
    */
   test('PositionHelper getCurrentPositionScrollValue returns z index', () => {
     assert.equal(helper.getCurrentPositionScrollValue(), 3);
@@ -171,7 +171,7 @@ describe('image', () => {
   /**
    * Tests getCurrentPositionAtDimValue: modifies one dim, keeps others.
    *
-   * @function module:tests/image~position-helper-get-current-at-dim-value
+   * @function module:tests/image~positionHelperGetCurrentAtDimValue
    */
   test(
     'PositionHelper getCurrentPositionAtDimValue replaces one axis',
@@ -186,7 +186,7 @@ describe('image', () => {
   /**
    * Tests getCurrentPositionAtScrollValue: modifies the scroll axis.
    *
-   * @function module:tests/image~position-helper-get-current-at-scroll-value
+   * @function module:tests/image~positionHelperGetCurrentAtScrollValue
    */
   test(
     'PositionHelper getCurrentPositionAtScrollValue replaces scroll axis',
@@ -203,7 +203,7 @@ describe('image', () => {
   /**
    * Tests that setCurrentPosition updates the current position.
    *
-   * @function module:tests/image~position-helper-set-position
+   * @function module:tests/image~positionHelperSetPosition
    */
   test('PositionHelper setCurrentPosition updates position', () => {
     const newPos = geometry.indexToWorld(new Index([0, 0, 0]));
@@ -215,7 +215,7 @@ describe('image', () => {
   /**
    * Tests that setCurrentPosition with undefined returns false without update.
    *
-   * @function module:tests/image~position-helper-set-position-undefined
+   * @function module:tests/image~positionHelperSetPositionUndefined
    */
   test('PositionHelper setCurrentPosition with undefined returns false', () => {
     const res = helper.setCurrentPosition(undefined);
@@ -232,7 +232,7 @@ describe('image', () => {
   /**
    * Tests isPositionInBounds for positions inside and outside the geometry.
    *
-   * @function module:tests/image~position-helper-in-bounds
+   * @function module:tests/image~positionHelperInBounds
    */
   test('PositionHelper isPositionInBounds returns true/false correctly', () => {
     // isPositionInBounds only checks the scroll dim (z)
@@ -245,7 +245,7 @@ describe('image', () => {
   /**
    * Tests setCurrentPositionSafe rejects an out-of-bounds position.
    *
-   * @function module:tests/image~position-helper-set-safe
+   * @function module:tests/image~positionHelperSetSafe
    */
   test('PositionHelper setCurrentPositionSafe rejects out-of-bounds', () => {
     const outOfBounds = geometry.indexToWorld(new Index([0, 0, 5]));
@@ -264,7 +264,7 @@ describe('image', () => {
    * Tests getIncrementPosition and getDecrementPosition return
    * the neighbouring world points without moving.
    *
-   * @function module:tests/image~position-helper-get-inc-dec
+   * @function module:tests/image~positionHelperGetIncDec
    */
   test(
     'PositionHelper getIncrementPosition and getDecrementPosition',
@@ -283,7 +283,7 @@ describe('image', () => {
   /**
    * Tests that incrementPosition moves when in bounds and fails at the max.
    *
-   * @function module:tests/image~position-helper-increment
+   * @function module:tests/image~positionHelperIncrement
    */
   test(
     'PositionHelper incrementPosition: moves in bounds, fails at max',
@@ -300,7 +300,7 @@ describe('image', () => {
   /**
    * Tests that decrementPosition moves when in bounds and fails at zero.
    *
-   * @function module:tests/image~position-helper-decrement
+   * @function module:tests/image~positionHelperDecrement
    */
   test('PositionHelper decrementPosition: moves in bounds, fails at 0', () => {
     // Start at z=3 — three decrements possible
@@ -315,7 +315,7 @@ describe('image', () => {
   /**
    * Tests incrementPositionAlongScroll and decrementPositionAlongScroll.
    *
-   * @function module:tests/image~position-helper-scroll-inc-dec
+   * @function module:tests/image~positionHelperScrollIncDec
    */
   test('PositionHelper increment/decrementPositionAlongScroll', () => {
     assert.ok(helper.incrementPositionAlongScroll(), 'increment scroll z→4');
@@ -331,7 +331,7 @@ describe('image', () => {
   /**
    * Tests that merge throws when the two helpers have different scroll dims.
    *
-   * @function module:tests/image~position-helper-merge-incompatible
+   * @function module:tests/image~positionHelperMergeIncompatible
    */
   test('PositionHelper merge throws on incompatible scroll dims', () => {
     const {helper: h1} = makeHelper([3, 3, 2], [0, 0, 0], 2);
@@ -342,7 +342,7 @@ describe('image', () => {
   /**
    * Tests that merge extends the geometry along the scroll dimension.
    *
-   * @function module:tests/image~position-helper-merge-compatible
+   * @function module:tests/image~positionHelperMergeCompatible
    */
   test('PositionHelper merge extends the scroll size', () => {
     // Two single-slice 3×3 geometries at adjacent z positions

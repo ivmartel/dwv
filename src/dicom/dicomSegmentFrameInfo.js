@@ -35,7 +35,7 @@ const TagKeys = {
 /**
  * Check the dimension organization from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The root dicom element.
+ * @param {Record<string, DataElement>} dataElements The root dicom element.
  * @returns {object} The dimension organizations and indices.
  */
 export function getDimensionOrganization(dataElements) {
@@ -160,7 +160,7 @@ export class DicomSegmentFrameInfo {
 /**
  * Get a frame information object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {DicomSegmentFrameInfo} A frame information object.
  */
 export function getSegmentFrameInfo(dataElements) {
@@ -298,7 +298,7 @@ export function isEqualSegmentFrameInfo(dsfi1, dsfi2) {
  * Get a dicom item from a frame information object.
  *
  * @param {object} frameInfo The frame information object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomSegmentFrameInfoItem(frameInfo) {
   const item = {

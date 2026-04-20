@@ -54,7 +54,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link DicomSRContent} toString and hasHeader.
    *
-   * @function module:tests/dicom~dicomsrcontent-tostring-hasheader
+   * @function module:tests/dicom~dicomsrcontentTostringHasheader
    */
   test('DicomSRContent toString hasHeader', () => {
     const content = new DicomSRContent(ValueTypes.text);
@@ -173,7 +173,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getSRContent} with code value type.
    *
-   * @function module:tests/dicom~getsrcontent-code
+   * @function module:tests/dicom~getsrcontentCode
    */
   test('getSRContent CODE', () => {
     const vt = new DataElement('CS');

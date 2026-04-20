@@ -36,17 +36,16 @@ import {logger} from '../utils/logger.js';
 import {arraySortEquals} from '../utils/array.js';
 import {Size} from './size.js';
 import {ColourMap} from './luts.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {Spacing} from '../image/spacing.js';
 import {DataElement} from '../dicom/dataElement.js';
-import {MaskSegment} from '../dicom/dicomSegment.js';
-/* eslint-enable no-unused-vars */
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Spacing} from '../image/spacing.js';
+ * @import {MaskSegment} from '../dicom/dicomSegment.js';
+ */
+
+/**
+ * @typedef {Record<string, DataElement>} DataElements
  */
 
 /**
@@ -379,7 +378,7 @@ export class MaskFactory {
   /**
    * Check dicom elements.
    *
-   * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
+   * @param {Record<string, DataElement>} _dicomElements The DICOM tags.
    * @returns {string|undefined} A possible warning.
    */
   checkElements(_dicomElements) {
@@ -389,7 +388,7 @@ export class MaskFactory {
   /**
    * Get an {@link Image} object from the read DICOM file.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @param {Uint8Array | Int8Array |
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
@@ -827,8 +826,8 @@ export class MaskFactory {
    * @param {Image} image The mask image.
    * @param {MaskSegment[]} segments The mask segments.
    * @param {Image} sourceImage The source image.
-   * @param {Object<string, any>} [extraTags] Optional list of extra tags.
-   * @returns {Object<string, DataElement>} A list of dicom elements.
+   * @param {Record<string, any>} [extraTags] Optional list of extra tags.
+   * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(
     image,

@@ -358,7 +358,7 @@ describe('utils', () => {
   /**
    * Tests for {@link parseMultipart}.
    *
-   * @function module:tests/utils~parse-multipart
+   * @function module:tests/utils~parseMultipart
    */
   test('Parse multipart - #DWV-REQ-IO-02-002 Load DICOM multipart URL',
     () => {

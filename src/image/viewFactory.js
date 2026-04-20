@@ -2,16 +2,15 @@ import {custom} from '../app/custom.js';
 import {View} from './view.js';
 import {WindowLevel} from './windowLevel.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from './image.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * List of default window level presets.
  *
- * @type {Object.<string, Object.<string, WindowLevel>>}
+ * @type {Record<string, Record<string, WindowLevel>>}
  */
 const defaultWlPresets = {
   CT: {
@@ -31,7 +30,7 @@ export class ViewFactory {
   /**
    * Get an View object from the read DICOM file.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @param {Image} image The associated image.
    * @returns {View} The new View.
    */

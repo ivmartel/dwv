@@ -1,12 +1,11 @@
+import {Point2D} from '../../math/point.js';
 // external
 import Konva from 'konva';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D} from '../../math/point.js';
-import {Style} from '../../gui/style.js';
-import {Annotation} from '../../image/annotation.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Style} from '../../gui/style.js';
+ * @import {Annotation} from '../../image/annotation.js';
+ */
 
 /**
  * Label factory to create and update shape label.

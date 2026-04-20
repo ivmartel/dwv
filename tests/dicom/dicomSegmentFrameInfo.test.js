@@ -56,7 +56,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link DicomSegmentFrameInfo} using simple DICOM data.
    *
-   * @function module:tests/dicom~dicom-segment-frame-info-class
+   * @function module:tests/dicom~dicomSegmentFrameInfoClass
    */
   test('DICOM segment frame info class', () => {
     const dimIndex0 = [1, 1];

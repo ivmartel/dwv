@@ -10,10 +10,9 @@ import {logger} from '../../utils/logger.js';
 import {Anchor} from './anchor.js';
 import {defaultLabelTexts} from './drawBounds.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Annotation} from '../../image/annotation.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Annotation} from '../../image/annotation.js';
+ */
 
 /**
  * Get the label text expression for a named shape, honouring the custom

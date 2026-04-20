@@ -1,13 +1,12 @@
 import {getStats} from './stats.js';
 import {Index} from './index.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point.js';
-import {Value} from './value.js';
-import {ViewController} from '../app/viewController.js';
-import {Scalar2D} from './scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D} from '../math/point.js';
+ * @import {Value} from './value.js';
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Scalar2D} from './scalar.js';
+ */
 
 /**
  * Mulitply the three inputs if the last two are not null.
@@ -183,7 +182,7 @@ export class Ellipse {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, Value>} A quantification object.
    */
   quantify(viewController, index, flags) {
     // shape quantification

@@ -15,17 +15,16 @@ import {MAX_CONTOUR_SIZE} from './view.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Geometry} from './geometry.js';
-import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix.js';
-import {NumberRange} from '../math/stats.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {RGB} from '../utils/colour.js';
-import {ColourMap} from './luts.js';
-import {Point} from '../math/point.js';
-import {Label} from './label.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Geometry} from './geometry.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {NumberRange} from '../math/stats.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {RGB} from '../utils/colour.js';
+ * @import {ColourMap} from './luts.js';
+ * @import {Point} from '../math/point.js';
+ * @import {Label} from './label.js';
+ */
 
 const ML_PER_MM = 0.001; // ml/mm^3
 
@@ -73,7 +72,7 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
 /**
  * Create an Image from DICOM elements.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The Image object.
  */
 export function createImage(elements) {
@@ -88,7 +87,7 @@ export function createImage(elements) {
 /**
  * Create a mask Image from DICOM elements.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The mask Image object.
  */
 export function createMaskImage(elements) {
@@ -267,7 +266,7 @@ export class Image {
   /**
    * Meta information.
    *
-   * @type {Object<string, any>}
+   * @type {Record<string, any>}
    */
   #meta = {};
 
@@ -665,7 +664,7 @@ export class Image {
   /**
    * Get the meta information of the image.
    *
-   * @returns {Object<string, any>} The meta information of the image.
+   * @returns {Record<string, any>} The meta information of the image.
    */
   getMeta() {
     return this.#meta;
@@ -674,7 +673,7 @@ export class Image {
   /**
    * Set the meta information of the image.
    *
-   * @param {Object<string, any>} rhs The meta information of the image.
+   * @param {Record<string, any>} rhs The meta information of the image.
    */
   setMeta(rhs) {
     this.#meta = rhs;

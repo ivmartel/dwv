@@ -953,7 +953,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.1 containing a line.
    *
-   * @function module:tests/state~read-v01-state-line
+   * @function module:tests/state~readV01StateLine
    */
   test('Read v01 state line', () => {
     testState(v01Line, '0.1', 'line');
@@ -962,7 +962,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.1 containing a roi.
    *
-   * @function module:tests/state~read-v01-state-roi
+   * @function module:tests/state~readV01StateRoi
    */
   test('Read v01 state roi', () => {
     testState(v01Roi, '0.1', 'roi');
@@ -971,7 +971,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.1 containing an ellipse.
    *
-   * @function module:tests/state~read-v01-state-ellipse
+   * @function module:tests/state~readV01StateEllipse
    */
   test('Read v01 state ellipse', () => {
     testState(v01Ellipse, '0.1', 'ellipse');
@@ -980,7 +980,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.1 containing a protractor.
    *
-   * @function module:tests/state~read-v01-state-protractor
+   * @function module:tests/state~readV01StateProtractor
    */
   test('Read v01 state protractor', () => {
     testState(v01Protractor, '0.1', 'protractor');
@@ -989,7 +989,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.1 containing a rectangle.
    *
-   * @function module:tests/state~read-v01-state-rectangle
+   * @function module:tests/state~readV01StateRectangle
    */
   test('Read v01 state rectangle', () => {
     testState(v01Rectangle, '0.1', 'rectangle');
@@ -998,7 +998,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.1 containing a multi slice ruler.
    *
-   * @function module:tests/state~read-v01-state-line-multi-slice
+   * @function module:tests/state~readV01StateLineMultiSlice
    */
   test('Read v01 state line multi-slice', () => {
     testState(v01LineMulti, '0.1', 'line_multi-slice');
@@ -1007,7 +1007,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing an arrow.
    *
-   * @function module:tests/state~read-v02-state-arrow
+   * @function module:tests/state~readV02StateArrow
    */
   test('Read v02 state arrow', () => {
     testState(v02Arrow, '0.2', 'arrow');
@@ -1016,7 +1016,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing a ruler.
    *
-   * @function module:tests/state~read-v02-state-ruler
+   * @function module:tests/state~readV02StateRuler
    */
   test('Read v02 state ruler', () => {
     testState(v02Ruler, '0.2', 'ruler');
@@ -1025,7 +1025,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing a roi.
    *
-   * @function module:tests/state~read-v02-state-roi
+   * @function module:tests/state~readV02StateRoi
    */
   test('Read v02 state roi', () => {
     testState(v02Roi, '0.2', 'roi');
@@ -1034,7 +1034,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing a hand draw.
    *
-   * @function module:tests/state~read-v02-state-hand
+   * @function module:tests/state~readV02StateHand
    */
   test('Read v02 state hand', () => {
     testState(v02Hand, '0.2', 'hand');
@@ -1043,7 +1043,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing an ellipse.
    *
-   * @function module:tests/state~read-v02-state-ellipse
+   * @function module:tests/state~readV02StateEllipse
    */
   test('Read v02 state ellipse', () => {
     testState(v02Ellipse, '0.2', 'ellipse');
@@ -1052,7 +1052,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing a protractor.
    *
-   * @function module:tests/state~read-v02-state-protractor
+   * @function module:tests/state~readV02StateProtractor
    */
   test('Read v02 state protractor', () => {
     testState(v02Protractor, '0.2', 'protractor');
@@ -1061,7 +1061,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing a rectangle.
    *
-   * @function module:tests/state~read-v02-state-rectangle
+   * @function module:tests/state~readV02StateRectangle
    */
   test('Read v02 state rectangle', () => {
     testState(v02Rectangle, '0.2', 'rectangle');
@@ -1070,7 +1070,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.2 containing a multi slice ruler.
    *
-   * @function module:tests/state~read-v02-state-ruler-multi-slice
+   * @function module:tests/state~readV02StateRulerMultiSlice
    */
   test('Read v02 state ruler multi-slice', () => {
     testState(v02RulerMulti, '0.2', 'ruler_multi-slice');
@@ -1079,7 +1079,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing an arrow.
    *
-   * @function module:tests/state~read-v03-state-arrow
+   * @function module:tests/state~readV03StateArrow
    */
   test('Read v03 state arrow', () => {
     testState(v03Arrow, '0.3', 'arrow');
@@ -1088,7 +1088,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing a ruler.
    *
-   * @function module:tests/state~read-v03-state-ruler
+   * @function module:tests/state~readV03StateRuler
    */
   test('Read v03 state ruler', () => {
     testState(v03Ruler, '0.3', 'ruler');
@@ -1097,7 +1097,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing a roi.
    *
-   * @function module:tests/state~read-v03-state-roi
+   * @function module:tests/state~readV03StateRoi
    */
   test('Read v03 state roi', () => {
     testState(v03Roi, '0.3', 'roi');
@@ -1106,7 +1106,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing a hand draw.
    *
-   * @function module:tests/state~read-v03-state-hand
+   * @function module:tests/state~readV03StateHand
    */
   test('Read v03 state hand', () => {
     testState(v03Hand, '0.3', 'hand');
@@ -1115,7 +1115,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing an ellipse.
    *
-   * @function module:tests/state~read-v03-state-ellipse
+   * @function module:tests/state~readV03StateEllipse
    */
   test('Read v03 state ellipse', () => {
     testState(v03Ellipse, '0.3', 'ellipse');
@@ -1124,7 +1124,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing a protractor.
    *
-   * @function module:tests/state~read-v03-state-protractor
+   * @function module:tests/state~readV03StateProtractor
    */
   test('Read v03 state protractor', () => {
     testState(v03Protractor, '0.3', 'protractor');
@@ -1133,7 +1133,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing a rectangle.
    *
-   * @function module:tests/state~read-v03-state-rectangle
+   * @function module:tests/state~readV03StateRectangle
    */
   test('Read v03 state rectangle', () => {
     testState(v03Rectangle, '0.3', 'rectangle');
@@ -1142,7 +1142,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.3 containing a multi slice ruler.
    *
-   * @function module:tests/state~read-v03-state-ruler-multi-slice
+   * @function module:tests/state~readV03StateRulerMultiSlice
    */
   test('Read v03 state ruler multi-slice', () => {
     testState(v03RulerMulti, '0.3', 'ruler_multi-slice');
@@ -1151,7 +1151,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing an arrow.
    *
-   * @function module:tests/state~read-v04-state-arrow
+   * @function module:tests/state~readV04StateArrow
    */
   test('Read v04 state arrow', () => {
     testState(v04Arrow, '0.4', 'arrow');
@@ -1160,7 +1160,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing a ruler.
    *
-   * @function module:tests/state~read-v04-state-ruler
+   * @function module:tests/state~readV04StateRuler
    */
   test('Read v04 state ruler', () => {
     testState(v04Ruler, '0.4', 'ruler');
@@ -1169,7 +1169,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing a roi.
    *
-   * @function module:tests/state~read-v04-state-roi
+   * @function module:tests/state~readV04StateRoi
    */
   test('Read v04 state roi', () => {
     testState(v04Roi, '0.4', 'roi');
@@ -1178,7 +1178,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing a hand draw.
    *
-   * @function module:tests/state~read-v04-state-hand
+   * @function module:tests/state~readV04StateHand
    */
   test('Read v04 state hand', () => {
     testState(v04Hand, '0.4', 'hand');
@@ -1187,7 +1187,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing an ellipse.
    *
-   * @function module:tests/state~read-v04-state-ellipse
+   * @function module:tests/state~readV04StateEllipse
    */
   test('Read v04 state ellipse', () => {
     testState(v04Ellipse, '0.4', 'ellipse');
@@ -1196,7 +1196,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing a protractor.
    *
-   * @function module:tests/state~read-v04-state-protractor
+   * @function module:tests/state~readV04StateProtractor
    */
   test('Read v04 state protractor', () => {
     testState(v04Protractor, '0.4', 'protractor');
@@ -1206,7 +1206,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing a rectangle.
    *
-   * @function module:tests/state~read-v04-state-rectangle
+   * @function module:tests/state~readV04StateRectangle
    */
   test('Read v04 state rectangle', () => {
     testState(v04Rectangle, '0.4', 'rectangle');
@@ -1215,7 +1215,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.4 containing a multi slice ruler.
    *
-   * @function module:tests/state~read-v04-state-ruler-multi-slice
+   * @function module:tests/state~readV04StateRulerMultiSlice
    */
   test('Read v04 state ruler multi-slice', () => {
     testState(v04RulerMulti, '0.4', 'ruler_multi-slice');
@@ -1224,7 +1224,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing an arrow.
    *
-   * @function module:tests/state~read-v05-state-arrow
+   * @function module:tests/state~readV05StateArrow
    */
   test('Read v05 state arrow', () => {
     testState(v05Arrow, '0.5', 'arrow');
@@ -1233,7 +1233,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing a ruler.
    *
-   * @function module:tests/state~read-v05-state-ruler
+   * @function module:tests/state~readV05StateRuler
    */
   test('Read v05 state ruler', () => {
     testState(v05Ruler, '0.5', 'ruler');
@@ -1242,7 +1242,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing a roi.
    *
-   * @function module:tests/state~read-v05-state-roi
+   * @function module:tests/state~readV05StateRoi
    */
   test('Read v05 state roi', () => {
     testState(v05Roi, '0.5', 'roi');
@@ -1251,7 +1251,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing a hand draw.
    *
-   * @function module:tests/state~read-v05-state-hand
+   * @function module:tests/state~readV05StateHand
    */
   test('Read v05 state hand', () => {
     testState(v05Hand, '0.5', 'hand');
@@ -1260,7 +1260,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing an ellipse.
    *
-   * @function module:tests/state~read-v05-state-ellipse
+   * @function module:tests/state~readV05StateEllipse
    */
   test('Read v05 state ellipse', () => {
     testState(v05Ellipse, '0.5', 'ellipse');
@@ -1269,7 +1269,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing a protractor.
    *
-   * @function module:tests/state~read-v05-state-protractor
+   * @function module:tests/state~readV05StateProtractor
    */
   test('Read v05 state protractor', () => {
     testState(v05Protractor, '0.5', 'protractor');
@@ -1279,7 +1279,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing a rectangle.
    *
-   * @function module:tests/state~read-v05-state-rectangle
+   * @function module:tests/state~readV05StateRectangle
    */
   test('Read v05 state rectangle', () => {
     testState(v05Rectangle, '0.5', 'rectangle');
@@ -1288,7 +1288,7 @@ describe('state', () => {
   /**
    * Tests for {@link State} v0.5 containing a multi slice ruler.
    *
-   * @function module:tests/state~read-v05-state-ruler-multi-slice
+   * @function module:tests/state~readV05StateRulerMultiSlice
    */
   test('Read v05 state ruler multi-slice', () => {
     testState(v05RulerMulti, '0.5', 'ruler_multi-slice');

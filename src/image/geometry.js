@@ -44,7 +44,7 @@ export class Geometry {
   /**
    * Local helper object for time points.
    *
-   * @type {Object<string, Point3D[]>}
+   * @type {Record<string, Point3D[]>}
    */
   #timeOrigins = {};
 

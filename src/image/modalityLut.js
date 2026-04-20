@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {RescaleSlopeAndIntercept} from './rsi.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {RescaleSlopeAndIntercept} from './rsi.js';
+ */
 
 /**
  * Modality LUT class: compensates for any modality-specific presentation.

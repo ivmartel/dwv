@@ -1,11 +1,10 @@
 import {Index} from '../math/index.js';
 import {Point} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {Scalar2D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Scalar2D} from '../math/scalar.js';
+ */
 
 /**
  * Immutable Size class.

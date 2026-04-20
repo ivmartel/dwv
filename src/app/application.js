@@ -35,19 +35,18 @@ import {WindowLevel} from '../image/windowLevel.js';
 import {PlaneHelper} from '../image/planeHelper.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
 import {konvaToAnnotation} from '../gui/drawLayer.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawLayer} from '../gui/drawLayer.js';
-import {Image} from '../image/image.js';
-import {Matrix33} from '../math/matrix.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {Scalar3D} from '../math/scalar.js';
 import {DicomData} from './dataController.js';
-import {Command} from '../command/undoStack.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {DrawLayer} from '../gui/drawLayer.js';
+ * @import {Image} from '../image/image.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {Scalar3D} from '../math/scalar.js';
+ * @import {Command} from '../command/undoStack.js';
+ */
 
 /**
  * View configuration: mainly defines the ´divId´
@@ -148,13 +147,13 @@ export class AppOptions {
   /**
    * DataId indexed object containing the data view configurations.
    *
-   * @type {Object<string, ViewConfig[]>|undefined}
+   * @type {Record<string, ViewConfig[]>|undefined}
    */
   dataViewConfigs;
   /**
    * Tool name indexed object containing individual tool configurations.
    *
-   * @type {Object<string, ToolConfig>|undefined}
+   * @type {Record<string, ToolConfig>|undefined}
    */
   tools;
   /**
@@ -193,7 +192,7 @@ export class AppOptions {
   rootDocument;
 
   /**
-   * @param {Object<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
+   * @param {Record<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
    *   indexed object containing the data view configurations.
    */
   constructor(dataViewConfigs) {
@@ -204,7 +203,7 @@ export class AppOptions {
 /**
  * List of ViewConfigs indexed by dataIds.
  *
- * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
+ * @typedef {Record<string, ViewConfig[]>} DataViewConfigs
  */
 
 /**
@@ -278,7 +277,7 @@ export class App {
   /**
    * Info datas.
    *
-   * @type {Object<string, InfoData>}
+   * @type {Record<string, InfoData>}
    */
   #infoDatas = {};
 
@@ -348,7 +347,7 @@ export class App {
    * Get the meta data.
    *
    * @param {string} dataId The data id.
-   * @returns {Object<string, DataElement>|undefined} The list of meta data.
+   * @returns {Record<string, DataElement>|undefined} The list of meta data.
    */
   getMetaData(dataId) {
     let res;
@@ -997,7 +996,7 @@ export class App {
    * Get the data view config.
    * Carefull, returns a reference, do not modify without resetting.
    *
-   * @returns {Object<string, ViewConfig[]>} The configuration list.
+   * @returns {Record<string, ViewConfig[]>} The configuration list.
    */
   getDataViewConfigs() {
     return this.#options.dataViewConfigs;
@@ -1007,7 +1006,7 @@ export class App {
    * Set the data view configuration.
    * Resets the stage and recreates all the views.
    *
-   * @param {Object<string, ViewConfig[]>} configs The configuration list.
+   * @param {Record<string, ViewConfig[]>} configs The configuration list.
    */
   setDataViewConfigs(configs) {
     // clean up

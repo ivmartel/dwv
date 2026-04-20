@@ -1,11 +1,10 @@
 import {Point2D} from './point.js';
 import {Line} from './line.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController.js';
-import {Annotation} from '../image/annotation.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Annotation} from '../image/annotation.js';
+ */
 
 /**
  * BidimensionalLine shape.

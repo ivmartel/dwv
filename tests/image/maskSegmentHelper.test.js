@@ -85,7 +85,7 @@ describe('image', () => {
   /**
    * Tests that the constructor reads segments from an existing meta object.
    *
-   * @function module:tests/image~mask-segment-helper-constructor-existing
+   * @function module:tests/image~maskSegmentHelperConstructorExisting
    */
   test('MaskSegmentHelper constructor reads pre-existing segments', () => {
     const seg = makeSeg(1);
@@ -98,7 +98,7 @@ describe('image', () => {
   /**
    * Tests that the constructor initialises meta.custom when absent.
    *
-   * @function module:tests/image~mask-segment-helper-constructor-no-custom
+   * @function module:tests/image~maskSegmentHelperConstructorNoCustom
    */
   test(
     'MaskSegmentHelper constructor initialises meta.custom when absent',
@@ -118,7 +118,7 @@ describe('image', () => {
    * Tests that the constructor adds a segments array when meta.custom exists
    * but has no segments property.
    *
-   * @function module:tests/image~mask-segment-helper-constructor-no-segments
+   * @function module:tests/image~maskSegmentHelperConstructorNoSegments
    */
   test(
     'MaskSegmentHelper constructor adds segments array when missing',
@@ -138,7 +138,7 @@ describe('image', () => {
   /**
    * Tests that getMask returns the mask passed to the constructor.
    *
-   * @function module:tests/image~mask-segment-helper-get-mask
+   * @function module:tests/image~maskSegmentHelperGetMask
    */
   test('MaskSegmentHelper getMask returns the mask image', () => {
     const mask = makeMockMask();
@@ -163,7 +163,7 @@ describe('image', () => {
   /**
    * Tests hasSegment and getSegment for present and absent segments.
    *
-   * @function module:tests/image~mask-segment-helper-has-get-segment
+   * @function module:tests/image~maskSegmentHelperHasGetSegment
    */
   test('MaskSegmentHelper hasSegment and getSegment', () => {
     const seg = makeSeg(3);
@@ -180,7 +180,7 @@ describe('image', () => {
   /**
    * Tests that getNumberOfSegments tracks additions and removals.
    *
-   * @function module:tests/image~mask-segment-helper-count
+   * @function module:tests/image~maskSegmentHelperCount
    */
   test('MaskSegmentHelper getNumberOfSegments tracks add/remove', () => {
     assert.equal(helper.getNumberOfSegments(), 0, 'starts empty');
@@ -199,7 +199,7 @@ describe('image', () => {
    * Tests that addSegment calls updatePaletteColourMap when displayRGBValue
    * is set.
    *
-   * @function module:tests/image~mask-segment-helper-add-rgb
+   * @function module:tests/image~maskSegmentHelperAddRgb
    */
   test('MaskSegmentHelper addSegment calls updatePaletteColourMap', () => {
     const mask = makeMockMask();
@@ -225,7 +225,7 @@ describe('image', () => {
   /**
    * Tests that addSegment does not add a segment with a duplicate number.
    *
-   * @function module:tests/image~mask-segment-helper-add-duplicate
+   * @function module:tests/image~maskSegmentHelperAddDuplicate
    */
   test('MaskSegmentHelper addSegment ignores duplicate segment number', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -249,7 +249,7 @@ describe('image', () => {
   /**
    * Tests that removeSegment removes an existing segment.
    *
-   * @function module:tests/image~mask-segment-helper-remove
+   * @function module:tests/image~maskSegmentHelperRemove
    */
   test('MaskSegmentHelper removeSegment removes the correct segment', () => {
     helper.addSegment(makeSeg(1));
@@ -262,7 +262,7 @@ describe('image', () => {
   /**
    * Tests that removeSegment is a no-op for an unknown segment number.
    *
-   * @function module:tests/image~mask-segment-helper-remove-unknown
+   * @function module:tests/image~maskSegmentHelperRemoveUnknown
    */
   test('MaskSegmentHelper removeSegment is a no-op for unknown number', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -284,7 +284,7 @@ describe('image', () => {
   /**
    * Tests that updateSegment replaces an existing segment in-place.
    *
-   * @function module:tests/image~mask-segment-helper-update
+   * @function module:tests/image~maskSegmentHelperUpdate
    */
   test('MaskSegmentHelper updateSegment replaces an existing segment', () => {
     const original = makeSeg(1, 'original');
@@ -297,7 +297,7 @@ describe('image', () => {
   /**
    * Tests that updateSegment is a no-op for an unknown segment number.
    *
-   * @function module:tests/image~mask-segment-helper-update-unknown
+   * @function module:tests/image~maskSegmentHelperUpdateUnknown
    */
   test('MaskSegmentHelper updateSegment is a no-op for unknown number', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -319,7 +319,7 @@ describe('image', () => {
   /**
    * Tests that maskHasSegments passes displayValue to hasValues.
    *
-   * @function module:tests/image~mask-segment-helper-mask-has-segments-display
+   * @function module:tests/image~maskSegmentHelperMaskHasSegmentsDisplay
    */
   test(
     'MaskSegmentHelper maskHasSegments uses displayValue when available',
@@ -348,7 +348,7 @@ describe('image', () => {
    * Tests that maskHasSegments falls back to segment.number when displayValue
    * is absent.
    *
-   * @function module:tests/image~mask-segment-helper-mask-has-segments-number
+   * @function module:tests/image~maskSegmentHelperMaskHasSegmentsNumber
    */
   test(
     'MaskSegmentHelper maskHasSegments falls back to segment.number',
@@ -369,7 +369,7 @@ describe('image', () => {
   /**
    * Tests that maskHasSegments inserts false for unknown segment numbers.
    *
-   * @function module:tests/image~mask-segment-helper-mask-has-segments-unknown
+   * @function module:tests/image~maskSegmentHelperMaskHasSegmentsUnknown
    */
   test(
     'MaskSegmentHelper maskHasSegments returns false for unknown segments',
@@ -401,7 +401,7 @@ describe('image', () => {
   /**
    * Tests that findOverlap returns empty when neither mask has labelled voxels.
    *
-   * @function module:tests/image~mask-segment-helper-find-overlap-empty
+   * @function module:tests/image~maskSegmentHelperFindOverlapEmpty
    */
   test('MaskSegmentHelper findOverlap returns empty for blank masks', () => {
     const mask1 = makeRealMask(3, 1, [0, 0, 0]);
@@ -415,7 +415,7 @@ describe('image', () => {
    * Tests findOverlap when two masks share the same geometry and identical
    * pixel values — every labelled voxel overlaps 100%.
    *
-   * @function module:tests/image~mask-segment-helper-find-overlap-identical
+   * @function module:tests/image~maskSegmentHelperFindOverlapIdentical
    */
   test(
     'MaskSegmentHelper findOverlap: identical masks give 100% overlap',
@@ -451,7 +451,7 @@ describe('image', () => {
   /**
    * Tests findOverlap when the two masks have no overlapping labelled voxels.
    *
-   * @function module:tests/image~mask-segment-helper-find-overlap-none
+   * @function module:tests/image~maskSegmentHelperFindOverlapNone
    */
   test('MaskSegmentHelper findOverlap: non-overlapping masks', () => {
     // mask1: seg 1 at pixel 0; mask2: seg 2 at pixel 1 (no shared voxels)
@@ -471,7 +471,7 @@ describe('image', () => {
   /**
    * Tests findOverlap with partial overlap between segments.
    *
-   * @function module:tests/image~mask-segment-helper-find-overlap-partial
+   * @function module:tests/image~maskSegmentHelperFindOverlapPartial
    */
   test('MaskSegmentHelper findOverlap: partial overlap gives correct %', () => {
     // mask1: seg 1 at pixels 0,1,2 (3 voxels)
@@ -500,7 +500,7 @@ describe('image', () => {
   /**
    * Tests for {@link MaskSegmentHelper} findOverlap.
    *
-   * @function module:tests/image~mask-segment-helper-find-overlap
+   * @function module:tests/image~maskSegmentHelperFindOverlap
    */
   test('MaskSegmentHelper findOverlap', () => {
     const imgOrigins = [new Point3D(0, 0, 0)];
