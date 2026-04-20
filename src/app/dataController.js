@@ -42,10 +42,10 @@ export const dataEventNames = [
 /**
  * Merge meta datas.
  *
- * @param {Object<string, DataElement>} meta0 The first data to merge.
- * @param {Object<string, DataElement>} meta1 The second data to merge.
+ * @param {Record<string, DataElement>} meta0 The first data to merge.
+ * @param {Record<string, DataElement>} meta1 The second data to merge.
  * @param {string} meta1Id A meta1 specific id.
- * @returns {Object<string, DataElement>} The merged data.
+ * @returns {Record<string, DataElement>} The merged data.
  */
 function mergeMeta(meta0, meta1, meta1Id) {
   // update meta data
@@ -74,7 +74,7 @@ export class DicomData {
   /**
    * DICOM meta data.
    *
-   * @type {Object<string, DataElement>}
+   * @type {Record<string, DataElement>}
    */
   meta;
 
@@ -122,7 +122,7 @@ export class DicomData {
   #hasDuplicateOrigin = false;
 
   /**
-   * @param {Object<string, DataElement>} meta The DICOM meta data.
+   * @param {Record<string, DataElement>} meta The DICOM meta data.
    */
   constructor(meta) {
     this.meta = meta;
@@ -208,7 +208,7 @@ export class DicomData {
   /**
    * Merge meta data to this meta.
    *
-   * @param {Object<string, DataElement>} meta The data to merge.
+   * @param {Record<string, DataElement>} meta The data to merge.
    */
   #mergeMeta(meta) {
     const meta1IdNum = getVolumeIdTagValue(meta);
@@ -434,7 +434,7 @@ export class DataController {
   /**
    * List of DICOM data.
    *
-   * @type {Object<string, DicomData>}
+   * @type {Record<string, DicomData>}
    */
   #dataList = {};
 
@@ -442,14 +442,14 @@ export class DataController {
    * Temporary slice list for data with duplicate origin
    * that needs to be created once the load is finished.
    *
-   * @type {Object<string, DicomSliceDataList>}
+   * @type {Record<string, DicomSliceDataList>}
    */
   #tmpSliceList = {};
 
   /**
    * List of DICOM data.
    *
-   * @type {Object<string, DicomData>}
+   * @type {Record<string, DicomData>}
    */
   #dataListStashed = {};
 

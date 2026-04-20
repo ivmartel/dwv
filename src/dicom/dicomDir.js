@@ -43,7 +43,7 @@ export function getFileListFromDicomDir(data) {
 /**
  * Get a DICOMDIR file list.
  *
- * @param {Object<string, DataElement>} dicomElements The dicom elements.
+ * @param {Record<string, DataElement>} dicomElements The dicom elements.
  * @returns {Array|undefined} The file list as an array ordered by
  *   STUDY > SERIES > IMAGES.
  */

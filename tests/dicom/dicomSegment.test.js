@@ -23,7 +23,7 @@ describe('dicom', () => {
   /**
    * Get a dicom code from simple dicom elements.
    *
-   * @param {Object<string, DataElement>} simpleElements DICOM simple elements.
+   * @param {Record<string, DataElement>} simpleElements DICOM simple elements.
    * @returns {DicomCode} The corresponding DICOM code.
    */
   function getCodeFromSimpleDicom(simpleElements) {

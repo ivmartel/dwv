@@ -39,14 +39,14 @@ import {Filter} from './filter.js';
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  *
- * @type {Object<string, any>}
+ * @type {Record<string, any>}
  */
 export const toolList = {};
 
 /**
  * Default tool list.
  *
- * @type {Object<string, any>}
+ * @type {Record<string, any>}
  */
 export const defaultToolList = {
   WindowLevel,

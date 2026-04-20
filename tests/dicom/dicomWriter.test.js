@@ -478,7 +478,7 @@ describe('dicom', () => {
    * Test a JSON config: write a DICOM file and read it back.
    *
    * @param {object} config A JSON config representing DICOM tags.
-   * @param {Object<string, WriterRule>} [writerRules] Optional DICOM
+   * @param {Record<string, WriterRule>} [writerRules] Optional DICOM
    *   writer rules.
    * @param {object} [outConfig] Optional resulting JSON after
    *   applying writer rules.

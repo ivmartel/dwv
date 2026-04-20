@@ -47,7 +47,7 @@ const TagKeys = {
 /**
  * Extract the 2D size from dicom elements.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The sizes as [columns, rows] or
  *   undefined if not present.
  */
@@ -65,7 +65,7 @@ export function getImage2DSize(elements) {
 /**
  * Get the 2D spacing values.
  *
- * @param {Object<string, DataElement>} elements The dicom element.
+ * @param {Record<string, DataElement>} elements The dicom element.
  * @param {string} tagKey The tag key.
  * @returns {number[]|undefined} The values if present.
  */
@@ -86,7 +86,7 @@ function get2DSpacingValues(elements, tagKey) {
 /**
  * Get the 2D spacing values from a functional group.
  *
- * @param {Object<string, DataElement>} funcGroupElements The dicom elements.
+ * @param {Record<string, DataElement>} funcGroupElements The dicom elements.
  * @returns {number[]|undefined} The values if present.
  */
 function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
@@ -104,7 +104,7 @@ function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
 /**
  * Get the pixel spacing for projection data.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 function getProjection2DSpacingValues(elements) {
@@ -138,7 +138,7 @@ function getProjection2DSpacingValues(elements) {
 /**
  * Get the pixel spacing for secondary capture data.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 function getSecondaryCapture2DSpacingValues(elements) {
@@ -153,7 +153,7 @@ function getSecondaryCapture2DSpacingValues(elements) {
 /**
  * Get the pixel spacing for multi-frame data.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 function getMultiFrame2DSpacingValues(elements) {
@@ -186,7 +186,7 @@ function getMultiFrame2DSpacingValues(elements) {
 /**
  * Get the pixel spacing from the different spacing tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The spacing as [columnSapcing, rowSpacing] or
  *   undefined if not present.
  */
@@ -213,7 +213,7 @@ export function getPixelSpacing(elements) {
 /**
  * Get the pixel aspect ratio.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 export function getPixelAspectRatio(elements) {
@@ -223,7 +223,7 @@ export function getPixelAspectRatio(elements) {
 /**
  * Get a spacing object from a dicom measure element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {Spacing|undefined} A spacing object.
  */
 export function getSpacingFromMeasure(dataElements) {
@@ -243,7 +243,7 @@ export function getSpacingFromMeasure(dataElements) {
 /**
  * Get pixel data unit from a list of tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {string|undefined} The unit value if available.
  */
 export function getTagPixelUnit(elements) {
@@ -256,7 +256,7 @@ export function getTagPixelUnit(elements) {
 /**
  * Default get pixel data unit.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {string|undefined} The unit value if available.
  */
 function defaultGetTagPixelUnit(elements) {
@@ -281,7 +281,7 @@ function defaultGetTagPixelUnit(elements) {
 /**
  * Get an orientation matrix from a dicom orientation element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationMatrix(dataElements) {
@@ -334,7 +334,7 @@ export function getDicomPlaneOrientationItem(orientation) {
 /**
  * Get the photometric interpretation from the data elements.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @returns {string|undefined} The photometric interpretation value.
  */
 export function getPhotometricInterpretation(dataElements) {
@@ -392,7 +392,7 @@ export function isSecondatyCapture(SOPClassUID) {
 /**
  * Get the referenced series UID from the data elements.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @returns {string|undefined} The referenced series UID.
  */
 export function getReferencedSeriesUID(dataElements) {

@@ -198,7 +198,7 @@ export class MaskSegmentHelper {
    *
    * @typedef Overlap
    * @property {string} label The segment label.
-   * @property {Object.<number, OverlapCount>} overlap A Dictionary
+   * @property {Record<number, OverlapCount>} overlap A Dictionary
    *  containing the counts. The key is the segment number of the overlapping
    *  segment.
    * @property {number} count The voxel volume of this segment.
@@ -211,7 +211,7 @@ export class MaskSegmentHelper {
    * The value is a Dictionary of all of the segments in the second set
    * that overlap with the key segment.
    *
-   * @typedef {Object.<number, Overlap>} OverlapMap
+   * @typedef {Record<number, Overlap>} OverlapMap
    */
 
   /**

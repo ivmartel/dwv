@@ -88,7 +88,7 @@ export function isEqualCode(code1, code2) {
 /**
  * Get a code object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {DicomCode} A code object.
  */
 export function getCode(dataElements) {
@@ -125,7 +125,7 @@ export function getCode(dataElements) {
  * Get a simple dicom element item from a code object.
  *
  * @param {DicomCode} code The code object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomCodeItem(code) {
   // dicom item (tags are in group/element order)

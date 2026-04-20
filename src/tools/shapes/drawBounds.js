@@ -11,7 +11,7 @@ import Konva from 'konva';
 /**
  * List of default label texts.
  *
- * @type {Object.<string, Object.<string, string>>}
+ * @type {Record<string, Record<string, string>>}
  */
 export const defaultLabelTexts = {
   arrow: {

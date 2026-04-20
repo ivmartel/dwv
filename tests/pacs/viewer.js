@@ -545,7 +545,7 @@ function removePostLoadListeners() {
 /**
  * Merge with first app config.
  *
- * @param {Object<string, ViewConfig[]>} dataViewConfigs A list
+ * @param {Record<string, ViewConfig[]>} dataViewConfigs A list
  *   of data view configs.
  */
 function mergeAppConfig(dataViewConfigs) {

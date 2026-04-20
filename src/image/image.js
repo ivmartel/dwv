@@ -73,7 +73,7 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
 /**
  * Create an Image from DICOM elements.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The Image object.
  */
 export function createImage(elements) {
@@ -88,7 +88,7 @@ export function createImage(elements) {
 /**
  * Create a mask Image from DICOM elements.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The mask Image object.
  */
 export function createMaskImage(elements) {
@@ -267,7 +267,7 @@ export class Image {
   /**
    * Meta information.
    *
-   * @type {Object<string, any>}
+   * @type {Record<string, any>}
    */
   #meta = {};
 
@@ -665,7 +665,7 @@ export class Image {
   /**
    * Get the meta information of the image.
    *
-   * @returns {Object<string, any>} The meta information of the image.
+   * @returns {Record<string, any>} The meta information of the image.
    */
   getMeta() {
     return this.#meta;
@@ -674,7 +674,7 @@ export class Image {
   /**
    * Set the meta information of the image.
    *
-   * @param {Object<string, any>} rhs The meta information of the image.
+   * @param {Record<string, any>} rhs The meta information of the image.
    */
   setMeta(rhs) {
     this.#meta = rhs;

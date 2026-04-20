@@ -51,7 +51,7 @@ export const viewEventNames = [
 /**
  * Create a View from DICOM elements and image.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @param {Image} image The associated image.
  * @returns {View} The View object.
  */

@@ -66,7 +66,7 @@ export class MeasuredValue {
 /**
  * Get a measured value object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {MeasuredValue} A measured value object.
  */
 export function getMeasuredValue(dataElements) {
@@ -101,7 +101,7 @@ export function getMeasuredValue(dataElements) {
  * Get a simple dicom element item from a measured value object.
  *
  * @param {MeasuredValue} value The measured value object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomMeasuredValueItem(value) {
   // dicom item (tags are in group/element order)

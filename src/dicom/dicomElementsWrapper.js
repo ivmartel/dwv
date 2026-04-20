@@ -26,7 +26,7 @@ import {DataElement} from './dataElement.js';
  * Dump the DICOM tags to a string in the same way as the
  * DCMTK `dcmdump` command (https://support.dcmtk.org/docs-dcmrt/dcmdump.html).
  *
- * @param {Object<string, DataElement>} dicomElements The dicom elements.
+ * @param {Record<string, DataElement>} dicomElements The dicom elements.
  * @returns {string} The dumped file.
  */
 export function dcmdump(dicomElements) {

@@ -24,7 +24,7 @@ import {logger} from '../utils/logger.js';
  * List of DICOM data elements indexed via a 8 character string formed from
  * the group and element numbers.
  *
- * @typedef {Object<string, DataElement>} DataElements
+ * @typedef {Record<string, DataElement>} DataElements
  */
 
 /**
@@ -705,7 +705,7 @@ export class DicomParser {
   /**
    * Get the DICOM data elements.
    *
-   * @returns {Object<string, DataElement>} The data elements.
+   * @returns {Record<string, DataElement>} The data elements.
    */
   getDicomElements() {
     return this.#dataElements;

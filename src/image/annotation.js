@@ -79,7 +79,7 @@ export class Annotation {
   /**
    * Annotation quantification.
    *
-   * @type {Object<string, Value>|undefined}
+   * @type {Record<string, Value>|undefined}
    */
   quantification;
 
@@ -342,7 +342,7 @@ export class Annotation {
   /**
    * Set the annotation text expression.
    *
-   * @param {Object.<string, string>} labelText The list of label
+   * @param {Record<string, string>} labelText The list of label
    *   texts indexed by modality.
    */
   setTextExpr(labelText) {

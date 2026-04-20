@@ -93,7 +93,7 @@ function hasValue(element) {
 /**
  * Safely get an elements' first value from a list of elements.
  *
- * @param {Object<string, DataElement>} dataElements A list of data elements.
+ * @param {Record<string, DataElement>} dataElements A list of data elements.
  * @param {string} key The tag key as for example '00100020'.
  * @returns {any|undefined} The elements' value or undefined.
  */
@@ -108,7 +108,7 @@ export function safeGet(dataElements, key) {
 /**
  * Safely get all of an elements' values from a list of elements.
  *
- * @param {Object<string, DataElement>} dataElements A list of data elements.
+ * @param {Record<string, DataElement>} dataElements A list of data elements.
  * @param {string} key The tag key as for example '00100020'.
  * @returns {any[]|undefined} The elements' values or undefined.
  */

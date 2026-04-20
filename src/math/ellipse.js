@@ -183,7 +183,7 @@ export class Ellipse {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, Value>} A quantification object.
    */
   quantify(viewController, index, flags) {
     // shape quantification

@@ -28,7 +28,7 @@ import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
+ * @typedef {Record<string, DataElement>} DataElements
  */
 
 /**
@@ -99,7 +99,7 @@ const MetaTagKeys = {
 /**
  * Get the palette colour map.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @returns {ColourMap|undefined} The palette colour map.
  */
 function getPaletteColourMap(dataElements) {
@@ -191,7 +191,7 @@ function getPaletteColourMap(dataElements) {
 /**
  * Get the window level presets.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @param {number} intensityFactor The intensity factor.
  * @returns {object|undefined} The presets.
  */

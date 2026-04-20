@@ -625,7 +625,7 @@ function applyProtractorHitFunc(kshape, protractor) {
 /**
  * Registry mapping annotator names to their Konva rendering entry.
  *
- * @type {Object.<string, KonvaShapePainter>}
+ * @type {Record<string, KonvaShapePainter>}
  */
 const MAP = {
   rectangle: new RectangleKonvaPainter(),

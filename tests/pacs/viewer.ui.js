@@ -92,7 +92,7 @@ export class LayoutProtocol {
    * Get the data view configs for the given data ids.
    *
    * @param {string[]} dataIds The data id.
-   * @returns {Object<string, ViewConfig[]>} The data view configs.
+   * @returns {Record<string, ViewConfig[]>} The data view configs.
    */
   getDataViewConfigs(dataIds) {
     const res = {};

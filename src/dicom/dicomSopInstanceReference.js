@@ -41,7 +41,7 @@ export class SopInstanceReference {
 /**
  * Get a SOP reference object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {SopInstanceReference} A SOP reference object.
  */
 export function getSopInstanceReference(dataElements) {
@@ -63,7 +63,7 @@ export function getSopInstanceReference(dataElements) {
  * Get a simple dicom element item from a SOP reference object.
  *
  * @param {SopInstanceReference} ref The SOP reference object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomSopInstanceReferenceItem(ref) {
   // dicom item (tags are in group/element order)

@@ -64,7 +64,7 @@ export class Protractor {
    *
    * @param {ViewController} _viewController The associated view controller.
    * @param {string[]} _flags A list of stat values to calculate.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, Value>} A quantification object.
    */
   quantify(_viewController, _flags) {
     let angle;

@@ -31,7 +31,7 @@ export class AnnotationGroup {
   /**
    * Annotation meta data.
    *
-   * @type {Object<string, any>}
+   * @type {Record<string, any>}
    */
   #meta = {};
 
@@ -254,7 +254,7 @@ export class AnnotationGroup {
   /**
    * Get the meta data.
    *
-   * @returns {Object<string, any>} The meta data.
+   * @returns {Record<string, any>} The meta data.
    */
   getMeta() {
     return this.#meta;

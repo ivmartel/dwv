@@ -36,7 +36,7 @@ const TagKeys = {
 /**
  * Get the decayed dose (Bq).
  *
- * @param {Object<string, DataElement>} elements The DICOM elements to check.
+ * @param {Record<string, DataElement>} elements The DICOM elements to check.
  * @returns {object} The value and a warning if
  *   the elements are not as expected.
  */
@@ -203,7 +203,7 @@ function getDecayedDose(elements) {
  * - {@link https://qibawiki.rsna.org/images/6/62/SUV_vendorneutral_pseudocode_happypathonly_20180626_DAC.pdf},
  * - {@link https://qibawiki.rsna.org/images/8/86/SUV_vendorneutral_pseudocode_20180626_DAC.pdf}.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {object} The value and a warning if
  *   the elements are not as expected.
  */

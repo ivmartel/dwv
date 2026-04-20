@@ -157,7 +157,7 @@ export class MaskSegment {
 /**
  * Get a segment object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {MaskSegment} A segment object.
  */
 export function getSegment(dataElements) {
@@ -308,7 +308,7 @@ export function isSimilarSegment(seg1, seg2) {
  * Get a dicom simple tag from a segment object.
  *
  * @param {MaskSegment} segment The segment object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomSegmentItem(segment) {
   let algoType = segment.algorithmType;
