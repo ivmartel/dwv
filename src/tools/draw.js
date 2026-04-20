@@ -15,6 +15,7 @@ import {Annotation} from '../image/annotation.js';
 import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {WheelTick} from './behaviors/wheelTick.js';
 import {runWheelTickPipeline} from './behaviors/wheelTickPipeline.js';
+import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 
 // external
 import Konva from 'konva';
