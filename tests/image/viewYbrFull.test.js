@@ -14,7 +14,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataYbrFull} basic RGBA mapping.
    *
-   * @function module:tests/image~view-ybr-full-basic
+   * @function module:tests/image~viewYbrFullBasic
    */
   test('generateImageDataYbrFull converts YBR to RGB correctly', () => {
     // Use a range of representative YBR values
@@ -46,7 +46,7 @@ describe('image', () => {
   /**
    * Tests that neutral chroma (Cb = Cr = 128) produces R = G = B = Y.
    *
-   * @function module:tests/image~view-ybr-full-neutral-chroma
+   * @function module:tests/image~viewYbrFullNeutralChroma
    */
   test('generateImageDataYbrFull with neutral chroma yields R=G=B=Y', () => {
     // When Cb = Cr = 128 the chroma terms vanish: R=G=B=Y
@@ -65,7 +65,7 @@ describe('image', () => {
   /**
    * Tests that the alpha function receives the full YBR triplet and index.
    *
-   * @function module:tests/image~view-ybr-full-alpha-args
+   * @function module:tests/image~viewYbrFullAlphaArgs
    */
   test('generateImageDataYbrFull passes YBR triplet and index to alpha', () => {
     const triplets = [[10, 20, 30], [40, 50, 60]];
@@ -92,7 +92,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataYbrFull} with an empty iterator.
    *
-   * @function module:tests/image~view-ybr-full-empty
+   * @function module:tests/image~viewYbrFullEmpty
    */
   test('generateImageDataYbrFull does nothing for an empty iterator', () => {
     const array = makeImageData(1);
@@ -107,7 +107,7 @@ describe('image', () => {
   /**
    * Tests that out-of-range floating-point RGB results are clamped to [0,255].
    *
-   * @function module:tests/image~view-ybr-full-clamping
+   * @function module:tests/image~viewYbrFullClamping
    */
   test('generateImageDataYbrFull clamps out-of-range RGB values', () => {
     // Y=255, Cb=0, Cr=255:

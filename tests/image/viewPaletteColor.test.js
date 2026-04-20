@@ -19,7 +19,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataPaletteColor} with 8-bit data.
    *
-   * @function module:tests/image~view-palette-color-8bit
+   * @function module:tests/image~viewPaletteColor8bit
    */
   test('generateImageDataPaletteColor writes correct RGBA for 8-bit data',
     () => {
@@ -49,7 +49,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataPaletteColor} with 16-bit stored data.
    *
-   * @function module:tests/image~view-palette-color-16bit
+   * @function module:tests/image~viewPaletteColor16bit
    */
   test('generateImageDataPaletteColor right-shifts lut values for 16-bit data',
     () => {
@@ -79,7 +79,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataPaletteColor} alpha function.
    *
-   * @function module:tests/image~view-palette-color-alpha
+   * @function module:tests/image~viewPaletteColorAlpha
    */
   test('generateImageDataPaletteColor passes pixel value and index to alpha',
     () => {
@@ -109,7 +109,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataPaletteColor} empty iterator.
    *
-   * @function module:tests/image~view-palette-color-empty
+   * @function module:tests/image~viewPaletteColorEmpty
    */
   test('generateImageDataPaletteColor does nothing for empty iterator', () => {
     const colourMap = makeColourMap();
@@ -127,7 +127,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataPaletteColor} 16-bit logging.
    *
-   * @function module:tests/image~view-palette-color-16bit-log
+   * @function module:tests/image~viewPaletteColor16bitLog
    */
   test('generateImageDataPaletteColor logs info for 16-bit data', () => {
     const infoSpy = vi.spyOn(loggerModule.logger, 'info')

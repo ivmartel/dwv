@@ -15,7 +15,7 @@ describe('image', () => {
   /**
    * Tests for {@link Geometry}.
    *
-   * @function module:tests/image~geometry-class
+   * @function module:tests/image~geometryClass
    */
   test('Geometry class', () => {
     // case #0: simple, index and points are equal

@@ -358,7 +358,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from dwv034 containing an arrow.
    *
-   * @function module:tests/annotation~read-dwv034-arrow
+   * @function module:tests/annotation~readDwv034Arrow
    */
   test('Read dwv034 arrow', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Arrow);
@@ -369,7 +369,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from dwv034 containing a circle.
    *
-   * @function module:tests/annotation~read-dwv034-circle
+   * @function module:tests/annotation~readDwv034Circle
    */
   test('Read dwv034 circle', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Circle);
@@ -380,7 +380,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from dwv034 containing a ellipse.
    *
-   * @function module:tests/annotation~read-dwv034-ellipse
+   * @function module:tests/annotation~readDwv034Ellipse
    */
   test('Read dwv034 ellipse', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Ellipse);
@@ -391,7 +391,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from dwv034 containing a protractor.
    *
-   * @function module:tests/annotation~read-dwv034-protractor
+   * @function module:tests/annotation~readDwv034Protractor
    */
   test('Read dwv034 protractor', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Protractor);
@@ -402,7 +402,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from dwv034 containing a rectangle.
    *
-   * @function module:tests/annotation~read-dwv034-rectangle
+   * @function module:tests/annotation~readDwv034Rectangle
    */
   test('Read dwv034 rectangle', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Rectangle);
@@ -413,7 +413,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from dwv034 containing a ROI.
    *
-   * @function module:tests/annotation~read-dwv034-roi
+   * @function module:tests/annotation~readDwv034Roi
    */
   test('Read dwv034 roi', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Roi);
@@ -424,7 +424,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from dwv034 containing a ruler.
    *
-   * @function module:tests/annotation~read-dwv034-ruler
+   * @function module:tests/annotation~readDwv034Ruler
    */
   test('Read dwv034 ruler', () => {
     const annotationGroup = get034AnnotationGroup(dwv034Ruler);
@@ -439,7 +439,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing an arrow.
    *
-   * @function module:tests/annotation~read-tid1500-v0-arrow
+   * @function module:tests/annotation~readTid1500V0Arrow
    */
   test('Read tid1500 v0 arrow', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Arrow);
@@ -450,7 +450,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a circle.
    *
-   * @function module:tests/annotation~read-tid1500-v0-circle
+   * @function module:tests/annotation~readTid1500V0Circle
    */
   test('Read tid1500 v0 circle', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Circle);
@@ -461,7 +461,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing an ellipse.
    *
-   * @function module:tests/annotation~read-tid1500-v0-ellipse
+   * @function module:tests/annotation~readTid1500V0Ellipse
    */
   test('Read tid1500 v0 ellipse', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Ellipse);
@@ -472,7 +472,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a protractor.
    *
-   * @function module:tests/annotation~read-tid1500-v0-protractor
+   * @function module:tests/annotation~readTid1500V0Protractor
    */
   test('Read tid1500 v0 protractor', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Protractor);
@@ -483,7 +483,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a rectangle.
    *
-   * @function module:tests/annotation~read-tid1500-v0-rectangle
+   * @function module:tests/annotation~readTid1500V0Rectangle
    */
   test('Read tid1500 v0 rectangle', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Rectangle);
@@ -494,7 +494,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a roi.
    *
-   * @function module:tests/annotation~read-tid1500-v0-roi
+   * @function module:tests/annotation~readTid1500V0Roi
    */
   test('Read tid1500 v0 roi', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Roi);
@@ -505,7 +505,7 @@ describe('annotation', () => {
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a ruler.
    *
-   * @function module:tests/annotation~read-tid1500-v0-ruler
+   * @function module:tests/annotation~readTid1500V0Ruler
    */
   test('Read tid1500 v0 ruler', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Ruler);
@@ -581,7 +581,7 @@ describe('annotation', () => {
    * Tests for {@link Annotation} from tid1500 v0 containing a
    * BidimensionalLine.
    *
-   * @function module:tests/annotation~read-tid1500-v0-bidimensional
+   * @function module:tests/annotation~readTid1500V0Bidimensional
    */
   test('Read tid1500 v0 bidimensional', () => {
     const annotationGroup = getAnnotationGroup(tid1500v0Bidimensional);

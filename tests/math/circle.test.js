@@ -12,7 +12,7 @@ describe('math', () => {
   /**
    * Tests for {@link Circle}.
    *
-   * @function module:tests/math~circle-class
+   * @function module:tests/math~circleClass
    */
   test('Circle class - #DWV-REQ-UI-07-002 Draw circle', () => {
     const center0 = new Point2D(0, 0);
@@ -43,7 +43,7 @@ describe('math', () => {
   /**
    * Tests for {@link Circle} quantification.
    *
-   * @function module:tests/math~circle-quantification
+   * @function module:tests/math~circleQuantification
    */
   test('Circle quantification - #DWV-REQ-UI-07-002 Draw circle',
     () => {

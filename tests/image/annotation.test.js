@@ -114,7 +114,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation} constructor defaults.
    *
-   * @function module:tests/image~annotation-constructor
+   * @function module:tests/image~annotationConstructor
    */
   test('Annotation constructor sets unique non-empty ids and default values',
     () => {
@@ -136,7 +136,7 @@ describe('image', () => {
   /**
    * Tests that each Annotation instance receives unique ids.
    *
-   * @function module:tests/image~annotation-unique-ids
+   * @function module:tests/image~annotationUniqueIds
    */
   test('Annotation instances have unique tracking ids', () => {
     const a = new Annotation();
@@ -152,7 +152,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation} meta data add/get/list operations.
    *
-   * @function module:tests/image~annotation-meta-add-get
+   * @function module:tests/image~annotationMetaAddGet
    */
   test('Annotation addMetaItem / getMetaItem / getMetaConceptIds', () => {
     const ann = new Annotation();
@@ -184,7 +184,7 @@ describe('image', () => {
   /**
    * Tests that {@link Annotation#addMetaItem} warns when overwriting.
    *
-   * @function module:tests/image~annotation-meta-overwrite
+   * @function module:tests/image~annotationMetaOverwrite
    */
   test('Annotation addMetaItem warns on duplicate concept id', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -205,7 +205,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#removeMetaItem}.
    *
-   * @function module:tests/image~annotation-meta-remove
+   * @function module:tests/image~annotationMetaRemove
    */
   test('Annotation removeMetaItem deletes an existing entry silently', () => {
     const ann = new Annotation();
@@ -228,7 +228,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#canView} initial state.
    *
-   * @function module:tests/image~annotation-can-view
+   * @function module:tests/image~annotationCanView
    */
   test('Annotation canView returns false before init', () => {
     const ann = new Annotation();
@@ -242,7 +242,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#getText} with no quantification.
    *
-   * @function module:tests/image~annotation-get-text-plain
+   * @function module:tests/image~annotationGetTextPlain
    */
   test('Annotation getText returns plain textExpr when no quantification',
     () => {
@@ -254,7 +254,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#getText} with flag substitution.
    *
-   * @function module:tests/image~annotation-get-text-flags
+   * @function module:tests/image~annotationGetTextFlags
    */
   test('Annotation getText replaces {flags} from quantification', () => {
     const ann = new Annotation();
@@ -268,7 +268,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#getText} with empty textExpr.
    *
-   * @function module:tests/image~annotation-get-text-empty
+   * @function module:tests/image~annotationGetTextEmpty
    */
   test('Annotation getText returns empty string for default textExpr', () => {
     const ann = new Annotation();
@@ -282,7 +282,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#isCompatibleView} without planePoints.
    *
-   * @function module:tests/image~annotation-compatible-view-no-plane
+   * @function module:tests/image~annotationCompatibleViewNoPlane
    */
   test('Annotation isCompatibleView delegates to planeHelper ' +
     'when no planePoints',
@@ -304,7 +304,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#isCompatibleView} with planePoints set.
    *
-   * @function module:tests/image~annotation-compatible-view-plane
+   * @function module:tests/image~annotationCompatibleViewPlane
    */
   test('Annotation isCompatibleView compares cosines when planePoints set',
     () => {
@@ -332,7 +332,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#getOrientationName} without planePoints.
    *
-   * @function module:tests/image~annotation-orientation-undefined
+   * @function module:tests/image~annotationOrientationUndefined
    */
   test('Annotation getOrientationName returns undefined without planePoints',
     () => {
@@ -344,7 +344,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#getOrientationName} with axial planePoints.
    *
-   * @function module:tests/image~annotation-orientation-axial
+   * @function module:tests/image~annotationOrientationAxial
    */
   test('Annotation getOrientationName returns a string when planePoints set',
     () => {
@@ -368,7 +368,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#init} setting annotation fields.
    *
-   * @function module:tests/image~annotation-init
+   * @function module:tests/image~annotationInit
    */
   test('Annotation init sets referencedSopInstanceUID and enables canView',
     () => {
@@ -387,7 +387,7 @@ describe('image', () => {
   /**
    * Tests that a second {@link Annotation#init} call is a no-op.
    *
-   * @function module:tests/image~annotation-init-twice
+   * @function module:tests/image~annotationInitTwice
    */
   test('Annotation init is a no-op when called a second time', () => {
     const debugSpy = vi.spyOn(loggerModule.logger, 'debug')
@@ -407,7 +407,7 @@ describe('image', () => {
   /**
    * Tests that init stores planePoints for non-acquisition orientation.
    *
-   * @function module:tests/image~annotation-init-oriented
+   * @function module:tests/image~annotationInitOriented
    */
   test('Annotation init stores planePoints for oblique orientation', () => {
     const ann = new Annotation();
@@ -426,7 +426,7 @@ describe('image', () => {
   /**
    * Tests that {@link Annotation#setViewController} warns on unknown UID.
    *
-   * @function module:tests/image~annotation-set-vc-unknown-uid
+   * @function module:tests/image~annotationSetVcUnknownUid
    */
   test('Annotation setViewController warns when UID does not match', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -445,7 +445,7 @@ describe('image', () => {
    * Tests that {@link Annotation#setViewController} is rejected for
    * incompatible views.
    *
-   * @function module:tests/image~annotation-set-vc-incompatible
+   * @function module:tests/image~annotationSetVcIncompatible
    */
   test('Annotation setViewController is ignored for incompatible view', () => {
     const ann = new Annotation();
@@ -471,7 +471,7 @@ describe('image', () => {
    * Tests that {@link Annotation#setViewController} succeeds for
    * a compatible view.
    *
-   * @function module:tests/image~annotation-set-vc-compatible
+   * @function module:tests/image~annotationSetVcCompatible
    */
   test('Annotation setViewController enables canView for compatible view',
     () => {
@@ -494,7 +494,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#setTextExpr} without a view controller.
    *
-   * @function module:tests/image~annotation-set-text-no-vc
+   * @function module:tests/image~annotationSetTextNoVc
    */
   test('Annotation setTextExpr warns when no view controller is set', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -509,7 +509,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#setTextExpr} using modality-specific text.
    *
-   * @function module:tests/image~annotation-set-text-modality
+   * @function module:tests/image~annotationSetTextModality
    */
   test('Annotation setTextExpr uses modality-specific text when available',
     () => {
@@ -525,7 +525,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#setTextExpr} falling back to '*'.
    *
-   * @function module:tests/image~annotation-set-text-fallback
+   * @function module:tests/image~annotationSetTextFallback
    */
   test('Annotation setTextExpr falls back to "*" key for unknown modality',
     () => {
@@ -545,7 +545,7 @@ describe('image', () => {
   /**
    * Tests for {@link Annotation#getFactory} when no mathShape is set.
    *
-   * @function module:tests/image~annotation-get-factory-no-shape
+   * @function module:tests/image~annotationGetFactoryNoShape
    */
   test('Annotation getFactory returns undefined when mathShape is not set',
     () => {
@@ -558,7 +558,7 @@ describe('image', () => {
    * Tests for {@link Annotation#getFactory} when no factory supports
    * the given shape.
    *
-   * @function module:tests/image~annotation-get-factory-no-match
+   * @function module:tests/image~annotationGetFactoryNoMatch
    */
   test('Annotation getFactory warns and returns undefined ' +
     'for unsupported shape',

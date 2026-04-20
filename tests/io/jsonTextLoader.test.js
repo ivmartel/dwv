@@ -52,7 +52,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} events.
      *
-     * @function module:tests/io~jsontextloader-events-isloading-initial
+     * @function module:tests/io~jsontextloaderEventsIsloadingInitial
      */
     test('isLoading initial', () => {
       assert.notOk(loader.isLoading());
@@ -61,7 +61,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} events.
      *
-     * @function module:tests/io~jsontextloader-events-load-sets-flag-and-fires
+     * @function module:tests/io~jsontextloaderEventsLoadSetsFlagAndFires
      */
     test('load sets flag and fires', () => {
       const text = '{"key": "value"}';
@@ -95,7 +95,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} events.
      *
-     * @function module:tests/io~jsontextloader-events-load-resets-flag
+     * @function module:tests/io~jsontextloaderEventsLoadResetsFlag
      */
     test('load resets flag', () => {
       assert.notOk(loader.isLoading());
@@ -106,7 +106,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} events.
      *
-     * @function module:tests/io~jsontextloader-events-load-fires-error
+     * @function module:tests/io~jsontextloaderEventsLoadFiresError
      */
     test('load fires error', () => {
       loader.onloaditem = () => {
@@ -128,7 +128,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} events.
      *
-     * @function module:tests/io~jsontextloader-events-abort-resets-internals
+     * @function module:tests/io~jsontextloaderEventsAbortResetsInternals
      */
     test('abort resets internals', () => {
       loader.abort();
@@ -141,7 +141,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} events.
      *
-     * @function module:tests/io~jsontextloader-events-setoptions-does-nothing
+     * @function module:tests/io~jsontextloaderEventsSetoptionsDoesNothing
      */
     test('setOptions does nothing', () => {
       loader.setOptions({foo: 'bar'});
@@ -151,7 +151,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} events.
      *
-     * @function module:tests/io~jsontextloader-events-default-does-not-throw
+     * @function module:tests/io~jsontextloaderEventsDefaultDoesNotThrow
      */
     test('default does not throw', () => {
       const loader2 = new JSONTextLoader();
@@ -177,7 +177,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadFile.
      *
-     * @function module:tests/io~jsontextloader-file-true-for-json
+     * @function module:tests/io~jsontextloaderFiletrueForJson
      */
     test('true for json', () => {
       const jsonFile = new File(['test'], 'test.json');
@@ -187,7 +187,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadFile.
      *
-     * @function module:tests/io~jsontextloader-file-false-for-non-json
+     * @function module:tests/io~jsontextloaderFilefalseForNonJson
      */
     test('false for non-json', () => {
       const txtFile = new File(['test'], 'test.txt');
@@ -197,7 +197,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadFile.
      *
-     * @function module:tests/io~jsontextloader-file-handles-uppercase
+     * @function module:tests/io~jsontextloaderFileHandlesUppercase
      */
     test('handles uppercase', () => {
       const jsonFile = new File(['test'], 'test.JSON');
@@ -207,7 +207,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadFile.
      *
-     * @function module:tests/io~jsontextloader-file-handles-multiple
+     * @function module:tests/io~jsontextloaderFileHandlesMultiple
      */
     test('handles multiple', () => {
       const file = new File(['test'], 'data.backup.json');
@@ -217,7 +217,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadFile.
      *
-     * @function module:tests/io~jsontextloader-file-handles-no-extension
+     * @function module:tests/io~jsontextloaderFileHandlesNoExtension
      */
     test('handles no extension', () => {
       const file = new File(['test'], 'data');
@@ -235,7 +235,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadMemory.
      *
-     * @function module:tests/io~jsontextloader-memory-json-content-type
+     * @function module:tests/io~jsontextloaderMemoryJsonContentType
      */
     test('json content-type', () => {
       const mem = {
@@ -248,7 +248,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadMemory.
      *
-     * @function module:tests/io~jsontextloader-memory-json-content-type-charset
+     * @function module:tests/io~jsontextloaderMemoryJsonContentTypeCharset
      */
     test('json content-type charset', () => {
       const mem = {
@@ -260,7 +260,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadMemory.
      *
-     * @function module:tests/io~jsontextloader-memory-non-json-content-type
+     * @function module:tests/io~jsontextloaderMemoryNonJsonContentType
      */
     test('non-json content-type', () => {
       const mem = {
@@ -273,7 +273,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadMemory.
      *
-     * @function module:tests/io~jsontextloader-memory-no-content-type
+     * @function module:tests/io~jsontextloaderMemoryNoContentType
      */
     test('no content-type', () => {
       const mem = {
@@ -285,7 +285,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadMemory.
      *
-     * @function module:tests/io~jsontextloader-memory-non-json-filename
+     * @function module:tests/io~jsontextloaderMemoryNonJsonFilename
      */
     test('non-json filename', () => {
       const mem = {
@@ -297,7 +297,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadMemory.
      *
-     * @function module:tests/io~jsontextloader-memory-empty
+     * @function module:tests/io~jsontextloaderMemoryEmpty
      */
     test('empty', () => {
       const mem = {};
@@ -309,7 +309,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} loadFileAs.
      *
-     * @function module:tests/io~jsontextloader-loadfileas-returns-text
+     * @function module:tests/io~jsontextloaderLoadfileasReturnsText
      */
     test('returns Text', () => {
       const loader = new JSONTextLoader();
@@ -321,7 +321,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} loadUrlAs.
      *
-     * @function module:tests/io~jsontextloader-loadurlas-returns-text
+     * @function module:tests/io~jsontextloaderLoadurlasReturnsText
      */
     test('returns Text', () => {
       const loader = new JSONTextLoader();
@@ -333,7 +333,7 @@ describe('io', () => {
     /**
      * Tests for {@link JSONTextLoader} canLoadUrl.
      *
-     * @function module:tests/io~jsontextloader-canloadurl-patterns
+     * @function module:tests/io~jsontextloaderCanloadurlPatterns
      */
     test('patterns', () => {
       const loader = new JSONTextLoader();

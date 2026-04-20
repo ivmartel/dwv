@@ -19,7 +19,7 @@ describe('image', () => {
   /**
    * Tests for {@link ResamplingFilter}.
    *
-   * @function module:tests/image~resamplingfilter-class
+   * @function module:tests/image~resamplingfilterClass
    */
   test('ResamplingFilter class', () => {
     /* eslint-disable @stylistic/js/array-element-newline */

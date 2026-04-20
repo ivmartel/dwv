@@ -48,7 +48,7 @@ describe('image', () => {
   /**
    * Tests that {@link annotationGroupEventNames} exports the expected events.
    *
-   * @function module:tests/image~annotation-group-event-names
+   * @function module:tests/image~annotationGroupEventNames
    */
   test('annotationGroupEventNames contains expected event strings', () => {
     assert.include(
@@ -66,7 +66,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup} constructor with no arguments.
    *
-   * @function module:tests/image~annotation-group-ctor-empty
+   * @function module:tests/image~annotationGroupCtorEmpty
    */
   test('AnnotationGroup constructor creates an empty editable group', () => {
     const group = new AnnotationGroup();
@@ -79,7 +79,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup} constructor with an initial list.
    *
-   * @function module:tests/image~annotation-group-ctor-list
+   * @function module:tests/image~annotationGroupCtorList
    */
   test('AnnotationGroup constructor accepts a pre-built list', () => {
     const a1 = makeAnnotation('uid-1');
@@ -96,7 +96,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup#setEditable} toggling and event firing.
    *
-   * @function module:tests/image~annotation-group-editable
+   * @function module:tests/image~annotationGroupEditable
    */
   test('AnnotationGroup setEditable updates flag and fires event', () => {
     const group = new AnnotationGroup();
@@ -124,7 +124,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup#setColour} / getColour.
    *
-   * @function module:tests/image~annotation-group-colour
+   * @function module:tests/image~annotationGroupColour
    */
   test('AnnotationGroup setColour / getColour round-trip', () => {
     const group = new AnnotationGroup();
@@ -140,7 +140,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup#add} updating the list and firing events.
    *
-   * @function module:tests/image~annotation-group-add
+   * @function module:tests/image~annotationGroupAdd
    */
   test('AnnotationGroup add appends annotation and fires annotationadd', () => {
     const group = new AnnotationGroup();
@@ -160,7 +160,7 @@ describe('image', () => {
   /**
    * Tests that {@link AnnotationGroup#add} forwards the propagate flag.
    *
-   * @function module:tests/image~annotation-group-add-propagate
+   * @function module:tests/image~annotationGroupAddPropagate
    */
   test('AnnotationGroup add forwards propagate flag in event', () => {
     const group = new AnnotationGroup();
@@ -181,7 +181,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup#find} by tracking UID.
    *
-   * @function module:tests/image~annotation-group-find
+   * @function module:tests/image~annotationGroupFind
    */
   test('AnnotationGroup find returns annotation by UID or undefined', () => {
     const group = new AnnotationGroup();
@@ -200,7 +200,7 @@ describe('image', () => {
    * Tests for {@link AnnotationGroup#update} replacing the entry and
    * firing annotationupdate.
    *
-   * @function module:tests/image~annotation-group-update
+   * @function module:tests/image~annotationGroupUpdate
    */
   test('AnnotationGroup update replaces annotation and fires event', () => {
     const group = new AnnotationGroup();
@@ -223,7 +223,7 @@ describe('image', () => {
   /**
    * Tests that update calls updateQuantification when mathShape changes.
    *
-   * @function module:tests/image~annotation-group-update-quantification
+   * @function module:tests/image~annotationGroupUpdateQuantification
    */
   test('AnnotationGroup update triggers quantification for mathShape key',
     () => {
@@ -240,7 +240,7 @@ describe('image', () => {
   /**
    * Tests that update calls updateQuantification when textExpr changes.
    *
-   * @function module:tests/image~annotation-group-update-text-expr
+   * @function module:tests/image~annotationGroupUpdateTextExpr
    */
   test('AnnotationGroup update triggers quantification for textExpr key',
     () => {
@@ -257,7 +257,7 @@ describe('image', () => {
   /**
    * Tests that update does NOT call updateQuantification for unrelated keys.
    *
-   * @function module:tests/image~annotation-group-update-no-quantification
+   * @function module:tests/image~annotationGroupUpdateNoQuantification
    */
   test('AnnotationGroup update skips quantification for unrelated keys',
     () => {
@@ -274,7 +274,7 @@ describe('image', () => {
   /**
    * Tests that update warns when the annotation is not found.
    *
-   * @function module:tests/image~annotation-group-update-not-found
+   * @function module:tests/image~annotationGroupUpdateNotFound
    */
   test('AnnotationGroup update warns when annotation UID is not found', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -291,7 +291,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup#remove} by UID.
    *
-   * @function module:tests/image~annotation-group-remove
+   * @function module:tests/image~annotationGroupRemove
    */
   test('AnnotationGroup remove deletes annotation and fires event', () => {
     const group = new AnnotationGroup();
@@ -312,7 +312,7 @@ describe('image', () => {
   /**
    * Tests that remove warns when the annotation is not found.
    *
-   * @function module:tests/image~annotation-group-remove-not-found
+   * @function module:tests/image~annotationGroupRemoveNotFound
    */
   test('AnnotationGroup remove warns when annotation UID is not found', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -325,7 +325,7 @@ describe('image', () => {
   /**
    * Tests that remove only removes the targeted annotation, preserving others.
    *
-   * @function module:tests/image~annotation-group-remove-selective
+   * @function module:tests/image~annotationGroupRemoveSelective
    */
   test('AnnotationGroup remove only removes the targeted annotation', () => {
     const group = new AnnotationGroup();
@@ -351,7 +351,7 @@ describe('image', () => {
    * Tests that {@link AnnotationGroup#setViewController} delegates to each
    * annotation and triggers quantification updates.
    *
-   * @function module:tests/image~annotation-group-set-view-controller
+   * @function module:tests/image~annotationGroupSetViewController
    */
   test('AnnotationGroup setViewController delegates to all annotations',
     () => {
@@ -379,7 +379,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup} meta data CRUD.
    *
-   * @function module:tests/image~annotation-group-meta
+   * @function module:tests/image~annotationGroupMeta
    */
   test('AnnotationGroup meta data set / get / has round-trip', () => {
     const group = new AnnotationGroup();
@@ -406,7 +406,7 @@ describe('image', () => {
   /**
    * Tests for {@link AnnotationGroup#removeEventListener}.
    *
-   * @function module:tests/image~annotation-group-remove-listener
+   * @function module:tests/image~annotationGroupRemoveListener
    */
   test('AnnotationGroup removeEventListener stops callback from firing', () => {
     const group = new AnnotationGroup();

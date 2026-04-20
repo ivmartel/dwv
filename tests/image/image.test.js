@@ -69,7 +69,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} getValue.
    *
-   * @function module:tests/image~image-getvalue
+   * @function module:tests/image~imageGetvalue
    */
   test('Image getValue', () => {
     const zeroStats = {min: 0, max: 0, mean: 0, stdDev: 0};
@@ -146,7 +146,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} histogram.
    *
-   * @function module:tests/image~image-histogram
+   * @function module:tests/image~imageHistogram
    */
   test('Image histogram', () => {
     // create a simple image
@@ -181,7 +181,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} append.
    *
-   * @function module:tests/image~image-append-slice
+   * @function module:tests/image~imageAppendSlice
    */
   test('Image append slice', () => {
     /**
@@ -323,7 +323,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} convolute2D.
    *
-   * @function module:tests/image~image-convolute2d
+   * @function module:tests/image~imageConvolute2d
    */
   test('Image convolute2D', () => {
     // create a simple image
@@ -365,7 +365,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} transform.
    *
-   * @function module:tests/image~image-transform
+   * @function module:tests/image~imageTransform
    */
   test('Image transform', () => {
     // create a simple image
@@ -420,7 +420,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} compose.
    *
-   * @function module:tests/image~image-compose
+   * @function module:tests/image~imageCompose
    */
   test('Image compose', () => {
     // create two simple images
@@ -515,7 +515,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} hasValues and getOffsets.
    *
-   * @function module:tests/image~hasvalues-getoffsets
+   * @function module:tests/image~hasvaluesGetoffsets
    */
   test('hasValues getOffsets', () => {
     const size0 = 3;
@@ -581,7 +581,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} getContourDistance.
    *
-   * @function module:tests/image~image-getcontourdistance
+   * @function module:tests/image~imageGetcontourdistance
    */
   test('Image getContourDistance', () => {
 

@@ -45,7 +45,7 @@ describe('image', () => {
   /**
    * Tests for {@link ThresholdFilter} getName.
    *
-   * @function module:tests/image~threshold-filter-name
+   * @function module:tests/image~thresholdFilterName
    */
   test('ThresholdFilter getName returns Threshold', () => {
     assert.equal(new ThresholdFilter().getName(), 'Threshold');
@@ -54,7 +54,7 @@ describe('image', () => {
   /**
    * Tests for {@link ThresholdFilter} min/max accessors.
    *
-   * @function module:tests/image~threshold-filter-accessors
+   * @function module:tests/image~thresholdFilterAccessors
    */
   test('ThresholdFilter min/max accessors round-trip', () => {
     const f = new ThresholdFilter();
@@ -67,7 +67,7 @@ describe('image', () => {
   /**
    * Tests for {@link ThresholdFilter} image accessor.
    *
-   * @function module:tests/image~threshold-filter-image-accessor
+   * @function module:tests/image~thresholdFilterImageAccessor
    */
   test('ThresholdFilter setOriginalImage/getOriginalImage round-trip', () => {
     const f = new ThresholdFilter();
@@ -79,7 +79,7 @@ describe('image', () => {
   /**
    * Tests that update returns a new image, leaving the original unchanged.
    *
-   * @function module:tests/image~threshold-filter-new-image
+   * @function module:tests/image~thresholdFilterNewImage
    */
   test('ThresholdFilter update returns a new image', () => {
     const img = makeImage(3, 1, [10, 50, 90]);
@@ -95,7 +95,7 @@ describe('image', () => {
   /**
    * Tests that values inside [min, max] are preserved.
    *
-   * @function module:tests/image~threshold-filter-inside-range
+   * @function module:tests/image~thresholdFilterInsideRange
    */
   test('ThresholdFilter keeps values inside [min, max]', () => {
     const img = makeImage(3, 1, [10, 50, 90]);
@@ -112,7 +112,7 @@ describe('image', () => {
   /**
    * Tests that values outside [min, max] are replaced with imageMin.
    *
-   * @function module:tests/image~threshold-filter-outside-range
+   * @function module:tests/image~thresholdFilterOutsideRange
    */
   test('ThresholdFilter replaces out-of-range values with imageMin', () => {
     // values: 10 (min), 20, 30, 40, 50
@@ -138,7 +138,7 @@ describe('image', () => {
   /**
    * Tests for {@link SharpenFilter} getName.
    *
-   * @function module:tests/image~sharpen-filter-name
+   * @function module:tests/image~sharpenFilterName
    */
   test('SharpenFilter getName returns Sharpen', () => {
     assert.equal(new SharpenFilter().getName(), 'Sharpen');
@@ -147,7 +147,7 @@ describe('image', () => {
   /**
    * Tests for {@link SharpenFilter} image accessor.
    *
-   * @function module:tests/image~sharpen-filter-image-accessor
+   * @function module:tests/image~sharpenFilterImageAccessor
    */
   test('SharpenFilter setOriginalImage/getOriginalImage round-trip', () => {
     const f = new SharpenFilter();
@@ -159,7 +159,7 @@ describe('image', () => {
   /**
    * Tests that update returns a new image.
    *
-   * @function module:tests/image~sharpen-filter-new-image
+   * @function module:tests/image~sharpenFilterNewImage
    */
   test('SharpenFilter update returns a new image', () => {
     const img = makeImage(3, 3, Array(9).fill(10));
@@ -172,7 +172,7 @@ describe('image', () => {
    * Tests that a uniform image is preserved by the sharpen kernel.
    * For a flat region: 5v - 4v = v at every interior pixel.
    *
-   * @function module:tests/image~sharpen-filter-uniform
+   * @function module:tests/image~sharpenFilterUniform
    */
   test('SharpenFilter preserves a uniform image', () => {
     const img = makeImage(3, 3, Array(9).fill(10));
@@ -188,7 +188,7 @@ describe('image', () => {
    * Tests the sharpen kernel coefficient at the centre pixel.
    * With all neighbours = 0 and centre = 100, the centre output = 5 × 100.
    *
-   * @function module:tests/image~sharpen-filter-center-pixel
+   * @function module:tests/image~sharpenFilterCenterPixel
    */
   test('SharpenFilter amplifies isolated centre pixel by factor 5', () => {
     // 3×3, all zeros except centre (index 4)
@@ -207,7 +207,7 @@ describe('image', () => {
   /**
    * Tests for {@link SobelFilter} getName.
    *
-   * @function module:tests/image~sobel-filter-name
+   * @function module:tests/image~sobelFilterName
    */
   test('SobelFilter getName returns Sobel', () => {
     assert.equal(new SobelFilter().getName(), 'Sobel');
@@ -216,7 +216,7 @@ describe('image', () => {
   /**
    * Tests for {@link SobelFilter} image accessor.
    *
-   * @function module:tests/image~sobel-filter-image-accessor
+   * @function module:tests/image~sobelFilterImageAccessor
    */
   test('SobelFilter setOriginalImage/getOriginalImage round-trip', () => {
     const f = new SobelFilter();
@@ -228,7 +228,7 @@ describe('image', () => {
   /**
    * Tests that update returns a new image.
    *
-   * @function module:tests/image~sobel-filter-new-image
+   * @function module:tests/image~sobelFilterNewImage
    */
   test('SobelFilter update returns a new image', () => {
     const img = makeImage(3, 3, Array(9).fill(10));
@@ -241,7 +241,7 @@ describe('image', () => {
    * Tests that a uniform image produces zero gradient everywhere.
    * GradX = gradY = 0 on a flat field → sqrt(0² + 0²) = 0.
    *
-   * @function module:tests/image~sobel-filter-uniform
+   * @function module:tests/image~sobelFilterUniform
    */
   test('SobelFilter produces zero gradient for a uniform image', () => {
     const img = makeImage(3, 3, Array(9).fill(20));
@@ -257,7 +257,7 @@ describe('image', () => {
    * Tests that the Sobel output is floor(sqrt(gradX² + gradY²)).
    * A vertical step edge gives a known horizontal gradient.
    *
-   * @function module:tests/image~sobel-filter-step-edge
+   * @function module:tests/image~sobelFilterStepEdge
    */
   test('SobelFilter detects a vertical step edge', () => {
     // 3×3 image: left column = 0, right column = 100

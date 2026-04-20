@@ -350,7 +350,7 @@ describe('utils', () => {
   /**
    * Tests for {@link parseWeasisXMLManifest}.
    *
-   * @function module:tests/utils~parse-manifest
+   * @function module:tests/utils~parseWeasisXMLManifest
    */
   test('Parse Manifest - #DWV-REQ-IO-02-006 Load Data Manifest URL',
     () => {

@@ -23,7 +23,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataMonochrome} basic RGBA mapping.
    *
-   * @function module:tests/image~view-monochrome-basic
+   * @function module:tests/image~viewMonochromeBasic
    */
   test('generateImageDataMonochrome writes correct RGBA values', () => {
     const colourMap = makeColourMap();
@@ -53,7 +53,7 @@ describe('image', () => {
   /**
    * Tests that the window LUT mapping is applied before colour-map lookup.
    *
-   * @function module:tests/image~view-monochrome-windowing
+   * @function module:tests/image~viewMonochromeWindowing
    */
   test('generateImageDataMonochrome applies windowLut before colour-map lookup',
     () => {
@@ -83,7 +83,7 @@ describe('image', () => {
    * Tests that the alpha function receives the raw pixel value (not the
    * windowed one) together with its position index.
    *
-   * @function module:tests/image~view-monochrome-alpha-args
+   * @function module:tests/image~viewMonochromeAlphaArgs
    */
   test('generateImageDataMonochrome alpha check', () => {
     const colourMap = makeColourMap();
@@ -116,7 +116,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataMonochrome} with an empty iterator.
    *
-   * @function module:tests/image~view-monochrome-empty
+   * @function module:tests/image~viewMonochromeEmpty
    */
   test('generateImageDataMonochrome does nothing for an empty iterator', () => {
     const colourMap = makeColourMap();

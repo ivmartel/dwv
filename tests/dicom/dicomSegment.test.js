@@ -79,7 +79,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link MaskSegment} using simple DICOM data.
    *
-   * @function module:tests/dicom~dicom-segment-class
+   * @function module:tests/dicom~dicomSegmentClass
    */
   test('DICOM segment class', () => {
     const number0 = 0;

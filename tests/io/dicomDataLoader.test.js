@@ -12,7 +12,7 @@ describe('io', () => {
   /**
    * Tests for {@link DicomDataLoader} events with single frame data.
    *
-   * @function module:tests/io~dicom-data-loader-canloadurl
+   * @function module:tests/io~dicomDataLoaderCanloadurl
    */
   test(
     'DICOM data loader canloadurl - ' +

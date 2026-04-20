@@ -21,7 +21,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} factories.
    *
-   * @function module:tests/math~orientation-matrix-factories
+   * @function module:tests/math~orientationMatrixFactories
    */
   test('orientation matrix factories', () => {
     const theo00 = new Matrix33([
