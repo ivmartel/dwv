@@ -11,6 +11,7 @@ export default [
     },
     settings: {
       jsdoc: {
+        // in order to use @import
         mode: 'typescript',
       }
     },
