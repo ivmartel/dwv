@@ -6,12 +6,11 @@ import {Circle} from '../math/circle.js';
 import {Ellipse} from '../math/ellipse.js';
 import {Rectangle} from '../math/rectangle.js';
 import {logger} from '../utils/logger.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
 import {BidimensionalLine} from '../math/bidimensionalLine.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {DataElement} from './dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -75,7 +74,7 @@ export class SpatialCoordinate {
 /**
  * Get a scoord object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {SpatialCoordinate} A scoord object.
  */
 export function getSpatialCoordinate(dataElements) {
@@ -101,7 +100,7 @@ export function getSpatialCoordinate(dataElements) {
  * Get a simple dicom element item from a scoord object.
  *
  * @param {SpatialCoordinate} scoord The scoord object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomSpatialCoordinateItem(scoord) {
   // dicom item (tags are in group/element order)

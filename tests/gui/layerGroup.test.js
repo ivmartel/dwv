@@ -15,7 +15,7 @@ describe('gui', () => {
   /**
    * Tests for {@link LayerGroup} string id.
    *
-   * @function module:tests/gui~layergroup-string-id
+   * @function module:tests/gui~layergroupStringId
    */
   test('LayerGroup string id', () => {
     // test #00
@@ -46,7 +46,7 @@ describe('gui', () => {
   /**
    * Tests for {@link LayerGroup} creation.
    *
-   * @function module:tests/gui~layergroup-creation
+   * @function module:tests/gui~layergroupCreation
    */
   test('LayerGroup creation', () => {
     const element00 = document.createElement('div');
@@ -61,7 +61,7 @@ describe('gui', () => {
   /**
    * Tests for {@link LayerGroup} add/remove view layer.
    *
-   * @function module:tests/gui~layergroup-add-remove-view-layer
+   * @function module:tests/gui~layergroupAddRemoveViewLayer
    */
   test('LayerGroup add remove view layer', () => {
     const element00 = document.createElement('div');
@@ -88,7 +88,7 @@ describe('gui', () => {
   /**
    * Tests for {@link LayerGroup} add/remove draw layer.
    *
-   * @function module:tests/gui~layergroup-add-remove-draw-layer
+   * @function module:tests/gui~layergroupAddRemoveDrawLayer
    */
   test('LayerGroup add remove draw layer', () => {
     const element00 = document.createElement('div');

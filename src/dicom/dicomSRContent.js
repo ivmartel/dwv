@@ -26,17 +26,13 @@ import {
   getSpatialCoordinate3D,
   getDicomSpatialCoordinate3DItem
 } from './dicomSpatialCoordinate3D.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {
-  safeGet,
-  safeGetAll,
-  DataElement
-} from './dataElement.js';
-import {DicomCode} from './dicomCode.js';
+import {safeGet, safeGetAll} from './dataElement.js';
 import {MeasuredValue} from './dicomMeasuredValue.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {DicomCode} from './dicomCode.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -125,7 +121,7 @@ export const ValueTypeValueTagName = {
 /**
  * Get the content template value.
  *
- * @param {Object<string, DataElement>} dataElements The dicom elements.
+ * @param {Record<string, DataElement>} dataElements The dicom elements.
  * @returns {string|undefined} The template as
  *   'MappingResource'-'TemplateIdentifier'.
  */
@@ -256,7 +252,7 @@ export function isEqualContentItem(item1, item2) {
 /**
  * Get a content item object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {DicomSRContent} A content item object.
  */
 export function getSRContent(dataElements) {
@@ -320,7 +316,7 @@ export function getSRContent(dataElements) {
  * Get a simple dicom element item from a content item object.
  *
  * @param {DicomSRContent} content The content item object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomSRContentItem(content) {
   // dicom item (tags are in ~group/element order)

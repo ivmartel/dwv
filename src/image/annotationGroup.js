@@ -1,11 +1,10 @@
 import {logger} from '../utils/logger.js';
 import {ListenerHandler} from '../utils/listen.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Annotation} from './annotation.js';
-import {ViewController} from '../app/viewController.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Annotation} from './annotation.js';
+ * @import {ViewController} from '../app/viewController.js';
+ */
 
 /**
  * List of annotation group event names.
@@ -31,7 +30,7 @@ export class AnnotationGroup {
   /**
    * Annotation meta data.
    *
-   * @type {Object<string, any>}
+   * @type {Record<string, any>}
    */
   #meta = {};
 
@@ -254,7 +253,7 @@ export class AnnotationGroup {
   /**
    * Get the meta data.
    *
-   * @returns {Object<string, any>} The meta data.
+   * @returns {Record<string, any>} The meta data.
    */
   getMeta() {
     return this.#meta;

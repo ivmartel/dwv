@@ -17,7 +17,7 @@
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and
  *  'xxxx' with '0004'.
  *
- * @type {Object<string, Object<string, string[]>>}
+ * @type {Record<string, Record<string, string[]>>}
  */
 export const dictionary = {
   '0000': {
@@ -5244,7 +5244,7 @@ export const dictionary = {
  * Add tags to the dictionary.
  *
  * @param {string} group The group key.
- * @param {Object<string, string[]>} tags The tags to add as an
+ * @param {Record<string, string[]>} tags The tags to add as an
  *   object indexed by element key with values as:
  *   [VR, multiplicity, TagName] (all strings).
  */
@@ -5258,7 +5258,7 @@ export function addTagsToDictionary(group, tags) {
  * Copied from gdcm-2.6.1\Source\DataDictionary\GroupName.dic
  * -> removed duplicates (commented).
  *
- * @type {Object<string, string>}
+ * @type {Record<string, string>}
  */
 export const tagGroups = {
   '0000': 'Command',
@@ -5341,7 +5341,7 @@ export const tagGroups = {
  * Added locally used 'ox'.
  * See {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1}.
  *
- * @type {Object<string, boolean>}
+ * @type {Record<string, boolean>}
  */
 const vr32bitVL = {
   OB: true,
@@ -5376,7 +5376,7 @@ export function is32bitVLVR(vr) {
  *
  * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2}.
  *
- * @type {Object<string, boolean>}
+ * @type {Record<string, boolean>}
  */
 const vrCharSetString = {
   SH: true,
@@ -5403,7 +5403,7 @@ export function isCharSetStringVR(vr) {
  *
  * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
  *
- * @type {Object<string, string>}
+ * @type {Record<string, string>}
  */
 export const vrTypes = {
   AE: 'string',
@@ -5447,7 +5447,7 @@ export const vrTypes = {
  *
  * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part06/chapter_A.html#table_A-1}.
  *
- * @type {Object<string, string>}
+ * @type {Record<string, string>}
  */
 export const transferSyntaxes = {
   '1.2.840.10008.1.2': 'Implicit VR Little Endian',
@@ -5502,7 +5502,7 @@ export const transferSyntaxes = {
 /**
  * Transfer syntaxes indexed by keyword.
  *
- * @type {Object<string, string>}
+ * @type {Record<string, string>}
  */
 export const transferSyntaxKeywords = {
   ImplicitVRLittleEndian: '1.2.840.10008.1.2',
@@ -5559,7 +5559,7 @@ export const transferSyntaxKeywords = {
  *
  * See {@link https://dicom.nema.org/dicom/2013/output/chtml/part04/sect_B.5.html#table_B.5-1}.
  *
- * @type {Object<string, string>}
+ * @type {Record<string, string>}
  */
 export const SOPClassUIDs = {
   SecondaryCapture: '1.2.840.10008.5.1.4.1.1.7'

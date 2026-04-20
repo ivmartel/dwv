@@ -5,10 +5,9 @@ import {
 } from '../command/drawCommands.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Annotation} from '../image/annotation.js';
+ */
 
 /**
  * Draw controller.

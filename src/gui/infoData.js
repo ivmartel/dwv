@@ -7,11 +7,10 @@ import {
 } from '../dicom/dicomDate.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Info data item class.
@@ -120,7 +119,7 @@ export class InfoData {
   /**
    * Info data config indexed by modality.
    *
-   * @type {Object<string, InfoDataItem[]>}
+   * @type {Record<string, InfoDataItem[]>}
    */
   #infoConfigs;
 
@@ -141,7 +140,7 @@ export class InfoData {
   /**
    * Meta data storage indexed by dataUid.
    *
-   * @type {Object<string, InfoDataItem[]>|undefined}
+   * @type {Record<string, InfoDataItem[]>|undefined}
    */
   #infoData = {};
 
@@ -162,7 +161,7 @@ export class InfoData {
   /**
    * @param {App} app The associated application.
    * @param {string} dataId The associated data id.
-   * @param {Object<string, InfoDataItem[]>} configs The info data config.
+   * @param {Record<string, InfoDataItem[]>} configs The info data config.
    */
   constructor(app, dataId, configs) {
     this.#app = app;
@@ -197,7 +196,7 @@ export class InfoData {
   /**
    * Handle a new loaded item event.
    *
-   * @param {Object<string, DataElement>} data The item meta data.
+   * @param {Record<string, DataElement>} data The item meta data.
    */
   addItemMeta(data) {
     // create and store info data
@@ -379,7 +378,7 @@ export class InfoData {
  * Create info data array for a DICOM image.
  *
  * @param {object} dicomElements DICOM elements of the image.
- * @param {Object<string, InfoDataItem[]>} configs The info data configs.
+ * @param {Record<string, InfoDataItem[]>} configs The info data configs.
  * @returns {InfoDataItem[]} Info data array.
  */
 function createInfoData(dicomElements, configs) {
@@ -466,7 +465,7 @@ function createInfoData(dicomElements, configs) {
  * Create info data array for a DOM image.
  *
  * @param {object} domElements Meta data.
- * @param {Object<string, InfoDataItem[]>} configs The info data configs.
+ * @param {Record<string, InfoDataItem[]>} configs The info data configs.
  * @returns {InfoDataItem[]} Info data array.
  */
 function createInfoDataForDom(domElements, configs) {

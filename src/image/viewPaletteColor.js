@@ -1,9 +1,8 @@
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ColourMap} from './luts.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ColourMap} from './luts.js';
+ */
 
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.

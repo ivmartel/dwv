@@ -45,7 +45,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} events with single frame data.
    *
-   * @function module:tests/io~raw-image-loader-canloadurl
+   * @function module:tests/io~rawImageLoaderCanloadurl
    */
   test('RAW image loader canloadurl', () => {
     const loader = new RawImageLoader();
@@ -143,7 +143,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} canLoadFile.
    *
-   * @function module:tests/io~raw-image-loader-canloadfile
+   * @function module:tests/io~rawImageLoaderCanloadfile
    */
   test('RAW image loader canloadfile', () => {
     const loader = new RawImageLoader();
@@ -158,7 +158,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} canLoadMemory.
    *
-   * @function module:tests/io~raw-image-loader-canloadmemory
+   * @function module:tests/io~rawImageLoaderCanloadmemory
    */
   test('RAW image loader canloadmemory', () => {
     const loader = new RawImageLoader();
@@ -169,7 +169,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} static behavior helpers.
    *
-   * @function module:tests/io~raw-image-loader-content-and-state
+   * @function module:tests/io~rawImageLoaderContentAndState
    */
   test('RAW image loader content and state helpers', () => {
     const loader = new RawImageLoader();
@@ -182,7 +182,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} load from file/data url.
    *
-   * @function module:tests/io~raw-image-loader-load-file
+   * @function module:tests/io~rawImageLoaderLoadFile
    */
   test('RAW image loader load file data and fires callbacks', () => {
     const loader = new RawImageLoader();
@@ -227,7 +227,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} load from url response.
    *
-   * @function module:tests/io~raw-image-loader-load-url
+   * @function module:tests/io~rawImageLoaderLoadUrl
    */
   test('RAW image loader load url data creates object url', () => {
     const loader = new RawImageLoader();
@@ -246,7 +246,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} load error forwarding.
    *
-   * @function module:tests/io~raw-image-loader-load-error
+   * @function module:tests/io~rawImageLoaderLoadError
    */
   test('RAW image loader forwards view conversion errors', () => {
     const loader = new RawImageLoader();
@@ -277,7 +277,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawImageLoader} abort callbacks.
    *
-   * @function module:tests/io~raw-image-loader-abort
+   * @function module:tests/io~rawImageLoaderAbort
    */
   test('RAW image loader abort fires abort and loadend', () => {
     const loader = new RawImageLoader();

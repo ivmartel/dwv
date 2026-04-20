@@ -74,14 +74,14 @@ import {Threshold, Sobel, Sharpen} from './filter.js';
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  *
- * @type {Object<string, Object<string, any>>}
+ * @type {Record<string, Record<string, any>>}
  */
 export const toolOptions = {};
 
 /**
  * Default tool options.
  *
- * @type {Object<string, Object<string, any>>}
+ * @type {Record<string, Record<string, any>>}
  */
 export const defaultToolOptions = {
   draw: {

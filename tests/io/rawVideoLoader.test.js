@@ -37,7 +37,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} events with single frame data.
    *
-   * @function module:tests/io~raw-video-loader-canloadurl
+   * @function module:tests/io~rawVideoLoaderCanloadurl
    */
   test('RAW video loader canloadurl', () => {
     const loader = new RawVideoLoader();
@@ -130,7 +130,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} canLoadFile.
    *
-   * @function module:tests/io~raw-video-loader-canloadfile
+   * @function module:tests/io~rawVideoLoaderCanloadfile
    */
   test('RAW video loader canloadfile', () => {
     const loader = new RawVideoLoader();
@@ -145,7 +145,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} canLoadMemory.
    *
-   * @function module:tests/io~raw-video-loader-canloadmemory
+   * @function module:tests/io~rawVideoLoaderCanloadmemory
    */
   test('RAW video loader canloadmemory', () => {
     const loader = new RawVideoLoader();
@@ -156,7 +156,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} static behavior helpers.
    *
-   * @function module:tests/io~raw-video-loader-content-and-state
+   * @function module:tests/io~rawVideoLoaderContentAndState
    */
   test('RAW video loader content and state helpers', () => {
     const loader = new RawVideoLoader();
@@ -169,7 +169,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} load with url origin.
    *
-   * @function module:tests/io~raw-video-loader-load-url
+   * @function module:tests/io~rawVideoLoaderLoadUrl
    */
   test('RAW video loader load url converts ArrayBuffer to data uri', () => {
     const loader = new RawVideoLoader();
@@ -184,7 +184,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} load with file/data uri input.
    *
-   * @function module:tests/io~raw-video-loader-load-file
+   * @function module:tests/io~rawVideoLoaderLoadFile
    */
   test('RAW video loader load file uses source buffer directly', () => {
     const loader = new RawVideoLoader();
@@ -199,7 +199,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} metadata callback delegation.
    *
-   * @function module:tests/io~raw-video-loader-metadata-delegation
+   * @function module:tests/io~rawVideoLoaderMetadataDelegation
    */
   test('RAW video loader delegates metadata event to DOM reader', () => {
     const loader = new RawVideoLoader();
@@ -224,7 +224,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} metadata handler error forwarding.
    *
-   * @function module:tests/io~raw-video-loader-metadata-error
+   * @function module:tests/io~rawVideoLoaderMetadataError
    */
   test('RAW video loader forwards metadata processing errors', () => {
     const loader = new RawVideoLoader();
@@ -256,7 +256,7 @@ describe('io', () => {
   /**
    * Tests for {@link RawVideoLoader} abort callbacks.
    *
-   * @function module:tests/io~raw-video-loader-abort
+   * @function module:tests/io~rawVideoLoaderAbort
    */
   test('RAW video loader abort fires abort and loadend', () => {
     const loader = new RawVideoLoader();

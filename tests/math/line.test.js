@@ -18,7 +18,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line}.
    *
-   * @function module:tests/math~line-class
+   * @function module:tests/math~lineClass
    */
   test('Line class - #DWV-REQ-UI-07-007 Draw ruler', () => {
     const p00 = new Point2D(0, 0);
@@ -102,7 +102,7 @@ describe('math', () => {
   /**
    * Tests for {@link getAngle}.
    *
-   * @function module:tests/math~angle-between-lines
+   * @function module:tests/math~angleBetweenLines
    */
   test('Angle between lines - #DWV-REQ-UI-07-005 Draw protractor',
     () => {
@@ -174,7 +174,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line}.
    *
-   * @function module:tests/math~perpendicular-line
+   * @function module:tests/math~perpendicularLine
    */
   test('Perpendicular line', () => {
     const p00 = new Point2D(0, 0);
@@ -220,7 +220,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line}.
    *
-   * @function module:tests/math~line-getperpendicularlineatdistance
+   * @function module:tests/math~lineGetperpendicularlineatdistance
    */
   test('Line getPerpendicularLineAtDistance', () => {
     const p00 = new Point2D(0, 0);
@@ -254,7 +254,7 @@ describe('math', () => {
   /**
    * Tests for {@link Line}.
    *
-   * @function module:tests/math~line-ispointinlinerange
+   * @function module:tests/math~lineIspointinlinerange
    */
   test('Line isPointInLineRange', () => {
     const p00 = new Point2D(0, 0);

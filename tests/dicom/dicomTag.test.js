@@ -15,7 +15,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link Tag}.
    *
-   * @function module:tests/dicom~dicom-tag-class
+   * @function module:tests/dicom~dicomTagClass
    */
   test('DICOM tag class', () => {
     // error cases

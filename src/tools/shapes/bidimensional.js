@@ -11,10 +11,10 @@ import {
 } from './drawBounds.js';
 import {custom} from '../../app/custom.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Style} from '../../gui/style.js';
-import {Annotation} from '../../image/annotation.js';
+/**
+ * @import {Style} from '../../gui/style.js';
+ * @import {Annotation} from '../../image/annotation.js';
+ */
 
 /**
  * Bidimensional (long/short axis) annotation factory.
@@ -423,7 +423,6 @@ export class BidimensionalFactory {
    * @param {Annotation} annotation The associated annotation.
    */
   constrainAnchorMove(anchor, annotation) {
-    const group = anchor.getParent();
     const mathShape = annotation.mathShape;
 
     // Handle SHORT AXIS anchors (anchor2 and anchor3)
@@ -480,10 +479,10 @@ export class BidimensionalFactory {
   /**
    * Handle anchor movement end.
    *
-   * @param {Konva.Ellipse} anchor The active anchor.
-   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} _anchor The active anchor.
+   * @param {Annotation} _annotation The associated annotation.
    */
-  onAnchorMoveEnd(anchor, annotation) {
+  onAnchorMoveEnd(_anchor, _annotation) {
     // does nothing
   }
 

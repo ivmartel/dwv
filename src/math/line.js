@@ -4,12 +4,11 @@ import {
   REAL_WORLD_EPSILON,
 } from './matrix.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController.js';
-import {Scalar2D} from './scalar.js';
-import {Value} from './value.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Scalar2D} from './scalar.js';
+ * @import {Value} from './value.js';
+ */
 
 /**
  * Line shape.
@@ -186,7 +185,7 @@ export class Line {
    * Quantify a line according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, Value>} A quantification object.
    */
   quantify(viewController) {
     // length

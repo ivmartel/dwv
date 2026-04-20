@@ -130,7 +130,7 @@ export class ColourMap {
 /**
  * List of available lookup tables (lut).
  *
- * @type {Object<string, ColourMap>}
+ * @type {Record<string, ColourMap>}
  */
 export const luts = {
   // plain

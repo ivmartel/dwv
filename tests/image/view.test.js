@@ -17,7 +17,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} listeners.
    *
-   * @function module:tests/image~view-wlchange-event
+   * @function module:tests/image~viewWlchangeEvent
    */
   test('View wlchange event - #DWV-REQ-UI-03-001 Change image window/level',
     () => {
@@ -59,7 +59,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} getImage meta.
    *
-   * @function module:tests/image~playback-milliseconds
+   * @function module:tests/image~playbackMilliseconds
    */
   test('Playback milliseconds', () => {
     // create an image
@@ -101,7 +101,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} generateImageData MONO.
    *
-   * @function module:tests/image~generate-data-mono
+   * @function module:tests/image~generateDataMono
    */
   test('Generate data MONO - #DWV-REQ-UI-02-001 Display image',
     () => {
@@ -161,7 +161,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} generateImageData MONO with RSI.
    *
-   * @function module:tests/image~generate-data-mono-with-rsi
+   * @function module:tests/image~generateDataMonoWithRsi
    */
   test('Generate data MONO with RSI - #DWV-REQ-UI-02-001 Display image',
     () => {
@@ -223,7 +223,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} generateImageData RGB.
    *
-   * @function module:tests/image~generate-data-rgb
+   * @function module:tests/image~generateDataRgb
    */
   test('Generate data RGB - #DWV-REQ-UI-02-001 Display image',
     () => {
@@ -323,7 +323,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} generateImageData timing.
    *
-   * @function module:tests/image~generate-data-timing
+   * @function module:tests/image~generateDataTiming
    */
   test('Generate data timing - #DWV-REQ-UI-02-001 Display image',
     () => {

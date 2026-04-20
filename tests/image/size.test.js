@@ -12,7 +12,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size}.
    *
-   * @function module:tests/image~size-class
+   * @function module:tests/image~sizeClass
    */
   test('Size class', () => {
     // error cases
@@ -123,7 +123,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size.indexToOffset}.
    *
-   * @function module:tests/image~index-to-and-from-offset
+   * @function module:tests/image~indexToAndFromOffset
    */
   test('Index to and from offset', () => {
     const size00 = new Size([4, 3, 2]);
@@ -225,7 +225,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size.normalisePoint}.
    *
-   * @function module:tests/image~index-normalise-point
+   * @function module:tests/image~indexNormalisePoint
    */
   test('Index normalise Point', () => {
     const size00 = new Size([4, 3, 2]);
@@ -284,7 +284,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size.normaliseIndex}.
    *
-   * @function module:tests/image~size-normalise-index
+   * @function module:tests/image~sizeNormaliseIndex
    */
   test('Size normalise Index', () => {
     const size00 = new Size([4, 3, 2]);

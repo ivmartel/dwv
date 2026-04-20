@@ -7,11 +7,10 @@ import {
 } from './drawBounds.js';
 import {Anchor} from './anchor.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Style} from '../../gui/style.js';
-import {Annotation} from '../../image/annotation.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Style} from '../../gui/style.js';
+ * @import {Annotation} from '../../image/annotation.js';
+ */
 
 /**
  * Generic Konva shape renderer.

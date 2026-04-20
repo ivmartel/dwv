@@ -14,7 +14,7 @@ describe('math', () => {
   /**
    * Tests for {@link Index}.
    *
-   * @function module:tests/math~index-class
+   * @function module:tests/math~indexClass
    */
   test('Index class', () => {
     // error cases
@@ -135,7 +135,7 @@ describe('math', () => {
   /**
    * Tests for {@link getZeroIndex}.
    *
-   * @function module:tests/math~index-getzeroindex
+   * @function module:tests/math~indexGetzeroindex
    */
   test('Index getZeroIndex', () => {
     const i0 = getZeroIndex(3);

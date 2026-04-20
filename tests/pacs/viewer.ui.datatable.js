@@ -4,11 +4,10 @@ import {luts} from '../../src/image/luts.js';
 
 import {getControlDiv} from './viewer.ui.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../../src/app/application.js';
-import {LayoutProtocol} from './viewer.ui.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../../src/app/application.js';
+ * @import {LayoutProtocol} from './viewer.ui.js';
+ */
 
 /**
  * Get the layer group div ids associated to a view config.

@@ -1,13 +1,12 @@
 import {RoiAnnotator} from './shapeAnnotators.js';
 import {ShapeRenderer} from './shapeRenderer.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import Konva from 'konva';
-import {Style} from '../../gui/style.js';
-import {Annotation} from '../../image/annotation.js';
-import {Point2D} from '../../math/point.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import Konva from 'konva';
+ * @import {Style} from '../../gui/style.js';
+ * @import {Annotation} from '../../image/annotation.js';
+ * @import {Point2D} from '../../math/point.js';
+ */
 
 /**
  * ROI factory.

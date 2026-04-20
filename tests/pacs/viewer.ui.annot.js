@@ -14,12 +14,11 @@ import {
   isButtonPressed
 } from './viewer.ui.icons.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../../src/app/application.js';
-import {Annotation} from '../../src/image/annotation.js';
-import {AnnotationGroup} from '../../src/image/annotationGroup.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../../src/app/application.js';
+ * @import {Annotation} from '../../src/image/annotation.js';
+ * @import {AnnotationGroup} from '../../src/image/annotationGroup.js';
+ */
 
 /**
  * Get the annotation group divId.

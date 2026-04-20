@@ -137,7 +137,7 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using simple DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~simple-dicom-parsing
+   * @function module:tests/dicom~simpleDicomParsing
    */
   test('Simple DICOM parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
@@ -194,7 +194,7 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using simple DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~simple-dicom-parsing-until-tag
+   * @function module:tests/dicom~simpleDicomParsingUntilTag
    */
   test('Simple DICOM parsing until tag',
     () => {
@@ -259,7 +259,7 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using sequence test DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicom-sequence-parsing
+   * @function module:tests/dicom~dicomSequenceParsing
    */
   test('DICOM sequence parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
@@ -394,7 +394,7 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using DICOMDIR data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicomdir-parsing
+   * @function module:tests/dicom~dicomdirParsing
    */
   test('DICOMDIR parsing - #DWV-REQ-IO-02-004 Load DICOMDIR URL',
     () => {

@@ -15,7 +15,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle}.
    *
-   * @function module:tests/math~rectangle-class
+   * @function module:tests/math~rectangleClass
    */
   test('Rectangle class - #DWV-REQ-UI-07-006 Draw rectangle',
     () => {
@@ -61,7 +61,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle} quantification.
    *
-   * @function module:tests/math~rectangle-quantification
+   * @function module:tests/math~rectangleQuantification
    */
   test('Rectangle quantification - #DWV-REQ-UI-07-006 Draw rectangle',
     () => {
@@ -108,7 +108,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle} getRectangleIndices.
    *
-   * @function module:tests/math~rectangle-getrectangleindices
+   * @function module:tests/math~rectangleGetrectangleindices
    */
   test('Rectangle getRectangleIndices',
     () => {

@@ -15,7 +15,7 @@ describe('io', () => {
   /**
    * Tests for {@link MultipartLoader#load} with a real multipart buffer.
    *
-   * @function module:tests/io~multipart-loader-load
+   * @function module:tests/io~multipartLoaderLoad
    */
   test(
     'MultipartLoader load - two JSON parts end-to-end',

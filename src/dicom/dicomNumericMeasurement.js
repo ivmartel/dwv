@@ -7,12 +7,11 @@ import {
   getDicomMeasuredValueItem
 } from './dicomMeasuredValue.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-import {MeasuredValue} from './dicomMeasuredValue.js';
-import {DicomCode} from './dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {MeasuredValue} from './dicomMeasuredValue.js';
+ * @import {DicomCode} from './dicomCode.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -58,7 +57,7 @@ export class NumericMeasurement {
 /**
  * Get a measurement object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {NumericMeasurement} A measurement object.
  */
 export function getNumericMeasurement(dataElements) {
@@ -81,7 +80,7 @@ export function getNumericMeasurement(dataElements) {
  * Get a simple dicom element item from a measurement object.
  *
  * @param {NumericMeasurement} measurement The measurement object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {Record<string, any>} The item as a list of (key, value) pairs.
  */
 export function getDicomNumericMeasurementItem(measurement) {
   // dicom item (tags are in group/element order)

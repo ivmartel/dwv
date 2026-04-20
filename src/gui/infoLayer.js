@@ -3,10 +3,9 @@ import {
   getLayerDetailsFromInfoLayerDivId
 } from './layerGroup.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {InfoDataItem} from './infoData.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {InfoDataItem} from './infoData.js';
+ */
 
 /**
  * Get the HTML div id of a position element.

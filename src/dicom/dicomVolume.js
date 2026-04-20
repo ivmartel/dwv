@@ -8,10 +8,9 @@ import {
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -66,7 +65,7 @@ const SOPClassUIDs = {
 /**
  * Get the diffusion b-value from a functional DICOM sequence.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
 function getDiffusionBValueFromFunctionalSeq(elements) {
@@ -82,7 +81,7 @@ function getDiffusionBValueFromFunctionalSeq(elements) {
 /**
  * Get the diffusion b-value from standard DICOM tag.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
 function getStandardDiffusionBValueFromEMR(elements) {
@@ -115,7 +114,7 @@ function getStandardDiffusionBValueFromEMR(elements) {
  * Get the diffusion b-value from MR from non standard
  *   and/or private DICOM tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
 function getNonStandardDiffusionBValueFromMR(elements) {
@@ -164,7 +163,7 @@ function getNonStandardDiffusionBValueFromMR(elements) {
  * Get the b-value from the frame content sequence if
  * the dimension index sequence has a pointer to the b-value.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
 function getDiffusionBValueFromFrameContent(elements) {
@@ -210,7 +209,7 @@ function getDiffusionBValueFromFrameContent(elements) {
  * Get the diffusion b-value from Enhanced MR from non standard
  *   and/or private DICOM tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
 function getNonStandardDiffusionBValueFromEMR(elements) {
@@ -231,7 +230,7 @@ function getNonStandardDiffusionBValueFromEMR(elements) {
 /**
  * Get the diffusion b-value.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {number|undefined} The value, if present.
  */
 function getDiffusionBValue(elements) {
@@ -274,7 +273,7 @@ function getDiffusionBValue(elements) {
 /**
  * Get the tag time value for MR images.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {number|undefined} The value, if present.
  */
 function getMRVolumeIdTagValue(elements) {
@@ -301,7 +300,7 @@ function getMRVolumeIdTagValue(elements) {
  * Get the volume id from a list of tags. Default
  * returns MR diffusion b-value.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number|undefined} The id value if available.
  */
 export function getVolumeIdTagValue(elements) {
@@ -324,7 +323,7 @@ export function getVolumeIdTagValue(elements) {
  * Get the volume id from a list of tags parsed after the load finishes.
  * Default uses acquisition time.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number|undefined} The id value if available.
  */
 export function getPostLoadVolumeIdTagValue(elements) {

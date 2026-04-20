@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from './image.js';
+ */
 
 /**
  * Threshold an image between an input minimum and maximum.

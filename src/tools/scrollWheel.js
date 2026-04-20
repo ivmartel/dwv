@@ -1,9 +1,8 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ */
 
 /**
  * Get a normalised spin speed in the Y direction to try to support

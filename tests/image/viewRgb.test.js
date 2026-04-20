@@ -11,7 +11,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataRgb} basic RGBA mapping.
    *
-   * @function module:tests/image~view-rgb-basic
+   * @function module:tests/image~viewRgbBasic
    */
   test('generateImageDataRgb writes RGB triplets verbatim into the buffer',
     () => {
@@ -40,7 +40,7 @@ describe('image', () => {
    * Tests that the alpha function receives the full RGB triplet and the
    * position index, and that the returned value is stored in the alpha byte.
    *
-   * @function module:tests/image~view-rgb-alpha-args
+   * @function module:tests/image~viewRgbAlphaArgs
    */
   test('generateImageDataRgb passes RGB triplet and index to alpha', () => {
     const triplets = [[10, 20, 30], [40, 50, 60]];
@@ -67,7 +67,7 @@ describe('image', () => {
   /**
    * Tests for {@link generateImageDataRgb} with an empty iterator.
    *
-   * @function module:tests/image~view-rgb-empty
+   * @function module:tests/image~viewRgbEmpty
    */
   test('generateImageDataRgb does nothing for an empty iterator', () => {
     const array = makeImageData(1);
@@ -83,7 +83,7 @@ describe('image', () => {
    * Tests that no colour conversion is applied — values are copied as-is.
    * Verifies the function does not mix up channels.
    *
-   * @function module:tests/image~view-rgb-no-conversion
+   * @function module:tests/image~viewRgbNoConversion
    */
   test('generateImageDataRgb does not alter channel values', () => {
     // Use asymmetric values so a channel swap would be immediately visible

@@ -8,13 +8,12 @@ import {
   WindowLevel as WindowLevelValues
 } from '../image/windowLevel.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {Point2D} from '../math/point.js';
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {Point2D} from '../math/point.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ */
 
 /**
  * WindowLevel tool: handle window/level related events.

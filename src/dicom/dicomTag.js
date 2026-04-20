@@ -3,10 +3,9 @@ import {
   tagGroups
 } from './dictionary.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Immutable tag.
@@ -349,7 +348,7 @@ export function isAnyPixelDataTag(tag) {
  * Get the dicom data element for the pixel data (can be regular,
  * float or double data).
  *
- * @param {Object<string, DataElement>} elements The data elements.
+ * @param {Record<string, DataElement>} elements The data elements.
  * @returns {DataElement|undefined} The pixel data element.
  */
 export function getAnyPixelDataElement(elements) {
@@ -367,7 +366,7 @@ export function getAnyPixelDataElement(elements) {
 /**
  * Check if an input data elements contains a pixel data element.
  *
- * @param {Object<string, DataElement>} elements Data elements.
+ * @param {Record<string, DataElement>} elements Data elements.
  * @returns {boolean} True if the elements contain one of the
  *   pixel data tags.
  */
@@ -417,7 +416,7 @@ export function getTagFromDictionary(tagName) {
  * Get an array reducer to reduce an array of tag keys taken from
  *   the input dataElements and return as simple elements.
  *
- * @param {Object<string, DataElement>} dataElements The meta data
+ * @param {Record<string, DataElement>} dataElements The meta data
  *   index by tag keys.
  * @returns {any} An array reducer callbackFn.
  */
@@ -462,9 +461,9 @@ function getSimpleElementReducer(dataElements) {
  * - indexed by tag names instead of tag keys,
  * - no element object, just value if not sequence nor merged item.
  *
- * @param {Object<string, DataElement>} metaData The meta data
+ * @param {Record<string, DataElement>} metaData The meta data
  *   index by tag keys.
- * @returns {Object<string, any>} The simple elements.
+ * @returns {Record<string, any>} The simple elements.
  */
 export function getAsSimpleElements(metaData) {
   const meta = structuredClone(metaData);

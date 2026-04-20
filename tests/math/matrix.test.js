@@ -17,7 +17,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33}.
    *
-   * @function module:tests/math~matrix33-class
+   * @function module:tests/math~matrix33Class
    */
   test('Matrix33 class', () => {
     const m0 = new getIdentityMat33();
@@ -60,7 +60,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} toString.
    *
-   * @function module:tests/math~matrix33-tostring
+   * @function module:tests/math~matrix33ToString
    */
   test('Matrix33 tostring', () => {
     /* eslint-disable @stylistic/js/array-element-newline */
@@ -77,7 +77,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} vector multiplication.
    *
-   * @function module:tests/math~matrix33-multiply-vector
+   * @function module:tests/math~matrix33MultiplyVector
    */
   test('Matrix33 multiply vector', () => {
     // id
@@ -124,7 +124,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} multiplication.
    *
-   * @function module:tests/math~matrix33-multiply
+   * @function module:tests/math~matrix33Multiply
    */
   test('Matrix33 multiply', () => {
     // id
@@ -156,7 +156,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} inversion.
    *
-   * @function module:tests/math~matrix33-inverse
+   * @function module:tests/math~matrix33Inverse
    */
   test('Matrix33 inverse', () => {
     // id
@@ -194,7 +194,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} getAbs.
    *
-   * @function module:tests/math~matrix33-abs
+   * @function module:tests/math~matrix33Abs
    */
   test('Matrix33 abs', () => {
     const m00 = new Matrix33([
@@ -209,7 +209,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} asOneAndZeros.
    *
-   * @function module:tests/math~matrix33-asoneandzeros
+   * @function module:tests/math~matrix33AsoneAndzeros
    */
   test('Matrix33 asOneAndZeros', () => {
     // test #00
@@ -234,7 +234,7 @@ describe('math', () => {
   /**
    * Tests for {@link Matrix33} factories.
    *
-   * @function module:tests/math~matrix33-factories
+   * @function module:tests/math~matrix33Factories
    */
   test('Matrix33 factories', () => {
     // test #00

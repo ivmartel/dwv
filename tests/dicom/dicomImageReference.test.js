@@ -32,7 +32,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link ImageReference} with undefined.
      *
-     * @function module:tests/dicom~imagereference-with-undefined
+     * @function module:tests/dicom~imagereferenceWithUndefined
      */
     test('with undefined', () => {
       const ref = new ImageReference();
@@ -44,7 +44,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link ImageReference}.
      *
-     * @function module:tests/dicom~imagereference-class
+     * @function module:tests/dicom~imagereferenceClass
      */
     test('class', () => {
       const sopRef = new SopInstanceReference();
@@ -63,7 +63,7 @@ describe('dicom', () => {
      * Tests for {@link getDicomImageReferenceItem} and
      * {@link getImageReference}.
      *
-     * @function module:tests/dicom~imagereference-round-trip
+     * @function module:tests/dicom~imagereferenceRoundTrip
      */
     test('round trip', () => {
       const sopDeClass = new DataElement('UI');
@@ -118,7 +118,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getImageReference}.
      *
-     * @function module:tests/dicom~getimagereference-good-input
+     * @function module:tests/dicom~getimagereferenceGoodInput
      */
     test('good input', () => {
       const deFrame = new DataElement('IS');
@@ -157,7 +157,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getImageReference} with incomplete input.
      *
-     * @function module:tests/dicom~getimagereference-incomplete-input
+     * @function module:tests/dicom~getimagereferenceIncompleteInput
      */
     test('incomplete input', () => {
       const sopDeClass = new DataElement('UI');
@@ -186,7 +186,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getImageReference} with empty input.
      *
-     * @function module:tests/dicom~getimagereference-empty-input
+     * @function module:tests/dicom~getimagereferenceEmptyInput
      */
     test('empty input', () => {
       const ref = getImageReference({});
@@ -202,7 +202,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomImageReferenceItem}.
      *
-     * @function module:tests/dicom~getdicomimagereferenceitem-good-input
+     * @function module:tests/dicom~getdicomimagereferenceitemGoodInput
      */
     test('good input', () => {
       const sopRef = new SopInstanceReference();
@@ -228,7 +228,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomImageReferenceItem} with undefined input.
      *
-     * @function module:tests/dicom~getdicomimagereferenceitem-undefined-input
+     * @function module:tests/dicom~getdicomimagereferenceitemUndefinedInput
      */
     test('undefined input', () => {
       const sopRef = new SopInstanceReference();

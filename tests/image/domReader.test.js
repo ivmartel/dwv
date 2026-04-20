@@ -155,7 +155,7 @@ describe('image', () => {
   /**
    * Tests that getViewFromDOMImage returns data and preserves origin as source.
    *
-   * @function module:tests/image~dom-reader-image-source
+   * @function module:tests/image~domReaderImageSource
    */
   test('getViewFromDOMImage returns data and source', () => {
     const origin = 'http://example.com/img.png';
@@ -168,7 +168,7 @@ describe('image', () => {
   /**
    * Tests that meta info fields are populated correctly for a URL origin.
    *
-   * @function module:tests/image~dom-reader-image-url-info
+   * @function module:tests/image~domReaderImageUrlInfo
    */
   test('getViewFromDOMImage with URL origin sets info fields', () => {
     const origin = 'http://example.com/img.png';
@@ -187,7 +187,7 @@ describe('image', () => {
   /**
    * Tests that meta info fields are populated correctly for a File origin.
    *
-   * @function module:tests/image~dom-reader-image-file-info
+   * @function module:tests/image~domReaderImageFileInfo
    */
   test('getViewFromDOMImage with File origin sets info fields', () => {
     const file = new File(['x'], 'photo.png', {type: 'image/png'});
@@ -208,7 +208,7 @@ describe('image', () => {
   /**
    * Tests that index defaults to 0 when not supplied.
    *
-   * @function module:tests/image~dom-reader-image-default-index
+   * @function module:tests/image~domReaderImageDefaultIndex
    */
   test('getViewFromDOMImage defaults imageUid to 0 when index is falsy', () => {
     const {data} = getViewFromDOMImage(
@@ -220,7 +220,7 @@ describe('image', () => {
   /**
    * Tests that the created image has RGB photometric interpretation.
    *
-   * @function module:tests/image~dom-reader-image-photometric
+   * @function module:tests/image~domReaderImagePhotometric
    */
   test('getViewFromDOMImage creates RGB image', () => {
     const {data} = getViewFromDOMImage(
@@ -234,7 +234,7 @@ describe('image', () => {
   /**
    * Tests that alpha is stripped: the image buffer holds only RGB bytes.
    *
-   * @function module:tests/image~dom-reader-image-strip-alpha
+   * @function module:tests/image~domReaderImageStripAlpha
    */
   test('getViewFromDOMImage strips alpha channel from pixel data', () => {
     const rgbaData = makeRgbaData(4); // 2×2
@@ -253,7 +253,7 @@ describe('image', () => {
   /**
    * Tests that SeriesInstanceUID is set in the image meta.
    *
-   * @function module:tests/image~dom-reader-image-series-uid
+   * @function module:tests/image~domReaderImageSeriesUid
    */
   test('getViewFromDOMImage sets SeriesInstanceUID in image meta', () => {
     const origin = 'http://x.com/img.png';
@@ -273,7 +273,7 @@ describe('image', () => {
   /**
    * Tests that onloaditem fires on the first seeked event (URL origin).
    *
-   * @function module:tests/image~dom-reader-video-loaditem-url
+   * @function module:tests/image~domReaderVideoLoaditemUrl
    */
   test(
     'getViewFromDOMVideo calls onloaditem on first seek (URL origin)',
@@ -302,7 +302,7 @@ describe('image', () => {
   /**
    * Tests that onloaditem fires on the first seeked event (File origin).
    *
-   * @function module:tests/image~dom-reader-video-loaditem-file
+   * @function module:tests/image~domReaderVideoLoaditemFile
    */
   test(
     'getViewFromDOMVideo calls onloaditem on first seek (File origin)',
@@ -326,7 +326,7 @@ describe('image', () => {
   /**
    * Tests that onprogress fires for every frame.
    *
-   * @function module:tests/image~dom-reader-video-progress
+   * @function module:tests/image~domReaderVideoProgress
    */
   test('getViewFromDOMVideo calls onprogress for each frame', () => {
     const origin = 'http://x.com/clip.mp4';
@@ -352,7 +352,7 @@ describe('image', () => {
   /**
    * Tests that onload and onloadend fire after the last frame.
    *
-   * @function module:tests/image~dom-reader-video-load-end
+   * @function module:tests/image~domReaderVideoLoadEnd
    */
   test(
     'getViewFromDOMVideo fires onload and onloadend after last frame',
@@ -376,7 +376,7 @@ describe('image', () => {
   /**
    * Tests multi-frame: appendFrameBuffer called and listener removed at end.
    *
-   * @function module:tests/image~dom-reader-video-multiframe
+   * @function module:tests/image~domReaderVideoMultiframe
    */
   test(
     'getViewFromDOMVideo appends frames and removes listener when done',

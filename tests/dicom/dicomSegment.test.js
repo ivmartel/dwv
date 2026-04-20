@@ -8,11 +8,10 @@ import {
 import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
 import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../../src/dicom/dataElement.js';
-import {DicomCode} from '../../src/dicom/dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../../src/dicom/dataElement.js';
+ * @import {DicomCode} from '../../src/dicom/dicomCode.js';
+ */
 
 /**
  * Tests for the 'dicom/dicomSegment.js' file.
@@ -23,7 +22,7 @@ describe('dicom', () => {
   /**
    * Get a dicom code from simple dicom elements.
    *
-   * @param {Object<string, DataElement>} simpleElements DICOM simple elements.
+   * @param {Record<string, DataElement>} simpleElements DICOM simple elements.
    * @returns {DicomCode} The corresponding DICOM code.
    */
   function getCodeFromSimpleDicom(simpleElements) {
@@ -79,7 +78,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link MaskSegment} using simple DICOM data.
    *
-   * @function module:tests/dicom~dicom-segment-class
+   * @function module:tests/dicom~dicomSegmentClass
    */
   test('DICOM segment class', () => {
     const number0 = 0;

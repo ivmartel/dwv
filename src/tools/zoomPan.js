@@ -7,12 +7,11 @@ import {
 } from '../gui/generic.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ */
 
 /**
  * ZoomAndPan class.

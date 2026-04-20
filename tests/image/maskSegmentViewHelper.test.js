@@ -23,7 +23,7 @@ describe('image', () => {
   /**
    * Tests that isHidden returns false for a segment never added.
    *
-   * @function module:tests/image~mask-segment-view-helper-is-hidden-initial
+   * @function module:tests/image~maskSegmentViewHelperIsHiddenInitial
    */
   test('MaskSegmentViewHelper isHidden returns false initially', () => {
     assert.notOk(helper.isHidden(1));
@@ -33,7 +33,7 @@ describe('image', () => {
   /**
    * Tests that a segment is hidden after addToHidden.
    *
-   * @function module:tests/image~mask-segment-view-helper-add-to-hidden
+   * @function module:tests/image~maskSegmentViewHelperAddToHidden
    */
   test('MaskSegmentViewHelper addToHidden makes segment hidden', () => {
     helper.addToHidden(1);
@@ -44,7 +44,7 @@ describe('image', () => {
   /**
    * Tests that addToHidden is a no-op for an already-hidden segment.
    *
-   * @function module:tests/image~mask-segment-view-helper-add-duplicate
+   * @function module:tests/image~maskSegmentViewHelperAddDuplicate
    */
   test('MaskSegmentViewHelper addToHidden ignores duplicate', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -63,7 +63,7 @@ describe('image', () => {
   /**
    * Tests that removeFromHidden unhides a hidden segment.
    *
-   * @function module:tests/image~mask-segment-view-helper-remove-from-hidden
+   * @function module:tests/image~maskSegmentViewHelperRemoveFromHidden
    */
   test('MaskSegmentViewHelper removeFromHidden unhides a segment', () => {
     helper.addToHidden(1);
@@ -76,7 +76,7 @@ describe('image', () => {
   /**
    * Tests that removeFromHidden is a no-op for a segment not in the list.
    *
-   * @function module:tests/image~mask-segment-view-helper-remove-unknown
+   * @function module:tests/image~maskSegmentViewHelperRemoveUnknown
    */
   test('MaskSegmentViewHelper removeFromHidden is a no-op for unknown', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
@@ -94,7 +94,7 @@ describe('image', () => {
   /**
    * Tests that multiple segments can be independently hidden and shown.
    *
-   * @function module:tests/image~mask-segment-view-helper-multiple
+   * @function module:tests/image~maskSegmentViewHelperMultiple
    */
   test('MaskSegmentViewHelper manages multiple segments independently', () => {
     helper.addToHidden(1);

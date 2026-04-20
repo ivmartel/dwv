@@ -67,7 +67,7 @@ describe('utils', () => {
   /**
    * Tests for {@link WorkerTask} constructor.
    *
-   * @function module:tests/utils~worker-task-constructor
+   * @function module:tests/utils~WorkerTask
    */
   test('WorkerTask constructor stores startMessage and info', () => {
     const msg = {buffer: new Uint8Array([1, 2])};
@@ -80,7 +80,7 @@ describe('utils', () => {
   /**
    * Tests that {@link WorkerTask#getWorker} returns undefined by default.
    *
-   * @function module:tests/utils~worker-task-get-worker
+   * @function module:tests/utils~WorkerTaskGetWorker
    */
   test('WorkerTask getWorker returns undefined by default', () => {
     const task = new WorkerTask({}, {});
@@ -90,7 +90,7 @@ describe('utils', () => {
   /**
    * Tests that default event handlers are no-ops.
    *
-   * @function module:tests/utils~thread-pool-default-handlers
+   * @function module:tests/utils~ThreadPoolHandlers
    */
   test('ThreadPool default event handlers exist and do not throw', () => {
     const pool = new ThreadPool(1);
@@ -109,7 +109,7 @@ describe('utils', () => {
   /**
    * Tests that addWorkerTask fires onworkstart on the first task only.
    *
-   * @function module:tests/utils~thread-pool-workstart
+   * @function module:tests/utils~ThreadPoolWorkStart
    */
   test('ThreadPool addWorkerTask fires onworkstart only for the first task',
     () => {
@@ -131,7 +131,7 @@ describe('utils', () => {
    * Tests that addWorkerTask dispatches the task immediately when a thread
    * is free (postMessage called, thread moved to runningThreads).
    *
-   * @function module:tests/utils~thread-pool-immediate-dispatch
+   * @function module:tests/utils~threadPoolImmediateDispatch
    */
   test('ThreadPool addWorkerTask dispatches task immediately when thread free',
     () => {
@@ -154,7 +154,7 @@ describe('utils', () => {
   /**
    * Tests that addWorkerTask queues a task when no thread is free.
    *
-   * @function module:tests/utils~thread-pool-queue
+   * @function module:tests/utils~threadPoolQueue
    */
   test('ThreadPool addWorkerTask queues task when all threads are busy', () => {
     const {pool} = makePool(1);
@@ -176,7 +176,7 @@ describe('utils', () => {
    * Tests that when a worker replies, onworkitem is called with the event
    * augmented by task info.
    *
-   * @function module:tests/utils~thread-pool-workitem
+   * @function module:tests/utils~threadPoolWorkitem
    */
   test('ThreadPool fires onworkitem with augmented event on worker reply',
     () => {
@@ -207,7 +207,7 @@ describe('utils', () => {
    * Tests that when the last task completes, onwork and onworkend are fired
    * and the thread is returned to freeThreads.
    *
-   * @function module:tests/utils~thread-pool-work-done
+   * @function module:tests/utils~threadPoolWorkDone
    */
   test('ThreadPool fires onwork and onworkend when all tasks complete', () => {
     const {pool, events} = makePool(1);
@@ -223,7 +223,7 @@ describe('utils', () => {
   /**
    * Tests that a queued task is dispatched when a running task finishes.
    *
-   * @function module:tests/utils~thread-pool-queue-drain
+   * @function module:tests/utils~threadPoolQueueDrain
    */
   test('ThreadPool runs next queued task when a thread is freed', () => {
     const {pool, events} = makePool(1);
@@ -259,7 +259,7 @@ describe('utils', () => {
   /**
    * Tests that multiple tasks across multiple threads all complete correctly.
    *
-   * @function module:tests/utils~thread-pool-multi-thread
+   * @function module:tests/utils~threadPoolMultiThread
    */
   test('ThreadPool handles concurrent tasks on multiple threads', () => {
     const {pool, events} = makePool(2);
@@ -294,7 +294,7 @@ describe('utils', () => {
    * Tests that abort() stops running workers, clears the queue, and
    * fires onabort + onworkend.
    *
-   * @function module:tests/utils~thread-pool-abort
+   * @function module:tests/utils~threadPoolAbort
    */
   test('ThreadPool abort stops workers, clears queue, fires onabort', () => {
     const {pool, events} = makePool(1);
@@ -314,7 +314,7 @@ describe('utils', () => {
   /**
    * Tests that the pool is fully operational after an abort.
    *
-   * @function module:tests/utils~thread-pool-reuse-after-abort
+   * @function module:tests/utils~threadPoolReuseAfterAbort
    */
   test('ThreadPool is reusable after abort', () => {
     const {pool, events} = makePool(1);
@@ -351,7 +351,7 @@ describe('utils', () => {
   /**
    * Tests that a worker error stops all threads and fires onerror + onworkend.
    *
-   * @function module:tests/utils~thread-pool-error
+   * @function module:tests/utils~threadPoolError
    */
   test('ThreadPool handles worker error: stops pool and fires onerror', () => {
     const {pool, events} = makePool(2);

@@ -5,11 +5,10 @@ import {
   getTouchPoints
 } from '../gui/generic.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {Point2D} from '../math/point.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {Point2D} from '../math/point.js';
+ */
 
 /**
  * Opacity class.

@@ -60,7 +60,7 @@ export class WriterRule {
 /**
  * Possible writer actions.
  *
- * @type {Object<string, Function>}
+ * @type {Record<string, Function>}
  */
 const writerActions = {
   copy(item) {
@@ -82,7 +82,7 @@ const writerActions = {
 /**
  * Get simple (non official) DICOM anonymisation rules.
  *
- * @returns {Object<string, WriterRule>} The rules.
+ * @returns {Record<string, WriterRule>} The rules.
  */
 export function getDefaultAnonymisationRules() {
   return {
@@ -359,7 +359,7 @@ export class DicomWriter {
   /**
    * Default rules: just copy.
    *
-   * @type {Object<string, WriterRule>}
+   * @type {Record<string, WriterRule>}
    */
   #defaultRules = {
     default: {action: 'copy', value: null}
@@ -368,7 +368,7 @@ export class DicomWriter {
   /**
    * Writing rules.
    *
-   * @type {Object<string, WriterRule>}
+   * @type {Record<string, WriterRule>}
    */
   #rules = this.#defaultRules;
 
@@ -419,7 +419,7 @@ export class DicomWriter {
    * First checked by tagKey, tagName and then by groupName,
    * if nothing is found the default rule is applied.
    *
-   * @param {Object<string, WriterRule>} rules The input rules.
+   * @param {Record<string, WriterRule>} rules The input rules.
    * @param {boolean} [addMissingTags] If true, explicit tags that
    *   have replace rule and a value will be
    *   added if missing. Defaults to false.
@@ -854,7 +854,7 @@ export class DicomWriter {
   /**
    * Get the ArrayBuffer corresponding to input DICOM elements.
    *
-   * @param {Object<string, DataElement>} dataElements The elements to write.
+   * @param {Record<string, DataElement>} dataElements The elements to write.
    * @returns {ArrayBuffer} The elements as a buffer.
    */
   getBuffer(dataElements) {
@@ -1365,9 +1365,9 @@ function getBpeForVrType(vrType) {
  * tag names instead of keys and direct values (no value property) for
  * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {Object<string, any>} simpleTags The 'simple' DICOM
+ * @param {Record<string, any>} simpleTags The 'simple' DICOM
  *   tags object.
- * @returns {Object<string, DataElement>} The DICOM elements.
+ * @returns {Record<string, DataElement>} The DICOM elements.
  */
 export function getElementsFromJSONTags(simpleTags) {
   const keys = Object.keys(simpleTags);

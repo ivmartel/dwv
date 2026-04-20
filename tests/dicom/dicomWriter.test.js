@@ -16,10 +16,9 @@ import {
 } from '../../src/dicom/dictionary.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WriterRule} from '../../src/dicom/dicomWriter.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WriterRule} from '../../src/dicom/dicomWriter.js';
+ */
 
 // test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm?inline';
@@ -65,7 +64,7 @@ describe('dicom', () => {
    * Tests for {@link DicomWriter} using multiframe DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~write-multiframe
+   * @function module:tests/dicom~writeMultiframe
    */
   test('Write multiframe - #DWV-REQ-IO-05-001 Write DICOM file',
     () => {
@@ -114,7 +113,7 @@ describe('dicom', () => {
    * Tests for {@link DicomWriter} anomnymisation.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~write-anonymised
+   * @function module:tests/dicom~writeAnonymised
    */
   test('Write anonymised - #DWV-REQ-IO-05-002 Write anonymised DICOM file',
     () => {
@@ -194,7 +193,7 @@ describe('dicom', () => {
    * Tests for {@link DicomWriter} anomnymisation and add tags.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~write-anonymised-and-add-tags
+   * @function module:tests/dicom~writeAnonymisedAndAddTags
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -478,7 +477,7 @@ describe('dicom', () => {
    * Test a JSON config: write a DICOM file and read it back.
    *
    * @param {object} config A JSON config representing DICOM tags.
-   * @param {Object<string, WriterRule>} [writerRules] Optional DICOM
+   * @param {Record<string, WriterRule>} [writerRules] Optional DICOM
    *   writer rules.
    * @param {object} [outConfig] Optional resulting JSON after
    *   applying writer rules.
@@ -601,7 +600,7 @@ describe('dicom', () => {
    * Tests write/read DICOM data with explicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit
+   * @function module:tests/dicom~readWriteSyntheticExplicit
    */
   test(
     'Read-write synthetic explicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
@@ -618,7 +617,7 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with explicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit-with-rules
+   * @function module:tests/dicom~readWriteSyntheticExplicitWithRules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -639,7 +638,7 @@ describe('dicom', () => {
    * Tests write/read DICOM data with implicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-implicit
+   * @function module:tests/dicom~readWriteSyntheticImplicit
    */
   test(
     'Read-write synthetic implicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
@@ -656,7 +655,7 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with implicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-implicit-with-rules
+   * @function module:tests/dicom~readWriteSyntheticImplicitWithRules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -677,7 +676,7 @@ describe('dicom', () => {
    * Tests write/read DICOM data with explicit big endian encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit-big-endian
+   * @function module:tests/dicom~readWriteSyntheticExplicitBigEndian
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -695,7 +694,7 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with explicit big endian encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit-be-with-rules
+   * @function module:tests/dicom~readWriteSyntheticExplicitBeWithRules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len

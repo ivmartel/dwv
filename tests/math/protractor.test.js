@@ -11,7 +11,7 @@ describe('math', () => {
   /**
    * Tests for {@link Protractor}.
    *
-   * @function module:tests/math~protractor-class
+   * @function module:tests/math~protractorClass
    */
   test('Protractor class - #DWV-REQ-UI-07-005 Draw protractor',
     () => {
@@ -35,7 +35,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle} quantification.
    *
-   * @function module:tests/math~protractor-quantification
+   * @function module:tests/math~protractorQuantification
    */
   test('Protractor quantification - #DWV-REQ-UI-07-005 Draw protractor',
     () => {

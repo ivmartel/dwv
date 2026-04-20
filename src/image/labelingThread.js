@@ -1,9 +1,8 @@
 import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Geometry} from './geometry.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Geometry} from './geometry.js';
+ */
 
 /**
  * List of compatible typed arrays.

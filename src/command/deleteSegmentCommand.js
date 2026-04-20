@@ -1,11 +1,10 @@
 import {MaskSegmentHelper} from '../image/maskSegmentHelper.js';
 import {Command} from './undoStack.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from '../image/image.js';
-import {MaskSegment} from '../dicom/dicomSegment.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from '../image/image.js';
+ * @import {MaskSegment} from '../dicom/dicomSegment.js';
+ */
 
 /**
  * Delete segment command.

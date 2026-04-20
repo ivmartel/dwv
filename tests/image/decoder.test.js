@@ -75,7 +75,7 @@ describe('image', () => {
   /**
    * Tests for {@link PixelBufferDecoder} constructor.
    *
-   * @function module:tests/image~decoder-constructor
+   * @function module:tests/image~decoderConstructor
    */
   test('PixelBufferDecoder constructor creates a ThreadPool with size 10',
     () => {
@@ -93,7 +93,7 @@ describe('image', () => {
   /**
    * Tests that all default event handlers are no-ops.
    *
-   * @function module:tests/image~decoder-default-handlers
+   * @function module:tests/image~decoderDefaultHandlers
    */
   test('PixelBufferDecoder default event handlers exist and do not throw',
     () => {
@@ -115,7 +115,7 @@ describe('image', () => {
    * Tests that the first decode() call wires the decoder's event handlers
    * onto the pool.
    *
-   * @function module:tests/image~decoder-callback-wiring
+   * @function module:tests/image~decoderCallbackWiring
    */
   test('PixelBufferDecoder decode wires event handlers to pool on first call',
     () => {
@@ -137,7 +137,7 @@ describe('image', () => {
    * Tests that pool callbacks are assigned only once across multiple decode
    * calls.
    *
-   * @function module:tests/image~decoder-callback-wiring-once
+   * @function module:tests/image~decoderCallbackWiringOnce
    */
   test('PixelBufferDecoder decode wires callbacks only on the first call',
     () => {
@@ -162,7 +162,7 @@ describe('image', () => {
   /**
    * Tests that decode() routes 'jpeg-baseline' to the correct worker task.
    *
-   * @function module:tests/image~decoder-route-jpeg-baseline
+   * @function module:tests/image~decoderRouteJpegBaseline
    */
   test('PixelBufferDecoder decode routes jpeg-baseline to correct task', () => {
     const dec = new PixelBufferDecoder('jpeg-baseline');
@@ -177,7 +177,7 @@ describe('image', () => {
   /**
    * Tests that decode() routes 'jpeg-lossless' to the correct worker task.
    *
-   * @function module:tests/image~decoder-route-jpeg-lossless
+   * @function module:tests/image~decoderRouteJpegLossless
    */
   test('PixelBufferDecoder decode routes jpeg-lossless to correct task',
     () => {
@@ -193,7 +193,7 @@ describe('image', () => {
   /**
    * Tests that decode() routes 'jpeg2000' to the correct worker task.
    *
-   * @function module:tests/image~decoder-route-jpeg2000
+   * @function module:tests/image~decoderRouteJpeg2000
    */
   test('PixelBufferDecoder decode routes jpeg2000 to correct task', () => {
     const dec = new PixelBufferDecoder('jpeg2000');
@@ -207,7 +207,7 @@ describe('image', () => {
   /**
    * Tests that decode() routes 'rle' to the correct worker task.
    *
-   * @function module:tests/image~decoder-route-rle
+   * @function module:tests/image~decoderRouteRle
    */
   test('PixelBufferDecoder decode routes rle to correct task', () => {
     const dec = new PixelBufferDecoder('rle');
@@ -225,7 +225,7 @@ describe('image', () => {
   /**
    * Tests that the worker task receives the correct buffer, meta and info.
    *
-   * @function module:tests/image~decoder-task-payload
+   * @function module:tests/image~decoderTaskPayload
    */
   test('PixelBufferDecoder decode passes buffer, meta and info to task', () => {
     const dec = new PixelBufferDecoder('rle');
@@ -249,7 +249,7 @@ describe('image', () => {
   /**
    * Tests that decode() does not add a task for an unrecognised algorithm.
    *
-   * @function module:tests/image~decoder-unknown-algo
+   * @function module:tests/image~decoderUnknownAlgo
    */
   test('PixelBufferDecoder decode ignores unknown algorithm names', () => {
     const dec = new PixelBufferDecoder('unknown-codec');
@@ -267,7 +267,7 @@ describe('image', () => {
   /**
    * Tests that abort() delegates to the underlying thread pool.
    *
-   * @function module:tests/image~decoder-abort
+   * @function module:tests/image~decoderAbort
    */
   test('PixelBufferDecoder abort delegates to pool.abort', () => {
     const dec = new PixelBufferDecoder('jpeg-baseline');

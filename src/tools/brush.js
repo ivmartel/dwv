@@ -18,14 +18,13 @@ import {
   DrawBrushCommandProperties,
   DrawBrushCommand
 } from '../command/drawBrushCommand.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point, Point3D} from '../math/point.js';
-import {App} from '../app/application.js';
-import {LayerGroup} from '../gui/layerGroup.js';
 import {ViewLayer} from '../gui/viewLayer.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {Point, Point3D} from '../math/point.js';
+ * @import {App} from '../app/application.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ */
 
 const ERROR_MESSAGES = {
   brush: {
