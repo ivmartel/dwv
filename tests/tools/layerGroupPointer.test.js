@@ -98,6 +98,16 @@ describe('tools/layerGroupPointer', () => {
     vi.restoreAllMocks();
   });
 
+  test('LayerGroupPointer extends EventTarget', () => {
+    const pointer = new LayerGroupPointer({
+      app: {getLayerGroupByDivId: () => ({})},
+      dragBehavior: new DragBehavior()
+    });
+    assert.ok(pointer instanceof EventTarget);
+    assert.equal(typeof pointer.addEventListener, 'function');
+    assert.equal(typeof pointer.dispatchEvent, 'function');
+  });
+
   test('mousedown starts drag when canStart; mousemove updates drag', () => {
     const {canvas, groupDivId} = setupLayerCanvas();
     const layerGroup = {};

@@ -77,11 +77,14 @@ function getPrimaryTouchLayerContext(event, app) {
  * Per-move deltas are computed inside {@link DragBehavior#onUpdate}.
  * Hover ({@link HoverBehavior}) is driven from mouse events only, not touch.
  *
+ * Extends {@link EventTarget} so subclasses (tools) can use
+ * `addEventListener` / `dispatchEvent` like other UI tools.
+ *
  * Event entry points use the same names as tools (`mousedown`, `mousemove`,
  * `wheel`, `dblclick`, …). Those handlers are arrow functions so they stay
  * bound when the toolbox invokes them as bare callbacks (`func(event)`).
  */
-export class LayerGroupPointer {
+export class LayerGroupPointer extends EventTarget {
 
   /**
    * @type {App}
@@ -160,6 +163,7 @@ export class LayerGroupPointer {
     tapBehavior,
     longTouchToDblClickMs = 500
   }) {
+    super();
     this.#app = app;
     this.#dragBehavior = dragBehavior;
     this.#hoverBehavior = hoverBehavior;
