@@ -502,15 +502,43 @@ describe('tools/layerGroupPointer', () => {
   test('mouseup invokes tap when there was no move', () => {
     const {canvas, groupDivId} = setupLayerCanvas();
     const onTap = vi.fn();
+    class NoStartDrag extends DragBehavior {
+      canStart() {
+        return false;
+      }
+    }
     const pointer = new LayerGroupPointer({
       app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
-      dragBehavior: new DragBehavior(),
+      dragBehavior: new NoStartDrag(),
       tapBehavior: {onTap}
     });
 
     pointer.mousedown(mouseEvent('mousedown', canvas, 2, 3));
     pointer.mouseup(mouseEvent('mouseup', canvas, 2, 3));
     assert.equal(onTap.mock.calls.length, 1);
+  });
+
+  test('mouseup ends active drag even if pointer did not move', () => {
+    const {canvas, groupDivId} = setupLayerCanvas();
+    const onEnd = vi.fn();
+    class T extends DragBehavior {
+      onEnd() {
+        onEnd();
+        super.onEnd();
+      }
+    }
+    const drag = new T();
+    const pointer = new LayerGroupPointer({
+      app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
+      dragBehavior: drag
+    });
+
+    pointer.mousedown(mouseEvent('mousedown', canvas, 1, 1));
+    assert.ok(drag.isActive());
+
+    pointer.mouseup(mouseEvent('mouseup', canvas, 1, 1));
+    assert.equal(onEnd.mock.calls.length, 1);
+    assert.equal(drag.isActive(), false);
   });
 
   test('mouseup does not tap after mousemove', () => {

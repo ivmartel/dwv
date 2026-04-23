@@ -6,6 +6,27 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {WheelTick} from './behaviors/wheelTick.js';
 
 /**
+ * `MouseEvent#button` values (left through fifth / forward).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+ *
+ * @type {Readonly<{
+ *   left: 0,
+ *   middle: 1,
+ *   right: 2,
+ *   back: 3,
+ *   forward: 4
+ * }>}
+ */
+export const MouseEventButtons = {
+  left: 0,
+  middle: 1,
+  right: 2,
+  back: 3,
+  forward: 4
+};
+
+/**
  * @import {App} from '../app/application.js';
  * @import {DragBehavior} from './behaviors/dragBehavior.js';
  * @import {HoverBehavior} from './behaviors/hoverBehavior.js';
@@ -137,11 +158,13 @@ export class LayerGroupPointer extends EventTarget {
   #longTouchTimerId = null;
 
   /**
-   * True after a mouse down, reset at mouse up.
+   * `MouseEvent#button` from the last mousedown while that button is held;
+   * `undefined` after mouseup or {@link LayerGroupPointer#cancel}. Not set by
+   * touch.
    *
-   * @type {boolean}
+   * @type {number|undefined}
    */
-  #downed = false;
+  #mouseDownButton;
 
   /**
    * True after a mouse or touch move, reset at mousedown or touchstart.
@@ -174,6 +197,16 @@ export class LayerGroupPointer extends EventTarget {
     this.#longTouchToDblClickMs = longTouchToDblClickMs;
   }
 
+  /**
+   * Get the list of event names that this tool can fire.
+   * Default implementation returns an empty array.
+   * 
+   * @returns {string[]} The list of event names.
+   */
+  getEventNames() {
+    return [];
+  }
+  
   /**
    * @param {WheelEvent} event The mouse wheel event.
    *   Calls `preventDefault` once before `onWheel` / tick handling.
@@ -209,7 +242,7 @@ export class LayerGroupPointer extends EventTarget {
    * End behaviors that have end method.
    */
   cancel() {
-    this.#downed = false;
+    this.#mouseDownButton = undefined;
     this.#moved = false;
     this.#clearLongTouchTimer();
 
@@ -229,12 +262,14 @@ export class LayerGroupPointer extends EventTarget {
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
-    this.#downed = true;
+    this.#mouseDownButton = event.button;
     this.#moved = false;
 
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
     if (this.#dragBehavior?.canStart(point, layerGroup)) {
-      this.#dragBehavior.onStart(point, layerGroup);
+      this.#dragBehavior.onStart(point, layerGroup, {
+        mouseDownButton: event.button
+      });
     }
   };
 
@@ -245,7 +280,7 @@ export class LayerGroupPointer extends EventTarget {
     this.#moved = true;
 
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-    if (this.#downed) {
+    if (typeof this.#mouseDownButton !== 'undefined') {
       // remove hover while dragging
       this.#hoverBehavior?.onEnd();
       // update drag
@@ -262,15 +297,12 @@ export class LayerGroupPointer extends EventTarget {
    * @param {MouseEvent} event The mouse up event.
    */
   mouseup = (event) => {
-    this.#downed = false;
+    this.#mouseDownButton = undefined;
 
-    if (this.#moved) {
-      // end drag
-      if (this.#dragBehavior?.isActive()) {
-        this.#dragBehavior.onEnd();
-      }
-    } else {
-      // tap if no move
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.onEnd();
+    } else if (!this.#moved) {
+      // tap if no move and drag did not start (or already ended)
       const {point, layerGroup} = getMouseLayerContext(event, this.#app);
       this.#tapBehavior?.onTap(point, layerGroup);
     }
@@ -300,16 +332,19 @@ export class LayerGroupPointer extends EventTarget {
       // one touch drag
       const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
       if (this.#dragBehavior?.canStart(point, layerGroup)) {
-        this.#dragBehavior.onStart(point, layerGroup);
+        this.#dragBehavior.onStart(point, layerGroup, {});
       }
       // long single touch to dblclick
-      // recommended type is ReturnType<typeof setTimeout> but
-      //   lint does not like it
-      // @ts-ignore
-      this.#longTouchTimerId = setTimeout(() => {
-        this.#longTouchTimerId = null;
-        this.dblclick(event);
-      }, this.#longTouchToDblClickMs);
+      const delay = this.#longTouchToDblClickMs;
+      if (delay !== null && delay !== undefined && delay > 0) {
+        // recommended type is ReturnType<typeof setTimeout> but
+        //   lint does not like it
+        // @ts-ignore
+        this.#longTouchTimerId = setTimeout(() => {
+          this.#longTouchTimerId = null;
+          this.dblclick(event);
+        }, delay);
+      }
     } else if (touchPoints.length === 2) {
       // two touch
       this.#twoTouchBehavior?.onStart(touchPoints);
@@ -346,17 +381,14 @@ export class LayerGroupPointer extends EventTarget {
   touchend = (event) => {
     this.#clearLongTouchTimer();
 
-    if (this.#moved) {
-      // end one touch drag
-      if (this.#dragBehavior?.isActive()) {
-        this.#dragBehavior.onEnd();
-      }
-      // end two touch
-      if (this.#twoTouchBehavior?.isActive()) {
-        this.#twoTouchBehavior.onEnd();
-      }
-    } else {
-      // tap if no move
+    if (this.#twoTouchBehavior?.isActive()) {
+      this.#twoTouchBehavior.onEnd();
+      return;
+    }
+
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.onEnd();
+    } else if (!this.#moved) {
       const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
       this.#tapBehavior?.onTap(point, layerGroup);
     }
