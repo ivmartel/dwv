@@ -81,7 +81,8 @@ export class BrushDragBehavior extends DragBehavior {
     // forward brush mask paint events to this behavior
     for (const type of BRUSH_MASK_FORWARD_EVENT_TYPES) {
       this.#maskPaint.addEventListener(type, (e) => {
-        this.dispatchEvent(new CustomEvent(type, {detail: e.detail}));
+        const ce = /** @type {CustomEvent} */ (e);
+        this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
       });
     }
   }

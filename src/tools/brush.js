@@ -64,7 +64,8 @@ export class Brush extends LayerGroupPointer {
     // forward brush drag behavior events to this tool
     for (const type of this.getEventNames()) {
       this.#brushDrag.addEventListener(type, (e) => {
-        this.dispatchEvent(new CustomEvent(type, {detail: e.detail}));
+        const ce = /** @type {CustomEvent} */ (e);
+        this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
       });
     }
   }
