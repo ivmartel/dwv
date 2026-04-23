@@ -206,7 +206,7 @@ export class LayerGroupPointer extends EventTarget {
   getEventNames() {
     return [];
   }
-  
+
   /**
    * @param {WheelEvent} event The mouse wheel event.
    *   Calls `preventDefault` once before `onWheel` / tick handling.
