@@ -6,7 +6,6 @@ import {LayerGroupPointer} from './layerGroupPointer.js';
 
 /**
  * @import {App} from '../app/application.js';
- * @import {BrushDragBehavior} from './behaviors/brushDragBehavior.js';
  */
 
 /**

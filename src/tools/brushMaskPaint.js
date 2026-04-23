@@ -19,7 +19,7 @@ import {ERROR_MESSAGES, formatString} from './brushPaintMessages.js';
 /**
  * @import {App} from '../app/application.js';
  * @import {LayerGroup} from '../gui/layerGroup.js';
- * @import {Point2D} from '../math/point.js';
+ * @import {Point, Point3D, Point2D} from '../math/point.js';
  * @import {ViewLayer} from '../gui/viewLayer.js';
  */
 
