@@ -200,7 +200,7 @@ export class LayerGroupPointer extends EventTarget {
   /**
    * Get the list of event names that this tool can fire.
    * Default implementation returns an empty array.
-   * 
+   *
    * @returns {string[]} The list of event names.
    */
   getEventNames() {
