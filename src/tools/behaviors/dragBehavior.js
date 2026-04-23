@@ -10,7 +10,6 @@ import {Point2D} from '../../math/point.js';
 
 /**
  * @import {LayerGroup} from '../../gui/layerGroup.js';
- * @import {Point2D} from '../../math/point.js';
  * @import {Scalar2D} from '../../math/scalar.js';
  */
 
