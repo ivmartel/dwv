@@ -343,9 +343,10 @@ export class FloodfillDragBehavior extends DragBehavior {
   /**
    * @param {Point2D} point The pointer position at drag start.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @param {object} [_pointerStart] Drag start context (unused).
    */
-  onStart(point, layerGroup) {
-    super.onStart(point, layerGroup);
+  onStart(point, layerGroup, _pointerStart) {
+    super.onStart(point, layerGroup, _pointerStart);
 
     if (this.#isResampled(layerGroup)) {
       return;

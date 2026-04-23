@@ -15,17 +15,17 @@ import * as loggerModule from '../../../src/utils/logger.js';
 
 describe('tools/behaviors', () => {
   describe('DragStep', () => {
-    test('stores points and computes dx/dy', () => {
+    test('stores points and computes delta Scalar2D', () => {
       const p0 = new Point2D(10, 20);
       const p1 = new Point2D(15, 25);
       const step = new DragStep(p0, p1);
 
-      assert.equal(step.point0.getX(), 10);
-      assert.equal(step.point0.getY(), 20);
-      assert.equal(step.point1.getX(), 15);
-      assert.equal(step.point1.getY(), 25);
-      assert.equal(step.dx, 5);
-      assert.equal(step.dy, 5);
+      assert.equal(p0.getX(), 10);
+      assert.equal(p0.getY(), 20);
+      assert.equal(p1.getX(), 15);
+      assert.equal(p1.getY(), 25);
+      assert.equal(step.delta.x, 5);
+      assert.equal(step.delta.y, 5);
     });
 
     test('computes negative deltas', () => {
@@ -33,15 +33,15 @@ describe('tools/behaviors', () => {
       const p1 = new Point2D(15, 25);
       const step = new DragStep(p0, p1);
 
-      assert.equal(step.dx, -5);
-      assert.equal(step.dy, -5);
+      assert.equal(step.delta.x, -5);
+      assert.equal(step.delta.y, -5);
     });
 
     test('passesThresholdX returns true when no threshold', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(5, 0),
-        {thresholdX: 0}
+        {threshold: {x: 0, y: 0}}
       );
       assert.ok(step.passesThresholdX());
     });
@@ -50,7 +50,7 @@ describe('tools/behaviors', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(15, 0),
-        {thresholdX: 10}
+        {threshold: {x: 10, y: 0}}
       );
       assert.ok(step.passesThresholdX());
     });
@@ -59,7 +59,7 @@ describe('tools/behaviors', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(5, 0),
-        {thresholdX: 10}
+        {threshold: {x: 10, y: 0}}
       );
       assert.notOk(step.passesThresholdX());
     });
@@ -68,7 +68,7 @@ describe('tools/behaviors', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(0, 5),
-        {thresholdY: 0}
+        {threshold: {x: 0, y: 0}}
       );
       assert.ok(step.passesThresholdY());
     });
@@ -77,7 +77,7 @@ describe('tools/behaviors', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(0, 15),
-        {thresholdY: 10}
+        {threshold: {x: 0, y: 10}}
       );
       assert.ok(step.passesThresholdY());
     });
@@ -86,7 +86,7 @@ describe('tools/behaviors', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(15, 5),
-        {thresholdX: 10, thresholdY: 10}
+        {threshold: {x: 10, y: 10}}
       );
       assert.ok(step.passesThreshold());
     });
@@ -95,7 +95,7 @@ describe('tools/behaviors', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(5, 5),
-        {thresholdX: 10, thresholdY: 10}
+        {threshold: {x: 10, y: 10}}
       );
       assert.notOk(step.passesThreshold());
     });
@@ -104,7 +104,7 @@ describe('tools/behaviors', () => {
       const step = new DragStep(
         new Point2D(0, 0),
         new Point2D(1, 1),
-        {thresholdX: -5, thresholdY: -5}
+        {threshold: {x: -5, y: -5}}
       );
       assert.ok(step.passesThreshold());
     });
@@ -133,6 +133,25 @@ describe('tools/behaviors', () => {
       assert.ok(behavior.isActive());
     });
 
+    test('prevPoint getter matches onStart and null after onEnd', () => {
+      const point = new Point2D(3, 4);
+      behavior.onStart(point);
+      assert.strictEqual(behavior.prevPoint, point);
+      behavior.onEnd();
+      assert.equal(behavior.prevPoint, null);
+    });
+
+    test('during onDrag prevPoint is current move endpoint', () => {
+      let seenPrev = null;
+      const end = new Point2D(5, 0);
+      behavior.onDrag = () => {
+        seenPrev = behavior.prevPoint;
+      };
+      behavior.onStart(new Point2D(0, 0));
+      behavior.onUpdate(end);
+      assert.strictEqual(seenPrev, end);
+    });
+
     test('onEnd makes behavior inactive', () => {
       behavior.onStart(new Point2D(10, 20));
       behavior.onEnd();
@@ -150,7 +169,7 @@ describe('tools/behaviors', () => {
     });
 
     test('onUpdate does not call onDrag when threshold fails', () => {
-      const behavior2 = new DragBehavior({thresholdX: 100, thresholdY: 100});
+      const behavior2 = new DragBehavior({threshold: {x: 100, y: 100}});
       const mockDrag = vi.fn();
       behavior2.onDrag = mockDrag;
 
@@ -160,7 +179,7 @@ describe('tools/behaviors', () => {
       assert.equal(mockDrag.mock.calls.length, 0);
     });
 
-    test('onUpdate updates prevPoint after threshold', () => {
+    test('onUpdate advances prevPoint before onDrag for next step', () => {
       const mockDrag = vi.fn();
       behavior.onDrag = mockDrag;
 
@@ -176,7 +195,19 @@ describe('tools/behaviors', () => {
       // The second drag should have dx = 20 (from 20 to 40)
       assert.equal(mockDrag2.mock.calls.length, 1);
       const dragStepArg = mockDrag2.mock.calls[0][0];
-      assert.equal(dragStepArg.dx, 20);
+      assert.equal(dragStepArg.delta.x, 20);
+    });
+
+    test('setThreshold changes drag sensitivity', () => {
+      const behavior3 = new DragBehavior({threshold: {x: 100, y: 100}});
+      const mockDrag = vi.fn();
+      behavior3.onDrag = mockDrag;
+      behavior3.onStart(new Point2D(0, 0));
+      behavior3.onUpdate(new Point2D(5, 5));
+      assert.equal(mockDrag.mock.calls.length, 0);
+      behavior3.setDragThreshold({x: 0, y: 0});
+      behavior3.onUpdate(new Point2D(5, 5));
+      assert.equal(mockDrag.mock.calls.length, 1);
     });
   });
 
@@ -232,7 +263,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(10, -20),
-        {thresholdX: 0, thresholdY: 0}
+        {threshold: {x: 0, y: 0}}
       );
       behavior.onDrag(drag, layerGroup);
 
@@ -290,7 +321,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(0, 20),
-        {thresholdX: 15, thresholdY: 15}
+        {threshold: {x: 15, y: 15}}
       );
       behavior.onDrag(drag, layerGroup);
 
@@ -306,7 +337,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 20),
         new Point2D(0, 0),
-        {thresholdX: 15, thresholdY: 15}
+        {threshold: {x: 15, y: 15}}
       );
       behavior.onDrag(drag, layerGroup);
 
@@ -323,7 +354,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(20, 0),
-        {thresholdX: 15, thresholdY: 15}
+        {threshold: {x: 15, y: 15}}
       );
       behavior.onDrag(drag, layerGroup);
 
@@ -364,7 +395,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(20, 0),
-        {thresholdX: 15, thresholdY: 15}
+        {threshold: {x: 15, y: 15}}
       );
       behavior.onDrag(drag, layerGroup);
 
@@ -381,7 +412,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(5, 0),
-        {thresholdX: 15, thresholdY: 15}
+        {threshold: {x: 15, y: 15}}
       );
       behavior.onDrag(drag, layerGroup);
 
@@ -404,7 +435,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(10, 20),
-        {thresholdX: 0, thresholdY: 0}
+        {threshold: {x: 0, y: 0}}
       );
       behavior.onDrag(drag, layerGroup);
 
@@ -429,7 +460,7 @@ describe('tools/behaviors', () => {
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(10, 20),
-        {thresholdX: 0, thresholdY: 0}
+        {threshold: {x: 0, y: 0}}
       );
       behavior.onDrag(drag, layerGroup);
 

@@ -10,62 +10,100 @@ import {Point2D} from '../../math/point.js';
 
 /**
  * @import {LayerGroup} from '../../gui/layerGroup.js';
+ * @import {Point2D} from '../../math/point.js';
+ * @import {Scalar2D} from '../../math/scalar.js';
+ */
+
+/**
+ * Optional payload for {@link DragBehavior#onStart} (mouse vs touch).
+ *
+ * @typedef {object} DragPointerStartContext
+ * @property {number|undefined} [mouseDownButton] `MouseEvent#button` when the
+ *   pointer is mouse-driven; omit or leave undefined for touch.
  */
 
 /**
  * @typedef {object} DragBehaviorOptions
- * @property {number} [thresholdX] Minimum absolute display delta along X
- *   (pixels) before {@link DragBehavior#onDrag} runs; `0` disables the X
- *   check. Ignored together with `thresholdY` when both are `<= 0` (always
- *   invoke {@link DragBehavior#onDrag}).
- * @property {number} [thresholdY] Minimum absolute display delta along Y;
- *   `0` disables the Y check.
+ * @property {Scalar2D} [threshold] Defaults to zero on both axes (invoke
+ *   {@link DragBehavior#onDrag} on every move). Display-space move minimum in
+ *   pixels per axis (`<= 0` disables that axis for the minimum check).
  */
 
 /**
- * One pointer move while dragging: positions and delta from the previous event.
+ * @param {Scalar2D|{x?: number, y?: number}|undefined} threshold Raw threshold.
+ * @returns {Scalar2D} Copy with numeric `x` and `y`.
+ */
+function normalizeThreshold(threshold) {
+  return {
+    x: typeof threshold?.x === 'number' ? threshold.x : 0,
+    y: typeof threshold?.y === 'number' ? threshold.y : 0
+  };
+}
+
+/**
+ * One pointer move while dragging: display-space delta from the previous
+ * event as {@link Scalar2D} (`x` = `point1.x - point0.x`,
+ * `y` = `point1.y - point0.y`).
  */
 export class DragStep {
 
   /**
+   * Display delta from previous position (`x`/`y` in pixels).
+   *
+   * @type {Scalar2D}
+   */
+  #delta;
+
+  /**
+   * @type {Scalar2D}
+   */
+  #threshold;
+
+  /**
    * @param {Point2D} point0 Position at the previous move (or down).
    * @param {Point2D} point1 Current pointer position (display space).
-   * @param {DragBehaviorOptions} [options] Thresholds for
-   *   {@link passesThresholdX}, {@link passesThresholdY}, and
-   *   {@link passesThreshold}; default `0` / `0` (see
-   *   {@link DragBehaviorOptions}).
+   * @param {object} [options] Options.
+   * @param {Scalar2D} [options.threshold] Per-axis
+   *   thresholds (see {@link DragBehaviorOptions}).
    */
-  constructor(point0, point1, {thresholdX = 0, thresholdY = 0} = {}) {
-    this.point0 = point0;
-    this.point1 = point1;
-    this.dx = point1.getX() - point0.getX();
-    this.dy = point1.getY() - point0.getY();
-    this.thresholdX = thresholdX;
-    this.thresholdY = thresholdY;
+  constructor(point0, point1, {threshold} = {}) {
+    this.#delta = {
+      x: point1.getX() - point0.getX(),
+      y: point1.getY() - point0.getY()
+    };
+    this.#threshold = normalizeThreshold(threshold);
   }
 
   /**
-   * @returns {boolean} True when `thresholdX` is `<= 0` (no minimum on X), or
-   *   when `|dx| >= thresholdX`.
+   * @returns {Scalar2D} Display delta (`point1 - point0`); mutable — treat as
+   *   read-only from outside {@link DragStep}.
+   */
+  get delta() {
+    return this.#delta;
+  }
+
+  /**
+   * @returns {boolean} True when `threshold.x` is `<= 0` (no minimum on X), or
+   *   when `|delta.x| >= threshold.x`.
    */
   passesThresholdX() {
-    const t = this.thresholdX;
-    if (t <= 0) {
+    const tx = this.#threshold.x;
+    if (tx <= 0) {
       return true;
     }
-    return Math.abs(this.dx) >= t;
+    return Math.abs(this.#delta.x) >= tx;
   }
 
   /**
-   * @returns {boolean} True when `thresholdY` is `<= 0` (no minimum on Y), or
-   *   when `|dy| >= thresholdY`.
+   * @returns {boolean} True when `threshold.y` is `<= 0` (no minimum on Y), or
+   *   when `|delta.y| >= threshold.y`.
    */
   passesThresholdY() {
-    const t = this.thresholdY;
-    if (t <= 0) {
+    const ty = this.#threshold.y;
+    if (ty <= 0) {
       return true;
     }
-    return Math.abs(this.dy) >= t;
+    return Math.abs(this.#delta.y) >= ty;
   }
 
   /**
@@ -85,32 +123,35 @@ export class DragStep {
  * ({@link DragBehavior#onUpdate}); {@link LayerGroupPointer} only forwards
  * positions during an active drag.
  */
-export class DragBehavior {
+export class DragBehavior extends EventTarget {
 
   /**
-   * Previous pointer position for the current drag (set in {@link onStart},
-   * updated in {@link onUpdate}, cleared in {@link onEnd}).
+   * Pointer anchor for the next step (set in {@link onStart}, advanced in
+   * {@link onUpdate} before {@link onDrag}, cleared in {@link onEnd}).
    *
    * @type {Point2D|null}
    */
   #prevPoint = null;
 
   /**
-   * @type {number}
+   * @type {Scalar2D}
    */
-  #thresholdX;
-
-  /**
-   * @type {number}
-   */
-  #thresholdY;
+  #dragThreshold;
 
   /**
    * @param {DragBehaviorOptions} [options] Constructor options.
    */
-  constructor({thresholdX = 0, thresholdY = 0} = {}) {
-    this.#thresholdX = thresholdX;
-    this.#thresholdY = thresholdY;
+  constructor({threshold} = {}) {
+    super();
+    this.setDragThreshold(threshold);
+  }
+
+  /**
+   * @param {Scalar2D} threshold New per-axis minimum
+   *   move in display pixels before {@link DragBehavior#onDrag} runs.
+   */
+  setDragThreshold(threshold) {
+    this.#dragThreshold = normalizeThreshold(threshold);
   }
 
   /**
@@ -132,34 +173,43 @@ export class DragBehavior {
   /**
    * @param {Point2D} point The pointer position at drag start.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
+   * @param {DragPointerStartContext|undefined} [_pointerStart] Mouse/touch
+   *   context from {@link LayerGroupPointer}.
    */
-  onStart(point, _layerGroup) {
+  onStart(point, _layerGroup, _pointerStart) {
     this.#prevPoint = point;
+  }
+
+  /**
+   * @returns {Point2D|null} Last accepted pointer for the next step. When
+   *   {@link DragBehavior#onDrag} runs, already updated to this move's
+   *   endpoint (the `point` passed to {@link DragBehavior#onUpdate}).
+   */
+  get prevPoint() {
+    return this.#prevPoint;
   }
 
   /**
    * Advance the drag with a new pointer position. Builds a {@link DragStep}
    * with `point0` = previous position, `point1` = current, and this behavior's
-   * `thresholdX` / `thresholdY`; calls {@link onDrag} when
-   * {@link DragStep#passesThreshold} is true, then stores the current
-   * point as the new previous position.
+   * `threshold`; when {@link DragStep#passesThreshold} is true, assigns the
+   * current point as {@link DragBehavior#prevPoint}, then calls {@link onDrag}.
    *
    * @param {Point2D} point Current pointer position in display space.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   onUpdate(point, layerGroup) {
     const drag = new DragStep(this.#prevPoint, point, {
-      thresholdX: this.#thresholdX,
-      thresholdY: this.#thresholdY
+      threshold: this.#dragThreshold
     });
     if (drag.passesThreshold()) {
-      this.onDrag(drag, layerGroup);
       this.#prevPoint = point;
+      this.onDrag(drag, layerGroup);
     }
   }
 
   /**
-   * @param {DragStep} _drag Step with `dx`/`dy` and positions.
+   * @param {DragStep} _drag Step with {@link DragStep#delta}.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    */
   onDrag(_drag, _layerGroup) {
@@ -221,7 +271,7 @@ export class WindowLevelDragBehavior extends DragBehavior {
   }
 
   /**
-   * @param {DragStep} drag Delta from previous event (`dx`/`dy`).
+   * @param {DragStep} drag Delta from previous event ({@link DragStep#delta}).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   onDrag(drag, layerGroup) {
@@ -232,8 +282,8 @@ export class WindowLevelDragBehavior extends DragBehavior {
     }
     const viewController = viewLayer.getViewController();
 
-    const diffX = drag.dx;
-    const diffY = -drag.dy;
+    const diffX = drag.delta.x;
+    const diffY = -drag.delta.y;
     const range = viewController.getImageRescaledDataRange();
     const pixelToIntensity = (range.max - range.min) * 0.001;
 
@@ -242,8 +292,8 @@ export class WindowLevelDragBehavior extends DragBehavior {
     const windowCenter = center + (diffY * pixelToIntensity);
     const windowWidth = width + (diffX * pixelToIntensity);
 
-    const wl = new WindowLevelValues(windowCenter, windowWidth);
-    viewController.setWindowLevel(wl);
+    const windowLevel = new WindowLevelValues(windowCenter, windowWidth);
+    viewController.setWindowLevel(windowLevel);
   }
 
 }
@@ -258,8 +308,7 @@ export class ScrollDragBehavior extends DragBehavior {
 
   constructor() {
     super({
-      thresholdX: 15,
-      thresholdY: 15
+      threshold: {x: 15, y: 15}
     });
   }
 
@@ -285,13 +334,13 @@ export class ScrollDragBehavior extends DragBehavior {
     const positionHelper = layerGroup.getPositionHelper();
 
     if (drag.passesThresholdY() && layerGroup.canScroll()) {
-      if (drag.dy > 0) {
+      if (drag.delta.y > 0) {
         positionHelper.decrementPositionAlongScroll();
       } else {
         positionHelper.incrementPositionAlongScroll();
       }
     } else if (drag.passesThresholdX() && layerGroup.moreThanOne(3)) {
-      if (drag.dx > 0) {
+      if (drag.delta.x > 0) {
         positionHelper.incrementPosition(3);
       } else {
         positionHelper.decrementPosition(3);
@@ -311,8 +360,7 @@ export class OpacityDragBehavior extends DragBehavior {
 
   constructor() {
     super({
-      thresholdX: 15,
-      thresholdY: 15
+      threshold: {x: 15, y: 15}
     });
   }
 
@@ -327,8 +375,8 @@ export class OpacityDragBehavior extends DragBehavior {
   }
 
   /**
-   * @param {DragStep} drag Step; uses `dx` when
-   *   {@link DragStep#passesThresholdX}.
+   * @param {DragStep} drag Step; uses horizontal delta ({@link DragStep#delta}
+   *   `x`) when {@link DragStep#passesThresholdX}.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   onDrag(drag, layerGroup) {
@@ -339,8 +387,8 @@ export class OpacityDragBehavior extends DragBehavior {
     if (typeof layer === 'undefined') {
       return;
     }
-    const op = layer.getOpacity();
-    layer.setOpacity(op + (drag.dx / 200));
+    const opacity = layer.getOpacity();
+    layer.setOpacity(opacity + (drag.delta.x / 200));
     layer.draw();
   }
 
@@ -353,7 +401,7 @@ export class OpacityDragBehavior extends DragBehavior {
 export class PanDragBehavior extends DragBehavior {
 
   /**
-   * @param {object} drag Step with `dx`/`dy` (same shape as DragStep).
+   * @param {DragStep} drag Step with {@link DragStep#delta}.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   onDrag(drag, layerGroup) {
@@ -364,7 +412,7 @@ export class PanDragBehavior extends DragBehavior {
     }
     const viewController = viewLayer.getViewController();
     const planeOffset = viewLayer.displayToPlaneScale(
-      new Point2D(drag.dx, drag.dy)
+      new Point2D(drag.delta.x, drag.delta.y)
     );
     const offset3D = viewController.getOffset3DFromPlaneOffset({
       x: planeOffset.getX(),
