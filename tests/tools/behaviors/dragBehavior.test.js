@@ -10,7 +10,12 @@ import {
   OpacityDragBehavior,
   PanDragBehavior
 } from '../../../src/tools/behaviors/dragBehavior.js';
-import {makeMockLayerGroup, makeMockViewLayer, makeMockLayer} from './utils.js';
+import {
+  makeMockLayerGroup,
+  makeMockViewLayer,
+  makeMockViewController,
+  makeMockLayer
+} from './utils.js';
 import * as loggerModule from '../../../src/utils/logger.js';
 
 describe('tools/behaviors', () => {
@@ -108,6 +113,34 @@ describe('tools/behaviors', () => {
       );
       assert.ok(step.passesThreshold());
     });
+
+    test('omitted threshold options default both axes to zero', () => {
+      const step = new DragStep(new Point2D(0, 0), new Point2D(1, 2));
+      assert.ok(step.passesThresholdX());
+      assert.ok(step.passesThresholdY());
+      assert.equal(step.delta.x, 1);
+      assert.equal(step.delta.y, 2);
+    });
+
+    test('partial threshold treats missing axis as zero (no minimum)', () => {
+      const stepOnlyX = new DragStep(
+        new Point2D(0, 0),
+        new Point2D(1, 100),
+        {threshold: {x: 10}}
+      );
+      assert.notOk(stepOnlyX.passesThresholdX());
+      assert.ok(stepOnlyX.passesThresholdY());
+      assert.ok(stepOnlyX.passesThreshold());
+
+      const stepOnlyY = new DragStep(
+        new Point2D(0, 0),
+        new Point2D(100, 1),
+        {threshold: {y: 10}}
+      );
+      assert.ok(stepOnlyY.passesThresholdX());
+      assert.notOk(stepOnlyY.passesThresholdY());
+      assert.ok(stepOnlyY.passesThreshold());
+    });
   });
 
   describe('DragBehavior', () => {
@@ -129,13 +162,31 @@ describe('tools/behaviors', () => {
 
     test('onStart makes behavior active', () => {
       const point = new Point2D(10, 20);
-      behavior.onStart(point);
+      const layerGroup = makeMockLayerGroup();
+      behavior.onStart(point, layerGroup);
       assert.ok(behavior.isActive());
+    });
+
+    test('onStart accepts optional layerGroup and pointerStart context', () => {
+      const layerGroup = makeMockLayerGroup();
+      behavior.onStart(
+        new Point2D(1, 2),
+        layerGroup,
+        {mouseDownButton: 0}
+      );
+      assert.strictEqual(behavior.prevPoint.getX(), 1);
+      assert.ok(behavior.isActive());
+    });
+
+    test('onUpdate before onStart throws (no anchor point)', () => {
+      assert.throws(() => {
+        behavior.onUpdate(new Point2D(0, 0), makeMockLayerGroup());
+      });
     });
 
     test('prevPoint getter matches onStart and null after onEnd', () => {
       const point = new Point2D(3, 4);
-      behavior.onStart(point);
+      behavior.onStart(point, makeMockLayerGroup());
       assert.strictEqual(behavior.prevPoint, point);
       behavior.onEnd();
       assert.equal(behavior.prevPoint, null);
@@ -144,26 +195,40 @@ describe('tools/behaviors', () => {
     test('during onDrag prevPoint is current move endpoint', () => {
       let seenPrev = null;
       const end = new Point2D(5, 0);
+      const layerGroup = makeMockLayerGroup();
       behavior.onDrag = () => {
         seenPrev = behavior.prevPoint;
       };
-      behavior.onStart(new Point2D(0, 0));
-      behavior.onUpdate(end);
+      behavior.onStart(new Point2D(0, 0), layerGroup);
+      behavior.onUpdate(end, layerGroup);
       assert.strictEqual(seenPrev, end);
     });
 
     test('onEnd makes behavior inactive', () => {
-      behavior.onStart(new Point2D(10, 20));
+      behavior.onStart(new Point2D(10, 20), makeMockLayerGroup());
       behavior.onEnd();
       assert.notOk(behavior.isActive());
+    });
+
+    test('onUpdate passes layerGroup through to onDrag', () => {
+      const mockDrag = vi.fn();
+      behavior.onDrag = mockDrag;
+      const layerGroup = makeMockLayerGroup();
+
+      behavior.onStart(new Point2D(0, 0), layerGroup);
+      behavior.onUpdate(new Point2D(20, 0), layerGroup);
+
+      assert.equal(mockDrag.mock.calls.length, 1);
+      assert.strictEqual(mockDrag.mock.calls[0][1], layerGroup);
     });
 
     test('onUpdate calls onDrag when threshold passes', () => {
       const mockDrag = vi.fn();
       behavior.onDrag = mockDrag;
+      const layerGroup = makeMockLayerGroup();
 
-      behavior.onStart(new Point2D(0, 0));
-      behavior.onUpdate(new Point2D(20, 0));
+      behavior.onStart(new Point2D(0, 0), layerGroup);
+      behavior.onUpdate(new Point2D(20, 0), layerGroup);
 
       assert.equal(mockDrag.mock.calls.length, 1);
     });
@@ -172,9 +237,10 @@ describe('tools/behaviors', () => {
       const behavior2 = new DragBehavior({threshold: {x: 100, y: 100}});
       const mockDrag = vi.fn();
       behavior2.onDrag = mockDrag;
+      const layerGroup = makeMockLayerGroup();
 
-      behavior2.onStart(new Point2D(0, 0));
-      behavior2.onUpdate(new Point2D(5, 5));
+      behavior2.onStart(new Point2D(0, 0), layerGroup);
+      behavior2.onUpdate(new Point2D(5, 5), layerGroup);
 
       assert.equal(mockDrag.mock.calls.length, 0);
     });
@@ -182,15 +248,16 @@ describe('tools/behaviors', () => {
     test('onUpdate advances prevPoint before onDrag for next step', () => {
       const mockDrag = vi.fn();
       behavior.onDrag = mockDrag;
+      const layerGroup = makeMockLayerGroup();
 
-      behavior.onStart(new Point2D(0, 0));
+      behavior.onStart(new Point2D(0, 0), layerGroup);
       const p1 = new Point2D(20, 0);
-      behavior.onUpdate(p1);
+      behavior.onUpdate(p1, layerGroup);
 
       // Verify that next update uses p1 as reference
       const mockDrag2 = vi.fn();
       behavior.onDrag = mockDrag2;
-      behavior.onUpdate(new Point2D(40, 0));
+      behavior.onUpdate(new Point2D(40, 0), layerGroup);
 
       // The second drag should have dx = 20 (from 20 to 40)
       assert.equal(mockDrag2.mock.calls.length, 1);
@@ -198,15 +265,26 @@ describe('tools/behaviors', () => {
       assert.equal(dragStepArg.delta.x, 20);
     });
 
-    test('setThreshold changes drag sensitivity', () => {
+    test('setDragThreshold changes drag sensitivity', () => {
       const behavior3 = new DragBehavior({threshold: {x: 100, y: 100}});
       const mockDrag = vi.fn();
       behavior3.onDrag = mockDrag;
-      behavior3.onStart(new Point2D(0, 0));
-      behavior3.onUpdate(new Point2D(5, 5));
+      const layerGroup = makeMockLayerGroup();
+      behavior3.onStart(new Point2D(0, 0), layerGroup);
+      behavior3.onUpdate(new Point2D(5, 5), layerGroup);
       assert.equal(mockDrag.mock.calls.length, 0);
       behavior3.setDragThreshold({x: 0, y: 0});
-      behavior3.onUpdate(new Point2D(5, 5));
+      behavior3.onUpdate(new Point2D(5, 5), layerGroup);
+      assert.equal(mockDrag.mock.calls.length, 1);
+    });
+
+    test('constructor defaults threshold to zero on both axes', () => {
+      const b = new DragBehavior();
+      const lg = makeMockLayerGroup();
+      const mockDrag = vi.fn();
+      b.onDrag = mockDrag;
+      b.onStart(new Point2D(0, 0), lg);
+      b.onUpdate(new Point2D(1, 1), lg);
       assert.equal(mockDrag.mock.calls.length, 1);
     });
   });
@@ -253,13 +331,29 @@ describe('tools/behaviors', () => {
       assert.ok(result);
     });
 
+    test('activeViewLayerOnly false: first monochrome active layer', () => {
+      behavior.setActiveViewLayerOnly(false);
+      const layerGroup = makeMockLayerGroup();
+      const colorVc = makeMockViewController();
+      colorVc.isMonochrome.mockReturnValue(false);
+      const colorLayer = makeMockViewLayer(colorVc);
+      const monoLayer = makeMockViewLayer();
+      layerGroup.getActiveViewLayer.mockReturnValue(colorLayer);
+      layerGroup.getViewLayersFromActive.mockImplementation((fn) => {
+        const layers = [colorLayer, monoLayer];
+        return layers.filter((l) => fn(l));
+      });
+
+      assert.ok(behavior.canStart(new Point2D(0, 0), layerGroup));
+    });
+
     test('onDrag updates window level with dy delta', () => {
       const layerGroup = makeMockLayerGroup();
       const viewLayer = makeMockViewLayer();
       const viewController = viewLayer.getViewController();
       layerGroup.getActiveViewLayer.mockReturnValue(viewLayer);
 
-      behavior.onStart(new Point2D(0, 0));
+      behavior.onStart(new Point2D(0, 0), layerGroup);
       const drag = new DragStep(
         new Point2D(0, 0),
         new Point2D(10, -20),
@@ -311,6 +405,20 @@ describe('tools/behaviors', () => {
 
       const result = behavior.canStart(new Point2D(0, 0), layerGroup);
       assert.ok(result);
+    });
+
+    test('canStart true when draw layer references view layer', () => {
+      const layerGroup = makeMockLayerGroup();
+      const viewLayer = makeMockViewLayer();
+      layerGroup.getActiveViewLayer.mockReturnValue(undefined);
+      layerGroup.getActiveDrawLayer.mockReturnValue({
+        getReferenceLayerId: vi.fn(() => 'ref-layer')
+      });
+      layerGroup.getViewLayerById.mockReturnValue(viewLayer);
+
+      const result = behavior.canStart(new Point2D(0, 0), layerGroup);
+      assert.ok(result);
+      assert.equal(layerGroup.getViewLayerById.mock.calls[0][0], 'ref-layer');
     });
 
     test('onDrag decrements scroll when dy > 0 and canScroll', () => {
@@ -416,7 +524,7 @@ describe('tools/behaviors', () => {
       );
       behavior.onDrag(drag, layerGroup);
 
-      assert.notOk(layer.setOpacity.called);
+      assert.equal(layer.setOpacity.mock.calls.length, 0);
     });
   });
 
@@ -450,9 +558,10 @@ describe('tools/behaviors', () => {
       assert.equal(drawCalls, 1);
     });
 
-    test('onDrag does nothing when no view layer', () => {
+    test('onDrag does nothing when no view layer and no draw reference', () => {
       const layerGroup = makeMockLayerGroup();
       layerGroup.getActiveViewLayer.mockReturnValue(undefined);
+      layerGroup.getActiveDrawLayer.mockReturnValue(undefined);
 
       const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
         .mockImplementation(() => {});
@@ -464,10 +573,29 @@ describe('tools/behaviors', () => {
       );
       behavior.onDrag(drag, layerGroup);
 
-      // Should not crash and not call methods that depend on viewLayer
-      assert.notOk(layerGroup.getActiveViewLayer.called);
-
+      assert.equal(layerGroup.getActiveViewLayer.mock.calls.length, 1);
+      assert.equal(layerGroup.addTranslation.mock.calls.length, 0);
       assert.equal(warnSpy.mock.calls.length, 1, 'warning emitted');
+    });
+
+    test('onDrag uses view layer resolved from active draw layer', () => {
+      const layerGroup = makeMockLayerGroup();
+      const viewLayer = makeMockViewLayer();
+      layerGroup.getActiveViewLayer.mockReturnValue(undefined);
+      layerGroup.getActiveDrawLayer.mockReturnValue({
+        getReferenceLayerId: vi.fn(() => 'draw-ref')
+      });
+      layerGroup.getViewLayerById.mockReturnValue(viewLayer);
+
+      const drag = new DragStep(
+        new Point2D(0, 0),
+        new Point2D(10, 20),
+        {threshold: {x: 0, y: 0}}
+      );
+      behavior.onDrag(drag, layerGroup);
+
+      assert.equal(layerGroup.getViewLayerById.mock.calls[0][0], 'draw-ref');
+      assert.equal(layerGroup.addTranslation.mock.calls.length, 1);
     });
   });
 });
