@@ -1,6 +1,9 @@
 // @vitest-environment node
 import {describe, test, assert} from 'vitest';
-import {ERROR_MESSAGES, formatString} from '../../src/tools/brushPaintMessages.js';
+import {
+  ERROR_MESSAGES,
+  formatString
+} from '../../src/tools/brushPaintMessages.js';
 
 describe('brushPaintMessages', () => {
   describe('formatString', () => {

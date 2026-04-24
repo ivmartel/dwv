@@ -17,7 +17,8 @@ vi.mock('../../src/app/application.js', () => ({
 
 import {Brush} from '../../src/tools/brush.js';
 import {BrushMode} from '../../src/tools/brushMaskPaint.js';
-import {BrushDragBehavior} from '../../src/tools/behaviors/brushDragBehavior.js';
+import {BrushDragBehavior} from
+  '../../src/tools/behaviors/brushDragBehavior.js';
 
 describe('Brush', () => {
   afterEach(() => {
@@ -85,7 +86,7 @@ describe('Brush', () => {
     assert.equal(setFeaturesSpy.mock.calls.length, callsBefore);
   });
 
-  test('activate(true) prevents default on contextmenu for configured divs', () => {
+  test('activate(true) prevents default contextmenu on configured divs', () => {
     const div = document.createElement('div');
     div.id = 'brush-view-test';
     document.body.appendChild(div);

@@ -18,7 +18,7 @@ vi.mock('../../../src/tools/brushMaskPaint.js', () => {
    */
   class BrushMaskPaint extends EventTarget {
     /**
-     * @param {{ app: object }} opts
+     * @param {{ app: object }} opts Options with mocked `app` reference.
      */
     constructor(opts) {
       super();
@@ -26,7 +26,7 @@ vi.mock('../../../src/tools/brushMaskPaint.js', () => {
     }
 
     /**
-     * @param {object} features
+     * @param {object} features Brush feature fields (segment, mode).
      */
     setFeatures(features) {
       if (typeof features.selectedSegmentNumber !== 'undefined') {
@@ -60,7 +60,7 @@ vi.mock('../../../src/tools/brushMaskPaint.js', () => {
     finalizeStroke() {}
 
     /**
-     * @param {string} mode
+     * @param {string} mode Add vs delete brush mode (`add` / `del`).
      */
     setBrushMode(mode) {
       maskState.brushMode = mode;
@@ -70,14 +70,17 @@ vi.mock('../../../src/tools/brushMaskPaint.js', () => {
 });
 
 import {Point2D} from '../../../src/math/point.js';
-import {BrushDragBehavior} from '../../../src/tools/behaviors/brushDragBehavior.js';
+import {BrushDragBehavior} from
+  '../../../src/tools/behaviors/brushDragBehavior.js';
 import {ViewLayer} from '../../../src/gui/viewLayer.js';
 import {MouseEventButtons} from '../../../src/tools/layerGroupPointer.js';
 import * as loggerModule from '../../../src/utils/logger.js';
 
 describe('BrushDragBehavior', () => {
   /**
-   * @returns {object}
+   * Minimal app stub with `getData` for series metadata.
+   *
+   * @returns {object} App-like object for {@link BrushDragBehavior}.
    */
   function makeApp() {
     return {
@@ -90,8 +93,10 @@ describe('BrushDragBehavior', () => {
   }
 
   /**
-   * @param {unknown} activeLayer
-   * @returns {object}
+   * Layer group mock wired to the given active layer.
+   *
+   * @param {unknown} activeLayer Value returned by `getActiveLayer`.
+   * @returns {object} Layer group stub for `canStart` / drag tests.
    */
   function makeLayerGroup(activeLayer) {
     return {
@@ -119,7 +124,8 @@ describe('BrushDragBehavior', () => {
   });
 
   test('canStart is false when selected segment is undefined', () => {
-    const warnSpy = vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
     maskState.selectedSegmentNumber = undefined;
     const behavior = new BrushDragBehavior(makeApp());
     const lg = makeLayerGroup(new ViewLayer());
@@ -136,7 +142,7 @@ describe('BrushDragBehavior', () => {
     assert.notOk(behavior.canStart(new Point2D(0, 0), lg));
   });
 
-  test('canStart is true for ViewLayer with segment and not blacklisted', () => {
+  test('canStart is true with ViewLayer, segment, not blacklisted', () => {
     const behavior = new BrushDragBehavior(makeApp());
     const lg = makeLayerGroup(new ViewLayer());
 
