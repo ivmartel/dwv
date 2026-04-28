@@ -19,12 +19,12 @@ describe('tools/behaviors', () => {
       behavior = new TapBehavior();
     });
 
-    test('onTap is a no-op by default', () => {
+    test('onTap appends display point to list', () => {
       const point = new Point2D(10, 20);
       const layerGroup = makeMockLayerGroup();
-      // Should not throw
       behavior.onTap(point, layerGroup);
-      assert.ok(true);
+      assert.equal(behavior.getPointList().length, 1);
+      assert.equal(behavior.getPointList()[0], point);
     });
   });
 

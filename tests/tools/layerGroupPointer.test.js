@@ -206,6 +206,31 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(drag.isActive(), false);
   });
 
+  test('mouseout calls tapBehavior.cancel when tap is active', () => {
+    const {groupDivId} = setupLayerCanvas();
+    const onTapCancel = vi.fn();
+    const tap = {
+      isActive: () => true,
+      onTap() {
+        // no-op
+      },
+      onUpdate() {
+        // no-op
+      },
+      cancel: onTapCancel
+    };
+    const pointer = new LayerGroupPointer({
+      app: {
+        getLayerGroupByDivId: (id) =>
+          (id === groupDivId ? {} : undefined)
+      },
+      tapBehavior: tap
+    });
+
+    pointer.mouseout(new MouseEvent('mouseout', {bubbles: true}));
+    assert.equal(onTapCancel.mock.calls.length, 1);
+  });
+
   test('touchstart, touchmove, touchend drive drag lifecycle', () => {
     vi.useFakeTimers();
     const {canvas, groupDivId} = setupLayerCanvas();
@@ -394,7 +419,18 @@ describe('tools/layerGroupPointer', () => {
         onUpdate: onHoverUpdate,
         onEnd: onHoverEnd
       },
-      tapBehavior: {onTap}
+      tapBehavior: {
+        onTap,
+        isActive() {
+          return false;
+        },
+        onUpdate() {
+          // no-op
+        },
+        cancel() {
+          // no-op
+        }
+      }
     });
 
     pointer.mousemove(mouseEvent('mousemove', canvas, 1, 1));
@@ -510,7 +546,18 @@ describe('tools/layerGroupPointer', () => {
     const pointer = new LayerGroupPointer({
       app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
       dragBehavior: new NoStartDrag(),
-      tapBehavior: {onTap}
+      tapBehavior: {
+        onTap,
+        isActive() {
+          return false;
+        },
+        onUpdate() {
+          // no-op
+        },
+        cancel() {
+          // no-op
+        }
+      }
     });
 
     pointer.mousedown(mouseEvent('mousedown', canvas, 2, 3));
@@ -547,13 +594,55 @@ describe('tools/layerGroupPointer', () => {
     const pointer = new LayerGroupPointer({
       app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
       dragBehavior: new DragBehavior(),
-      tapBehavior: {onTap}
+      tapBehavior: {
+        onTap,
+        isActive() {
+          return false;
+        },
+        onUpdate() {
+          // no-op
+        },
+        cancel() {
+          // no-op
+        }
+      }
     });
 
     pointer.mousedown(mouseEvent('mousedown', canvas, 0, 0));
     pointer.mousemove(mouseEvent('mousemove', canvas, 1, 1));
     pointer.mouseup(mouseEvent('mouseup', canvas, 1, 1));
     assert.equal(onTap.mock.calls.length, 0);
+  });
+
+  test('mouseup invokes tap when tap is active even after mousemove', () => {
+    const {canvas, groupDivId} = setupLayerCanvas();
+    const onTap = vi.fn();
+    class NoStartDrag extends DragBehavior {
+      canStart() {
+        return false;
+      }
+    }
+    const pointer = new LayerGroupPointer({
+      app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
+      dragBehavior: new NoStartDrag(),
+      tapBehavior: {
+        onTap,
+        isActive() {
+          return true;
+        },
+        onUpdate() {
+          // no-op
+        },
+        cancel() {
+          // no-op
+        }
+      }
+    });
+
+    pointer.mousedown(mouseEvent('mousedown', canvas, 0, 0));
+    pointer.mousemove(mouseEvent('mousemove', canvas, 4, 4));
+    pointer.mouseup(mouseEvent('mouseup', canvas, 4, 4));
+    assert.equal(onTap.mock.calls.length, 1);
   });
 
   test('cancel ends active drag and clears long-touch timer', () => {

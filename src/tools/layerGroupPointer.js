@@ -250,6 +250,10 @@ export class LayerGroupPointer extends EventTarget {
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.onEnd();
     }
+    // end sticky tap
+    if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.cancel();
+    }
     // end two touch
     if (this.#twoTouchBehavior?.isActive()) {
       this.#twoTouchBehavior?.onEnd();
@@ -283,9 +287,11 @@ export class LayerGroupPointer extends EventTarget {
     if (typeof this.#mouseDownButton !== 'undefined') {
       // remove hover while dragging
       this.#hoverBehavior?.onEnd();
-      // update drag
+      // update drag or sticky tap
       if (this.#dragBehavior?.isActive()) {
         this.#dragBehavior.onUpdate(point, layerGroup);
+      } else if (this.#tapBehavior?.isActive()) {
+        this.#tapBehavior.onUpdate(point, layerGroup);
       }
     } else {
       // update hover
@@ -294,6 +300,9 @@ export class LayerGroupPointer extends EventTarget {
   };
 
   /**
+   * Ends drag or delivers a tap when `tapBehavior.isActive()` (sticky session)
+   * or the pointer did not move since mousedown.
+   *
    * @param {MouseEvent} event The mouse up event.
    */
   mouseup = (event) => {
@@ -301,10 +310,11 @@ export class LayerGroupPointer extends EventTarget {
 
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.onEnd();
-    } else if (!this.#moved) {
-      // tap if no move and drag did not start (or already ended)
+    } else if (this.#tapBehavior &&
+      (this.#tapBehavior.isActive() || !this.#moved)) {
+      // Discrete tap without move; or sticky tap (active) including after move.
       const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-      this.#tapBehavior?.onTap(point, layerGroup);
+      this.#tapBehavior.onTap(point, layerGroup);
     }
   };
 
@@ -315,6 +325,10 @@ export class LayerGroupPointer extends EventTarget {
     // end drag
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.onEnd();
+    }
+    // end sticky tap
+    if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.cancel();
     }
     // end hover
     this.#hoverBehavior?.onEnd();
@@ -388,7 +402,8 @@ export class LayerGroupPointer extends EventTarget {
 
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.onEnd();
-    } else if (!this.#moved) {
+    } else if (this.#tapBehavior &&
+      (this.#tapBehavior.isActive() || !this.#moved)) {
       const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
       this.#tapBehavior?.onTap(point, layerGroup);
     }
