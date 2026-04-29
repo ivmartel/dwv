@@ -188,19 +188,34 @@ export class Draw {
    *   where to create the draw layer.
    * @returns {boolean} True if possible.
    */
-  #canCreateDrawLayer(layerGroup) {
+  #checkDrawRefData(layerGroup) {
     let res = true;
 
     // validate reference meta data
     if (typeof this.#refMetaValidator !== 'undefined') {
       const referenceViewLayer = layerGroup.getActiveViewLayer();
-      const dataId = referenceViewLayer.getDataId();
-      const data = this.#app.getData(dataId);
-      const meta = data.image.getMeta();
-      res = this.#refMetaValidator(meta);
+      const refDataId = referenceViewLayer.getDataId();
+      const refData = this.#app.getData(refDataId);
+      const refMeta = refData.image.getMeta();
+      res = this.#refMetaValidator(refMeta);
     }
 
     return res;
+  }
+
+  /**
+   * Check if the base image supports drawing.
+   *
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {boolean} True if the image is resampled.
+   */
+  #checkBaseData(layerGroup) {
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const baseDataId = viewLayer.getDataId();
+    const baseData = this.#app.getData(baseDataId);
+    const baseImage = baseData.image;
+
+    return !baseImage.isResampled();
   }
 
   /**
@@ -210,15 +225,15 @@ export class Draw {
    * @param {DrawLayer} drawLayer The layer where to create the draw.
    * @returns {boolean} True if possible.
    */
-  #canCreateDraw(drawLayer) {
+  #checkDrawData(drawLayer) {
     let res = true;
 
     // validate annotation group meta data
     if (typeof this.#drawMetaValidator !== 'undefined') {
-      const dataId = drawLayer.getDataId();
-      const data = this.#app.getData(dataId);
-      const meta = data.annotationGroup.getMeta();
-      res = this.#drawMetaValidator(meta);
+      const drawDataId = drawLayer.getDataId();
+      const drawData = this.#app.getData(drawDataId);
+      const drawMeta = drawData.annotationGroup.getMeta();
+      res = this.#drawMetaValidator(drawMeta);
     }
 
     return res;
@@ -252,6 +267,10 @@ export class Draw {
     // set active to bind to toolboxController
     layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
 
+    // sync style
+    const kStage = drawLayer.getKonvaStage();
+    this.#style.setZoomScale(kStage.scale());
+
     return drawLayer;
   }
 
@@ -259,19 +278,17 @@ export class Draw {
    * Get the selected shape at the given point.
    *
    * @param {Point2D} point The start point.
-   * @param {LayerGroup} layerGroup The layer group.
+   * @param {DrawLayer} drawLayer The draw layer.
    * @returns {Konva.Shape|null} The shape or undefined if no shape
    *  bellow the input point.
    */
-  #getSelectShape(point, layerGroup) {
+  #getSelectShape(point, drawLayer) {
     let res = null;
-    const drawLayer = layerGroup.getActiveDrawLayer();
+
     if (typeof drawLayer !== 'undefined') {
       const data = drawLayer.getDrawController().getAnnotationGroup();
-      const kStage = drawLayer.getKonvaStage();
-      // update scale
-      this.#style.setZoomScale(kStage.scale());
       if (data.isEditable()) {
+        const kStage = drawLayer.getKonvaStage();
         // determine if the click happened on an existing shape or not
         res = kStage.getIntersection({
           x: point.getX(),
@@ -283,41 +300,33 @@ export class Draw {
   }
 
   /**
-   * Start tool interaction.
+   * Draw warn event.
+   *
+   * @event Draw#warn
+   * @type {object}
+   * @property {string} type The event type.
+   * @property {string} message The warning message.
+   */
+
+  /**
+   * Check if a draw layer can be created.
    *
    * @param {LayerGroup} layerGroup The layer group.
    * @returns {boolean} True if all ok.
    */
   #checkCanCreate(layerGroup) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
-
-    /**
-     * Draw warn event.
-     *
-     * @event Draw#warn
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} message The warning message.
-     */
-
-    if (typeof drawLayer === 'undefined') {
-      // drawLayer creation check
-      if (!this.#canCreateDrawLayer(layerGroup)) {
-        // fire warn if not possible
-        this.#fireEvent({
-          type: 'warn',
-          message: 'Cannot create draw layer, reference meta is invalid'
-        });
-        return false;
-      }
-      // create draw layer
-      this.#createDrawLayer(layerGroup);
-    } else if (!this.#canCreateDraw(drawLayer)) {
-      // draw creation check
-      // fire warn if not possible
+    if (!this.#checkDrawRefData(layerGroup)) {
       this.#fireEvent({
         type: 'warn',
-        message: 'Cannot create draw, data meta is invalid'
+        message: 'Cannot create draw, reference data is invalid'
+      });
+      return false;
+    }
+
+    if (!this.#checkBaseData(layerGroup)) {
+      this.#fireEvent({
+        type: 'warn',
+        message: 'Cannot create draw, base data is invalid'
       });
       return false;
     }
@@ -326,22 +335,70 @@ export class Draw {
   }
 
   /**
-   * Start tool interaction.
+   * Check if a draw layer can be created.
+   *
+   * @param {DrawLayer} drawLayer The draw layer.
+   * @returns {boolean} True if all ok.
+   */
+  #checkCanEdit(drawLayer) {
+    // draw data check
+    if (!this.#checkDrawData(drawLayer)) {
+      this.#fireEvent({
+        type: 'warn',
+        message: 'Cannot edit draw, data meta is invalid'
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Try to select a shape group.
    *
    * @param {Point2D} point The start point.
    * @param {LayerGroup} layerGroup The layer group.
+   * @returns {boolean} True if successful.
    */
-  #switchEditOrCreateShapeGroup(point, layerGroup) {
-    if (!this.#checkCanCreate(layerGroup)) {
-      return;
+  #tryToSelectShapeGroup(point, layerGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
+
+    // edit
+    if (typeof drawLayer !== 'undefined' &&
+      this.#checkCanEdit(drawLayer)) {
+      const kShape = this.#getSelectShape(point, drawLayer);
+      if (kShape) {
+        this.#selectShapeGroup(kShape, drawLayer);
+        return true;
+      }
     }
 
-    const kShape = this.#getSelectShape(point, layerGroup);
-    if (kShape) {
-      this.#selectShapeGroup(layerGroup, kShape);
-    } else {
-      this.#startShapeGroupCreation();
+    return false;
+  }
+
+  /**
+   * Try to create shape group.
+   *
+   * @param {Point2D} point The start point.
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {boolean} True if successful.
+   */
+  #tryToCreateShapeGroup(point, layerGroup) {
+    let drawLayer = layerGroup.getActiveDrawLayer();
+
+    // create layer
+    if (typeof drawLayer === 'undefined' &&
+      this.#checkCanCreate(layerGroup)) {
+      drawLayer = this.#createDrawLayer(layerGroup);
     }
+    // start drawing
+    if (typeof drawLayer !== 'undefined' &&
+      this.#checkCanEdit(drawLayer)) {
+      this.#startShapeGroupCreation();
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -399,11 +456,10 @@ export class Draw {
   /**
    * Selects a shape group.
    *
-   * @param {LayerGroup} layerGroup The layer group.
    * @param {Konva.Shape} kshape The shape that has been selected.
+   * @param {DrawLayer} drawLayer The draw layer.
    */
-  #selectShapeGroup(layerGroup, kshape) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
+  #selectShapeGroup(kshape, drawLayer) {
     let group = kshape.getParent();
     // kshape: Konva.Tag -> parent: Konva.Label -> parent: Konva.Group
     if (kshape instanceof Konva.Tag) {
@@ -456,11 +512,11 @@ export class Draw {
   }
 
   /**
-   * Finish tool interaction.
+   * Check shape creation: if enough points, stop drawing.
    *
    * @param {LayerGroup} layerGroup The layer group.
    */
-  #finishShapeGroupCreation(layerGroup) {
+  #checkShapeGroupCreation(layerGroup) {
     // exit if no points
     if (this.#points.length === 0) {
       logger.warn('Draw mouseup but no points...');
@@ -476,24 +532,10 @@ export class Draw {
   }
 
   /**
-   * Chack if the base image is resampled.
+   * Store a point if first or different from last.
    *
-   * @param {MouseEvent} event The mouse down event.
-   * @returns {boolean} True if the image is resampled.
+   * @param {Point2D} mousePoint The input point.
    */
-  #isResampled(event) {
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(
-      layerDetails.groupDivId
-    );
-    const viewLayer = layerGroup.getBaseViewLayer();
-    const referenceDataId = viewLayer.getDataId();
-    const referenceData = this.#app.getData(referenceDataId);
-    const image = referenceData.image;
-
-    return image.isResampled();
-  }
-
   #storePoint(mousePoint) {
     let isNew;
     const nPoints = this.#points.length;
@@ -512,19 +554,10 @@ export class Draw {
   /**
    * Handle mouse down event.
    *
-   * @param {object} event The mouse down event.
+   * @param {object} _event The mouse down event.
    */
-  mousedown = (event) => {
-    const mousePoint = getMousePoint(event);
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-
-    if (!this.#isDrawing && !this.#isResampled(event)) {
-      this.#switchEditOrCreateShapeGroup(mousePoint, layerGroup);
-    }
-
-    // store point (after switch or edit)
-    this.#storePoint(mousePoint);
+  mousedown = (_event) => {
+    // does nothing
   };
 
   /**
@@ -549,27 +582,37 @@ export class Draw {
    * @param {object} event The mouse up event.
    */
   mouseup = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+
+    // try to select
+    if (this.#tryToSelectShapeGroup(mousePoint, layerGroup)) {
+      return;
+    }
+
+    // try to create
+    if (!this.#isDrawing) {
+      this.#tryToCreateShapeGroup(mousePoint, layerGroup);
+    }
     // exit if not started draw
     if (!this.#isDrawing) {
       return;
     }
 
     // store point (before finish)
-    const mousePoint = getMousePoint(event);
     this.#storePoint(mousePoint);
-
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    this.#finishShapeGroupCreation(layerGroup);
+    // check if done
+    this.#checkShapeGroupCreation(layerGroup);
   };
 
   /**
    * Handle mouse out event.
    *
-   * @param {object} event The mouse out event.
+   * @param {object} _event The mouse out event.
    */
-  mouseout = (event) => {
-    this.mouseup(event);
+  mouseout = (_event) => {
+    this.#setToNotDrawingState();
   };
 
   /**
@@ -603,17 +646,10 @@ export class Draw {
   /**
    * Handle touch start event.
    *
-   * @param {object} event The touch start event.
+   * @param {object} _event The touch start event.
    */
-  touchstart = (event) => {
-    // exit if not started draw
-    if (this.#isDrawing) {
-      return;
-    }
-    const touchPoints = getTouchPoints(event);
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    this.#switchEditOrCreateShapeGroup(touchPoints[0], layerGroup);
+  touchstart = (_event) => {
+    // does nothing
   };
 
   /**
@@ -638,7 +674,28 @@ export class Draw {
    * @param {object} event The touch end event.
    */
   touchend = (event) => {
-    this.dblclick(event);
+    const touchPoint = getTouchPoints(event)[0];
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+
+    // try to select
+    if (this.#tryToSelectShapeGroup(touchPoint, layerGroup)) {
+      return;
+    }
+
+    // try to create
+    if (!this.#isDrawing) {
+      this.#tryToCreateShapeGroup(touchPoint, layerGroup);
+    }
+    // exit if not started draw
+    if (!this.#isDrawing) {
+      return;
+    }
+
+    // store point (before finish)
+    this.#storePoint(touchPoint);
+    // check if done
+    this.#checkShapeGroupCreation(layerGroup);
   };
 
   /**
@@ -729,7 +786,7 @@ export class Draw {
    *
    * @param {Point2D[]} tmpPoints The array of new points.
    * @param {LayerGroup} layerGroup The origin layer group.
-   * @returns {Annotation} The created annotation.
+   * @returns {Annotation|undefined} The created annotation.
    */
   #getAnnotation(tmpPoints, layerGroup) {
     const drawLayer = layerGroup.getActiveDrawLayer();
