@@ -25,22 +25,12 @@ export class TapBehavior {
   #numberOfTaps = 1;
 
   /**
-   * Mutable buffer cleared in {@link cancel}. Base class stores display taps;
-   * {@link DrawTapBehavior} stores display placement points here too.
-   *
-   * @returns {Point2D[]} Same array reference until {@link cancel}.
-   */
-  getPointList() {
-    return this.#points;
-  }
-
-  /**
    * Set the number of taps.
    *
    * @param {number} numberOfTaps The number of taps.
    */
   setNumberOfTaps(numberOfTaps) {
-    this.cancel();
+    this.onEnd();
     this.#numberOfTaps = numberOfTaps;
   }
 
@@ -48,8 +38,7 @@ export class TapBehavior {
    * @returns {boolean} True when the tap behavior is active.
    */
   isActive() {
-    const tapCount = this.#points.length;
-    return tapCount !== 0 && tapCount <= this.#numberOfTaps;
+    return this.#points.length !== 0;
   }
 
   /**
@@ -61,28 +50,24 @@ export class TapBehavior {
   }
 
   /**
-   * Cancel the tap behavior.
-   */
-  cancel() {
-    this.#points = [];
-  }
-
-  /**
    * @param {Point2D} point Display position under the pointer.
    * @param {LayerGroup} _layerGroup Layer group under the pointer.
    */
   onTap(point, _layerGroup) {
-    // reset points if the number of taps is
-    // at limit or exceeded
-    const tapCount = this.#points.length;
-    if (tapCount >= this.#numberOfTaps) {
-      this.#points = [];
-    }
     // add the current point
     this.#points.push(point);
-    // override in subclass
+    // call onEnd if the number of taps is at limit
+    if (this.#points.length === this.#numberOfTaps) {
+      this.onEnd();
+    }
   }
 
+  /**
+   * End the tap behavior.
+   */
+  onEnd() {
+    this.#points = [];
+  }
 }
 
 /**

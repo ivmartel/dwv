@@ -19,13 +19,23 @@ describe('tools/behaviors', () => {
       behavior = new TapBehavior();
     });
 
-    test('onTap appends display point to list', () => {
+    test('default onTap does not set active', () => {
       const point = new Point2D(10, 20);
       const layerGroup = makeMockLayerGroup();
       behavior.onTap(point, layerGroup);
-      assert.equal(behavior.getPointList().length, 1);
-      assert.equal(behavior.getPointList()[0], point);
+      assert.notOk(behavior.isActive());
     });
+
+    test('sticky onTap does set active', () => {
+      const point = new Point2D(10, 20);
+      const layerGroup = makeMockLayerGroup();
+      behavior.setNumberOfTaps(2);
+      behavior.onTap(point, layerGroup);
+      assert.ok(behavior.isActive());
+      behavior.onTap(point, layerGroup);
+      assert.notOk(behavior.isActive());
+    });
+
   });
 
   describe('PositionSetTapBehavior', () => {

@@ -252,7 +252,7 @@ export class LayerGroupPointer extends EventTarget {
     }
     // end sticky tap
     if (this.#tapBehavior?.isActive()) {
-      this.#tapBehavior.cancel();
+      this.#tapBehavior.onEnd();
     }
     // end two touch
     if (this.#twoTouchBehavior?.isActive()) {
@@ -328,7 +328,7 @@ export class LayerGroupPointer extends EventTarget {
     }
     // end sticky tap
     if (this.#tapBehavior?.isActive()) {
-      this.#tapBehavior.cancel();
+      this.#tapBehavior.onEnd();
     }
     // end hover
     this.#hoverBehavior?.onEnd();
