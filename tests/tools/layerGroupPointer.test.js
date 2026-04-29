@@ -217,7 +217,7 @@ describe('tools/layerGroupPointer', () => {
       onUpdate() {
         // no-op
       },
-      cancel: onTapCancel
+      onEnd: onTapCancel
     };
     const pointer = new LayerGroupPointer({
       app: {
