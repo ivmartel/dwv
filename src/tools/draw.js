@@ -61,13 +61,6 @@ export class Draw {
   #style;
 
   /**
-   * Interaction start flag.
-   *
-   * @type {boolean}
-   */
-  #isDrawing = false;
-
-  /**
    * Shape factory list.
    *
    * @type {object}
@@ -168,6 +161,11 @@ export class Draw {
    * @type {Array}
    */
   #callbackStore = [];
+
+  /**
+   * @type {Point2D}
+   */
+  #lastMovePoint;
 
   /**
    * @param {App} app The associated application.
@@ -379,11 +377,10 @@ export class Draw {
   /**
    * Try to create shape group.
    *
-   * @param {Point2D} point The start point.
    * @param {LayerGroup} layerGroup The layer group.
    * @returns {boolean} True if successful.
    */
-  #tryToCreateShapeGroup(point, layerGroup) {
+  #tryToCreateShapeGroup(layerGroup) {
     let drawLayer = layerGroup.getActiveDrawLayer();
 
     // create layer
@@ -418,39 +415,22 @@ export class Draw {
   }
 
   /**
-   * Initializes the new shape creation:
-   * - Updates the started variable,
-   * - Gets the factory,
-   * - Initializes the points array.
+   * Initializes the new shape creation.
    */
   #startShapeGroupCreation() {
     // disable edition
     this.#shapeHandler.disableAndResetEditor();
-    this.#setToDrawingState();
     // set factory
     this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
-  }
-
-  /**
-   * Sets the variables to drawing state:
-   * - Updates is drawing variable,
-   * - Initializes the current factory,
-   * - Resets points.
-   */
-  #setToDrawingState() {
-    this.#isDrawing = true;
+    // reset points
     this.#points = [];
   }
 
   /**
-   * Resets the variables to not drawing state:
-   * - Destroys tmp shape group,
-   * - Updates is drawing variable,
-   * - Resets points.
+   * @returns {boolean} True when interaction is ongoing.
    */
-  #setToNotDrawingState() {
-    this.#isDrawing = false;
-    this.#points = [];
+  #isDrawing() {
+    return this.#points.length !== 0;
   }
 
   /**
@@ -505,6 +485,8 @@ export class Draw {
       return;
     }
 
+    this.#lastMovePoint = point;
+
     const tmpPoints = this.#points.slice();
     tmpPoints.push(point);
     // update points
@@ -517,38 +499,53 @@ export class Draw {
    * @param {LayerGroup} layerGroup The layer group.
    */
   #checkShapeGroupCreation(layerGroup) {
-    // exit if no points
-    if (this.#points.length === 0) {
-      logger.warn('Draw mouseup but no points...');
-      return;
-    }
-
     // do we have all the needed points
-    if (this.#points.length === this.#currentFactory.getNPoints()) {
-      // store points
+    if (typeof this.#currentFactory.getNPoints() !== 'undefined' &&
+      this.#points.length !== 0 &&
+      this.#points.length === this.#currentFactory.getNPoints()) {
       this.#onFinalPoints(this.#points, layerGroup);
-      this.#setToNotDrawingState();
     }
   }
 
   /**
    * Store a point if first or different from last.
    *
-   * @param {Point2D} mousePoint The input point.
+   * @param {Point2D} displayPoint The input point.
    */
-  #storePoint(mousePoint) {
+  #storePoint(displayPoint) {
     let isNew;
     const nPoints = this.#points.length;
     if (nPoints !== 0) {
       const lastPoint = this.#points[nPoints - 1];
-      isNew = lastPoint.getX() !== mousePoint.getX() ||
-        lastPoint.getY() !== mousePoint.getY();
+      isNew = lastPoint.getX() !== displayPoint.getX() ||
+        lastPoint.getY() !== displayPoint.getY();
     } else {
       isNew = true;
     }
-    if (this.#isDrawing && isNew) {
-      this.#points.push(mousePoint);
+    if (isNew) {
+      this.#points.push(displayPoint);
     }
+  }
+
+  /**
+   * @param {Point2D} point The update point.
+   * @param {LayerGroup} layerGroup The layer group.
+   */
+  #onInteractionStep(point, layerGroup) {
+    // try to select
+    if (this.#tryToSelectShapeGroup(point, layerGroup)) {
+      return;
+    }
+    // try to create
+    if (!this.#isDrawing()) {
+      if (!this.#tryToCreateShapeGroup(layerGroup)) {
+        return;
+      }
+    }
+    // store point (before check)
+    this.#storePoint(point);
+    // check if done
+    this.#checkShapeGroupCreation(layerGroup);
   }
 
   /**
@@ -567,7 +564,7 @@ export class Draw {
    */
   mousemove = (event) => {
     // exit if not started draw
-    if (!this.#isDrawing) {
+    if (!this.#isDrawing()) {
       return;
     }
     const mousePoint = getMousePoint(event);
@@ -585,34 +582,27 @@ export class Draw {
     const mousePoint = getMousePoint(event);
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-
-    // try to select
-    if (this.#tryToSelectShapeGroup(mousePoint, layerGroup)) {
-      return;
-    }
-
-    // try to create
-    if (!this.#isDrawing) {
-      this.#tryToCreateShapeGroup(mousePoint, layerGroup);
-    }
-    // exit if not started draw
-    if (!this.#isDrawing) {
-      return;
-    }
-
-    // store point (before finish)
-    this.#storePoint(mousePoint);
-    // check if done
-    this.#checkShapeGroupCreation(layerGroup);
+    this.#onInteractionStep(mousePoint, layerGroup);
   };
 
   /**
    * Handle mouse out event.
    *
-   * @param {object} _event The mouse out event.
+   * @param {object} event The mouse out event.
    */
-  mouseout = (_event) => {
-    this.#setToNotDrawingState();
+  mouseout = (event) => {
+    // exit if not started draw
+    if (!this.#isDrawing()) {
+      return;
+    }
+
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+
+    // store point (before check)
+    this.#storePoint(this.#lastMovePoint);
+    // check if done
+    this.#checkShapeGroupCreation(layerGroup);
   };
 
   /**
@@ -621,26 +611,24 @@ export class Draw {
    * @param {object} event The double click event.
    */
   dblclick = (event) => {
+    // exit if not started draw
+    if (!this.#isDrawing()) {
+      return;
+    }
     // only end by double click undefined NPoints
     if (this.#currentFactory &&
       typeof this.#currentFactory.getNPoints() !== 'undefined') {
       return;
     }
-    // exit if not started draw
-    if (!this.#isDrawing) {
-      return;
-    }
-    // exit if no points
-    if (this.#points.length === 0) {
-      logger.warn('Draw dblclick but no points...');
-      return;
-    }
 
-    // store points
+    const mousePoint = getMousePoint(event);
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+
+    // store point (before final)
+    this.#storePoint(mousePoint);
+    // finalise (no length check)
     this.#onFinalPoints(this.#points, layerGroup);
-    this.#setToNotDrawingState();
   };
 
   /**
@@ -659,7 +647,7 @@ export class Draw {
    */
   touchmove = (event) => {
     // exit if not started draw
-    if (!this.#isDrawing) {
+    if (!this.#isDrawing()) {
       return;
     }
     const touchPoint = getTouchPoints(event)[0];
@@ -677,25 +665,7 @@ export class Draw {
     const touchPoint = getTouchPoints(event)[0];
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-
-    // try to select
-    if (this.#tryToSelectShapeGroup(touchPoint, layerGroup)) {
-      return;
-    }
-
-    // try to create
-    if (!this.#isDrawing) {
-      this.#tryToCreateShapeGroup(touchPoint, layerGroup);
-    }
-    // exit if not started draw
-    if (!this.#isDrawing) {
-      return;
-    }
-
-    // store point (before finish)
-    this.#storePoint(touchPoint);
-    // check if done
-    this.#checkShapeGroupCreation(layerGroup);
+    this.#onInteractionStep(touchPoint, layerGroup);
   };
 
   /**
@@ -717,7 +687,7 @@ export class Draw {
    */
   keydown = (event) => {
     // call app handler if we are not in the middle of a draw
-    if (!this.#isDrawing) {
+    if (!this.#isDrawing()) {
       event.context = 'Draw';
       this.#app.onKeydown(event);
     }
@@ -752,8 +722,6 @@ export class Draw {
       // reset temporary shape group
       this.#tmpShapeGroup.destroy();
       this.#tmpShapeGroup = null;
-      // set state
-      this.#setToNotDrawingState();
       // redraw
       konvaLayer.draw();
     }
@@ -902,6 +870,9 @@ export class Draw {
 
     // re-activate layer
     konvaLayer.listening(true);
+
+    // reset points
+    this.#points = [];
   }
 
   /**
