@@ -643,9 +643,9 @@ export class Draw {
   /**
    * Handle touch move event.
    *
-   * @param {object} event The touch move event.
+   * @param {object} _event The touch move event.
    */
-  touchmove = (event) => {
+  touchmove = (_event) => {
     // does nothing
   };
 
