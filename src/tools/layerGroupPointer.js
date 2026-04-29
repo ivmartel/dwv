@@ -237,11 +237,8 @@ export class LayerGroupPointer extends EventTarget {
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
     if (typeof this.#doubleClickBehavior !== 'undefined') {
       this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
-    } else {
-      // end sticky tap
-      if (this.#tapBehavior?.isActive()) {
-        this.#tapBehavior.onEnd();
-      }
+    } else if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.onEnd();
     }
   };
 
