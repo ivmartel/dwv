@@ -646,14 +646,7 @@ export class Draw {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    // exit if not started draw
-    if (!this.#isDrawing()) {
-      return;
-    }
-    const touchPoint = getTouchPoints(event)[0];
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    this.#updateShapeGroupCreation(touchPoint, layerGroup);
+    // does nothing
   };
 
   /**
