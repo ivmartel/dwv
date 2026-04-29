@@ -103,13 +103,6 @@ export class Draw {
   #points = [];
 
   /**
-   * Last selected point.
-   *
-   * @type {Point2D}
-   */
-  #lastPoint = null;
-
-  /**
    * With scroll flag.
    *
    * @type {boolean}
@@ -168,13 +161,6 @@ export class Draw {
    * Event listeners.
    */
   #listeners = {};
-
-  /**
-   * Flag to know if the last added point was made by mouse move.
-   *
-   * @type {boolean}
-   */
-  #lastIsMouseMovePoint = false;
 
   /**
    * Callback store to allow attach/detach.
@@ -270,14 +256,40 @@ export class Draw {
   }
 
   /**
-   * Start tool interaction.
+   * Get the selected shape at the given point.
    *
    * @param {Point2D} point The start point.
-   * @param {string} divId The layer group divId.
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {Konva.Shape|null} The shape or undefined if no shape
+   *  bellow the input point.
    */
-  #switchEditOrCreateShapeGroup(point, divId) {
-    const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    let drawLayer = layerGroup.getActiveDrawLayer();
+  #getSelectShape(point, layerGroup) {
+    let res = null;
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer !== 'undefined') {
+      const data = drawLayer.getDrawController().getAnnotationGroup();
+      const kStage = drawLayer.getKonvaStage();
+      // update scale
+      this.#style.setZoomScale(kStage.scale());
+      if (data.isEditable()) {
+        // determine if the click happened on an existing shape or not
+        res = kStage.getIntersection({
+          x: point.getX(),
+          y: point.getY()
+        });
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Start tool interaction.
+   *
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {boolean} True if all ok.
+   */
+  #checkCanCreate(layerGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
 
     /**
      * Draw warn event.
@@ -296,10 +308,10 @@ export class Draw {
           type: 'warn',
           message: 'Cannot create draw layer, reference meta is invalid'
         });
-        return;
+        return false;
       }
       // create draw layer
-      drawLayer = this.#createDrawLayer(layerGroup);
+      this.#createDrawLayer(layerGroup);
     } else if (!this.#canCreateDraw(drawLayer)) {
       // draw creation check
       // fire warn if not possible
@@ -307,30 +319,28 @@ export class Draw {
         type: 'warn',
         message: 'Cannot create draw, data meta is invalid'
       });
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Start tool interaction.
+   *
+   * @param {Point2D} point The start point.
+   * @param {LayerGroup} layerGroup The layer group.
+   */
+  #switchEditOrCreateShapeGroup(point, layerGroup) {
+    if (!this.#checkCanCreate(layerGroup)) {
       return;
     }
 
-    // data should exist / be created
-    const data = drawLayer.getDrawController().getAnnotationGroup();
-
-    const stage = drawLayer.getKonvaStage();
-
-    // update scale
-    this.#style.setZoomScale(stage.scale());
-
-    if (data.isEditable()) {
-      // determine if the click happened on an existing shape or not
-      const kshape = stage.getIntersection({
-        x: point.getX(),
-        y: point.getY()
-      });
-      if (kshape) {
-        // select shape for edition
-        this.#selectShapeGroup(drawLayer, kshape);
-      } else {
-        // create new shape
-        this.#startShapeGroupCreation(layerGroup, point);
-      }
+    const kShape = this.#getSelectShape(point, layerGroup);
+    if (kShape) {
+      this.#selectShapeGroup(layerGroup, kShape);
+    } else {
+      this.#startShapeGroupCreation();
     }
   }
 
@@ -355,22 +365,13 @@ export class Draw {
    * - Updates the started variable,
    * - Gets the factory,
    * - Initializes the points array.
-   *
-   * @param {LayerGroup} layerGroup The layer group where the user clicks.
-   * @param {Point2D} point The start point where the user clicks.
    */
-  #startShapeGroupCreation(layerGroup, point) {
+  #startShapeGroupCreation() {
     // disable edition
     this.#shapeHandler.disableAndResetEditor();
     this.#setToDrawingState();
-    // store point
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to start shape');
-      return;
-    }
-    this.#lastPoint = viewLayer.displayToPlanePos(point);
-    this.#points.push(this.#lastPoint);
+    // set factory
+    this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
   }
 
   /**
@@ -380,11 +381,7 @@ export class Draw {
    * - Resets points.
    */
   #setToDrawingState() {
-    // start storing points
     this.#isDrawing = true;
-    // set factory
-    this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
-    // clear array
     this.#points = [];
   }
 
@@ -402,10 +399,11 @@ export class Draw {
   /**
    * Selects a shape group.
    *
-   * @param {DrawLayer} drawLayer The draw layer where to draw.
+   * @param {LayerGroup} layerGroup The layer group.
    * @param {Konva.Shape} kshape The shape that has been selected.
    */
-  #selectShapeGroup(drawLayer, kshape) {
+  #selectShapeGroup(layerGroup, kshape) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
     let group = kshape.getParent();
     // kshape: Konva.Tag -> parent: Konva.Label -> parent: Konva.Group
     if (kshape instanceof Konva.Tag) {
@@ -436,47 +434,33 @@ export class Draw {
    * Update tool interaction.
    *
    * @param {Point2D} point The update point.
-   * @param {string} divId The layer group divId.
+   * @param {LayerGroup} layerGroup The layer group.
    */
-  #updateShapeGroupCreation(point, divId) {
-    const layerGroup = this.#app.getLayerGroupByDivId(divId);
+  #updateShapeGroupCreation(point, layerGroup) {
+    // validate position
     const viewLayer = this.#getViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       logger.warn('No view layer to update shape');
       return;
     }
     const pos = viewLayer.displayToPlanePos(point);
-
-    // validate position
     const vc = viewLayer.getViewController();
     if (!vc.validatePlanePoint(pos)) {
       return;
     }
 
-    // draw line to current pos
-    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
-      // clear last mouse move point
-      if (this.#lastIsMouseMovePoint) {
-        this.#points.pop();
-      }
-      // current point
-      this.#lastPoint = pos;
-      // mark it as temporary
-      this.#lastIsMouseMovePoint = true;
-      // add it to the list
-      this.#points.push(this.#lastPoint);
-      // update points
-      this.#onNewPoints(this.#points, layerGroup);
-    }
+    const tmpPoints = this.#points.slice();
+    tmpPoints.push(point);
+    // update points
+    this.#onNewPoints(tmpPoints, layerGroup);
   }
 
   /**
    * Finish tool interaction.
    *
-   * @param {string} divId The layer group divId.
+   * @param {LayerGroup} layerGroup The layer group.
    */
-  #finishShapeGroupCreation(divId) {
+  #finishShapeGroupCreation(layerGroup) {
     // exit if no points
     if (this.#points.length === 0) {
       logger.warn('Draw mouseup but no points...');
@@ -486,14 +470,9 @@ export class Draw {
     // do we have all the needed points
     if (this.#points.length === this.#currentFactory.getNPoints()) {
       // store points
-      const layerGroup =
-        this.#app.getLayerGroupByDivId(divId);
       this.#onFinalPoints(this.#points, layerGroup);
       this.#setToNotDrawingState();
     }
-
-    // reset mouse move point flag
-    this.#lastIsMouseMovePoint = false;
   }
 
   /**
@@ -515,19 +494,37 @@ export class Draw {
     return image.isResampled();
   }
 
+  #storePoint(mousePoint) {
+    let isNew;
+    const nPoints = this.#points.length;
+    if (nPoints !== 0) {
+      const lastPoint = this.#points[nPoints - 1];
+      isNew = lastPoint.getX() !== mousePoint.getX() ||
+        lastPoint.getY() !== mousePoint.getY();
+    } else {
+      isNew = true;
+    }
+    if (this.#isDrawing && isNew) {
+      this.#points.push(mousePoint);
+    }
+  }
+
   /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    // exit if not started draw
-    if (this.#isDrawing || this.#isResampled(event)) {
-      return;
-    }
     const mousePoint = getMousePoint(event);
     const layerDetails = getLayerDetailsFromEvent(event);
-    this.#switchEditOrCreateShapeGroup(mousePoint, layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+
+    if (!this.#isDrawing && !this.#isResampled(event)) {
+      this.#switchEditOrCreateShapeGroup(mousePoint, layerGroup);
+    }
+
+    // store point (after switch or edit)
+    this.#storePoint(mousePoint);
   };
 
   /**
@@ -542,7 +539,8 @@ export class Draw {
     }
     const mousePoint = getMousePoint(event);
     const layerDetails = getLayerDetailsFromEvent(event);
-    this.#updateShapeGroupCreation(mousePoint, layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    this.#updateShapeGroupCreation(mousePoint, layerGroup);
   };
 
   /**
@@ -555,8 +553,14 @@ export class Draw {
     if (!this.#isDrawing) {
       return;
     }
+
+    // store point (before finish)
+    const mousePoint = getMousePoint(event);
+    this.#storePoint(mousePoint);
+
     const layerDetails = getLayerDetailsFromEvent(event);
-    this.#finishShapeGroupCreation(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    this.#finishShapeGroupCreation(layerGroup);
   };
 
   /**
@@ -608,7 +612,8 @@ export class Draw {
     }
     const touchPoints = getTouchPoints(event);
     const layerDetails = getLayerDetailsFromEvent(event);
-    this.#switchEditOrCreateShapeGroup(touchPoints[0], layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    this.#switchEditOrCreateShapeGroup(touchPoints[0], layerGroup);
   };
 
   /**
@@ -621,44 +626,10 @@ export class Draw {
     if (!this.#isDrawing) {
       return;
     }
-
+    const touchPoint = getTouchPoints(event)[0];
     const layerDetails = getLayerDetailsFromEvent(event);
-    const touchPoints = getTouchPoints(event);
-
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to handle touch move');
-      return;
-    }
-    const pos = viewLayer.displayToPlanePos(touchPoints[0]);
-
-    // validate position
-    const vc = viewLayer.getViewController();
-    if (!vc.validatePlanePoint(pos)) {
-      return;
-    }
-
-    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
-      // clear last added point from the list (but not the first one)
-      if (this.#points.length !== 1) {
-        this.#points.pop();
-      }
-      // current point
-      this.#lastPoint = pos;
-      // add current one to the list
-      this.#points.push(this.#lastPoint);
-      // allow for anchor points
-      if (this.#points.length < this.#currentFactory.getNPoints()) {
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => {
-          this.#points.push(this.#lastPoint);
-        }, this.#currentFactory.getTimeout());
-      }
-      // update points
-      this.#onNewPoints(this.#points, layerGroup);
-    }
+    this.#updateShapeGroupCreation(touchPoint, layerGroup);
   };
 
   /**
@@ -732,6 +703,74 @@ export class Draw {
   };
 
   /**
+   * Set the auto shape colour based on the input layer id.
+   *
+   * @param {DrawLayer} drawLayer The input layer.
+   */
+  #setAutoColour(drawLayer) {
+    // auto mode: vary shape colour with layer id
+    if (this.#autoShapeColour) {
+      const colours = [
+        '#ffff80', '#ff80ff', '#80ffff', '#80ff80', '8080ff', 'ff8080'
+      ];
+      // warning: depends on layer id nomenclature
+      const drawLayerId = drawLayer.getId();
+      const layerId = drawLayerId.substring(drawLayerId.length - 1);
+      const layerIndex = parseInt(layerId, 10) - 1;
+      const colour = colours[layerIndex];
+      if (typeof colour !== 'undefined') {
+        this.#style.setLineColour(colour);
+      }
+    }
+  }
+
+  /**
+   * Create an annotation based on the input points.
+   *
+   * @param {Point2D[]} tmpPoints The array of new points.
+   * @param {LayerGroup} layerGroup The origin layer group.
+   * @returns {Annotation} The created annotation.
+   */
+  #getAnnotation(tmpPoints, layerGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const drawController = drawLayer.getDrawController();
+
+    const viewLayer = layerGroup.getViewLayerById(
+      drawLayer.getReferenceLayerId());
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to handle new points');
+      return;
+    }
+    const viewController = viewLayer.getViewController();
+
+    // create annotation
+    const annotation = new Annotation();
+    // use group colour if defined
+    const groupColour = drawController.getAnnotationGroup().getColour();
+    if (typeof groupColour !== 'undefined') {
+      annotation.colour = groupColour;
+    } else {
+      annotation.colour = this.#style.getLineColour();
+    }
+    annotation.init(viewController);
+
+    // meta data
+    if (typeof this.#annotationMeta !== 'undefined') {
+      for (const meta of this.#annotationMeta) {
+        annotation.addMetaItem(meta.concept, meta.value);
+      }
+    }
+
+    // set annotation shape
+    const planePoints = tmpPoints.map((item) =>
+      viewLayer.displayToPlanePos(item)
+    );
+    this.#currentFactory.setAnnotationMathShape(annotation, planePoints);
+
+    return annotation;
+  }
+
+  /**
    * Update the current draw with new points.
    *
    * @param {Point2D[]} tmpPoints The array of new points.
@@ -749,43 +788,14 @@ export class Draw {
       logger.warn('No draw layer to handle new points');
       return;
     }
-    const drawController = drawLayer.getDrawController();
     const konvaLayer = drawLayer.getKonvaLayer();
-    const viewLayer = layerGroup.getViewLayerById(
-      drawLayer.getReferenceLayerId());
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to handle new points');
-      return;
-    }
-    const viewController = viewLayer.getViewController();
 
-    // auto mode: vary shape colour with layer id
-    if (this.#autoShapeColour) {
-      const colours = [
-        '#ffff80', '#ff80ff', '#80ffff', '#80ff80', '8080ff', 'ff8080'
-      ];
-      // warning: depends on layer id nomenclature
-      const drawLayerId = drawLayer.getId();
-      const layerId = drawLayerId.substring(drawLayerId.length - 1);
-      const layerIndex = parseInt(layerId, 10) - 1;
-      const colour = colours[layerIndex];
-      if (typeof colour !== 'undefined') {
-        this.#style.setLineColour(colour);
-      }
-    }
+    // set auto colour (if present)
+    this.#setAutoColour(drawLayer);
 
-    // create tmp annotation
-    const annotation = new Annotation();
-    // use group colour if defined
-    const groupColour = drawController.getAnnotationGroup().getColour();
-    if (typeof groupColour !== 'undefined') {
-      annotation.colour = groupColour;
-    } else {
-      annotation.colour = this.#style.getLineColour();
-    }
-    annotation.init(viewController);
-    // set annotation shape
-    this.#currentFactory.setAnnotationMathShape(annotation, tmpPoints);
+    // get annotation
+    const annotation = this.#getAnnotation(tmpPoints, layerGroup);
+
     // create shape group
     this.#tmpShapeGroup =
       this.#currentFactory.createShapeGroup(annotation, this.#style);
@@ -822,33 +832,9 @@ export class Draw {
     }
     const konvaLayer = drawLayer.getKonvaLayer();
     const drawController = drawLayer.getDrawController();
-    const viewLayer = layerGroup.getViewLayerById(
-      drawLayer.getReferenceLayerId());
-    if (typeof viewLayer === 'undefined') {
-      logger.warn('No view layer to handle final points');
-      return;
-    }
-    const viewController = viewLayer.getViewController();
 
-    // create final annotation
-    const annotation = new Annotation();
-    // use group colour if defined
-    const groupColour = drawController.getAnnotationGroup().getColour();
-    if (typeof groupColour !== 'undefined') {
-      annotation.colour = groupColour;
-    } else {
-      annotation.colour = this.#style.getLineColour();
-    }
-    annotation.init(viewController);
-    // meta data
-    if (typeof this.#annotationMeta !== 'undefined') {
-      for (const meta of this.#annotationMeta) {
-        annotation.addMetaItem(meta.concept, meta.value);
-      }
-    }
-
-    // set annotation shape
-    this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
+    // get annotation
+    const annotation = this.#getAnnotation(finalPoints, layerGroup);
 
     // create add annotation command
     const command = new AddAnnotationCommand(annotation, drawController);
