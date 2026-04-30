@@ -45,6 +45,8 @@ export class Draw extends LayerGroupPointer {
    * @param {App} app The associated application.
    */
   constructor(app) {
+    // Use a reference to 'this' since we
+    //   cannot use 'this' before calling 'super'
     const drawToolRef = {
       /** @type {LayerGroupPointer|undefined} */
       self: undefined
