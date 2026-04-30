@@ -8,8 +8,9 @@ import {getActiveOrDrawRefViewLayer} from './utils.js';
 
 /**
  * Tap (no drag move): subclasses implement {@link TapBehavior#onTap}.
+ * Extends {@link EventTarget} so tap-driven tools can emit and forward events.
  */
-export class TapBehavior {
+export class TapBehavior extends EventTarget {
 
   /**
    * Tap points. Reset to empty array on the tap after
@@ -30,7 +31,7 @@ export class TapBehavior {
    * @param {number} numberOfTaps The number of taps.
    */
   setNumberOfTaps(numberOfTaps) {
-    this.onEnd();
+    this.#points = [];
     this.#numberOfTaps = numberOfTaps;
   }
 
@@ -39,6 +40,15 @@ export class TapBehavior {
    */
   isActive() {
     return this.#points.length !== 0;
+  }
+
+  /**
+   * Committed tap points (copy).
+   *
+   * @returns {Point2D[]} Display-space points accumulated for this tap session.
+   */
+  getPointList() {
+    return this.#points.slice();
   }
 
   /**
