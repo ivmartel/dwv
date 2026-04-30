@@ -75,8 +75,9 @@ function getPrimaryTouchLayerContext(event, app) {
 /**
  * @typedef {object} LayerGroupPointerOptions
  * @property {App} app Used to resolve {@link LayerGroup} from events.
- * @property {DragBehavior} dragBehavior Drag behaviour; whether a drag may
- *   begin is {@link DragBehavior#canStart}.
+ * @property {DragBehavior} [dragBehavior] Drag behaviour; whether a drag may
+ *   begin is {@link DragBehavior#canStart}. Omit when only tap/wheel/hover
+ *   behaviours apply (e.g. {@link Draw}).
  * @property {HoverBehavior} [hoverBehavior] Hover behaviour
  *   (e.g. `TooltipHoverBehavior`).
  * @property {WheelBehavior} [wheelBehavior] Mouse wheel handling.
@@ -113,7 +114,7 @@ export class LayerGroupPointer extends EventTarget {
   #app;
 
   /**
-   * @type {DragBehavior}
+   * @type {DragBehavior|undefined}
    */
   #dragBehavior;
 
@@ -294,10 +295,11 @@ export class LayerGroupPointer extends EventTarget {
       // update drag or sticky tap
       if (this.#dragBehavior?.isActive()) {
         this.#dragBehavior.onUpdate(point, layerGroup);
-      } else if (this.#tapBehavior?.isActive()) {
-        this.#tapBehavior.onUpdate(point, layerGroup);
       }
     } else {
+      if (this.#tapBehavior?.isActive()) {
+        this.#tapBehavior.onUpdate(point, layerGroup);
+      }
       // update hover
       this.#hoverBehavior?.onUpdate(point, layerGroup);
     }
