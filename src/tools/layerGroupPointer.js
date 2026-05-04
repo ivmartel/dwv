@@ -314,9 +314,11 @@ export class LayerGroupPointer extends EventTarget {
   mouseup = (event) => {
     this.#mouseDownButton = undefined;
 
-    if (this.#dragBehavior?.isActive()) {
+    if (this.#dragBehavior?.isActive() && this.#moved) {
       this.#dragBehavior.onEnd();
-    } else if (this.#tapBehavior &&
+    }
+
+    if (this.#tapBehavior &&
       (this.#tapBehavior.isActive() || !this.#moved)) {
       // Discrete tap without move; or sticky tap (active) including after move.
       const {point, layerGroup} = getMouseLayerContext(event, this.#app);
