@@ -53,7 +53,7 @@
     "html-webpack-plugin": "^5.6.6",
     "jsdoc": "^4.0.5",
     "jsdom": "^29.0.0",
-    "typescript": "5.6.3",
+    "typescript": "6.0.3",
     "vitest": "^4.1.0",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.0",
