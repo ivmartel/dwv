@@ -125,6 +125,13 @@ export class DragStep {
 export class DragBehavior extends EventTarget {
 
   /**
+   * Start point.
+   *
+   * @type {Point2D|null}
+   */
+  #startPoint = null;
+
+  /**
    * Pointer anchor for the next step (set in {@link onStart}, advanced in
    * {@link onUpdate} before {@link onDrag}, cleared in {@link onEnd}).
    *
@@ -143,6 +150,22 @@ export class DragBehavior extends EventTarget {
   constructor({threshold} = {}) {
     super();
     this.setDragThreshold(threshold);
+  }
+
+  /**
+   * @returns {Point2D|null} The start point.
+   */
+  get startPoint() {
+    return this.#startPoint;
+  }
+
+  /**
+   * @returns {Point2D|null} Last accepted pointer for the next step. When
+   *   {@link DragBehavior#onDrag} runs, already updated to this move's
+   *   endpoint (the `point` passed to {@link DragBehavior#onUpdate}).
+   */
+  get prevPoint() {
+    return this.#prevPoint;
   }
 
   /**
@@ -176,16 +199,8 @@ export class DragBehavior extends EventTarget {
    *   context from {@link LayerGroupPointer}.
    */
   onStart(point, _layerGroup, _pointerStart) {
+    this.#startPoint = point;
     this.#prevPoint = point;
-  }
-
-  /**
-   * @returns {Point2D|null} Last accepted pointer for the next step. When
-   *   {@link DragBehavior#onDrag} runs, already updated to this move's
-   *   endpoint (the `point` passed to {@link DragBehavior#onUpdate}).
-   */
-  get prevPoint() {
-    return this.#prevPoint;
   }
 
   /**
@@ -216,6 +231,7 @@ export class DragBehavior extends EventTarget {
   }
 
   onEnd() {
+    this.#startPoint = null;
     this.#prevPoint = null;
   }
 
