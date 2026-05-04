@@ -253,18 +253,18 @@ export class LayerGroupPointer extends EventTarget {
 
     // end drag
     if (this.#dragBehavior?.isActive()) {
-      this.#dragBehavior.onEnd();
+      this.#dragBehavior.reset();
     }
     // end sticky tap
     if (this.#tapBehavior?.isActive()) {
-      this.#tapBehavior.onEnd();
+      this.#tapBehavior.reset();
     }
     // end two touch
     if (this.#twoTouchBehavior?.isActive()) {
-      this.#twoTouchBehavior?.onEnd();
+      this.#twoTouchBehavior?.reset();
     }
     // end hover
-    this.#hoverBehavior?.onEnd();
+    this.#hoverBehavior?.reset();
   }
 
   /**

@@ -22,6 +22,13 @@ export class TwoTouchBehavior {
   }
 
   /**
+   * Behavior reset.
+   */
+  reset() {
+    // does nothing
+  }
+
+  /**
    * @param {Point2D[]} _points Two touch points.
    */
   onStart(_points) {
@@ -67,6 +74,14 @@ export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
    */
   isActive() {
     return typeof this.#pointsLine !== 'undefined';
+  }
+
+  /**
+   * Behavior reset.
+   */
+  reset() {
+    this.#pointsLine = undefined;
+    this.#midPoint = undefined;
   }
 
   /**
@@ -130,8 +145,7 @@ export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
    * End two-touch tracking (touch end or pointer cancel).
    */
   onEnd() {
-    this.#pointsLine = undefined;
-    this.#midPoint = undefined;
+    this.reset();
   }
 
 }

@@ -193,6 +193,14 @@ export class DragBehavior extends EventTarget {
   }
 
   /**
+   * Reset behavior.
+   */
+  reset() {
+    this.#startPoint = null;
+    this.#prevPoint = null;
+  }
+
+  /**
    * @param {Point2D} point The pointer position at drag start.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    * @param {DragPointerStartContext|undefined} [_pointerStart] Mouse/touch
@@ -231,8 +239,7 @@ export class DragBehavior extends EventTarget {
   }
 
   onEnd() {
-    this.#startPoint = null;
-    this.#prevPoint = null;
+    this.reset();
   }
 
 }

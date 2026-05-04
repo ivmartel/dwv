@@ -344,7 +344,7 @@ describe('tools/layerGroupPointer', () => {
       new Point2D(0, 0),
       new Point2D(10, 10)
     ]);
-    const onEnd = vi.fn();
+    const reset = vi.fn();
 
     class T extends TwoTouchBehavior {
       #active = false;
@@ -354,9 +354,12 @@ describe('tools/layerGroupPointer', () => {
       onStart() {
         this.#active = true;
       }
-      onEnd() {
-        onEnd();
+      reset() {
         this.#active = false;
+        reset();
+      }
+      onEnd() {
+        this.reset();
       }
     }
 
@@ -374,7 +377,7 @@ describe('tools/layerGroupPointer', () => {
     assert.ok(twoTouch.isActive());
 
     pointer.cancel();
-    assert.equal(onEnd.mock.calls.length, 1);
+    assert.equal(reset.mock.calls.length, 1);
     assert.equal(twoTouch.isActive(), false);
   });
 
@@ -416,6 +419,7 @@ describe('tools/layerGroupPointer', () => {
       },
       dragBehavior: undefined,
       hoverBehavior: {
+        reset() {},
         onUpdate: onHoverUpdate,
         onEnd: onHoverEnd
       },
@@ -645,15 +649,15 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(onTap.mock.calls.length, 1);
   });
 
-  test('cancel ends active drag and clears long-touch timer', () => {
+  test('cancel clears long-touch timer', () => {
     vi.useFakeTimers();
     const {canvas} = setupLayerCanvas();
     getTouchPointsSpy.mockReturnValue([new Point2D(1, 1)]);
-    const onEnd = vi.fn();
+    const reset = vi.fn();
     class T extends DragBehavior {
-      onEnd() {
-        onEnd();
-        super.onEnd();
+      reset() {
+        reset();
+        super.reset();
       }
     }
     const drag = new T();
@@ -667,7 +671,7 @@ describe('tools/layerGroupPointer', () => {
 
     pointer.touchstart(touchEvent('touchstart', canvas));
     pointer.cancel();
-    assert.equal(onEnd.mock.calls.length, 1);
+    assert.equal(reset.mock.calls.length, 1);
     assert.equal(drag.isActive(), false);
 
     vi.advanceTimersByTime(600);

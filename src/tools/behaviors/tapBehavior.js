@@ -43,6 +43,13 @@ export class TapBehavior extends EventTarget {
   }
 
   /**
+   * Behavior reset.
+   */
+  reset() {
+    this.#points = [];
+  }
+
+  /**
    * Committed tap points (copy).
    *
    * @returns {Point2D[]} Display-space points accumulated for this tap session.
@@ -76,7 +83,7 @@ export class TapBehavior extends EventTarget {
    * End the tap behavior.
    */
   onEnd() {
-    this.#points = [];
+    this.reset();
   }
 }
 

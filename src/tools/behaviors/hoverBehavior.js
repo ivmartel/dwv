@@ -9,6 +9,13 @@
 export class HoverBehavior {
 
   /**
+   * Behavior reset.
+   */
+  reset() {
+    // does nothing
+  }
+
+  /**
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    */
@@ -54,6 +61,16 @@ export class TooltipHoverBehavior extends HoverBehavior {
   }
 
   /**
+   * Behavior reset.
+   */
+  reset() {
+    if (typeof this.#currentLayerGroup !== 'undefined') {
+      this.#currentLayerGroup.removeTooltipDiv();
+      this.#currentLayerGroup = undefined;
+    }
+  }
+
+  /**
    * @param {Point2D} point The update point.
    * @param {LayerGroup} layerGroup The layer group.
    */
@@ -67,10 +84,7 @@ export class TooltipHoverBehavior extends HoverBehavior {
    * Invoked when hover ends; removes the last tooltip html div.
    */
   onEnd() {
-    if (typeof this.#currentLayerGroup !== 'undefined') {
-      this.#currentLayerGroup.removeTooltipDiv();
-      this.#currentLayerGroup = undefined;
-    }
+    this.reset();
   }
 
   /**
