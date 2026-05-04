@@ -129,7 +129,6 @@ export class DrawTapBehavior extends TapBehavior {
    */
   setOptions(options) {
     this.#shapeFactoryList = options;
-    this.#applyTapLimitFromFactory();
   }
 
   /**
@@ -160,7 +159,6 @@ export class DrawTapBehavior extends TapBehavior {
         throw new Error(`Unknown shape: '${features.shapeName}'`);
       }
       this.#shapeName = features.shapeName;
-      this.#applyTapLimitFromFactory();
     }
   }
 
@@ -220,24 +218,22 @@ export class DrawTapBehavior extends TapBehavior {
    * Start a new factory instance for the current shape name.
    */
   #startShapeGroupCreation() {
-    this.#shapeHandler.disableAndResetEditor();
     if (!this.#shapeFactoryList || !this.#shapeName) {
       logger.warn('DrawTapBehavior: missing factory list or shape name');
       return;
     }
     this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
-    this.#applyTapLimitFromFactory();
   }
 
   #applyTapLimitFromFactory() {
     if (!this.#currentFactory) {
       return;
     }
-    const n = this.#currentFactory.getNPoints?.();
-    if (typeof n === 'undefined') {
+    const nPoints = this.#currentFactory.getNPoints();
+    if (typeof nPoints === 'undefined') {
       super.setNumberOfTaps(OPEN_ENDED_TAP_LIMIT);
     } else {
-      super.setNumberOfTaps(n);
+      super.setNumberOfTaps(nPoints);
     }
   }
 
@@ -278,7 +274,10 @@ export class DrawTapBehavior extends TapBehavior {
       if (this.trySelectShapeGroup(point, layerGroup)) {
         return;
       }
-      if (!this.tryBeginPlacement(layerGroup)) {
+      if (this.tryBeginPlacement(layerGroup)) {
+        this.#shapeHandler.disableAndResetEditor();
+        this.#applyTapLimitFromFactory();
+      } else {
         return;
       }
     }
@@ -411,7 +410,6 @@ export class DrawTapBehavior extends TapBehavior {
     this.#app.addAndRenderAnnotationData(
       data, layerGroup.getDivId(), refDataId);
     const drawLayer = layerGroup.getActiveDrawLayer();
-    drawLayer.setShapeHandler(this.#shapeHandler);
     layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
 
     const kStage = drawLayer.getKonvaStage();
