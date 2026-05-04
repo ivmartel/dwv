@@ -31,7 +31,7 @@
   ],
   "dependencies": {
     "jszip": "^3.10.1",
-    "konva": "~10.2.1",
+    "konva": "~10.3.0",
     "magic-wand-tool": "~1.1.7"
   },
   "devDependencies": {
