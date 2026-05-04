@@ -271,6 +271,11 @@ export class LayerGroupPointer extends EventTarget {
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
+    // end drag
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+
     this.#mouseDownButton = event.button;
     this.#moved = false;
 
