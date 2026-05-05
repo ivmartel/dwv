@@ -159,13 +159,11 @@ export class LayerGroupPointer extends EventTarget {
   #longTouchTimerId = null;
 
   /**
-   * `MouseEvent#button` from the last mousedown while that button is held;
-   * `undefined` after mouseup, {@link LayerGroupPointer#mouseout}, or
-   * {@link LayerGroupPointer#cancel}. Not set by touch.
+   * True after a mouse down, reset at mouseup or mouseout.
    *
-   * @type {number|undefined}
+   * @type {boolean}
    */
-  #mouseDownButton;
+  #mouseDowned = false;
 
   /**
    * True after a mouse or touch move, reset at mousedown or touchstart.
@@ -247,7 +245,7 @@ export class LayerGroupPointer extends EventTarget {
    * End behaviors that have end method.
    */
   cancel() {
-    this.#mouseDownButton = undefined;
+    this.#mouseDowned = false;
     this.#moved = false;
     this.#clearLongTouchTimer();
 
@@ -268,6 +266,8 @@ export class LayerGroupPointer extends EventTarget {
   }
 
   /**
+   * Handle mouse down.
+   *
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
@@ -276,7 +276,7 @@ export class LayerGroupPointer extends EventTarget {
       this.#dragBehavior.reset();
     }
 
-    this.#mouseDownButton = event.button;
+    this.#mouseDowned = true;
     this.#moved = false;
 
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
@@ -288,20 +288,23 @@ export class LayerGroupPointer extends EventTarget {
   };
 
   /**
+   * Handle mouse move.
+   *
    * @param {MouseEvent} event The mouse move event.
    */
   mousemove = (event) => {
     this.#moved = true;
 
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
-    if (typeof this.#mouseDownButton !== 'undefined') {
-      // remove hover while dragging
+    if (this.#mouseDowned) {
+      // remove hover for down+move
       this.#hoverBehavior?.onEnd();
-      // update drag or sticky tap
+      // update drag
       if (this.#dragBehavior?.isActive()) {
         this.#dragBehavior.onUpdate(point, layerGroup);
       }
     } else {
+      // update sticky tap
       if (this.#tapBehavior?.isActive()) {
         this.#tapBehavior.onUpdate(point, layerGroup);
       }
@@ -311,21 +314,27 @@ export class LayerGroupPointer extends EventTarget {
   };
 
   /**
-   * Ends drag or delivers a tap when `tapBehavior.isActive()` (sticky session)
-   * or the pointer did not move since mousedown.
+   * Handle mouse up.
    *
    * @param {MouseEvent} event The mouse up event.
    */
   mouseup = (event) => {
-    this.#mouseDownButton = undefined;
+    this.#mouseDowned = false;
 
-    if (this.#dragBehavior?.isActive() && this.#moved) {
-      this.#dragBehavior.onEnd();
+    if (this.#dragBehavior?.isActive()) {
+      if (this.#moved) {
+        // up+move -> end drag
+        this.#dragBehavior.onEnd();
+      } else {
+        // up and no move -> reset drag
+        this.#dragBehavior.reset();
+      }
     }
 
     if (this.#tapBehavior &&
       (this.#tapBehavior.isActive() || !this.#moved)) {
-      // Discrete tap without move; or sticky tap (active) including after move.
+      // active tap -> sticky tap
+      // no move -> discrete tap
       const {point, layerGroup} = getMouseLayerContext(event, this.#app);
       this.#tapBehavior.onTap(point, layerGroup);
     }
@@ -346,9 +355,7 @@ export class LayerGroupPointer extends EventTarget {
     // end hover
     this.#hoverBehavior?.onEnd();
 
-    // Align pointer flags with mouseup/cancel: leaving the layer often skips
-    // mouseup, leaving #mouseDownButton stale relative to behaviors above.
-    this.#mouseDownButton = undefined;
+    this.#mouseDowned = false;
     this.#moved = false;
   };
 

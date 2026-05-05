@@ -630,7 +630,7 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(onTap.mock.calls.length, 1);
   });
 
-  test('mouseup does not end active drag if pointer did not move', () => {
+  test('mouseup does reset active drag if pointer did not move', () => {
     const {canvas, groupDivId} = setupLayerCanvas();
     const onEnd = vi.fn();
     class T extends DragBehavior {
@@ -650,7 +650,7 @@ describe('tools/layerGroupPointer', () => {
 
     pointer.mouseup(mouseEvent('mouseup', canvas, 1, 1));
     assert.equal(onEnd.mock.calls.length, 0);
-    assert.equal(drag.isActive(), true);
+    assert.equal(drag.isActive(), false);
   });
 
   test('mouseup does not tap after mousemove', () => {
