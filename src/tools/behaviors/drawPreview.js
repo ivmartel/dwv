@@ -163,7 +163,7 @@ export class DrawPreview {
    */
   #checkShapeGroupCreation() {
     if (!this.#shapeFactoryList || !this.#shapeName) {
-      logger.warn('DrawTapBehavior: missing factory list or shape name');
+      logger.warn('DrawPreview: missing factory list or shape name');
       return false;
     }
     return true;

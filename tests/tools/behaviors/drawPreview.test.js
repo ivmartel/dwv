@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import {describe, test, assert, vi, beforeEach} from 'vitest';
+import {describe, test, assert, vi, afterEach, beforeEach} from 'vitest';
 import {Point2D} from '../../../src/math/point.js';
 import {DrawPreview} from '../../../src/tools/behaviors/drawPreview.js';
 import {RulerFactory} from '../../../src/tools/shapes/ruler.js';
@@ -9,6 +9,7 @@ import {
   createRectangleDrawIntegrationSetup
 } from './rectangleDrawFixture.js';
 import {makeMockLayerGroup, makeMockViewLayer} from './utils.js';
+import * as loggerModule from '../../../src/utils/logger.js';
 
 /**
  * @returns {object} Minimal app stub for {@link DrawPreview}.
@@ -43,6 +44,10 @@ describe('tools/behaviors/drawPreview', () => {
     preview = new DrawPreview(app);
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   test('hasShape is false before setOptions', () => {
     assert.equal(preview.hasShape('ruler'), false);
   });
@@ -62,12 +67,15 @@ describe('tools/behaviors/drawPreview', () => {
   });
 
   test('tryBeginPlacement returns false when shape is not configured', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
     const lg = makeMockLayerGroup();
     lg.getActiveDrawLayer = vi.fn(() => ({
       getDataId: vi.fn(() => 'draw-1')
     }));
     preview.setOptions({ruler: RulerFactory});
     assert.equal(preview.tryBeginPlacement(lg), false);
+    assert.equal(warnSpy.mock.calls.length, 1, 'warning on trybegin');
   });
 
   test('tryBeginPlacement returns true when draw layer exists and shape is set',
