@@ -5,7 +5,7 @@ import {Index} from '../../../src/math/index.js';
 import {Point2D, Point3D} from '../../../src/math/point.js';
 import {Rectangle} from '../../../src/math/rectangle.js';
 import {RectangleFactory} from '../../../src/tools/shapes/rectangle.js';
-import {makeStyle} from '../utils/toolTestHelpers.js';
+import {makeStyle} from '../shapes/utils.js';
 
 /**
  * Konva stage + layer group + app mocks for rectangle finalization tests.

@@ -1,18 +1,18 @@
 // @vitest-environment jsdom
 import {describe, test, assert, beforeEach} from 'vitest';
-import {getPainter} from '../../src/tools/shapes/shapePainters.js';
-import {Rectangle} from '../../src/math/rectangle.js';
-import {Circle} from '../../src/math/circle.js';
-import {Ellipse} from '../../src/math/ellipse.js';
-import {Line} from '../../src/math/line.js';
-import {ROI} from '../../src/math/roi.js';
-import {Protractor} from '../../src/math/protractor.js';
-import {Point2D} from '../../src/math/point.js';
+import {getPainter} from '../../../src/tools/shapes/shapePainters.js';
+import {Rectangle} from '../../../src/math/rectangle.js';
+import {Circle} from '../../../src/math/circle.js';
+import {Ellipse} from '../../../src/math/ellipse.js';
+import {Line} from '../../../src/math/line.js';
+import {ROI} from '../../../src/math/roi.js';
+import {Protractor} from '../../../src/math/protractor.js';
+import {Point2D} from '../../../src/math/point.js';
 import Konva from 'konva';
 import {
   makeStyle,
   makeAnnotation as _makeAnnotation
-} from './utils/toolTestHelpers.js';
+} from './utils.js';
 
 // ---------------------------------------------------------------------------
 // Helpers

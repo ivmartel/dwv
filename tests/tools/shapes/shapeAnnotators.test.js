@@ -7,16 +7,16 @@ import {
   ArrowAnnotator,
   RoiAnnotator,
   ProtractorAnnotator,
-} from '../../src/tools/shapes/shapeAnnotators.js';
-import {Anchor} from '../../src/tools/shapes/anchor.js';
-import {Rectangle} from '../../src/math/rectangle.js';
-import {Circle} from '../../src/math/circle.js';
-import {Ellipse} from '../../src/math/ellipse.js';
-import {Line} from '../../src/math/line.js';
-import {ROI} from '../../src/math/roi.js';
-import {Protractor} from '../../src/math/protractor.js';
-import {Point2D} from '../../src/math/point.js';
-import {makeAnnotation as _makeAnnotation} from './utils/toolTestHelpers.js';
+} from '../../../src/tools/shapes/shapeAnnotators.js';
+import {Anchor} from '../../../src/tools/shapes/anchor.js';
+import {Rectangle} from '../../../src/math/rectangle.js';
+import {Circle} from '../../../src/math/circle.js';
+import {Ellipse} from '../../../src/math/ellipse.js';
+import {Line} from '../../../src/math/line.js';
+import {ROI} from '../../../src/math/roi.js';
+import {Protractor} from '../../../src/math/protractor.js';
+import {Point2D} from '../../../src/math/point.js';
+import {makeAnnotation as _makeAnnotation} from './utils.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
