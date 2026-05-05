@@ -46,7 +46,8 @@ function makeImage3x3(values) {
 }
 
 /**
- * Minimal app stub with image data for {@link Threshold}/{@link Sharpen}/{@link Sobel}.
+ * Minimal app stub with image data for {@link Threshold}, {@link Sharpen},
+ * and {@link Sobel}.
  *
  * @param {Image} image Pixel data.
  * @returns {object} App mock.
@@ -78,7 +79,8 @@ function getResultImageFromSetImage(app) {
 }
 
 /**
- * Filter entry that stores listeners like shape/DOM-style APIs used by {@link Filter}.
+ * Filter entry that stores listeners like shape/DOM-style APIs used by
+ * {@link Filter}.
  */
 class RecordingFilter {
   /** @type {Map<string, Function[]>} */
@@ -202,31 +204,33 @@ describe('tools/filter', () => {
       assert.equal(spy.mock.calls.length, 0);
     });
 
-    test('setFeatures selects filter and optional run dispatches command', () => {
-      const img = makeImage3x3(Array(9).fill(10));
-      const app = makeFilterApp(img);
-      const tool = new Filter(app);
-      tool.setOptions({threshold: Threshold});
-      tool.init();
-      tool.activate(true);
-      const spy = vi.fn();
-      tool.addEventListener('filterrun', spy);
-      tool.setFeatures({
-        filterName: 'threshold',
-        run: true,
-        runArgs: {
-          dataId: app.dataId,
-          min: 0,
-          max: 255
-        }
+    test(
+      'setFeatures selects filter and optional run dispatches command',
+      () => {
+        const img = makeImage3x3(Array(9).fill(10));
+        const app = makeFilterApp(img);
+        const tool = new Filter(app);
+        tool.setOptions({threshold: Threshold});
+        tool.init();
+        tool.activate(true);
+        const spy = vi.fn();
+        tool.addEventListener('filterrun', spy);
+        tool.setFeatures({
+          filterName: 'threshold',
+          run: true,
+          runArgs: {
+            dataId: app.dataId,
+            min: 0,
+            max: 255
+          }
+        });
+        assert.equal(app.render.mock.calls.length, 1);
+        assert.equal(app.addToUndoStack.mock.calls.length, 1);
+        assert.equal(spy.mock.calls.length, 1);
+        assert.equal(spy.mock.calls[0][0].type, 'filterrun');
+        const out = getResultImageFromSetImage(app);
+        assert.deepEqual(Array.from(out.getBuffer()), Array(9).fill(10));
       });
-      assert.equal(app.render.mock.calls.length, 1);
-      assert.equal(app.addToUndoStack.mock.calls.length, 1);
-      assert.equal(spy.mock.calls.length, 1);
-      assert.equal(spy.mock.calls[0][0].type, 'filterrun');
-      const out = getResultImageFromSetImage(app);
-      assert.deepEqual(Array.from(out.getBuffer()), Array(9).fill(10));
-    });
 
   });
 
