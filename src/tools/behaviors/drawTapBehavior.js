@@ -296,7 +296,7 @@ export class DrawTapBehavior extends TapBehavior {
       }
     }
 
-    // store point if not yet done
+    // exit if known point
     const last = this.getPointList();
     if (last.length > 0) {
       const prev = last[last.length - 1];
@@ -322,7 +322,8 @@ export class DrawTapBehavior extends TapBehavior {
       if (typeof n !== 'undefined') {
         if (pts.length === n) {
           this.#drawPreview.onFinalPoints(pts, lg);
-        } else if (pts.length === n - 1) {
+        } else if (pts.length === n - 1 &&
+          typeof this.#lastMovePoint !== 'undefined') {
           pts.push(this.#lastMovePoint);
           this.#drawPreview.onFinalPoints(pts, lg);
         }
