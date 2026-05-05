@@ -2,6 +2,7 @@ import {logger} from '../utils/logger.js';
 import {RemoveAnnotationCommand} from '../command/drawCommands.js';
 import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {DrawTapBehavior} from './behaviors/drawTapBehavior.js';
+import {DrawDragBehavior} from './behaviors/drawDragBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 
@@ -21,6 +22,11 @@ export class Draw extends LayerGroupPointer {
    * @type {App}
    */
   #app;
+
+  /**
+   * @type {DrawDragBehavior}
+   */
+  #drawDrag;
 
   /**
    * @type {DrawTapBehavior}
@@ -56,17 +62,24 @@ export class Draw extends LayerGroupPointer {
         new CustomEvent(data.type, {detail: data}));
     });
     const tapBehavior = new DrawTapBehavior(app, shapeHandler);
+    const dragBehavior = new DrawDragBehavior(app, shapeHandler);
     super({
       app,
+      dragBehavior,
       tapBehavior,
       wheelBehavior: new ScrollWheelBehavior()
     });
     drawToolRef.self = this;
     this.#app = app;
+    this.#drawDrag = dragBehavior;
     this.#drawTap = tapBehavior;
     this.#shapeHandler = shapeHandler;
 
     for (const type of this.getEventNames()) {
+      this.#drawDrag.addEventListener(type, (e) => {
+        const ce = /** @type {CustomEvent} */ (e);
+        this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
+      });
       this.#drawTap.addEventListener(type, (e) => {
         const ce = /** @type {CustomEvent} */ (e);
         this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
@@ -105,6 +118,7 @@ export class Draw extends LayerGroupPointer {
     }
 
     if (event.key === 'Escape') {
+      this.#drawDrag.resetPlacement();
       this.#drawTap.resetPlacement();
     }
   };
@@ -178,6 +192,7 @@ export class Draw extends LayerGroupPointer {
    * @param {object} options The list of shape names amd classes.
    */
   setOptions(options) {
+    this.#drawDrag.setOptions(options);
     this.#drawTap.setOptions(options);
   }
 
@@ -200,6 +215,7 @@ export class Draw extends LayerGroupPointer {
     if (typeof features.mouseOverCursor !== 'undefined') {
       this.#shapeHandler.storeMouseOverCursor(features.mouseOverCursor);
     }
+    this.#drawDrag.setFeatures(features);
     this.#drawTap.setFeatures(features);
   }
 
