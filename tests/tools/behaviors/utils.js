@@ -27,7 +27,8 @@ export function makeMockViewController() {
     })),
     getOffset3DFromPlaneOffset: vi.fn(() => (new Vector3D(0, 1, 2))),
     setCurrentPosition: vi.fn(),
-    play: vi.fn()
+    play: vi.fn(),
+    validatePlanePoint: vi.fn(() => true)
   };
 }
 
