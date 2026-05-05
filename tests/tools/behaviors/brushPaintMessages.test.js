@@ -3,7 +3,7 @@ import {describe, test, assert} from 'vitest';
 import {
   ERROR_MESSAGES,
   formatString
-} from '../../src/tools/brushPaintMessages.js';
+} from '../../../src/tools/behaviors/brushPaintMessages.js';
 
 describe('brushPaintMessages', () => {
   describe('formatString', () => {

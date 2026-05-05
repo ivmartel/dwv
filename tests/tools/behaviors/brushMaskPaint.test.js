@@ -3,7 +3,7 @@ import {describe, test, assert, vi, beforeEach} from 'vitest';
 import {
   BrushMaskPaint,
   BrushMode
-} from '../../src/tools/brushMaskPaint.js';
+} from '../../../src/tools/behaviors/brushMaskPaint.js';
 
 describe('BrushMaskPaint', () => {
   /** @type {BrushMaskPaint} */

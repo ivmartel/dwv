@@ -1,7 +1,7 @@
 import {logger} from '../../utils/logger.js';
 import {ViewLayer} from '../../gui/viewLayer.js';
-import {ERROR_MESSAGES} from '../brushPaintMessages.js';
-import {BrushMode, BrushMaskPaint} from '../brushMaskPaint.js';
+import {ERROR_MESSAGES} from './brushPaintMessages.js';
+import {BrushMode, BrushMaskPaint} from './brushMaskPaint.js';
 import {DragBehavior} from './dragBehavior.js';
 import {MouseEventButtons} from '../layerGroupPointer.js';
 

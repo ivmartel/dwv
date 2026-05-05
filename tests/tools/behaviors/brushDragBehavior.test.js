@@ -11,7 +11,7 @@ vi.mock('../../../src/gui/viewLayer.js', () => ({
   ViewLayer: class ViewLayer {}
 }));
 
-vi.mock('../../../src/tools/brushMaskPaint.js', () => {
+vi.mock('../../../src/tools/behaviors/brushMaskPaint.js', () => {
   const BrushMode = {Del: 'del', Add: 'add'};
   /**
    * Lightweight stand-in used only by {@link BrushDragBehavior} tests.

@@ -1,5 +1,5 @@
 
-import {BrushMode} from './brushMaskPaint.js';
+import {BrushMode} from './behaviors/brushMaskPaint.js';
 import {BrushDragBehavior} from './behaviors/brushDragBehavior.js';
 import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';

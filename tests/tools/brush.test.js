@@ -16,7 +16,7 @@ vi.mock('../../src/app/application.js', () => ({
 }));
 
 import {Brush} from '../../src/tools/brush.js';
-import {BrushMode} from '../../src/tools/brushMaskPaint.js';
+import {BrushMode} from '../../src/tools/behaviors/brushMaskPaint.js';
 import {BrushDragBehavior} from
   '../../src/tools/behaviors/brushDragBehavior.js';
 

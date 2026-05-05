@@ -1,26 +1,26 @@
-import {logger} from '../utils/logger.js';
-import {Index} from '../math/index.js';
-import {getEllipseIndices} from '../math/ellipse.js';
-import {Image} from '../image/image.js';
-import {Size} from '../image/size.js';
-import {Geometry} from '../image/geometry.js';
-import {ColourMap} from '../image/luts.js';
-import {getDefaultDicomSegJson} from '../image/maskFactory.js';
-import {getDwvUIDPrefix} from '../dicom/dicomParser.js';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
-import {DicomData} from '../app/dataController.js';
-import {ViewConfig} from '../app/application.js';
+import {logger} from '../../utils/logger.js';
+import {Index} from '../../math/index.js';
+import {getEllipseIndices} from '../../math/ellipse.js';
+import {Image} from '../../image/image.js';
+import {Size} from '../../image/size.js';
+import {Geometry} from '../../image/geometry.js';
+import {ColourMap} from '../../image/luts.js';
+import {getDefaultDicomSegJson} from '../../image/maskFactory.js';
+import {getDwvUIDPrefix} from '../../dicom/dicomParser.js';
+import {getElementsFromJSONTags} from '../../dicom/dicomWriter.js';
+import {DicomData} from '../../app/dataController.js';
+import {ViewConfig} from '../../app/application.js';
 import {
   DrawBrushCommandProperties,
   DrawBrushCommand
-} from '../command/drawBrushCommand.js';
+} from '../../command/drawBrushCommand.js';
 import {ERROR_MESSAGES, formatString} from './brushPaintMessages.js';
 
 /**
- * @import {App} from '../app/application.js';
- * @import {LayerGroup} from '../gui/layerGroup.js';
- * @import {Point, Point3D, Point2D} from '../math/point.js';
- * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {App} from '../../app/application.js';
+ * @import {LayerGroup} from '../../gui/layerGroup.js';
+ * @import {Point, Point3D, Point2D} from '../../math/point.js';
+ * @import {ViewLayer} from '../../gui/viewLayer.js';
  */
 
 export const BrushMode = {
@@ -218,7 +218,7 @@ export class BrushMaskPaint extends EventTarget {
   #selectedSegmentNumber;
 
   /**
-   * @type {import('../image/image.js').Image|undefined}
+   * @type {import('../../image/image.js').Image|undefined}
    */
   #mask;
 
@@ -228,7 +228,7 @@ export class BrushMaskPaint extends EventTarget {
   #maskDataId;
 
   /**
-   * @type {import('../gui/layerGroup.js').LayerGroup|undefined}
+   * @type {import('../../gui/layerGroup.js').LayerGroup|undefined}
    */
   #currentLayerGroup;
 
