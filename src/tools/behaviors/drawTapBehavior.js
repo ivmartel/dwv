@@ -331,6 +331,7 @@ export class DrawTapBehavior extends TapBehavior {
       }
     }
 
+    this.#lastMovePoint = undefined;
     this.#placementLayerGroup = undefined;
     super.onEnd();
   }
