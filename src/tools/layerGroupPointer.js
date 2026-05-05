@@ -160,8 +160,8 @@ export class LayerGroupPointer extends EventTarget {
 
   /**
    * `MouseEvent#button` from the last mousedown while that button is held;
-   * `undefined` after mouseup or {@link LayerGroupPointer#cancel}. Not set by
-   * touch.
+   * `undefined` after mouseup, {@link LayerGroupPointer#mouseout}, or
+   * {@link LayerGroupPointer#cancel}. Not set by touch.
    *
    * @type {number|undefined}
    */
@@ -251,19 +251,19 @@ export class LayerGroupPointer extends EventTarget {
     this.#moved = false;
     this.#clearLongTouchTimer();
 
-    // end drag
+    // reset drag
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.reset();
     }
-    // end sticky tap
+    // reset sticky tap
     if (this.#tapBehavior?.isActive()) {
       this.#tapBehavior.reset();
     }
-    // end two touch
+    // reset two touch
     if (this.#twoTouchBehavior?.isActive()) {
       this.#twoTouchBehavior?.reset();
     }
-    // end hover
+    // reset hover
     this.#hoverBehavior?.reset();
   }
 
@@ -271,7 +271,7 @@ export class LayerGroupPointer extends EventTarget {
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
-    // end drag
+    // reset drag
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.reset();
     }
@@ -345,6 +345,11 @@ export class LayerGroupPointer extends EventTarget {
     }
     // end hover
     this.#hoverBehavior?.onEnd();
+
+    // Align pointer flags with mouseup/cancel: leaving the layer often skips
+    // mouseup, leaving #mouseDownButton stale relative to behaviors above.
+    this.#mouseDownButton = undefined;
+    this.#moved = false;
   };
 
   /**
@@ -373,7 +378,10 @@ export class LayerGroupPointer extends EventTarget {
         }, delay);
       }
     } else if (touchPoints.length === 2) {
-      // two touch
+      // Second finger or two-finger start: end single-touch drag first.
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.reset();
+      }
       this.#twoTouchBehavior?.onStart(touchPoints);
     }
   };
@@ -395,7 +403,10 @@ export class LayerGroupPointer extends EventTarget {
         this.#dragBehavior.onUpdate(point, layerGroup);
       }
     } else if (touchPoints.length === 2) {
-      // two touch
+      // Transition frames may have two touches before two-touch is active.
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.reset();
+      }
       if (this.#twoTouchBehavior?.isActive()) {
         this.#twoTouchBehavior.onUpdate(touchPoints, layerGroup);
       }

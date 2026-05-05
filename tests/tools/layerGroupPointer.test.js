@@ -206,6 +206,27 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(drag.isActive(), false);
   });
 
+  test('mouseout clears pressed-button state so hover moves resume', () => {
+    const {canvas, groupDivId} = setupLayerCanvas();
+    const onHoverUpdate = vi.fn();
+    const pointer = new LayerGroupPointer({
+      app: {
+        getLayerGroupByDivId: (id) =>
+          (id === groupDivId ? {} : undefined)
+      },
+      dragBehavior: new DragBehavior(),
+      hoverBehavior: {
+        onUpdate: onHoverUpdate,
+        onEnd: vi.fn()
+      }
+    });
+
+    pointer.mousedown(mouseEvent('mousedown', canvas, 1, 1));
+    pointer.mouseout(new MouseEvent('mouseout', {bubbles: true}));
+    pointer.mousemove(mouseEvent('mousemove', canvas, 5, 6));
+    assert.equal(onHoverUpdate.mock.calls.length, 1);
+  });
+
   test('mouseout calls tapBehavior.onEnd when tap is active', () => {
     const {groupDivId} = setupLayerCanvas();
     const onTapEnd = vi.fn();
@@ -278,6 +299,46 @@ describe('tools/layerGroupPointer', () => {
 
     vi.advanceTimersByTime(600);
     vi.useRealTimers();
+  });
+
+  test('touchstart with two touches ends active one-finger drag', () => {
+    const {canvas, groupDivId} = setupLayerCanvas();
+    const p1 = new Point2D(1, 2);
+    const p2 = new Point2D(3, 4);
+    const reset = vi.fn();
+
+    class T extends DragBehavior {
+      reset() {
+        reset();
+        super.reset();
+      }
+    }
+
+    const drag = new T();
+    const twoOnStart = vi.fn();
+    const pointer = new LayerGroupPointer({
+      app: {
+        getLayerGroupByDivId: (id) =>
+          (id === groupDivId ? {} : undefined)
+      },
+      dragBehavior: drag,
+      twoTouchBehavior: {
+        onStart: twoOnStart,
+        onUpdate: vi.fn(),
+        onEnd: vi.fn(),
+        reset: vi.fn()
+      }
+    });
+
+    getTouchPointsSpy.mockReturnValueOnce([p1]);
+    pointer.touchstart(touchEvent('touchstart', canvas));
+    assert.ok(drag.isActive());
+
+    getTouchPointsSpy.mockReturnValue([p1, p2]);
+    pointer.touchstart(touchEvent('touchstart', canvas));
+    assert.equal(reset.mock.calls.length, 1);
+    assert.equal(drag.isActive(), false);
+    assert.equal(twoOnStart.mock.calls.length, 1);
   });
 
   test('two-touch events drive TwoTouchBehavior lifecycle', () => {
