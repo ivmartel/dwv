@@ -19,11 +19,28 @@ describe('tools/behaviors', () => {
       behavior = new TapBehavior();
     });
 
+    test('TapBehavior extends EventTarget', () => {
+      assert.ok(behavior instanceof EventTarget);
+      assert.equal(typeof behavior.addEventListener, 'function');
+      assert.equal(typeof behavior.dispatchEvent, 'function');
+    });
+
     test('default onTap does not set active', () => {
       const point = new Point2D(10, 20);
       const layerGroup = makeMockLayerGroup();
       behavior.onTap(point, layerGroup);
       assert.notOk(behavior.isActive());
+    });
+
+    test('reset clears an in-progress multi-tap session', () => {
+      const point = new Point2D(1, 2);
+      const layerGroup = makeMockLayerGroup();
+      behavior.setNumberOfTaps(3);
+      behavior.onTap(point, layerGroup);
+      assert.ok(behavior.isActive());
+      behavior.reset();
+      assert.notOk(behavior.isActive());
+      assert.deepEqual(behavior.getPointList(), []);
     });
 
     test('sticky onTap does set active', () => {

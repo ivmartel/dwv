@@ -150,6 +150,12 @@ describe('tools/behaviors', () => {
       behavior = new DragBehavior();
     });
 
+    test('DragBehavior extends EventTarget', () => {
+      assert.ok(behavior instanceof EventTarget);
+      assert.equal(typeof behavior.addEventListener, 'function');
+      assert.equal(typeof behavior.dispatchEvent, 'function');
+    });
+
     test('is not active initially', () => {
       assert.notOk(behavior.isActive());
     });
@@ -208,6 +214,14 @@ describe('tools/behaviors', () => {
       behavior.onStart(new Point2D(10, 20), makeMockLayerGroup());
       behavior.onEnd();
       assert.notOk(behavior.isActive());
+    });
+
+    test('reset clears drag state like onEnd', () => {
+      behavior.onStart(new Point2D(10, 20), makeMockLayerGroup());
+      behavior.reset();
+      assert.notOk(behavior.isActive());
+      assert.equal(behavior.prevPoint, null);
+      assert.equal(behavior.startPoint, null);
     });
 
     test('onUpdate passes layerGroup through to onDrag', () => {

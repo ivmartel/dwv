@@ -206,9 +206,9 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(drag.isActive(), false);
   });
 
-  test('mouseout calls tapBehavior.cancel when tap is active', () => {
+  test('mouseout calls tapBehavior.onEnd when tap is active', () => {
     const {groupDivId} = setupLayerCanvas();
-    const onTapCancel = vi.fn();
+    const onTapEnd = vi.fn();
     const tap = {
       isActive: () => true,
       onTap() {
@@ -217,7 +217,7 @@ describe('tools/layerGroupPointer', () => {
       onUpdate() {
         // no-op
       },
-      onEnd: onTapCancel
+      onEnd: onTapEnd
     };
     const pointer = new LayerGroupPointer({
       app: {
@@ -228,7 +228,7 @@ describe('tools/layerGroupPointer', () => {
     });
 
     pointer.mouseout(new MouseEvent('mouseout', {bubbles: true}));
-    assert.equal(onTapCancel.mock.calls.length, 1);
+    assert.equal(onTapEnd.mock.calls.length, 1);
   });
 
   test('touchstart, touchmove, touchend drive drag lifecycle', () => {
@@ -431,7 +431,7 @@ describe('tools/layerGroupPointer', () => {
         onUpdate() {
           // no-op
         },
-        cancel() {
+        reset() {
           // no-op
         }
       }
@@ -558,7 +558,7 @@ describe('tools/layerGroupPointer', () => {
         onUpdate() {
           // no-op
         },
-        cancel() {
+        reset() {
           // no-op
         }
       }
@@ -606,7 +606,7 @@ describe('tools/layerGroupPointer', () => {
         onUpdate() {
           // no-op
         },
-        cancel() {
+        reset() {
           // no-op
         }
       }
@@ -637,7 +637,7 @@ describe('tools/layerGroupPointer', () => {
         onUpdate() {
           // no-op
         },
-        cancel() {
+        reset() {
           // no-op
         }
       }
