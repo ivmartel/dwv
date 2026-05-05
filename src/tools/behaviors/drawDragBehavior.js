@@ -29,6 +29,11 @@ export class DrawDragBehavior extends DragBehavior {
   #shapeHandler;
 
   /**
+   * @type {Point2D|undefined}
+   */
+  #lastMovePoint;
+
+  /**
    * Layer group for the current placement preview/finalize path.
    *
    * @type {LayerGroup|undefined}
@@ -169,6 +174,7 @@ export class DrawDragBehavior extends DragBehavior {
       return;
     }
 
+    this.#lastMovePoint = this.prevPoint;
     this.#placementLayerGroup = layerGroup;
 
     // update preview
@@ -184,14 +190,15 @@ export class DrawDragBehavior extends DragBehavior {
    */
   onEnd() {
     const lg = this.#placementLayerGroup;
-    if (lg) {
+    if (lg && typeof this.#lastMovePoint !== 'undefined') {
       const finalPoints = [
         this.startPoint,
-        this.prevPoint
+        this.#lastMovePoint
       ];
       this.#drawPreview.onFinalPoints(finalPoints, lg);
     }
 
+    this.#lastMovePoint = undefined;
     this.#placementLayerGroup = undefined;
     super.onEnd();
   }
