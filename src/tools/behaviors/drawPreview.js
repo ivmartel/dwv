@@ -30,14 +30,14 @@ export function isValidDrawPoint(point, layerGroup) {
   const drawLayer = layerGroup.getActiveDrawLayer();
   if (typeof drawLayer === 'undefined') {
     logger.warn('No draw layer to check point');
-    return;
+    return false;
   }
   // ref view layer
   const viewLayer = layerGroup.getViewLayerById(
     drawLayer.getReferenceLayerId());
   if (typeof viewLayer === 'undefined') {
     logger.warn('No view layer to check point');
-    return;
+    return false;
   }
   // check point
   const pos = viewLayer.displayToPlanePos(point);

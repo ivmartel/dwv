@@ -16,7 +16,7 @@ import Konva from 'konva';
  * @import {Point2D} from '../../math/point.js';
  * @import {DrawLayer} from '../../gui/drawLayer.js';
  * @import {DrawShapeHandler} from '../shapes/drawShapeHandler.js';
- * @import {DragStep} from './dragBehavior.js';
+ * @import {DragPointerStartContext, DragStep} from './dragBehavior.js';
  */
 
 /**
@@ -104,15 +104,27 @@ export class DrawDragBehavior extends DragBehavior {
     return res;
   }
 
-  canStart() {
+  /**
+   * Gate drag placement to two-point shapes only (line-like placement).
+   *
+   * @param {Point2D} _point Display point (unused).
+   * @param {LayerGroup} _layerGroup Layer group (unused).
+   * @returns {boolean} True only when the active shape factory
+   * expects two points.
+   * @override
+   */
+  canStart(_point, _layerGroup) {
     return this.#drawPreview.getNPoints() === 2;
   }
 
   /**
    * @param {Point2D} point Display point.
    * @param {LayerGroup} layerGroup Layer group.
+   * @param {DragPointerStartContext|undefined} [_pointerStart] Mouse/touch
+   *   context from {@link LayerGroupPointer}.
+   * @override
    */
-  onStart(point, layerGroup) {
+  onStart(point, layerGroup, _pointerStart) {
     if (!this.isActive()) {
       const drawLayer = layerGroup.getActiveDrawLayer();
       if (typeof drawLayer !== 'undefined') {
@@ -138,7 +150,7 @@ export class DrawDragBehavior extends DragBehavior {
     // add point
     this.#placementLayerGroup = layerGroup;
 
-    super.onStart(point, layerGroup);
+    super.onStart(point, layerGroup, _pointerStart);
   }
 
   /**
@@ -146,6 +158,7 @@ export class DrawDragBehavior extends DragBehavior {
    *
    * @param {DragStep} _drag Step with {@link DragStep#delta}.
    * @param {LayerGroup} layerGroup Layer group.
+   * @override
    */
   onDrag(_drag, layerGroup) {
     if (!this.isActive()) {
@@ -169,6 +182,8 @@ export class DrawDragBehavior extends DragBehavior {
 
   /**
    * DragBehavior ends session — finalize shape.
+   *
+   * @override
    */
   onEnd() {
     const lg = this.#placementLayerGroup;

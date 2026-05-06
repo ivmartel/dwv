@@ -40,7 +40,8 @@ function getSpinY(event) {
 }
 
 /**
- * Accumulates wheel spin and reports when it crosses a full tick threshold.
+ * Accumulates wheel spin and reports when it crosses a full tick threshold
+ * (used with {@link WheelBehavior#onWheelTick}).
  */
 export class WheelTick {
 
@@ -50,6 +51,8 @@ export class WheelTick {
   #sum = 0;
 
   /**
+   * Add normalized spin from a wheel event to the accumulator.
+   *
    * @param {WheelEvent} event The wheel event.
    */
   add(event) {
@@ -57,21 +60,23 @@ export class WheelTick {
   }
 
   /**
-   * @returns {number} Accumulated spin (sign = direction).
+   * @returns {number} Accumulated spin since last {@link WheelTick#clear}
+   *   (sign = direction).
    */
   getSum() {
     return this.#sum;
   }
 
   /**
-   * @returns {boolean} True when accumulated spin crosses a tick threshold.
+   * @returns {boolean} True when accumulated spin crosses a discrete tick
+   *   threshold.
    */
   isTick() {
     return Math.abs(this.#sum) >= 1;
   }
 
   /**
-   * Reset accumulated spin after consuming a tick.
+   * Reset accumulated spin (typically after handling a tick).
    */
   clear() {
     this.#sum = 0;

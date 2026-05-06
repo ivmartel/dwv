@@ -334,6 +334,7 @@ export class FloodfillDragBehavior extends DragBehavior {
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    * @returns {boolean} Whether a drag may begin.
+   * @override
    */
   canStart(_point, _layerGroup) {
     // Floodfill can always start a drag
@@ -344,6 +345,7 @@ export class FloodfillDragBehavior extends DragBehavior {
    * @param {Point2D} point The pointer position at drag start.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    * @param {object} [_pointerStart] Drag start context (unused).
+   * @override
    */
   onStart(point, layerGroup, _pointerStart) {
     super.onStart(point, layerGroup, _pointerStart);
@@ -395,8 +397,12 @@ export class FloodfillDragBehavior extends DragBehavior {
   }
 
   /**
+   * Resize threshold from drag distance instead of incremental
+   * {@link DragBehavior#onDrag}.
+   *
    * @param {Point2D} point The pointer position.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onUpdate(point, layerGroup) {
     super.onUpdate(point, layerGroup);
@@ -420,6 +426,11 @@ export class FloodfillDragBehavior extends DragBehavior {
     );
   }
 
+  /**
+   * Stop floodfill drag tracking flags.
+   *
+   * @override
+   */
   onEnd() {
     super.onEnd();
     if (this.#started) {

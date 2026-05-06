@@ -248,6 +248,7 @@ export class DrawTapBehavior extends TapBehavior {
    *
    * @param {Point2D} point Display point.
    * @param {LayerGroup} layerGroup Layer group.
+   * @override
    */
   onUpdate(point, layerGroup) {
     if (!this.isActive()) {
@@ -274,6 +275,7 @@ export class DrawTapBehavior extends TapBehavior {
   /**
    * @param {Point2D} point Display point.
    * @param {LayerGroup} layerGroup Layer group.
+   * @override
    */
   onTap(point, layerGroup) {
     if (!this.isActive()) {
@@ -309,6 +311,8 @@ export class DrawTapBehavior extends TapBehavior {
 
   /**
    * TapBehavior ends session — finalize fixed-count shapes or clear preview.
+   *
+   * @override
    */
   onEnd() {
     const pts = this.getPointList();

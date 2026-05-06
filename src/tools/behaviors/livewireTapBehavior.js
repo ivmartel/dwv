@@ -102,6 +102,7 @@ export class LivewireTapBehavior extends TapBehavior {
 
   /**
    * @returns {boolean} True while a livewire session is in progress.
+   * @override
    */
   isActive() {
     return this.#started;
@@ -147,6 +148,7 @@ export class LivewireTapBehavior extends TapBehavior {
    *
    * @param {Point2D} point The pointer position.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onTap(point, layerGroup) {
     if (this.#isResampled(layerGroup)) {
@@ -226,6 +228,7 @@ export class LivewireTapBehavior extends TapBehavior {
    *
    * @param {Point2D} point The pointer position.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onUpdate(point, layerGroup) {
     if (!this.#started) {
@@ -332,6 +335,8 @@ export class LivewireTapBehavior extends TapBehavior {
   }
 
   /**
+   * Clear livewire session state and parent tap list.
+   *
    * @override
    */
   reset() {

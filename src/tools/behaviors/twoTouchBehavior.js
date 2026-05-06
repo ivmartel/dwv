@@ -15,6 +15,8 @@ import {getActiveOrDrawRefViewLayer} from './utils.js';
 export class TwoTouchBehavior {
 
   /**
+   * Whether two-touch tracking is active (subclasses track gesture state).
+   *
    * @returns {boolean} True when a two-finger gesture is in progress.
    */
   isActive() {
@@ -22,13 +24,15 @@ export class TwoTouchBehavior {
   }
 
   /**
-   * Behavior reset.
+   * Clear two-touch session state; default is a no-op.
    */
   reset() {
     // does nothing
   }
 
   /**
+   * First frame with two simultaneous touches (or equivalent pointers).
+   *
    * @param {Point2D[]} _points Two touch points.
    */
   onStart(_points) {
@@ -36,6 +40,8 @@ export class TwoTouchBehavior {
   }
 
   /**
+   * Two-touch move; return value is used for tap vs gesture disambiguation.
+   *
    * @param {Point2D[]} _points Two touch points.
    * @param {LayerGroup} _layerGroup The layer group under the touch.
    * @returns {boolean} True when the gesture counts as movement (for tap).
@@ -45,7 +51,8 @@ export class TwoTouchBehavior {
   }
 
   /**
-   * End two-touch tracking (touch end or pointer cancel).
+   * End two-touch tracking (touch end or pointer cancel); override in
+   * subclasses.
    */
   onEnd() {
     // override in subclass
@@ -71,13 +78,16 @@ export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
 
   /**
    * @returns {boolean} True after {@link ZoomScrollTwoTouchBehavior#onStart}.
+   * @override
    */
   isActive() {
     return typeof this.#pointsLine !== 'undefined';
   }
 
   /**
-   * Behavior reset.
+   * Clear pinch/scroll tracking lines and midpoint.
+   *
+   * @override
    */
   reset() {
     this.#pointsLine = undefined;
@@ -88,6 +98,7 @@ export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
    * Begin or reset two-finger tracking.
    *
    * @param {Point2D[]} points Two touch points.
+   * @override
    */
   onStart(points) {
     this.#pointsLine = new Line(points[0], points[1]);
@@ -99,6 +110,7 @@ export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
    * @param {LayerGroup} layerGroup The layer group under the touch.
    * @returns {boolean} False when tracking is inactive; true after an update
    *   that counts as gesture movement (for tap detection).
+   * @override
    */
   onUpdate(points, layerGroup) {
     if (this.#pointsLine === undefined) {
@@ -143,6 +155,8 @@ export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
 
   /**
    * End two-touch tracking (touch end or pointer cancel).
+   *
+   * @override
    */
   onEnd() {
     this.reset();

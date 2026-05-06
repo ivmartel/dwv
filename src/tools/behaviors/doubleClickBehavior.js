@@ -20,6 +20,9 @@ import {logger} from '../../utils/logger.js';
 export class DoubleClickBehavior {
 
   /**
+   * Handle a double-click at the given display position; override in
+   * subclasses.
+   *
    * @param {Point2D} _point The click position in display space.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    */
@@ -68,6 +71,7 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
   /**
    * @param {Point2D} point The click position in display space.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onDoubleClick(point, layerGroup) {
     const viewLayer = getActiveOrFirstMonochromeViewLayer(
@@ -104,6 +108,7 @@ export class PlayDoubleClickBehavior extends DoubleClickBehavior {
   /**
    * @param {Point2D} _point The click position (unused).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onDoubleClick(_point, layerGroup) {
     const viewLayer = getActiveOrDrawRefViewLayer(layerGroup);

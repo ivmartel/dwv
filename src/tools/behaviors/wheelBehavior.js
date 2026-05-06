@@ -16,6 +16,8 @@ import {getActiveOrDrawRefViewLayer} from './utils.js';
 export class WheelBehavior {
 
   /**
+   * Raw wheel event (every `wheel`); use with continuous effects such as zoom.
+   *
    * @param {WheelEvent} _event The wheel event.
    * @param {LayerGroup|undefined} _layerGroup Layer group under the wheel.
    */
@@ -24,6 +26,9 @@ export class WheelBehavior {
   }
 
   /**
+   * Discrete wheel tick after accumulation ({@link WheelTick}); use for
+   * slice scroll and similar stepped actions.
+   *
    * @param {boolean} _up True when spin is in the positive direction.
    * @param {LayerGroup} _layerGroup Layer group under the wheel event.
    */
@@ -41,6 +46,7 @@ export class ScrollWheelBehavior extends WheelBehavior {
   /**
    * @param {boolean} up True to increment along scroll / next index.
    * @param {LayerGroup} layerGroup The layer group under the wheel.
+   * @override
    */
   onWheelTick(up, layerGroup) {
     const positionHelper = layerGroup.getPositionHelper();
@@ -72,6 +78,7 @@ export class ZoomWheelBehavior extends WheelBehavior {
   /**
    * @param {WheelEvent} event The wheel event.
    * @param {LayerGroup|undefined} layerGroup The layer group under the wheel.
+   * @override
    */
   onWheel(event, layerGroup) {
     if (typeof layerGroup === 'undefined') {

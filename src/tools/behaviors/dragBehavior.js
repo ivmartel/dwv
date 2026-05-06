@@ -184,6 +184,8 @@ export class DragBehavior extends EventTarget {
   }
 
   /**
+   * Whether a drag may start at the given pointer (tool-specific gate).
+   *
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    * @returns {boolean} Whether a drag may begin.
@@ -193,7 +195,8 @@ export class DragBehavior extends EventTarget {
   }
 
   /**
-   * Reset behavior.
+   * Clear drag anchors ({@link DragBehavior#startPoint},
+   * {@link DragBehavior#prevPoint}).
    */
   reset() {
     this.#startPoint = null;
@@ -201,6 +204,9 @@ export class DragBehavior extends EventTarget {
   }
 
   /**
+   * Begin tracking: records start and previous pointer for
+   * {@link DragBehavior#onUpdate}.
+   *
    * @param {Point2D} point The pointer position at drag start.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    * @param {DragPointerStartContext|undefined} [_pointerStart] Mouse/touch
@@ -231,6 +237,8 @@ export class DragBehavior extends EventTarget {
   }
 
   /**
+   * Qualifying move step after threshold checks; override in subclasses.
+   *
    * @param {DragStep} _drag Step with {@link DragStep#delta}.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    */
@@ -238,6 +246,9 @@ export class DragBehavior extends EventTarget {
     // override in subclass
   }
 
+  /**
+   * End the drag and reset anchors ({@link DragBehavior#reset}).
+   */
   onEnd() {
     this.reset();
   }
@@ -278,6 +289,7 @@ export class WindowLevelDragBehavior extends DragBehavior {
    * @param {Point2D} _point The pointer position (unused).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    * @returns {boolean} True if W/L adjustment is allowed.
+   * @override
    */
   canStart(_point, layerGroup) {
     const viewLayer = getActiveOrFirstMonochromeViewLayer(
@@ -295,6 +307,7 @@ export class WindowLevelDragBehavior extends DragBehavior {
   /**
    * @param {DragStep} drag Delta from previous event ({@link DragStep#delta}).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onDrag(drag, layerGroup) {
     const viewLayer = getActiveOrFirstMonochromeViewLayer(
@@ -328,6 +341,9 @@ export class WindowLevelDragBehavior extends DragBehavior {
  */
 export class ScrollDragBehavior extends DragBehavior {
 
+  /**
+   * Uses a 15×15 display-pixel move threshold on both axes.
+   */
   constructor() {
     super({
       threshold: {x: 15, y: 15}
@@ -338,6 +354,7 @@ export class ScrollDragBehavior extends DragBehavior {
    * @param {Point2D} _point The pointer position (unused).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    * @returns {boolean} True if scrolling is possible.
+   * @override
    */
   canStart(_point, layerGroup) {
     const viewLayer = getActiveOrDrawRefViewLayer(layerGroup);
@@ -351,6 +368,7 @@ export class ScrollDragBehavior extends DragBehavior {
   /**
    * @param {DragStep} drag Step with 15×15 thresholds from this behavior.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onDrag(drag, layerGroup) {
     const positionHelper = layerGroup.getPositionHelper();
@@ -380,6 +398,9 @@ export class ScrollDragBehavior extends DragBehavior {
  */
 export class OpacityDragBehavior extends DragBehavior {
 
+  /**
+   * Uses a 15×15 display-pixel move threshold on both axes.
+   */
   constructor() {
     super({
       threshold: {x: 15, y: 15}
@@ -390,6 +411,7 @@ export class OpacityDragBehavior extends DragBehavior {
    * @param {Point2D} _point The pointer position (unused).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    * @returns {boolean} True when an active layer exists.
+   * @override
    */
   canStart(_point, layerGroup) {
     const layer = layerGroup.getActiveLayer();
@@ -400,6 +422,7 @@ export class OpacityDragBehavior extends DragBehavior {
    * @param {DragStep} drag Step; uses horizontal delta ({@link DragStep#delta}
    *   `x`) when {@link DragStep#passesThresholdX}.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onDrag(drag, layerGroup) {
     if (!drag.passesThresholdX()) {
@@ -425,6 +448,7 @@ export class PanDragBehavior extends DragBehavior {
   /**
    * @param {DragStep} drag Step with {@link DragStep#delta}.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onDrag(drag, layerGroup) {
     const viewLayer = getActiveOrDrawRefViewLayer(layerGroup);

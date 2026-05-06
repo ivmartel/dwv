@@ -9,13 +9,15 @@
 export class HoverBehavior {
 
   /**
-   * Behavior reset.
+   * Clear hover-specific state; default is a no-op.
    */
   reset() {
     // does nothing
   }
 
   /**
+   * Pointer move while hovering (not dragging); override in subclasses.
+   *
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    */
@@ -23,6 +25,10 @@ export class HoverBehavior {
     // override in subclass
   }
 
+  /**
+   * Hover session end (pointer leaves, drag starts, etc.); override in
+   * subclasses.
+   */
   onEnd() {
     // override in subclass
   }
@@ -61,7 +67,9 @@ export class TooltipHoverBehavior extends HoverBehavior {
   }
 
   /**
-   * Behavior reset.
+   * Remove any visible tooltip DOM from the last hovered layer group.
+   *
+   * @override
    */
   reset() {
     if (typeof this.#currentLayerGroup !== 'undefined') {
@@ -73,6 +81,7 @@ export class TooltipHoverBehavior extends HoverBehavior {
   /**
    * @param {Point2D} point The update point.
    * @param {LayerGroup} layerGroup The layer group.
+   * @override
    */
   onUpdate(point, layerGroup) {
     if (this.#tooltipEnabled) {
@@ -82,6 +91,8 @@ export class TooltipHoverBehavior extends HoverBehavior {
 
   /**
    * Invoked when hover ends; removes the last tooltip html div.
+   *
+   * @override
    */
   onEnd() {
     this.reset();

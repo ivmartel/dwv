@@ -103,6 +103,7 @@ export class BrushDragBehavior extends DragBehavior {
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    * @returns {boolean} Whether painting may begin.
+   * @override
    */
   canStart(_point, layerGroup) {
     if (!this.#activeLayerIsViewLayerForGroup(layerGroup) ||
@@ -121,6 +122,7 @@ export class BrushDragBehavior extends DragBehavior {
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    * @param {DragPointerStartContext|undefined} pointerStart Mouse/touch
    *   context from {@link LayerGroupPointer}.
+   * @override
    */
   onStart(point, layerGroup, pointerStart) {
     super.onStart(point, layerGroup, pointerStart);
@@ -139,6 +141,7 @@ export class BrushDragBehavior extends DragBehavior {
    * @param {DragStep} _drag Unused (threshold already applied in
    *   {@link DragBehavior#onUpdate}).
    * @param {LayerGroup} layerGroup The layer group under the pointer.
+   * @override
    */
   onDrag(_drag, layerGroup) {
     const point = this.prevPoint;
@@ -148,6 +151,11 @@ export class BrushDragBehavior extends DragBehavior {
     this.#paintStep(point, layerGroup);
   }
 
+  /**
+   * Finalize stroke buffers or delegate reset when the drag never activated.
+   *
+   * @override
+   */
   onEnd() {
     if (this.isActive()) {
       this.#endStroke();
