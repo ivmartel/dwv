@@ -180,7 +180,7 @@ export class DrawDragBehavior extends DragBehavior {
     // update preview
     const tmpPoints = [
       this.startPoint,
-      this.prevPoint
+      this.#lastMovePoint
     ];
     this.#drawPreview.onNewPoints(tmpPoints, layerGroup);
   }
