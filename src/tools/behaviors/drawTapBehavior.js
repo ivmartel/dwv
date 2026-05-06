@@ -1,6 +1,8 @@
-import {logger} from '../../utils/logger.js';
 import {TapBehavior} from './tapBehavior.js';
-import {DrawPreview} from './drawPreview.js';
+import {
+  isValidDrawPoint,
+  DrawPreview
+} from './drawPreview.js';
 
 // external
 import Konva from 'konva';
@@ -9,7 +11,6 @@ import Konva from 'konva';
  * @import {App} from '../../app/application.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Point2D} from '../../math/point.js';
- * @import {ViewLayer} from '../../gui/viewLayer.js';
  * @import {DrawLayer} from '../../gui/drawLayer.js';
  * @import {DrawShapeHandler} from '../shapes/drawShapeHandler.js';
  */
@@ -142,20 +143,6 @@ export class DrawTapBehavior extends TapBehavior {
   }
 
   /**
-   * @param {LayerGroup} layerGroup The layer group.
-   * @returns {ViewLayer|undefined} The view layer.
-   */
-  #getViewLayer(layerGroup) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    if (typeof drawLayer === 'undefined') {
-      logger.warn('No draw layer to do draw');
-      return;
-    }
-    return layerGroup.getViewLayerById(
-      drawLayer.getReferenceLayerId());
-  }
-
-  /**
    * Check if the draw data is valid.
    *
    * @param {DrawLayer} drawLayer The draw layer.
@@ -270,14 +257,8 @@ export class DrawTapBehavior extends TapBehavior {
     if (this.#isLastListPoint(point)) {
       return;
     }
-
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      return;
-    }
-    const pos = viewLayer.displayToPlanePos(point);
-    const vc = viewLayer.getViewController();
-    if (!vc.validatePlanePoint(pos)) {
+    // exit if not valid
+    if (!isValidDrawPoint(point, layerGroup)) {
       return;
     }
 

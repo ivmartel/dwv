@@ -1,6 +1,8 @@
-import {logger} from '../../utils/logger.js';
 import {DragBehavior} from './dragBehavior.js';
-import {DrawPreview} from './drawPreview.js';
+import {
+  isValidDrawPoint,
+  DrawPreview
+} from './drawPreview.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -12,7 +14,6 @@ import Konva from 'konva';
  * @import {App} from '../../app/application.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Point2D} from '../../math/point.js';
- * @import {ViewLayer} from '../../gui/viewLayer.js';
  * @import {DrawLayer} from '../../gui/drawLayer.js';
  * @import {DrawShapeHandler} from '../shapes/drawShapeHandler.js';
  * @import {DragStep} from './dragBehavior.js';
@@ -78,20 +79,6 @@ export class DrawDragBehavior extends DragBehavior {
   resetPlacement() {
     this.#drawPreview.resetPlacement();
     super.onEnd();
-  }
-
-  /**
-   * @param {LayerGroup} layerGroup The layer group.
-   * @returns {ViewLayer|undefined} The view layer.
-   */
-  #getViewLayer(layerGroup) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    if (typeof drawLayer === 'undefined') {
-      logger.warn('No draw layer to do draw');
-      return;
-    }
-    return layerGroup.getViewLayerById(
-      drawLayer.getReferenceLayerId());
   }
 
   /**
@@ -164,13 +151,8 @@ export class DrawDragBehavior extends DragBehavior {
     if (!this.isActive()) {
       return;
     }
-    const viewLayer = this.#getViewLayer(layerGroup);
-    if (typeof viewLayer === 'undefined') {
-      return;
-    }
-    const pos = viewLayer.displayToPlanePos(this.prevPoint);
-    const vc = viewLayer.getViewController();
-    if (!vc.validatePlanePoint(pos)) {
+    // exit if not valid
+    if (!isValidDrawPoint(point, layerGroup)) {
       return;
     }
 

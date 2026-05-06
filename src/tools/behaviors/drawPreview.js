@@ -18,6 +18,34 @@ import Konva from 'konva';
  */
 
 /**
+ * Check if a point is valid in the input layerGroup active
+ * draw layer.
+ *
+ * @param {Point2D} point The display point to validate.
+ * @param {LayerGroup} layerGroup The layer group.
+ * @returns {boolean} True if valid.
+ */
+export function isValidDrawPoint(point, layerGroup) {
+  // active draw layer
+  const drawLayer = layerGroup.getActiveDrawLayer();
+  if (typeof drawLayer === 'undefined') {
+    logger.warn('No draw layer to check point');
+    return;
+  }
+  // ref view layer
+  const viewLayer = layerGroup.getViewLayerById(
+    drawLayer.getReferenceLayerId());
+  if (typeof viewLayer === 'undefined') {
+    logger.warn('No view layer to check point');
+    return;
+  }
+  // check point
+  const pos = viewLayer.displayToPlanePos(point);
+  const vc = viewLayer.getViewController();
+  return vc.validatePlanePoint(pos);
+}
+
+/**
  * Draw preview class.
  */
 export class DrawPreview {
