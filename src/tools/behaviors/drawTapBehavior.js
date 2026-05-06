@@ -3,15 +3,12 @@ import {
   isValidDrawPoint,
   DrawPreview
 } from './drawPreview.js';
-
-// external
-import Konva from 'konva';
+import {DrawSelect} from './drawSelect.js';
 
 /**
  * @import {App} from '../../app/application.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Point2D} from '../../math/point.js';
- * @import {DrawLayer} from '../../gui/drawLayer.js';
  * @import {DrawShapeHandler} from '../shapes/drawShapeHandler.js';
  */
 
@@ -26,11 +23,6 @@ const OPEN_ENDED_TAP_LIMIT = 65535;
  * Tap-driven placement session for {@link Draw}.
  */
 export class DrawTapBehavior extends TapBehavior {
-
-  /**
-   * @type {App}
-   */
-  #app;
 
   /**
    * @type {DrawShapeHandler}
@@ -50,18 +42,18 @@ export class DrawTapBehavior extends TapBehavior {
   #placementLayerGroup;
 
   /**
-   * Annotation group meta validator.
-   *
-   * @type {Function|undefined}
-   */
-  #drawMetaValidator;
-
-  /**
    * Draw preview.
    *
    * @type {DrawPreview}
    */
   #drawPreview;
+
+  /**
+   * Draw select.
+   *
+   * @type {DrawSelect}
+   */
+  #drawSelect;
 
   /**
    * @param {App} app The application.
@@ -70,9 +62,9 @@ export class DrawTapBehavior extends TapBehavior {
    */
   constructor(app, shapeHandler) {
     super();
-    this.#app = app;
     this.#shapeHandler = shapeHandler;
     this.#drawPreview = new DrawPreview(app);
+    this.#drawSelect = new DrawSelect(app, shapeHandler);
   }
 
   /**
@@ -86,10 +78,8 @@ export class DrawTapBehavior extends TapBehavior {
    * @param {object} features Live features (shape, colour, meta, …).
    */
   setFeatures(features) {
-    if (typeof features.drawMetaValidator !== 'undefined') {
-      this.#drawMetaValidator = features.drawMetaValidator;
-    }
     this.#drawPreview.setFeatures(features);
+    this.#drawSelect.setFeatures(features);
   }
 
   /**
@@ -110,11 +100,21 @@ export class DrawTapBehavior extends TapBehavior {
   #trySelectShapeGroup(point, layerGroup) {
     const drawLayer = layerGroup.getActiveDrawLayer();
 
-    if (typeof drawLayer !== 'undefined' &&
-      this.#checkCanEdit(drawLayer)) {
-      const kShape = this.#getSelectShape(point, drawLayer);
-      if (kShape) {
-        this.#selectShapeGroup(kShape, drawLayer);
+    if (typeof drawLayer !== 'undefined') {
+      // check can edit
+      if (!this.#drawSelect.checkCanEdit(drawLayer)) {
+        this.dispatchEvent(new CustomEvent('warn', {
+          detail: {
+            type: 'warn',
+            message: 'Cannot edit draw, data meta is invalid'
+          }
+        }));
+        return false;
+      }
+      // try to select
+      const details = this.#drawSelect.trySelectShapeGroup(point, drawLayer);
+      if (typeof details !== 'undefined') {
+        this.dispatchEvent(new CustomEvent('annotationselect', details));
         return true;
       }
     }
@@ -140,92 +140,6 @@ export class DrawTapBehavior extends TapBehavior {
   resetPlacement() {
     this.#drawPreview.resetPlacement();
     super.onEnd();
-  }
-
-  /**
-   * Check if the draw data is valid.
-   *
-   * @param {DrawLayer} drawLayer The draw layer.
-   * @returns {boolean} True if the data is valid.
-   */
-  #checkDrawData(drawLayer) {
-    let res = true;
-    const validator = this.#drawMetaValidator;
-    if (typeof validator !== 'undefined') {
-      const drawDataId = drawLayer.getDataId();
-      const drawData = this.#app.getData(drawDataId);
-      const drawMeta = drawData.annotationGroup.getMeta();
-      res = validator(drawMeta);
-    }
-    return res;
-  }
-
-  /**
-   * Check if the draw data can be edited.
-   *
-   * @param {DrawLayer} drawLayer The draw layer.
-   * @returns {boolean} True if the data is editable.
-   */
-  #checkCanEdit(drawLayer) {
-    if (!this.#checkDrawData(drawLayer)) {
-      this.dispatchEvent(new CustomEvent('warn', {
-        detail: {
-          type: 'warn',
-          message: 'Cannot edit draw, data meta is invalid'
-        }
-      }));
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Get the data under the input point.
-   *
-   * @param {Point2D} point The point where to find the data.
-   * @param {DrawLayer} drawLayer The draw layer.
-   * @returns {Konva.Shape|null} The shape of null.
-   */
-  #getSelectShape(point, drawLayer) {
-    let res = null;
-
-    if (typeof drawLayer !== 'undefined') {
-      const data = drawLayer.getDrawController().getAnnotationGroup();
-      if (data.isEditable()) {
-        const kStage = drawLayer.getKonvaStage();
-        res = kStage.getIntersection({
-          x: point.getX(),
-          y: point.getY()
-        });
-      }
-    }
-    return res;
-  }
-
-  /**
-   * Selects a shape group.
-   *
-   * @param {Konva.Shape} kshape The shape that has been selected.
-   * @param {DrawLayer} drawLayer The draw layer where to draw.
-   */
-  #selectShapeGroup(kshape, drawLayer) {
-    let group = kshape.getParent();
-    if (kshape instanceof Konva.Tag) {
-      group = group.getParent();
-    }
-    const selectedShape = group.find('.shape')[0];
-    if (!(selectedShape instanceof Konva.Shape)) {
-      return;
-    }
-    this.dispatchEvent(new CustomEvent('annotationselect', {
-      detail: {
-        type: 'annotationselect',
-        annotationid: group.id(),
-        dataid: drawLayer.getDataId()
-      }
-    }));
-    this.#shapeHandler.setEditorShape(selectedShape, drawLayer);
   }
 
   /**
