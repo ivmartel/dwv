@@ -152,7 +152,7 @@ export class DrawDragBehavior extends DragBehavior {
       return;
     }
     // exit if not valid
-    if (!isValidDrawPoint(point, layerGroup)) {
+    if (!isValidDrawPoint(this.prevPoint, layerGroup)) {
       return;
     }
 
