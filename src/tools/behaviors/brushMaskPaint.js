@@ -218,7 +218,7 @@ export class BrushMaskPaint extends EventTarget {
   #selectedSegmentNumber;
 
   /**
-   * @type {import('../../image/image.js').Image|undefined}
+   * @type {Image|undefined}
    */
   #mask;
 
@@ -228,7 +228,7 @@ export class BrushMaskPaint extends EventTarget {
   #maskDataId;
 
   /**
-   * @type {import('../../gui/layerGroup.js').LayerGroup|undefined}
+   * @type {LayerGroup|undefined}
    */
   #currentLayerGroup;
 

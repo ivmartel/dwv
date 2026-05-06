@@ -29,7 +29,7 @@ import {Point2D} from '../../math/point.js';
  */
 
 /**
- * @param {Scalar2D|{x?: number, y?: number}|undefined} threshold Raw threshold.
+ * @param {Scalar2D|undefined} threshold Raw threshold.
  * @returns {Scalar2D} Copy with numeric `x` and `y`.
  */
 function normalizeThreshold(threshold) {
