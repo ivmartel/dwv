@@ -242,6 +242,21 @@ export class DrawTapBehavior extends TapBehavior {
   }
 
   /**
+   * Is the input point the last in the points list.
+   *
+   * @param {Point2D} point The point to check.
+   * @returns {boolean} True if equal to last.
+   */
+  #isLastListPoint(point) {
+    const list = this.getPointList();
+    if (list.length > 0) {
+      const last = list[list.length - 1];
+      return last.equals(point);
+    }
+    return false;
+  }
+
+  /**
    * Preview update while pointer moves during sticky placement.
    *
    * @param {Point2D} point Display point.
@@ -251,6 +266,11 @@ export class DrawTapBehavior extends TapBehavior {
     if (!this.isActive()) {
       return;
     }
+    // exit if known point
+    if (this.#isLastListPoint(point)) {
+      return;
+    }
+
     const viewLayer = this.#getViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
@@ -297,14 +317,10 @@ export class DrawTapBehavior extends TapBehavior {
     }
 
     // exit if known point
-    const last = this.getPointList();
-    if (last.length > 0) {
-      const prev = last[last.length - 1];
-      if (prev.getX() === point.getX() &&
-        prev.getY() === point.getY()) {
-        return;
-      }
+    if (this.#isLastListPoint(point)) {
+      return;
     }
+
     // add point
     this.#placementLayerGroup = layerGroup;
     super.onTap(point, layerGroup);
@@ -321,14 +337,25 @@ export class DrawTapBehavior extends TapBehavior {
     if (pts.length > 0 && lg) {
       if (typeof n !== 'undefined') {
         if (pts.length === n) {
+          // we have all points -> finish
           this.#drawPreview.onFinalPoints(pts, lg);
         } else if (pts.length === n - 1 &&
-          typeof this.#lastMovePoint !== 'undefined') {
+          typeof this.#lastMovePoint !== 'undefined' &&
+          !this.#isLastListPoint(this.#lastMovePoint)) {
+          // one point missing -> finish with last move
+          // (for ex on mouse out)
           pts.push(this.#lastMovePoint);
           this.#drawPreview.onFinalPoints(pts, lg);
+        } else {
+          // missing points -> remove
+          this.#drawPreview.resetPlacement();
         }
-      } else {
+      } else if (pts.length > 2) {
+        // undef npoints + some points -> finish
         this.#drawPreview.onFinalPoints(pts, lg);
+      } else {
+        // undef npoints + not finished -> remove
+        this.#drawPreview.resetPlacement();
       }
     }
 
