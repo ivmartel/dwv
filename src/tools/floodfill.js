@@ -1,6 +1,7 @@
 import {Style} from '../gui/style.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {FloodfillDragBehavior} from './behaviors/floodfillDragBehavior.js';
+import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 
 /**
  * @import {App} from '../app/application.js';
@@ -35,7 +36,8 @@ export class Floodfill extends LayerGroupPointer {
     );
     super({
       app,
-      dragBehavior
+      dragBehavior,
+      wheelBehavior: new ScrollWheelBehavior()
     });
     this.#app = app;
     this.#style = style;
