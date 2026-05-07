@@ -26,44 +26,50 @@ vi.mock('../../src/utils/logger.js', () => ({
 import {Livewire} from '../../src/tools/livewire.js';
 import {LayerGroupPointer} from '../../src/tools/layerGroupPointer.js';
 
+/**
+ * Minimal app stub for {@link Livewire} and {@link LayerGroupPointer}.
+ *
+ * @returns {object} Mock application.
+ */
+function makeLivewireAppMock() {
+  return {
+    getLayerGroupByDivId: vi.fn(() => undefined),
+    onKeydown: vi.fn(),
+    getBaseScale: vi.fn(() => 1)
+  };
+}
+
 describe('Livewire', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  test('instantiates with app and extends LayerGroupPointer', () => {
-    const mockApp = {onKeydown: vi.fn(), getBaseScale: vi.fn(() => 1)};
+  test('constructs as Livewire / LayerGroupPointer / EventTarget', () => {
+    const mockApp = makeLivewireAppMock();
     const livewire = new Livewire(mockApp);
 
-    assert.isDefined(livewire);
+    assert.ok(livewire instanceof Livewire);
     assert.ok(livewire instanceof LayerGroupPointer);
     assert.ok(livewire instanceof EventTarget);
   });
 
-  test('lifecycle methods do not throw', () => {
-    const mockApp = {
-      getLayerGroupByDivId: () => undefined,
-      onKeydown: vi.fn(),
-      getBaseScale: vi.fn(() => 1)
-    };
+  test('tap + wheel stack handles lifecycle without throwing', () => {
+    const mockApp = makeLivewireAppMock();
 
     const livewire = new Livewire(mockApp);
 
     assert.doesNotThrow(() => {
       livewire.init();
       livewire.activate(true);
+      assert.equal(mockApp.getBaseScale.mock.calls.length, 1);
       livewire.setFeatures({shapeColour: '#00FF00'});
       livewire.activate(false);
     });
   });
 
-  test('keydown sets context and forwards to app', () => {
-    const mockApp = {
-      getLayerGroupByDivId: () => undefined,
-      onKeydown: vi.fn(),
-      getBaseScale: vi.fn(() => 1)
-    };
+  test('keydown sets tool context and forwards to app', () => {
+    const mockApp = makeLivewireAppMock();
 
     const livewire = new Livewire(mockApp);
     const event = {key: 'Escape', clientX: 10, clientY: 20};

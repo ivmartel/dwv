@@ -15,6 +15,20 @@ import {
 } from './utils.js';
 
 /**
+ * Minimal mock for {@link DrawSelect} (methods used by {@link DrawTapBehavior}).
+ *
+ * @returns {object} DrawSelect-like stub.
+ */
+function makeDrawSelectStub() {
+  return {
+    setFeatures: vi.fn(),
+    disableAndResetEditor: vi.fn(),
+    checkCanEdit: vi.fn(() => true),
+    trySelectShapeGroup: vi.fn(() => false)
+  };
+}
+
+/**
  * @returns {object} App stub for {@link DrawTapBehavior}.
  */
 function makeDrawTapApp() {
@@ -57,16 +71,13 @@ function makeMinimalDrawLayer() {
 
 describe('tools/behaviors/drawTapBehavior', () => {
   let app;
-  let shapeHandler;
+  let drawSelect;
   let behavior;
 
   beforeEach(() => {
     app = makeDrawTapApp();
-    shapeHandler = {
-      disableAndResetEditor: vi.fn(),
-      setEditorShape: vi.fn()
-    };
-    behavior = new DrawTapBehavior(app, shapeHandler);
+    drawSelect = makeDrawSelectStub();
+    behavior = new DrawTapBehavior(app, drawSelect);
   });
 
   test('DrawTapBehavior extends TapBehavior / EventTarget', () => {
@@ -122,7 +133,7 @@ describe('tools/behaviors/drawTapBehavior', () => {
     lg.getActiveDrawLayer = vi.fn(() => makeMinimalDrawLayer());
 
     behavior.onTap(new Point2D(10, 20), lg);
-    assert.equal(shapeHandler.disableAndResetEditor.mock.calls.length, 1);
+    assert.equal(drawSelect.disableAndResetEditor.mock.calls.length, 1);
     assert.ok(behavior.isActive());
   });
 
@@ -169,11 +180,8 @@ describe('tools/behaviors/drawTapBehavior', () => {
     const {app: intApp, layerGroup, addedAnnotations, cleanup} =
       createRectangleDrawIntegrationSetup();
     try {
-      const localShapeHandler = {
-        disableAndResetEditor: vi.fn(),
-        setEditorShape: vi.fn()
-      };
-      const localBehavior = new DrawTapBehavior(intApp, localShapeHandler);
+      const localDrawSelect = makeDrawSelectStub();
+      const localBehavior = new DrawTapBehavior(intApp, localDrawSelect);
       localBehavior.setOptions({rectangle: RectangleFactory});
       localBehavior.setFeatures({shapeName: 'rectangle'});
       const begin = new Point2D(8, 16);

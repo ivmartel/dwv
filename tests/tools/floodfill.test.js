@@ -27,7 +27,21 @@ vi.mock('magic-wand-tool', () => ({
   }
 }));
 
+import {LayerGroupPointer} from '../../src/tools/layerGroupPointer.js';
 import {Floodfill} from '../../src/tools/floodfill.js';
+
+/**
+ * Minimal app stub for {@link Floodfill} and {@link LayerGroupPointer}.
+ *
+ * @returns {object} Mock application.
+ */
+function makeFloodfillAppMock() {
+  return {
+    getLayerGroupByDivId: vi.fn(() => undefined),
+    onKeydown: vi.fn(),
+    getBaseScale: vi.fn(() => 1)
+  };
+}
 
 describe('Floodfill', () => {
 
@@ -35,42 +49,35 @@ describe('Floodfill', () => {
     vi.restoreAllMocks();
   });
 
-  test('should instantiate with app and be a LayerGroupPointer', () => {
-    const mockApp = {onKeydown: vi.fn(), getBaseScale: vi.fn(() => 1)};
+  test('constructs as Floodfill / LayerGroupPointer / EventTarget', () => {
+    const mockApp = makeFloodfillAppMock();
     const floodfill = new Floodfill(mockApp);
 
-    assert.isDefined(floodfill);
+    assert.ok(floodfill instanceof Floodfill);
+    assert.ok(floodfill instanceof LayerGroupPointer);
+    assert.ok(floodfill instanceof EventTarget);
   });
 
-  test('behavior combination should handle lifecycle methods', () => {
-    const mockApp = {
-      getLayerGroupByDivId: () => undefined,
-      onKeydown: vi.fn(),
-      getBaseScale: vi.fn(() => 1)
-    };
+  test('drag + wheel stack handles lifecycle without throwing', () => {
+    const mockApp = makeFloodfillAppMock();
 
     const floodfill = new Floodfill(mockApp);
 
-    // Call lifecycle methods - should not throw
     assert.doesNotThrow(() => {
       floodfill.init();
       floodfill.activate(true);
+      assert.equal(mockApp.getBaseScale.mock.calls.length, 1);
       floodfill.setFeatures({shapeColour: '#FF0000'});
       floodfill.activate(false);
     });
   });
 
-  test('should handle keydown events with behavior context', () => {
-    const mockApp = {
-      getLayerGroupByDivId: () => undefined,
-      onKeydown: vi.fn(),
-      getBaseScale: vi.fn(() => 1)
-    };
+  test('keydown sets tool context and forwards to app', () => {
+    const mockApp = makeFloodfillAppMock();
 
     const floodfill = new Floodfill(mockApp);
     const event = {key: 'Enter', clientX: 10, clientY: 20};
 
-    // Keydown should set context and forward to app
     floodfill.keydown(event);
 
     assert.equal(event.context, 'Floodfill');
