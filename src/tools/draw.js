@@ -51,16 +51,7 @@ export class Draw extends LayerGroupPointer {
    * @param {App} app The associated application.
    */
   constructor(app) {
-    // Use a reference to 'this' since we
-    //   cannot use 'this' before calling 'super'
-    const drawToolRef = {
-      /** @type {LayerGroupPointer|undefined} */
-      self: undefined
-    };
-    const shapeHandler = new DrawShapeHandler(app, (data) => {
-      drawToolRef.self?.dispatchEvent(
-        new CustomEvent(data.type, {detail: data}));
-    });
+    const shapeHandler = new DrawShapeHandler(app);
     const tapBehavior = new DrawTapBehavior(app, shapeHandler);
     const dragBehavior = new DrawDragBehavior(app, shapeHandler);
     super({
@@ -69,7 +60,6 @@ export class Draw extends LayerGroupPointer {
       tapBehavior,
       wheelBehavior: new ScrollWheelBehavior()
     });
-    drawToolRef.self = this;
     this.#app = app;
     this.#drawDrag = dragBehavior;
     this.#drawTap = tapBehavior;
@@ -81,6 +71,10 @@ export class Draw extends LayerGroupPointer {
         this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
       });
       this.#drawTap.addEventListener(type, (e) => {
+        const ce = /** @type {CustomEvent} */ (e);
+        this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
+      });
+      this.#shapeHandler.addEventListener(type, (e) => {
         const ce = /** @type {CustomEvent} */ (e);
         this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
       });

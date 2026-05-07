@@ -23,19 +23,19 @@ export class DrawShapeEditor {
   #app;
 
   /**
-   * Event callback.
+   * Event emitter.
    *
    * @type {Function}
    */
-  #eventCallback;
+  #emitEvent;
 
   /**
    * @param {App} app The associated application.
-   * @param {Function} eventCallback Event callback.
+   * @param {Function} emitEvent Event emitter.
    */
-  constructor(app, eventCallback) {
+  constructor(app, emitEvent) {
     this.#app = app;
-    this.#eventCallback = eventCallback;
+    this.#emitEvent = emitEvent;
   }
 
   /**
@@ -322,7 +322,7 @@ export class DrawShapeEditor {
       // add command to undo stack
       this.#app.addToUndoStack(command);
       // fire event manually since command is not executed
-      this.#eventCallback({
+      this.#emitEvent({
         type: 'annotationupdate',
         data: this.#annotation,
         dataid: this.#drawLayer.getDataId(),
