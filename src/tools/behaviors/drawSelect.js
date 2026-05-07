@@ -24,6 +24,13 @@ export class DrawSelect {
   #shapeHandler;
 
   /**
+   * Callback store to allow attach/detach.
+   *
+   * @type {Array}
+   */
+  #callbackStore = [];
+
+  /**
    * Annotation group meta validator.
    *
    * @type {Function|undefined}
@@ -47,6 +54,10 @@ export class DrawSelect {
     if (typeof features.drawMetaValidator !== 'undefined') {
       this.#drawMetaValidator = features.drawMetaValidator;
     }
+  }
+
+  disableAndResetEditor() {
+    this.#shapeHandler.disableAndResetEditor();
   }
 
   /**
@@ -136,5 +147,67 @@ export class DrawSelect {
       return this.#selectShapeGroup(kShape, drawLayer);
     }
     return false;
+  }
+
+  /**
+   * Get a DrawLayer position callback.
+   *
+   * TODO: check need for store item removal.
+   *
+   * @param {DrawLayer} layer The layer to update.
+   * @returns {Function} The callback.
+   */
+  #getPositionCallback(layer) {
+    const layerId = layer.getId();
+    if (typeof this.#callbackStore[layerId] === 'undefined') {
+      this.#callbackStore[layerId] = () => {
+        layer.activateCurrentPositionShapes(true);
+      };
+    }
+    return this.#callbackStore[layerId];
+  }
+
+  /**
+   * Activate a draw layer.
+   *
+   * @param {DrawLayer} drawLayer The layer to update.
+   * @param {boolean} flag The flag to activate or not.
+   */
+  #activateLayer(drawLayer, flag) {
+
+    drawLayer.setShapeHandler(this.#shapeHandler);
+    drawLayer.activateCurrentPositionShapes(flag);
+
+    if (flag) {
+      this.#app.addEventListener('positionchange',
+        this.#getPositionCallback(drawLayer)
+      );
+    } else {
+      this.#app.removeEventListener('positionchange',
+        this.#getPositionCallback(drawLayer)
+      );
+    }
+  }
+
+  activate(flag) {
+    if (!flag) {
+      this.#shapeHandler.onMouseOutShapeGroup();
+    }
+    // activate current layers
+    const drawLayers = this.#app.getDrawLayers();
+    for (const drawLayer of drawLayers) {
+      if (typeof drawLayer !== 'undefined') {
+        this.#activateLayer(drawLayer, flag);
+      }
+    }
+    // listen to activate new layers
+    this.#app.addEventListener('drawlayeradd', (event) => {
+      const newDrawLayers = this.#app.getDrawLayers(function (item) {
+        return item.getId() === event.layerid;
+      });
+      if (newDrawLayers.length === 1) {
+        this.#activateLayer(newDrawLayers[0], flag);
+      }
+    });
   }
 }

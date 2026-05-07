@@ -3,12 +3,12 @@ import {RemoveAnnotationCommand} from '../command/drawCommands.js';
 import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {DrawTapBehavior} from './behaviors/drawTapBehavior.js';
 import {DrawDragBehavior} from './behaviors/drawDragBehavior.js';
+import {DrawSelect} from './behaviors/drawSelect.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 
 /**
  * @import {App} from '../app/application.js';
- * @import {DrawLayer} from '../gui/drawLayer.js';
  */
 
 /**
@@ -22,6 +22,11 @@ export class Draw extends LayerGroupPointer {
    * @type {App}
    */
   #app;
+
+  /**
+   * @type {DrawSelect}
+   */
+  #drawSelect;
 
   /**
    * @type {DrawDragBehavior}
@@ -41,19 +46,13 @@ export class Draw extends LayerGroupPointer {
   #shapeHandler;
 
   /**
-   * Callback store to allow attach/detach.
-   *
-   * @type {Array}
-   */
-  #callbackStore = [];
-
-  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     const shapeHandler = new DrawShapeHandler(app);
-    const tapBehavior = new DrawTapBehavior(app, shapeHandler);
-    const dragBehavior = new DrawDragBehavior(app, shapeHandler);
+    const drawSelect = new DrawSelect(app, shapeHandler);
+    const tapBehavior = new DrawTapBehavior(app, drawSelect);
+    const dragBehavior = new DrawDragBehavior(app, drawSelect);
     super({
       app,
       dragBehavior,
@@ -61,6 +60,7 @@ export class Draw extends LayerGroupPointer {
       wheelBehavior: new ScrollWheelBehavior()
     });
     this.#app = app;
+    this.#drawSelect = drawSelect;
     this.#drawDrag = dragBehavior;
     this.#drawTap = tapBehavior;
     this.#shapeHandler = shapeHandler;
@@ -114,46 +114,9 @@ export class Draw extends LayerGroupPointer {
     if (event.key === 'Escape') {
       this.#drawDrag.resetPlacement();
       this.#drawTap.resetPlacement();
+      this.#drawSelect.disableAndResetEditor();
     }
   };
-
-  /**
-   * Get a DrawLayer position callback.
-   *
-   * TODO: check need for store item removal.
-   *
-   * @param {DrawLayer} layer The layer to update.
-   * @returns {Function} The callback.
-   */
-  #getPositionCallback(layer) {
-    const layerId = layer.getId();
-    if (typeof this.#callbackStore[layerId] === 'undefined') {
-      this.#callbackStore[layerId] = () => {
-        layer.activateCurrentPositionShapes(true);
-      };
-    }
-    return this.#callbackStore[layerId];
-  }
-
-  /**
-   * Activate a draw layer.
-   *
-   * @param {DrawLayer} drawLayer The layer to update.
-   * @param {boolean} flag The flag to activate or not.
-   */
-  #activateLayer(drawLayer, flag) {
-    drawLayer.setShapeHandler(this.#shapeHandler);
-    drawLayer.activateCurrentPositionShapes(flag);
-    if (flag) {
-      this.#app.addEventListener('positionchange',
-        this.#getPositionCallback(drawLayer)
-      );
-    } else {
-      this.#app.removeEventListener('positionchange',
-        this.#getPositionCallback(drawLayer)
-      );
-    }
-  }
 
   /**
    * Activate the tool.
@@ -161,23 +124,7 @@ export class Draw extends LayerGroupPointer {
    * @param {boolean} flag The flag to activate or not.
    */
   activate(flag) {
-    if (!flag) {
-      this.#shapeHandler.onMouseOutShapeGroup();
-    }
-    const drawLayers = this.#app.getDrawLayers();
-    for (const drawLayer of drawLayers) {
-      if (typeof drawLayer !== 'undefined') {
-        this.#activateLayer(drawLayer, flag);
-      }
-    }
-    this.#app.addEventListener('drawlayeradd', (event) => {
-      const newDrawLayers = this.#app.getDrawLayers(function (item) {
-        return item.getId() === event.layerid;
-      });
-      if (newDrawLayers.length === 1) {
-        this.#activateLayer(newDrawLayers[0], flag);
-      }
-    });
+    this.#drawSelect.activate(flag);
   }
 
   /**

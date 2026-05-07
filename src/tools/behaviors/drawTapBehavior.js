@@ -3,13 +3,12 @@ import {
   isValidDrawPoint,
   DrawPreview
 } from './drawPreview.js';
-import {DrawSelect} from './drawSelect.js';
 
 /**
  * @import {App} from '../../app/application.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Point2D} from '../../math/point.js';
- * @import {DrawShapeHandler} from '../shapes/drawShapeHandler.js';
+ * @import {DrawSelect} from './drawSelect.js';
  */
 
 /**
@@ -23,11 +22,6 @@ const OPEN_ENDED_TAP_LIMIT = 65535;
  * Tap-driven placement session for {@link Draw}.
  */
 export class DrawTapBehavior extends TapBehavior {
-
-  /**
-   * @type {DrawShapeHandler}
-   */
-  #shapeHandler;
 
   /**
    * @type {Point2D|undefined}
@@ -57,14 +51,13 @@ export class DrawTapBehavior extends TapBehavior {
 
   /**
    * @param {App} app The application.
-   * @param {DrawShapeHandler} shapeHandler Handler for selecting and editing
+   * @param {DrawSelect} drawSelect Hepler for selecting and editing
    *   existing shapes.
    */
-  constructor(app, shapeHandler) {
+  constructor(app, drawSelect) {
     super();
-    this.#shapeHandler = shapeHandler;
     this.#drawPreview = new DrawPreview(app);
-    this.#drawSelect = new DrawSelect(app, shapeHandler);
+    this.#drawSelect = drawSelect;
   }
 
   /**
@@ -195,7 +188,7 @@ export class DrawTapBehavior extends TapBehavior {
       }
       // shape creation
       if (this.#drawPreview.tryBeginPlacement(layerGroup)) {
-        this.#shapeHandler.disableAndResetEditor();
+        this.#drawSelect.disableAndResetEditor();
         this.#applyTapLimitFromFactory();
       } else {
         const reason = this.#drawPreview.getCannotCreateReason(layerGroup);

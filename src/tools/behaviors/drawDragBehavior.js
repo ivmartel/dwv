@@ -3,6 +3,7 @@ import {
   isValidDrawPoint,
   DrawPreview
 } from './drawPreview.js';
+import {DrawSelect} from './drawSelect.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -15,7 +16,6 @@ import Konva from 'konva';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Point2D} from '../../math/point.js';
  * @import {DrawLayer} from '../../gui/drawLayer.js';
- * @import {DrawShapeHandler} from '../shapes/drawShapeHandler.js';
  * @import {DragPointerStartContext, DragStep} from './dragBehavior.js';
  */
 
@@ -25,9 +25,9 @@ import Konva from 'konva';
 export class DrawDragBehavior extends DragBehavior {
 
   /**
-   * @type {DrawShapeHandler}
+   * @type {DrawSelect}
    */
-  #shapeHandler;
+  #drawSelect;
 
   /**
    * @type {Point2D|undefined}
@@ -50,12 +50,12 @@ export class DrawDragBehavior extends DragBehavior {
 
   /**
    * @param {App} app The application.
-   * @param {DrawShapeHandler} shapeHandler Handler for selecting and editing
+   * @param {DrawSelect} drawSelect Hepler for selecting and editing
    *   existing shapes.
    */
-  constructor(app, shapeHandler) {
+  constructor(app, drawSelect) {
     super();
-    this.#shapeHandler = shapeHandler;
+    this.#drawSelect = drawSelect;
     this.#drawPreview = new DrawPreview(app);
   }
 
@@ -135,7 +135,7 @@ export class DrawDragBehavior extends DragBehavior {
 
       // shape creation
       if (this.#drawPreview.tryBeginPlacement(layerGroup)) {
-        this.#shapeHandler.disableAndResetEditor();
+        this.#drawSelect.disableAndResetEditor();
       } else {
         const reason = this.#drawPreview.getCannotCreateReason(layerGroup);
         this.dispatchEvent(new CustomEvent('warn', {
