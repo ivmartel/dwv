@@ -55,11 +55,10 @@ describe('tools', () => {
         assert.notOk(BidimensionalFactory.supports(undefined));
       });
 
-      test('getName, getGroupName, getNPoints, getTimeout', () => {
+      test('getName, getGroupName, getNPoints', () => {
         assert.equal(factory.getName(), 'bidimensional');
         assert.equal(factory.getGroupName(), 'bidimensional-group');
         assert.equal(factory.getNPoints(), 2);
-        assert.equal(factory.getTimeout(), 0);
       });
 
       test('setAnnotationMathShape stores a BidimensionalLine', () => {

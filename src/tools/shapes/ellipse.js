@@ -64,15 +64,6 @@ export class EllipseFactory {
   }
 
   /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} The timeout in milliseconds.
-   */
-  getTimeout() {
-    return this.#annotator.getTimeout();
-  }
-
-  /**
    * Set an annotation math shape from input points.
    *
    * @param {Annotation} annotation The annotation.

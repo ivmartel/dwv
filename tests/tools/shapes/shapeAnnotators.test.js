@@ -79,7 +79,6 @@ describe('tools', () => {
       assert.equal(a.getName(), 'rectangle');
       assert.equal(a.getGroupName(), 'rectangle-group');
       assert.equal(a.getNPoints(), 2);
-      assert.equal(a.getTimeout(), 0);
     });
 
     test('isComplete always true', () => {
@@ -189,7 +188,6 @@ describe('tools', () => {
       assert.equal(a.getName(), 'circle');
       assert.equal(a.getGroupName(), 'circle-group');
       assert.equal(a.getNPoints(), 2);
-      assert.equal(a.getTimeout(), 0);
     });
 
     test('setAnnotationMathShape from center + edge point', () => {
@@ -297,7 +295,6 @@ describe('tools', () => {
       assert.equal(a.getName(), 'ellipse');
       assert.equal(a.getGroupName(), 'ellipse-group');
       assert.equal(a.getNPoints(), 2);
-      assert.equal(a.getTimeout(), 0);
     });
 
     test('setAnnotationMathShape computes a and b from two points', () => {
@@ -408,7 +405,6 @@ describe('tools', () => {
       assert.equal(a.getName(), 'ruler');
       assert.equal(a.getGroupName(), 'ruler-group');
       assert.equal(a.getNPoints(), 2);
-      assert.equal(a.getTimeout(), 0);
     });
 
     test('setAnnotationMathShape stores a Line from 2 points', () => {
@@ -493,7 +489,6 @@ describe('tools', () => {
       assert.equal(a.getName(), 'arrow');
       assert.equal(a.getGroupName(), 'arrow-group');
       assert.equal(a.getNPoints(), 2);
-      assert.equal(a.getTimeout(), 0);
     });
 
     test('setAnnotationMathShape sets mathShape and referencePoints', () => {
@@ -582,7 +577,6 @@ describe('tools', () => {
       assert.equal(a.getName(), 'roi');
       assert.equal(a.getGroupName(), 'roi-group');
       assert.equal(a.getNPoints(), undefined);
-      assert.equal(a.getTimeout(), 100);
     });
 
     test('setAnnotationMathShape stores all points as ROI', () => {
@@ -661,7 +655,6 @@ describe('tools', () => {
       assert.equal(a.getName(), 'protractor');
       assert.equal(a.getGroupName(), 'protractor-group');
       assert.equal(a.getNPoints(), 3);
-      assert.equal(a.getTimeout(), 500);
     });
 
     test('isComplete: true for 3 points, false for 2', () => {

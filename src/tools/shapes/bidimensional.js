@@ -73,15 +73,6 @@ export class BidimensionalFactory {
   }
 
   /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} The timeout in milliseconds.
-   */
-  getTimeout() {
-    return 0;
-  }
-
-  /**
    * Get the default label template for the annotation.
    * Returns the draft label if the short axis is not yet set.
    *
