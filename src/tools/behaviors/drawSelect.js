@@ -105,25 +105,22 @@ export class DrawSelect {
    *
    * @param {Konva.Shape} kshape The shape that has been selected.
    * @param {DrawLayer} drawLayer The draw layer where to draw.
-   * @returns {object|undefined} Shape details if valid or undefined.
+   * @returns {boolean} True if all good.
    */
   #selectShapeGroup(kshape, drawLayer) {
+    // get shape
     let group = kshape.getParent();
     if (kshape instanceof Konva.Tag) {
       group = group.getParent();
     }
     const selectedShape = group.find('.shape')[0];
     if (!(selectedShape instanceof Konva.Shape)) {
-      return;
+      return false;
     }
-
+    // select shape
     this.#shapeHandler.setEditorShape(selectedShape, drawLayer);
 
-    return {
-      type: 'annotationselect',
-      annotationid: group.id(),
-      dataid: drawLayer.getDataId()
-    };
+    return true;
   }
 
   /**
@@ -131,14 +128,13 @@ export class DrawSelect {
    *
    * @param {Point2D} point Display point.
    * @param {DrawLayer} drawLayer Layer group.
-   * @returns {object|undefined} Shape details if found or undefined.
+   * @returns {boolean} True if successful.
    */
   trySelectShapeGroup(point, drawLayer) {
-    let res;
     const kShape = this.#getSelectShape(point, drawLayer);
     if (kShape) {
-      res = this.#selectShapeGroup(kShape, drawLayer);
+      return this.#selectShapeGroup(kShape, drawLayer);
     }
-    return res;
+    return false;
   }
 }

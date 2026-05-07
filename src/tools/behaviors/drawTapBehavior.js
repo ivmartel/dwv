@@ -112,11 +112,7 @@ export class DrawTapBehavior extends TapBehavior {
         return false;
       }
       // try to select
-      const details = this.#drawSelect.trySelectShapeGroup(point, drawLayer);
-      if (typeof details !== 'undefined') {
-        this.dispatchEvent(new CustomEvent('annotationselect', details));
-        return true;
-      }
+      return this.#drawSelect.trySelectShapeGroup(point, drawLayer);
     }
 
     return false;

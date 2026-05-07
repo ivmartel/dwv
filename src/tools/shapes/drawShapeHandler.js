@@ -121,10 +121,18 @@ export class DrawShapeHandler extends EventTarget {
       // disable
       this.#shapeEditor.disable();
       // set shape
+      const annotationId = shape.getParent().id();
       this.#shapeEditor.setShape(
         shape,
         drawLayer,
-        drawLayer.getDrawController().getAnnotation(shape.getParent().id()));
+        drawController.getAnnotation(annotationId)
+      );
+      // emit
+      this.#emitEvent({
+        type: 'annotationselect',
+        annotationid: annotationId,
+        dataid: drawLayer.getDataId()
+      });
       // enable
       this.#shapeEditor.enable();
     }
