@@ -3,7 +3,6 @@ import {
   isValidDrawPoint,
   DrawPreview
 } from './drawPreview.js';
-import {DrawSelect} from './drawSelect.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -17,6 +16,7 @@ import Konva from 'konva';
  * @import {Point2D} from '../../math/point.js';
  * @import {DrawLayer} from '../../gui/drawLayer.js';
  * @import {DragPointerStartContext, DragStep} from './dragBehavior.js';
+ * @import {DrawSelect} from './drawSelect.js';
  */
 
 /**
