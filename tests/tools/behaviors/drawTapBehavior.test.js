@@ -15,7 +15,8 @@ import {
 } from './utils.js';
 
 /**
- * Minimal mock for {@link DrawSelect} (methods used by {@link DrawTapBehavior}).
+ * Minimal mock for {@link DrawSelect}
+ * (methods used by {@link DrawTapBehavior}).
  *
  * @returns {object} DrawSelect-like stub.
  */
