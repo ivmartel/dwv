@@ -363,6 +363,11 @@ export class LayerGroupPointer extends EventTarget {
    * @param {TouchEvent} event The touch start event.
    */
   touchstart = (event) => {
+    // reset drag
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+
     this.#moved = false;
     this.#clearLongTouchTimer();
 
@@ -385,10 +390,6 @@ export class LayerGroupPointer extends EventTarget {
         }, delay);
       }
     } else if (touchPoints.length === 2) {
-      // Second finger or two-finger start: end single-touch drag first.
-      if (this.#dragBehavior?.isActive()) {
-        this.#dragBehavior.reset();
-      }
       this.#twoTouchBehavior?.onStart(touchPoints);
     }
   };
@@ -432,11 +433,21 @@ export class LayerGroupPointer extends EventTarget {
     }
 
     if (this.#dragBehavior?.isActive()) {
-      this.#dragBehavior.onEnd();
-    } else if (this.#tapBehavior &&
+      if (this.#moved) {
+        // up+move -> end drag
+        this.#dragBehavior.onEnd();
+      } else {
+        // up and no move -> reset drag
+        this.#dragBehavior.reset();
+      }
+    }
+
+    if (this.#tapBehavior &&
       (this.#tapBehavior.isActive() || !this.#moved)) {
+      // active tap -> sticky tap
+      // no move -> discrete tap
       const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
-      this.#tapBehavior?.onTap(point, layerGroup);
+      this.#tapBehavior.onTap(point, layerGroup);
     }
   };
 
