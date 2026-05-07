@@ -33,9 +33,12 @@ import {LayerGroupPointer} from '../../src/tools/layerGroupPointer.js';
  */
 function makeLivewireAppMock() {
   return {
-    getLayerGroupByDivId: vi.fn(() => undefined),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
     onKeydown: vi.fn(),
-    getBaseScale: vi.fn(() => 1)
+    getBaseScale: vi.fn(() => 1),
+    getDrawLayers: vi.fn(() => []),
+    getActiveLayerGroup: vi.fn()
   };
 }
 

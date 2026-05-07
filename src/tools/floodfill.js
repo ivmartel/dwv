@@ -2,6 +2,8 @@ import {Style} from '../gui/style.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {FloodfillDragBehavior} from './behaviors/floodfillDragBehavior.js';
 import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
+import {DrawSelect} from './behaviors/drawSelect.js';
+import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 
 /**
  * @import {App} from '../app/application.js';
@@ -19,6 +21,16 @@ export class Floodfill extends LayerGroupPointer {
   #app;
 
   /**
+   * @type {DrawSelect}
+   */
+  #drawSelect;
+
+  /**
+   * @type {FloodfillDragBehavior}
+   */
+  #dragBehavior;
+
+  /**
    * Drawing style.
    *
    * @type {Style}
@@ -30,9 +42,12 @@ export class Floodfill extends LayerGroupPointer {
    */
   constructor(app) {
     const style = new Style();
+    const shapeHandler = new DrawShapeHandler(app);
+    const drawSelect = new DrawSelect(app, shapeHandler);
     const dragBehavior = new FloodfillDragBehavior(
       app,
-      style
+      style,
+      drawSelect
     );
     super({
       app,
@@ -40,6 +55,8 @@ export class Floodfill extends LayerGroupPointer {
       wheelBehavior: new ScrollWheelBehavior()
     });
     this.#app = app;
+    this.#drawSelect = drawSelect;
+    this.#dragBehavior = dragBehavior;
     this.#style = style;
   }
 
@@ -51,6 +68,10 @@ export class Floodfill extends LayerGroupPointer {
   keydown = (event) => {
     event.context = 'Floodfill';
     this.#app.onKeydown(event);
+
+    if (event.key === 'Escape') {
+      this.#drawSelect.disableAndResetEditor();
+    }
   };
 
   /**
@@ -65,6 +86,8 @@ export class Floodfill extends LayerGroupPointer {
       // set the default to the first in the list
       this.setFeatures({shapeColour: this.#style.getLineColour()});
     }
+
+    this.#drawSelect.activate(bool);
   }
 
   /**
@@ -83,6 +106,8 @@ export class Floodfill extends LayerGroupPointer {
     if (typeof features.shapeColour !== 'undefined') {
       this.#style.setLineColour(features.shapeColour);
     }
+
+    this.#dragBehavior.setFeatures(features);
   }
 
 } // Floodfill class

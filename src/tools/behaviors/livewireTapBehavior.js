@@ -14,6 +14,7 @@ import {TapBehavior} from './tapBehavior.js';
  * @import {App} from '../../app/application.js';
  * @import {Style} from '../../gui/style.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
+ * @import {DrawSelect} from './drawSelect.js';
  */
 
 /**
@@ -33,13 +34,6 @@ export class LivewireTapBehavior extends TapBehavior {
    * @type {Style}
    */
   #style;
-
-  /**
-   * Interaction start flag.
-   *
-   * @type {boolean}
-   */
-  #started = false;
 
   /**
    * Start point.
@@ -91,21 +85,32 @@ export class LivewireTapBehavior extends TapBehavior {
   #scissors = new Scissors();
 
   /**
+   * Draw select.
+   *
+   * @type {DrawSelect}
+   */
+  #drawSelect;
+
+  /**
    * @param {App} app The associated application.
    * @param {Style} style Drawing style (shared with the tool).
+   * @param {DrawSelect} drawSelect Hepler for selecting and editing
+   *   existing shapes.
    */
-  constructor(app, style) {
+  constructor(app, style, drawSelect) {
     super();
     this.#app = app;
     this.#style = style;
+    this.#drawSelect = drawSelect;
+    // open ended tap
+    super.setNumberOfTaps(500);
   }
 
   /**
-   * @returns {boolean} True while a livewire session is in progress.
-   * @override
+   * @param {object} features Live features (shape, colour, meta, …).
    */
-  isActive() {
-    return this.#started;
+  setFeatures(features) {
+    this.#drawSelect.setFeatures(features);
   }
 
   /**
@@ -144,6 +149,34 @@ export class LivewireTapBehavior extends TapBehavior {
   }
 
   /**
+   * Try to select an existing shape at the pointer.
+   *
+   * @param {Point2D} point Display point.
+   * @param {LayerGroup} layerGroup Layer group.
+   * @returns {boolean} True if selection consumed the event.
+   */
+  #trySelectShapeGroup(point, layerGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
+
+    if (typeof drawLayer !== 'undefined') {
+      // check can edit
+      if (!this.#drawSelect.checkCanEdit(drawLayer)) {
+        this.dispatchEvent(new CustomEvent('warn', {
+          detail: {
+            type: 'warn',
+            message: 'Cannot edit draw, data meta is invalid'
+          }
+        }));
+        return false;
+      }
+      // try to select
+      return this.#drawSelect.trySelectShapeGroup(point, drawLayer);
+    }
+
+    return false;
+  }
+
+  /**
    * Start or continue tool interaction (tap commit).
    *
    * @param {Point2D} point The pointer position.
@@ -153,6 +186,13 @@ export class LivewireTapBehavior extends TapBehavior {
   onTap(point, layerGroup) {
     if (this.#isResampled(layerGroup)) {
       return;
+    }
+
+    if (!this.isActive()) {
+      // shape selection
+      if (this.#trySelectShapeGroup(point, layerGroup)) {
+        return;
+      }
     }
 
     let viewLayer;
@@ -174,9 +214,8 @@ export class LivewireTapBehavior extends TapBehavior {
     const index = viewLayer.displayToPlaneIndex(point);
 
     // first time
-    if (!this.#started) {
+    if (!this.isActive()) {
       this.#annotation = undefined;
-      this.#started = true;
       this.#startPoint = new Point2D(index.get(0), index.get(1));
       // clear vars
       this.#clearPaths();
@@ -191,6 +230,8 @@ export class LivewireTapBehavior extends TapBehavior {
           data, layerGroup.getDivId(), refDataId);
         // get draw layer
         drawLayer = layerGroup.getActiveDrawLayer();
+        // activate listening
+        drawLayer.getKonvaLayer().listening(true);
         // set active to bind to toolboxController
         layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
       }
@@ -211,7 +252,7 @@ export class LivewireTapBehavior extends TapBehavior {
       if (diffX < this.#tolerance &&
         diffY < this.#tolerance) {
         // finish
-        this.finishShape();
+        this.onEnd();
       } else {
         // anchor point
         this.#path = this.#currentPath;
@@ -221,6 +262,8 @@ export class LivewireTapBehavior extends TapBehavior {
         this.#path.addControlPoint(this.#currentPath.getPoint(0));
       }
     }
+
+    super.onTap(point, layerGroup);
   }
 
   /**
@@ -231,7 +274,7 @@ export class LivewireTapBehavior extends TapBehavior {
    * @override
    */
   onUpdate(point, layerGroup) {
-    if (!this.#started) {
+    if (!this.isActive()) {
       return;
     }
     const drawLayer = layerGroup.getActiveDrawLayer();
@@ -316,22 +359,8 @@ export class LivewireTapBehavior extends TapBehavior {
     this.#app.addToUndoStack(command);
     // execute command: triggers draw creation
     command.execute();
-  }
 
-  /**
-   * Double-click / mouseout path from {@link LayerGroupPointer}.
-   *
-   * @override
-   */
-  onEnd() {
-    this.finishShape();
-  }
-
-  /**
-   * Finish the livewire ROI (closure near start or dblclick).
-   */
-  finishShape() {
-    this.#started = false;
+    super.onUpdate(point, layerGroup);
   }
 
   /**
@@ -340,7 +369,6 @@ export class LivewireTapBehavior extends TapBehavior {
    * @override
    */
   reset() {
-    this.#started = false;
     this.#annotation = undefined;
     this.#clearPaths();
     this.#parentPoints = [];
@@ -348,4 +376,3 @@ export class LivewireTapBehavior extends TapBehavior {
   }
 
 }
-

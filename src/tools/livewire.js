@@ -2,6 +2,8 @@ import {Style} from '../gui/style.js';
 import {LayerGroupPointer} from './layerGroupPointer.js';
 import {ScrollWheelBehavior} from './behaviors/wheelBehavior.js';
 import {LivewireTapBehavior} from './behaviors/livewireTapBehavior.js';
+import {DrawSelect} from './behaviors/drawSelect.js';
+import {DrawShapeHandler} from './shapes/drawShapeHandler.js';
 
 /**
  * @import {App} from '../app/application.js';
@@ -19,6 +21,16 @@ export class Livewire extends LayerGroupPointer {
   #app;
 
   /**
+   * @type {DrawSelect}
+   */
+  #drawSelect;
+
+  /**
+   * @type {LivewireTapBehavior}
+   */
+  #tapBehavior;
+
+  /**
    * Drawing style.
    *
    * @type {Style}
@@ -30,12 +42,21 @@ export class Livewire extends LayerGroupPointer {
    */
   constructor(app) {
     const style = new Style();
+    const shapeHandler = new DrawShapeHandler(app);
+    const drawSelect = new DrawSelect(app, shapeHandler);
+    const tapBehavior = new LivewireTapBehavior(
+      app,
+      style,
+      drawSelect
+    );
     super({
       app,
-      tapBehavior: new LivewireTapBehavior(app, style),
+      tapBehavior,
       wheelBehavior: new ScrollWheelBehavior()
     });
     this.#app = app;
+    this.#drawSelect = drawSelect;
+    this.#tapBehavior = tapBehavior;
     this.#style = style;
   }
 
@@ -47,6 +68,10 @@ export class Livewire extends LayerGroupPointer {
   keydown = (event) => {
     event.context = 'Livewire';
     this.#app.onKeydown(event);
+
+    if (event.key === 'Escape') {
+      this.#drawSelect.disableAndResetEditor();
+    }
   };
 
   /**
@@ -59,6 +84,8 @@ export class Livewire extends LayerGroupPointer {
       this.#style.setBaseScale(this.#app.getBaseScale());
       this.setFeatures({shapeColour: this.#style.getLineColour()});
     }
+
+    this.#drawSelect.activate(bool);
   }
 
   /**
@@ -77,6 +104,8 @@ export class Livewire extends LayerGroupPointer {
     if (typeof features.shapeColour !== 'undefined') {
       this.#style.setLineColour(features.shapeColour);
     }
+
+    this.#tapBehavior.setFeatures(features);
   }
 
 }

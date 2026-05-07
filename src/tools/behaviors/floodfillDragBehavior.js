@@ -20,6 +20,7 @@ import MagicWand from 'magic-wand-tool';
 /**
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Scalar2D} from '../../math/scalar.js';
+ * @import {DrawSelect} from './drawSelect.js';
  */
 
 /**
@@ -33,13 +34,6 @@ export class FloodfillDragBehavior extends DragBehavior {
    * @type {object}
    */
   #app;
-
-  /**
-   * Interaction start flag.
-   *
-   * @type {boolean}
-   */
-  #started = false;
 
   /**
    * Current annotation.
@@ -119,13 +113,30 @@ export class FloodfillDragBehavior extends DragBehavior {
   #style;
 
   /**
+   * Draw select.
+   *
+   * @type {DrawSelect}
+   */
+  #drawSelect;
+
+  /**
    * @param {object} app The associated application.
    * @param {object} style The floodfill style.
+   * @param {DrawSelect} drawSelect Hepler for selecting and editing
+   *   existing shapes.
    */
-  constructor(app, style) {
+  constructor(app, style, drawSelect) {
     super();
     this.#app = app;
     this.#style = style;
+    this.#drawSelect = drawSelect;
+  }
+
+  /**
+   * @param {object} features Live features (shape, colour, meta, …).
+   */
+  setFeatures(features) {
+    this.#drawSelect.setFeatures(features);
   }
 
   /**
@@ -331,6 +342,34 @@ export class FloodfillDragBehavior extends DragBehavior {
   }
 
   /**
+   * Try to select an existing shape at the pointer.
+   *
+   * @param {Point2D} point Display point.
+   * @param {LayerGroup} layerGroup Layer group.
+   * @returns {boolean} True if selection consumed the event.
+   */
+  #trySelectShapeGroup(point, layerGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
+
+    if (typeof drawLayer !== 'undefined') {
+      // check can edit
+      if (!this.#drawSelect.checkCanEdit(drawLayer)) {
+        this.dispatchEvent(new CustomEvent('warn', {
+          detail: {
+            type: 'warn',
+            message: 'Cannot edit draw, data meta is invalid'
+          }
+        }));
+        return false;
+      }
+      // try to select
+      return this.#drawSelect.trySelectShapeGroup(point, drawLayer);
+    }
+
+    return false;
+  }
+
+  /**
    * @param {Point2D} _point The pointer position.
    * @param {LayerGroup} _layerGroup The layer group under the pointer.
    * @returns {boolean} Whether a drag may begin.
@@ -348,10 +387,15 @@ export class FloodfillDragBehavior extends DragBehavior {
    * @override
    */
   onStart(point, layerGroup, _pointerStart) {
-    super.onStart(point, layerGroup, _pointerStart);
-
     if (this.#isResampled(layerGroup)) {
       return;
+    }
+
+    if (!this.isActive()) {
+      // shape selection
+      if (this.#trySelectShapeGroup(point, layerGroup)) {
+        return;
+      }
     }
 
     this.#annotation = undefined;
@@ -370,6 +414,8 @@ export class FloodfillDragBehavior extends DragBehavior {
       this.#app.addAndRenderAnnotationData(data, divId, refDataId);
       // get draw layer
       drawLayer = layerGroup.getActiveDrawLayer();
+      // activate listening
+      drawLayer.getKonvaLayer().listening(true);
       // set active to bind to toolboxController
       layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
     } else {
@@ -391,9 +437,10 @@ export class FloodfillDragBehavior extends DragBehavior {
     this.#style.setZoomScale(
       drawLayer.getKonvaLayer().getAbsoluteScale());
 
-    this.#started = true;
     this.#initialpoint = this.#getIndex(point, layerGroup);
     this.#paintBorder(this.#initialpoint, this.#initialThreshold, layerGroup);
+
+    super.onStart(point, layerGroup, _pointerStart);
   }
 
   /**
@@ -405,9 +452,7 @@ export class FloodfillDragBehavior extends DragBehavior {
    * @override
    */
   onUpdate(point, layerGroup) {
-    super.onUpdate(point, layerGroup);
-
-    if (!this.#started) {
+    if (!this.isActive()) {
       return;
     }
 
@@ -424,18 +469,8 @@ export class FloodfillDragBehavior extends DragBehavior {
       this.#currentThreshold,
       layerGroup
     );
-  }
 
-  /**
-   * Stop floodfill drag tracking flags.
-   *
-   * @override
-   */
-  onEnd() {
-    super.onEnd();
-    if (this.#started) {
-      this.#started = false;
-    }
+    super.onUpdate(point, layerGroup);
   }
 
 } // FloodfillDragBehavior class
