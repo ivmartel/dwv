@@ -63,9 +63,9 @@ export class DrawPreview {
   #style;
 
   /**
-   * @type {object|null}
+   * @type {object|undefined}
    */
-  #shapeFactoryList = null;
+  #shapeFactoryList;
 
   /**
    * @type {string|undefined}
@@ -73,14 +73,14 @@ export class DrawPreview {
   #shapeName;
 
   /**
-   * @type {object|null}
+   * @type {object|undefined}
    */
-  #currentFactory = null;
+  #currentFactory;
 
   /**
-   * @type {Konva.Group|null}
+   * @type {Konva.Group|undefined}
    */
-  #tmpShapeGroup = null;
+  #tmpShapeGroup;
 
   /**
    * Reference image meta validator.
@@ -150,7 +150,9 @@ export class DrawPreview {
         throw new Error(`Unknown shape: '${features.shapeName}'`);
       }
       this.#shapeName = features.shapeName;
-      this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
+      if (this.#shapeFactoryList !== undefined) {
+        this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
+      }
     }
   }
 
@@ -204,7 +206,7 @@ export class DrawPreview {
    */
   getNPoints() {
     let number = 0;
-    if (this.#currentFactory) {
+    if (this.#currentFactory !== undefined) {
       number = this.#currentFactory.getNPoints();
     }
     return number;
@@ -217,7 +219,7 @@ export class DrawPreview {
     if (this.#tmpShapeGroup) {
       const konvaLayer = this.#tmpShapeGroup.getLayer();
       this.#tmpShapeGroup.destroy();
-      this.#tmpShapeGroup = null;
+      this.#tmpShapeGroup = undefined;
       konvaLayer.draw();
     }
   }
@@ -375,7 +377,7 @@ export class DrawPreview {
   onNewPoints(tmpPoints, layerGroup) {
     if (this.#tmpShapeGroup) {
       this.#tmpShapeGroup.destroy();
-      this.#tmpShapeGroup = null;
+      this.#tmpShapeGroup = undefined;
     }
 
     const drawLayer = layerGroup.getActiveDrawLayer();
@@ -412,7 +414,7 @@ export class DrawPreview {
   onFinalPoints(finalPoints, layerGroup) {
     if (this.#tmpShapeGroup) {
       this.#tmpShapeGroup.destroy();
-      this.#tmpShapeGroup = null;
+      this.#tmpShapeGroup = undefined;
     }
 
     const drawLayer = layerGroup.getActiveDrawLayer();

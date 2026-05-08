@@ -34,7 +34,7 @@ export class Filter {
    *
    * @type {object}
    */
-  #filterList = null;
+  #filterList;
 
   /**
    * Selected filter.
@@ -194,7 +194,7 @@ export class Filter {
   /**
    * Get the list of filters.
    *
-   * @returns {Array} The list of filter objects.
+   * @returns {object|undefined} The list of filter objects.
    */
   getFilterList() {
     return this.#filterList;
@@ -204,10 +204,10 @@ export class Filter {
    * Check if a filter is in the filter list.
    *
    * @param {string} name The name to check.
-   * @returns {string} The filter list element for the given name.
+   * @returns {boolean} True if the filter is present.
    */
   hasFilter(name) {
-    return this.#filterList[name];
+    return this.#filterList?.[name] !== undefined;
   }
 
 } // class Filter

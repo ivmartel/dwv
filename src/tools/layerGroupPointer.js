@@ -157,9 +157,9 @@ export class LayerGroupPointer extends EventTarget {
   #longTouchToDblClickMs;
 
   /**
-   * @type {number|null}
+   * @type {number|undefined}
    */
-  #longTouchTimerId = null;
+  #longTouchTimerId;
 
   /**
    * True after a mouse down, reset at mouseup or mouseout.
@@ -264,7 +264,7 @@ export class LayerGroupPointer extends EventTarget {
     // avoid tap on touchend
     this.#downed = false;
     // reset timer
-    this.#longTouchTimerId = null;
+    this.#longTouchTimerId = undefined;
   };
 
   /**
@@ -501,9 +501,9 @@ export class LayerGroupPointer extends EventTarget {
   };
 
   #clearLongTouchTimer() {
-    if (this.#longTouchTimerId !== null) {
+    if (typeof this.#longTouchTimerId !== 'undefined') {
       clearTimeout(this.#longTouchTimerId);
-      this.#longTouchTimerId = null;
+      this.#longTouchTimerId = undefined;
     }
   }
 

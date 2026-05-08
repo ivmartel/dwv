@@ -86,19 +86,22 @@ export class DrawDragBehavior extends DragBehavior {
    *
    * @param {Point2D} point The point where to find the data.
    * @param {DrawLayer} drawLayer The draw layer.
-   * @returns {Konva.Shape|null} The shape of null.
+   * @returns {Konva.Shape|undefined} The shape or undefined.
    */
   #getSelectShape(point, drawLayer) {
-    let res = null;
+    let res;
 
     if (typeof drawLayer !== 'undefined') {
       const data = drawLayer.getDrawController().getAnnotationGroup();
       if (data.isEditable()) {
         const kStage = drawLayer.getKonvaStage();
-        res = kStage.getIntersection({
+        const intersection = kStage.getIntersection({
           x: point.getX(),
           y: point.getY()
         });
+        if (intersection) {
+          res = intersection;
+        }
       }
     }
     return res;

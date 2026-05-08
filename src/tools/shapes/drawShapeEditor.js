@@ -41,16 +41,16 @@ export class DrawShapeEditor {
   /**
    * Current shape factory.
    *
-   * @type {object}
+   * @type {object|undefined}
    */
-  #currentFactory = null;
+  #currentFactory;
 
   /**
    * Edited shape.
    *
-   * @type {Konva.Shape}
+   * @type {Konva.Shape|undefined}
    */
-  #shape = null;
+  #shape;
 
   /**
    * Associated draw layer. Used to bound anchor move.
@@ -90,7 +90,7 @@ export class DrawShapeEditor {
     this.#drawLayer = drawLayer;
     this.#annotation = annotation;
 
-    if (this.#shape) {
+    if (this.#shape !== undefined) {
       // remove old anchors
       this.#removeAnchors();
 
@@ -107,7 +107,7 @@ export class DrawShapeEditor {
   /**
    * Get the edited shape.
    *
-   * @returns {Konva.Shape} The edited shape.
+   * @returns {Konva.Shape|undefined} The edited shape.
    */
   getShape() {
     return this.#shape;
@@ -136,7 +136,7 @@ export class DrawShapeEditor {
    */
   enable() {
     this.#isActive = true;
-    if (this.#shape) {
+    if (this.#shape !== undefined) {
       this.#setAnchorsVisible(true);
       if (this.#shape.getLayer()) {
         this.#shape.getLayer().draw();
@@ -149,7 +149,7 @@ export class DrawShapeEditor {
    */
   disable() {
     this.#isActive = false;
-    if (this.#shape) {
+    if (this.#shape !== undefined) {
       this.#setAnchorsVisible(false);
       if (this.#shape.getLayer()) {
         this.#shape.getLayer().draw();
@@ -184,7 +184,7 @@ export class DrawShapeEditor {
    * @param {object} func A f(shape) function.
    */
   #applyFuncToAnchors(func) {
-    if (this.#shape && this.#shape.getParent()) {
+    if (this.#shape !== undefined && this.#shape.getParent()) {
       const anchors = this.#shape.getParent().find('.anchor');
       anchors.forEach(func);
     }
@@ -234,7 +234,10 @@ export class DrawShapeEditor {
    */
   #addAnchors() {
     // exit if no shape or no layer
-    if (!this.#shape || !this.#shape.getLayer()) {
+    if (this.#shape === undefined || !this.#shape.getLayer()) {
+      return;
+    }
+    if (this.#currentFactory === undefined) {
       return;
     }
     // get shape group
@@ -275,6 +278,9 @@ export class DrawShapeEditor {
       if (!(evAnchor instanceof Konva.Shape)) {
         return;
       }
+      if (this.#currentFactory === undefined) {
+        return;
+      }
       // validate the anchor position
       validateAnchorPosition(this.#drawLayer.getBaseSize(), evAnchor);
       if (typeof this.#currentFactory.constrainAnchorMove !== 'undefined') {
@@ -305,7 +311,7 @@ export class DrawShapeEditor {
       if (!(evAnchor instanceof Konva.Shape)) {
         return;
       }
-      this.#currentFactory.onAnchorMoveEnd(
+      this.#currentFactory?.onAnchorMoveEnd(
         evAnchor, this.#annotation);
 
       // update annotation command

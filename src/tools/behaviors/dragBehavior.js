@@ -127,17 +127,17 @@ export class DragBehavior extends EventTarget {
   /**
    * Start point.
    *
-   * @type {Point2D|null}
+   * @type {Point2D|undefined}
    */
-  #startPoint = null;
+  #startPoint;
 
   /**
    * Pointer anchor for the next step (set in {@link onStart}, advanced in
    * {@link onUpdate} before {@link onDrag}, cleared in {@link onEnd}).
    *
-   * @type {Point2D|null}
+   * @type {Point2D|undefined}
    */
-  #prevPoint = null;
+  #prevPoint;
 
   /**
    * @type {Scalar2D}
@@ -153,14 +153,14 @@ export class DragBehavior extends EventTarget {
   }
 
   /**
-   * @returns {Point2D|null} The start point.
+   * @returns {Point2D|undefined} The start point.
    */
   get startPoint() {
     return this.#startPoint;
   }
 
   /**
-   * @returns {Point2D|null} Last accepted pointer for the next step. When
+   * @returns {Point2D|undefined} Last accepted pointer for the next step. When
    *   {@link DragBehavior#onDrag} runs, already updated to this move's
    *   endpoint (the `point` passed to {@link DragBehavior#onUpdate}).
    */
@@ -180,7 +180,7 @@ export class DragBehavior extends EventTarget {
    * @returns {boolean} True after {@link onStart} until {@link onEnd}.
    */
   isActive() {
-    return this.#prevPoint !== null;
+    return this.#prevPoint !== undefined;
   }
 
   /**
@@ -199,8 +199,8 @@ export class DragBehavior extends EventTarget {
    * {@link DragBehavior#prevPoint}).
    */
   reset() {
-    this.#startPoint = null;
-    this.#prevPoint = null;
+    this.#startPoint = undefined;
+    this.#prevPoint = undefined;
   }
 
   /**

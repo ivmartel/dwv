@@ -18,6 +18,7 @@ import {logger} from '../../utils/logger.js';
 import MagicWand from 'magic-wand-tool';
 
 /**
+ * @import {App} from '../../app/application.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Scalar2D} from '../../math/scalar.js';
  * @import {DrawSelect} from './drawSelect.js';
@@ -31,7 +32,7 @@ export class FloodfillDragBehavior extends DragBehavior {
   /**
    * Associated app.
    *
-   * @type {object}
+   * @type {App}
    */
   #app;
 
@@ -45,30 +46,30 @@ export class FloodfillDragBehavior extends DragBehavior {
   /**
    * Coordinates of the first mousedown event.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #initialpoint;
 
   /**
    * Canvas info.
    *
-   * @type {object}
+   * @type {object|undefined}
    */
-  #imageInfo = null;
+  #imageInfo;
 
   /**
    * Floodfill border.
    *
-   * @type {object}
+   * @type {Point2D[]}
    */
-  #border = null;
+  #border = [];
 
   /**
    * Threshold tolerance of the tool border.
    *
-   * @type {number}
+   * @type {number|undefined}
    */
-  #currentThreshold = null;
+  #currentThreshold;
 
   /**
    * Threshold default tolerance of the tool border.
@@ -178,22 +179,22 @@ export class FloodfillDragBehavior extends DragBehavior {
   /**
    * Calculate border.
    *
-   * @param {object} points The input points.
+   * @param {Scalar2D} point The input points.
    * @param {number} threshold The threshold of the floodfill.
    * @param {boolean} simple Return first points or a list.
    * @returns {Point2D[]} The parent points.
    */
-  #calcBorder(points, threshold, simple) {
+  #calcBorder(point, threshold, simple) {
     this.#parentPoints = [];
     const image = {
-      data: this.#imageInfo.data,
-      width: this.#imageInfo.width,
-      height: this.#imageInfo.height,
+      data: this.#imageInfo?.data,
+      width: this.#imageInfo?.width,
+      height: this.#imageInfo?.height,
       bytes: 4
     };
 
     const mask = MagicWand.floodFill(
-      image, points.x, points.y, threshold);
+      image, point.x, point.y, threshold);
     const blurred = MagicWand.gaussBlurOnlyBorder(mask, this.#blurRadius);
     let cs = MagicWand.traceContours(blurred);
     cs = MagicWand.simplifyContours(
@@ -218,7 +219,7 @@ export class FloodfillDragBehavior extends DragBehavior {
   /**
    * Paint Floodfill.
    *
-   * @param {object} point The start point.
+   * @param {Scalar2D} point The start point.
    * @param {number} threshold The border threshold.
    * @param {LayerGroup} layerGroup The origin layer group.
    * @returns {boolean} False if no border.
@@ -428,8 +429,8 @@ export class FloodfillDragBehavior extends DragBehavior {
     }
 
     this.#imageInfo = viewLayer.getImageData();
-    if (!this.#imageInfo) {
-      logger.error('No image found');
+    if (this.#imageInfo === undefined) {
+      logger.error('No image info found');
       return;
     }
 

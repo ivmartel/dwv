@@ -145,7 +145,7 @@ export class BrushDragBehavior extends DragBehavior {
    */
   onDrag(_drag, layerGroup) {
     const point = this.prevPoint;
-    if (point === null) {
+    if (point === undefined) {
       return;
     }
     this.#paintStep(point, layerGroup);
@@ -263,4 +263,3 @@ export class BrushDragBehavior extends DragBehavior {
     this.#eraserFromRightButtonStroke = false;
   }
 }
-

@@ -65,9 +65,9 @@ export class ViewLayer {
   /**
    * The image data array.
    *
-   * @type {ImageData}
+   * @type {ImageData|undefined}
    */
-  #imageData = null;
+  #imageData;
 
   /**
    * The layer base size as {x,y}.

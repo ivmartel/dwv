@@ -346,7 +346,7 @@ export class DrawShapeHandler extends EventTarget {
 
       // display trash
       this.#trash.activate(drawLayer);
-      // deactivate anchors to avoid events on null shape
+      // deactivate anchors to avoid events on undefined shape
       this.#shapeEditor.setAnchorsActive(false);
       // draw
       konvaLayer.draw();
