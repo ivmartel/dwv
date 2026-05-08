@@ -233,15 +233,38 @@ export class LayerGroupPointer extends EventTarget {
   };
 
   /**
-   * @param {MouseEvent|TouchEvent} event The double click event.
+   * @param {MouseEvent} event The double click event.
    */
   dblclick = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+
     const {point, layerGroup} = getMouseLayerContext(event, this.#app);
     if (typeof this.#doubleClickBehavior !== 'undefined') {
       this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
     } else if (this.#tapBehavior?.isActive()) {
       this.#tapBehavior.onEnd();
     }
+  };
+
+  /**
+   * @param {Point2D} point Display point.
+   * @param {LayerGroup} layerGroup Layer group.
+   */
+  #longTouch(point, layerGroup) {
+    // similar to this.dblclick
+    if (typeof this.#doubleClickBehavior !== 'undefined') {
+      this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
+    } else if (this.#tapBehavior?.isActive()) {
+      // add last point
+      this.#tapBehavior.onTap(point, layerGroup);
+      this.#tapBehavior.onEnd();
+    }
+    // avoid tap on touchend
+    this.#downed = false;
+    // reset timer
+    this.#longTouchTimerId = null;
   };
 
   /**
@@ -406,10 +429,7 @@ export class LayerGroupPointer extends EventTarget {
         //   lint does not like it
         // @ts-ignore
         this.#longTouchTimerId = setTimeout(() => {
-          // avoid tap on touchend
-          this.#downed = false;
-          this.#longTouchTimerId = null;
-          this.dblclick(event);
+          this.#longTouch(point, layerGroup);
         }, delay);
       }
     } else if (touchPoints.length === 2) {
