@@ -31,6 +31,11 @@ export class DrawSelect {
   #callbackStore = [];
 
   /**
+   * @type {Function}
+   */
+  #drawLayerAddCallback;
+
+  /**
    * Annotation group meta validator.
    *
    * @type {Function|undefined}
@@ -168,6 +173,42 @@ export class DrawSelect {
   }
 
   /**
+   * Get the 'drawlayeradd' callback.
+   *
+   * @returns {Function} The callback.
+   */
+  #getDrawLayerAddCallback() {
+    return (event) => {
+      const newDrawLayers = this.#app.getDrawLayers(function (item) {
+        return item.getId() === event.layerid;
+      });
+      if (newDrawLayers.length === 1) {
+        this.#activateLayer(newDrawLayers[0], true);
+      }
+    };
+  }
+
+  /**
+   * Bind to app 'drawlayeradd.
+   */
+  #bindToDrawLayerAdd() {
+    if (typeof this.#drawLayerAddCallback === 'undefined') {
+      this.#drawLayerAddCallback = this.#getDrawLayerAddCallback();
+      this.#app.addEventListener('drawlayeradd', this.#drawLayerAddCallback);
+    }
+  }
+
+  /**
+   * Unbind to app 'drawlayeradd.
+   */
+  #unbindToDrawLayerAdd() {
+    if (typeof this.#drawLayerAddCallback !== 'undefined') {
+      this.#app.removeEventListener('drawlayeradd', this.#drawLayerAddCallback);
+      this.#drawLayerAddCallback = undefined;
+    }
+  }
+
+  /**
    * Activate a draw layer.
    *
    * @param {DrawLayer} drawLayer The layer to update.
@@ -189,6 +230,9 @@ export class DrawSelect {
     }
   }
 
+  /**
+   * @param {boolean} flag True to activate.
+   */
   activate(flag) {
     if (!flag) {
       this.#shapeHandler.onMouseOutShapeGroup();
@@ -200,14 +244,12 @@ export class DrawSelect {
         this.#activateLayer(drawLayer, flag);
       }
     }
-    // listen to activate new layers
-    this.#app.addEventListener('drawlayeradd', (event) => {
-      const newDrawLayers = this.#app.getDrawLayers(function (item) {
-        return item.getId() === event.layerid;
-      });
-      if (newDrawLayers.length === 1) {
-        this.#activateLayer(newDrawLayers[0], flag);
-      }
-    });
+    // listen to 'drawlayeradd'' to activate new layers
+    if (flag) {
+      this.#bindToDrawLayerAdd();
+    } else {
+      this.#unbindToDrawLayerAdd();
+    }
   }
+
 }
