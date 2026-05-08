@@ -1084,7 +1084,8 @@ export class ViewLayer {
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
       const eventName = names[i];
-      const passive = eventName !== 'wheel';
+      const passive = eventName !== 'wheel' && 
+        eventName !== 'touchstart';
       this.#containerDiv.addEventListener(
         eventName, this.#fireEvent, {passive});
     }
