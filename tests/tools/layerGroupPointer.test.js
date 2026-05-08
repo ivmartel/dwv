@@ -330,7 +330,9 @@ describe('tools/layerGroupPointer', () => {
       }
     });
 
-    getTouchPointsSpy.mockReturnValueOnce([p1]);
+    // touchstart reads touch points twice: once for branch selection and once
+    // when building the drag start context.
+    getTouchPointsSpy.mockReturnValue([p1]);
     pointer.touchstart(touchEvent('touchstart', canvas));
     assert.ok(drag.isActive());
 
@@ -732,7 +734,9 @@ describe('tools/layerGroupPointer', () => {
 
     pointer.touchstart(touchEvent('touchstart', canvas));
     pointer.cancel();
-    assert.equal(reset.mock.calls.length, 1);
+    // touchstart resets active drag before starting touch drag, then cancel
+    // resets the active touch drag state once more.
+    assert.equal(reset.mock.calls.length, 2);
     assert.equal(drag.isActive(), false);
 
     vi.advanceTimersByTime(600);
