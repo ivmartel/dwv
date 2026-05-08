@@ -31,7 +31,7 @@ export class DrawSelect {
   #callbackStore = [];
 
   /**
-   * @type {Function}
+   * @type {Function|undefined}
    */
   #drawLayerAddCallback;
 
@@ -192,7 +192,7 @@ export class DrawSelect {
   }
 
   /**
-   * Bind to app 'drawlayeradd.
+   * Bind to app 'drawlayeradd'.
    */
   #bindToDrawLayerAdd() {
     if (typeof this.#drawLayerAddCallback === 'undefined') {
@@ -202,7 +202,7 @@ export class DrawSelect {
   }
 
   /**
-   * Unbind to app 'drawlayeradd.
+   * Unbind to app 'drawlayeradd'.
    */
   #unbindToDrawLayerAdd() {
     if (typeof this.#drawLayerAddCallback !== 'undefined') {
