@@ -1,14 +1,14 @@
 // @vitest-environment jsdom
 import {describe, test, assert, beforeEach} from 'vitest';
-import {BidimensionalFactory} from '../../src/tools/shapes/bidimensional.js';
-import {BidimensionalLine} from '../../src/math/bidimensionalLine.js';
-import {Point2D} from '../../src/math/point.js';
+import {BidimensionalFactory} from '../../../src/tools/shapes/bidimensional.js';
+import {BidimensionalLine} from '../../../src/math/bidimensionalLine.js';
+import {Point2D} from '../../../src/math/point.js';
 import Konva from 'konva';
 import {
   makeStyle,
   makeAnnotation,
   makeShapeGroupWithAnchors,
-} from './utils/toolTestHelpers.js';
+} from './utils.js';
 
 /**
  * Build a horizontal BidimensionalLine annotation via the factory.
@@ -55,11 +55,10 @@ describe('tools', () => {
         assert.notOk(BidimensionalFactory.supports(undefined));
       });
 
-      test('getName, getGroupName, getNPoints, getTimeout', () => {
+      test('getName, getGroupName, getNPoints', () => {
         assert.equal(factory.getName(), 'bidimensional');
         assert.equal(factory.getGroupName(), 'bidimensional-group');
         assert.equal(factory.getNPoints(), 2);
-        assert.equal(factory.getTimeout(), 0);
       });
 
       test('setAnnotationMathShape stores a BidimensionalLine', () => {

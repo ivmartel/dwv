@@ -7,11 +7,10 @@ import {
   getDcmDicomCode
 } from './dicomCode.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-import {Spacing} from '../image/spacing.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {Spacing} from '../image/spacing.js';
+ */
 
 /**
  * Related DICOM tag keys.

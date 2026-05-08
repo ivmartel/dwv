@@ -43,7 +43,7 @@ function defaultOpenRoiDialog(annotation, callback) {
 /**
  * Draw shape handler: handle action on existing shapes.
  */
-export class DrawShapeHandler {
+export class DrawShapeHandler extends EventTarget {
 
   /**
    * Associated app.
@@ -88,25 +88,21 @@ export class DrawShapeHandler {
   #mouseOverShapeGroup;
 
   /**
-   * Event callback.
+   * Emit shape-edit events for Draw tool forwarding.
    *
-   * @type {Function}
+   * @param {object} data The event detail payload.
    */
-  #eventCallback;
-
-  /**
-   * @callback eventFn
-   * @param {object} event The event.
-   */
+  #emitEvent = (data) => {
+    this.dispatchEvent(new CustomEvent(data.type, {detail: data}));
+  };
 
   /**
    * @param {App} app The associated application.
-   * @param {Function} eventCallback Event callback.
    */
-  constructor(app, eventCallback) {
+  constructor(app) {
+    super();
     this.#app = app;
-    this.#eventCallback = eventCallback;
-    this.#shapeEditor = new DrawShapeEditor(app, eventCallback);
+    this.#shapeEditor = new DrawShapeEditor(app, this.#emitEvent);
     this.#trash = new DrawTrash();
   }
 
@@ -125,10 +121,18 @@ export class DrawShapeHandler {
       // disable
       this.#shapeEditor.disable();
       // set shape
+      const annotationId = shape.getParent().id();
       this.#shapeEditor.setShape(
         shape,
         drawLayer,
-        drawLayer.getDrawController().getAnnotation(shape.getParent().id()));
+        drawController.getAnnotation(annotationId)
+      );
+      // emit
+      this.#emitEvent({
+        type: 'annotationselect',
+        annotationid: annotationId,
+        dataid: drawLayer.getDataId()
+      });
       // enable
       this.#shapeEditor.enable();
     }
@@ -342,7 +346,7 @@ export class DrawShapeHandler {
 
       // display trash
       this.#trash.activate(drawLayer);
-      // deactivate anchors to avoid events on null shape
+      // deactivate anchors to avoid events on undefined shape
       this.#shapeEditor.setAnchorsActive(false);
       // draw
       konvaLayer.draw();
@@ -469,7 +473,7 @@ export class DrawShapeHandler {
           // add command to undo stack
           this.#app.addToUndoStack(command);
           // fire event manually since command is not executed
-          this.#eventCallback({
+          this.#emitEvent({
             type: 'annotationupdate',
             data: annotation,
             dataid: drawLayer.getDataId(),
@@ -555,7 +559,7 @@ export class DrawShapeHandler {
         // add command to undo stack
         this.#app.addToUndoStack(command);
         // fire event manually since command is not executed
-        this.#eventCallback({
+        this.#emitEvent({
           type: 'annotationupdate',
           data: annotation,
           dataid: drawLayer.getDataId(),

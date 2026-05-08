@@ -1101,7 +1101,7 @@ function setAppTool(toolName) {
   // force window level non strict mode
   if (toolName === 'WindowLevel') {
     _app.setToolFeatures({
-      strictViewLayer: false
+      activeViewLayerOnly: false
     });
   }
 

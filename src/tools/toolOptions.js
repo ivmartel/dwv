@@ -21,7 +21,6 @@ import {Threshold, Sobel, Sharpen} from './filter.js';
  *   getName() {return 'love';}
  *   static supports(mathShape) {return mathShape instanceof ROI;}
  *   getNPoints() {return 1;}
- *   getTimeout() {return 0;}
  *   setAnnotationMathShape(annotation, points) {
  *     const px = points[0].getX();
  *     const py = points[0].getY();

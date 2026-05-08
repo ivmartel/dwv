@@ -85,15 +85,6 @@ export class RectangleAnnotator {
   }
 
   /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} Timeout in milliseconds.
-   */
-  getTimeout() {
-    return 0;
-  }
-
-  /**
    * Returns true when the annotation has enough data to be fully rendered.
    *
    * @returns {boolean} Always true for rectangles.
@@ -299,15 +290,6 @@ export class CircleAnnotator {
   }
 
   /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} Timeout in milliseconds.
-   */
-  getTimeout() {
-    return 0;
-  }
-
-  /**
    * Returns true when the annotation has enough data to be fully rendered.
    *
    * @returns {boolean} Always true for circles.
@@ -498,15 +480,6 @@ export class EllipseAnnotator {
    */
   getNPoints() {
     return 2;
-  }
-
-  /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} Timeout in milliseconds.
-   */
-  getTimeout() {
-    return 0;
   }
 
   /**
@@ -720,15 +693,6 @@ export class RulerAnnotator {
   }
 
   /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} Timeout in milliseconds.
-   */
-  getTimeout() {
-    return 0;
-  }
-
-  /**
    * Returns true when the annotation has enough data to be fully rendered.
    *
    * @returns {boolean} Always true for rulers.
@@ -900,15 +864,6 @@ export class ArrowAnnotator {
   }
 
   /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} Timeout in milliseconds.
-   */
-  getTimeout() {
-    return 0;
-  }
-
-  /**
    * Returns true when the annotation has enough data to be fully rendered.
    *
    * @returns {boolean} Always true for arrows.
@@ -1067,15 +1022,6 @@ export class RoiAnnotator {
    */
   getNPoints() {
     return undefined;
-  }
-
-  /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} Timeout in milliseconds.
-   */
-  getTimeout() {
-    return 100;
   }
 
   /**
@@ -1244,15 +1190,6 @@ export class ProtractorAnnotator {
    */
   getNPoints() {
     return 3;
-  }
-
-  /**
-   * Get the timeout between point storage.
-   *
-   * @returns {number} Timeout in milliseconds.
-   */
-  getTimeout() {
-    return 500;
   }
 
   /**

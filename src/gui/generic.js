@@ -1,4 +1,3 @@
-import {logger} from '../utils/logger.js';
 import {Point2D} from '../math/point.js';
 
 /**
@@ -20,33 +19,24 @@ export const InteractionEventNames = [
  * Get the positions (without the parent offset) of a list of touch events.
  *
  * @param {Array} touches The list of touch events.
+ * @param {object} rect The bounding client rect.
  * @returns {Point2D[]} The list of positions of the touch events.
  */
-function getTouchesPositions(touches) {
-  // get the touch offset from all its parents
+function getTouchesPositions(touches, rect) {
+  // compensate for margin, padding...
   let offsetLeft = 0;
   let offsetTop = 0;
-  if (touches.length !== 0 &&
-    typeof touches[0].target !== 'undefined') {
-    let offsetParent = touches[0].target.offsetParent;
-    while (offsetParent) {
-      if (!isNaN(offsetParent.offsetLeft)) {
-        offsetLeft += offsetParent.offsetLeft;
-      }
-      if (!isNaN(offsetParent.offsetTop)) {
-        offsetTop += offsetParent.offsetTop;
-      }
-      offsetParent = offsetParent.offsetParent;
-    }
-  } else {
-    logger.debug('No touch target offset parent.');
+  if (typeof rect !== 'undefined') {
+    offsetLeft = rect.left;
+    offsetTop = rect.top;
   }
+
   // set its position
   const positions = [];
   for (let i = 0; i < touches.length; ++i) {
     positions.push(new Point2D(
-      touches[i].pageX - offsetLeft,
-      touches[i].pageY - offsetTop
+      touches[i].clientX - offsetLeft,
+      touches[i].clientY - offsetTop
     ));
   }
   return positions;
@@ -59,15 +49,17 @@ function getTouchesPositions(touches) {
  * @returns {Point2D[]} The array of points.
  */
 export function getTouchPoints(event) {
+  const rect = event.currentTarget.getBoundingClientRect();
+
   let positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = getTouchesPositions(event.targetTouches);
+    positions = getTouchesPositions(event.targetTouches, rect);
   } else if (typeof event.changedTouches !== 'undefined' &&
     event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = getTouchesPositions(event.changedTouches);
+    positions = getTouchesPositions(event.changedTouches, rect);
   }
   return positions;
 }

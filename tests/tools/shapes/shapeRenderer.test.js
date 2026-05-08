@@ -1,25 +1,25 @@
 // @vitest-environment jsdom
 import {describe, test, assert, beforeEach} from 'vitest';
-import {RectangleFactory} from '../../src/tools/shapes/rectangle.js';
-import {CircleFactory} from '../../src/tools/shapes/circle.js';
-import {EllipseFactory} from '../../src/tools/shapes/ellipse.js';
-import {RulerFactory} from '../../src/tools/shapes/ruler.js';
-import {ArrowFactory} from '../../src/tools/shapes/arrow.js';
-import {RoiFactory} from '../../src/tools/shapes/roi.js';
-import {ProtractorFactory} from '../../src/tools/shapes/protractor.js';
-import {Rectangle} from '../../src/math/rectangle.js';
-import {Circle} from '../../src/math/circle.js';
-import {Ellipse} from '../../src/math/ellipse.js';
-import {Line} from '../../src/math/line.js';
-import {ROI} from '../../src/math/roi.js';
-import {Protractor} from '../../src/math/protractor.js';
-import {Point2D} from '../../src/math/point.js';
+import {RectangleFactory} from '../../../src/tools/shapes/rectangle.js';
+import {CircleFactory} from '../../../src/tools/shapes/circle.js';
+import {EllipseFactory} from '../../../src/tools/shapes/ellipse.js';
+import {RulerFactory} from '../../../src/tools/shapes/ruler.js';
+import {ArrowFactory} from '../../../src/tools/shapes/arrow.js';
+import {RoiFactory} from '../../../src/tools/shapes/roi.js';
+import {ProtractorFactory} from '../../../src/tools/shapes/protractor.js';
+import {Rectangle} from '../../../src/math/rectangle.js';
+import {Circle} from '../../../src/math/circle.js';
+import {Ellipse} from '../../../src/math/ellipse.js';
+import {Line} from '../../../src/math/line.js';
+import {ROI} from '../../../src/math/roi.js';
+import {Protractor} from '../../../src/math/protractor.js';
+import {Point2D} from '../../../src/math/point.js';
 import Konva from 'konva';
 import {
   makeStyle,
   makeAnnotation as _makeAnnotation,
   makeShapeGroupWithAnchors,
-} from './utils/toolTestHelpers.js';
+} from './utils.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
