@@ -151,7 +151,7 @@ export class DrawSelect {
    */
   trySelectShapeGroup(point, drawLayer) {
     const kShape = this.#getSelectShape(point, drawLayer);
-    if (kShape) {
+    if (kShape !== undefined) {
       return this.#selectShapeGroup(kShape, drawLayer);
     }
     return false;
