@@ -1,4 +1,3 @@
-import {logger} from '../utils/logger.js';
 import {Point2D} from '../math/point.js';
 
 /**
