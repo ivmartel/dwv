@@ -78,23 +78,22 @@ function getPrimaryTouchLayerContext(event, app) {
 /**
  * @typedef {object} LayerGroupPointerOptions
  * @property {App} app Used to resolve {@link LayerGroup} from events.
- * @property {DragBehavior} [dragBehavior] Drag behaviour; whether a drag may
- *   begin is {@link DragBehavior#canStart}. Omit when only tap/wheel/hover
- *   behaviours apply (e.g. {@link Draw}).
- * @property {HoverBehavior} [hoverBehavior] Hover behaviour
- *   (e.g. `TooltipHoverBehavior`).
- * @property {WheelBehavior} [wheelBehavior] Mouse wheel handling.
- * @property {DoubleClickBehavior} [doubleClickBehavior]
- *   Double-click handling.
- * @property {TwoTouchBehavior} [twoTouchBehavior] Two-finger gestures
- *   ({@link TwoTouchBehavior}).
- * @property {TapBehavior} [tapBehavior] Tap when the gesture did not move
- *   (internal `#moved` flag).
+ * @property {DragBehavior} [dragBehavior] Drag behaviour:
+ *   mouse down / touch start + move + end (mouse or touch).
+ * @property {HoverBehavior} [hoverBehavior] Hover behaviour:
+ *   mouse move without click (only mouse).
+ * @property {WheelBehavior} [wheelBehavior] Mouse wheel handling
+ *   (only mouse).
+ * @property {DoubleClickBehavior} [doubleClickBehavior] Double-click
+ *   behaviour, also triggered by long touch.
+ * @property {TwoTouchBehavior} [twoTouchBehavior] Two-finger behaviour
+ *   (only touch).
+ * @property {TapBehavior} [tapBehavior] Tap behaviour: can be one tap
+ *   or sticky tap for multiple taps (finite or finished with double click).
+ *   For mouse or touch.
  * @property {number|null} [longTouchToDblClickMs] After a touchstart on the
  *   single-touch path, schedule {@link LayerGroupPointer#dblclick} after this
  *   many milliseconds (defaults to 500).
- *   Cleared on touchmove, touchend, or
- *   {@link LayerGroupPointer#cancel}.
  */
 
 /**
