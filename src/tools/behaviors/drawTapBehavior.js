@@ -210,6 +210,12 @@ export class DrawTapBehavior extends TapBehavior {
     // add point
     this.#placementLayerGroup = layerGroup;
     super.onTap(point, layerGroup);
+
+    // update preview
+    const tmpPoints = this.getPointList();
+    if (tmpPoints.length > 1) {
+      this.#drawPreview.onNewPoints(tmpPoints, layerGroup);
+    }
   }
 
   /**
