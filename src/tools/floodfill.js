@@ -85,6 +85,8 @@ export class Floodfill extends LayerGroupPointer {
       this.#style.setBaseScale(this.#app.getBaseScale());
       // set the default to the first in the list
       this.setFeatures({shapeColour: this.#style.getLineColour()});
+    } else {
+      this.cancel();
     }
 
     this.#drawSelect.activate(bool);

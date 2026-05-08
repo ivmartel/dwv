@@ -68,10 +68,10 @@ export class ZoomAndPan extends LayerGroupPointer {
   /**
    * Activate the tool.
    *
-   * @param {boolean} _bool The flag to activate or not.
+   * @param {boolean} bool The flag to activate or not.
    */
-  activate(_bool) {
-    if (!_bool) {
+  activate(bool) {
+    if (!bool) {
       this.cancel();
     }
   }

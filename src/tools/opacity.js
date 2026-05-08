@@ -62,10 +62,12 @@ export class Opacity extends LayerGroupPointer {
   /**
    * Activate the tool.
    *
-   * @param {boolean} _bool The flag to activate or not.
+   * @param {boolean} bool The flag to activate or not.
    */
-  activate(_bool) {
-    // does nothing
+  activate(bool) {
+    if (!bool) {
+      this.cancel();
+    }
   }
 
   /**

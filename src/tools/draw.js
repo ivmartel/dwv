@@ -121,10 +121,14 @@ export class Draw extends LayerGroupPointer {
   /**
    * Activate the tool.
    *
-   * @param {boolean} flag The flag to activate or not.
+   * @param {boolean} bool The flag to activate or not.
    */
-  activate(flag) {
-    this.#drawSelect.activate(flag);
+  activate(bool) {
+    if (!bool) {
+      this.cancel();
+    }
+
+    this.#drawSelect.activate(bool);
   }
 
   /**

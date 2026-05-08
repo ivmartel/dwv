@@ -83,6 +83,8 @@ export class Livewire extends LayerGroupPointer {
     if (bool) {
       this.#style.setBaseScale(this.#app.getBaseScale());
       this.setFeatures({shapeColour: this.#style.getLineColour()});
+    } else {
+      this.cancel();
     }
 
     this.#drawSelect.activate(bool);
