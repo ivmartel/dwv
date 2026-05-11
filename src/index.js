@@ -2,12 +2,12 @@
 export * from './app/index.js';
 // command
 export * from './command/index.js';
+// dicom
+export * from './dicom/index.js';
 // gui
 export * from './gui/index.js';
 // image
 export * from './image/index.js';
-// dicom
-export * from './dicom/index.js';
 // math
 export * from './math/indexDir.js';
 // tools
