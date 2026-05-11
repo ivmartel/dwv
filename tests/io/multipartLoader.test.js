@@ -209,16 +209,19 @@ describe('io', () => {
         assert.equal(progressEvents[1].index, 3, 'index forwarded for second');
       });
 
-    test('load assigns onloaditem and onload by reference', () => {
+    test('load: onloaditem by reference; onload fires once per URL', () => {
       const loader = new MultipartLoader();
+      const loads = [];
+      loader.onload = (e) => loads.push(e);
       loader.load(new ArrayBuffer(8), 'origin', 0);
 
       assert.equal(
         capturedML.instance.onloaditem, loader.onloaditem,
         'onloaditem forwarded by reference');
-      assert.equal(
-        capturedML.instance.onload, loader.onload,
-        'onload forwarded by reference');
+
+      capturedML.instance.onload({source: 'origin'});
+      assert.equal(loads.length, 1,
+        'loader.onload called once for single URL');
     });
 
     test('load: onloadend resets isLoading then fires', () => {
@@ -243,6 +246,39 @@ describe('io', () => {
       assert.equal(
         capturedML.instance.onabort, loader.onabort,
         'onabort forwarded by reference');
+    });
+
+    test('load with 2 URLs: accumulates parts, fires MemoryLoader once', () => {
+      const loader = new MultipartLoader();
+      loader.setOptions({numberOfFiles: 2});
+
+      parseMultipart
+        .mockReturnValueOnce([{data: 'part-a'}])
+        .mockReturnValueOnce([{data: 'part-b'}]);
+
+      let startCount = 0;
+      loader.onloadstart = () => startCount++;
+
+      // first URL — MemoryLoader must not be created yet
+      loader.load(new ArrayBuffer(8), 'url-0', 0);
+      assert.equal(capturedML.instance, null,
+        'MemoryLoader not created after first of two URLs');
+      assert.ok(loader.isLoading(), 'still loading after first URL');
+      assert.equal(startCount, 1, 'onloadstart fired once');
+
+      // second URL — MemoryLoader must be created with combined parts
+      loader.load(new ArrayBuffer(8), 'url-1', 1);
+      assert.notEqual(capturedML.instance, null,
+        'MemoryLoader created after last URL');
+      assert.equal(capturedML.instance.load.mock.calls.length, 1,
+        'MemoryLoader.load called exactly once');
+      assert.deepEqual(
+        capturedML.instance.load.mock.calls[0][0],
+        [{data: 'part-a'}, {data: 'part-b'}],
+        'MemoryLoader receives combined parts from both URLs');
+      assert.equal(startCount, 1, 'onloadstart still fired only once');
+      assert.equal(parseMultipart.mock.calls.length, 2,
+        'parseMultipart called once per URL');
     });
 
     /**

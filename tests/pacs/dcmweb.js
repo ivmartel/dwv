@@ -524,7 +524,11 @@ function qidoResponseToTable() {
       // store a cookie with accept and token to allow opening in viewer
       // (should be deleted in viewer.js...)
       instanceLink.onclick = function () {
-        document.cookie = 'accept=application/dicom; ';
+        document.cookie = `accept=${
+          encodeURIComponent(
+            'multipart/related; type="application/dicom"; transfer-syntax=*;'
+          ) }; `;
+
         if (typeof token !== 'undefined') {
           document.cookie = `access_token=${token}; `;
         }
