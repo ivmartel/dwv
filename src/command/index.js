@@ -3,7 +3,10 @@ import {DeleteSegmentCommand} from './deleteSegmentCommand.js';
 import {
   ChangeSegmentColourCommand
 } from './changeSegmentColourCommand.js';
-import {DrawBrushCommand} from './drawBrushCommand.js';
+import {
+  DrawBrushCommandProperties,
+  DrawBrushCommand
+} from './drawBrushCommand.js';
 import {RunFilterCommand} from './runFilterCommand.js';
 
 export {
@@ -11,5 +14,6 @@ export {
   ChangeSegmentColourCommand,
   DeleteSegmentCommand,
   DrawBrushCommand,
+  DrawBrushCommandProperties,
   RunFilterCommand
 };
