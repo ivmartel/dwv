@@ -7,9 +7,7 @@
 import Konva from 'konva';
 
 // @public
-export function addTagsToDictionary(group: string, tags: {
-    [x: string]: string[];
-}): void;
+export function addTagsToDictionary(group: string, tags: Record<string, string[]>): void;
 
 // @public
 export class Annotation {
@@ -28,17 +26,13 @@ export class Annotation {
     mathShape: object;
     planeOrigin: Point3D | undefined;
     planePoints: Point3D[] | undefined;
-    quantification: {
-        [x: string]: Value;
-    } | undefined;
+    quantification: Record<string, Value> | undefined;
     referencedFrameNumber: number | undefined;
     referencedSopClassUID: string;
     referencedSopInstanceUID: string;
     referencePoints: Point2D[] | undefined;
     removeMetaItem(conceptId: string): void;
-    setTextExpr(labelText: {
-        [x: string]: string;
-    }): void;
+    setTextExpr(labelText: Record<string, string>): void;
     setViewController(viewController: ViewController): void;
     textExpr: string;
     trackingId: string;
@@ -55,9 +49,7 @@ export class AnnotationGroup {
     getColour(): string;
     getLength(): number;
     getList(): Annotation[];
-    getMeta(): {
-        [x: string]: any;
-    };
+    getMeta(): Record<string, any>;
     getMetaValue(key: string): string | object | undefined;
     hasMeta(key: string): boolean;
     isEditable(): boolean;
@@ -72,26 +64,12 @@ export class AnnotationGroup {
 
 // @public
 export class AnnotationGroupFactory {
-    checkElements(dataElements: {
-        [x: string]: DataElement;
-    }): string | undefined;
-    create(dataElements: {
-        [x: string]: DataElement;
-    }): AnnotationGroup;
-    createCADReport(dataElements: {
-        [x: string]: DataElement;
-    }): CADReport | undefined;
+    checkElements(dataElements: Record<string, DataElement>): string | undefined;
+    create(dataElements: Record<string, DataElement>): AnnotationGroup;
+    createCADReport(dataElements: Record<string, DataElement>): CADReport | undefined;
     getWarning(): string | undefined;
-    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
-        [x: string]: any;
-    }): {
-        [x: string]: DataElement;
-    };
-    toDicomCADReport(report: CADReport, extraTags?: {
-        [x: string]: any;
-    }): {
-        [x: string]: DataElement;
-    };
+    toDicom(annotationGroup: AnnotationGroup, extraTags?: Record<string, any>): Record<string, DataElement>;
+    toDicomCADReport(report: CADReport, extraTags?: Record<string, any>): Record<string, DataElement>;
 }
 
 // @public
@@ -121,18 +99,14 @@ export class App {
     getDataIdFromSeriesUid(uid: string): string;
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
-    getDataViewConfigs(): {
-        [x: string]: ViewConfig[];
-    };
+    getDataViewConfigs(): Record<string, ViewConfig[]>;
     getDrawLayers(callbackFn?: Function): DrawLayer[];
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     // @deprecated
     getImage(dataId: string): Image_2 | undefined;
     getInfoData(dataId: string): InfoData | undefined;
     getLayerGroupByDivId(divId: string): LayerGroup | undefined;
-    getMetaData(dataId: string): {
-        [x: string]: DataElement;
-    } | undefined;
+    getMetaData(dataId: string): Record<string, DataElement> | undefined;
     getNextDataId(): string;
     getNumberOfLayerGroups(): number;
     getOffset(): Scalar3D;
@@ -171,9 +145,7 @@ export class App {
     setActiveLayerGroup(index: number): void;
     // @deprecated
     setColourMap(name: string): void;
-    setDataViewConfigs(configs: {
-        [x: string]: ViewConfig[];
-    }): void;
+    setDataViewConfigs(configs: Record<string, ViewConfig[]>): void;
     // @deprecated
     setDrawings(drawings: any[], drawingsDetails: any[], dataId: string): void;
     setImage(dataId: string, img: Image_2): void;
@@ -194,19 +166,13 @@ export class App {
 
 // @public
 export class AppOptions {
-    constructor(dataViewConfigs?: {
-        [x: string]: ViewConfig[];
-    });
+    constructor(dataViewConfigs?: Record<string, ViewConfig[]>);
     binders: string[] | undefined;
-    dataViewConfigs: {
-        [x: string]: ViewConfig[];
-    } | undefined;
+    dataViewConfigs: Record<string, ViewConfig[]> | undefined;
     defaultCharacterSet: string | undefined;
     overlayConfig: object | undefined;
     rootDocument: DocumentFragment;
-    tools: {
-        [x: string]: ToolConfig;
-    } | undefined;
+    tools: Record<string, ToolConfig> | undefined;
     viewOnFirstLoadItem: boolean | undefined;
 }
 
@@ -245,9 +211,7 @@ export class Circle {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): {
-        [x: string]: Value;
-    };
+    quantify(viewController: ViewController, index: Index, flags: string[]): Record<string, Value>;
 }
 
 // @public
@@ -266,34 +230,20 @@ export class Command {
 }
 
 // @public
-export function createImage(elements: {
-    [x: string]: DataElement;
-}): Image_2;
+export function createImage(elements: Record<string, DataElement>): Image_2;
 
 // @public
-export function createMaskImage(elements: {
-    [x: string]: DataElement;
-}): Image_2;
+export function createMaskImage(elements: Record<string, DataElement>): Image_2;
 
 // @public
-export function createView(elements: {
-    [x: string]: DataElement;
-}, image: Image_2): View;
+export function createView(elements: Record<string, DataElement>, image: Image_2): View;
 
 // @public (undocumented)
 export namespace custom {
     let // (undocumented)
-    wlPresets: {
-        [x: string]: {
-            [x: string]: WindowLevel;
-        };
-    };
+    wlPresets: Record<string, Record<string, WindowLevel>>;
     let // (undocumented)
-    labelTexts: {
-        [x: string]: {
-            [x: string]: string;
-        };
-    };
+    labelTexts: Record<string, Record<string, string>>;
     let // (undocumented)
     privateBValueRules: object[];
     let // (undocumented)
@@ -320,16 +270,10 @@ export class DataElement {
 }
 
 // @public
-export const defaultToolList: {
-    [x: string]: any;
-};
+export const defaultToolList: Record<string, any>;
 
 // @public
-export const defaultToolOptions: {
-    [x: string]: {
-        [x: string]: any;
-    };
-};
+export const defaultToolOptions: Record<string, Record<string, any>>;
 
 // @public
 export class DeleteSegmentCommand extends Command {
@@ -365,18 +309,14 @@ export class DicomCode {
 
 // @public
 export class DicomData {
-    constructor(meta: {
-        [x: string]: DataElement;
-    });
+    constructor(meta: Record<string, DataElement>);
     annotationGroup: AnnotationGroup | undefined;
     appendData(data: DicomData): void;
     buffer: any | undefined;
     getComplete(): boolean | undefined;
     hasDuplicateOrigin(): boolean;
     image: Image_2 | undefined;
-    meta: {
-        [x: string]: DataElement;
-    };
+    meta: Record<string, DataElement>;
     numberOfFiles: number;
     setComplete(flag: boolean): void;
     warn: string[];
@@ -385,9 +325,7 @@ export class DicomData {
 // @public
 export class DicomParser {
     getDefaultCharacterSet(): string;
-    getDicomElements(): {
-        [x: string]: DataElement;
-    };
+    getDicomElements(): Record<string, DataElement>;
     parse(buffer: ArrayBuffer, untilTag?: Tag): void;
     safeGet(key: string): any | undefined;
     setDecoderCharacterSet(characterSet: string): void;
@@ -408,16 +346,41 @@ export class DicomSRContent {
 
 // @public
 export class DicomWriter {
-    getBuffer(dataElements: {
-        [x: string]: DataElement;
-    }): ArrayBuffer;
+    getBuffer(dataElements: Record<string, DataElement>): ArrayBuffer;
     getElementToWrite(element: DataElement): DataElement | null;
     setFixUnknownVR(flag: boolean): void;
-    setRules(rules: {
-        [x: string]: WriterRule;
-    }, addMissingTags?: boolean): void;
+    setRules(rules: Record<string, WriterRule>, addMissingTags?: boolean): void;
     setUseUnVrForPrivateSq(flag: boolean): void;
     useSpecialTextEncoder(): void;
+}
+
+// @public
+export class DrawBrushCommand extends Command {
+    constructor(properties: DrawBrushCommandProperties);
+    getExecuteEvent(): CustomEvent;
+    getOriginalValuesLists(): any[] | undefined;
+    onExecute(_event: CustomEvent): void;
+    onUndo(_event: CustomEvent): void;
+}
+
+// @public (undocumented)
+export class DrawBrushCommandProperties {
+    // (undocumented)
+    dataId: any;
+    // (undocumented)
+    isSilent: any;
+    // (undocumented)
+    mask: any;
+    // (undocumented)
+    mode: any;
+    // (undocumented)
+    offsetsLists: any;
+    // (undocumented)
+    originalValuesLists: any;
+    // (undocumented)
+    segmentNumber: any;
+    // (undocumented)
+    srclayerid: any;
 }
 
 // @public
@@ -485,8 +448,8 @@ export class DrawLayer {
 }
 
 // @public
-export class DrawShapeHandler {
-    constructor(app: App, eventCallback: Function);
+export class DrawShapeHandler extends EventTarget {
+    constructor(app: App);
     addShapeGroupListeners(shapeGroup: Konva.Group, annotation: Annotation, drawLayer: DrawLayer): void;
     disableAndResetEditor(): void;
     getEditorAnnotation(): Annotation | undefined;
@@ -508,9 +471,7 @@ export class Ellipse {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): {
-        [x: string]: Value;
-    };
+    quantify(viewController: ViewController, index: Index, flags: string[]): Record<string, Value>;
 }
 
 // @public
@@ -550,29 +511,19 @@ export class Geometry {
 }
 
 // @public
-export function getAsSimpleElements(metaData: {
-    [x: string]: DataElement;
-}): {
-    [x: string]: any;
-};
+export function getAsSimpleElements(metaData: Record<string, DataElement>): Record<string, any>;
 
 // @public
 export function getDefaultDicomSegJson(): object;
 
 // @public
-export function getDicomSRContentItem(content: DicomSRContent): {
-    [x: string]: any;
-};
+export function getDicomSRContentItem(content: DicomSRContent): Record<string, any>;
 
 // @public
 export function getDwvVersion(): string;
 
 // @public
-export function getElementsFromJSONTags(simpleTags: {
-    [x: string]: any;
-}): {
-    [x: string]: DataElement;
-};
+export function getElementsFromJSONTags(simpleTags: Record<string, any>): Record<string, DataElement>;
 
 // @public
 export function getEllipseIndices(center: Index, radius: number[], dir: number[]): Index[];
@@ -581,17 +532,13 @@ export function getEllipseIndices(center: Index, radius: number[], dir: number[]
 export function getLayerDetailsFromEvent(event: object): object;
 
 // @public
-export function getManufacturer(elements: {
-    [x: string]: DataElement;
-}): string | undefined;
+export function getManufacturer(elements: Record<string, DataElement>): string | undefined;
 
 // @public
 export function getMousePoint(event: object): Point2D;
 
 // @public
-export function getNormalisedManufacturer(elements: {
-    [x: string]: DataElement;
-}): string | undefined;
+export function getNormalisedManufacturer(elements: Record<string, DataElement>): string | undefined;
 
 // @public
 export function getOrientationName(cosines: number[]): string | undefined;
@@ -603,9 +550,7 @@ export function getPixelDataTag(): Tag;
 export function getRectangleIndices(center: Index, size: number[], dir: number[]): Index[];
 
 // @public
-export function getReferencedSeriesUID(dataElements: {
-    [x: string]: DataElement;
-}): string | undefined;
+export function getReferencedSeriesUID(dataElements: Record<string, DataElement>): string | undefined;
 
 // @public
 export function getReverseOrientation(ori: string): string;
@@ -614,9 +559,7 @@ export function getReverseOrientation(ori: string): string;
 export function getSegmentationCode(): DicomCode;
 
 // @public
-export function getSRContent(dataElements: {
-    [x: string]: DataElement;
-}): DicomSRContent;
+export function getSRContent(dataElements: Record<string, DataElement>): DicomSRContent;
 
 // @public
 export function getTagFromKey(key: string): Tag;
@@ -675,9 +618,7 @@ class Image_2 {
     getGeometry(): Geometry;
     getHistogram(): any[];
     getImageUid(index?: Index): string;
-    getMeta(): {
-        [x: string]: any;
-    };
+    getMeta(): Record<string, any>;
     getNumberOfComponents(): number;
     getOffsets(value: number | RGB): number[];
     getOriginForImageUid(uid: string): Point3D | undefined;
@@ -708,9 +649,7 @@ class Image_2 {
     setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
     setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
     setComplete(flag: boolean): void;
-    setMeta(rhs: {
-        [x: string]: any;
-    }): void;
+    setMeta(rhs: Record<string, any>): void;
     setPaletteColourMap(map: ColourMap): void;
     setPhotometricInterpretation(interp: string): void;
     setPlanarConfiguration(config: number): void;
@@ -738,14 +677,10 @@ export class Index {
 
 // @public
 export class InfoData {
-    constructor(app: App, dataId: string, configs: {
-        [x: string]: InfoDataItem[];
-    });
+    constructor(app: App, dataId: string, configs: Record<string, InfoDataItem[]>);
     addAppListeners(): void;
     addEventListener(type: string, callback: object): void;
-    addItemMeta(data: {
-        [x: string]: DataElement;
-    }): void;
+    addItemMeta(data: Record<string, DataElement>): void;
     isListening(): boolean;
     onSliceChange: (event: object) => void;
     removeAppListeners(): void;
@@ -849,13 +784,10 @@ export class LayerGroup {
 
 // @public (undocumented)
 export namespace logger {
-    // (undocumented)
     export function debug(msg: string): void;
     let // (undocumented)
     level: number;
-    // (undocumented)
     export function error(msg: string): void;
-    // (undocumented)
     export function info(msg: string): void;
     // (undocumented)
     export namespace levels {
@@ -870,31 +802,19 @@ export namespace logger {
         let // (undocumented)
         ERROR: number;
     }
-    // (undocumented)
     export function trace(msg: string): void;
-    // (undocumented)
     export function warn(msg: string): void;
 }
 
 // @public
-export const luts: {
-    [x: string]: ColourMap;
-};
+export const luts: Record<string, ColourMap>;
 
 // @public
 export class MaskFactory {
-    checkElements(_dicomElements: {
-        [x: string]: DataElement;
-    }): string | undefined;
-    create(dataElements: {
-        [x: string]: DataElement;
-    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array, refImage?: Image_2): Image_2;
+    checkElements(_dicomElements: Record<string, DataElement>): string | undefined;
+    create(dataElements: Record<string, DataElement>, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array, refImage?: Image_2): Image_2;
     getWarning(): string | undefined;
-    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: {
-        [x: string]: any;
-    }): {
-        [x: string]: DataElement;
-    };
+    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: Record<string, any>): Record<string, DataElement>;
 }
 
 // @public
@@ -916,19 +836,15 @@ export class MaskSegment {
 export class MaskSegmentHelper {
     constructor(mask: Image_2);
     addSegment(segment: MaskSegment): void;
-    findOverlap(rhs: MaskSegmentHelper): {
-        [x: number]: {
+    findOverlap(rhs: MaskSegmentHelper): Record<number, {
+        label: string;
+        overlap: Record<number, {
             label: string;
-            overlap: {
-                [x: number]: {
-                    label: string;
-                    count: number;
-                    percentage: number;
-                };
-            };
             count: number;
-        };
-    };
+            percentage: number;
+        }>;
+        count: number;
+    }>;
     getMask(): Image_2;
     getNumberOfSegments(): number;
     getSegment(segmentNumber: number): MaskSegment | undefined;
@@ -1098,9 +1014,7 @@ export class Protractor {
     getCentroid(): Point2D;
     getLength(): number;
     getPoint(index: number): Point2D | undefined;
-    quantify(_viewController: ViewController, _flags: string[]): {
-        [x: string]: Value;
-    };
+    quantify(_viewController: ViewController, _flags: string[]): Record<string, Value>;
 }
 
 // @public
@@ -1117,9 +1031,7 @@ export class Rectangle {
     getSurface(): number;
     getWidth(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, index: Index, flags: string[]): {
-        [x: string]: Value;
-    };
+    quantify(viewController: ViewController, index: Index, flags: string[]): Record<string, Value>;
 }
 
 // @public
@@ -1161,6 +1073,13 @@ export class ROI {
 }
 
 // @public
+export class RunFilterCommand extends Command {
+    constructor(filter: object, dataId: string, app: App);
+    onExecute(_event: object): void;
+    onUndo(_event: object): void;
+}
+
+// @public
 export class Scalar2D {
     x: number;
     y: number;
@@ -1174,9 +1093,7 @@ export class Scalar3D {
 }
 
 // @public
-export class ScrollWheel {
-    constructor(app: App);
-    wheel(event: WheelEvent): void;
+export class ScrollWheelBehavior extends WheelBehavior {
 }
 
 // @public
@@ -1251,16 +1168,10 @@ export class ToolConfig {
 }
 
 // @public
-export const toolList: {
-    [x: string]: any;
-};
+export const toolList: Record<string, any>;
 
 // @public
-export const toolOptions: {
-    [x: string]: {
-        [x: string]: any;
-    };
-};
+export const toolOptions: Record<string, Record<string, any>>;
 
 // @public
 export class Value {
@@ -1467,6 +1378,12 @@ export class ViewLayer {
     setView(view: object, dataId: string): void;
     unbindImage(): void;
     unbindInteraction(): void;
+}
+
+// @public
+export class WheelBehavior {
+    onWheel(_event: WheelEvent, _layerGroup: LayerGroup | undefined): void;
+    onWheelTick(_up: boolean, _layerGroup: LayerGroup): void;
 }
 
 // @public
