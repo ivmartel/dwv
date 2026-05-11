@@ -69,6 +69,10 @@ export class ZipLoader extends LoaderBase {
       this.#filename = this.#zobjs[num].name;
       this.#zobjs[num].async('arrayBuffer').then((bufContent) => {
         this.#zipAsyncCallback(bufContent, origin, index);
+      }).catch((err) => {
+        this.setLoading(false);
+        this.onerror({error: err});
+        this.onloadend({});
       });
     } else {
       const memoryIO = new MemoryLoader();
@@ -113,12 +117,27 @@ export class ZipLoader extends LoaderBase {
     JSZip.loadAsync(buffer).then((zip) => {
       this.#files = [];
       this.#zobjs = zip.file(/.*\.dcm/);
+      if (this.#zobjs.length === 0) {
+        this.setLoading(false);
+        this.onerror({
+          error: new Error('No DICOM file found in ZIP')
+        });
+        this.onloadend({});
+        return;
+      }
       // recursively load zip files into the files array
-      const num = this.#files.length;
-      this.#filename = this.#zobjs[num].name;
-      this.#zobjs[num].async('arrayBuffer').then((content) => {
+      this.#filename = this.#zobjs[0].name;
+      this.#zobjs[0].async('arrayBuffer').then((content) => {
         this.#zipAsyncCallback(content, origin, index);
+      }).catch((err) => {
+        this.setLoading(false);
+        this.onerror({error: err});
+        this.onloadend({});
       });
+    }).catch((err) => {
+      this.setLoading(false);
+      this.onerror({error: err});
+      this.onloadend({});
     });
   }
 
