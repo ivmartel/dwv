@@ -1,5 +1,7 @@
 // app
 export * from './app/index.js';
+// command
+export * from './command/index.js';
 // gui
 export * from './gui/index.js';
 // image
