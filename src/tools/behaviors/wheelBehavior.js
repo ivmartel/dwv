@@ -26,7 +26,7 @@ export class WheelBehavior {
   }
 
   /**
-   * Discrete wheel tick after accumulation ({@link WheelTick}); use for
+   * Discrete wheel tick after accumulation; use for
    * slice scroll and similar stepped actions.
    *
    * @param {boolean} _up True when spin is in the positive direction.
