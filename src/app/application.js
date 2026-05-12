@@ -1876,6 +1876,11 @@ export class App {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
+    // flatten CustomEvent detail to top level so external listeners receive
+    // the same event shape regardless of whether the source uses detail
+    if (event.detail !== null && typeof event.detail === 'object') {
+      Object.assign(event, event.detail);
+    }
     let propagate = true;
     if (typeof event.propagate !== 'undefined') {
       propagate = event.propagate;
