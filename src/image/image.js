@@ -3,7 +3,6 @@ import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
 import {arrayContains} from '../utils/array.js';
 import {getTypedArray} from '../dicom/dicomParser.js';
-import {ListenerHandler} from '../utils/listen.js';
 import {valueRange} from './iterator.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {ImageFactory} from './imageFactory.js';
@@ -137,7 +136,7 @@ export function createMaskImage(elements) {
  * request.onload = onload;
  * request.send();
  */
-export class Image {
+export class Image extends EventTarget {
 
   /**
    * Data geometry.
@@ -292,13 +291,6 @@ export class Image {
   #histogram = null;
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
    * The labeling thread.
    *
    * @type {LabelingThread}
@@ -325,6 +317,7 @@ export class Image {
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
    */
   constructor(geometry, buffer, imageUids) {
+    super();
     this.#geometry = geometry;
     this.#buffer = buffer;
     this.#resampled = false;
@@ -608,7 +601,7 @@ export class Image {
   setPaletteColourMap(map) {
     this.#paletteColourMap = map;
     // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
@@ -631,7 +624,7 @@ export class Image {
     this.#paletteColourMap.green[index] = colour.g;
     this.#paletteColourMap.blue[index] = colour.b;
     // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
@@ -1093,9 +1086,7 @@ export class Image {
      * @type {object}
      * @property {string} type The event type.
      */
-    this.#fireEvent({
-      type: 'imagegeometrychange'
-    });
+    this.dispatchEvent(new CustomEvent('imagegeometrychange'));
   }
 
   /**
@@ -1147,9 +1138,7 @@ export class Image {
      * @type {object}
      * @property {string} type The event type.
      */
-    this.#fireEvent({
-      type: 'appendframe'
-    });
+    this.dispatchEvent(new CustomEvent('appendframe'));
     // memory will be updated at the first appendSlice or appendFrameBuffer
   }
 
@@ -1192,37 +1181,6 @@ export class Image {
     return this.#histogram;
   }
 
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
-
   // ****************************************
   // image data modifiers... carefull...
   // ****************************************
@@ -1261,7 +1219,7 @@ export class Image {
       }
     }
     // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
@@ -1354,7 +1312,7 @@ export class Image {
       originalValuesLists.push(originalValues);
     }
     // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
     return originalValuesLists;
   }
 
@@ -1399,7 +1357,7 @@ export class Image {
      * @type {object}
      * @property {string} type The event type.
      */
-    this.#fireEvent({type: 'imagecontentchange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
@@ -2128,23 +2086,21 @@ export class Image {
             return v1.id - v2.id;
           });
 
-        this.#fireEvent({
-          type: 'labelschanged',
-          labels: labelsSorted
-        });
+        this.dispatchEvent(new CustomEvent('labelschanged',
+          {detail: {labels: labelsSorted}}));
 
         //TODO: This is temporary until a proper method of displaying
         // diameters is implmented.
         // ------
         if (event.data.buffer) {
           this.#buffer = event.data.buffer;
-          this.#fireEvent({type: 'imagecontentchange'});
+          this.dispatchEvent(new CustomEvent('imagecontentchange'));
         }
         // ------
       };
     }
 
-    this.#fireEvent({type: 'labelingstart'});
+    this.dispatchEvent(new CustomEvent('labelingstart'));
 
     this.#labelingThread.run(this.#buffer, this.#geometry);
   }
@@ -2181,12 +2137,13 @@ export class Image {
         // we only care about the most recent one.
         if (this.#resamplingJobId === data.jobId) {
           this.#buffer.set(data.targetImageBuffer, data.startOffset);
-          this.#fireEvent({type: 'imageresampled', frame: data.frame});
+          this.dispatchEvent(new CustomEvent('imageresampled',
+            {detail: {frame: data.frame}}));
         }
       };
 
       this.#resamplingThread.ondone = (_) => {
-        this.#fireEvent({type: 'imageresamplingcomplete'});
+        this.dispatchEvent(new CustomEvent('imageresamplingcomplete'));
       };
     }
 
@@ -2197,7 +2154,7 @@ export class Image {
       ? {buffer: this.#rawBuffer, geometry: this.#rawGeometry}
       : {buffer: this.#buffer, geometry: this.#geometry};
 
-    this.#fireEvent({type: 'imageresamplingstart'});
+    this.dispatchEvent(new CustomEvent('imageresamplingstart'));
 
     const resampled = this.#resamplingThread.run(
       source.buffer,
@@ -2219,8 +2176,8 @@ export class Image {
     this.#geometry = resampled.geometry;
     this.#resamplingJobId = resampled.jobId;
 
-    this.#fireEvent({type: 'imagecontentchange'});
-    this.#fireEvent({type: 'imagegeometrychange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
+    this.dispatchEvent(new CustomEvent('imagegeometrychange'));
   }
 
   /**
@@ -2231,7 +2188,7 @@ export class Image {
       return;
     }
 
-    this.#fireEvent({type: 'imageresamplingstart'});
+    this.dispatchEvent(new CustomEvent('imageresamplingstart'));
 
     this.#resampled = false;
     this.#buffer = this.#rawBuffer;
@@ -2239,9 +2196,9 @@ export class Image {
     this.#rawBuffer = null;
     this.#rawGeometry = null;
 
-    this.#fireEvent({type: 'imagecontentchange'});
-    this.#fireEvent({type: 'imagegeometrychange'});
-    this.#fireEvent({type: 'imageresampled'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
+    this.dispatchEvent(new CustomEvent('imagegeometrychange'));
+    this.dispatchEvent(new CustomEvent('imageresampled'));
   }
 
 } // class Image

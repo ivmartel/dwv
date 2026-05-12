@@ -421,7 +421,7 @@ export class ViewLayer {
     const maybeTimeIndex = this.#viewController.getCurrentIndex().get(3);
     const matchingTimeIndex =
       typeof maybeTimeIndex === 'undefined' ||
-      maybeTimeIndex === event.frame;
+      maybeTimeIndex === event.detail?.frame;
 
     if (this.#dataId === event.dataid && matchingTimeIndex) {
       this.#needsDataUpdate = true;
