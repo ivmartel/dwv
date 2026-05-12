@@ -894,13 +894,12 @@ export class DataController {
    * to the event value.
    *
    * @param {string} dataId The data id.
-   * @returns {Function} A fireEvent function.
+   * @returns {EventListener} A fireEvent function.
    */
   #getFireEvent(dataId) {
-    return (event) => {
-      event.dataid = dataId;
-      this.#fireEvent(event);
-    };
+    return /** @type {EventListener} */ ((event) => {
+      this.#fireEvent(Object.assign(event, {dataid: dataId}));
+    });
   }
 
 } // DataController class
