@@ -304,7 +304,7 @@ export class AnnotationUI {
     const annotationGroup = this.#app.getData(dataId).annotationGroup;
     annotationGroup.addEventListener(
       'annotationgroupeditablechange', function (event) {
-        const disabled = !event.data;
+        const disabled = !event.detail.data;
         inputColour.disabled = disabled;
         deleteButton.disabled = disabled;
       }
@@ -500,10 +500,10 @@ export class AnnotationUI {
   /**
    * Handle 'dataadd' event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    */
   #onDataAdd = (event) => {
-    const data = this.#app.getData(event.dataid);
+    const data = this.#app.getData(event.detail.dataid);
     const ag = data.annotationGroup;
     if (typeof ag !== 'undefined') {
       // setup html if needed
@@ -511,7 +511,7 @@ export class AnnotationUI {
         this.#setupHtml();
       }
       // annotation group as html
-      const item = this.#getAnnotationGroupHtml(ag, event.dataid);
+      const item = this.#getAnnotationGroupHtml(ag, event.detail.dataid);
       // add annotation group item
       const addItem = this.#rootDoc.getElementById('addannotationgroupitem');
       // remove and add after to make it last item
@@ -527,10 +527,10 @@ export class AnnotationUI {
   /**
    * Handle 'drawlayeradd' event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    */
   #onDrawLayerAdd = (event) => {
-    const dataId = event.dataid;
+    const dataId = event.detail.dataid;
     const annotationGroup = this.#app.getData(dataId).annotationGroup;
     // strike through non viewable annotations
     for (const annotation of annotationGroup.getList()) {
@@ -549,11 +549,11 @@ export class AnnotationUI {
   /**
    * Handle 'annotationadd' event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    */
   #onAnnotationAdd = (event) => {
-    const annotation = event.data;
-    const dataId = event.dataid;
+    const annotation = event.detail.data;
+    const dataId = event.detail.dataid;
     // add item to list
     const listDivId = `${getAnnotationGroupDivId(dataId)}-list`;
     const listDiv = this.#rootDoc.getElementById(listDivId);
@@ -563,12 +563,12 @@ export class AnnotationUI {
   /**
    * Handle 'annotationupdate' event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    */
   #onAnnotationUpdate = (event) => {
-    const annotation = event.data;
-    const dataId = event.dataid;
-    const keys = event.keys;
+    const annotation = event.detail.data;
+    const dataId = event.detail.dataid;
+    const keys = event.detail.keys;
 
     if (typeof keys !== 'undefined') {
       const annotationDivId = getAnnotationDivId(annotation, dataId);
@@ -584,11 +584,11 @@ export class AnnotationUI {
   /**
    * Handle 'annotationremove' event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    */
   #onAnnotationRemove = (event) => {
-    const annotation = event.data;
-    const dataId = event.dataid;
+    const annotation = event.detail.data;
+    const dataId = event.detail.dataid;
     // remove annotation from list
     const annotationDivId = getAnnotationDivId(annotation, dataId);
     const item = this.#rootDoc.getElementById(annotationDivId);

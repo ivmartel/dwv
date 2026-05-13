@@ -64,15 +64,16 @@ export class InfoLayer {
   /**
    * Handle info data change.
    *
-   * @param {object} event The value change event.
+   * @param {CustomEvent} event The value change event.
    */
   onDataChange = (event) => {
-    if (typeof event.data === 'undefined') {
+    const data = event.detail?.data;
+    if (typeof data === 'undefined') {
       return;
     }
     // avoid events from other layers
-    if (typeof event.srclayerid !== 'undefined') {
-      const srcDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+    if (typeof event.detail?.srclayerid !== 'undefined') {
+      const srcDetails = getLayerDetailsFromLayerDivId(event.detail.srclayerid);
       const details =
         getLayerDetailsFromInfoLayerDivId(this.#containerDiv.id);
       if (srcDetails.groupDivId !== details.groupDivId) {
@@ -80,9 +81,9 @@ export class InfoLayer {
       }
     }
     if (!this.#created) {
-      this.#create(event.data);
+      this.#create(data);
     }
-    this.#update(event.data);
+    this.#update(data);
   };
 
   /**

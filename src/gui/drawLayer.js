@@ -58,6 +58,9 @@ import Konva from 'konva';
 
 /**
  * Draw layer.
+ *
+ * Not an EventTarget in order to forward native DOM events while
+ * preserving `preventDefault()` for tools (see '#fireDomEvent').
  */
 export class DrawLayer {
 
@@ -566,25 +569,28 @@ export class DrawLayer {
   setAnnotationGroup(annotationGroup, dataId, exeCallback) {
     this.#dataId = dataId;
     // local listeners
-    annotationGroup.addEventListener('annotationadd', (event) => {
-      // draw annotation
-      this.#addAnnotationDraw(event.data, true);
-      this.getKonvaLayer().draw();
-    });
-    annotationGroup.addEventListener('annotationupdate', (event) => {
-      // update annotation draw
-      this.#updateAnnotationDraw(event.data);
-      this.getKonvaLayer().draw();
-    });
-    annotationGroup.addEventListener('annotationremove', (event) => {
-      // remove annotation draw
-      this.#removeAnnotationDraw(event.data);
-      this.getKonvaLayer().draw();
-    });
+    annotationGroup.addEventListener('annotationadd',
+      (/** @type {CustomEvent} */ event) => {
+        // draw annotation
+        this.#addAnnotationDraw(event.detail.data, true);
+        this.getKonvaLayer().draw();
+      });
+    annotationGroup.addEventListener('annotationupdate',
+      (/** @type {CustomEvent} */ event) => {
+        // update annotation draw
+        this.#updateAnnotationDraw(event.detail.data);
+        this.getKonvaLayer().draw();
+      });
+    annotationGroup.addEventListener('annotationremove',
+      (/** @type {CustomEvent} */ event) => {
+        // remove annotation draw
+        this.#removeAnnotationDraw(event.detail.data);
+        this.getKonvaLayer().draw();
+      });
     annotationGroup.addEventListener(
       'annotationgroupeditablechange',
-      (event) => {
-        this.activateCurrentPositionShapes(event.data);
+      (/** @type {CustomEvent} */ event) => {
+        this.activateCurrentPositionShapes(event.detail.data);
       }
     );
 
@@ -1059,7 +1065,7 @@ export class DrawLayer {
     // interaction events
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
-      this.#containerDiv.addEventListener(names[i], this.#fireEvent);
+      this.#containerDiv.addEventListener(names[i], this.#fireDomEvent);
     }
   }
 
@@ -1073,7 +1079,7 @@ export class DrawLayer {
     // interaction events
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
-      this.#containerDiv.removeEventListener(names[i], this.#fireEvent);
+      this.#containerDiv.removeEventListener(names[i], this.#fireDomEvent);
     }
   }
 
@@ -1105,14 +1111,15 @@ export class DrawLayer {
 
     this.#activateDrawLayer(posGroupId);
     // TODO: add check
-    this.#fireEvent({
-      type: 'positionchange',
-      value: [
-        index.getValues(),
-        position.getValues(),
-      ],
-      valid: true
-    });
+    this.#fireEvent(new CustomEvent('positionchange', {
+      detail: {
+        value: [
+          index.getValues(),
+          position.getValues(),
+        ],
+        valid: true
+      }
+    }));
 
     return true;
   }
@@ -1212,9 +1219,22 @@ export class DrawLayer {
   /**
    * Fire an event: call all associated listeners with the input event object.
    *
-   * @param {object} event The event to fire.
+   * @param {CustomEvent} event The event to fire.
    */
   #fireEvent = (event) => {
+    const detail = Object.assign({}, event.detail, {
+      srclayerid: this.getId(),
+      dataid: this.#dataId,
+    });
+    this.#listenerHandler.fireEvent(new CustomEvent(event.type, {detail}));
+  };
+
+  /**
+   * Forward a DOM interaction event.
+   *
+   * @param {object} event The DOM event to forward.
+   */
+  #fireDomEvent = (event) => {
     event.srclayerid = this.getId();
     event.dataid = this.#dataId;
     this.#listenerHandler.fireEvent(event);

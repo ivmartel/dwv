@@ -241,20 +241,20 @@ function viewerSetup() {
 
   // bind events
   _app.addEventListener('error', function (event) {
-    console.error('load error', event, event.error);
-    const message = event.error.message;
+    console.error('load error', event, event.detail.error);
+    const message = event.detail.error.message;
     const isRenderError = typeof message !== 'undefined' &&
       message.startsWith('Render error');
     // abort load
     if (!isRenderError) {
-      _app.abortLoad(event.dataid);
+      _app.abortLoad(event.detail.dataid);
     }
   });
   _app.addEventListener('loadstart', function (event) {
     console.log('%c----------------', 'color: teal;');
-    console.log(`load source data:${event.dataid}`, event.source);
+    console.log(`load source data:${event.detail.dataid}`, event.detail.source);
     // timer
-    console.time(`load-data-${event.dataid}`);
+    console.time(`load-data-${event.detail.dataid}`);
     // update load counters
     if (numberOfDataToLoad === numberOfLoadendData) {
       numberOfDataToLoad = 0;
@@ -274,26 +274,25 @@ function viewerSetup() {
     return sum + value;
   };
   _app.addEventListener('loadprogress', function (event) {
-    if (typeof event.lengthComputable !== 'undefined' &&
-      event.lengthComputable) {
-      dataLoadProgress[event.dataid] =
-        Math.ceil((event.loaded / event.total) * 100);
+    if (event.detail.total > 0) {
+      dataLoadProgress[event.detail.dataid] =
+        Math.ceil((event.detail.loaded / event.detail.total) * 100);
       const progressElement = document.getElementById('loadprogress');
       progressElement.value =
         dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
     }
   });
   _app.addEventListener('loaditem', function (event) {
-    if (typeof event.warn !== 'undefined') {
-      console.warn('load-warn', event.warn);
+    if (typeof event.detail.warn !== 'undefined') {
+      console.warn('load-warn', event.detail.warn);
     }
   });
   _app.addEventListener('loadstart', function (event) {
     // add new data view config for new data
-    addNewDataViewConfig(event.dataid);
+    addNewDataViewConfig(event.detail.dataid);
   });
   _app.addEventListener('loadend', function (event) {
-    console.timeEnd(`load-data-${event.dataid}`);
+    console.timeEnd(`load-data-${event.detail.dataid}`);
     // update load counter
     ++numberOfLoadendData;
     // remove abort shortcut
@@ -301,10 +300,10 @@ function viewerSetup() {
   });
   _app.addEventListener('load', function (event) {
     // log meta data
-    logMetaData(event.dataid, event.loadtype);
+    logMetaData(event.detail.dataid, event.detail.loadtype);
     // render if not done yet
     if (!viewOnFirstLoadItem) {
-      _app.render(event.dataid);
+      _app.render(event.detail.dataid);
     }
     // update sliders with new data info
     // (has to be after full load)
@@ -346,10 +345,10 @@ function viewerSetup() {
 
   _app.addEventListener('positionchange', function (event) {
     const input = document.getElementById('position');
-    const values = event.value[1];
-    let text = `(index: ${event.value[0]})`;
-    if (event.value.length > 2) {
-      text += ` value: ${event.value[2]}`;
+    const values = event.detail.value[1];
+    let text = `(index: ${event.detail.value[0]})`;
+    if (event.detail.value.length > 2) {
+      text += ` value: ${event.detail.value[2]}`;
     }
     input.value = values.map(getPrecisionRound(2));
     // index as small text
@@ -369,17 +368,17 @@ function viewerSetup() {
   });
   // labels
   _app.addEventListener('labelingstart', function (event) {
-    console.time(`label-data-${event.dataid}`);
+    console.time(`label-data-${event.detail.dataid}`);
   });
   _app.addEventListener('labelschanged', function (event) {
-    console.timeEnd(`label-data-${event.dataid}`);
+    console.timeEnd(`label-data-${event.detail.dataid}`);
   });
   // resampling
   _app.addEventListener('imageresamplingstart', function (event) {
-    console.time(`resample-data-${event.dataid}`);
+    console.time(`resample-data-${event.detail.dataid}`);
   });
   _app.addEventListener('imageresamplingcomplete', function (event) {
-    console.timeEnd(`resample-data-${event.dataid}`);
+    console.timeEnd(`resample-data-${event.detail.dataid}`);
   });
 
   _app.addEventListener('warn', function (event) {
@@ -516,10 +515,10 @@ function logMetaData(dataId, loadType) {
  * Init individual slider on layer related event.
  * WARNING: needs to be called with the final geometry.
  *
- * @param {object} event The layer event.
+ * @param {CustomEvent} event The layer event.
  */
 function initSliderOnEvent(event) {
-  initSlider(event.layergroupid);
+  initSlider(event.detail.layergroupid);
 }
 
 /**

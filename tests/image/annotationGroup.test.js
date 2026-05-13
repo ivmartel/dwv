@@ -109,12 +109,12 @@ describe('image', () => {
     assert.isFalse(group.isEditable());
     assert.equal(events.length, 1);
     assert.equal(events[0].type, 'annotationgroupeditablechange');
-    assert.isFalse(events[0].data);
+    assert.isFalse(events[0].detail.data);
 
     group.setEditable(true);
     assert.isTrue(group.isEditable());
     assert.equal(events.length, 2);
-    assert.isTrue(events[1].data);
+    assert.isTrue(events[1].detail.data);
   });
 
   // -------------------------------------------------------------------------
@@ -154,7 +154,7 @@ describe('image', () => {
     assert.equal(group.getList()[0], ann);
     assert.equal(events.length, 1);
     assert.equal(events[0].type, 'annotationadd');
-    assert.equal(events[0].data, ann);
+    assert.equal(events[0].detail.data, ann);
   });
 
   /**
@@ -168,10 +168,10 @@ describe('image', () => {
     group.addEventListener('annotationadd', (e) => events.push(e));
 
     group.add(makeAnnotation('uid-1'), false);
-    assert.isFalse(events[0].propagate);
+    assert.isFalse(events[0].detail.propagate);
 
     group.add(makeAnnotation('uid-2'), true);
-    assert.isTrue(events[1].propagate);
+    assert.isTrue(events[1].detail.propagate);
   });
 
   // -------------------------------------------------------------------------
@@ -216,8 +216,8 @@ describe('image', () => {
     assert.equal(group.getList()[0], updated, 'list entry replaced');
     assert.equal(events.length, 1);
     assert.equal(events[0].type, 'annotationupdate');
-    assert.equal(events[0].data, updated);
-    assert.deepEqual(events[0].keys, ['colour']);
+    assert.equal(events[0].detail.data, updated);
+    assert.deepEqual(events[0].detail.keys, ['colour']);
   });
 
   /**
@@ -306,7 +306,7 @@ describe('image', () => {
     assert.equal(group.getLength(), 0);
     assert.equal(events.length, 1);
     assert.equal(events[0].type, 'annotationremove');
-    assert.equal(events[0].data, ann);
+    assert.equal(events[0].detail.data, ann);
   });
 
   /**

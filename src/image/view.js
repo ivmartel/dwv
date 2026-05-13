@@ -15,7 +15,7 @@ import {generateImageDataYbrFull} from './viewYbrFull.js';
 import {ViewFactory} from './viewFactory.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {getSliceIterator} from '../image/iterator.js';
-import {ListenerHandler} from '../utils/listen.js';
+
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
 
@@ -94,7 +94,7 @@ export function createView(elements, image) {
  * request.onload = onload;
  * request.send();
  */
-export class View {
+export class View extends EventTarget {
 
   /**
    * The associated image.
@@ -250,16 +250,10 @@ export class View {
   #segmentViewHelper;
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
    * @param {Image} image The associated image.
    */
   constructor(image) {
+    super();
     this.setImage(image);
   }
 
@@ -327,9 +321,7 @@ export class View {
   setMaskViewHelper(helper) {
     this.#segmentViewHelper = helper;
 
-    this.#fireEvent({
-      type: 'alphafuncchange'
-    });
+    this.dispatchEvent(new CustomEvent('alphafuncchange'));
   }
 
   /**
@@ -380,13 +372,13 @@ export class View {
      * Mask view change event.
      *
      * @event View#maskviewchange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'maskviewchange',
-      value: [this.#fillOpacity, this.#contourThickness]
-    });
+    this.dispatchEvent(new CustomEvent('maskviewchange', {
+      detail: {value: [this.#fillOpacity, this.#contourThickness]}
+    }));
   }
 
   /**
@@ -416,10 +408,9 @@ export class View {
     }
 
     // fire mask view change
-    this.#fireEvent({
-      type: 'maskviewchange',
-      value: [this.#fillOpacity, this.#contourThickness]
-    });
+    this.dispatchEvent(new CustomEvent('maskviewchange', {
+      detail: {value: [this.#fillOpacity, this.#contourThickness]}
+    }));
   }
 
   /**
@@ -475,12 +466,10 @@ export class View {
      * Alpha func change event.
      *
      * @event View#alphafuncchange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
      */
-    this.#fireEvent({
-      type: 'alphafuncchange'
-    });
+    this.dispatchEvent(new CustomEvent('alphafuncchange'));
   }
 
   /**
@@ -618,14 +607,13 @@ export class View {
          * Window/level add preset event.
          *
          * @event View#wlpresetadd
-         * @type {object}
-         * @property {string} type The event type.
-         * @property {string} name The name of the preset.
+         * @type {CustomEvent}
+         * @property {object} detail The event detail.
+         * @property {string} detail.name The name of the preset.
          */
-        this.#fireEvent({
-          type: 'wlpresetadd',
-          name: key
-        });
+        this.dispatchEvent(new CustomEvent('wlpresetadd', {
+          detail: {name: key}
+        }));
       }
     }
   }
@@ -675,14 +663,13 @@ export class View {
      * Color change event.
      *
      * @event View#colourmapchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'colourmapchange',
-      value: [name]
-    });
+    this.dispatchEvent(new CustomEvent('colourmapchange', {
+      detail: {value: [name]}
+    }));
   }
 
   /**
@@ -816,14 +803,12 @@ export class View {
       this.#currentPosition = position;
       if (!silent) {
         // fire event with valid: false
-        this.#fireEvent({
-          type: 'positionchange',
-          value: [
-            index.getValues(),
-            inPosition.getValues(),
-          ],
-          valid: false
-        });
+        this.dispatchEvent(new CustomEvent('positionchange', {
+          detail: {
+            value: [index.getValues(), inPosition.getValues()],
+            valid: false
+          }
+        }));
       }
 
       // do no send invalid positionchange event: avoid empty repaint
@@ -858,34 +843,35 @@ export class View {
     this.#currentPosition = position;
 
     if (!silent) {
-      /**
-       * Position change event.
-       *
-       * @event View#positionchange
-       * @type {object}
-       * @property {Array} value The changed value as [index, pixelValue].
-       * @property {number[]} diffDims An array of modified indices.
-       */
-      const posEvent = {
-        type: 'positionchange',
-        value: [
-          index.getValues(),
-          inPosition.getValues(),
-        ],
-        diffDims,
-        data: {
-          imageUid: this.#image.getImageUid(index)
-        }
-      };
+      /** @type {Array} */
+      const posValue = [
+        index.getValues(),
+        inPosition.getValues(),
+      ];
 
       // add value if possible
       if (this.#image.canQuantify()) {
         const pixValue = this.#image.getRescaledValueAtIndex(index);
-        posEvent.value.push(pixValue);
+        posValue.push(pixValue);
       }
 
-      // fire
-      this.#fireEvent(posEvent);
+      /**
+       * Position change event.
+       *
+       * @event View#positionchange
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {Array} detail.value The changed value as
+       *   [index, pixelValue].
+       * @property {number[]} detail.diffDims An array of modified indices.
+       */
+      this.dispatchEvent(new CustomEvent('positionchange', {
+        detail: {
+          value: posValue,
+          diffDims,
+          data: {imageUid: this.#image.getImageUid(index)}
+        }
+      }));
     }
 
     // all good
@@ -951,20 +937,21 @@ export class View {
        * Window/level change event.
        *
        * @event View#wlchange
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {Array} value The changed value.
-       * @property {number} wc The new window center value.
-       * @property {number} ww The new window wdth value.
-       * @property {boolean} skipGenerate Flag to skip view generation.
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {Array} detail.value The changed value.
+       * @property {number} detail.wc The new window center value.
+       * @property {number} detail.ww The new window width value.
+       * @property {boolean} detail.skipGenerate Flag to skip view generation.
        */
-      this.#fireEvent({
-        type: 'wlchange',
-        value: [wlBound.center, wlBound.width, name],
-        wc: wlBound.center,
-        ww: wlBound.width,
-        skipGenerate: silent
-      });
+      this.dispatchEvent(new CustomEvent('wlchange', {
+        detail: {
+          value: [wlBound.center, wlBound.width, name],
+          wc: wlBound.center,
+          ww: wlBound.width,
+          skipGenerate: silent
+        }
+      }));
     }
   }
 
@@ -1020,37 +1007,6 @@ export class View {
     const keys = Object.keys(this.getWindowPresets());
     this.setWindowLevelPreset(keys[id], silent);
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 
   /**
    * Get the image window/level that covers the full data range.

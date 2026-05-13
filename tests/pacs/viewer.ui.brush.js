@@ -89,7 +89,7 @@ export class BrushToolUI {
   /**
    * Handle brush size change event.
    *
-   * @param {object} event The change event.
+   * @param {CustomEvent} event The change event.
    */
   #onBrushSizeChange(event) {
     const newValue = event.detail.value;

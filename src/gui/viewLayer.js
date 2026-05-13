@@ -17,6 +17,9 @@ import {getScaledOffset} from './layerGroup.js';
 
 /**
  * View layer.
+ *
+ * Not an EventTarget in order to forward native DOM events while
+ * preserving `preventDefault()` for tools (see '#fireDomEvent').
  */
 export class ViewLayer {
 
@@ -312,13 +315,15 @@ export class ViewLayer {
   /**
    * Handle an image set event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    * @function
    */
   onimageset = (event) => {
-    // event.value = [index, image]
-    if (this.#dataId === event.dataid) {
-      this.#viewController.setImage(event.value[0]);
+    // event.detail.value = [index, image]
+    const dataid = event.detail?.dataid;
+    const value = event.detail?.value;
+    if (this.#dataId === dataid) {
+      this.#viewController.setImage(value[0]);
       this.#setBaseSize(this.#viewController.getImageSize().get2D());
       this.#needsDataUpdate = true;
     }
@@ -345,12 +350,13 @@ export class ViewLayer {
   /**
    * Handle an image content change event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    * @function
    */
   onimagecontentchange = (event) => {
     // event.value = [index]
-    if (this.#dataId === event.dataid) {
+    const dataid = event.detail?.dataid;
+    if (typeof dataid === 'undefined' || this.#dataId === dataid) {
       this.#isValidPosition = this.#viewController.isPositionInBounds();
       // flag update and draw
       this.#needsDataUpdate = true;
@@ -361,12 +367,13 @@ export class ViewLayer {
   /**
    * Handle an image change event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    * @function
    */
   onimagegeometrychange = (event) => {
     // event.value = [index]
-    if (this.#dataId === event.dataid) {
+    const dataid = event.detail?.dataid;
+    if (typeof dataid === 'undefined' || this.#dataId === dataid) {
       const vcSize = this.#viewController.getImageSize().get2D();
       const vcSpacing = this.#viewController.getImageSpacing().get2D();
 
@@ -414,7 +421,7 @@ export class ViewLayer {
   /**
    * Handle an image resampled event.
    *
-   * @param {object} event The event.
+   * @param {CustomEvent} event The event.
    * @function
    */
   onimageresampled = (event) => {
@@ -423,7 +430,9 @@ export class ViewLayer {
       typeof maybeTimeIndex === 'undefined' ||
       maybeTimeIndex === event.detail?.frame;
 
-    if (this.#dataId === event.dataid && matchingTimeIndex) {
+    const dataid = event.detail?.dataid;
+    if ((typeof dataid === 'undefined' || this.#dataId === dataid) &&
+      matchingTimeIndex) {
       this.#needsDataUpdate = true;
       this.draw();
     }
@@ -490,14 +499,17 @@ export class ViewLayer {
      * Opacity change event.
      *
      * @event App#opacitychange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.srclayerid The source layer id.
+     * @property {string} detail.dataid The data id.
+     * @property {Array} detail.value The changed value.
      */
-    const event = {
-      type: 'opacitychange',
-      value: [this.#opacity]
-    };
-    this.#fireEvent(event);
+    this.#fireEvent(new CustomEvent('opacitychange', {
+      detail: {
+        value: [this.#opacity]
+      }
+    }));
   }
 
   /**
@@ -831,15 +843,17 @@ export class ViewLayer {
      * Render start event.
      *
      * @event App#renderstart
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.srclayerid The source layer id.
+     * @property {string} detail.dataid The data id.
+     * @property {string} detail.layerid The layer id.
      */
-    let event = {
-      type: 'renderstart',
-      layerid: this.getId(),
-      dataid: this.getDataId()
-    };
-    this.#fireEvent(event);
+    this.#fireEvent(new CustomEvent('renderstart', {
+      detail: {
+        layerid: this.getId()
+      }
+    }));
 
     // update data if needed
     if (this.#needsDataUpdate) {
@@ -876,15 +890,17 @@ export class ViewLayer {
      * Render end event.
      *
      * @event App#renderend
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.srclayerid The source layer id.
+     * @property {string} detail.dataid The data id.
+     * @property {string} detail.layerid The layer id.
      */
-    event = {
-      type: 'renderend',
-      layerid: this.getId(),
-      dataid: this.getDataId()
-    };
-    this.#fireEvent(event);
+    this.#fireEvent(new CustomEvent('renderend', {
+      detail: {
+        layerid: this.getId()
+      }
+    }));
   }
 
   /**
@@ -1087,7 +1103,7 @@ export class ViewLayer {
       const passive = eventName !== 'wheel' &&
         eventName !== 'touchstart';
       this.#containerDiv.addEventListener(
-        eventName, this.#fireEvent, {passive});
+        eventName, this.#fireDomEvent, {passive});
     }
   }
 
@@ -1100,7 +1116,7 @@ export class ViewLayer {
     // interaction events
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
-      this.#containerDiv.removeEventListener(names[i], this.#fireEvent);
+      this.#containerDiv.removeEventListener(names[i], this.#fireDomEvent);
     }
   }
 
@@ -1129,9 +1145,22 @@ export class ViewLayer {
   /**
    * Fire an event: call all associated listeners with the input event object.
    *
-   * @param {object} event The event to fire.
+   * @param {CustomEvent} event The event to fire.
    */
   #fireEvent = (event) => {
+    const detail = Object.assign({}, event.detail, {
+      srclayerid: this.getId(),
+      dataid: this.#dataId,
+    });
+    this.#listenerHandler.fireEvent(new CustomEvent(event.type, {detail}));
+  };
+
+  /**
+   * Forward a DOM interaction event.
+   *
+   * @param {object} event The DOM event to forward.
+   */
+  #fireDomEvent = (event) => {
     event.srclayerid = this.getId();
     event.dataid = this.#dataId;
     this.#listenerHandler.fireEvent(event);
@@ -1154,12 +1183,12 @@ export class ViewLayer {
   /**
    * Handle window/level change.
    *
-   * @param {object} event The event fired when changing the window/level.
+   * @param {CustomEvent} event The event fired when changing the window/level.
    */
   #onWLChange = (event) => {
     // generate and draw if no skip flag
-    const skip = typeof event.skipGenerate !== 'undefined' &&
-      event.skipGenerate === true;
+    const skip = typeof event.detail?.skipGenerate !== 'undefined' &&
+      event.detail?.skipGenerate === true;
     if (!skip) {
       this.#needsDataUpdate = true;
       this.draw();
@@ -1169,11 +1198,11 @@ export class ViewLayer {
   /**
    * Handle colour map change.
    *
-   * @param {object} event The event fired when changing the colour map.
+   * @param {CustomEvent} event The event fired when changing the colour map.
    */
   #onColourMapChange = (event) => {
-    const skip = typeof event.skipGenerate !== 'undefined' &&
-      event.skipGenerate === true;
+    const skip = typeof event.detail?.skipGenerate !== 'undefined' &&
+      event.detail?.skipGenerate === true;
     if (!skip) {
       this.#needsDataUpdate = true;
       this.draw();
@@ -1183,15 +1212,15 @@ export class ViewLayer {
   /**
    * Handle position change.
    *
-   * @param {object} event The event fired when changing the position.
+   * @param {CustomEvent} event The event fired when changing the position.
    */
   #onPositionChange = (event) => {
-    const skip = typeof event.skipGenerate !== 'undefined' &&
-      event.skipGenerate === true;
+    const skip = typeof event.detail?.skipGenerate !== 'undefined' &&
+      event.detail?.skipGenerate === true;
     if (!skip) {
       let valid = true;
-      if (typeof event.valid !== 'undefined') {
-        valid = event.valid;
+      if (typeof event.detail?.valid !== 'undefined') {
+        valid = event.detail.valid;
       }
       // clear for non valid events
       if (!valid) {
@@ -1208,7 +1237,7 @@ export class ViewLayer {
           dims3D.indexOf(this.#viewController.getScrollDimIndex());
         dims3D.splice(indexScrollDimIndex, 1);
         // remove non scroll index from diff dims
-        const diffDims = event.diffDims.filter(function (item) {
+        const diffDims = event.detail?.diffDims?.filter(function (item) {
           return dims3D.indexOf(item) === -1;
         });
         // update if we have something left
@@ -1235,11 +1264,11 @@ export class ViewLayer {
   /**
    * Handle alpha function change.
    *
-   * @param {object} event The event fired when changing the function.
+   * @param {CustomEvent} event The event fired when changing the function.
    */
   #onAlphaFuncChange = (event) => {
-    const skip = typeof event.skipGenerate !== 'undefined' &&
-      event.skipGenerate === true;
+    const skip = typeof event.detail?.skipGenerate !== 'undefined' &&
+      event.detail?.skipGenerate === true;
     if (!skip) {
       this.#needsDataUpdate = true;
       this.draw();
@@ -1249,11 +1278,11 @@ export class ViewLayer {
   /**
    * Handle mask view change.
    *
-   * @param {object} event The event fired when changing the function.
+   * @param {CustomEvent} event The event fired when changing the function.
    */
   #onMaskViewChange = (event) => {
-    const skip = typeof event.skipGenerate !== 'undefined' &&
-      event.skipGenerate === true;
+    const skip = typeof event.detail?.skipGenerate !== 'undefined' &&
+      event.detail?.skipGenerate === true;
     if (!skip) {
       this.#needsDataUpdate = true;
       this.draw();
