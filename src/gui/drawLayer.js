@@ -60,7 +60,7 @@ import Konva from 'konva';
  * Draw layer.
  *
  * Not an EventTarget in order to forward and add information to
- * HTML div events.
+ * DOM div events (see '#fireDomEvent').
  */
 export class DrawLayer {
 

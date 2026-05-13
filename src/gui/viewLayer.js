@@ -19,7 +19,7 @@ import {getScaledOffset} from './layerGroup.js';
  * View layer.
  *
  * Not an EventTarget in order to forward and add information to
- * HTML div events.
+ * DOM div events (see '#fireDomEvent').
  */
 export class ViewLayer {
 
