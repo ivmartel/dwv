@@ -29,7 +29,7 @@ import {
   toolOptions,
   defaultToolOptions
 } from '../tools/toolOptions.js';
-import {binderList} from '../gui/stage.js';
+import {binderList} from '../gui/binders.js';
 import {WindowLevel} from '../image/windowLevel.js';
 import {PlaneHelper} from '../image/planeHelper.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
