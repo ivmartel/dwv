@@ -1083,8 +1083,8 @@ export class Image extends EventTarget {
      * Image geometry change event.
      *
      * @event Image#imagegeometrychange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
      */
     this.dispatchEvent(new CustomEvent('imagegeometrychange'));
   }
@@ -1135,8 +1135,8 @@ export class Image extends EventTarget {
      * Append frame event.
      *
      * @event Image#appendframe
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
      */
     this.dispatchEvent(new CustomEvent('appendframe'));
     // memory will be updated at the first appendSlice or appendFrameBuffer
@@ -1354,8 +1354,8 @@ export class Image extends EventTarget {
      * Image content change event.
      *
      * @event Image#imagecontentchange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
      */
     this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }

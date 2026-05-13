@@ -39,7 +39,7 @@ export class DataTableUI {
   #registeredViewListeners = false;
 
   /**
-   * @type {Function}
+   * @type {EventListener}
    */
   #layerAddListener;
 
@@ -79,9 +79,9 @@ export class DataTableUI {
    */
   registerLayerAddListeners(layout) {
     // add data row on layer creation
-    this.#layerAddListener = (event) => {
-      this.#clearDataTableRow(event.dataid);
-      this.#addDataRow(event.dataid, layout);
+    this.#layerAddListener = (/** @type {CustomEvent} */ event) => {
+      this.#clearDataTableRow(event.detail?.dataid);
+      this.#addDataRow(event.detail?.dataid, layout);
     };
 
     this.#app.addEventListener('viewlayeradd', this.#layerAddListener);
@@ -113,40 +113,40 @@ export class DataTableUI {
   /**
    * Handle app wl change.
    *
-   * @param {object} event The change event.
+   * @param {CustomEvent} event The change event.
    */
   #onWLChange = (event) => {
     // width number
-    let elemId = `width-${event.dataid}-number`;
+    let elemId = `width-${event.detail.dataid}-number`;
     let elem = document.getElementById(elemId);
     if (elem) {
-      elem.value = event.value[1];
+      elem.value = event.detail.value[1];
     } else {
       console.warn('wl change: HTML not ready?');
     }
     // width range
-    elemId = `width-${event.dataid}-range`;
+    elemId = `width-${event.detail.dataid}-range`;
     elem = document.getElementById(elemId);
     if (elem) {
-      elem.value = event.value[1];
+      elem.value = event.detail.value[1];
     }
     // center number
-    elemId = `center-${event.dataid}-number`;
+    elemId = `center-${event.detail.dataid}-number`;
     elem = document.getElementById(elemId);
     if (elem) {
-      elem.value = event.value[0];
+      elem.value = event.detail.value[0];
     }
     // center range
-    elemId = `center-${event.dataid}-range`;
+    elemId = `center-${event.detail.dataid}-range`;
     elem = document.getElementById(elemId);
     if (elem) {
-      elem.value = event.value[0];
+      elem.value = event.detail.value[0];
     }
     // preset select
-    elemId = `preset-${event.dataid}-select`;
+    elemId = `preset-${event.detail.dataid}-select`;
     const selectElem = document.getElementById(elemId);
     if (selectElem) {
-      const ids = this.#getDataLayerGroupDivIds(event.dataid);
+      const ids = this.#getDataLayerGroupDivIds(event.detail.dataid);
       const lg = this.#app.getLayerGroupByDivId(ids[0]);
       const vls = lg.getViewLayersByDataId(event.dataid);
       if (typeof vls !== 'undefined' && vls.length !== 0) {
@@ -174,12 +174,12 @@ export class DataTableUI {
   /**
    * Handle app opacity change.
    *
-   * @param {object} event The change event.
+   * @param {CustomEvent} event The change event.
    */
   #onOpacityChange = (event) => {
-    const value = parseFloat(event.value[0]).toPrecision(3);
+    const value = parseFloat(event.detail.value[0]).toPrecision(3);
     // number
-    let elemId = `opacity-${event.dataid}-number`;
+    let elemId = `opacity-${event.detail.dataid}-number`;
     let elem = document.getElementById(elemId);
     if (elem) {
       elem.value = value;
@@ -187,7 +187,7 @@ export class DataTableUI {
       console.warn('opacity change: HTML not ready?');
     }
     // range
-    elemId = `opacity-${event.dataid}-range`;
+    elemId = `opacity-${event.detail.dataid}-range`;
     elem = document.getElementById(elemId);
     if (elem) {
       elem.value = value;

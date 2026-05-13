@@ -106,7 +106,7 @@ export class ToolboxController {
    *
    * @param {string} eventType The event type, for example
    *   mousedown, touchstart...
-   * @returns {Function} The event handler.
+   * @returns {EventListener} The event handler.
    */
   getSelectedToolEventHandler(eventType) {
     return this.getSelectedTool()[eventType];
@@ -179,15 +179,16 @@ export class ToolboxController {
    * Get an active layer change handler.
    *
    * @param {string} divId The associated layer group div id.
-   * @returns {Function} The event handler.
+   * @returns {EventListener} The event handler.
    */
   #getActiveLayerChangeHandler(divId) {
-    return (event) => {
-      const layer = event.value[0];
+    return ((/** @type {CustomEvent} */ event) => {
+      const value = event.detail?.value;
+      const layer = value?.[0];
       if (typeof layer !== 'undefined') {
         this.#internalBindLayerGroup(divId, layer);
       }
-    };
+    });
   }
 
   /**

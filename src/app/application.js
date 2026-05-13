@@ -13,7 +13,6 @@ import {Point3D} from '../math/point.js';
 import {Stage} from '../gui/stage.js';
 import {Style} from '../gui/style.js';
 import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
-import {ListenerHandler} from '../utils/listen.js';
 import {State} from '../io/state.js';
 import {logger} from '../utils/logger.js';
 import {getUriQuery, decodeQuery} from '../utils/uri.js';
@@ -223,7 +222,7 @@ export class AppOptions {
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  */
-export class App {
+export class App extends EventTarget {
 
   /**
    * App options.
@@ -280,13 +279,6 @@ export class App {
    * @type {Record<string, InfoData>}
    */
   #infoDatas = {};
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Get a DicomData.
@@ -776,28 +768,6 @@ export class App {
    */
   resetViews() {
     this.#stage.resetViews();
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
   }
 
   // load API [begin] -------------------------------------------------------
@@ -1292,11 +1262,13 @@ export class App {
       // check compatibility
       if (isImage && !this.#canRenderData(dataId, layerGroup)) {
         // fire render error
-        this.#fireEvent({
-          type: 'error',
-          error: new Error('Render error: incompatible geometries for overlay'),
-          dataid: dataId
-        });
+        this.dispatchEvent(new CustomEvent('error', {
+          detail: {
+            error: new Error(
+              'Render error: incompatible geometries for overlay'),
+            dataid: dataId,
+          }
+        }));
         continue;
       }
       // create layer if needed
@@ -1586,7 +1558,8 @@ export class App {
   /**
    * Key down callback. Meant to be used in tools.
    *
-   * @param {KeyboardEvent} event The key down event.
+   * @param {object} event The KeyboardEvent down event
+   * augmented with a context.
    * @fires App#keydown
    * @function
    */
@@ -1595,11 +1568,25 @@ export class App {
      * Key down event.
      *
      * @event App#keydown
-     * @type {KeyboardEvent}
-     * @property {string} type The event type: keydown.
-     * @property {string} context The tool where the event originated.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.key The key value.
+     * @property {string} detail.code The code value.
+     * @property {boolean} detail.ctrlKey True if ctrl key is down.
+     * @property {boolean} detail.altKey True if alt key is down.
+     * @property {boolean} detail.shiftKey True if shift key is down.
+     * @property {string} detail.context The tool where the event originated.
      */
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('keydown', {
+      detail: {
+        key: event.key,
+        code: event.code,
+        ctrlKey: event.ctrlKey,
+        altKey: event.altKey,
+        shiftKey: event.shiftKey,
+        context: event.context,
+      }
+    }));
   };
 
   /**
@@ -1872,23 +1859,18 @@ export class App {
 
   /**
    * Fire an event: call all associated listeners with the input event object.
+   * Collects detail from CustomEvents and top-level plain object properties,
+   * then dispatches a new CustomEvent with the flattened detail on this App.
    *
-   * @param {object} event The event to fire.
+   * @param {CustomEvent} event The event to fire.
    */
   #fireEvent = (event) => {
-    // flatten CustomEvent detail to top level so external listeners receive
-    // the same event shape regardless of whether the source uses detail
-    if (event.detail !== null && typeof event.detail === 'object') {
-      Object.assign(event, event.detail);
+    if (event.detail?.propagate === false) {
+      return;
     }
-    let propagate = true;
-    if (typeof event.propagate !== 'undefined') {
-      propagate = event.propagate;
-      delete event.propagate;
-    }
-    if (propagate) {
-      this.#listenerHandler.fireEvent(event);
-    }
+    const detail = Object.assign({}, event.detail);
+    delete detail.propagate;
+    this.dispatchEvent(new CustomEvent(event.type, {detail}));
   };
 
   /**
@@ -1906,14 +1888,20 @@ export class App {
      * Load start event.
      *
      * @event App#loadstart
-     * @type {object}
-     * @property {string} type The event type: loadstart.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {*} detail.source The load source: string for an url,
      *   File for a file.
+     * @property {string} detail.dataid The data id.
      */
-    event.type = 'loadstart';
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('loadstart', {
+      detail: {
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+        source: event.source,
+      }
+    }));
   };
 
   /**
@@ -1926,16 +1914,24 @@ export class App {
      * Load progress event.
      *
      * @event App#loadprogress
-     * @type {object}
-     * @property {string} type The event type: loadprogress.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {*} detail.source The load source: string for an url,
      *   File for a file.
-     * @property {number} loaded The loaded percentage.
-     * @property {number} total The total percentage.
+     * @property {string} detail.dataid The data id.
+     * @property {number} detail.loaded The loaded percentage.
+     * @property {number} detail.total The total percentage.
      */
-    event.type = 'loadprogress';
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('loadprogress', {
+      detail: {
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+        source: event.source,
+        loaded: event.loaded,
+        total: event.total,
+      }
+    }));
   };
 
   /**
@@ -1988,22 +1984,24 @@ export class App {
      * Load item event: fired when an item has been successfully loaded.
      *
      * @event App#loaditem
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {*} detail.source The load source: string for an url,
      *   File for a file.
-     * @property {object} data The loaded meta data.
+     * @property {string} detail.dataid The data id.
+     * @property {object} detail.data The loaded meta data.
      */
-    this.#fireEvent({
-      type: 'loaditem',
-      data: eventMetaData,
-      source: event.source,
-      loadtype: event.loadtype,
-      dataid: event.dataid,
-      isfirstitem: event.isfirstitem,
-      warn: event.warn
-    });
+    this.dispatchEvent(new CustomEvent('loaditem', {
+      detail: {
+        data: eventMetaData,
+        source: event.source,
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+        isfirstitem: event.isfirstitem,
+        warn: event.warn,
+      }
+    }));
 
     // update info data if present
     if (typeof this.#infoDatas !== 'undefined' &&
@@ -2039,12 +2037,17 @@ export class App {
      * Load event: fired when a load finishes successfully.
      *
      * @event App#load
-     * @type {object}
-     * @property {string} type The event type: load.
-     * @property {string} loadType The load type: image or state.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {string} detail.dataid The data id.
      */
-    event.type = 'load';
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('load', {
+      detail: {
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+      }
+    }));
   };
 
   /**
@@ -2058,14 +2061,20 @@ export class App {
      *   successfully or not.
      *
      * @event App#loadend
-     * @type {object}
-     * @property {string} type The event type: loadend.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {string} detail.dataid The data id.
+     * @property {*} detail.source The load source: string for an url,
      *   File for a file.
      */
-    event.type = 'loadend';
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('loadend', {
+      detail: {
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+        source: event.source,
+      }
+    }));
   };
 
   /**
@@ -2078,18 +2087,24 @@ export class App {
      * Load error event.
      *
      * @event App#error
-     * @type {object}
-     * @property {string} type The event type: error.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {string} detail.dataid The data id.
+     * @property {*} detail.source The load source: string for an url,
      *   File for a file.
-     * @property {object} error The error.
-     * @property {object} target The event target.
+     * @property {object} detail.error The error.
+     * @property {object} detail.target The event target.
      */
-    if (typeof event.type === 'undefined') {
-      event.type = 'error';
-    }
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('error', {
+      detail: {
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+        source: event.source,
+        error: event.error,
+        target: event.target,
+      }
+    }));
   };
 
   /**
@@ -2102,16 +2117,21 @@ export class App {
      * Load timeout event.
      *
      * @event App#timeout
-     * @type {object}
-     * @property {string} type The event type: timeout.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: an url as a string.
-     * @property {object} target The event target.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {string} detail.dataid The data id.
+     * @property {*} detail.source The load source: an url as a string.
+     * @property {object} detail.target The event target.
      */
-    if (typeof event.type === 'undefined') {
-      event.type = 'timeout';
-    }
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('timeout', {
+      detail: {
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+        source: event.source,
+        target: event.target,
+      }
+    }));
   };
 
   /**
@@ -2124,16 +2144,20 @@ export class App {
      * Load abort event.
      *
      * @event App#abort
-     * @type {object}
-     * @property {string} type The event type: abort.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.loadtype The load type: image or state.
+     * @property {string} detail.dataid The data id.
+     * @property {*} detail.source The load source: string for an url,
      *   File for a file.
      */
-    if (typeof event.type === 'undefined') {
-      event.type = 'abort';
-    }
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('abort', {
+      detail: {
+        loadtype: event.loadtype,
+        dataid: event.dataid,
+        source: event.source,
+      }
+    }));
   };
 
   /**
@@ -2155,39 +2179,50 @@ export class App {
       group.addEventListener(eventName, this.#fireEvent);
     }
     // updata data view config
-    group.addEventListener('wlchange', (event) => {
-      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+    group.addEventListener('wlchange', (/** @type {CustomEvent} */ event) => {
+      const srclayerid = event.detail?.srclayerid;
+      const dataid = event.detail?.dataid;
+      const value = event.detail?.value;
+      const layerDetails = getLayerDetailsFromLayerDivId(srclayerid);
       const groupId = layerDetails.groupDivId;
-      const config = this.getViewConfig(event.dataid, groupId, true);
+      const config = this.getViewConfig(dataid, groupId, true);
       if (typeof config !== 'undefined') {
         // reset previous values
         config.windowCenter = undefined;
         config.windowWidth = undefined;
         config.wlPresetName = undefined;
         // window width, center and name
-        if (event.value.length === 3) {
-          config.windowCenter = event.value[0];
-          config.windowWidth = event.value[1];
-          config.wlPresetName = event.value[2];
+        if (value.length === 3) {
+          config.windowCenter = value[0];
+          config.windowWidth = value[1];
+          config.wlPresetName = value[2];
         }
       }
     });
-    group.addEventListener('opacitychange', (event) => {
-      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
-      const groupId = layerDetails.groupDivId;
-      const config = this.getViewConfig(event.dataid, groupId, true);
-      if (typeof config !== 'undefined') {
-        config.opacity = event.value[0];
-      }
-    });
-    group.addEventListener('colourmapchange', (event) => {
-      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
-      const groupId = layerDetails.groupDivId;
-      const config = this.getViewConfig(event.dataid, groupId, true);
-      if (typeof config !== 'undefined') {
-        config.colourMap = event.value[0];
-      }
-    });
+    group.addEventListener('opacitychange',
+      (/** @type {CustomEvent} */ event) => {
+        const srclayerid = event.detail?.srclayerid;
+        const dataid = event.detail?.dataid;
+        const value = event.detail?.value;
+        const layerDetails = getLayerDetailsFromLayerDivId(srclayerid);
+        const groupId = layerDetails.groupDivId;
+        const config = this.getViewConfig(dataid, groupId, true);
+        if (typeof config !== 'undefined') {
+          config.opacity = value[0];
+        }
+      });
+    group.addEventListener('colourmapchange',
+      (/** @type {CustomEvent} */ event) => {
+        const srclayerid = event.detail?.srclayerid;
+        const dataid = event.detail?.dataid;
+        const value = event.detail?.value;
+        const layerDetails = getLayerDetailsFromLayerDivId(srclayerid);
+        const groupId = layerDetails.groupDivId;
+        const config = this.getViewConfig(dataid, groupId, true);
+        if (typeof config !== 'undefined') {
+          config.colourMap = value[0];
+        }
+      });
   }
 
   /**
@@ -2294,10 +2329,14 @@ export class App {
       viewController.getCurrentIndex().getValues(),
       viewController.getCurrentPosition().getValues()
     ];
-    layerGroup.updateLayersToPositionChange({
-      value,
-      srclayerid: viewLayer.getId()
-    });
+    layerGroup.updateLayersToPositionChange(
+      new CustomEvent('positionchange', {
+        detail: {
+          value,
+          srclayerid: viewLayer.getId()
+        }
+      })
+    );
 
     // sync layer groups
     this.#stage.fitToContainer();
@@ -2333,18 +2372,19 @@ export class App {
      * Add view layer event.
      *
      * @event App#viewlayeradd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} layerid The layer id.
-     * @property {string} layergroupid The layer group id.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.layerid The layer id.
+     * @property {string} detail.layergroupid The layer group id.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'viewlayeradd',
-      layerid: viewLayer.getId(),
-      layergroupid: layerGroup.getDivId(),
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('viewlayeradd', {
+      detail: {
+        layerid: viewLayer.getId(),
+        layergroupid: layerGroup.getDivId(),
+        dataid: dataId,
+      }
+    }));
 
     // initialise the toolbox for base
     if (isBaseLayer) {
@@ -2483,10 +2523,12 @@ export class App {
       refViewController.getCurrentIndex().getValues(),
       refViewController.getCurrentPosition().getValues()
     ];
-    layerGroup.updateLayersToPositionChange({
-      value,
-      srclayerid: drawLayer.getId()
-    });
+    layerGroup.updateLayersToPositionChange(new CustomEvent('positionchange', {
+      detail: {
+        value,
+        srclayerid: drawLayer.getId()
+      }
+    }));
 
     // sync layer groups
     this.#stage.fitToContainer();
@@ -2528,18 +2570,19 @@ export class App {
      * Add draw layer event.
      *
      * @event App#drawlayeradd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} layerid The layer id.
-     * @property {string} layergroupid The layer group id.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.layerid The layer id.
+     * @property {string} detail.layergroupid The layer group id.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'drawlayeradd',
-      layerid: drawLayer.getId(),
-      layergroupid: layerGroup.getDivId(),
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('drawlayeradd', {
+      detail: {
+        layerid: drawLayer.getId(),
+        layergroupid: layerGroup.getDivId(),
+        dataid: dataId,
+      }
+    }));
   }
 
   /**

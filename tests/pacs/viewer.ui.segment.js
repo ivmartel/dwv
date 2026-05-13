@@ -291,13 +291,13 @@ export class SegmentationUI {
   /**
    * Handle a labels changed event.
    *
-   * @param {object} event The change event.
+   * @param {CustomEvent} event The change event.
    */
   #onLabelsChanged = (event) => {
     const segmentation =
       _segmentations.find(
         (seg) => {
-          return seg.dataId === event.dataid;
+          return seg.dataId === event.detail.dataid;
         }
       );
 
@@ -334,10 +334,10 @@ export class SegmentationUI {
   /**
    * Handle a dataadd event.
    *
-   * @param {object} event The dataadd event.
+   * @param {CustomEvent} event The dataadd event.
    */
   #onDataAdd = (event) => {
-    const dataId = event.dataid;
+    const dataId = event.detail.dataid;
     const maskImage = this.#app.getData(dataId).image;
 
     if (typeof maskImage !== 'undefined' &&

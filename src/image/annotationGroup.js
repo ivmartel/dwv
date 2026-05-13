@@ -1,5 +1,4 @@
 import {logger} from '../utils/logger.js';
-import {ListenerHandler} from '../utils/listen.js';
 
 /**
  * @import {Annotation} from './annotation.js';
@@ -21,7 +20,7 @@ export const annotationGroupEventNames = [
 /**
  * Annotation group.
  */
-export class AnnotationGroup {
+export class AnnotationGroup extends EventTarget {
   /**
    * @type {Annotation[]}
    */
@@ -33,13 +32,6 @@ export class AnnotationGroup {
    * @type {Record<string, any>}
    */
   #meta = {};
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Editable flag.
@@ -61,6 +53,7 @@ export class AnnotationGroup {
    *   create new if not provided.
    */
   constructor(list) {
+    super();
     if (typeof list !== 'undefined') {
       this.#list = list;
     } else {
@@ -107,14 +100,13 @@ export class AnnotationGroup {
      * Annotation group editable flag change event.
      *
      * @event AnnotationGroup#annotationgroupeditablechange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {boolean} data The value of the editable flag.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {boolean} detail.data The value of the editable flag.
      */
-    this.#fireEvent({
-      type: 'annotationgroupeditablechange',
-      data: flag
-    });
+    this.dispatchEvent(new CustomEvent('annotationgroupeditablechange', {
+      detail: {data: flag}
+    }));
   }
 
   /**
@@ -148,15 +140,13 @@ export class AnnotationGroup {
      * Annotation add event.
      *
      * @event AnnotationGroup#annotationadd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Annotation} data The added annotation.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Annotation} detail.data The added annotation.
      */
-    this.#fireEvent({
-      type: 'annotationadd',
-      data: annotation,
-      propagate
-    });
+    this.dispatchEvent(new CustomEvent('annotationadd', {
+      detail: {data: annotation, propagate}
+    }));
   }
 
   /**
@@ -182,17 +172,14 @@ export class AnnotationGroup {
        * Annotation update event.
        *
        * @event AnnotationGroup#annotationupdate
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {Annotation} data The updated annotation.
-       * @property {string[]} keys The properties that were updated.
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {Annotation} detail.data The updated annotation.
+       * @property {string[]} detail.keys The properties that were updated.
        */
-      this.#fireEvent({
-        type: 'annotationupdate',
-        data: annotation,
-        keys: propKeys,
-        propagate
-      });
+      this.dispatchEvent(new CustomEvent('annotationupdate', {
+        detail: {data: annotation, keys: propKeys, propagate}
+      }));
     } else {
       logger.warn('Cannot find annotation to update');
     }
@@ -214,15 +201,13 @@ export class AnnotationGroup {
        * Annotation remove event.
        *
        * @event AnnotationGroup#annotationremove
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {Annotation} data The removed annotation.
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {Annotation} detail.data The removed annotation.
        */
-      this.#fireEvent({
-        type: 'annotationremove',
-        data: annotation,
-        propagate
-      });
+      this.dispatchEvent(new CustomEvent('annotationremove', {
+        detail: {data: annotation, propagate}
+      }));
     } else {
       logger.warn('Cannot find annotation to remove');
     }
@@ -289,34 +274,4 @@ export class AnnotationGroup {
     this.#meta[key] = value;
   }
 
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 }

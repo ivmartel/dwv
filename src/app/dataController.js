@@ -1,4 +1,3 @@
-import {ListenerHandler} from '../utils/listen.js';
 import {mergeObjects} from '../utils/operator.js';
 import {MaskFactory} from '../image/maskFactory.js';
 import {ImageFactory} from '../image/imageFactory.js';
@@ -428,7 +427,7 @@ export class DicomSliceDataList {
 /**
  * DicomData controller.
  */
-export class DataController {
+export class DataController extends EventTarget {
 
   /**
    * List of DICOM data.
@@ -460,11 +459,11 @@ export class DataController {
   #dataIdCounter = -1;
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
+   * Constructor.
    */
-  #listenerHandler = new ListenerHandler();
+  constructor() {
+    super();
+  }
 
   /**
    * Get the next data id.
@@ -565,16 +564,15 @@ export class DataController {
      * Data image set event.
      *
      * @event DataController#dataimageset
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The event value, first element is the image.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The event value,
+     *   first element is the image.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'dataimageset',
-      value: [image],
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('dataimageset', {
+      detail: {value: [image], dataid: dataId}
+    }));
   }
 
   /**
@@ -687,14 +685,13 @@ export class DataController {
      * Data add event.
      *
      * @event DataController#dataadd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'dataadd',
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('dataadd', {
+      detail: {dataid: dataId}
+    }));
 
     return true;
   }
@@ -727,14 +724,13 @@ export class DataController {
        * Data remove event.
        *
        * @event DataController#dataremove
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {string} dataid The data id.
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {string} detail.dataid The data id.
        */
-      this.#fireEvent({
-        type: 'dataremove',
-        dataid: dataId
-      });
+      this.dispatchEvent(new CustomEvent('dataremove', {
+        detail: {dataid: dataId}
+      }));
     }
   }
 
@@ -812,14 +808,13 @@ export class DataController {
      * Data udpate event.
      *
      * @event DataController#dataupdate
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'dataupdate',
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('dataupdate', {
+      detail: {dataid: dataId}
+    }));
   }
 
   /**
@@ -859,37 +854,6 @@ export class DataController {
   }
 
   /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
-
-  /**
    * Get a fireEvent function that adds the input data id
    * to the event value.
    *
@@ -897,8 +861,9 @@ export class DataController {
    * @returns {EventListener} A fireEvent function.
    */
   #getFireEvent(dataId) {
-    return /** @type {EventListener} */ ((event) => {
-      this.#fireEvent(Object.assign(event, {dataid: dataId}));
+    return ((/** @type {CustomEvent} */ event) => {
+      const detail = Object.assign({}, event.detail, {dataid: dataId});
+      this.dispatchEvent(new CustomEvent(event.type, {detail}));
     });
   }
 

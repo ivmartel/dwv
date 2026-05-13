@@ -1,4 +1,3 @@
-import {ListenerHandler} from '../utils/listen.js';
 import {getReverseOrientation} from '../dicom/dicomParser.js';
 import {
   getDateObj,
@@ -100,7 +99,7 @@ function replaceFlags(inputStr, values) {
 /**
  * DICOM Header info data.
  */
-export class InfoData {
+export class InfoData extends EventTarget {
 
   /**
    * Associated app.
@@ -152,18 +151,12 @@ export class InfoData {
   #currentDataUid;
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
    * @param {App} app The associated application.
    * @param {string} dataId The associated data id.
    * @param {Record<string, InfoDataItem[]>} configs The info data config.
    */
   constructor(app, dataId, configs) {
+    super();
     this.#app = app;
     this.#dataId = dataId;
     this.#infoConfigs = configs;
@@ -226,16 +219,18 @@ export class InfoData {
   /**
    * Handle a changed slice event.
    *
-   * @param {object} event The slicechange event.
+   * @param {CustomEvent} event The slicechange event.
    */
   onSliceChange = (event) => {
-    if (event.dataid !== this.#dataId) {
+    const dataid = event.detail?.dataid;
+    if (dataid !== this.#dataId) {
       return;
     }
-    if (typeof event.data !== 'undefined' &&
-      typeof event.data.imageUid !== 'undefined' &&
-      this.#currentDataUid !== event.data.imageUid) {
-      this.#currentDataUid = event.data.imageUid;
+    const eventData = event.detail?.data;
+    if (typeof eventData !== 'undefined' &&
+      typeof eventData.imageUid !== 'undefined' &&
+      this.#currentDataUid !== eventData.imageUid) {
+      this.#currentDataUid = eventData.imageUid;
       this.#updateData(event);
     }
   };
@@ -243,12 +238,13 @@ export class InfoData {
   /**
    * Update the info data.
    *
-   * @param {object} event An event defined by the info map and
+   * @param {CustomEvent} event An event defined by the info map and
    *   registered in toggleListeners.
    */
   #updateData = (event) => {
-    if (typeof event.dataid !== 'undefined' &&
-      event.dataid !== this.#dataId) {
+    const dataid = event.detail?.dataid;
+    if (typeof dataid !== 'undefined' &&
+      dataid !== this.#dataId) {
       return;
     }
 
@@ -270,7 +266,7 @@ export class InfoData {
         // update text if the value is an event type
 
         const format = infoDataItem.format;
-        let values = event.value;
+        let values = event.detail?.value;
         // optional number precision
         if (typeof infoDataItem.precision !== 'undefined') {
           let mapFunc;
@@ -294,14 +290,13 @@ export class InfoData {
      * Value change event.
      *
      * @event InfoData#valuechange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {InfoDataItem[]} data The value of the info data.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {InfoDataItem[]} detail.data The value of the info data.
      */
-    this.#fireEvent({
-      type: 'valuechange',
-      data: sliceInfoData
-    });
+    this.dispatchEvent(new CustomEvent('valuechange', {
+      detail: {data: sliceInfoData}
+    }));
   };
 
   /**
@@ -339,37 +334,6 @@ export class InfoData {
     }
     // update flag
     this.#isListening = false;
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent(event) {
-    this.#listenerHandler.fireEvent(event);
   }
 
 } // class InfoData

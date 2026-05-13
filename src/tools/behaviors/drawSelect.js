@@ -26,12 +26,12 @@ export class DrawSelect {
   /**
    * Callback store to allow attach/detach.
    *
-   * @type {Array}
+   * @type {EventListener[]}
    */
   #callbackStore = [];
 
   /**
-   * @type {Function|undefined}
+   * @type {EventListener|undefined}
    */
   #drawLayerAddCallback;
 
@@ -163,7 +163,7 @@ export class DrawSelect {
    * TODO: check need for store item removal.
    *
    * @param {DrawLayer} layer The layer to update.
-   * @returns {Function} The callback.
+   * @returns {EventListener} The callback.
    */
   #getPositionCallback(layer) {
     const layerId = layer.getId();
@@ -178,17 +178,18 @@ export class DrawSelect {
   /**
    * Get the 'drawlayeradd' callback.
    *
-   * @returns {Function} The callback.
+   * @returns {EventListener} The callback.
    */
   #getDrawLayerAddCallback() {
-    return (event) => {
+    return ((/** @type {CustomEvent} */ event) => {
+      const layerid = event.detail?.layerid;
       const newDrawLayers = this.#app.getDrawLayers(function (item) {
-        return item.getId() === event.layerid;
+        return item.getId() === layerid;
       });
       if (newDrawLayers.length === 1) {
         this.#activateLayer(newDrawLayers[0], true);
       }
-    };
+    });
   }
 
   /**

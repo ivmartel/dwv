@@ -38,10 +38,10 @@ describe('image', () => {
 
       // listeners
       const listener1 = function (event) {
-        assert.equal(event.wc, 0, 'Expected call to listener1.');
+        assert.equal(event.detail.wc, 0, 'Expected call to listener1.');
       };
       const listener2 = function (event) {
-        assert.equal(event.ww, 1, 'Expected call to listener2.');
+        assert.equal(event.detail.ww, 1, 'Expected call to listener2.');
       };
         // with two listeners
       view0.addEventListener('wlchange', listener1);

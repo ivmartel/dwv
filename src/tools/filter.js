@@ -1,4 +1,3 @@
-import {ListenerHandler} from '../utils/listen.js';
 import {
   ThresholdFilter,
   SobelFilter,
@@ -13,7 +12,7 @@ import {RunFilterCommand} from '../command/runFilterCommand.js';
 /**
  * Filter tool.
  */
-export class Filter {
+export class Filter extends EventTarget {
 
   /**
    * Associated app.
@@ -26,6 +25,7 @@ export class Filter {
    * @param {App} app The associated application.
    */
   constructor(app) {
+    super();
     this.#app = app;
   }
 
@@ -44,11 +44,13 @@ export class Filter {
   #selectedFilter = 0;
 
   /**
-   * Listener handler.
+   * Forward an event from sub-filters.
    *
-   * @type {ListenerHandler}
+   * @param {CustomEvent} event The event to forward.
    */
-  #listenerHandler = new ListenerHandler();
+  #forwardEvent = (event) => {
+    this.dispatchEvent(new CustomEvent(event.type, {detail: event.detail}));
+  };
 
   /**
    * Activate the tool.
@@ -59,13 +61,15 @@ export class Filter {
     // setup event listening
     for (const key in this.#filterList) {
       if (bool) {
-        this.#filterList[key].addEventListener('filterrun', this.#fireEvent);
-        this.#filterList[key].addEventListener('filterundo', this.#fireEvent);
+        this.#filterList[key].addEventListener(
+          'filterrun', this.#forwardEvent);
+        this.#filterList[key].addEventListener(
+          'filterundo', this.#forwardEvent);
       } else {
         this.#filterList[key].removeEventListener(
-          'filterrun', this.#fireEvent);
+          'filterrun', this.#forwardEvent);
         this.#filterList[key].removeEventListener(
-          'filterundo', this.#fireEvent);
+          'filterundo', this.#forwardEvent);
       }
     }
   }
@@ -121,37 +125,6 @@ export class Filter {
   getEventNames() {
     return ['filterrun', 'filterundo'];
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 
   /**
    * Get the selected filter.
@@ -215,7 +188,7 @@ export class Filter {
 /**
  * Threshold filter tool.
  */
-export class Threshold {
+export class Threshold extends EventTarget {
   /**
    * Associated app.
    *
@@ -227,6 +200,7 @@ export class Threshold {
    * @param {App} app The associated application.
    */
   constructor(app) {
+    super();
     this.#app = app;
   }
 
@@ -243,13 +217,6 @@ export class Threshold {
    * @type {boolean}
    */
   #resetImage = true;
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Activate the filter.
@@ -288,50 +255,23 @@ export class Threshold {
       this.#resetImage = false;
     }
     const command = new RunFilterCommand(this.#filter, args.dataId, this.#app);
-    command.onExecute = this.#fireEvent;
-    command.onUndo = this.#fireEvent;
+    command.onExecute = (event) => {
+      this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
+    };
+    command.onUndo = (event) => {
+      this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
+    };
     command.execute();
     // save command in undo stack
     this.#app.addToUndoStack(command);
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *  event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 
 } // class Threshold
 
 /**
  * Sharpen filter tool.
  */
-export class Sharpen {
+export class Sharpen extends EventTarget {
   /**
    * Associated app.
    *
@@ -343,15 +283,9 @@ export class Sharpen {
    * @param {App} app The associated application.
    */
   constructor(app) {
+    super();
     this.#app = app;
   }
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Activate the filter.
@@ -382,50 +316,23 @@ export class Sharpen {
     const image = this.#app.getData(args.dataId).image;
     filter.setOriginalImage(image);
     const command = new RunFilterCommand(filter, args.dataId, this.#app);
-    command.onExecute = this.#fireEvent;
-    command.onUndo = this.#fireEvent;
+    command.onExecute = (event) => {
+      this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
+    };
+    command.onUndo = (event) => {
+      this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
+    };
     command.execute();
     // save command in undo stack
     this.#app.addToUndoStack(command);
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *    event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 
 } // filter.Sharpen
 
 /**
  * Sobel filter tool.
  */
-export class Sobel {
+export class Sobel extends EventTarget {
   /**
    * Associated app.
    *
@@ -437,15 +344,9 @@ export class Sobel {
    * @param {App} app The associated application.
    */
   constructor(app) {
+    super();
     this.#app = app;
   }
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Activate the filter.
@@ -476,42 +377,15 @@ export class Sobel {
     const image = this.#app.getData(args.dataId).image;
     filter.setOriginalImage(image);
     const command = new RunFilterCommand(filter, args.dataId, this.#app);
-    command.onExecute = this.#fireEvent;
-    command.onUndo = this.#fireEvent;
+    command.onExecute = (event) => {
+      this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
+    };
+    command.onUndo = (event) => {
+      this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
+    };
     command.execute();
     // save command in undo stack
     this.#app.addToUndoStack(command);
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *  event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 
 } // class filter.Sobel

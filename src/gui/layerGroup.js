@@ -2,7 +2,6 @@ import {Index} from '../math/index.js';
 import {Point} from '../math/point.js';
 import {Vector3D} from '../math/vector.js';
 import {viewEventNames} from '../image/view.js';
-import {ListenerHandler} from '../utils/listen.js';
 import {logger} from '../utils/logger.js';
 import {precisionRound} from '../utils/string.js';
 import {ViewLayer} from './viewLayer.js';
@@ -135,7 +134,7 @@ export function getScaledOffset(offset, scale, newScale, center) {
  * - planePos = viewController.getOffset3DFromPlaneOffset(pos)
  *   no need yet for a planePos to displayPos...
  */
-export class LayerGroup {
+export class LayerGroup extends EventTarget {
 
   /**
    * The container div.
@@ -181,13 +180,6 @@ export class LayerGroup {
    * @type {number}
    */
   #activeLayerIndex = undefined;
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Flag to activate crosshair or not.
@@ -274,6 +266,7 @@ export class LayerGroup {
    * default to false.
    */
   constructor(containerDiv, withInfoLayer) {
+    super();
     this.#containerDiv = containerDiv;
 
     if (typeof withInfoLayer !== 'undefined' &&
@@ -766,14 +759,13 @@ export class LayerGroup {
      * Active layer change event.
      *
      * @event LayerGroup#activelayerchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'activelayerchange',
-      value: [this.#layers[index]]
-    });
+    this.dispatchEvent(new CustomEvent('activelayerchange', {
+      detail: {value: [this.#layers[index]]}
+    }));
   }
 
   /**
@@ -1059,16 +1051,14 @@ export class LayerGroup {
      * Remove layer event.
      *
      * @event LayerGroup#removelayer
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} layerid The layer id.
-     * @property {string} layergroupid The layer group id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.layerid The layer id.
+     * @property {string} detail.layergroupid The layer group id.
      */
-    this.#fireEvent({
-      type: 'layerremove',
-      layerid: layer.getId(),
-      layergroupid: this.getDivId()
-    });
+    this.dispatchEvent(new CustomEvent('layerremove', {
+      detail: {layerid: layer.getId(), layergroupid: this.getDivId()}
+    }));
   }
 
   /**
@@ -1269,10 +1259,11 @@ export class LayerGroup {
   /**
    * Update info data on position change.
    *
-   * @param {object} event The position change event.
+   * @param {CustomEvent} event The position change event.
    */
   #updateInfoData = (event) => {
-    const infoData = this.#infoDatas[event.dataid];
+    const dataid = event.detail?.dataid;
+    const infoData = this.#infoDatas[dataid];
     if (typeof infoData !== 'undefined') {
       infoData.onSliceChange(event);
     }
@@ -1281,7 +1272,7 @@ export class LayerGroup {
   /**
    * Update layers (but not the event source layer) to a position change.
    *
-   * @param {object} event The position change event.
+   * @param {CustomEvent} event The position change event.
    * @function
    */
   updateLayersToPositionChange = (event) => {
@@ -1296,8 +1287,9 @@ export class LayerGroup {
       }
     }
 
-    const index = new Index(event.value[0]);
-    const position = new Point(event.value[1]);
+    const value = event.detail?.value;
+    const index = new Index(value[0]);
+    const position = new Point(value[1]);
 
     // origin of the first view layer
     const viewLayerOffsets = {};
@@ -1366,7 +1358,8 @@ export class LayerGroup {
 
       // update position (triggers redraw)
       let hasSetPos = false;
-      if (layer.getId() !== event.srclayerid) {
+      const srclayerid = event.detail?.srclayerid;
+      if (layer.getId() !== srclayerid) {
         hasSetPos = layer.setCurrentPosition(position, index);
       }
 
@@ -1377,11 +1370,9 @@ export class LayerGroup {
     }
 
     const hasValidPosition = this.hasAnyLayerWithValidPosition();
-    this.#fireEvent({
-      type: 'outofrange',
-      layergroupid: this.getDivId(),
-      value: [!hasValidPosition]
-    });
+    this.dispatchEvent(new CustomEvent('outofrange', {
+      detail: {layergroupid: this.getDivId(), value: [!hasValidPosition]}
+    }));
 
     // show crosshair after position update
     if (this.#showCrosshair) {
@@ -1551,14 +1542,11 @@ export class LayerGroup {
      * Zoom change event.
      *
      * @event LayerGroup#zoomchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'zoomchange',
-      value
-    });
+    this.dispatchEvent(new CustomEvent('zoomchange', {detail: {value}}));
   }
 
   /**
@@ -1594,18 +1582,13 @@ export class LayerGroup {
      * Offset change event.
      *
      * @event LayerGroup#offsetchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'offsetchange',
-      value: [
-        this.#offset.x,
-        this.#offset.y,
-        this.#offset.z
-      ]
-    });
+    this.dispatchEvent(new CustomEvent('offsetchange', {
+      detail: {value: [this.#offset.x, this.#offset.y, this.#offset.z]}
+    }));
   }
 
   /**
@@ -1671,34 +1654,14 @@ export class LayerGroup {
   }
 
   /**
-   * Add an event listener to this class.
+   * Re-dispatch an event from a sub-layer as a new CustomEvent on this group.
    *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
+   * @param {CustomEvent} event The event to re-dispatch.
    */
   #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
+    const detail = event.detail !== null && typeof event.detail === 'object'
+      ? Object.assign({}, event.detail) : {};
+    this.dispatchEvent(new CustomEvent(event.type, {detail}));
   };
 
 } // LayerGroup class
