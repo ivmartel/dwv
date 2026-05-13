@@ -18,8 +18,8 @@ export const InteractionEventNames = [
 /**
  * Get the positions (without the parent offset) of a list of touch events.
  *
- * @param {Array} touches The list of touch events.
- * @param {object} rect The bounding client rect.
+ * @param {TouchList} touches The list of touch events.
+ * @param {DOMRect} rect The bounding client rect.
  * @returns {Point2D[]} The list of positions of the touch events.
  */
 function getTouchesPositions(touches, rect) {
@@ -45,11 +45,12 @@ function getTouchesPositions(touches, rect) {
 /**
  * Get the offsets of an input touch event.
  *
- * @param {object} event The event to get the offset from.
+ * @param {TouchEvent} event The event to get the offset from.
  * @returns {Point2D[]} The array of points.
  */
 export function getTouchPoints(event) {
-  const rect = event.currentTarget.getBoundingClientRect();
+  const rect = /** @type {HTMLElement} */ (event.currentTarget)
+    .getBoundingClientRect();
 
   let positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
@@ -67,7 +68,7 @@ export function getTouchPoints(event) {
 /**
  * Get the offset of an input mouse event.
  *
- * @param {object} event The event to get the offset from.
+ * @param {MouseEvent} event The event to get the offset from.
  * @returns {Point2D} The 2D point.
  */
 export function getMousePoint(event) {

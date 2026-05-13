@@ -44,7 +44,7 @@ export const MouseEventButtons = {
 /**
  * Mouse position and layer group from a DOM event targeting a view layer.
  *
- * @param {MouseEvent|TouchEvent} event The mouse or touch event.
+ * @param {MouseEvent} event The mouse or touch event.
  * @param {App} app The application (resolves the layer group).
  * @returns {{point: Point2D, layerGroup: LayerGroup}}
  *   Pointer position and layer group.
