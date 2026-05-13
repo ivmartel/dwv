@@ -59,8 +59,8 @@ import Konva from 'konva';
 /**
  * Draw layer.
  *
- * Not an EventTarget in order to forward and add information to
- * DOM div events (see '#fireDomEvent').
+ * Not an EventTarget in order to forward native DOM events while
+ * preserving `preventDefault()` for tools (see '#fireDomEvent').
  */
 export class DrawLayer {
 
