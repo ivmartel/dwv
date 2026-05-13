@@ -97,7 +97,7 @@ function getConfigsHtmlList(configs) {
  * @param {string} fileName The input file name.
  */
 function getFileConfigsHtmlList(fileName) {
-  const url = `/tests/dicom/${fileName}.json`;
+  const url = `/tests/data/${fileName}.json`;
   const request = new XMLHttpRequest();
   request.open('GET', url, true);
   request.onerror = function (event) {

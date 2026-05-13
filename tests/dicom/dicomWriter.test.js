@@ -23,7 +23,7 @@ import {b64urlToArrayBuffer} from './utils.js';
 // test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm?inline';
 import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm?inline';
-import syntheticData from '/tests/dicom/synthetic-data.json';
+import syntheticData from '/tests/data/synthetic-data.json';
 
 /**
  * Tests for the 'dicom/dicomWriter.js' file.

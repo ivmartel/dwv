@@ -7,7 +7,7 @@ export default {
   mode: 'production',
   devtool: 'source-map',
   entry: {
-    viewer: './tests/pacs/viewer.js',
+    viewer: './dev/pacs/viewer.js',
   },
   output: {
     filename: '[name].min.js',

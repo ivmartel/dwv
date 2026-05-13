@@ -159,7 +159,7 @@ function getDwvUrl(uri) {
       const islocal = localChk ? localChk.checked : true;
       let uriroot;
       if (islocal) {
-        uriroot = '../';
+        uriroot = '/tests/';
       } else {
         uriroot = _githubRaw;
       }
