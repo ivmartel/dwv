@@ -47,7 +47,7 @@ function addDataLine(id, doc) {
   const viewConfig0 = new ViewConfig(layConDiv.id);
   const viewConfigs = {0: [viewConfig0]};
   const options = new AppOptions(viewConfigs);
-  const url = `../data/${fileroot}.dcm`;
+  const url = `/tests/data/${fileroot}.dcm`;
   const app = new App();
   app.init(options);
   // display loading time
