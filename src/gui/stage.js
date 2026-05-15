@@ -373,7 +373,7 @@ export class Stage {
    *
    * @param {object} binder The layer binder.
    * @param {number} index The index of the associated layer group.
-   * @returns {EventListener} The binder function.
+   * @returns {EventListener|undefined} The binder function.
    */
   #getBinderCallback(binder, index) {
     // silent exit
