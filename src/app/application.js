@@ -1016,7 +1016,6 @@ export class App extends EventTarget {
     logger.debug(
       'App.getViewConfigs: deprecated since v0.37, ' +
       'use app.getStageController().getViewConfigs()');
-    console.trace();
     return this.#stageController.getViewConfigs(dataId, excludeStarConfig);
   }
 
