@@ -376,6 +376,11 @@ export class Stage {
    * @returns {EventListener} The binder function.
    */
   #getBinderCallback(binder, index) {
+    // silent exit
+    // TODO: check if avoidable
+    if (!this.#callbackStore) {
+      return;
+    }
     if (typeof this.#callbackStore[index] === 'undefined') {
       this.#callbackStore[index] = [];
     }
