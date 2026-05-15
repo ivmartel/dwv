@@ -103,7 +103,8 @@ export class Brush extends LayerGroupPointer {
    * @param {boolean} bool The flag to activate or not.
    */
   activate(bool) {
-    const viewConfigs = this.#app.getDataViewConfigs();
+    const stgCtrl = this.#app.getStageController();
+    const viewConfigs = stgCtrl.getDataViewConfigs();
     const allDivIds = getUniqueDataViewConfigsDivIds(viewConfigs);
     if (bool) {
       this.#deactivateDivIdsContextMenu(allDivIds);

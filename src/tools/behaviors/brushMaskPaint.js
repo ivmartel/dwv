@@ -577,7 +577,8 @@ export class BrushMaskPaint extends EventTarget {
    * @returns {string} The orientation.
    */
   #getDataViewConfigOrientation(divId) {
-    const dataConfigs = this.#app.getDataViewConfigs();
+    const stgCtrl = this.#app.getStageController();
+    const dataConfigs = stgCtrl.getDataViewConfigs();
     let orient;
     for (const key in dataConfigs) {
       const config = dataConfigs[key].find(function (item) {
@@ -603,8 +604,9 @@ export class BrushMaskPaint extends EventTarget {
     }
     const viewConfig = new ViewConfig(divId);
     viewConfig.orientation = this.#getDataViewConfigOrientation(divId);
-    this.#app.addDataViewConfig(this.#maskDataId, viewConfig);
-    this.#app.render(this.#maskDataId);
+    const stgCtrl = this.#app.getStageController();
+    stgCtrl.addDataViewConfig(this.#maskDataId, viewConfig);
+    stgCtrl.render(this.#maskDataId);
   }
 
   /**
@@ -761,7 +763,8 @@ export class BrushMaskPaint extends EventTarget {
       }
       // get source position
       // any layer from the app (could be other layer group)
-      const sourceVl = this.#app.getViewLayersByDataId(sourceDataId)[0];
+      const stgCtrl = this.#app.getStageController();
+      const sourceVl = stgCtrl.getViewLayersByDataId(sourceDataId)[0];
       const sourceViewController = sourceVl.getViewController();
       const planePos = sourceVl.displayToPlanePos(mousePoint);
       sourcePosition = sourceViewController.getPositionFromPlanePoint(planePos);

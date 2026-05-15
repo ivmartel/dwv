@@ -606,7 +606,8 @@ export class SegmentationUI {
 
     if (typeof label !== 'undefined') {
       const dataId = segmentation.dataId;
-      const drawLayers = this.#app.getViewLayersByDataId(dataId);
+      const stgCtrl = this.#app.getStageController();
+      const drawLayers = stgCtrl.getViewLayersByDataId(dataId);
       for (const layer of drawLayers) {
         layer.setCurrentPosition(label.centroid);
       }
@@ -640,7 +641,8 @@ export class SegmentationUI {
       segViewHelper.addToHidden(segment.number);
     }
     // apply hidden
-    const vls = this.#app.getViewLayersByDataId(segmentation.dataId);
+    const stageCtrl = this.#app.getStageController();
+    const vls = stageCtrl.getViewLayersByDataId(segmentation.dataId);
     if (vls.length === 0) {
       console.warn('No layers to show/hide seg');
     }

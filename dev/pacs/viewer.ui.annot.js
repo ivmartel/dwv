@@ -145,7 +145,8 @@ export class AnnotationUI {
       document.createTextNode('Add annotation group'));
     addAnnotationGroupButton.onclick = () => {
       const divId = 'layerGroup0';
-      const layerGroup = this.#app.getLayerGroupByDivId(divId);
+      const stgCtrl = this.#app.getStageController();
+      const layerGroup = stgCtrl.getLayerGroupByDivId(divId);
       // add annotation group
       const viewLayer = layerGroup.getActiveViewLayer();
       if (typeof viewLayer === 'undefined') {
@@ -262,7 +263,8 @@ export class AnnotationUI {
         splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
       const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const drawLayers = this.#app.getDrawLayersByDataId(clkDataId);
+      const drawLayers =
+        this.#app.getStageController().getDrawLayersByDataId(clkDataId);
       // toggle hidden
       if (isButtonPressed(target)) {
         setButtonPressed(target, false);
@@ -356,7 +358,8 @@ export class AnnotationUI {
       const clkAnnotation = clkAnnotationGroup.find(annotationId);
       const annotCentroid = clkAnnotation.getCentroid();
       if (typeof annotCentroid !== 'undefined') {
-        const drawLayers = this.#app.getDrawLayersByDataId(clkDataId);
+        const drawLayers =
+          this.#app.getStageController().getDrawLayersByDataId(clkDataId);
         for (const layer of drawLayers) {
           layer.setCurrentPosition(annotCentroid);
         }
@@ -445,7 +448,8 @@ export class AnnotationUI {
     hideLabelsButton.title = 'Show/hide annotation labels';
     hideLabelsButton.onclick = (event) => {
       const target = event.target;
-      const drawLayer = this.#app.getDrawLayersByDataId(dataId)[0];
+      const drawLayer =
+        this.#app.getStageController().getDrawLayersByDataId(dataId)[0];
       if (typeof drawLayer === 'undefined') {
         console.warn(`Cannot find draw layer with id ${dataId}`);
       }

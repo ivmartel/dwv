@@ -27,21 +27,34 @@ import {RectangleFactory} from '../../src/tools/shapes/rectangle.js';
  * @returns {object} Minimal {@link App} stub for {@link Draw}.
  */
 function makeDrawApp(overrides = {}) {
+  const stgCtrlKeys = ['getDrawLayers', 'getActiveLayerGroup'];
+  const stgCtrlOverrides = {};
+  const appOverrides = {};
+  for (const [k, v] of Object.entries(overrides)) {
+    if (stgCtrlKeys.includes(k)) {
+      stgCtrlOverrides[k] = v;
+    } else {
+      appOverrides[k] = v;
+    }
+  }
   return {
     getStyle: vi.fn(() => ({
       setLineColour: vi.fn(),
       getLineColour: vi.fn(() => '#ffff80'),
       setZoomScale: vi.fn()
     })),
-    getDrawLayers: vi.fn(() => []),
+    getStageController: vi.fn(() => ({
+      getDrawLayers: vi.fn(() => []),
+      getActiveLayerGroup: vi.fn(),
+      ...stgCtrlOverrides
+    })),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     onKeydown: vi.fn(),
-    getActiveLayerGroup: vi.fn(),
     addToUndoStack: vi.fn((cmd) => {
       cmd.execute();
     }),
-    ...overrides
+    ...appOverrides
   };
 }
 

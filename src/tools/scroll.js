@@ -50,7 +50,8 @@ import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
  * document.body.appendChild(range);
  * // update app on slider change
  * range.oninput = function () {
- *   const lg = app.getLayerGroupByDivId('layerGroup0');
+ *   const stgCtrl = app.getStageController();
+ *   const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
  *   const vl = lg.getBaseViewLayer();
  *   const vc = vl.getViewController();
  *   const index = vc.getCurrentIndex();
@@ -66,7 +67,8 @@ import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
  * });
  * // update slider on slice change (for ex via mouse wheel)
  * app.addEventListener('positionchange', function () {
- *   const lg = app.getLayerGroupByDivId('layerGroup0');
+ *   const stgCtrl = app.getStageController();
+ *   const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
  *   const vl = lg.getBaseViewLayer();
  *   const vc = vl.getViewController();
  *   range.value = vc.getCurrentIndex().get(2);

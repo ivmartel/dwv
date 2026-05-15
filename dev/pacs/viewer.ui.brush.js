@@ -107,7 +107,8 @@ export class BrushToolUI {
    * @param {number} _brushSize The new size.
    */
   // #updateBrushCursorSize(_brushSize) {
-  //   const lg = this.#app.getActiveLayerGroup();
+  //   const stgCtrl = this.#app.getStageController();
+  //   const lg = stgCtrl.getActiveLayerGroup();
   //   if (typeof lg === 'undefined') {
   //     throw new Error('No active layer group for brush cursor');
   //   }

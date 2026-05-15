@@ -84,7 +84,8 @@ export class State {
    * @param {object} data The state data.
    */
   apply(app, data) {
-    const layerGroup = app.getActiveLayerGroup();
+    const stgCtrl = app.getStageController();
+    const layerGroup = stgCtrl.getActiveLayerGroup();
     const viewLayer = layerGroup.getBaseViewLayer();
     const viewController = viewLayer.getViewController();
     // display
@@ -96,7 +97,7 @@ export class State {
     //viewController.setCurrentIndex(new Index(data.position));
 
     // apply saved scale on top of current base one
-    const baseScale = app.getActiveLayerGroup().getBaseScale();
+    const baseScale = stgCtrl.getActiveLayerGroup().getBaseScale();
     let scale;
     let offset;
     if (typeof data.scaleCenter !== 'undefined') {
@@ -133,8 +134,8 @@ export class State {
         z: 0
       };
     }
-    app.getActiveLayerGroup().setScale(scale);
-    app.getActiveLayerGroup().setOffset(offset);
+    stgCtrl.getActiveLayerGroup().setScale(scale);
+    stgCtrl.getActiveLayerGroup().setOffset(offset);
     // drawings (will draw the draw layer)
     app.setDrawings(data.drawings, data.drawingsDetails, this.#dataId);
   }

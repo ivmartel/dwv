@@ -183,7 +183,8 @@ export class DrawSelect {
   #getDrawLayerAddCallback() {
     return ((/** @type {CustomEvent} */ event) => {
       const layerid = event.detail?.layerid;
-      const newDrawLayers = this.#app.getDrawLayers(function (item) {
+      const stgCtrl = this.#app.getStageController();
+      const newDrawLayers = stgCtrl.getDrawLayers(function (item) {
         return item.getId() === layerid;
       });
       if (newDrawLayers.length === 1) {
@@ -242,7 +243,8 @@ export class DrawSelect {
       this.#shapeHandler.onMouseOutShapeGroup();
     }
     // activate current layers
-    const drawLayers = this.#app.getDrawLayers();
+    const stgCtrl = this.#app.getStageController();
+    const drawLayers = stgCtrl.getDrawLayers();
     for (const drawLayer of drawLayers) {
       if (typeof drawLayer !== 'undefined') {
         this.#activateLayer(drawLayer, flag);

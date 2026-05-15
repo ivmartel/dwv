@@ -54,12 +54,14 @@ function makeImage3x3(values) {
  */
 function makeFilterApp(image) {
   const dataId = 'test-data';
+  const render = vi.fn();
   return {
     dataId,
     image,
     getData: vi.fn(() => ({image})),
     setImage: vi.fn(),
-    render: vi.fn(),
+    render,
+    getStageController: () => ({render}),
     addToUndoStack: vi.fn(),
     onKeydown: vi.fn()
   };

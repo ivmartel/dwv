@@ -82,7 +82,9 @@ export class Floodfill extends LayerGroupPointer {
   activate(bool) {
     if (bool) {
       // init with the app window scale
-      this.#style.setBaseScale(this.#app.getBaseScale());
+      const stgCtrl = this.#app.getStageController();
+      const lg = stgCtrl.getActiveLayerGroup();
+      this.#style.setBaseScale(lg.getBaseScale());
       // set the default to the first in the list
       this.setFeatures({shapeColour: this.#style.getLineColour()});
     } else {

@@ -100,7 +100,7 @@ describe('tools/layerGroupPointer', () => {
 
   test('LayerGroupPointer extends EventTarget', () => {
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: () => ({})},
+      app: {getStageController: () => ({getLayerGroupByDivId: () => ({})})},
       dragBehavior: new DragBehavior()
     });
     assert.ok(pointer instanceof EventTarget);
@@ -133,8 +133,10 @@ describe('tools/layerGroupPointer', () => {
     const drag = new T();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? layerGroup : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? layerGroup : undefined)
+        })
       },
       dragBehavior: drag
     });
@@ -166,8 +168,10 @@ describe('tools/layerGroupPointer', () => {
     const drag = new T();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: drag,
       hoverBehavior: {
@@ -191,8 +195,10 @@ describe('tools/layerGroupPointer', () => {
     const drag = new DragBehavior();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: drag,
       hoverBehavior: {
@@ -211,8 +217,10 @@ describe('tools/layerGroupPointer', () => {
     const onHoverUpdate = vi.fn();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: new DragBehavior(),
       hoverBehavior: {
@@ -242,8 +250,10 @@ describe('tools/layerGroupPointer', () => {
     };
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       tapBehavior: tap
     });
@@ -278,8 +288,10 @@ describe('tools/layerGroupPointer', () => {
     const drag = new T();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: drag,
       longTouchToDblClickMs: 500
@@ -318,8 +330,10 @@ describe('tools/layerGroupPointer', () => {
     const twoOnStart = vi.fn();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: drag,
       twoTouchBehavior: {
@@ -377,8 +391,10 @@ describe('tools/layerGroupPointer', () => {
     const twoTouch = new T();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? layerGroup : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? layerGroup : undefined)
+        })
       },
       dragBehavior: new DragBehavior(),
       twoTouchBehavior: twoTouch
@@ -429,8 +445,10 @@ describe('tools/layerGroupPointer', () => {
     const twoTouch = new T();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: new DragBehavior(),
       twoTouchBehavior: twoTouch
@@ -460,7 +478,7 @@ describe('tools/layerGroupPointer', () => {
 
     const drag = new NoDrag();
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: () => ({})},
+      app: {getStageController: () => ({getLayerGroupByDivId: () => ({})})},
       dragBehavior: drag
     });
 
@@ -477,8 +495,10 @@ describe('tools/layerGroupPointer', () => {
 
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: undefined,
       hoverBehavior: {
@@ -525,8 +545,10 @@ describe('tools/layerGroupPointer', () => {
     const onHoverUpdate = vi.fn();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: new DragBehavior(),
       hoverBehavior: {
@@ -546,8 +568,10 @@ describe('tools/layerGroupPointer', () => {
     const onWheelTick = vi.fn();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? layerGroup : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? layerGroup : undefined)
+        })
       },
       dragBehavior: new DragBehavior(),
       wheelBehavior: {onWheel, onWheelTick}
@@ -568,8 +592,10 @@ describe('tools/layerGroupPointer', () => {
     const {canvas, groupDivId} = setupLayerCanvas();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: new DragBehavior()
     });
@@ -585,8 +611,10 @@ describe('tools/layerGroupPointer', () => {
     const onWheelTick = vi.fn();
     const pointer = new LayerGroupPointer({
       app: {
-        getLayerGroupByDivId: (id) =>
-          (id === groupDivId ? {} : undefined)
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) =>
+            (id === groupDivId ? {} : undefined)
+        })
       },
       dragBehavior: new DragBehavior(),
       wheelBehavior: {onWheel, onWheelTick}
@@ -611,7 +639,11 @@ describe('tools/layerGroupPointer', () => {
       }
     }
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
+      app: {
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)
+        })
+      },
       dragBehavior: new NoStartDrag(),
       tapBehavior: {
         onTap,
@@ -643,7 +675,11 @@ describe('tools/layerGroupPointer', () => {
     }
     const drag = new T();
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
+      app: {
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)
+        })
+      },
       dragBehavior: drag
     });
 
@@ -659,7 +695,11 @@ describe('tools/layerGroupPointer', () => {
     const {canvas, groupDivId} = setupLayerCanvas();
     const onTap = vi.fn();
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
+      app: {
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)
+        })
+      },
       dragBehavior: new DragBehavior(),
       tapBehavior: {
         onTap,
@@ -690,7 +730,11 @@ describe('tools/layerGroupPointer', () => {
       }
     }
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)},
+      app: {
+        getStageController: () => ({
+          getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)
+        })
+      },
       dragBehavior: new NoStartDrag(),
       tapBehavior: {
         onTap,
@@ -725,7 +769,7 @@ describe('tools/layerGroupPointer', () => {
     }
     const drag = new T();
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: () => ({})},
+      app: {getStageController: () => ({getLayerGroupByDivId: () => ({})})},
       dragBehavior: drag
     });
 
@@ -749,7 +793,7 @@ describe('tools/layerGroupPointer', () => {
     getTouchPointsSpy.mockReturnValue([new Point2D(1, 1)]);
     const onDoubleClick = vi.fn();
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: () => ({})},
+      app: {getStageController: () => ({getLayerGroupByDivId: () => ({})})},
       dragBehavior: new DragBehavior(),
       doubleClickBehavior: {onDoubleClick}
     });
@@ -768,7 +812,7 @@ describe('tools/layerGroupPointer', () => {
     getTouchPointsSpy.mockReturnValue([new Point2D(1, 1)]);
     const onDoubleClick = vi.fn();
     const pointer = new LayerGroupPointer({
-      app: {getLayerGroupByDivId: () => ({})},
+      app: {getStageController: () => ({getLayerGroupByDivId: () => ({})})},
       dragBehavior: new DragBehavior(),
       doubleClickBehavior: {onDoubleClick}
     });

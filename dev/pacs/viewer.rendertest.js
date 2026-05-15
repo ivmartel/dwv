@@ -21,10 +21,11 @@ export function setupRenderTests(app) {
 function getRunRenderTest(app) {
   return function () {
     const numberOfRun = 20;
+    const stgCtrl = app.getStageController();
     // default to first layer group
-    app.setActiveLayerGroup(0);
+    stgCtrl.setActiveLayerGroup(0);
 
-    const vl = app.getActiveLayerGroup().getActiveViewLayer();
+    const vl = stgCtrl.getActiveLayerGroup().getActiveViewLayer();
     if (typeof vl === 'undefined') {
       return;
     }

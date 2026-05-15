@@ -39,19 +39,21 @@ export const MouseEventButtons = {
  * @import {DoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
  * @import {TapBehavior} from './behaviors/tapBehavior.js';
  * @import {TwoTouchBehavior} from './behaviors/twoTouchBehavior.js';
+ * @import {StageController} from '../app/stageController.js';
  */
 
 /**
  * Mouse position and layer group from a DOM event targeting a view layer.
  *
  * @param {MouseEvent} event The mouse or touch event.
- * @param {App} app The application (resolves the layer group).
+ * @param {StageController} stgCtrl The stage controller
+ *   (resolves the layer group).
  * @returns {{point: Point2D, layerGroup: LayerGroup}}
  *   Pointer position and layer group.
  */
-function getMouseLayerContext(event, app) {
+function getMouseLayerContext(event, stgCtrl) {
   const layerDetails = getLayerDetailsFromEvent(event);
-  const layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+  const layerGroup = stgCtrl.getLayerGroupByDivId(layerDetails.groupDivId);
   return {
     point: getMousePoint(event),
     layerGroup
@@ -62,13 +64,14 @@ function getMouseLayerContext(event, app) {
  * First touch position and layer group from a touch event.
  *
  * @param {TouchEvent} event The touch event.
- * @param {App} app The application (resolves the layer group).
+ * @param {StageController} stgCtrl The stage controller
+ *   (resolves the layer group).
  * @returns {{point: Point2D, layerGroup: LayerGroup}}
  *   Primary touch point and layer group.
  */
-function getPrimaryTouchLayerContext(event, app) {
+function getPrimaryTouchLayerContext(event, stgCtrl) {
   const layerDetails = getLayerDetailsFromEvent(event);
-  const layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+  const layerGroup = stgCtrl.getLayerGroupByDivId(layerDetails.groupDivId);
   return {
     point: getTouchPoints(event)[0],
     layerGroup
@@ -218,7 +221,8 @@ export class LayerGroupPointer extends EventTarget {
     }
     event.preventDefault();
     const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const stgCtrl = this.#app.getStageController();
+    const layerGroup = stgCtrl.getLayerGroupByDivId(layerDetails.groupDivId);
     this.#wheelBehavior.onWheel(event, layerGroup);
 
     this.#wheelTick.add(event);
@@ -239,7 +243,8 @@ export class LayerGroupPointer extends EventTarget {
       return;
     }
 
-    const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+    const stgCtrl = this.#app.getStageController();
+    const {point, layerGroup} = getMouseLayerContext(event, stgCtrl);
     if (typeof this.#doubleClickBehavior !== 'undefined') {
       this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
     } else if (this.#tapBehavior?.isActive()) {
@@ -307,7 +312,8 @@ export class LayerGroupPointer extends EventTarget {
     // set flag
     this.#downed = true;
 
-    const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+    const stgCtrl = this.#app.getStageController();
+    const {point, layerGroup} = getMouseLayerContext(event, stgCtrl);
     if (this.#dragBehavior?.canStart(point, layerGroup)) {
       this.#dragBehavior.onStart(point, layerGroup, {
         mouseDownButton: event.button
@@ -327,7 +333,8 @@ export class LayerGroupPointer extends EventTarget {
     // set flag
     this.#moved = true;
 
-    const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+    const stgCtrl = this.#app.getStageController();
+    const {point, layerGroup} = getMouseLayerContext(event, stgCtrl);
     if (this.#downed) {
       // remove hover for down+move
       this.#hoverBehavior?.onEnd();
@@ -369,7 +376,8 @@ export class LayerGroupPointer extends EventTarget {
       (this.#tapBehavior.isActive() || (this.#downed && !this.#moved))) {
       // active tap -> sticky tap
       // down + no move -> discrete tap
-      const {point, layerGroup} = getMouseLayerContext(event, this.#app);
+      const stgCtrl = this.#app.getStageController();
+      const {point, layerGroup} = getMouseLayerContext(event, stgCtrl);
       this.#tapBehavior.onTap(point, layerGroup);
     }
 
@@ -413,10 +421,11 @@ export class LayerGroupPointer extends EventTarget {
     // set flag
     this.#downed = true;
 
+    const stgCtrl = this.#app.getStageController();
     const touchPoints = getTouchPoints(event);
     if (touchPoints.length === 1) {
       // one touch drag
-      const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
+      const {point, layerGroup} = getPrimaryTouchLayerContext(event, stgCtrl);
       if (this.#dragBehavior?.canStart(point, layerGroup)) {
         this.#dragBehavior.onStart(point, layerGroup, {});
       }
@@ -446,7 +455,8 @@ export class LayerGroupPointer extends EventTarget {
     this.#moved = true;
 
     // context
-    const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
+    const stgCtrl = this.#app.getStageController();
+    const {point, layerGroup} = getPrimaryTouchLayerContext(event, stgCtrl);
 
     const touchPoints = getTouchPoints(event);
     if (touchPoints.length === 1) {
@@ -491,7 +501,8 @@ export class LayerGroupPointer extends EventTarget {
       (this.#tapBehavior.isActive() || (this.#downed && !this.#moved))) {
       // active tap -> sticky tap
       // down + no move -> discrete tap
-      const {point, layerGroup} = getPrimaryTouchLayerContext(event, this.#app);
+      const stgCtrl = this.#app.getStageController();
+      const {point, layerGroup} = getPrimaryTouchLayerContext(event, stgCtrl);
       this.#tapBehavior.onTap(point, layerGroup);
     }
 

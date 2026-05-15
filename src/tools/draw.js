@@ -96,7 +96,8 @@ export class Draw extends LayerGroupPointer {
     if ((event.key === 'Delete' ||
       event.key === 'Backspace') &&
       typeof annotation !== 'undefined') {
-      const layerGroup = this.#app.getActiveLayerGroup();
+      const stgCtrl = this.#app.getStageController();
+      const layerGroup = stgCtrl.getActiveLayerGroup();
       const drawLayer = layerGroup.getActiveDrawLayer();
       if (typeof drawLayer === 'undefined') {
         logger.warn('No draw layer to handle key down');

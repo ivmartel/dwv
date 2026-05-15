@@ -147,7 +147,8 @@ export class DataTableUI {
     const selectElem = document.getElementById(elemId);
     if (selectElem) {
       const ids = this.#getDataLayerGroupDivIds(event.detail.dataid);
-      const lg = this.#app.getLayerGroupByDivId(ids[0]);
+      const stgCtrl = this.#app.getStageController();
+      const lg = stgCtrl.getLayerGroupByDivId(ids[0]);
       const vls = lg.getViewLayersByDataId(event.dataid);
       if (typeof vls !== 'undefined' && vls.length !== 0) {
         const vl = vls[0];
@@ -201,7 +202,8 @@ export class DataTableUI {
    * @returns {Array} The list of div ids.
    */
   #getDataLayerGroupDivIds(dataId) {
-    const dataViewConfigs = this.#app.getDataViewConfigs();
+    const dataViewConfigs =
+      this.#app.getStageController().getDataViewConfigs();
     let viewConfig = dataViewConfigs[dataId];
     if (typeof viewConfig === 'undefined') {
       viewConfig = dataViewConfigs['*'];
@@ -277,7 +279,8 @@ export class DataTableUI {
     const canAlpha = dataIsImage;
     const isMonochrome = dataIsImage && image.isMonochrome();
 
-    const dataViewConfigs = this.#app.getDataViewConfigs();
+    const stgCtrl = this.#app.getStageController();
+    const dataViewConfigs = stgCtrl.getDataViewConfigs();
     const allLayerGroupDivIds = layout.getLayerGroupDivIds();
 
     const table = this.#getLayersTable(allLayerGroupDivIds.length);
@@ -315,7 +318,7 @@ export class DataTableUI {
         const split = fullId.split('-');
         const chgGroupDivId = split[1];
         const chgDataId = split[2];
-        const lg = this.#app.getLayerGroupByDivId(chgGroupDivId);
+        const lg = stgCtrl.getLayerGroupByDivId(chgGroupDivId);
         lg.setActiveLayerByDataId(chgDataId);
       };
       return radio;
@@ -331,7 +334,7 @@ export class DataTableUI {
       button.onclick = () => {
         // update app
         const config = layout.getViewConfigsByDivId(divId);
-        this.#app.addDataViewConfig(dataId, config);
+        stgCtrl.addDataViewConfig(dataId, config);
         // update html
         const parent = button.parentElement;
         if (parent) {
@@ -358,7 +361,7 @@ export class DataTableUI {
       button.appendChild(document.createTextNode('-'));
       button.onclick = () => {
         // update app
-        this.#app.removeDataViewConfig(dataId, divId);
+        stgCtrl.removeDataViewConfig(dataId, divId);
         // update html
         const parent = button.parentElement;
         parent.replaceChildren();
@@ -380,7 +383,7 @@ export class DataTableUI {
         // update app
         const config = layout.getViewConfigsByDivId(divId);
         config.orientation = orientation;
-        this.#app.updateDataViewConfig(dataId, divId, config);
+        stgCtrl.updateDataViewConfig(dataId, divId, config);
       };
       return button;
     };
@@ -423,8 +426,8 @@ export class DataTableUI {
     }
 
     // use first layer
-    const initialVls = this.#app.getViewLayersByDataId(dataId);
-    const initialDls = this.#app.getDrawLayersByDataId(dataId);
+    const initialVls = stgCtrl.getViewLayersByDataId(dataId);
+    const initialDls = stgCtrl.getDrawLayersByDataId(dataId);
     let initialLayer;
     if (initialVls.length !== 0) {
       initialLayer = initialVls[0];
@@ -447,7 +450,7 @@ export class DataTableUI {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+        const lg = stgCtrl.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();
@@ -481,7 +484,7 @@ export class DataTableUI {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+        const lg = stgCtrl.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();
@@ -523,7 +526,7 @@ export class DataTableUI {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+        const lg = stgCtrl.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();
@@ -562,7 +565,7 @@ export class DataTableUI {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+        const lg = stgCtrl.getLayerGroupByDivId(lgIds[i]);
         const layer = lg.getActiveLayer();
         if (typeof layer !== 'undefined') {
           layer.setOpacity(value);
@@ -584,7 +587,7 @@ export class DataTableUI {
         // update selected layers
         const lgIds = getSelectedLayerGroupIds();
         for (let i = 0; i < lgIds.length; ++i) {
-          const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+          const lg = stgCtrl.getLayerGroupByDivId(lgIds[i]);
           const layer = lg.getActiveLayer();
           if (typeof layer !== 'undefined') {
             layer.setFillOpacity(parseFloat(value));
@@ -608,7 +611,7 @@ export class DataTableUI {
         // update selected layers
         const lgIds = getSelectedLayerGroupIds();
         for (let i = 0; i < lgIds.length; ++i) {
-          const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+          const lg = stgCtrl.getLayerGroupByDivId(lgIds[i]);
           const layer = lg.getActiveLayer();
           if (typeof layer !== 'undefined') {
             layer.setContourThickness(parseInt(value, 10));
@@ -647,7 +650,7 @@ export class DataTableUI {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+        const lg = stgCtrl.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();

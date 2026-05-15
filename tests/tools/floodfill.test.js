@@ -36,14 +36,21 @@ import {Floodfill} from '../../src/tools/floodfill.js';
  * @returns {object} Mock application.
  */
 function makeFloodfillAppMock() {
-  return {
+  const mockLayerGroup = {
+    getBaseScale: vi.fn(() => 1)
+  };
+  const stgCtrl = {
+    getActiveLayerGroup: vi.fn(() => mockLayerGroup),
+    getDrawLayers: vi.fn(() => [])
+  };
+  const app = {
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     onKeydown: vi.fn(),
-    getBaseScale: vi.fn(() => 1),
-    getDrawLayers: vi.fn(() => []),
-    getActiveLayerGroup: vi.fn()
+    getStageController: vi.fn(() => stgCtrl)
   };
+  app.stgCtrl = stgCtrl;
+  return app;
 }
 
 describe('Floodfill', () => {
@@ -69,7 +76,7 @@ describe('Floodfill', () => {
     assert.doesNotThrow(() => {
       floodfill.init();
       floodfill.activate(true);
-      assert.equal(mockApp.getBaseScale.mock.calls.length, 1);
+      assert.equal(mockApp.stgCtrl.getActiveLayerGroup.mock.calls.length, 1);
       floodfill.setFeatures({shapeColour: '#FF0000'});
       floodfill.activate(false);
     });

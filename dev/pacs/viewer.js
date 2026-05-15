@@ -303,7 +303,7 @@ function viewerSetup() {
     logMetaData(event.detail.dataid, event.detail.loadtype);
     // render if not done yet
     if (!viewOnFirstLoadItem) {
-      _app.render(event.detail.dataid);
+      _app.getStageController().render(event.detail.dataid);
     }
     // update sliders with new data info
     // (has to be after full load)
@@ -547,9 +547,10 @@ function removePostLoadListeners() {
  *   of data view configs.
  */
 function mergeAppConfig(dataViewConfigs) {
+  const stgCtrl = _app.getStageController();
   for (const dataId in dataViewConfigs) {
     const configs = dataViewConfigs[dataId];
-    const appConfigs = _app.getViewConfigs(dataId);
+    const appConfigs = stgCtrl.getViewConfigs(dataId);
     if (appConfigs.length !== 0) {
       // use first as base
       for (const config of configs) {
@@ -593,7 +594,8 @@ function getSlider(layerGroupDivId) {
   range.disabled = true;
   // update app on slider change
   range.oninput = function () {
-    const lg = _app.getLayerGroupByDivId(layerGroupDivId);
+    const stgCtrl = _app.getStageController();
+    const lg = stgCtrl.getLayerGroupByDivId(layerGroupDivId);
     const ph = lg.getPositionHelper();
     const pos = ph.getCurrentPositionAtScrollValue(this.value);
     ph.setCurrentPosition(pos);
@@ -624,7 +626,8 @@ function initSlider(layerGroupId) {
     // disabled by default
     slider.disabled = true;
     // init if possible
-    const lg = _app.getLayerGroupByDivId(layerGroupId);
+    const stgCtrl = _app.getStageController();
+    const lg = stgCtrl.getLayerGroupByDivId(layerGroupId);
     if (typeof lg !== 'undefined') {
       const ph = lg.getPositionHelper();
       if (typeof ph !== 'undefined') {
@@ -648,7 +651,8 @@ function updateSliders(layout) {
   for (const divId of layout.getLayerGroupDivIds()) {
     const slider = document.getElementById(`${divId}-slider`);
     if (slider) {
-      const lg = _app.getLayerGroupByDivId(divId);
+      const stgCtrl = _app.getStageController();
+      const lg = stgCtrl.getLayerGroupByDivId(divId);
       if (typeof lg !== 'undefined') {
         const ph = lg.getPositionHelper();
         slider.value = ph.getCurrentPositionScrollValue();
@@ -697,7 +701,7 @@ function addLayerGroupsDivs(layout) {
 function addNewDataViewConfig(dataId) {
   const configs = _layouts[_selectedLayoutIndex].getViewConfigsByDataId(dataId);
   for (const config of configs) {
-    _app.addDataViewConfig(dataId, config, false);
+    _app.getStageController().addDataViewConfig(dataId, config, false);
   }
 }
 
@@ -723,7 +727,7 @@ function setupFileLine() {
 function setupPositionLine() {
   const positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function (event) {
-    const vls = _app.getViewLayersByDataId('0');
+    const vls = _app.getStageController().getViewLayersByDataId('0');
     const vc = vls[0].getViewController();
     const element = event.target;
     const values = element.value.split(',');
@@ -741,7 +745,7 @@ function setupLayoutLine(dataTable) {
   const resetViewsButton = document.getElementById('resetviews');
   resetViewsButton.disabled = true;
   resetViewsButton.addEventListener('click', function () {
-    _app.resetZoomPan();
+    _app.getStageController().resetZoomPan();
   });
 
   const changeLayoutSelect = document.getElementById('changelayout');
@@ -788,11 +792,12 @@ function setupLayoutLine(dataTable) {
     dataTable.registerLayerAddListeners(selectedLayout);
 
     // set config (deletes previous layers)
-    _app.setDataViewConfigs(dataViewConfigs);
+    const stgCtrl = _app.getStageController();
+    stgCtrl.setDataViewConfigs(dataViewConfigs);
 
     // render data (creates layers)
     for (let i = 0; i < dataIds.length; ++i) {
-      _app.render(dataIds[i]);
+      stgCtrl.render(dataIds[i]);
     }
 
     // listen to view changes
@@ -807,7 +812,7 @@ function setupLayoutLine(dataTable) {
   smoothingChk.disabled = true;
   smoothingChk.addEventListener('change', function (event) {
     const inputElement = event.target;
-    _app.setImageSmoothing(inputElement.checked);
+    _app.getStageController().setImageSmoothing(inputElement.checked);
   });
 }
 
@@ -818,7 +823,8 @@ function setupRotateLine() {
   const rotateXButton = document.getElementById('rotate-x');
   rotateXButton.disabled = true;
   rotateXButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const stgCtrl = _app.getStageController();
+    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
@@ -843,7 +849,8 @@ function setupRotateLine() {
   const rotateYButton = document.getElementById('rotate-y');
   rotateYButton.disabled = true;
   rotateYButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const stgCtrl = _app.getStageController();
+    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
@@ -868,7 +875,8 @@ function setupRotateLine() {
   const rotateZButton = document.getElementById('rotate-z');
   rotateZButton.disabled = true;
   rotateZButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const stgCtrl = _app.getStageController();
+    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
@@ -912,7 +920,8 @@ function setupRotateLine() {
   const rotateResetButton = document.getElementById('rotate-reset');
   rotateResetButton.disabled = true;
   rotateResetButton.addEventListener('click', function () {
-    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const stgCtrl = _app.getStageController();
+    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 

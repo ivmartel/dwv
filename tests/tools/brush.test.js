@@ -29,7 +29,7 @@ describe('Brush', () => {
   test('exposes expected tool events, help, and init', () => {
     const app = {
       onKeydown: vi.fn(),
-      getDataViewConfigs: () => ({})
+      getStageController: () => ({getDataViewConfigs: () => ({})})
     };
     const brush = new Brush(app);
 
@@ -46,7 +46,7 @@ describe('Brush', () => {
   test('keydown forwards to app with Brush context', () => {
     const app = {
       onKeydown: vi.fn(),
-      getDataViewConfigs: () => ({})
+      getStageController: () => ({getDataViewConfigs: () => ({})})
     };
     const brush = new Brush(app);
     const event = {key: 'Escape', ctrlKey: false, altKey: false};
@@ -61,7 +61,7 @@ describe('Brush', () => {
     const setFeaturesSpy = vi.spyOn(BrushDragBehavior.prototype, 'setFeatures');
     const app = {
       onKeydown: vi.fn(),
-      getDataViewConfigs: () => ({})
+      getStageController: () => ({getDataViewConfigs: () => ({})})
     };
     const brush = new Brush(app);
 
@@ -93,8 +93,10 @@ describe('Brush', () => {
 
     const app = {
       onKeydown: vi.fn(),
-      getDataViewConfigs: () => ({
-        group0: [{divId: 'brush-view-test'}]
+      getStageController: () => ({
+        getDataViewConfigs: () => ({
+          group0: [{divId: 'brush-view-test'}]
+        })
       })
     };
     const brush = new Brush(app);
@@ -110,7 +112,7 @@ describe('Brush', () => {
     const setFeaturesSpy = vi.spyOn(BrushDragBehavior.prototype, 'setFeatures');
     const app = {
       onKeydown: vi.fn(),
-      getDataViewConfigs: () => ({})
+      getStageController: () => ({getDataViewConfigs: () => ({})})
     };
     const brush = new Brush(app);
 
