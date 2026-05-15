@@ -302,7 +302,7 @@ export class SegmentationUI {
       );
 
     if (typeof segmentation !== 'undefined') {
-      segmentation.labels = event.labels;
+      segmentation.labels = event.detail.labels;
     }
   };
 
