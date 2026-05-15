@@ -289,6 +289,9 @@ export class App extends EventTarget {
    * @deprecated Since v0.34, please use the getData method.
    */
   getImage(dataId) {
+    logger.debug(
+      'App.getImage: deprecated since v0.34, please use the getData method.'
+    );
     let res;
     if (typeof this.getData(dataId) !== 'undefined') {
       res = this.getData(dataId).image;
@@ -377,6 +380,9 @@ export class App extends EventTarget {
    *   equivalent directly instead.
    */
   canScroll() {
+    logger.debug(
+      'App.canScroll: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
     const viewLayer =
       this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     const controller = viewLayer.getViewController();
@@ -392,6 +398,9 @@ export class App extends EventTarget {
    *   equivalent directly instead.
    */
   canWindowLevel() {
+    logger.debug(
+      'App.canWindowLevel: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
     const viewLayer =
       this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     const controller = viewLayer.getViewController();
@@ -905,6 +914,9 @@ export class App extends EventTarget {
    * @function
    */
   loadFromUri = (uri, options) => {
+    logger.debug(
+      'App.loadFromUri: deprecated since v0.36, ' +
+      'please extract the file list and pass it to loadURLs.');
     const query = getUriQuery(uri);
     // check query
     if (query && typeof query.input !== 'undefined') {
@@ -982,6 +994,9 @@ export class App extends EventTarget {
    *   of the desired view layer directly.
    */
   initWLDisplay() {
+    logger.debug(
+      'App.initWLDisplay: deprecated since v0.33, ' +
+      'please set the opacity of the desired view layer directly.');
     const viewLayer =
       this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     const controller = viewLayer.getViewController();
@@ -1357,6 +1372,9 @@ export class App extends EventTarget {
    *   of the desired view layer directly.
    */
   setOpacity(alpha) {
+    logger.debug(
+      'App.setOpacity: deprecated since v0.33, ' +
+      'please set the opacity of the desired view layer directly.');
     const viewLayer =
       this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     viewLayer.setOpacity(alpha);
@@ -1372,6 +1390,9 @@ export class App extends EventTarget {
    * @param {string} dataId The converted data id.
    */
   setDrawings(drawings, drawingsDetails, dataId) {
+    logger.debug(
+      'App.setDrawings: deprecated since v0.34, ' +
+      'please switch to DICOM SR annotations.');
     const layerGroup = this.#stageController.getActiveLayerGroup();
     const viewLayer = layerGroup.getBaseViewLayer();
     const refDataId = viewLayer.getDataId();
@@ -1404,6 +1425,9 @@ export class App extends EventTarget {
    * @param {string} dataId The state data id.
    */
   applyJsonState(jsonState, dataId) {
+    logger.debug(
+      'App.applyJsonState: deprecated since v0.34, ' +
+      'please switch to DICOM SR for annotations.');
     const state = new State(dataId);
     state.apply(this, state.fromJSON(jsonState));
   }
@@ -1533,6 +1557,9 @@ export class App extends EventTarget {
    *   equivalent directly instead.
    */
   setColourMap(name) {
+    logger.debug(
+      'App.setColourMap: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
     const viewController =
       this.#stageController.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
@@ -1547,6 +1574,9 @@ export class App extends EventTarget {
    *   equivalent directly instead.
    */
   setWindowLevelPreset(preset) {
+    logger.debug(
+      'App.setWindowLevelPreset: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
     const viewController =
       this.#stageController.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
