@@ -828,7 +828,7 @@ function setupRotateLine() {
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
-    const image = _app.getImage(dataId);
+    const image = _app.getData(dataId).image;
     const geometry = image.getGeometry();
 
     const angle = (Math.PI / 180) * 20;
@@ -854,7 +854,7 @@ function setupRotateLine() {
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
-    const image = _app.getImage(dataId);
+    const image = _app.getData(dataId).image;
     const geometry = image.getGeometry();
 
     const angle = (Math.PI / 180) * 20;
@@ -880,7 +880,7 @@ function setupRotateLine() {
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
-    const image = _app.getImage(dataId);
+    const image = _app.getData(dataId).image;
     const geometry = image.getGeometry();
 
     const angle = (Math.PI / 180) * 20;
