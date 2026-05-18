@@ -86,7 +86,8 @@ export class DrawSelect {
     const validator = this.#drawMetaValidator;
     if (typeof validator !== 'undefined') {
       const drawDataId = drawLayer.getDataId();
-      const drawData = this.#app.getData(drawDataId);
+      const dataCtrl = this.#app.getDataController();
+      const drawData = dataCtrl.get(drawDataId);
       const drawMeta = drawData.annotationGroup.getMeta();
       res = validator(drawMeta);
     }

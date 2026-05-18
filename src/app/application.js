@@ -272,12 +272,26 @@ export class App extends EventTarget {
   #infoDatas = {};
 
   /**
+   * Get the data controller.
+   *
+   * @returns {DataController} The data controller.
+   */
+  getDataController() {
+    return this.#dataController;
+  }
+
+  /**
    * Get a DicomData.
    *
    * @param {string} dataId The data id.
    * @returns {DicomData|undefined} The data.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getData(dataId) {
+    logger.debug(
+      'App.getData: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.get(dataId);
   }
 
@@ -293,8 +307,8 @@ export class App extends EventTarget {
       'App.getImage: deprecated since v0.34, please use the getData method.'
     );
     let res;
-    if (typeof this.getData(dataId) !== 'undefined') {
-      res = this.getData(dataId).image;
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      res = this.#dataController.get(dataId).image;
     }
     return res;
   }
@@ -304,8 +318,13 @@ export class App extends EventTarget {
    *
    * @param {string} dataId The data id.
    * @param {Image} img The associated image.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   setImage(dataId, img) {
+    logger.debug(
+      'App.setImage: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     this.#dataController.setImage(dataId, img);
   }
 
@@ -313,8 +332,13 @@ export class App extends EventTarget {
    * Get the next data id.
    *
    * @returns {string} The data id.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getNextDataId() {
+    logger.debug(
+      'App.getNextDataId: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getNextDataId();
   }
 
@@ -324,8 +348,13 @@ export class App extends EventTarget {
    * @param {string} dataId The data id.
    * @param {DicomData} data The new data.
    * @returns {boolean} False if the data cannot be added.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   addData(dataId, data) {
+    logger.debug(
+      'App.addData: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.add(dataId, data);
   }
 
@@ -334,8 +363,13 @@ export class App extends EventTarget {
    *
    * @param {string} dataId The data id.
    * @returns {Record<string, DataElement>|undefined} The list of meta data.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getMetaData(dataId) {
+    logger.debug(
+      'App.getMetaData: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     let res;
     if (typeof this.#dataController.get(dataId) !== 'undefined') {
       res = this.#dataController.get(dataId).meta;
@@ -347,8 +381,13 @@ export class App extends EventTarget {
    * Get the list of ids in the data storage.
    *
    * @returns {string[]} The list of data ids.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getDataIds() {
+    logger.debug(
+      'App.getDataIds: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getDataIds();
   }
 
@@ -357,8 +396,13 @@ export class App extends EventTarget {
    *
    * @param {string[]} uids A list of UIDs.
    * @returns {string[]} The list of dataIds that contain the UIDs.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getDataIdsFromSopUids(uids) {
+    logger.debug(
+      'App.getDataIdsFromSopUids: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getDataIdsFromSopUids(uids);
   }
 
@@ -367,8 +411,13 @@ export class App extends EventTarget {
    *
    * @param {string} uid The SeriesInstanceUID.
    * @returns {string} The data id.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getDataIdFromSeriesUid(uid) {
+    logger.debug(
+      'App.getDataIdFromSeriesUid: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getDataIdFromSeriesUid(uid);
   }
 
@@ -1396,7 +1445,7 @@ export class App extends EventTarget {
     const layerGroup = this.#stageController.getActiveLayerGroup();
     const viewLayer = layerGroup.getBaseViewLayer();
     const refDataId = viewLayer.getDataId();
-    const refData = this.getData(refDataId);
+    const refData = this.#dataController.get(refDataId);
     const viewController = viewLayer.getViewController();
 
     // convert konva to annotation
@@ -1684,7 +1733,7 @@ export class App extends EventTarget {
    * @returns {DicomData} The new data.
    */
   createAnnotationData(refDataId) {
-    const refData = this.getData(refDataId);
+    const refData = this.#dataController.get(refDataId);
     const refMeta = refData.image.getMeta();
 
     const data = new DicomData({});
@@ -1733,8 +1782,9 @@ export class App extends EventTarget {
    */
   addAndRenderAnnotationData(data, divId, refDataId) {
     // add new data
-    const dataId = this.getNextDataId();
-    const added = this.addData(dataId, data);
+    const dataCtrl = this.#dataController;
+    const dataId = dataCtrl.getNextDataId();
+    const added = dataCtrl.add(dataId, data);
     if (!added) {
       throw new Error('Cannot add annotation data');
     }

@@ -72,7 +72,8 @@ function selectOdd(id) {
  * @returns {boolean} True if selected.
  */
 // function selectCT(id) {
-//   const modality = _app.getMetaData(id)['00080060'].value[0];
+//   const dataCtrl = _app.getDataController();
+//   const modality = dataCtrl.get(id).meta['00080060'].value[0];
 //   return modality === 'CT';
 // }
 /**
@@ -82,7 +83,8 @@ function selectOdd(id) {
  * @returns {boolean} True if selected.
  */
 // function selectPET(id) {
-//   const modality = _app.getMetaData(id)['00080060'].value[0];
+//   const dataCtrl = _app.getDataController();
+//   const modality = dataCtrl.get(id).meta['00080060'].value[0];
 //   return modality === 'PT';
 // }
 
@@ -266,7 +268,8 @@ function viewerSetup() {
     // add abort shortcut
     window.addEventListener('keydown', abortShortcut);
     // remove post-load listeners
-    if (_app.getDataIds().length !== 0) {
+    const dataCtrl = _app.getDataController();
+    if (dataCtrl.getDataIds().length !== 0) {
       removePostLoadListeners();
     }
   });
@@ -393,10 +396,11 @@ function viewerSetup() {
     if (getSelectedToolName() === 'Filter' &&
       event.altKey && event.key === 'r') {
       // run the sharpen filter
+      const dataCtrl = _app.getDataController();
       _app.setToolFeatures({
         filterName: 'Sharpen',
         runArgs: {
-          dataId: _app.getDataIds()[0]
+          dataId: dataCtrl.getDataIds()[0]
         },
         run: true
       });
@@ -484,7 +488,8 @@ function viewerSetup() {
  */
 function logMetaData(dataId, loadType) {
   // meta data
-  const meta = _app.getMetaData(dataId);
+  const dataCtrl = _app.getDataController();
+  const meta = dataCtrl.get(dataId).meta;
 
   // log tags for data with transfer syntax (dicom)
   if (typeof meta['00020010'] !== 'undefined') {
@@ -777,7 +782,8 @@ function setupLayoutLine(dataTable) {
     addLayerGroupsDivs(selectedLayout);
 
     // get configs
-    const dataIds = _app.getDataIds();
+    const dataCtrl = _app.getDataController();
+    const dataIds = dataCtrl.getDataIds();
     const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
 
     // merge app configs for possible extras (like window level)
@@ -820,15 +826,17 @@ function setupLayoutLine(dataTable) {
  * Setup rotate line.
  */
 function setupRotateLine() {
+  const dataCtrl = _app.getDataController();
+  const stgCtrl = _app.getStageController();
+
   const rotateXButton = document.getElementById('rotate-x');
   rotateXButton.disabled = true;
   rotateXButton.addEventListener('click', function () {
-    const stgCtrl = _app.getStageController();
     const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
-    const image = _app.getData(dataId).image;
+    const image = dataCtrl.get(dataId).image;
     const geometry = image.getGeometry();
 
     const angle = (Math.PI / 180) * 20;
@@ -849,12 +857,11 @@ function setupRotateLine() {
   const rotateYButton = document.getElementById('rotate-y');
   rotateYButton.disabled = true;
   rotateYButton.addEventListener('click', function () {
-    const stgCtrl = _app.getStageController();
     const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
-    const image = _app.getData(dataId).image;
+    const image = dataCtrl.get(dataId).image;
     const geometry = image.getGeometry();
 
     const angle = (Math.PI / 180) * 20;
@@ -875,12 +882,11 @@ function setupRotateLine() {
   const rotateZButton = document.getElementById('rotate-z');
   rotateZButton.disabled = true;
   rotateZButton.addEventListener('click', function () {
-    const stgCtrl = _app.getStageController();
     const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();
 
-    const image = _app.getData(dataId).image;
+    const image = dataCtrl.get(dataId).image;
     const geometry = image.getGeometry();
 
     const angle = (Math.PI / 180) * 20;
@@ -901,13 +907,13 @@ function setupRotateLine() {
   const rotateMatchButton = document.getElementById('rotate-match');
   rotateMatchButton.disabled = true;
   rotateMatchButton.addEventListener('click', function () {
-    const dataIds = _app.getDataIds();
+    const dataIds = dataCtrl.getDataIds();
     if (dataIds.length < 2) {
       console.log('Not enough datas to match geometries');
     }
     // log geometries if resample is needed
-    const geometry0 = _app.getData(dataIds[0]).image.getGeometry();
-    const geometry1 = _app.getData(dataIds[1]).image.getGeometry();
+    const geometry0 = dataCtrl.get(dataIds[0]).image.getGeometry();
+    const geometry1 = dataCtrl.get(dataIds[1]).image.getGeometry();
     if (!geometry0.getOrientation().equals(geometry1.getOrientation())) {
       console.log('Resample match');
       console.log('geometry0', geometry0.toString());
@@ -920,7 +926,6 @@ function setupRotateLine() {
   const rotateResetButton = document.getElementById('rotate-reset');
   rotateResetButton.disabled = true;
   rotateResetButton.addEventListener('click', function () {
-    const stgCtrl = _app.getStageController();
     const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
     const vl = lg.getBaseViewLayer();
     const dataId = vl.getDataId();

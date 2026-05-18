@@ -183,6 +183,7 @@ export class AnnotationUI {
    */
   #getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
+    const dataCtrl = this.#app.getDataController();
 
     const infoButton = getButton('Info');
     const ibIdPrefix = 'ib-';
@@ -197,7 +198,7 @@ export class AnnotationUI {
         splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
       const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const annotationGroup = this.#app.getData(clkDataId).annotationGroup;
+      const annotationGroup = dataCtrl.get(clkDataId).annotationGroup;
       const clkAnnotation = annotationGroup.find(annotationId);
 
       let qStr = 'Quantification:\n';
@@ -235,7 +236,7 @@ export class AnnotationUI {
         splitAnnotationDivId(target.id.substring(inputColourPrefix.length));
       const chgDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const annotationGroup = this.#app.getData(chgDataId).annotationGroup;
+      const annotationGroup = dataCtrl.get(chgDataId).annotationGroup;
       const chgAnnotation = annotationGroup.find(annotationId);
       // update
       if (newColour !== chgAnnotation.colour) {
@@ -294,7 +295,7 @@ export class AnnotationUI {
       const annotationId = indices.annotationId;
       // delete if possible
       const drawController = new DrawController(
-        this.#app.getData(clkDataId).annotationGroup);
+        dataCtrl.get(clkDataId).annotationGroup);
       // TODO reposition div at same position after delete undo?
       drawController.removeAnnotationWithCommand(
         annotationId,
@@ -303,7 +304,7 @@ export class AnnotationUI {
     };
 
     // disable/enable buttons if group is editable or not
-    const annotationGroup = this.#app.getData(dataId).annotationGroup;
+    const annotationGroup = dataCtrl.get(dataId).annotationGroup;
     annotationGroup.addEventListener(
       'annotationgroupeditablechange', function (event) {
         const disabled = !event.detail.data;
@@ -354,7 +355,7 @@ export class AnnotationUI {
       const indices = splitAnnotationDivId(target.id);
       const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const clkAnnotationGroup = this.#app.getData(clkDataId).annotationGroup;
+      const clkAnnotationGroup = dataCtrl.get(clkDataId).annotationGroup;
       const clkAnnotation = clkAnnotationGroup.find(annotationId);
       const annotCentroid = clkAnnotation.getCentroid();
       if (typeof annotCentroid !== 'undefined') {
@@ -507,7 +508,9 @@ export class AnnotationUI {
    * @param {CustomEvent} event The event.
    */
   #onDataAdd = (event) => {
-    const data = this.#app.getData(event.detail.dataid);
+    const dataId = event.detail.dataid;
+    const dataCtrl = this.#app.getDataController();
+    const data = dataCtrl.get(dataId);
     const ag = data.annotationGroup;
     if (typeof ag !== 'undefined') {
       // setup html if needed
@@ -535,7 +538,8 @@ export class AnnotationUI {
    */
   #onDrawLayerAdd = (event) => {
     const dataId = event.detail.dataid;
-    const annotationGroup = this.#app.getData(dataId).annotationGroup;
+    const dataCtrl = this.#app.getDataController();
+    const annotationGroup = dataCtrl.get(dataId).annotationGroup;
     // strike through non viewable annotations
     for (const annotation of annotationGroup.getList()) {
       let textDecoration = '';

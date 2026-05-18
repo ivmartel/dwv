@@ -278,7 +278,8 @@ export class SegmentationUI {
    * @param {number} dataId The data id.
    */
   #calculateLabels(dataId) {
-    const maskData = this.#app.getData(dataId);
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(dataId);
     if (!maskData) {
       throw new Error(
         `No data to calculate labels for dataId: ${dataId}`
@@ -338,7 +339,8 @@ export class SegmentationUI {
    */
   #onDataAdd = (event) => {
     const dataId = event.detail.dataid;
-    const maskImage = this.#app.getData(dataId).image;
+    const dataCtrl = this.#app.getDataController();
+    const maskImage = dataCtrl.get(dataId).image;
 
     if (typeof maskImage !== 'undefined' &&
       maskImage.getMeta().Modality === 'SEG') {
@@ -473,9 +475,10 @@ export class SegmentationUI {
    */
   #appSelectSegment(segmentNumber, segmentation) {
     segmentation.selectedSegmentNumber = segmentNumber;
+    const dataCtrl = this.#app.getDataController();
 
     // add segment if not present
-    const data = this.#app.getData(segmentation.dataId);
+    const data = dataCtrl.get(segmentation.dataId);
     if (typeof data !== 'undefined') {
       const maskImage = data.image;
       const segHelper = new MaskSegmentHelper(maskImage);
@@ -556,7 +559,8 @@ export class SegmentationUI {
       // update colours
       const newRgbColour = hexToRgb(newHexColour);
       // get segment and mask
-      const maskData = this.#app.getData(segmentation.dataId);
+      const dataCtrl = this.#app.getDataController();
+      const maskData = dataCtrl.get(segmentation.dataId);
       // change if possible
       if (typeof maskData !== 'undefined') {
         // create change colour command
@@ -683,7 +687,8 @@ export class SegmentationUI {
     const nextItem = listItem.nextSibling;
 
     // get mask
-    const data = this.#app.getData(segmentation.dataId);
+    const dataCtrl = this.#app.getDataController();
+    const data = dataCtrl.get(segmentation.dataId);
     // delete if possible
     if (typeof data !== 'undefined') {
       const segment =
@@ -926,7 +931,8 @@ export class SegmentationUI {
     const dataId = segmentation.dataId;
 
     // get data
-    const maskData = this.#app.getData(dataId);
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(dataId);
     if (typeof maskData === 'undefined') {
       throw new Error('Cannot save without mask image');
     }
@@ -934,11 +940,11 @@ export class SegmentationUI {
     if (typeof refSeriesUID === 'undefined') {
       throw new Error('Cannot save without referenced UID');
     }
-    const sourceId = this.#app.getDataIdFromSeriesUid(refSeriesUID);
+    const sourceId = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
     if (typeof sourceId === 'undefined') {
       throw new Error('Cannot save without referenced ID');
     }
-    const sourceData = this.#app.getData(sourceId);
+    const sourceData = dataCtrl.get(sourceId);
     if (typeof sourceData === 'undefined') {
       throw new Error('Cannot save without source image');
     }
@@ -1158,8 +1164,9 @@ export class SegmentationUI {
     overlapButton.onclick = (/*event*/) => {
       const segment0 = overlapSelect0.value;
       const segment1 = overlapSelect1.value;
-      const maskImage0 = this.#app.getData(segment0).image;
-      const maskImage1 = this.#app.getData(segment1).image;
+      const dataCtrl = this.#app.getDataController();
+      const maskImage0 = dataCtrl.get(segment0).image;
+      const maskImage1 = dataCtrl.get(segment1).image;
       const segHelper0 = new MaskSegmentHelper(maskImage0);
       const segHelper1 = new MaskSegmentHelper(maskImage1);
       const overlap = segHelper0.findOverlap(segHelper1);

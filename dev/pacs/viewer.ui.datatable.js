@@ -274,7 +274,8 @@ export class DataTableUI {
    * @param {LayoutProtocol} layout The layout.
    */
   #addDataRow(dataId, layout) {
-    const image = this.#app.getData(dataId).image;
+    const dataCtrl = this.#app.getDataController();
+    const image = dataCtrl.get(dataId).image;
     const dataIsImage = typeof image !== 'undefined';
     const canAlpha = dataIsImage;
     const isMonochrome = dataIsImage && image.isMonochrome();

@@ -62,7 +62,8 @@ import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
  * // activate tool and update range max on load
  * app.addEventListener('load', function () {
  *   app.setTool('Scroll');
- *   const size = app.getData(0).image.getGeometry().getSize();
+ *   const dataCtrl = app.getDataController();
+ *   const size = dataCtrl.get(0).image.getGeometry().getSize();
  *   range.max = size.get(2) - 1;
  * });
  * // update slider on slice change (for ex via mouse wheel)

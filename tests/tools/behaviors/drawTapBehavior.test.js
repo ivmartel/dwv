@@ -40,14 +40,16 @@ function makeDrawTapApp() {
   };
   return {
     getStyle: vi.fn(() => style),
-    getData: vi.fn(() => ({
-      image: {
-        getMeta: vi.fn(() => ({})),
-        isResampled: vi.fn(() => false)
-      },
-      annotationGroup: {
-        getMeta: vi.fn(() => ({}))
-      }
+    getDataController: vi.fn(() => ({
+      get: vi.fn(() => ({
+        image: {
+          getMeta: vi.fn(() => ({})),
+          isResampled: vi.fn(() => false)
+        },
+        annotationGroup: {
+          getMeta: vi.fn(() => ({}))
+        }
+      }))
     }))
   };
 }
@@ -103,24 +105,26 @@ describe('tools/behaviors/drawTapBehavior', () => {
     lg.getBaseViewLayer = vi.fn(() => ({
       getDataId: vi.fn(() => 'bad-base')
     }));
-    app.getData = vi.fn((id) => {
-      if (id === 'bad-base') {
+    app.getDataController = vi.fn(() => ({
+      get: vi.fn((id) => {
+        if (id === 'bad-base') {
+          return {
+            image: {
+              isResampled: vi.fn(() => true)
+            }
+          };
+        }
         return {
           image: {
-            isResampled: vi.fn(() => true)
+            getMeta: vi.fn(() => ({})),
+            isResampled: vi.fn(() => false)
+          },
+          annotationGroup: {
+            getMeta: vi.fn(() => ({}))
           }
         };
-      }
-      return {
-        image: {
-          getMeta: vi.fn(() => ({})),
-          isResampled: vi.fn(() => false)
-        },
-        annotationGroup: {
-          getMeta: vi.fn(() => ({}))
-        }
-      };
-    });
+      })
+    }));
 
     behavior.onTap(new Point2D(4, 5), lg);
     assert.equal(onWarn.mock.calls.length, 1);

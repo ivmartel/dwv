@@ -85,7 +85,8 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
       return;
     }
 
-    const image = this.#app.getData(viewLayer.getDataId()).image;
+    const dataCtrl = this.#app.getDataController();
+    const image = dataCtrl.get(viewLayer.getDataId()).image;
     const wl = new WindowLevelValues(
       image.getRescaledValueAtIndex(
         viewController.getCurrentIndex().getWithNew2D(

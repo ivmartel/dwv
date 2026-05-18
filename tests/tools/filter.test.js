@@ -55,11 +55,15 @@ function makeImage3x3(values) {
 function makeFilterApp(image) {
   const dataId = 'test-data';
   const render = vi.fn();
+  const dataCtrl = {
+    get: vi.fn(() => ({image})),
+    setImage: vi.fn()
+  };
   return {
     dataId,
     image,
-    getData: vi.fn(() => ({image})),
-    setImage: vi.fn(),
+    dataCtrl,
+    getDataController: vi.fn(() => dataCtrl),
     render,
     getStageController: () => ({render}),
     addToUndoStack: vi.fn(),
@@ -68,14 +72,15 @@ function makeFilterApp(image) {
 }
 
 /**
- * Image passed to {@link App#setImage} from {@link RunFilterCommand#execute}.
+ * Image passed to {@link DataController#setImage} from
+ * {@link RunFilterCommand#execute}.
  *
  * @param {object} app Mock app from {@link makeFilterApp}.
  * @returns {Image} The new image for `dataId`.
  */
 function getResultImageFromSetImage(app) {
-  assert.equal(app.setImage.mock.calls.length, 1);
-  const [dataId, image] = app.setImage.mock.calls[0];
+  assert.equal(app.dataCtrl.setImage.mock.calls.length, 1);
+  const [dataId, image] = app.dataCtrl.setImage.mock.calls[0];
   assert.equal(dataId, app.dataId);
   return image;
 }

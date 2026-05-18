@@ -58,7 +58,8 @@ export class RunFilterCommand extends Command {
    */
   execute() {
     // run filter and set app image
-    this.#app.setImage(this.#dataId, this.#filter.update());
+    this.#app.getDataController().setImage(
+      this.#dataId, this.#filter.update());
     // update display
     this.#app.getStageController().render(this.#dataId);
     /**
@@ -85,7 +86,8 @@ export class RunFilterCommand extends Command {
    */
   undo() {
     // reset the image
-    this.#app.setImage(this.#dataId, this.#filter.getOriginalImage());
+    this.#app.getDataController().setImage(
+      this.#dataId, this.#filter.getOriginalImage());
     // update display
     this.#app.getStageController().render(this.#dataId);
     /**

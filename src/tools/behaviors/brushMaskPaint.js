@@ -456,7 +456,8 @@ export class BrushMaskPaint extends EventTarget {
     if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskId);
     }
-    const maskData = this.#app.getData(this.#maskDataId);
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(this.#maskDataId);
     if (!maskData) {
       throw new Error(
         formatString(ERROR_MESSAGES.brush.noMaskImage, this.#maskDataId));
@@ -561,8 +562,9 @@ export class BrushMaskPaint extends EventTarget {
     const elements = getElementsFromJSONTags(firstSliceMeta);
     const data = new DicomData(elements);
     data.image = this.#mask;
-    const dataId = this.#app.getNextDataId();
-    const added = this.#app.addData(dataId, data);
+    const dataCtrl = this.#app.getDataController();
+    const dataId = dataCtrl.getNextDataId();
+    const added = dataCtrl.add(dataId, data);
     if (!added) {
       throw new Error('Cannot add mask data');
     }
@@ -654,7 +656,8 @@ export class BrushMaskPaint extends EventTarget {
     // search app for the data ID of this SOPInstanceUID...
     let ids = [];
     if (sourceDataUID !== 'undefined') {
-      ids = this.#app.getDataIdsFromSopUids([sourceDataUID]);
+      const dataCtrl = this.#app.getDataController();
+      ids = dataCtrl.getDataIdsFromSopUids([sourceDataUID]);
     }
     let sourceDataId = '0';
     if (ids.length > 0) {
@@ -704,7 +707,8 @@ export class BrushMaskPaint extends EventTarget {
     if (typeof maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskId);
     }
-    const maskData = this.#app.getData(maskDataId);
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(maskDataId);
     if (typeof maskData === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskImageGetOffset);
     }
@@ -749,7 +753,8 @@ export class BrushMaskPaint extends EventTarget {
       this.#mask = this.#getMaskImage(this.#maskDataId);
       // get source image
       const sourceDataId = this.#getSourceDataIdFromMask(this.#mask);
-      const sourceData = this.#app.getData(sourceDataId);
+      const dataCtrl = this.#app.getDataController();
+      const sourceData = dataCtrl.get(sourceDataId);
       if (!sourceData) {
         throw new Error(formatString(
           ERROR_MESSAGES.brush.noSourceImageGetOffset, sourceDataId
@@ -774,7 +779,8 @@ export class BrushMaskPaint extends EventTarget {
     } else {
       // view layer is source
       const sourceDataId = viewLayer.getDataId();
-      const sourceData = this.#app.getData(sourceDataId);
+      const dataCtrl = this.#app.getDataController();
+      const sourceData = dataCtrl.get(sourceDataId);
       if (!sourceData) {
         throw new Error(formatString(
           ERROR_MESSAGES.brush.noSourceImageGetOffset, sourceDataId
@@ -892,7 +898,8 @@ export class BrushMaskPaint extends EventTarget {
     const maskVl = this.#getMaskViewLayer();
     const srclayerid = maskVl.getId();
 
-    const maskData = this.#app.getData(this.#maskDataId);
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(this.#maskDataId);
     if (!maskData) {
       throw new Error(
         formatString(ERROR_MESSAGES.brush.noMaskImageDraw, this.#maskDataId)

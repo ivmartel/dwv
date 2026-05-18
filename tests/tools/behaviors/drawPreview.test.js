@@ -22,15 +22,17 @@ function makeDrawPreviewApp() {
   };
   return {
     getStyle: vi.fn(() => style),
-    getData: vi.fn((dataId) => ({
-      image: {
-        getMeta: vi.fn(() => ({})),
-        isResampled: vi.fn(() => false)
-      },
-      annotationGroup: {
-        getMeta: vi.fn(() => ({}))
-      },
-      dataId
+    getDataController: vi.fn(() => ({
+      get: vi.fn((dataId) => ({
+        image: {
+          getMeta: vi.fn(() => ({})),
+          isResampled: vi.fn(() => false)
+        },
+        annotationGroup: {
+          getMeta: vi.fn(() => ({}))
+        },
+        dataId
+      }))
     }))
   };
 }
@@ -91,21 +93,23 @@ describe('tools/behaviors/drawPreview', () => {
 
   test('getCannotCreateReason mentions base data when base image is resampled',
     () => {
-      app.getData = vi.fn((id) => {
-        if (id === 'base-data') {
+      app.getDataController = vi.fn(() => ({
+        get: vi.fn((id) => {
+          if (id === 'base-data') {
+            return {
+              image: {
+                isResampled: vi.fn(() => true)
+              }
+            };
+          }
           return {
             image: {
-              isResampled: vi.fn(() => true)
+              getMeta: vi.fn(() => ({})),
+              isResampled: vi.fn(() => false)
             }
           };
-        }
-        return {
-          image: {
-            getMeta: vi.fn(() => ({})),
-            isResampled: vi.fn(() => false)
-          }
-        };
-      });
+        })
+      }));
       const baseViewLayer = {getDataId: vi.fn(() => 'base-data')};
       const refViewLayer = makeMockViewLayer();
       const lg = {

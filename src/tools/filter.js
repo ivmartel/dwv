@@ -250,7 +250,8 @@ export class Threshold extends EventTarget {
     this.#filter.setMax(args.max);
     // reset the image if asked
     if (this.#resetImage) {
-      const image = this.#app.getData(args.dataId).image;
+      const dataCtrl = this.#app.getDataController();
+      const image = dataCtrl.get(args.dataId).image;
       this.#filter.setOriginalImage(image);
       this.#resetImage = false;
     }
@@ -313,7 +314,8 @@ export class Sharpen extends EventTarget {
       throw new Error('No dataId to run sharpen filter on.');
     }
     const filter = new SharpenFilter();
-    const image = this.#app.getData(args.dataId).image;
+    const dataCtrl = this.#app.getDataController();
+    const image = dataCtrl.get(args.dataId).image;
     filter.setOriginalImage(image);
     const command = new RunFilterCommand(filter, args.dataId, this.#app);
     command.onExecute = (event) => {
@@ -374,7 +376,8 @@ export class Sobel extends EventTarget {
       throw new Error('No dataId to run sobel filter on.');
     }
     const filter = new SobelFilter();
-    const image = this.#app.getData(args.dataId).image;
+    const dataCtrl = this.#app.getDataController();
+    const image = dataCtrl.get(args.dataId).image;
     filter.setOriginalImage(image);
     const command = new RunFilterCommand(filter, args.dataId, this.#app);
     command.onExecute = (event) => {

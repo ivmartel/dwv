@@ -96,7 +96,9 @@ describe('tools/behaviors', () => {
       const mockImage = {
         getRescaledValueAtIndex: vi.fn(() => 75)
       };
-      app.getData.mockReturnValue({image: mockImage});
+      app.getDataController.mockReturnValue({get: vi.fn(
+        () => ({image: mockImage})
+      )});
       const layerGroup = makeMockLayerGroup(viewLayer);
 
       const point = new Point2D(100, 200);

@@ -237,7 +237,8 @@ export class DrawPreview {
     if (typeof validator !== 'undefined') {
       const referenceViewLayer = layerGroup.getActiveViewLayer();
       const refDataId = referenceViewLayer.getDataId();
-      const refData = this.#app.getData(refDataId);
+      const dataCtrl = this.#app.getDataController();
+      const refData = dataCtrl.get(refDataId);
       const refMeta = refData.image.getMeta();
       res = validator(refMeta);
     }
@@ -254,7 +255,8 @@ export class DrawPreview {
   #checkBaseData(layerGroup) {
     const viewLayer = layerGroup.getBaseViewLayer();
     const baseDataId = viewLayer.getDataId();
-    const baseData = this.#app.getData(baseDataId);
+    const dataCtrl = this.#app.getDataController();
+    const baseData = dataCtrl.get(baseDataId);
     const baseImage = baseData.image;
 
     return !baseImage.isResampled();

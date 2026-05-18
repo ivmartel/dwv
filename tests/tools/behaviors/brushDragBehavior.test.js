@@ -84,10 +84,12 @@ describe('BrushDragBehavior', () => {
    */
   function makeApp() {
     return {
-      getData: vi.fn(() => ({
-        image: {
-          getMeta: () => ({SeriesInstanceUID: 'series-a'})
-        }
+      getDataController: vi.fn(() => ({
+        get: vi.fn(() => ({
+          image: {
+            getMeta: () => ({SeriesInstanceUID: 'series-a'})
+          }
+        }))
       }))
     };
   }

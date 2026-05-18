@@ -336,7 +336,8 @@ export class FloodfillDragBehavior extends DragBehavior {
   #isResampled(layerGroup) {
     const viewLayer = layerGroup.getBaseViewLayer();
     const referenceDataId = viewLayer.getDataId();
-    const referenceData = this.#app.getData(referenceDataId);
+    const dataCtrl = this.#app.getDataController();
+    const referenceData = dataCtrl.get(referenceDataId);
     const image = referenceData.image;
 
     return image.isResampled();

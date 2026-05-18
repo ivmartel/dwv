@@ -232,7 +232,8 @@ export class BrushDragBehavior extends DragBehavior {
     if (typeof drawLayer === 'undefined') {
       const viewLayer = layerGroup.getActiveViewLayer();
       const referenceDataId = viewLayer.getDataId();
-      const referenceData = this.#app.getData(referenceDataId);
+      const dataCtrl = this.#app.getDataController();
+      const referenceData = dataCtrl.get(referenceDataId);
       const referenceMeta = referenceData.image.getMeta();
       const seriesInstanceUID = referenceMeta.SeriesInstanceUID;
       if (this.#blacklist.includes(seriesInstanceUID)) {

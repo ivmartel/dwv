@@ -114,10 +114,12 @@ export function makeMockLayerGroup(viewLayer = null, layer = null) {
  */
 export function makeMockApp() {
   return {
-    getData: vi.fn(() => ({
-      image: {
-        getRescaledValueAtIndex: vi.fn(() => 50)
-      }
+    getDataController: vi.fn(() => ({
+      get: vi.fn(() => ({
+        image: {
+          getRescaledValueAtIndex: vi.fn(() => 50)
+        }
+      }))
     }))
   };
 }
