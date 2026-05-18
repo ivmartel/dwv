@@ -1,14 +1,19 @@
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
-import {dataEventNames} from '../app/dataController.js';
 import {Style} from '../gui/style.js';
 import {State} from '../io/state.js';
 import {logger} from '../utils/logger.js';
 import {getUriQuery, decodeQuery} from '../utils/uri.js';
 import {UndoStack} from '../command/undoStack.js';
 import {ToolboxController} from './toolboxController.js';
-import {LoadController} from './loadController.js';
-import {DataController} from './dataController.js';
+import {
+  loadEventNames,
+  LoadController
+} from './loadController.js';
+import {
+  dataEventNames,
+  DataController
+} from './dataController.js';
 import {InfoData} from '../gui/infoData.js';
 import {
   toolList,
@@ -811,14 +816,18 @@ export class App extends EventTarget {
     // create load controller
     this.#loadController =
       new LoadController(this.#options.defaultCharacterSet);
-    this.#loadController.onloadstart = this.#onloadstart;
-    this.#loadController.onprogress = this.#onloadprogress;
-    this.#loadController.onloaditem = this.#onloaditem;
-    this.#loadController.onload = this.#onload;
-    this.#loadController.onloadend = this.#onloadend;
-    this.#loadController.onerror = this.#onloaderror;
-    this.#loadController.ontimeout = this.#onloadtimeout;
-    this.#loadController.onabort = this.#onloadabort;
+    // handle locally
+    this.#loadController.addEventListener('loadstart', this.#onloadstart);
+    this.#loadController.addEventListener('loaditem', this.#onloaditem);
+    this.#loadController.addEventListener('load', this.#onload);
+    // propagate load events
+    for (const eventName of loadEventNames) {
+      if (eventName !== 'loadstart' &&
+        eventName !== 'loaditem' &&
+        eventName !== 'load') {
+        this.#loadController.addEventListener(eventName, this.#fireEvent);
+      }
+    }
 
     // create data controller
     this.#dataController = new DataController();
@@ -902,6 +911,110 @@ export class App extends EventTarget {
   }
 
   // load API [begin] -------------------------------------------------------
+
+  /**
+   * Load start event.
+   *
+   * @event App#loadstart
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
+
+  /**
+   * Load progress event.
+   *
+   * @event App#loadprogress
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   * @property {number} detail.loaded The loaded percentage.
+   * @property {number} detail.total The total percentage.
+   */
+
+  /**
+   * Load item event: fired when an item has been successfully loaded.
+   *
+   * @event App#loaditem
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   * @property {object} detail.data The loaded meta data.
+   * @property {boolean} detail.isfirstitem True if the item is the first
+   *  one loaded for the data id.
+   */
+
+  /**
+   * Load event: fired when a load finishes successfully.
+   *
+   * @event App#load
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
+
+  /**
+   * Load end event: fired when the load finishes,
+   *   successfully or not.
+   *
+   * @event App#loadend
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
+
+  /**
+   * Load error event.
+   *
+   * @event App#error
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   * @property {object} detail.error The error.
+   * @property {object} detail.target The event target.
+   */
+
+  /**
+   * Load timeout event.
+   *
+   * @event App#timeout
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: an url as a string.
+   * @property {object} detail.target The event target.
+   */
+
+  /**
+   * Load abort event.
+   *
+   * @event App#abort
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadtype The load type: image or state.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
 
   /**
    * Load a list of files. Can be image files or a state file.
@@ -1828,57 +1941,12 @@ export class App extends EventTarget {
   #onloadstart = (event) => {
     // create info data
     if (typeof this.#options.overlayConfig !== 'undefined') {
-      this.#infoDatas[event.dataid] = new InfoData(
-        this, event.dataid, this.#options.overlayConfig);
+      this.#infoDatas[event.detail.dataid] = new InfoData(
+        this, event.detail.dataid, this.#options.overlayConfig);
     }
-    /**
-     * Load start event.
-     *
-     * @event App#loadstart
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {*} detail.source The load source: string for an url,
-     *   File for a file.
-     * @property {string} detail.dataid The data id.
-     */
-    this.dispatchEvent(new CustomEvent('loadstart', {
-      detail: {
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-        source: event.source,
-      }
-    }));
-  };
 
-  /**
-   * Data load progress callback.
-   *
-   * @param {object} event The progress event.
-   */
-  #onloadprogress = (event) => {
-    /**
-     * Load progress event.
-     *
-     * @event App#loadprogress
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {*} detail.source The load source: string for an url,
-     *   File for a file.
-     * @property {string} detail.dataid The data id.
-     * @property {number} detail.loaded The loaded percentage.
-     * @property {number} detail.total The total percentage.
-     */
-    this.dispatchEvent(new CustomEvent('loadprogress', {
-      detail: {
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-        source: event.source,
-        loaded: event.loaded,
-        total: event.total,
-      }
-    }));
+    // propagate
+    this.#fireEvent(event);
   };
 
   /**
@@ -1888,79 +1956,58 @@ export class App extends EventTarget {
    */
   #onloaditem = (event) => {
     // check event
-    if (typeof event.data === 'undefined') {
+    if (typeof event.detail.data === 'undefined') {
       logger.error('Missing loaditem event data.');
     }
-    if (typeof event.loadtype === 'undefined') {
+    if (typeof event.detail.loadtype === 'undefined') {
       logger.error('Missing loaditem event load type.');
     }
 
-    let eventMetaData;
-    if (event.loadtype === 'image') {
-      eventMetaData = event.data.meta;
-    } else if (event.loadtype === 'state') {
-      eventMetaData = 'state';
-    }
+    const isFirstLoadItem = event.detail.isfirstitem;
 
-    const isFirstLoadItem = event.isfirstitem;
-
-    if (event.loadtype === 'image') {
+    if (event.detail.loadtype === 'image') {
       try {
         if (isFirstLoadItem) {
-          this.#dataController.add(event.dataid, event.data);
+          this.#dataController.add(event.detail.dataid, event.detail.data);
         } else {
-          this.#dataController.update(event.dataid, event.data);
+          this.#dataController.update(event.detail.dataid, event.detail.data);
         }
       } catch (error) {
-        this.#onloaderror({
-          dataid: event.dataid,
-          error,
-          source: event.source
-        });
-        this.#onloadend({
-          dataid: event.dataid,
-          source: event.source
-        });
+        this.dispatchEvent(new CustomEvent('error', {
+          detail: {
+            dataid: event.detail.dataid,
+            loadtype: event.detail.loadtype,
+            source: event.detail.source,
+            error
+          }
+        }));
+        this.dispatchEvent(new CustomEvent('loadend', {
+          detail: {
+            dataid: event.detail.dataid,
+            loadtype: event.detail.loadtype,
+            source: event.detail.source
+          }
+        }));
         return;
       }
-    } else if (event.loadtype === 'state') {
-      this.applyJsonState(event.data, event.dataid);
+    } else if (event.detail.loadtype === 'state') {
+      this.applyJsonState(event.detail.data, event.detail.dataid);
     }
 
-    /**
-     * Load item event: fired when an item has been successfully loaded.
-     *
-     * @event App#loaditem
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {*} detail.source The load source: string for an url,
-     *   File for a file.
-     * @property {string} detail.dataid The data id.
-     * @property {object} detail.data The loaded meta data.
-     */
-    this.dispatchEvent(new CustomEvent('loaditem', {
-      detail: {
-        data: eventMetaData,
-        source: event.source,
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-        isfirstitem: event.isfirstitem,
-        warn: event.warn,
-      }
-    }));
+    // propagate (before display)
+    this.#fireEvent(event);
 
     // update info data if present
     if (typeof this.#infoDatas !== 'undefined' &&
-      typeof this.#infoDatas[event.dataid] !== 'undefined') {
-      this.#infoDatas[event.dataid].addItemMeta(eventMetaData);
+      typeof this.#infoDatas[event.detail.dataid] !== 'undefined') {
+      this.#infoDatas[event.detail.dataid].addItemMeta(event.detail.data.meta);
     }
 
     // render if first and flag allows
-    if (event.loadtype === 'image' &&
-      this.#stageController.getViewConfigs(event.dataid).length !== 0 &&
+    if (event.detail.loadtype === 'image' &&
+      this.#stageController.getViewConfigs(event.detail.dataid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
-      this.#stageController.render(event.dataid);
+      this.#stageController.render(event.detail.dataid);
     }
   };
 
@@ -1971,140 +2018,17 @@ export class App extends EventTarget {
    */
   #onload = (event) => {
     // mark data as complete
-    const res = this.#dataController.markDataAsComplete(event.dataid);
+    const res = this.#dataController.markDataAsComplete(event.detail.dataid);
 
     // render if image has changed
     if (this.#options.viewOnFirstLoadItem &&
       typeof res.imageHasChanged !== 'undefined' &&
       res.imageHasChanged) {
-      this.#stageController.render(event.dataid);
+      this.#stageController.render(event.detail.dataid);
     }
 
-    /**
-     * Load event: fired when a load finishes successfully.
-     *
-     * @event App#load
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {string} detail.dataid The data id.
-     */
-    this.dispatchEvent(new CustomEvent('load', {
-      detail: {
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-      }
-    }));
-  };
-
-  /**
-   * Data load end callback.
-   *
-   * @param {object} event The load end event.
-   */
-  #onloadend = (event) => {
-    /**
-     * Main load end event: fired when the load finishes,
-     *   successfully or not.
-     *
-     * @event App#loadend
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {string} detail.dataid The data id.
-     * @property {*} detail.source The load source: string for an url,
-     *   File for a file.
-     */
-    this.dispatchEvent(new CustomEvent('loadend', {
-      detail: {
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-        source: event.source,
-      }
-    }));
-  };
-
-  /**
-   * Data load error callback.
-   *
-   * @param {object} event The error event.
-   */
-  #onloaderror = (event) => {
-    /**
-     * Load error event.
-     *
-     * @event App#error
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {string} detail.dataid The data id.
-     * @property {*} detail.source The load source: string for an url,
-     *   File for a file.
-     * @property {object} detail.error The error.
-     * @property {object} detail.target The event target.
-     */
-    this.dispatchEvent(new CustomEvent('error', {
-      detail: {
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-        source: event.source,
-        error: event.error,
-        target: event.target,
-      }
-    }));
-  };
-
-  /**
-   * Data load timeout callback.
-   *
-   * @param {object} event The timeout event.
-   */
-  #onloadtimeout = (event) => {
-    /**
-     * Load timeout event.
-     *
-     * @event App#timeout
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {string} detail.dataid The data id.
-     * @property {*} detail.source The load source: an url as a string.
-     * @property {object} detail.target The event target.
-     */
-    this.dispatchEvent(new CustomEvent('timeout', {
-      detail: {
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-        source: event.source,
-        target: event.target,
-      }
-    }));
-  };
-
-  /**
-   * Data load abort callback.
-   *
-   * @param {object} event The abort event.
-   */
-  #onloadabort = (event) => {
-    /**
-     * Load abort event.
-     *
-     * @event App#abort
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     * @property {string} detail.loadtype The load type: image or state.
-     * @property {string} detail.dataid The data id.
-     * @property {*} detail.source The load source: string for an url,
-     *   File for a file.
-     */
-    this.dispatchEvent(new CustomEvent('abort', {
-      detail: {
-        loadtype: event.loadtype,
-        dataid: event.dataid,
-        source: event.source,
-      }
-    }));
+    // propagate
+    this.#fireEvent(event);
   };
 
 } // class App

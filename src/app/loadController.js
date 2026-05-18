@@ -3,9 +3,25 @@ import {MemoryLoader} from '../io/memoryLoader.js';
 import {UrlsLoader} from '../io/urlsLoader.js';
 
 /**
+ * List of load event names.
+ *
+ * @type {string[]}
+ */
+export const loadEventNames = [
+  'loadstart',
+  'loadprogress',
+  'loaditem',
+  'load',
+  'loadend',
+  'error',
+  'abort',
+  'timeout'
+];
+
+/**
  * Load controller.
  */
-export class LoadController {
+export class LoadController extends EventTarget {
 
   /**
    * The default character set.
@@ -25,6 +41,7 @@ export class LoadController {
    * @param {string} defaultCharacterSet The default character set.
    */
   constructor(defaultCharacterSet) {
+    super();
     this.#defaultCharacterSet = defaultCharacterSet;
   }
 
@@ -173,8 +190,8 @@ export class LoadController {
    */
   #loadData(data, loader, loadType, dataId, options) {
     const eventInfo = {
-      loadtype: loadType,
-      dataid: dataId
+      dataid: dataId,
+      loadtype: loadType
     };
 
     // set callbacks
@@ -185,135 +202,70 @@ export class LoadController {
         isFirstItem: true
       };
       // callback
-      this.#augmentCallbackEvent(this.onloadstart, eventInfo)(event);
+      this.#getFireEvent('loadstart', eventInfo)(event);
     };
-    loader.onprogress = this.#augmentCallbackEvent(this.onprogress, eventInfo);
+    loader.onprogress = this.#getFireEvent('loadprogress', eventInfo);
     loader.onloaditem = (event) => {
       const eventInfoItem = {
-        loadtype: loadType,
-        dataid: dataId
+        dataid: dataId,
+        loadtype: loadType
       };
       if (typeof this.#currentLoaders[dataId] !== 'undefined') {
         eventInfoItem.isfirstitem = this.#currentLoaders[dataId].isFirstItem;
       }
       // callback
-      this.#augmentCallbackEvent(this.onloaditem, eventInfoItem)(event);
+      this.#getFireEvent('loaditem', eventInfoItem)(event);
       // update loader
       if (typeof this.#currentLoaders[dataId] !== 'undefined' &&
         this.#currentLoaders[dataId].isFirstItem) {
         this.#currentLoaders[dataId].isFirstItem = false;
       }
     };
-    loader.onload = this.#augmentCallbackEvent(this.onload, eventInfo);
+    loader.onload = this.#getFireEvent('load', eventInfo);
     loader.onloadend = (event) => {
       // reset current loader
       delete this.#currentLoaders[dataId];
       // callback
-      this.#augmentCallbackEvent(this.onloadend, eventInfo)(event);
+      this.#getFireEvent('loadend', eventInfo)(event);
     };
-    loader.onerror = this.#augmentCallbackEvent(this.onerror, eventInfo);
-    loader.onabort = this.#augmentCallbackEvent(this.onabort, eventInfo);
+    loader.onerror = this.#getFireEvent('error', eventInfo);
+    loader.onabort = this.#getFireEvent('abort', eventInfo);
     if (typeof loader.ontimeout !== 'undefined') {
-      loader.ontimeout = this.#augmentCallbackEvent(this.ontimeout, eventInfo);
+      loader.ontimeout = this.#getFireEvent('timeout', eventInfo);
     }
     // launch load
     try {
       loader.load(data, options);
     } catch (error) {
-      this.onerror({
-        error,
-        dataid: dataId
-      });
-      this.onloadend({
-        dataid: dataId
-      });
+      this.dispatchEvent(new CustomEvent('error', {
+        detail: {
+          dataid: dataId,
+          loadtype: loadType,
+          error
+        }
+      }));
+      this.dispatchEvent(new CustomEvent('loadend', {
+        detail: {
+          dataid: dataId,
+          loadtype: loadType,
+        }
+      }));
     }
   }
 
   /**
-   * Augment a callback event: adds loadtype to the event
-   *  passed to a callback.
+   * Get a fireEvent function that adds local information
+   * to the event value.
    *
-   * @param {object} callback The callback to update.
-   * @param {object} info Info object to append to the event.
-   * @returns {object} A function representing the modified callback.
+   * @param {string} type The event type to fire.
+   * @param {object} detail Local information.
+   * @returns {EventListener} A fireEvent function.
    */
-  #augmentCallbackEvent(callback, info) {
-    return function (event) {
-      const keys = Object.keys(info);
-      for (let i = 0; i < keys.length; ++i) {
-        const key = keys[i];
-        event[key] = info[key];
-      }
-      callback(event);
-    };
+  #getFireEvent(type, detail) {
+    return ((/** @type {CustomEvent} */ event) => {
+      const allDetail = Object.assign({}, event, detail);
+      this.dispatchEvent(new CustomEvent(type, {detail: allDetail}));
+    });
   }
-
-  /**
-   * Handle a load start event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load start event.
-   */
-  onloadstart(_event) {}
-
-  /**
-   * Handle a load progress event.
-   * Default does nothing.
-   *
-   * @param {object} _event The progress event.
-   */
-  onprogress(_event) {}
-
-  /**
-   * Handle a load event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when a file has been loaded successfully.
-   */
-  onload(_event) {}
-
-  /**
-   * Handle a load item event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when an item has been loaded successfully.
-   */
-  onloaditem(_event) {}
-
-  /**
-   * Handle a load end event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load end event fired
-   *  when a file load has completed, successfully or not.
-   */
-  onloadend(_event) {}
-
-  /**
-   * Handle an error event.
-   * Default does nothing.
-   *
-   * @param {object} _event The error event.
-   */
-  onerror(_event) {}
-
-  /**
-   * Handle a timeout event.
-   * Default does nothing.
-   *
-   * @param {object} _event The timeout event.
-   */
-  ontimeout(_event) {}
-
-  /**
-   * Handle an abort event.
-   * Default does nothing.
-   *
-   * @param {object} _event The abort event.
-   */
-  onabort(_event) {}
 
 } // class LoadController
