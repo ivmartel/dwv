@@ -184,6 +184,7 @@ export class AnnotationUI {
   #getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
     const dataCtrl = this.#app.getDataController();
+    const undoCtrl = this.#app.getUndoController();
 
     const infoButton = getButton('Info');
     const ibIdPrefix = 'ib-';
@@ -245,7 +246,7 @@ export class AnnotationUI {
           annotationId,
           {colour: chgAnnotation.colour},
           {colour: newColour},
-          this.#app.addToUndoStack
+          undoCtrl.addToUndoStack
         );
       }
     };
@@ -299,7 +300,7 @@ export class AnnotationUI {
       // TODO reposition div at same position after delete undo?
       drawController.removeAnnotationWithCommand(
         annotationId,
-        this.#app.addToUndoStack
+        undoCtrl.addToUndoStack
       );
     };
 

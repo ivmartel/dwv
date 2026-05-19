@@ -578,7 +578,8 @@ export class SegmentationUI {
         // execute command
         if (chgCmd.isValid()) {
           chgCmd.execute();
-          this.#app.addToUndoStack(chgCmd);
+          const undoCtrl = this.#app.getUndoController();
+          undoCtrl.addToUndoStack(chgCmd);
         }
       }
 
@@ -707,7 +708,8 @@ export class SegmentationUI {
       // execute command
       if (delCmd.isValid()) {
         delCmd.execute();
-        this.#app.addToUndoStack(delCmd);
+        const undoCtrl = this.#app.getUndoController();
+        undoCtrl.addToUndoStack(delCmd);
       }
     } else {
       listItem.remove();
