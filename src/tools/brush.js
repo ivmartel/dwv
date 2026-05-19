@@ -54,7 +54,7 @@ export class Brush extends LayerGroupPointer {
   constructor(app) {
     const dragBehavior = new BrushDragBehavior(app);
     super({
-      app,
+      stageController: app.getStageController(),
       dragBehavior,
       wheelBehavior: new ScrollWheelBehavior(),
       longTouchToDblClickMs: null

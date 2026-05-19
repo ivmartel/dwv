@@ -50,7 +50,7 @@ export class Floodfill extends LayerGroupPointer {
       drawSelect
     );
     super({
-      app,
+      stageController: app.getStageController(),
       dragBehavior,
       wheelBehavior: new ScrollWheelBehavior()
     });

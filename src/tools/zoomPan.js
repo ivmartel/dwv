@@ -46,7 +46,7 @@ export class ZoomAndPan extends LayerGroupPointer {
    */
   constructor(app) {
     super({
-      app,
+      stageController: app.getStageController(),
       dragBehavior: new PanDragBehavior(),
       wheelBehavior: new ZoomWheelBehavior(),
       twoTouchBehavior: new ZoomScrollTwoTouchBehavior(),

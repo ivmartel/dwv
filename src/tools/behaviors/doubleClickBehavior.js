@@ -8,7 +8,7 @@ import {
 import {logger} from '../../utils/logger.js';
 
 /**
- * @import {App} from '../../app/application.js';
+ * @import {DataController} from '../../app/dataController.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  * @import {Point2D} from '../../math/point.js';
  */
@@ -38,9 +38,9 @@ export class DoubleClickBehavior {
 export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
 
   /**
-   * @type {App}
+   * @type {DataController}
    */
-  #app;
+  #dataController;
 
   /**
    * If true, use only the active view layer; if false, resolve to the first
@@ -52,12 +52,12 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
 
   /**
    * @param {object} options Constructor options.
-   * @param {App} options.app The application.
+   * @param {DataController} options.dataController The data controller.
    * @param {boolean} [options.activeViewLayerOnly] Active view layer only.
    */
-  constructor({app, activeViewLayerOnly = true}) {
+  constructor({dataController, activeViewLayerOnly = true}) {
     super();
-    this.#app = app;
+    this.#dataController = dataController;
     this.#activeViewLayerOnly = activeViewLayerOnly;
   }
 
@@ -85,8 +85,7 @@ export class WindowLevelDoubleClickBehavior extends DoubleClickBehavior {
       return;
     }
 
-    const dataCtrl = this.#app.getDataController();
-    const image = dataCtrl.get(viewLayer.getDataId()).image;
+    const image = this.#dataController.get(viewLayer.getDataId()).image;
     const wl = new WindowLevelValues(
       image.getRescaledValueAtIndex(
         viewController.getCurrentIndex().getWithNew2D(

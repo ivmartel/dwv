@@ -50,7 +50,7 @@ export class Livewire extends LayerGroupPointer {
       drawSelect
     );
     super({
-      app,
+      stageController: app.getStageController(),
       tapBehavior,
       wheelBehavior: new ScrollWheelBehavior()
     });

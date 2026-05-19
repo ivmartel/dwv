@@ -108,19 +108,28 @@ export function makeMockLayerGroup(viewLayer = null, layer = null) {
 }
 
 /**
+ * Create a minimal DataController mock.
+ *
+ * @returns {object} The data controller mock.
+ */
+export function makeMockDataController() {
+  return {
+    get: vi.fn(() => ({
+      image: {
+        getRescaledValueAtIndex: vi.fn(() => 50)
+      }
+    }))
+  };
+}
+
+/**
  * Create a minimal App mock.
  *
  * @returns {object} The app mock.
  */
 export function makeMockApp() {
   return {
-    getDataController: vi.fn(() => ({
-      get: vi.fn(() => ({
-        image: {
-          getRescaledValueAtIndex: vi.fn(() => 50)
-        }
-      }))
-    }))
+    getDataController: vi.fn(() => makeMockDataController())
   };
 }
 

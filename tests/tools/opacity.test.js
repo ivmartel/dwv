@@ -26,7 +26,10 @@ describe('Opacity', () => {
   });
 
   test('should instantiate with app and be a LayerGroupPointer', () => {
-    const mockApp = {onKeydown: vi.fn()};
+    const mockApp = {
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      onKeydown: vi.fn()
+    };
     const opacity = new Opacity(mockApp);
 
     assert.isDefined(opacity);
@@ -34,7 +37,7 @@ describe('Opacity', () => {
 
   test('behavior combination should handle lifecycle methods', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
       onKeydown: vi.fn()
     };
 
@@ -51,7 +54,7 @@ describe('Opacity', () => {
 
   test('should handle keydown events with behavior context', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
       onKeydown: vi.fn()
     };
 

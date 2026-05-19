@@ -35,7 +35,11 @@ describe('WindowLevel', () => {
   });
 
   test('should instantiate with app and be a LayerGroupPointer', () => {
-    const mockApp = {onKeydown: vi.fn()};
+    const mockApp = {
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      getDataController: () => ({get: vi.fn()}),
+      onKeydown: vi.fn()
+    };
     const windowLevel = new WindowLevel(mockApp);
 
     assert.isDefined(windowLevel);
@@ -43,7 +47,8 @@ describe('WindowLevel', () => {
 
   test('behavior combination should handle lifecycle methods', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      getDataController: () => ({get: vi.fn()}),
       onKeydown: vi.fn()
     };
 
@@ -60,7 +65,8 @@ describe('WindowLevel', () => {
 
   test('should handle keydown events with behavior context', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      getDataController: () => ({get: vi.fn()}),
       onKeydown: vi.fn()
     };
 
@@ -77,7 +83,8 @@ describe('WindowLevel', () => {
 
   test('should handle activeViewLayerOnly feature', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      getDataController: () => ({get: vi.fn()}),
       onKeydown: vi.fn()
     };
 

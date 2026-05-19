@@ -60,9 +60,11 @@ export class WindowLevel extends LayerGroupPointer {
    */
   constructor(app) {
     const dragBehavior = new WindowLevelDragBehavior();
-    const doubleClickBehavior = new WindowLevelDoubleClickBehavior({app});
+    const doubleClickBehavior = new WindowLevelDoubleClickBehavior(
+      {dataController: app.getDataController()}
+    );
     super({
-      app,
+      stageController: app.getStageController(),
       dragBehavior,
       wheelBehavior: new ScrollWheelBehavior(),
       doubleClickBehavior

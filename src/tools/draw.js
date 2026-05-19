@@ -54,7 +54,7 @@ export class Draw extends LayerGroupPointer {
     const tapBehavior = new DrawTapBehavior(app, drawSelect);
     const dragBehavior = new DrawDragBehavior(app, drawSelect);
     super({
-      app,
+      stageController: app.getStageController(),
       dragBehavior,
       tapBehavior,
       wheelBehavior: new ScrollWheelBehavior()

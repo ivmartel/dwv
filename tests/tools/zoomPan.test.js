@@ -26,7 +26,10 @@ describe('ZoomAndPan', () => {
   });
 
   test('should instantiate with app and be a LayerGroupPointer', () => {
-    const mockApp = {onKeydown: vi.fn()};
+    const mockApp = {
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      onKeydown: vi.fn()
+    };
     const zoomPan = new ZoomAndPan(mockApp);
 
     assert.isDefined(zoomPan);
@@ -34,7 +37,7 @@ describe('ZoomAndPan', () => {
 
   test('behavior combination should handle lifecycle methods', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
       onKeydown: vi.fn()
     };
 
@@ -51,7 +54,7 @@ describe('ZoomAndPan', () => {
 
   test('should handle keydown events with behavior context', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
       onKeydown: vi.fn()
     };
 
@@ -68,7 +71,7 @@ describe('ZoomAndPan', () => {
 
   test('should call cancel when deactivated', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
       onKeydown: vi.fn()
     };
 

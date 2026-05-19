@@ -42,7 +42,7 @@ export class Opacity extends LayerGroupPointer {
    */
   constructor(app) {
     super({
-      app,
+      stageController: app.getStageController(),
       dragBehavior: new OpacityDragBehavior(),
       wheelBehavior: new ScrollWheelBehavior()
     });

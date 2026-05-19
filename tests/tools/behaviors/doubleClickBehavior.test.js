@@ -10,7 +10,7 @@ import {WindowLevel} from '../../../src/image/windowLevel.js';
 import {
   makeMockLayerGroup,
   makeMockViewLayer,
-  makeMockApp,
+  makeMockDataController,
   makeMockViewController,
   makeMockLayer
 } from './utils.js';
@@ -35,14 +35,15 @@ describe('tools/behaviors', () => {
 
   describe('WindowLevelDoubleClickBehavior', () => {
     let behavior;
-    let app;
+    let dataController;
 
     beforeEach(() => {
-      app = makeMockApp();
-      behavior = new WindowLevelDoubleClickBehavior({app});
+      dataController = makeMockDataController();
+      behavior = new WindowLevelDoubleClickBehavior({dataController});
     });
 
-    test('initializes with app and default activeViewLayerOnly=true', () => {
+    test('initializes with dataController and default ' +
+      'activeViewLayerOnly=true', () => {
       assert.ok(behavior);
     });
 
@@ -96,9 +97,7 @@ describe('tools/behaviors', () => {
       const mockImage = {
         getRescaledValueAtIndex: vi.fn(() => 75)
       };
-      app.getDataController.mockReturnValue({get: vi.fn(
-        () => ({image: mockImage})
-      )});
+      dataController.get.mockReturnValue({image: mockImage});
       const layerGroup = makeMockLayerGroup(viewLayer);
 
       const point = new Point2D(100, 200);

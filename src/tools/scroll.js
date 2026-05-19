@@ -102,7 +102,7 @@ export class Scroll extends LayerGroupPointer {
   constructor(app) {
     const tooltipHover = new TooltipHoverBehavior();
     super({
-      app,
+      stageController: app.getStageController(),
       dragBehavior: new ScrollDragBehavior(),
       hoverBehavior: tooltipHover,
       wheelBehavior: new ScrollWheelBehavior(),

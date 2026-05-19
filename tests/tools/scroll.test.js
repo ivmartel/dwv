@@ -26,7 +26,10 @@ describe('Scroll', () => {
   });
 
   test('should instantiate with app and be a LayerGroupPointer', () => {
-    const mockApp = {onKeydown: vi.fn()};
+    const mockApp = {
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      onKeydown: vi.fn()
+    };
     const scroll = new Scroll(mockApp);
 
     assert.isDefined(scroll);
@@ -34,7 +37,7 @@ describe('Scroll', () => {
 
   test('behavior combination should handle lifecycle methods', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
       onKeydown: vi.fn()
     };
 
@@ -51,7 +54,7 @@ describe('Scroll', () => {
 
   test('should handle keydown events with behavior context', () => {
     const mockApp = {
-      getLayerGroupByDivId: () => undefined,
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
       onKeydown: vi.fn()
     };
 
