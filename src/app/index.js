@@ -10,6 +10,7 @@ import {DrawController} from './drawController.js';
 import {StageController} from './stageController.js';
 import {ToolboxController} from './toolboxController.js';
 import {ViewController} from './viewController.js';
+import {UndoController} from './undoController.js';
 import {custom} from './custom.js';
 
 export {
@@ -20,6 +21,7 @@ export {
   StageController,
   ToolboxController,
   ToolConfig,
+  UndoController,
   ViewConfig,
   ViewController,
   custom,

@@ -270,7 +270,8 @@ export class FloodfillDragBehavior extends DragBehavior {
       }
 
       // add command to undo stack
-      this.#app.addToUndoStack(command);
+      const undoCtrl = this.#app.getUndoController();
+      undoCtrl.addToUndoStack(command);
       // execute command: triggers draw creation
       command.execute();
     }

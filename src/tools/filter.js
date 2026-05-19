@@ -264,7 +264,8 @@ export class Threshold extends EventTarget {
     };
     command.execute();
     // save command in undo stack
-    this.#app.addToUndoStack(command);
+    const undoCtrl = this.#app.getUndoController();
+    undoCtrl.addToUndoStack(command);
   }
 
 } // class Threshold
@@ -326,7 +327,8 @@ export class Sharpen extends EventTarget {
     };
     command.execute();
     // save command in undo stack
-    this.#app.addToUndoStack(command);
+    const undoCtrl = this.#app.getUndoController();
+    undoCtrl.addToUndoStack(command);
   }
 
 } // filter.Sharpen
@@ -388,7 +390,8 @@ export class Sobel extends EventTarget {
     };
     command.execute();
     // save command in undo stack
-    this.#app.addToUndoStack(command);
+    const undoCtrl = this.#app.getUndoController();
+    undoCtrl.addToUndoStack(command);
   }
 
 } // class filter.Sobel

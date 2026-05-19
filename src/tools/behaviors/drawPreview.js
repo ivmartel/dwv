@@ -433,7 +433,8 @@ export class DrawPreview {
     }
 
     const command = new AddAnnotationCommand(annotation, drawController);
-    this.#app.addToUndoStack(command);
+    const undoCtrl = this.#app.getUndoController();
+    undoCtrl.addToUndoStack(command);
     command.execute();
 
     konvaLayer.listening(true);

@@ -30,13 +30,20 @@ function makeDrawApp(overrides = {}) {
   const stgCtrlKeys = ['getDrawLayers', 'getActiveLayerGroup'];
   const stgCtrlOverrides = {};
   const appOverrides = {};
+  /** @type {ReturnType<typeof vi.fn>|undefined} */
+  let addToUndoStackOverride;
   for (const [k, v] of Object.entries(overrides)) {
-    if (stgCtrlKeys.includes(k)) {
+    if (k === 'addToUndoStack') {
+      addToUndoStackOverride = v;
+    } else if (stgCtrlKeys.includes(k)) {
       stgCtrlOverrides[k] = v;
     } else {
       appOverrides[k] = v;
     }
   }
+  const addToUndoStack = addToUndoStackOverride ?? vi.fn((cmd) => {
+    cmd.execute();
+  });
   return {
     getStyle: vi.fn(() => ({
       setLineColour: vi.fn(),
@@ -48,12 +55,11 @@ function makeDrawApp(overrides = {}) {
       getActiveLayerGroup: vi.fn(),
       ...stgCtrlOverrides
     })),
+    getUndoController: vi.fn(() => ({addToUndoStack})),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     onKeydown: vi.fn(),
-    addToUndoStack: vi.fn((cmd) => {
-      cmd.execute();
-    }),
+    addToUndoStack,
     ...appOverrides
   };
 }

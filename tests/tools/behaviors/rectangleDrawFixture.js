@@ -82,6 +82,7 @@ export function createRectangleDrawIntegrationSetup() {
     setZoomScale: vi.fn()
   };
 
+  const addToUndoStack = vi.fn();
   const app = {
     getStyle: vi.fn(() => appStyle),
     getData: vi.fn(() => ({
@@ -93,7 +94,8 @@ export function createRectangleDrawIntegrationSetup() {
         getMeta: vi.fn(() => ({}))
       }
     })),
-    addToUndoStack: vi.fn()
+    getUndoController: vi.fn(() => ({addToUndoStack})),
+    addToUndoStack
   };
 
   const cleanup = () => {

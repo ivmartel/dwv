@@ -4,12 +4,15 @@ import {Style} from '../gui/style.js';
 import {State} from '../io/state.js';
 import {logger} from '../utils/logger.js';
 import {getUriQuery, decodeQuery} from '../utils/uri.js';
-import {UndoStack} from '../command/undoStack.js';
 import {ToolboxController} from './toolboxController.js';
 import {
   loadEventNames,
   LoadController
 } from './loadController.js';
+import {
+  undoEventNames,
+  UndoController
+} from './undoController.js';
 import {
   dataEventNames,
   DataController
@@ -256,11 +259,11 @@ export class App extends EventTarget {
   #stageController = null;
 
   /**
-   * Undo stack.
+   * Undo controller.
    *
-   * @type {UndoStack}
+   * @type {UndoController}
    */
-  #undoStack = null;
+  #undoController = null;
 
   /**
    * Style.
@@ -519,6 +522,15 @@ export class App extends EventTarget {
   }
 
   /**
+   * Get the undo controller.
+   *
+   * @returns {UndoController} The undo controller.
+   */
+  getUndoController() {
+    return this.#undoController;
+  }
+
+  /**
    * Get the active layer group.
    * The layer is available after the first loaded item.
    *
@@ -659,11 +671,16 @@ export class App extends EventTarget {
    *
    * @param {Command} cmd The command to add.
    * @fires UndoStack#undoadd
+   * @deprecated Since v0.37, please use via app.getUndoController.
    * @function
    */
   addToUndoStack = (cmd) => {
-    if (this.#undoStack !== null) {
-      this.#undoStack.add(cmd);
+    logger.debug(
+      'App.addToUndoStack: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    if (this.#undoController !== null) {
+      this.#undoController.addToUndoStack(cmd);
     }
   };
 
@@ -673,12 +690,17 @@ export class App extends EventTarget {
    * @param {string} name The name of the command to remove.
    * @returns {boolean} True if the command was found and removed.
    * @fires UndoStack#undoremove
+   * @deprecated Since v0.37, please use via app.getUndoController.
    * @function
    */
   removeFromUndoStack = (name) => {
+    logger.debug(
+      'App.removeFromUndoStack: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
     let res = false;
-    if (this.#undoStack !== null) {
-      res = this.#undoStack.remove(name);
+    if (this.#undoController !== null) {
+      res = this.#undoController.removeFromUndoStack(name);
     }
     return res;
   };
@@ -732,11 +754,11 @@ export class App extends EventTarget {
       this.#options.rootDocument = document;
     }
 
-    // undo stack
-    this.#undoStack = new UndoStack();
-    this.#undoStack.addEventListener('undoadd', this.#fireEvent);
-    this.#undoStack.addEventListener('undo', this.#fireEvent);
-    this.#undoStack.addEventListener('redo', this.#fireEvent);
+    // undo controller
+    this.#undoController = new UndoController();
+    for (const name of undoEventNames) {
+      this.#undoController.addEventListener(name, this.#fireEvent);
+    }
 
     // tools
     if (typeof this.#options.tools !== 'undefined') {
@@ -849,7 +871,9 @@ export class App extends EventTarget {
     if (this.#toolboxController) {
       this.#stageController.setToolboxController(this.#toolboxController);
     }
-    this.#stageController.setAddToUndoStack(this.addToUndoStack);
+    this.#stageController.setAddToUndoStack(
+      (cmd) => this.#undoController.addToUndoStack(cmd)
+    );
     this.#stageController.setGetInfoData((id) => this.getInfoData(id));
     // propagate stage controller events
     for (const name of stageControllerEventNames) {
@@ -865,11 +889,8 @@ export class App extends EventTarget {
     this.#stageController.empty();
     this.#infoDatas = {};
     // reset undo/redo
-    if (this.#undoStack) {
-      this.#undoStack = new UndoStack();
-      this.#undoStack.addEventListener('undoadd', this.#fireEvent);
-      this.#undoStack.addEventListener('undo', this.#fireEvent);
-      this.#undoStack.addEventListener('redo', this.#fireEvent);
+    if (this.#undoController) {
+      this.#undoController.reset();
     }
   }
 
@@ -1680,9 +1701,9 @@ export class App extends EventTarget {
           }
         }
       } else if (event.key === 'y') { // crtl-y
-        this.#undoStack.redo();
+        this.#undoController.redo();
       } else if (event.key === 'z') { // crtl-z
-        this.#undoStack.undo();
+        this.#undoController.undo();
       } else if (event.key === ' ') { // crtl-space
         const nGroups = this.#stageController.getNumberOfLayerGroups();
         for (let i = 0; i < nGroups; ++i) {
@@ -1776,36 +1797,56 @@ export class App extends EventTarget {
    * Undo the last action.
    *
    * @fires UndoStack#undo
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   undo() {
-    this.#undoStack.undo();
+    logger.debug(
+      'App.undo: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    this.#undoController.undo();
   }
 
   /**
    * Redo the last action.
    *
    * @fires UndoStack#redo
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   redo() {
-    this.#undoStack.redo();
+    logger.debug(
+      'App.redo: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    this.#undoController.redo();
   }
 
   /**
    * Get the undo stack size.
    *
    * @returns {number} The size of the stack.
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   getStackSize() {
-    return this.#undoStack.getStackSize();
+    logger.debug(
+      'App.getStackSize: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    return this.#undoController.getStackSize();
   }
 
   /**
    * Get the current undo stack index.
    *
    * @returns {number} The stack index.
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   getCurrentStackIndex() {
-    return this.#undoStack.getCurrentStackIndex();
+    logger.debug(
+      'App.getCurrentStackIndex: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    return this.#undoController.getCurrentStackIndex();
   }
 
   /**

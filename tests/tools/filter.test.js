@@ -59,6 +59,7 @@ function makeFilterApp(image) {
     get: vi.fn(() => ({image})),
     setImage: vi.fn()
   };
+  const addToUndoStack = vi.fn();
   return {
     dataId,
     image,
@@ -66,7 +67,8 @@ function makeFilterApp(image) {
     getDataController: vi.fn(() => dataCtrl),
     render,
     getStageController: () => ({render}),
-    addToUndoStack: vi.fn(),
+    getUndoController: vi.fn(() => ({addToUndoStack})),
+    addToUndoStack,
     onKeydown: vi.fn()
   };
 }

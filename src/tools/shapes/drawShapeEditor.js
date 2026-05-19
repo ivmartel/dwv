@@ -326,7 +326,8 @@ export class DrawShapeEditor {
         this.#drawLayer.getDrawController()
       );
       // add command to undo stack
-      this.#app.addToUndoStack(command);
+      const undoCtrl = this.#app.getUndoController();
+      undoCtrl.addToUndoStack(command);
       // fire event manually since command is not executed
       this.#emitEvent({
         type: 'annotationupdate',

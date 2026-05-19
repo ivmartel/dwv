@@ -104,9 +104,10 @@ export class Draw extends LayerGroupPointer {
         return;
       }
       const drawController = drawLayer.getDrawController();
+      const undoCtrl = this.#app.getUndoController();
 
       const command = new RemoveAnnotationCommand(annotation, drawController);
-      this.#app.addToUndoStack(command);
+      undoCtrl.addToUndoStack(command);
       command.execute();
 
       this.#shapeHandler.onMouseOutShapeGroup();

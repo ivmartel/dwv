@@ -289,7 +289,8 @@ export class DrawShapeHandler extends EventTarget {
           drawLayer.getDrawController()
         );
         // add command to undo stack
-        this.#app.addToUndoStack(command);
+        const undoCtrl = this.#app.getUndoController();
+        undoCtrl.addToUndoStack(command);
         // execute command
         command.execute();
       };
@@ -414,6 +415,7 @@ export class DrawShapeHandler extends EventTarget {
 
     // drag end event handling
     shape.on('dragend.draw', (event) => {
+      const undoCtrl = this.#app.getUndoController();
       // remove trash
       this.#trash.remove();
       // activate(false) will also trigger a dragend.draw
@@ -447,7 +449,7 @@ export class DrawShapeHandler extends EventTarget {
           drawLayer.getDrawController()
         );
         // add command to undo stack
-        this.#app.addToUndoStack(command);
+        undoCtrl.addToUndoStack(command);
         // execute command: triggers draw remove
         command.execute();
 
@@ -471,7 +473,7 @@ export class DrawShapeHandler extends EventTarget {
             drawLayer.getDrawController()
           );
           // add command to undo stack
-          this.#app.addToUndoStack(command);
+          undoCtrl.addToUndoStack(command);
           // fire event manually since command is not executed
           this.#emitEvent({
             type: 'annotationupdate',
@@ -541,6 +543,7 @@ export class DrawShapeHandler extends EventTarget {
 
     // drag end event handling
     label.on('dragend.draw', (/*event*/) => {
+      const undoCtrl = this.#app.getUndoController();
       const translation = {
         x: label.x() - dragStartPos.x,
         y: label.y() - dragStartPos.y
@@ -557,7 +560,7 @@ export class DrawShapeHandler extends EventTarget {
           drawLayer.getDrawController()
         );
         // add command to undo stack
-        this.#app.addToUndoStack(command);
+        undoCtrl.addToUndoStack(command);
         // fire event manually since command is not executed
         this.#emitEvent({
           type: 'annotationupdate',

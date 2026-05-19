@@ -922,7 +922,8 @@ export class BrushMaskPaint extends EventTarget {
       this.#mask.recalculateLabels();
     };
 
-    this.#app.addToUndoStack(command);
+    const undoCtrl = this.#app.getUndoController();
+    undoCtrl.addToUndoStack(command);
     this.dispatchEvent(command.getExecuteEvent());
     this.#mask.recalculateLabels();
   }
