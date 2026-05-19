@@ -754,13 +754,58 @@ export class App extends EventTarget {
       this.#options.rootDocument = document;
     }
 
+    // create load controller
+    this.#loadController =
+      new LoadController(this.#options.defaultCharacterSet);
+    // handle locally
+    this.#loadController.addEventListener('loadstart', this.#onloadstart);
+    this.#loadController.addEventListener('loaditem', this.#onloaditem);
+    this.#loadController.addEventListener('load', this.#onload);
+    // propagate load events
+    for (const eventName of loadEventNames) {
+      if (eventName !== 'loadstart' &&
+        eventName !== 'loaditem' &&
+        eventName !== 'load') {
+        this.#loadController.addEventListener(eventName, this.#fireEvent);
+      }
+    }
+
+    // data controller
+    this.#dataController = new DataController();
+    // propagate data events
+    for (const eventName of dataEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propagate image events
+    for (const eventName of imageEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propagate annotation events
+    for (const eventName of annotationGroupEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+
     // undo controller
     this.#undoController = new UndoController();
     for (const name of undoEventNames) {
       this.#undoController.addEventListener(name, this.#fireEvent);
     }
 
-    // tools
+    // stage controller
+    this.#stageController = new StageController(
+      this.#dataController, this.#options);
+    this.#stageController.setAddToUndoStack(
+      (cmd) => this.#undoController.addToUndoStack(cmd)
+    );
+    this.#stageController.setGetInfoData(
+      (id) => this.getInfoData(id)
+    );
+    // propagate stage controller events
+    for (const name of stageControllerEventNames) {
+      this.#stageController.addEventListener(name, this.#fireEvent);
+    }
+
+    // tools (after controllers as tools may need them)
     if (typeof this.#options.tools !== 'undefined') {
       // setup the tool list
       const appToolList = {};
@@ -833,51 +878,8 @@ export class App extends EventTarget {
       }
       // add tools to the controller
       this.#toolboxController = new ToolboxController(appToolList);
-    }
 
-    // create load controller
-    this.#loadController =
-      new LoadController(this.#options.defaultCharacterSet);
-    // handle locally
-    this.#loadController.addEventListener('loadstart', this.#onloadstart);
-    this.#loadController.addEventListener('loaditem', this.#onloaditem);
-    this.#loadController.addEventListener('load', this.#onload);
-    // propagate load events
-    for (const eventName of loadEventNames) {
-      if (eventName !== 'loadstart' &&
-        eventName !== 'loaditem' &&
-        eventName !== 'load') {
-        this.#loadController.addEventListener(eventName, this.#fireEvent);
-      }
-    }
-
-    // create data controller
-    this.#dataController = new DataController();
-    // propagate data events
-    for (const eventName of dataEventNames) {
-      this.#dataController.addEventListener(eventName, this.#fireEvent);
-    }
-    // propage image events
-    for (const eventName of imageEventNames) {
-      this.#dataController.addEventListener(eventName, this.#fireEvent);
-    }
-    // propage annotation events
-    for (const eventName of annotationGroupEventNames) {
-      this.#dataController.addEventListener(eventName, this.#fireEvent);
-    }
-    // create stage controller
-    this.#stageController = new StageController(
-      this.#dataController, this.#options);
-    if (this.#toolboxController) {
       this.#stageController.setToolboxController(this.#toolboxController);
-    }
-    this.#stageController.setAddToUndoStack(
-      (cmd) => this.#undoController.addToUndoStack(cmd)
-    );
-    this.#stageController.setGetInfoData((id) => this.getInfoData(id));
-    // propagate stage controller events
-    for (const name of stageControllerEventNames) {
-      this.#stageController.addEventListener(name, this.#fireEvent);
     }
   }
 
