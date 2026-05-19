@@ -104,10 +104,12 @@ export class UndoController extends EventTarget {
    */
   #wireEvents() {
     for (const name of undoEventNames) {
-      this.#undoStack.addEventListener(name, (/** @type {CustomEvent} */ event) => {
-        const detail = Object.assign({}, event.detail);
-        this.dispatchEvent(new CustomEvent(name, {detail}));
-      });
+      this.#undoStack.addEventListener(name,
+        (/** @type {CustomEvent} */ event) => {
+          const detail = Object.assign({}, event.detail);
+          this.dispatchEvent(new CustomEvent(name, {detail}));
+        }
+      );
     }
   }
 
