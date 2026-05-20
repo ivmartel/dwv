@@ -143,8 +143,8 @@ export class BrushDragBehavior extends DragBehavior {
    */
   onEnd() {
     if (this.isActive()) {
-      this.#deactivateErasingModeIfDel();
       this.#maskPaint.finalizeStroke();
+      this.#deactivateErasingModeIfDel();
     }
     super.onEnd();
   }
