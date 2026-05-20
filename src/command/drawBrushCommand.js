@@ -1,13 +1,41 @@
 import {Command} from './undoStack.js';
 
+/**
+ * @import {Image} from '../image/image.js';
+ */
+
 export class DrawBrushCommandProperties {
+  /**
+   * @type {Image}
+   */
   mask;
+  /**
+   * @type {string}
+   */
   dataId;
+  /**
+   * @type {number[][]}
+   */
   offsetsLists;
+  /**
+   * @type {string}
+   */
   mode;
+  /**
+   * @type {number}
+   */
   segmentNumber;
+  /**
+   * @type {string}
+   */
   srclayerid;
+  /**
+   * @type {Array}
+   */
   originalValuesLists;
+  /**
+   * @type {boolean}
+   */
   isSilent;
 }
 /**
@@ -23,7 +51,13 @@ export class DrawBrushCommand extends Command {
   #originalValuesLists;
   #isSilent;
 
+  /**
+   * @type {string}
+   */
   #exeType;
+  /**
+   * @type {string}
+   */
   #undoType;
 
   /**
