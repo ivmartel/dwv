@@ -22,16 +22,7 @@ const BRUSH_MASK_FORWARD_EVENT_TYPES = [
  */
 
 /**
- * Mutable stroke buffers passed to {@link BrushDragBehavior#onEnd}.
- *
- * @typedef {object} BrushStrokeSession
- * @property {number[][]} tmpOffsetsLists Per-dab offset lists.
- * @property {unknown[]} tmpOriginalValuesLists Per-dab original values.
- */
-
-/**
  * Brush painting as a {@link DragBehavior} for {@link LayerGroupPointer}.
- * Owns stroke session state and mask dab painting via {@link BrushMaskPaint}.
  */
 export class BrushDragBehavior extends DragBehavior {
 
@@ -44,16 +35,6 @@ export class BrushDragBehavior extends DragBehavior {
    * @type {BrushMaskPaint}
    */
   #maskPaint;
-
-  /**
-   * @type {number[][]|undefined}
-   */
-  #tmpOffsetsLists;
-
-  /**
-   * @type {unknown[]|undefined}
-   */
-  #tmpOriginalValuesLists;
 
   /**
    * Set when this stroke began with the right button (temporary eraser UI).
@@ -126,12 +107,15 @@ export class BrushDragBehavior extends DragBehavior {
    */
   onStart(point, layerGroup, pointerStart) {
     super.onStart(point, layerGroup, pointerStart);
-    this.#eraserFromRightButtonStroke = false;
+
     const halfBrush = this.#maskPaint.getBrushSize() / 2;
     this.setDragThreshold({x: halfBrush, y: halfBrush});
+
+    this.#eraserFromRightButtonStroke = false;
     if (pointerStart?.mouseDownButton === MouseEventButtons.right) {
       this.#setEraserModeForRightButton();
     }
+
     if (!this.#beginStroke(point, layerGroup)) {
       super.onEnd();
     }
@@ -170,15 +154,7 @@ export class BrushDragBehavior extends DragBehavior {
    *   aborted).
    */
   #beginStroke(point, layerGroup) {
-    this.#tmpOffsetsLists = [];
-    this.#tmpOriginalValuesLists = [];
-    const offsets = this.#maskPaint.getMaskOffsets(point, layerGroup);
-    if (offsets.length > 0) {
-      this.#tmpOffsetsLists.push(offsets);
-      const originalChunk = this.#maskPaint.applyTemporaryPaint(offsets);
-      if (typeof originalChunk !== 'undefined') {
-        this.#tmpOriginalValuesLists.push(originalChunk);
-      }
+    if (this.#maskPaint.beginStroke(point, layerGroup)) {
       return true;
     }
     this.#deactivateErasingModeIfDel();
@@ -190,22 +166,12 @@ export class BrushDragBehavior extends DragBehavior {
    * @param {LayerGroup} layerGroup The layer group under the pointer.
    */
   #paintStep(point, layerGroup) {
-    const offsets = this.#maskPaint.getMaskOffsets(point, layerGroup);
-    if (offsets.length > 0) {
-      this.#tmpOffsetsLists.push(offsets);
-      const originalChunk = this.#maskPaint.applyTemporaryPaint(offsets);
-      if (typeof originalChunk !== 'undefined') {
-        this.#tmpOriginalValuesLists.push(originalChunk);
-      }
-    }
+    this.#maskPaint.paintStep(point, layerGroup);
   }
 
   #endStroke() {
     this.#deactivateErasingModeIfDel();
-    this.#maskPaint.finalizeStroke({
-      tmpOffsetsLists: this.#tmpOffsetsLists,
-      tmpOriginalValuesLists: this.#tmpOriginalValuesLists
-    });
+    this.#maskPaint.finalizeStroke();
   }
 
   /**

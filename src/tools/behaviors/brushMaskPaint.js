@@ -238,6 +238,16 @@ export class BrushMaskPaint extends EventTarget {
   #uid = 0;
 
   /**
+   * @type {number[][]|undefined}
+   */
+  #tmpOffsetsLists;
+
+  /**
+   * @type {unknown[]|undefined}
+   */
+  #tmpOriginalValuesLists;
+
+  /**
    * @param {object} options Options.
    * @param {App} options.app Application.
    */
@@ -441,43 +451,6 @@ export class BrushMaskPaint extends EventTarget {
       this.#mask.appendSlice(
         this.#createMaskImage(maskGeometry, element, sliceMeta));
     }
-  }
-
-  /**
-   * One dab for the current stroke: executes a temporary draw command.
-   *
-   * @param {number[]} offsets The mask offsets.
-   * @returns {unknown|undefined} Original values chunk for undo, if any.
-   */
-  #runTemporaryPaint(offsets) {
-    const maskVl = this.#getMaskViewLayer();
-    const srclayerid = maskVl.getId();
-
-    if (typeof this.#maskDataId === 'undefined') {
-      throw new Error(ERROR_MESSAGES.brush.noMaskId);
-    }
-    const dataCtrl = this.#app.getDataController();
-    const maskData = dataCtrl.get(this.#maskDataId);
-    if (!maskData) {
-      throw new Error(
-        formatString(ERROR_MESSAGES.brush.noMaskImage, this.#maskDataId));
-    }
-
-    const props = new DrawBrushCommandProperties();
-    props.mask = maskData.image;
-    props.dataId = this.#maskDataId;
-    props.offsetsLists = [offsets];
-    props.mode = this.#brushMode;
-    props.segmentNumber = this.#selectedSegmentNumber;
-    props.srclayerid = srclayerid;
-    const command = new DrawBrushCommand(props);
-    command.execute();
-
-    const originalValues = command.getOriginalValuesLists();
-    if (typeof originalValues !== 'undefined') {
-      return originalValues[0];
-    }
-    return undefined;
   }
 
   /**
@@ -873,28 +846,94 @@ export class BrushMaskPaint extends EventTarget {
   }
 
   /**
-   * Commit the stroke: undo command, labels, and brush events.
-   *
-   * @param {object} session Stroke buffers from {@link BrushDragBehavior}.
-   * @param {number[][]} session.tmpOffsetsLists Offset lists per dab.
-   * @param {unknown[]} session.tmpOriginalValuesLists Original values per dab.
+   * @param {number[]} offsets Mask offsets.
+   * @returns {unknown|undefined} Original values chunk for undo.
    */
-  #finalizeBrushStrokeSession(session) {
-    const tmpOffsetsLists = session.tmpOffsetsLists;
-    const tmpOriginalValuesLists = session.tmpOriginalValuesLists;
+  #applyTemporaryPaint(offsets) {
+    const maskVl = this.#getMaskViewLayer();
+    const srclayerid = maskVl.getId();
 
+    if (typeof this.#maskDataId === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.noMaskId);
+    }
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(this.#maskDataId);
+    if (!maskData) {
+      throw new Error(
+        formatString(ERROR_MESSAGES.brush.noMaskImage, this.#maskDataId));
+    }
+
+    const props = new DrawBrushCommandProperties();
+    props.mask = maskData.image;
+    props.dataId = this.#maskDataId;
+    props.offsetsLists = [offsets];
+    props.mode = this.#brushMode;
+    props.segmentNumber = this.#selectedSegmentNumber;
+    props.srclayerid = srclayerid;
+    const command = new DrawBrushCommand(props);
+    command.execute();
+
+    const originalValues = command.getOriginalValuesLists();
+    if (typeof originalValues !== 'undefined') {
+      return originalValues[0];
+    }
+    return undefined;
+  }
+
+  /**
+   * @param {Point2D} point Pointer position at stroke start.
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {boolean} False when first dab produced no offsets (drag
+   *   aborted).
+   */
+  beginStroke(point, layerGroup) {
+    this.#tmpOffsetsLists = [];
+    this.#tmpOriginalValuesLists = [];
+    const offsets = this.#getMaskOffsets(point, layerGroup);
+    if (offsets.length > 0) {
+      this.#tmpOffsetsLists.push(offsets);
+      const originalChunk = this.#applyTemporaryPaint(offsets);
+      if (typeof originalChunk !== 'undefined') {
+        this.#tmpOriginalValuesLists.push(originalChunk);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * @param {Point2D} point Current pointer position.
+   * @param {LayerGroup} layerGroup The layer group under the pointer.
+   */
+  paintStep(point, layerGroup) {
+    const offsets = this.#getMaskOffsets(point, layerGroup);
+    if (offsets.length > 0) {
+      this.#tmpOffsetsLists.push(offsets);
+      const originalChunk = this.#applyTemporaryPaint(offsets);
+      if (typeof originalChunk !== 'undefined') {
+        this.#tmpOriginalValuesLists.push(originalChunk);
+      }
+    }
+  }
+
+  /**
+   * Commit the stroke: undo command, labels, and brush events.
+   */
+  finalizeStroke() {
     if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.cannotDrawNoMaskId);
     }
-    if (typeof tmpOffsetsLists === 'undefined') {
+    if (typeof this.#tmpOffsetsLists === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.cannotDrawNoOffset);
     }
-    if (typeof tmpOriginalValuesLists === 'undefined') {
+    if (typeof this.#tmpOriginalValuesLists === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.cannotDrawNoColourList);
     }
 
-    tmpOffsetsLists.reverse();
-    tmpOriginalValuesLists.reverse();
+    this.#tmpOffsetsLists.reverse();
+    this.#tmpOriginalValuesLists.reverse();
+
     const maskVl = this.#getMaskViewLayer();
     const srclayerid = maskVl.getId();
 
@@ -908,11 +947,11 @@ export class BrushMaskPaint extends EventTarget {
     const props = new DrawBrushCommandProperties();
     props.mask = maskData.image;
     props.dataId = this.#maskDataId;
-    props.offsetsLists = tmpOffsetsLists;
+    props.offsetsLists = this.#tmpOffsetsLists;
     props.mode = this.#brushMode;
     props.segmentNumber = this.#selectedSegmentNumber;
     props.srclayerid = srclayerid;
-    props.originalValuesLists = tmpOriginalValuesLists;
+    props.originalValuesLists = this.#tmpOriginalValuesLists;
     const command = new DrawBrushCommand(props);
     command.onExecute = (event) => {
       this.dispatchEvent(event);
@@ -925,31 +964,8 @@ export class BrushMaskPaint extends EventTarget {
     const undoCtrl = this.#app.getUndoController();
     undoCtrl.addToUndoStack(command);
     this.dispatchEvent(command.getExecuteEvent());
+
     this.#mask.recalculateLabels();
-  }
-
-  /**
-   * @param {Point2D} point Pointer position.
-   * @param {LayerGroup} layerGroup Layer group under the pointer.
-   * @returns {number[]} Mask voxel offsets.
-   */
-  getMaskOffsets(point, layerGroup) {
-    return this.#getMaskOffsets(point, layerGroup);
-  }
-
-  /**
-   * @param {number[]} offsets Mask offsets.
-   * @returns {unknown|undefined} Original values chunk for undo.
-   */
-  applyTemporaryPaint(offsets) {
-    return this.#runTemporaryPaint(offsets);
-  }
-
-  /**
-   * @param {object} session Stroke buffers.
-   */
-  finalizeStroke(session) {
-    this.#finalizeBrushStrokeSession(session);
   }
 
   /**
