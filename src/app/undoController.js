@@ -37,10 +37,11 @@ export class UndoController extends EventTarget {
    *
    * @param {object} cmd The command to add.
    * @fires UndoStack#undoadd
+   * @function
    */
-  addToUndoStack(cmd) {
+  addToUndoStack = (cmd) => {
     this.#undoStack.add(cmd);
-  }
+  };
 
   /**
    * Remove a command from the undo stack.
@@ -48,10 +49,11 @@ export class UndoController extends EventTarget {
    * @param {string} name The name of the command to remove.
    * @returns {boolean} True if the command was found and removed.
    * @fires UndoStack#undoremove
+   * @function
    */
-  removeFromUndoStack(name) {
+  removeFromUndoStack = (name) => {
     return this.#undoStack.remove(name);
-  }
+  };
 
   /**
    * Undo the last command.
