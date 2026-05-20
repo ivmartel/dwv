@@ -116,7 +116,8 @@ export class BrushDragBehavior extends DragBehavior {
       this.#setEraserModeForRightButton();
     }
 
-    if (!this.#beginStroke(point, layerGroup)) {
+    if (!this.#maskPaint.beginStroke(point, layerGroup)) {
+      this.#deactivateErasingModeIfDel();
       super.onEnd();
     }
   }
@@ -132,7 +133,7 @@ export class BrushDragBehavior extends DragBehavior {
     if (point === undefined) {
       return;
     }
-    this.#paintStep(point, layerGroup);
+    this.#maskPaint.paintStep(point, layerGroup);
   }
 
   /**
@@ -142,36 +143,10 @@ export class BrushDragBehavior extends DragBehavior {
    */
   onEnd() {
     if (this.isActive()) {
-      this.#endStroke();
+      this.#deactivateErasingModeIfDel();
+      this.#maskPaint.finalizeStroke();
     }
     super.onEnd();
-  }
-
-  /**
-   * @param {Point2D} point Pointer position at stroke start.
-   * @param {LayerGroup} layerGroup The layer group.
-   * @returns {boolean} False when first dab produced no offsets (drag
-   *   aborted).
-   */
-  #beginStroke(point, layerGroup) {
-    if (this.#maskPaint.beginStroke(point, layerGroup)) {
-      return true;
-    }
-    this.#deactivateErasingModeIfDel();
-    return false;
-  }
-
-  /**
-   * @param {Point2D} point Current pointer position.
-   * @param {LayerGroup} layerGroup The layer group under the pointer.
-   */
-  #paintStep(point, layerGroup) {
-    this.#maskPaint.paintStep(point, layerGroup);
-  }
-
-  #endStroke() {
-    this.#deactivateErasingModeIfDel();
-    this.#maskPaint.finalizeStroke();
   }
 
   /**
