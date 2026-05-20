@@ -49,10 +49,6 @@ vi.mock('../../../src/tools/behaviors/brushMaskPaint.js', () => {
       return maskState.selectedSegmentNumber;
     }
 
-    applyTemporaryPaint() {
-      return undefined;
-    }
-
     beginStroke() {
       return true;
     }
