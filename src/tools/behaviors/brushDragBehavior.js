@@ -150,6 +150,20 @@ export class BrushDragBehavior extends DragBehavior {
   }
 
   /**
+   * Reset: end stroke if active and reset.
+   *
+   * @override
+   */
+  reset() {
+    // finalizeStroke if still active (for ex in a no move drag)
+    if (this.isActive()) {
+      this.#maskPaint.finalizeStroke();
+      this.#deactivateErasingModeIfDel();
+    }
+    super.reset();
+  }
+
+  /**
    * @param {LayerGroup} layerGroup The layer group.
    * @returns {boolean} True if active layer is a view layer.
    */
