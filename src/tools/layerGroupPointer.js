@@ -318,7 +318,8 @@ export class LayerGroupPointer extends EventTarget {
     this.#downed = true;
 
     const {point, layerGroup} = this.#getMouseLayerContext(event);
-    if (this.#dragBehavior?.canStart(point, layerGroup)) {
+    if (!this.#tapBehavior?.isActive() &&
+      this.#dragBehavior?.canStart(point, layerGroup)) {
       this.#dragBehavior.onStart(point, layerGroup, {
         mouseDownButton: event.button
       });
