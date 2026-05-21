@@ -247,9 +247,12 @@ export class DragBehavior extends EventTarget {
   }
 
   /**
-   * End the drag and reset anchors ({@link DragBehavior#reset}).
+   * End the drag session and reset.
    */
   onEnd() {
+    // isActive returns false after this
+    this.#prevPoint = undefined;
+    // reset
     this.reset();
   }
 

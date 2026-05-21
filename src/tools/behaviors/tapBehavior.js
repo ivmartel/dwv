@@ -87,9 +87,12 @@ export class TapBehavior extends EventTarget {
   }
 
   /**
-   * End the tap session and reset state ({@link TapBehavior#reset}).
+   * End the tap session and reset.
    */
   onEnd() {
+    // isActive returns false after this
+    this.#points = [];
+    // reset
     this.reset();
   }
 }

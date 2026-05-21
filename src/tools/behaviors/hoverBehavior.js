@@ -26,11 +26,10 @@ export class HoverBehavior {
   }
 
   /**
-   * Hover session end (pointer leaves, drag starts, etc.); override in
-   * subclasses.
+   * End hover session and reset.
    */
   onEnd() {
-    // override in subclass
+    this.reset();
   }
 
 }
@@ -87,15 +86,6 @@ export class TooltipHoverBehavior extends HoverBehavior {
     if (this.#tooltipEnabled) {
       this.#showTooltip(point, layerGroup);
     }
-  }
-
-  /**
-   * Invoked when hover ends; removes the last tooltip html div.
-   *
-   * @override
-   */
-  onEnd() {
-    this.reset();
   }
 
   /**

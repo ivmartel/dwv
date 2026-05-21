@@ -51,11 +51,10 @@ export class TwoTouchBehavior {
   }
 
   /**
-   * End two-touch tracking (touch end or pointer cancel); override in
-   * subclasses.
+   * End two-touch session and reset.
    */
   onEnd() {
-    // override in subclass
+    this.reset();
   }
 
 }
@@ -159,6 +158,9 @@ export class ZoomScrollTwoTouchBehavior extends TwoTouchBehavior {
    * @override
    */
   onEnd() {
+    // isActive returns false after this
+    this.#pointsLine = undefined;
+    // reset
     this.reset();
   }
 
