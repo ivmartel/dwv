@@ -389,9 +389,7 @@ export class MaskFactory {
    * Get an {@link Image} object from the read DICOM file.
    *
    * @param {Record<string, DataElement>} dataElements The DICOM tags.
-   * @param {Uint8Array | Int8Array |
-   *   Uint16Array | Int16Array |
-   *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+   * @param {Uint8Array} pixelBuffer The pixel buffer.
    * @param {Image} [refImage] Reference image, code will use its
    *   origins if present (best) or try to calculate them.
    * @returns {Image} A new Image.
@@ -609,9 +607,7 @@ export class MaskFactory {
     };
 
     // create output buffer
-    const buffer =
-      // @ts-ignore
-      new pixelBuffer.constructor(sliceSize * numberOfSlices);
+    const buffer = new Uint8Array(sliceSize * numberOfSlices);
     buffer.fill(0);
 
     // merge frame buffers

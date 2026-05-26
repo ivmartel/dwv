@@ -93,6 +93,7 @@ export function createMaskImage(elements) {
   const factory = new MaskFactory();
   return factory.create(
     elements,
+    /** @type {Uint8Array} */
     elements['7FE00010'].value[0]
   );
 }

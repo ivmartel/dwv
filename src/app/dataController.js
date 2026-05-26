@@ -605,6 +605,7 @@ export class DataController extends EventTarget {
         if (typeof factory.checkElements(data.meta) === 'undefined') {
           data.image = factory.create(
             data.meta,
+            /** @type {Uint8Array} */
             data.buffer,
             this.#dataList[refDataId].image
           );
