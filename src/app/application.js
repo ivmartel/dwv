@@ -40,7 +40,10 @@ import {LayerGroup} from '../gui/layerGroup.js';
 import {ViewLayer} from '../gui/viewLayer.js';
 import {DrawLayer} from '../gui/drawLayer.js';
 import {Image} from '../image/image.js';
-import {Matrix33} from '../math/matrix.js';
+import {
+  DIRECTION_EPSILON,
+  Matrix33
+} from '../math/matrix.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {Scalar3D} from '../math/scalar.js';
 import {DicomData} from './dataController.js';
@@ -1234,7 +1237,7 @@ export class App {
       ) {
         const baseOrientation = baseImage.getGeometry().getOrientation();
         const newOrientation = newImage.getGeometry().getOrientation();
-        res = newOrientation.isSimilar(baseOrientation);
+        res = newOrientation.isSimilar(baseOrientation, DIRECTION_EPSILON);
       }
     } else {
       // no base view: can render

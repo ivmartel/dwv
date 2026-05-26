@@ -12,6 +12,8 @@ export const BIG_EPSILON_EXPONENT = 12;
 // 'real world', for example when comparing positions
 export const REAL_WORLD_EPSILON = 1e-4;
 export const REAL_WORLD_EXPONENT = 5;
+// direction epsilon, for example when comparing orientations
+export const DIRECTION_EPSILON = 1e-6;
 
 /**
  * Check if two numbers are similar.
