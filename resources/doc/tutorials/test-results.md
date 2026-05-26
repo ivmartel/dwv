@@ -2,9 +2,9 @@
 
 ## Context
 
-Commit: [e0e8355](https://github.com/ivmartel/dwv/commit/e0e8355604160da7963fb0a5ae076fa8584a03f6)
+Commit: [279ee93](https://github.com/ivmartel/dwv/commit/279ee9345d08cf84e4d2d46a0a4513fa62a067f8)
 
-Date: Thu Mar 26 2026 15:49:05 GMT+0100 (Central European Standard Time)
+Date: Tue May 26 2026 15:32:15 GMT+0200 (Central European Summer Time)
 
 Environement: jsdom ^28.0.0
 
@@ -13,7 +13,7 @@ Success: 379 ✅
 
 Failed: 0 ❌
 
-(total: 379, skipped: 0, total time: 11514ms)
+(total: 379, skipped: 0, total time: 11941ms)
 
 ## Tests details
 
