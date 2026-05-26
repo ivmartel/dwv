@@ -1808,7 +1808,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@microsoft/api-extractor@npm:^7.57.7":
+"@microsoft/api-extractor@npm:^7.58.7":
   version: 7.58.7
   resolution: "@microsoft/api-extractor@npm:7.58.7"
   dependencies:
@@ -4881,7 +4881,7 @@ __metadata:
     "@babel/core": "npm:^7.29.0"
     "@babel/preset-env": "npm:^7.29.0"
     "@eslint/js": "npm:^10.0.1"
-    "@microsoft/api-extractor": "npm:^7.57.7"
+    "@microsoft/api-extractor": "npm:^7.58.7"
     "@stylistic/eslint-plugin": "npm:^5.10.0"
     "@vitest/coverage-v8": "npm:^4.1.7"
     babel-loader: "npm:^10.1.1"
@@ -4889,19 +4889,19 @@ __metadata:
     benchmark: "npm:^2.1.4"
     canvas: "npm:^3.2.1"
     clean-jsdoc-theme: "npm:^4.3.0"
-    eslint: "npm:^10.0.3"
+    eslint: "npm:^10.4.0"
     eslint-plugin-jsdoc: "npm:^63.0.0"
     github-release-notes: "npm:0.17.2"
-    globals: "npm:^17.4.0"
+    globals: "npm:^17.6.0"
     html-webpack-plugin: "npm:^5.6.6"
     jsdoc: "npm:^4.0.5"
-    jsdom: "npm:^29.0.0"
+    jsdom: "npm:^29.1.1"
     jszip: "npm:^3.10.1"
     konva: "npm:~10.3.0"
     magic-wand-tool: "npm:~1.1.7"
     typescript: "npm:5.6.3"
     vitest: "npm:^4.1.7"
-    webpack: "npm:^5.105.4"
+    webpack: "npm:^5.107.2"
     webpack-cli: "npm:^7.0.0"
     webpack-dev-server: "npm:^5.2.3"
     webpack-merge: "npm:^6.0.1"
@@ -5350,7 +5350,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^10.0.3":
+"eslint@npm:^10.4.0":
   version: 10.4.0
   resolution: "eslint@npm:10.4.0"
   dependencies:
@@ -6278,7 +6278,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^17.4.0":
+"globals@npm:^17.6.0":
   version: 17.6.0
   resolution: "globals@npm:17.6.0"
   checksum: 10c0/cf94fb4329cc5c68cf81018fd68324f413181ee169f0235b0b33b82bc93fe7825a21beea951f83a80e8e4bbdad9c0c80515a145b5fd4b5cb52f2a80db899a93f
@@ -7501,7 +7501,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdom@npm:^29.0.0":
+"jsdom@npm:^29.1.1":
   version: 29.1.1
   resolution: "jsdom@npm:29.1.1"
   dependencies:
@@ -12814,7 +12814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.105.4":
+"webpack@npm:^5.107.2":
   version: 5.107.2
   resolution: "webpack@npm:5.107.2"
   dependencies:
