@@ -357,7 +357,6 @@ export class SegmentationUI {
           // default segment created at first brush
           const segmentNumber = 1;
           const segment = getNewSegment(segmentNumber);
-          segHelper.addSegment(segment);
           // default segmentation
           const segmentation = {
             dataId,
@@ -393,7 +392,7 @@ export class SegmentationUI {
             dataId,
             labels: [],
             hasNewSegments: true,
-            segments: imgMeta.custom.segments,
+            segments: imgMeta.custom.segments.slice(),
             viewHelper: new MaskSegmentViewHelper()
           };
           // calculate labels
