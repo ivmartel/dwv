@@ -29,6 +29,7 @@ import {
 
 /**
  * @import {App} from '../../src/app/application.js';
+ * @import {MaskSegment} from '../../src/dicom/dicomSegment.js';
  */
 
 /**
@@ -38,7 +39,7 @@ import {
  * @property {number} dataId The segmentation data ID.
  * @property {object[]} labels The segmentation labels.
  * @property {boolean} hasNewSegments If the segmentation is new.
- * @property {object[]} segments The segmentation segments.
+ * @property {MaskSegment[]} segments The segmentation segments.
  * @property {MaskSegmentViewHelper} viewHelper A view helper.
  */
 
@@ -76,8 +77,8 @@ const _segmentations = [];
  * Get a segment from a segment list.
  *
  * @param {number} segmentNumber The segment number.
- * @param {object[]} segments The list to search.
- * @returns {object|undefined} The found segment.
+ * @param {MaskSegment[]} segments The list to search.
+ * @returns {MaskSegment|undefined} The found segment.
  */
 function getSegment(segmentNumber, segments) {
   return segments.find(function (item) {
@@ -108,7 +109,7 @@ function nextColour() {
  * Get a new segment.
  *
  * @param {number} number The segment number.
- * @returns {object} The new segment.
+ * @returns {MaskSegment} The new segment.
  */
 function getNewSegment(number) {
   return {
@@ -310,7 +311,7 @@ export class SegmentationUI {
   /**
    * Add a segment HTML to the main HTML.
    *
-   * @param {object} segmentation The segmentation.
+   * @param {Segmentation} segmentation The segmentation.
    */
   #addSegmentationHtml(segmentation) {
     // segmentation as html
@@ -509,7 +510,7 @@ export class SegmentationUI {
   /**
    * Select the erase in the brush tool.
    *
-   * @param {object} segmentation The segmentation.
+   * @param {Segmentation} segmentation The segmentation.
    */
   #appSelectEraser(segmentation) {
     // app features
@@ -756,7 +757,7 @@ export class SegmentationUI {
   /**
    * Get the HTML span element for a segment.
    *
-   * @param {object} segment The segment.
+   * @param {MaskSegment} segment The segment.
    * @param {number} segmentationIndex The segmentation index.
    * @returns {HTMLLiElement} THe HTML element.
    */
@@ -987,7 +988,7 @@ export class SegmentationUI {
   /**
    * Get labels info.
    *
-   * @param {object} segment The segment.
+   * @param {MaskSegment} segment The segment.
    * @param {number} segmentationIndex The segmentation index.
    * @returns {object[]} The labels info.
    */
@@ -1021,7 +1022,7 @@ export class SegmentationUI {
   /**
    * Get the HTML list element for a segmentation.
    *
-   * @param {object} segmentation The segmentation.
+   * @param {Segmentation} segmentation The segmentation.
    * @param {number} segmentationIndex The segmentation index.
    * @returns {HTMLLIElement} The HTML element.
    */
@@ -1109,7 +1110,7 @@ export class SegmentationUI {
   /**
    * Add to the list of segmentations on the overlap checker.
    *
-   * @param {object} segmentation The segmentation to add.
+   * @param {Segmentation} segmentation The segmentation to add.
    * @param {number} segmentationIndex The segmentation index.
    */
   #addOverlapCheckerSelection(segmentation, segmentationIndex) {
