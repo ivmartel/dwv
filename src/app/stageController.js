@@ -6,6 +6,7 @@ import {
   Orientation,
   getViewOrientation
 } from '../math/orientation.js';
+import {DIRECTION_EPSILON} from '../image/geometry.js';
 import {Point3D} from '../math/point.js';
 import {Stage} from '../gui/stage.js';
 import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
@@ -780,7 +781,7 @@ export class StageController extends EventTarget {
       ) {
         const baseOrientation = baseImage.getGeometry().getOrientation();
         const newOrientation = newImage.getGeometry().getOrientation();
-        res = newOrientation.isSimilar(baseOrientation);
+        res = newOrientation.isSimilar(baseOrientation, DIRECTION_EPSILON);
       }
     } else {
       res = true;

@@ -15,6 +15,9 @@ import {BooleanResult} from '../utils/result.js';
 import {arrayMap} from '../utils/array.js';
 import {Matrix33} from '../math/matrix.js';
 
+// direction epsilon, for example when comparing orientations
+export const DIRECTION_EPSILON = 1e-6;
+
 /**
  * 2D/3D Geometry class.
  */
@@ -375,7 +378,7 @@ export class Geometry {
     }
     // check orientation
     if (!this.getOrientation().isSimilar(
-      rhs.getOrientation(), REAL_WORLD_EPSILON)) {
+      rhs.getOrientation(), DIRECTION_EPSILON)) {
       return {
         success: false,
         message: 'Cannot append a slice with different orientation'
@@ -746,7 +749,7 @@ export function getSliceGeometrySpacing(origins) {
 export function mergeGeometries(geometry1, geometry2) {
   const orientation = geometry1.getOrientation();
   // check input
-  if (!orientation.isSimilar(geometry2.getOrientation(), REAL_WORLD_EPSILON)) {
+  if (!orientation.isSimilar(geometry2.getOrientation(), DIRECTION_EPSILON)) {
     throw new Error('Cannot merge geometries with different orientation');
   }
   const invOrientation = orientation.getInverse();
