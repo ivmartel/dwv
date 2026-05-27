@@ -358,18 +358,12 @@ export class SegmentationUI {
           const segmentNumber = 1;
           const segment = getNewSegment(segmentNumber);
           segHelper.addSegment(segment);
-
-          const imgMeta = maskImage.getMeta();
-          // add segments to meta
-          imgMeta.custom.segments = [segment];
-
           // default segmentation
-          // (bind segments with mask meta)
           const segmentation = {
             dataId,
             labels: [],
             hasNewSegments: false,
-            segments: imgMeta.custom.segments,
+            segments: [segment],
             selectedSegmentNumber: segmentNumber,
             viewHelper: new MaskSegmentViewHelper()
           };
@@ -474,33 +468,29 @@ export class SegmentationUI {
   }
 
   /**
-   * Add a segment to a mask.
+   * Select a segment in the brush tool.
    *
-   * @param {MaskSegment} segment The segment to add.
-   * @param {Segmentation} segmentation The segmentation.
+   * @param {number} segmentNumber The segment number.
+   * @param {object} segmentation The segmentation.
    */
-  #addSegmentToMask(segment, segmentation) {
-    // add segment if not present
+  #appSelectSegment(segmentNumber, segmentation) {
+    segmentation.selectedSegmentNumber = segmentNumber;
     const dataCtrl = this.#app.getDataController();
+
+    // add segment if not present
     const data = dataCtrl.get(segmentation.dataId);
     if (typeof data !== 'undefined') {
       const maskImage = data.image;
       const segHelper = new MaskSegmentHelper(maskImage);
-      // add segment to mask (also update palette color)
-      if (!segHelper.hasSegment(segment.number)) {
-        segHelper.addSegment(segment);
+      // add segment to mask
+      if (!segHelper.hasSegment(segmentNumber)) {
+        console.log('Add segment', segmentNumber);
+        segHelper.addSegment(getSegment(
+          segmentNumber, segmentation.segments
+        ));
       }
     }
-  }
 
-  /**
-   * Select a segment in the brush tool.
-   *
-   * @param {number} segmentNumber The segment number.
-   * @param {Segmentation} segmentation The segmentation.
-   */
-  #appSelectSegment(segmentNumber, segmentation) {
-    segmentation.selectedSegmentNumber = segmentNumber;
     // app features
     const features = {
       brushMode: 'add',
@@ -612,10 +602,6 @@ export class SegmentationUI {
       getRootFromHtmlId(prefixes.li, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
-    if (typeof segment === 'undefined') {
-      // possible new segment
-      return;
-    }
 
     // Find the first label for this segment
     const label =
@@ -921,8 +907,8 @@ export class SegmentationUI {
 
     // create new segment
     const newSegment = getNewSegment(segments.length + 1);
-    // add to mask
-    this.#addSegmentToMask(newSegment, segmentation);
+    // add to list
+    segments.push(newSegment);
     // update flag
     segmentation.hasNewSegments = true;
 
