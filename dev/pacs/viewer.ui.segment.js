@@ -30,6 +30,7 @@ import {
 /**
  * @import {App} from '../../src/app/application.js';
  * @import {MaskSegment} from '../../src/dicom/dicomSegment.js';
+ * @import {RGB} from '../../src/utils/colour.js';
  */
 
 /**
@@ -44,6 +45,11 @@ import {
  */
 
 // global vars
+/**
+ * List of possible colours.
+ *
+ * @type {RGB[]}
+ */
 const _colours = [
   {r: 255, g: 0, b: 0},
   {r: 0, g: 255, b: 0},
@@ -67,10 +73,17 @@ const _colours = [
   {r: 255, g: 255, b: 64},
   {r: 64, g: 64, b: 64},
 ];
-// colour array to pick from
+/**
+ * Colour array to pick from.
+ *
+ * @type {RGB[]}
+ */
 let _coloursPick = _colours.slice();
-// segmentation
-/** @type {Segmentation[]} */
+/**
+ * List of segmentations.
+ *
+ * @type {Segmentation[]}
+ */
 const _segmentations = [];
 
 /**
@@ -89,7 +102,7 @@ function getSegment(segmentNumber, segments) {
 /**
  * Get the next available colour from the colour list.
  *
- * @returns {object} The colour as {r,g,b}.
+ * @returns {RGB} The colour as {r,g,b}.
  */
 function nextColour() {
   // recreate if empty
@@ -471,7 +484,7 @@ export class SegmentationUI {
    * Select a segment in the brush tool.
    *
    * @param {number} segmentNumber The segment number.
-   * @param {object} segmentation The segmentation.
+   * @param {Segmentation} segmentation The segmentation.
    */
   #appSelectSegment(segmentNumber, segmentation) {
     segmentation.selectedSegmentNumber = segmentNumber;
