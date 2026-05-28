@@ -42,7 +42,7 @@ import {
   SpatialCoordinate
 } from '../dicom/dicomSpatialCoordinate.js';
 import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D.js';
-import {BIG_EPSILON_EXPONENT} from '../math/matrix.js';
+import {BIG_EPSILON_EXPONENT} from '../math/number.js';
 import {precisionRound} from '../utils/string.js';
 import {logger} from '../utils/logger.js';
 import {Annotation} from './annotation.js';

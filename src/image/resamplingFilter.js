@@ -1,5 +1,6 @@
 
-import {Matrix33, BIG_EPSILON} from '../math/matrix.js';
+import {Matrix33} from '../math/matrix.js';
+import {BIG_EPSILON} from '../math/number.js';
 import {getTypedArray} from '../dicom/dicomParser.js';
 
 /**

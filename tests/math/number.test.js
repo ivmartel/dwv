@@ -1,6 +1,9 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
-import {REAL_WORLD_EPSILON} from '../../src/math/matrix.js';
-import {isAboveEpsilon} from '../../src/math/number.js';
+import {
+  REAL_WORLD_EPSILON,
+  isSimilar,
+  isAboveEpsilon
+} from '../../src/math/number.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
 /**
@@ -11,6 +14,26 @@ describe('math', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  /**
+   * Tests for {@link isSimilar}.
+   *
+   * @function module:tests/math~isSimilar
+   */
+  test('isSimilar', () => {
+    // default tol = Number.EPSILON ~ 2e-16
+
+    // 1 and 1 -> true
+    assert.isTrue(isSimilar(1, 1));
+
+    // 1 and 1 + Number.EPSILON/2 -> true
+    assert.isTrue(isSimilar(1, 1 + Number.EPSILON / 2));
+    assert.isTrue(isSimilar(1, 1 - Number.EPSILON / 2));
+
+    // 1 and 1 + Number.EPSILON*2 -> false
+    assert.isFalse(isSimilar(1, 1 + Number.EPSILON * 2));
+    assert.isFalse(isSimilar(1, 1 - Number.EPSILON * 2));
   });
 
   /**

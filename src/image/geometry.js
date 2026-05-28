@@ -1,8 +1,8 @@
 import {
-  getIdentityMat33,
   REAL_WORLD_EPSILON,
   REAL_WORLD_EXPONENT
-} from '../math/matrix.js';
+} from '../math/number.js';
+import {getIdentityMat33} from '../math/matrix.js';
 import {Point3D, Point} from '../math/point.js';
 import {Vector3D} from '../math/vector.js';
 import {Index} from '../math/index.js';

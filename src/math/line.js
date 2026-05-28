@@ -2,7 +2,7 @@ import {Point2D} from './point.js';
 import {
   isSimilar,
   REAL_WORLD_EPSILON,
-} from './matrix.js';
+} from './number.js';
 
 /**
  * @import {ViewController} from '../app/viewController.js';

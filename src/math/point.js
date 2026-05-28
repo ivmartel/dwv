@@ -1,4 +1,4 @@
-import {isSimilar} from './matrix.js';
+import {isSimilar} from './number.js';
 import {Vector3D} from './vector.js';
 
 /**

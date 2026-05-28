@@ -1,33 +1,8 @@
 import {Vector3D} from './vector.js';
 import {Point3D} from './point.js';
 import {Index} from './index.js';
+import {isSimilar} from './number.js';
 import {logger} from '../utils/logger.js';
-
-// Number.EPSILON is difference between 1 and the smallest
-// floating point number greater than 1
-// -> ~2e-16
-// BIG_EPSILON -> ~2e-12
-export const BIG_EPSILON = Number.EPSILON * 1e4;
-export const BIG_EPSILON_EXPONENT = 12;
-// 'real world', for example when comparing positions
-export const REAL_WORLD_EPSILON = 1e-4;
-export const REAL_WORLD_EXPONENT = 5;
-
-/**
- * Check if two numbers are similar.
- *
- * @param {number} a The first number.
- * @param {number} b The second number.
- * @param {number} [tol] Optional comparison tolerance,
- *   defaults to Number.EPSILON.
- * @returns {boolean} True if similar.
- */
-export function isSimilar(a, b, tol) {
-  if (typeof tol === 'undefined') {
-    tol = Number.EPSILON;
-  }
-  return Math.abs(a - b) < tol;
-}
 
 /**
  * Immutable 3x3 Matrix.
