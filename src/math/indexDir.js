@@ -2,7 +2,7 @@ import {Circle} from './circle.js';
 import {Ellipse} from './ellipse.js';
 import {Index} from './index.js';
 import {Matrix33} from './matrix.js';
-import {NumberRange} from './stats.js';
+import {NumberRange} from './number.js';
 import {Point, Point2D, Point3D} from './point.js';
 import {Protractor} from './protractor.js';
 import {Rectangle} from './rectangle.js';

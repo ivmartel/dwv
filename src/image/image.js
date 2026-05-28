@@ -17,7 +17,7 @@ import {equalWl} from './windowLevel.js';
 /**
  * @import {Geometry} from './geometry.js';
  * @import {Matrix33} from '../math/matrix.js';
- * @import {NumberRange} from '../math/stats.js';
+ * @import {NumberRange} from '../math/number.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {RGB} from '../utils/colour.js';
  * @import {ColourMap} from './luts.js';
