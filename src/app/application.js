@@ -1983,7 +1983,9 @@ export class App extends EventTarget {
    */
   #onloadstart = (event) => {
     // create info data
-    if (typeof this.#options.overlayConfig !== 'undefined') {
+    if (typeof this.#options.overlayConfig !== 'undefined'
+      && Object.keys(this.#infoDatas).length === 0
+    ) {
       this.#infoDatas[event.detail.dataid] = new InfoData(
         this, event.detail.dataid, this.#options.overlayConfig);
     }
