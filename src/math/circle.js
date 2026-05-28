@@ -3,7 +3,7 @@ import {getStats} from './stats.js';
 /**
  * @import {Index} from './index.js';
  * @import {Point2D} from '../math/point.js';
- * @import {Value} from './value.js';
+ * @import {NumberValue} from './number.js';
  * @import {ViewController} from '../app/viewController.js';
  * @import {Scalar2D} from './scalar.js';
  */
@@ -162,7 +162,7 @@ export class Circle {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {Record<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(viewController, index, flags) {
     // shape quantification

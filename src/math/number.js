@@ -1,7 +1,7 @@
 /**
- * Class to store a value and a unit.
+ * Class to store a number value and a unit.
  */
-export class Value {
+export class NumberValue {
   /**
    * @type {number}
    */

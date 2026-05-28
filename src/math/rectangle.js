@@ -5,7 +5,7 @@ import {Index} from './index.js';
 /**
  * @import {ViewController} from '../app/viewController.js';
  * @import {Scalar2D} from './scalar.js';
- * @import {Value} from './value.js';
+ * @import {NumberValue} from './number.js';
  */
 
 /**
@@ -189,7 +189,7 @@ export class Rectangle {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {Record<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(viewController, index, flags) {
     const spacing2D = viewController.get2DSpacing();

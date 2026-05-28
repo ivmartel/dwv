@@ -15,7 +15,7 @@ import {
 } from './orientation.js';
 import {getEllipseIndices} from './ellipse.js';
 import {getRectangleIndices} from './rectangle.js';
-import {Value} from './value.js';
+import {NumberValue} from './number.js';
 
 export {
   Circle,
@@ -32,7 +32,7 @@ export {
   Scalar2D,
   Scalar3D,
   Vector3D,
-  Value,
+  NumberValue,
   Orientation,
   getOrientationName,
   getEllipseIndices,

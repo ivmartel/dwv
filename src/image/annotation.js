@@ -9,7 +9,7 @@ import {getUID} from '../dicom/dicomWriter.js';
 /**
  * @import {Point2D} from '../math/point.js';
  * @import {Index} from '../math/index.js';
- * @import {Value} from '../math/value.js';
+ * @import {NumberValue} from '../math/number.js';
  * @import {ViewController} from '../app/viewController.js';
  * @import {PlaneHelper} from './planeHelper.js';
  * @import {DicomCode} from '../dicom/dicomCode.js';
@@ -78,7 +78,7 @@ export class Annotation {
   /**
    * Annotation quantification.
    *
-   * @type {Record<string, Value>|undefined}
+   * @type {Record<string, NumberValue>|undefined}
    */
   quantification;
 

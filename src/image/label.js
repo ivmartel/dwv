@@ -1,6 +1,6 @@
 /**
  * @import {Point} from '../math/point.js';
- * @import {Value} from '../math/value.js';
+ * @import {NumberValue} from '../math/number.js';
  */
 
 /**
@@ -10,7 +10,7 @@ export class Diameter {
   /**
    * The scaled diameter value.
    *
-   * @type {Value}
+   * @type {NumberValue}
    */
   diameter;
 
@@ -71,7 +71,7 @@ export class Label {
   /**
    * The volume of the labeled segment.
    *
-   * @type {Value}
+   * @type {NumberValue}
    */
   volume;
 
@@ -92,7 +92,7 @@ export class Label {
   /**
    * The scaled height of the segment.
    *
-   * @type {Value}
+   * @type {NumberValue}
    */
   height;
 

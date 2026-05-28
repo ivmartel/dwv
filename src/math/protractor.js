@@ -2,7 +2,7 @@ import {Line, getAngle} from './line.js';
 
 /**
  * @import {Point2D} from '../math/point.js';
- * @import {Value} from './value.js';
+ * @import {NumberValue} from './number.js';
  * @import {ViewController} from '../app/viewController.js';
  */
 
@@ -63,7 +63,7 @@ export class Protractor {
    *
    * @param {ViewController} _viewController The associated view controller.
    * @param {string[]} _flags A list of stat values to calculate.
-   * @returns {Record<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(_viewController, _flags) {
     let angle;

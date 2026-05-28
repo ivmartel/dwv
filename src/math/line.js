@@ -7,7 +7,7 @@ import {
 /**
  * @import {ViewController} from '../app/viewController.js';
  * @import {Scalar2D} from './scalar.js';
- * @import {Value} from './value.js';
+ * @import {NumberValue} from './number.js';
  */
 
 /**
@@ -185,7 +185,7 @@ export class Line {
    * Quantify a line according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
-   * @returns {Record<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(viewController) {
     // length
