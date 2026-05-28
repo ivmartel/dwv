@@ -31,7 +31,7 @@ import {Geometry} from '../image/geometry.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
 import {Point, Point3D} from '../math/point.js';
 import {Index} from '../math/index.js';
-import {REAL_WORLD_EPSILON} from '../math/matrix.js';
+import {isAboveEpsilon} from '../math/number.js';
 import {logger} from '../utils/logger.js';
 import {arraySortEquals} from '../utils/array.js';
 import {Size} from './size.js';
@@ -749,31 +749,6 @@ export class MaskFactory {
     // tmp geometry with correct spacing but only one slice
     const tmpGeometry = new Geometry(
       [frameOrigins[0]], size, spacing, orientationMatrix);
-
-    // origin distance test
-    // TODO: maybe use sliceSpacing / 10
-    const isAboveEpsilon = function (value) {
-      let res = value > REAL_WORLD_EPSILON;
-      if (res) {
-        // try larger epsilon
-        res = value > REAL_WORLD_EPSILON * 10;
-        if (!res) {
-          // warn if epsilon < value < epsilon * 10
-          logger.warn(
-            'Using larger real world epsilon in SEG pos pat adding'
-          );
-        } else {
-          res = value > REAL_WORLD_EPSILON * 100;
-          if (!res) {
-            // warn if epsilon < value < epsilon * 100
-            logger.warn(
-              'Using larger+ real world epsilon in SEG pos pat adding'
-            );
-          }
-        }
-      }
-      return res;
-    };
 
     // add possibly missing origins
     const maskOrigins = [];
