@@ -1,7 +1,10 @@
 import {Vector3D} from './vector.js';
 import {Point3D} from './point.js';
 import {Index} from './index.js';
-import {isSimilar} from './number.js';
+import {
+  isSimilar,
+  isSimilarProgressive
+} from './number.js';
 import {logger} from '../utils/logger.js';
 
 /**
@@ -90,6 +93,42 @@ export class Matrix33 {
           return false;
         }
       }
+    }
+    return true;
+  }
+
+  /**
+   * Check for Matrix33 similarity with progressive tolerance (up to 10*tol).
+   *
+   * @param {Matrix33} rhs The other matrix to compare to.
+   * @param {number} [tol] Optional number comparison tolerance,
+   *   defaults to Number.EPSILON.
+   * @returns {boolean} True if both matrices are similar.
+   */
+  isSimilarProgressive(rhs, tol) {
+    const tolNum = 10;
+
+    let foundTolNum;
+    for (let i = 0; i < 3; ++i) {
+      for (let j = 0; j < 3; ++j) {
+        const br = isSimilarProgressive(
+          this.get(i, j), rhs.get(i, j), tol, tolNum);
+        if (!br.success) {
+          return false;
+        }
+        if (typeof br.message !== 'undefined') {
+          const mul = parseInt(br.message, 10);
+          if (typeof foundTolNum === 'undefined' || mul > foundTolNum) {
+            foundTolNum = mul;
+          }
+        }
+      }
+    }
+    if (typeof foundTolNum !== 'undefined') {
+      logger.warn(
+        `Using larger tolerance for matrix similarity: max diff is ~${
+          foundTolNum} times tolerance`
+      );
     }
     return true;
   }

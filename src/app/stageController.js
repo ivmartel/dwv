@@ -781,7 +781,8 @@ export class StageController extends EventTarget {
       ) {
         const baseOrientation = baseImage.getGeometry().getOrientation();
         const newOrientation = newImage.getGeometry().getOrientation();
-        res = newOrientation.isSimilar(baseOrientation, DIRECTION_EPSILON);
+        res = newOrientation.isSimilarProgressive(
+          baseOrientation, DIRECTION_EPSILON);
       }
     } else {
       res = true;

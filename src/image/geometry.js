@@ -749,7 +749,8 @@ export function getSliceGeometrySpacing(origins) {
 export function mergeGeometries(geometry1, geometry2) {
   const orientation = geometry1.getOrientation();
   // check input
-  if (!orientation.isSimilar(geometry2.getOrientation(), DIRECTION_EPSILON)) {
+  if (!orientation.isSimilarProgressive(
+    geometry2.getOrientation(), DIRECTION_EPSILON)) {
     throw new Error('Cannot merge geometries with different orientation');
   }
   const invOrientation = orientation.getInverse();
