@@ -2,6 +2,8 @@ import {describe, test, assert, vi, afterEach} from 'vitest';
 import {
   REAL_WORLD_EPSILON,
   isSimilar,
+  isSimilarProgressive,
+  isBellowTolerance,
   isAboveEpsilon
 } from '../../src/math/number.js';
 import * as loggerModule from '../../src/utils/logger.js';
@@ -34,6 +36,92 @@ describe('math', () => {
     // 1 and 1 + Number.EPSILON*2 -> false
     assert.isFalse(isSimilar(1, 1 + Number.EPSILON * 2));
     assert.isFalse(isSimilar(1, 1 - Number.EPSILON * 2));
+  });
+
+  /**
+   * Tests for {@link isSimilarProgressive}.
+   *
+   * @function module:tests/math~isSimilarProgressive
+   */
+  test('isSimilarProgressive', () => {
+    // default tol = Number.EPSILON ~ 2e-16
+
+    // 1 and 1 -> true
+    assert.isTrue(isSimilarProgressive(1, 1).success);
+
+    // 1 and 1 + Number.EPSILON/2 -> true
+    assert.isTrue(isSimilarProgressive(1, 1 + Number.EPSILON / 2).success);
+    assert.isTrue(isSimilarProgressive(1, 1 - Number.EPSILON / 2).success);
+
+    // 1 and 1 + Number.EPSILON*2 -> false
+    assert.isFalse(isSimilarProgressive(1, 1 + Number.EPSILON * 2).success);
+    assert.isFalse(isSimilarProgressive(1, 1 - Number.EPSILON * 2).success);
+
+    // with tolNum
+    const testA = 1;
+    const testB = 1 + Number.EPSILON * 5;
+    let res = isSimilarProgressive(testA, testB, undefined, 1);
+    assert.isFalse(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+
+    res = isSimilarProgressive(testA, testB, undefined, 4);
+    assert.isFalse(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+
+    res = isSimilarProgressive(testA, testB, undefined, 5);
+    assert.isFalse(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+
+    res = isSimilarProgressive(testA, testB, undefined, 6);
+    assert.isTrue(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+
+    res = isSimilarProgressive(testA, testB, undefined, 10);
+    assert.isTrue(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+  });
+
+  /**
+   * Tests for {@link isBellowTolerance}.
+   *
+   * @function module:tests/math~isBellowTolerance
+   */
+  test('isBellowTolerance', () => {
+    // default tol and tolNum
+    let testVal = Number.EPSILON / 2;
+    let res = isBellowTolerance(testVal);
+    assert.isTrue(res.success);
+
+    testVal = Number.EPSILON;
+    res = isBellowTolerance(testVal);
+    assert.isFalse(res.success);
+
+    testVal = Number.EPSILON * 2;
+    res = isBellowTolerance(testVal);
+    assert.isFalse(res.success);
+
+    // with tolNum
+    testVal = Number.EPSILON * 5;
+    // same as default
+    res = isBellowTolerance(testVal, Number.EPSILON, 1);
+    assert.isFalse(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+    // smaller tolNum than multiplier
+    res = isBellowTolerance(testVal, Number.EPSILON, 4);
+    assert.isFalse(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+    // equal tolNum and multiplier
+    res = isBellowTolerance(testVal, Number.EPSILON, 5);
+    assert.isFalse(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+    // larger tolNum than multiplier
+    res = isBellowTolerance(testVal, Number.EPSILON, 6);
+    assert.isTrue(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
+    // larger tolNum than multiplier
+    res = isBellowTolerance(testVal, Number.EPSILON, 10);
+    assert.isTrue(res.success);
+    assert.equal(res.message, '5', 'message shows multiple');
   });
 
   /**
