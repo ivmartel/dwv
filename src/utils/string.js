@@ -205,29 +205,3 @@ export function stringToUint8Array(str) {
   return arr;
 }
 
-/**
- * Round a float number to a given precision.
- *
- * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
- *
- * `toPrecision` uses all non zero digits of the number:
- * (123.009).toPrecision(4) = "123.0";
- * (0.09).toPrecision(4) = "0.09000".
- *
- * `toFixed` does not always behave as expected:
- * (123.009).toFixed(2) = "123.01";
- * (0.009).toFixed(2) = "0.01";
- * but
- * (-0.005).toFixed(2) = "-0.01" (expecting 0);
- * (1.005).toFixed(2) = "1" (expecting 1.01).
- *
- * @param {number} number The number to round.
- * @param {number} precision The rounding precision, ie the result number
- *   of digits after the comma.
- * @returns {number} The rounded number.
- */
-export function precisionRound(number, precision) {
-  const factor = Math.pow(10, precision);
-  const delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
-  return Math.round(number * factor + delta) / factor;
-}

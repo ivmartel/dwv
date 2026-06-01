@@ -1,13 +1,13 @@
 import {
   REAL_WORLD_EPSILON,
-  REAL_WORLD_EXPONENT
+  REAL_WORLD_EXPONENT,
+  precisionRound
 } from '../math/number.js';
 import {getIdentityMat33} from '../math/matrix.js';
 import {Point3D, Point} from '../math/point.js';
 import {Vector3D} from '../math/vector.js';
 import {Index} from '../math/index.js';
 import {getBasicStats} from '../math/stats.js';
-import {precisionRound} from '../utils/string.js';
 import {logger} from '../utils/logger.js';
 import {Size} from './size.js';
 import {Spacing} from './spacing.js';

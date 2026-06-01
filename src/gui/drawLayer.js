@@ -4,7 +4,7 @@ import {getScaledOffset} from './layerGroup.js';
 import {InteractionEventNames} from './generic.js';
 import {logger} from '../utils/logger.js';
 import {toStringId} from '../utils/array.js';
-import {precisionRound} from '../utils/string.js';
+import {precisionRound} from '../math/number.js';
 import {AddAnnotationCommand} from '../command/drawCommands.js';
 import {
   isNodeWithId,
