@@ -11,6 +11,7 @@ import {
   createImage,
   createMaskImage
 } from './image.js';
+import {ImageContour} from './imageContour.js';
 import {
   View,
   createView
@@ -48,6 +49,7 @@ export {
   Diameters,
   Geometry,
   Image,
+  ImageContour,
   Label,
   MaskFactory,
   MaskSegmentHelper,

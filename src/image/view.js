@@ -18,6 +18,7 @@ import {getSliceIterator} from '../image/iterator.js';
 
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
+import {MAX_CONTOUR_SIZE} from './imageContour.js';
 
 /**
  * @import {Image} from './image.js';
@@ -26,8 +27,6 @@ import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
  * @import {Point, Point3D} from '../math/point.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  */
-
-export const MAX_CONTOUR_SIZE = 10;
 
 /**
  * List of view event names.
@@ -228,7 +227,7 @@ export class View extends EventTarget {
       // iterator, but that would require a large change to a
       // lot of components for this one edge case.
       const contourDistance =
-        this.#image.getContourDistance(
+        this.#image.getContour().getDistance(
           index,
           this.getOrientation()
         );

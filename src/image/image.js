@@ -10,7 +10,7 @@ import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
-import {MAX_CONTOUR_SIZE} from './view.js';
+import {ImageContour} from './imageContour.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
 
@@ -164,12 +164,11 @@ export class Image extends EventTarget {
   #buffer;
 
   /**
-   * Data contour buffer.
-   * If there is no data contour this is null.
+   * Image contour.
    *
-   * @type {Uint8Array?}
+   * @type {ImageContour}
    */
-  #contourBuffer;
+  #contour;
 
   /**
    * Whether the image has been resampled or not.
@@ -325,7 +324,7 @@ export class Image extends EventTarget {
     this.#resamplingJobId = '0';
     this.#rawGeometry = null;
     this.#rawBuffer = null;
-    this.#contourBuffer = null;
+    this.#contour = new ImageContour();
     this.#imageUids = imageUids;
     this.#labelingThread = null;
     this.#resamplingThread = null;
@@ -864,19 +863,6 @@ export class Image extends EventTarget {
     tmpBuffer = null;
   }
 
-  /**
-   * Re-allocate buffer memory to an input size.
-   *
-   * @param {number} size The new size.
-   */
-  #reallocContour(size) {
-    let tmpBuffer = this.#contourBuffer;
-    this.#contourBuffer = new Uint8Array(size);
-    this.#contourBuffer.set(tmpBuffer);
-    // force GC
-    // eslint-disable-next-line no-useless-assignment
-    tmpBuffer = null;
-  }
 
   /**
    * Check if another image can be appended to this one.
@@ -989,9 +975,11 @@ export class Image extends EventTarget {
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
 
-      if (this.#contourBuffer !== null) {
-        const contourSize = size.getDimSize(2) * 3 * this.#meta.numberOfFiles;
-        this.#reallocContour(contourSize);
+      if (this.#contour.isInitialized()) {
+        this.#contour.realloc(
+          /** @type {Uint8Array} */ (this.#buffer),
+          this.#geometry.getSize()
+        );
       }
     }
 
@@ -1015,13 +1003,12 @@ export class Image extends EventTarget {
         indexOffset + sliceSize
       );
 
-      if (this.#contourBuffer !== null) {
+      if (this.#contour.isInitialized()) {
         const contourSliceSize = size.getDimSize(2) * 3;
         const contourIndexOffset = fullSliceIndex * contourSliceSize;
         const contourMaxOffset = totalSlices * contourSliceSize;
-        this.#contourBuffer.set(
-          this.#contourBuffer.subarray(contourIndexOffset, contourMaxOffset),
-          contourIndexOffset + contourSliceSize
+        this.#contour.shiftSlice(
+          contourIndexOffset, contourSliceSize, contourMaxOffset
         );
       }
     }
@@ -1107,9 +1094,11 @@ export class Image extends EventTarget {
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
 
-      if (this.#contourBuffer !== null) {
-        const contourSize = size.getDimSize(2) * 3 * this.#meta.numberOfFiles;
-        this.#reallocContour(contourSize);
+      if (this.#contour.isInitialized()) {
+        this.#contour.realloc(
+          /** @type {Uint8Array} */ (this.#buffer),
+          this.#geometry.getSize()
+        );
       }
     }
     // check index
@@ -1223,51 +1212,6 @@ export class Image extends EventTarget {
     this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
-  /**
-   * Reset the contour buffer for the values at an offset.
-   *
-   * @param {number} offset The offset to reset.
-   */
-  #resetContourAtOffset(offset) {
-    if (this.#contourBuffer !== null) {
-      this.#contourBuffer[offset * 3] = 0;
-      this.#contourBuffer[(offset * 3) + 1] = 0;
-      this.#contourBuffer[(offset * 3) + 2] = 0;
-    }
-  }
-
-  /**
-   * Reset the contour buffer for the values around an offset.
-   * Prevents certain artifacts, especially at small brush sizes
-   * and when erasing.
-   *
-   * @param {number} offset The offset to reset.
-   */
-  #resetContourAroundOffset(offset) {
-    this.#resetContourAtOffset(offset);
-
-    const size = this.#geometry.getSize();
-    const xOffset = size.getDimSize(0);
-    const yOffset = size.getDimSize(1);
-    const zOffset = size.getDimSize(2);
-
-    const max = MAX_CONTOUR_SIZE / 2;
-    const min = -max;
-    for (let x = min; x < max; x++) {
-      for (let y = min; y < max; y++) {
-        for (let z = min; z < max; z++) {
-          const p =
-            offset +
-            (xOffset * x) +
-            (yOffset * y) +
-            (zOffset * z);
-          if (p >= 0 && p < this.#buffer.length) {
-            this.#resetContourAtOffset(p);
-          }
-        }
-      }
-    }
-  }
 
   /**
    * Set the inner buffer values at given offsets.
@@ -1308,7 +1252,7 @@ export class Image extends EventTarget {
         }
         // write update value
         this.#buffer[offset] = value;
-        this.#resetContourAroundOffset(offset);
+        this.#contour.resetAroundOffset(offset);
       }
       originalValuesLists.push(originalValues);
     }
@@ -1347,7 +1291,7 @@ export class Image extends EventTarget {
       while (!ival.done) {
         const offset = offsets[ival.index];
         this.#buffer[offset] = ival.value;
-        this.#resetContourAroundOffset(offset);
+        this.#contour.resetAroundOffset(offset);
         ival = iterator.next();
       }
     }
@@ -1775,247 +1719,21 @@ export class Image extends EventTarget {
    * contour rendering needs to be supported.
    */
   initializeContour() {
-    this.#contourBuffer = new Uint8Array(this.#buffer.length * 3);
+    this.#contour.initialize(
+      /** @type {Uint8Array} */ (this.#buffer),
+      this.#geometry.getSize()
+    );
   }
 
   /**
-   * Get whether or not the contour buffer has been initialized.
+   * Get the image contour. Should only be available
+   * for segmentation images, but can be initialized
+   * for any Uint8Array image.
    *
-   * @returns {boolean} True if buffer has been initialized.
+   * @returns {ImageContour} The image contour.
    */
-  countourIsInitialized() {
-    return this.#contourBuffer !== null;
-  }
-
-  /**
-   * Move cursor a step in the X direction to check for border pixels.
-   *
-   * @param {number} distance Accumulated distance travelled.
-   * @param {number} index Current cursor index before moving.
-   * @param {number} direction Offset to move cursor.
-   * @param {number} dim The index of the current dimension.
-   * @param {number} checkValue Initial pixel value.
-   * @param {Function[]} queue Ordered queue of locations to check.
-   * @returns {Function} A function that returns the distance to the nearest
-   *  border pixel or 0.
-   */
-  #recursiveDistanceCheckX(distance, index, direction, dim, checkValue, queue) {
-    return () => {
-      const newIndex = index + direction;
-      const newDistance = distance + 1;
-
-      const size = this.#geometry.getSize();
-      const borderCheck = size.offsetToIndex(newIndex);
-
-      if (
-        newIndex >= this.#buffer.length ||
-        newIndex < 0 ||
-        borderCheck.get(dim) === 0 ||
-        borderCheck.get(dim) === size.get(dim) - 1 ||
-        newDistance === 255
-      ) {
-        return newDistance;
-      }
-
-      if (newDistance > MAX_CONTOUR_SIZE) {
-        return 255;
-      }
-
-      if (this.#buffer[newIndex] !== checkValue) {
-        return newDistance;
-      }
-
-      queue.push(this.#recursiveDistanceCheckX(
-        newDistance,
-        newIndex,
-        direction,
-        dim,
-        checkValue,
-        queue
-      ));
-
-      return 0;
-    };
-  }
-
-  /**
-   * Move cursor a step in the Y direction to check for border pixels.
-   * Also spawns two new cursors checking in the X directions to either side.
-   *
-   * @param {number} distance Accumulated distance travelled.
-   * @param {number} index Current cursor index before moving.
-   * @param {number} yDirection Offset to move cursor.
-   * @param {number} xDirection Offset to move cursor.
-   * @param {number} yDim The index of the y dimension.
-   * @param {number} xDim The index of the x dimension.
-   * @param {number} checkValue Initial pixel value.
-   * @param {Function[]} queue Ordered queue of locations to check.
-   * @returns {Function} A function that returns the distance to the nearest
-   *  border pixel or 0.
-   */
-  #recursiveDistanceCheckY(
-    distance,
-    index,
-    yDirection,
-    xDirection,
-    yDim,
-    xDim,
-    checkValue,
-    queue
-  ) {
-    return () => {
-      const newIndex = index + yDirection;
-      const newDistance = distance + 1;
-
-      const size = this.#geometry.getSize();
-      const borderCheck = size.offsetToIndex(newIndex);
-
-      if (
-        newIndex >= this.#buffer.length ||
-        newIndex < 0 ||
-        borderCheck.get(yDim) === 0 ||
-        borderCheck.get(yDim) === size.get(yDim) - 1 ||
-        newDistance === 255
-      ) {
-        return newDistance;
-      }
-
-      if (newDistance > MAX_CONTOUR_SIZE) {
-        return 255;
-      }
-
-      if (this.#buffer[newIndex] !== checkValue) {
-        return newDistance;
-      }
-
-      queue.push(this.#recursiveDistanceCheckX(
-        newDistance,
-        newIndex,
-        xDirection,
-        xDim,
-        checkValue,
-        queue
-      ));
-
-      queue.push(this.#recursiveDistanceCheckX(
-        newDistance,
-        newIndex,
-        -xDirection,
-        xDim,
-        checkValue,
-        queue
-      ));
-
-      queue.push(this.#recursiveDistanceCheckY(
-        newDistance,
-        newIndex,
-        yDirection,
-        xDirection,
-        yDim,
-        xDim,
-        checkValue,
-        queue
-      ));
-
-      return 0;
-    };
-  }
-
-  /**
-   * Calculate the distance to the nearest border pixel.
-   * (or return the cached distance).
-   *
-   * @param {number} index Index/offset of the pixel to check.
-   * @param {Matrix33} viewOrientation The orientation of the view.
-   * @returns {number} The distance to the nearest border pixel or 0.
-   */
-  getContourDistance(index, viewOrientation) {
-    if (this.#contourBuffer === null) {
-      // Contour not enabled
-      return 0;
-    }
-
-    const orientationIndex = viewOrientation.getThirdColMajorDirection();
-
-    const xDim = (orientationIndex + 1) % 3;
-    const yDim = (orientationIndex + 2) % 3;
-
-    const contourIndex = index * 3 + orientationIndex;
-
-    const bufferedDistance = this.#contourBuffer[contourIndex];
-    if (bufferedDistance > 0) {
-      return bufferedDistance;
-    }
-
-    const checkValue = this.#buffer[index];
-    const operationQueue = [];
-
-    const size = this.#geometry.getSize();
-    const yDimSize = size.getDimSize(yDim);
-    const xDimSize = size.getDimSize(xDim);
-
-    operationQueue.push(this.#recursiveDistanceCheckY(
-      0,
-      index,
-      yDimSize,
-      xDimSize,
-      yDim,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    operationQueue.push(this.#recursiveDistanceCheckX(
-      0,
-      index,
-      xDimSize,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    operationQueue.push(this.#recursiveDistanceCheckX(
-      0,
-      index,
-      -xDimSize,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    operationQueue.push(this.#recursiveDistanceCheckY(
-      0,
-      index,
-      -yDimSize,
-      xDimSize,
-      yDim,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    let opCount = 0;
-    // Enough to check every square up to MAX_CONTOUR_SIZE
-    const maxOps = Math.pow(MAX_CONTOUR_SIZE, 2);
-    while (operationQueue.length > 0) {
-      opCount++;
-      if (opCount > maxOps) {
-        this.#contourBuffer[contourIndex] = 255;
-        return 255;
-      }
-
-      const operation = operationQueue.shift();
-      const distanceCheck = operation();
-
-      if (distanceCheck > 0) {
-        // Return the first valid distance we find
-        this.#contourBuffer[contourIndex] = distanceCheck;
-        return distanceCheck;
-      }
-    }
-
-    // Something has gone wrong
-    return Infinity;
+  getContour() {
+    return this.#contour;
   }
 
   /**
