@@ -13,6 +13,7 @@ import {ResamplingThread} from './resamplingThread.js';
 import {ImageContour} from './imageContour.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
+import {SegmentCollection} from './segmentCollection.js';
 
 /**
  * @import {Geometry} from './geometry.js';
@@ -312,6 +313,13 @@ export class Image extends EventTarget {
   #complete = false;
 
   /**
+   * Segment collection for mask (SEG) images.
+   *
+   * @type {SegmentCollection|undefined}
+   */
+  #segmentCollection;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -352,6 +360,44 @@ export class Image extends EventTarget {
    */
   getComplete() {
     return this.#complete;
+  }
+
+  /**
+   * Set up a segment collection from the existing image buffer.
+   * Used for brush-painted masks (not created via MaskFactory).
+   */
+  setupSegmentCollection() {
+    this.#segmentCollection = new SegmentCollection(this.#geometry);
+    this.#segmentCollection.setLabelMap(
+      /** @type {Uint8Array} */ (this.#buffer)
+    );
+  }
+
+  /**
+   * Set the segment collection.
+   *
+   * @param {SegmentCollection} collection The segment collection.
+   */
+  setSegmentCollection(collection) {
+    this.#segmentCollection = collection;
+  }
+
+  /**
+   * Get the segment collection.
+   *
+   * @returns {SegmentCollection|undefined} The segment collection.
+   */
+  getSegmentCollection() {
+    return this.#segmentCollection;
+  }
+
+  /**
+   * Check whether the mask has overlapping segments.
+   *
+   * @returns {boolean} True if any two segments share at least one voxel.
+   */
+  getHasOverlap() {
+    return this.#segmentCollection?.getHasOverlap() ?? false;
   }
 
   /**

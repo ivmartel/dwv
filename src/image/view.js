@@ -9,7 +9,10 @@ import {
   validateWindowLevel
 } from './windowLevel.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
-import {generateImageDataPaletteColor} from './viewPaletteColor.js';
+import {
+  generateImageDataPaletteColor,
+  generateImageDataPaletteColorBlend
+} from './viewPaletteColor.js';
 import {generateImageDataRgb} from './viewRgb.js';
 import {generateImageDataYbrFull} from './viewYbrFull.js';
 import {ViewFactory} from './viewFactory.js';
@@ -1071,13 +1074,28 @@ export class View extends EventTarget {
         break;
 
       case 'PALETTE COLOR':
-        generateImageDataPaletteColor(
-          data,
-          iterator,
-          this.getAlphaFunction(),
-          image.getPaletteColourMap(),
-          image.getMeta().BitsStored === 16
-        );
+        if (image.getHasOverlap()) {
+          generateImageDataPaletteColorBlend(
+            data,
+            iterator,
+            image.getPaletteColourMap(),
+            image.getSegmentCollection(),
+            image.getGeometry().getSize().getDimSize(2),
+            image.getGeometry().getSize(),
+            this.getOrientation(),
+            this.getContourThickness(),
+            this.getFillOpacity(),
+            this.#segmentViewHelper
+          );
+        } else {
+          generateImageDataPaletteColor(
+            data,
+            iterator,
+            this.getAlphaFunction(),
+            image.getPaletteColourMap(),
+            image.getMeta().BitsStored === 16
+          );
+        }
         break;
 
       case 'RGB':

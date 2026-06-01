@@ -27,6 +27,7 @@ import {
 } from '../dicom/dicomSegmentFrameInfo.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
 import {Image} from '../image/image.js';
+import {SegmentCollection} from './segmentCollection.js';
 import {Geometry} from '../image/geometry.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
 import {Point, Point3D} from '../math/point.js';
@@ -40,8 +41,8 @@ import {DataElement} from '../dicom/dataElement.js';
 
 /**
  * @import {Matrix33} from '../math/matrix.js';
- * @import {Spacing} from '../image/spacing.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
+ * @import {Spacing} from '../image/spacing.js';
  */
 
 /**
@@ -185,71 +186,6 @@ function checkTag(dataElements, tagDefinition) {
     throw new Error(
       `Unsupported ${tagDefinition.name} value: ${tagValue}`);
   }
-}
-
-/**
- * Create ROI slice buffers.
- *
- * @param {Image} image The mask image.
- * @param {MaskSegment[]} segments The mask segments.
- * @param {number} sliceOffset The slice offset.
- * @returns {object} The ROI slice image buffers.
- */
-function createRoiSliceBuffers(
-  image,
-  segments,
-  sliceOffset
-) {
-  // create binary mask buffers
-  const geometry = image.getGeometry();
-  const size = geometry.getSize();
-  const sliceSize = size.getDimSize(2);
-  const buffers = {};
-  for (let o = 0; o < sliceSize; ++o) {
-    const inputOffset = sliceOffset + o;
-    const pixelValue = image.getValueAtOffset(inputOffset);
-    for (const segment of segments) {
-      const segmentIndex = segment.number - 1;
-      if (pixelValue === segment.number) {
-        if (buffers[segmentIndex] === undefined) {
-          buffers[segmentIndex] = new Uint8Array(sliceSize);
-        }
-        buffers[segmentIndex][o] = 1;
-      }
-    }
-  }
-  return buffers;
-}
-
-/**
- * Create ROI buffers.
- *
- * @param {Image} image The mask image.
- * @param {MaskSegment[]} segments The mask segments.
- * @returns {object} The ROI buffers.
- */
-function createRoiBuffers(image, segments) {
-  const geometry = image.getGeometry();
-  const size = geometry.getSize();
-
-  // image buffer to multi frame
-  const sliceSize = size.getDimSize(2);
-  const roiBuffers = {};
-  for (let k = 0; k < size.get(2); ++k) {
-    const sliceOffset = k * sliceSize;
-    // create slice buffers
-    const buffers = createRoiSliceBuffers(image, segments, sliceOffset);
-    // store slice buffers
-    const keys0 = Object.keys(buffers);
-    for (const key0 of keys0) {
-      if (roiBuffers[key0] === undefined) {
-        roiBuffers[key0] = {};
-      }
-      // ordering by slice index (follows posPat)
-      roiBuffers[key0][k] = buffers[key0];
-    }
-  }
-  return roiBuffers;
 }
 
 /**
@@ -606,15 +542,11 @@ export class MaskFactory {
       };
     };
 
-    // create output buffer
-    const buffer = new Uint8Array(sliceSize * numberOfSlices);
-    buffer.fill(0);
+    // build segment collection: per-segment, per-slice pixel data
+    const collection = new SegmentCollection(geometry);
 
-    // merge frame buffers
     const maskOrigins = geometry.getOrigins();
     let sliceIndex;
-    let frameOffset;
-    let sliceOffset;
     for (let f = 0; f < frameInfos.length; ++f) {
       // get the slice index from the position in the mask origins array
       const frameOrigin = point3DFromArray(frameInfos[f].imagePosPat);
@@ -623,22 +555,21 @@ export class MaskFactory {
       if (sliceIndex === -1) {
         throw new Error('Cannot find frame origin in mask origins');
       }
-      frameOffset = sliceSize * f;
-      sliceOffset = sliceSize * sliceIndex;
       // get the frame display value
       const frameSegment = segments.find(
         getFindSegmentFunc(frameInfos[f].refSegmentNumber)
       );
-      for (let l = 0; l < sliceSize; ++l) {
-        if (pixelBuffer[frameOffset + l] !== 0) {
-          const offset = sliceOffset + l;
-          if (hasDisplayRGBValue) {
-            buffer[offset] = frameSegment.number;
-          } else {
-            buffer[offset] = frameSegment.displayValue;
-          }
-        }
-      }
+      const value = hasDisplayRGBValue
+        ? frameSegment.number
+        : frameSegment.displayValue;
+      collection.addFrame(
+        frameSegment.number,
+        pixelBuffer,
+        sliceSize * f, // frameOffset
+        sliceIndex,
+        sliceSize,
+        value
+      );
     }
 
     // simple uids
@@ -647,8 +578,10 @@ export class MaskFactory {
       uids.push(m.toString());
     }
 
-    // create image
-    const image = new Image(geometry, buffer, uids);
+    // create image from the merged label map
+    const image = new Image(geometry, collection.getLabelMap(), uids);
+    image.setSegmentCollection(collection);
+
     if (hasDisplayRGBValue) {
       image.setPhotometricInterpretation('PALETTE COLOR');
       image.setPaletteColourMap(paletteColourMap);
@@ -698,7 +631,7 @@ export class MaskFactory {
     frameOrigins, size, spacing, orientationMatrix, refOrigins) {
     const findPointIndex = function (arr, val) {
       return arr.findIndex(function (arrVal) {
-        return val.isSimilar(arrVal, 1e-4);
+        return val.isSimilar(arrVal, 1e-2);
       });
     };
 
@@ -854,7 +787,7 @@ export class MaskFactory {
     };
 
     // image buffer to multi frame
-    const roiBuffers = createRoiBuffers(image, segments);
+    const roiBuffers = image.getSegmentCollection().getSegmentBuffers(segments);
 
     const frameInfos = [];
 
