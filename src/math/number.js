@@ -105,8 +105,11 @@ export function isBellowTolerance(value, tol, tolNum) {
   // how many tols away
   const multiple = Math.abs(value) / tol;
 
-  const br = new BooleanResult(multiple < tolNum);
-  br.message = `${precisionRound(multiple, 2)}`;
+  const res = multiple < tolNum;
+  const br = new BooleanResult(res);
+  if (!res) {
+    br.message = `${precisionRound(multiple, 2)}`;
+  }
   return br;
 }
 
