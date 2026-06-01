@@ -1,5 +1,5 @@
 import {logger} from '../../src/utils/logger.js';
-import {precisionRound} from '../../src/utils/number.js';
+import {precisionRound} from '../../src/math/number.js';
 import {custom} from '../../src/app/custom.js';
 import {
   AppOptions,
