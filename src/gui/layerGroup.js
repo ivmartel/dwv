@@ -3,7 +3,7 @@ import {Point} from '../math/point.js';
 import {Vector3D} from '../math/vector.js';
 import {viewEventNames} from '../image/view.js';
 import {logger} from '../utils/logger.js';
-import {precisionRound} from '../utils/string.js';
+import {precisionRound} from '../math/number.js';
 import {ViewLayer} from './viewLayer.js';
 import {DrawLayer} from './drawLayer.js';
 import {SOPClassUIDs} from '../dicom/dictionary.js';

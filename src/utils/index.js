@@ -14,7 +14,6 @@ import {
   getURLsFromKeyValueUri,
   handleURLsFromWeasisXMLManifest
 } from './uri.js';
-import {precisionRound} from './string.js';
 
 export {
   BooleanResult,
@@ -27,7 +26,6 @@ export {
   labToUintLab,
   getURLsFromKeyValueUri,
   handleURLsFromWeasisXMLManifest,
-  precisionRound,
   rgbToHex,
   srgbToCielab
 };

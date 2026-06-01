@@ -15,7 +15,10 @@ import {
 } from './orientation.js';
 import {getEllipseIndices} from './ellipse.js';
 import {getRectangleIndices} from './rectangle.js';
-import {NumberValue} from './number.js';
+import {
+  NumberValue,
+  precisionRound
+} from './number.js';
 
 export {
   Circle,
@@ -37,4 +40,5 @@ export {
   getOrientationName,
   getEllipseIndices,
   getRectangleIndices,
+  precisionRound,
 };
