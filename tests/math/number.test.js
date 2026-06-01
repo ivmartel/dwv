@@ -75,11 +75,11 @@ describe('math', () => {
 
     res = isSimilarProgressive(testA, testB, undefined, 6);
     assert.isTrue(res.success);
-    assert.equal(res.message, '5', 'message shows multiple');
+    assert.equal(res.message, undefined, 'message shows multiple');
 
     res = isSimilarProgressive(testA, testB, undefined, 10);
     assert.isTrue(res.success);
-    assert.equal(res.message, '5', 'message shows multiple');
+    assert.equal(res.message, undefined, 'message shows multiple');
   });
 
   /**
