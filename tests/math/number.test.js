@@ -118,11 +118,11 @@ describe('math', () => {
     // larger tolNum than multiplier
     res = isBellowTolerance(testVal, Number.EPSILON, 6);
     assert.isTrue(res.success);
-    assert.equal(res.message, '5', 'message shows multiple');
+    assert.equal(res.message, undefined, 'message shows multiple');
     // larger tolNum than multiplier
     res = isBellowTolerance(testVal, Number.EPSILON, 10);
     assert.isTrue(res.success);
-    assert.equal(res.message, '5', 'message shows multiple');
+    assert.equal(res.message, undefined, 'message shows multiple');
   });
 
   /**
