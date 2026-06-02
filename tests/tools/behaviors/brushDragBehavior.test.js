@@ -85,7 +85,8 @@ describe('BrushDragBehavior', () => {
       getDataController: vi.fn(() => ({
         get: vi.fn(() => ({
           image: {
-            getMeta: () => ({SeriesInstanceUID: 'series-a'})
+            getMeta: () => ({SeriesInstanceUID: 'series-a'}),
+            getHasOverlap: () => false
           }
         }))
       }))

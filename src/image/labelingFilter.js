@@ -90,7 +90,7 @@ export class LabelingFilter {
   /**
    * Label the buffer using the Hoshen–Kopelman algorithm.
    *
-   * @param {TypedArray} buffer The image buffer to regenerate the labels for.
+   * @param {Uint8Array} buffer The image buffer to regenerate the labels for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} sizes The image dimensions.
@@ -283,7 +283,7 @@ export class LabelingFilter {
   /**
    * Quantify labels: count items, calculate centroid, and calculate height.
    *
-   * @param {TypedArray} buffer The image buffer to quantify the labels for.
+   * @param {Uint8Array} buffer The image buffer to quantify the labels for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
@@ -413,7 +413,7 @@ export class LabelingFilter {
   /**
    * Calculate the major and minor (perpendicular) diameters of each segment.
    *
-   * @param {TypedArray} buffer The image buffer to calculate diameters for.
+   * @param {Uint8Array} buffer The image buffer to calculate diameters for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} sizes The image dimensions.
@@ -598,7 +598,7 @@ export class LabelingFilter {
    * Run the filter.
    *
    * @param {object} data The input data.
-   * @returns {object[]} The list of quantified labels.
+   * @returns {object} The list of quantified labels.
    */
   run(data) {
     const imageBuffer = data.imageBuffer;

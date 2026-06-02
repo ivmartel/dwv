@@ -530,6 +530,8 @@ export class BrushMaskPaint extends EventTarget {
       firstSliceMeta
     );
 
+    this.#mask.setupSegmentCollection();
+
     // fires load events and renders data
     // (will create viewLayer for it)
     const elements = getElementsFromJSONTags(firstSliceMeta);

@@ -8,11 +8,13 @@ import {RescaleSlopeAndIntercept} from './rsi.js';
 import {ImageFactory} from './imageFactory.js';
 import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
+import {LabelingFilter} from './labelingFilter.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
 import {ImageContour} from './imageContour.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
+import {SegmentCollection} from './segmentCollection.js';
 
 /**
  * @import {Geometry} from './geometry.js';
@@ -312,6 +314,13 @@ export class Image extends EventTarget {
   #complete = false;
 
   /**
+   * Segment collection for mask (SEG) images.
+   *
+   * @type {SegmentCollection|undefined}
+   */
+  #segmentCollection;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -352,6 +361,44 @@ export class Image extends EventTarget {
    */
   getComplete() {
     return this.#complete;
+  }
+
+  /**
+   * Set up a segment collection from the existing image buffer.
+   * Used for brush-painted masks (not created via MaskFactory).
+   */
+  setupSegmentCollection() {
+    this.#segmentCollection = new SegmentCollection(this.#geometry);
+    this.#segmentCollection.setLabelMap(
+      /** @type {Uint8Array} */ (this.#buffer)
+    );
+  }
+
+  /**
+   * Set the segment collection.
+   *
+   * @param {SegmentCollection} collection The segment collection.
+   */
+  setSegmentCollection(collection) {
+    this.#segmentCollection = collection;
+  }
+
+  /**
+   * Get the segment collection.
+   *
+   * @returns {SegmentCollection|undefined} The segment collection.
+   */
+  getSegmentCollection() {
+    return this.#segmentCollection;
+  }
+
+  /**
+   * Check whether the mask has overlapping segments.
+   *
+   * @returns {boolean} True if any two segments share at least one voxel.
+   */
+  getHasOverlap() {
+    return this.#segmentCollection?.getHasOverlap() ?? false;
   }
 
   /**
@@ -1737,91 +1784,164 @@ export class Image extends EventTarget {
   }
 
   /**
-   * Recalculate labels.
+   * Post-process labels after labeling thread is done.
+   *
+   * @param {any} labels The labels to update.
+   * @fires Image#labelschanged
    */
-  recalculateLabels() {
-    if (this.#labelingThread === null) {
-      this.#labelingThread = new LabelingThread();
-
-      const spacing = this.#geometry.getSpacing();
-      const lengthUnit = this.getMeta().lengthUnit;
-      let pixelVolume = 1;
-      let volumeUnit = 'unit.pixel';
-      if (lengthUnit === 'unit.mm') {
-        pixelVolume =
-          spacing.get(0) *
-          spacing.get(1) *
-          spacing.get(2) *
-          ML_PER_MM;
-        volumeUnit = 'unit.ml';
-      }
-
-      this.#labelingThread.ondone = (event) => {
-        const labels = event.data.labels;
-        // add centroid point and volume
-        for (const label of labels) {
-          label.centroid = this.#geometry.indexToWorld(
-            new Index(label.centroidIndex));
-          label.volume = {
-            value: label.count * pixelVolume,
-            unit: volumeUnit
-          };
-          // diameters should be already in the correct units
-          let majorDiameter;
-          let minorDiameter;
-          if (typeof label.diameters !== 'undefined') {
-            if (typeof label.diameters.major !== 'undefined') {
-              majorDiameter = label.diameters.major.diameter;
-            }
-            if (typeof label.diameters.minor !== 'undefined') {
-              minorDiameter = label.diameters.minor.diameter;
-            }
-          }
-          label.diameters = {
-            major: {
-              diameter: {
-                value: majorDiameter,
-                unit: lengthUnit
-              }
-            },
-            minor: {
-              diameter: {
-                value: minorDiameter,
-                unit: lengthUnit
-              }
-            }
-          };
-          label.height = {
-            value: label.height,
-            unit: lengthUnit
-          };
-        }
-        // sort
-        /** @type {Label[]} */
-        const labelsSorted =
-          labels.sort((v1, v2) => {
-            return v2.volume.value - v1.volume.value;
-          }).sort((v1, v2) => {
-            return v1.id - v2.id;
-          });
-
-        this.dispatchEvent(new CustomEvent('labelschanged',
-          {detail: {labels: labelsSorted}}));
-
-        //TODO: This is temporary until a proper method of displaying
-        // diameters is implmented.
-        // ------
-        if (event.data.buffer) {
-          this.#buffer = event.data.buffer;
-          this.dispatchEvent(new CustomEvent('imagecontentchange'));
-        }
-        // ------
-      };
+  #postProcessLabels(labels) {
+    const spacing = this.#geometry.getSpacing();
+    const lengthUnit = this.getMeta().lengthUnit;
+    let pixelVolume = 1;
+    let volumeUnit = 'unit.pixel';
+    if (lengthUnit === 'unit.mm') {
+      pixelVolume =
+        spacing.get(0) *
+        spacing.get(1) *
+        spacing.get(2) *
+        ML_PER_MM;
+      volumeUnit = 'unit.ml';
     }
 
+    for (const label of labels) {
+      // add centroid point
+      label.centroid = this.#geometry.indexToWorld(
+        new Index(label.centroidIndex));
+      // add volume
+      label.volume = {
+        value: label.count * pixelVolume,
+        unit: volumeUnit
+      };
+      // add unit to values
+      let majorDiameter;
+      let minorDiameter;
+      if (typeof label.diameters !== 'undefined') {
+        if (typeof label.diameters.major !== 'undefined') {
+          majorDiameter = label.diameters.major.diameter;
+        }
+        if (typeof label.diameters.minor !== 'undefined') {
+          minorDiameter = label.diameters.minor.diameter;
+        }
+      }
+      label.diameters = {
+        major: {
+          diameter: {
+            value: majorDiameter,
+            unit: lengthUnit
+          }
+        },
+        minor: {
+          diameter: {
+            value: minorDiameter,
+            unit: lengthUnit
+          }
+        }
+      };
+      label.height = {
+        value: label.height,
+        unit: lengthUnit
+      };
+    }
+    // sort by volume then by id
+    /** @type {Label[]} */
+    const labelsSorted =
+      labels.sort((v1, v2) => {
+        return v2.volume.value - v1.volume.value;
+      }).sort((v1, v2) => {
+        return v1.id - v2.id;
+      });
+
+    this.dispatchEvent(new CustomEvent('labelschanged', {
+      detail: {
+        labels: /** @type {Label[]} */ (labelsSorted)
+      }
+    }));
+  }
+
+  /**
+   * Label segments with overlap.
+   * The merged labelmap uses first-wins at overlap positions, so voxels
+   * shared by two segments are attributed only to the first segment.
+   * Run the filter once per segment on a clean per-segment buffer so
+   * every segment gets its correct voxels counted.
+   * Warning: not using workers, so might be slow for large images
+   * with many segments.
+   */
+  #labelOverlapSegments() {
+    const imageSize = this.#geometry.getSize();
+    const totalSize = imageSize.getTotalSize();
+    const sliceSize = imageSize.getDimSize(2);
+    const ndims = imageSize.length();
+    const unitVectors = Array(ndims).fill(0);
+    for (let d = 0; d < ndims; d++) {
+      unitVectors[d] = imageSize.getDimSize(d);
+    }
+    // full mask size
+    // TODO could be optimized to be the real
+    // size of the segments
+    const sizes = Array(ndims).fill(0);
+    for (let d = 0; d < ndims; d++) {
+      sizes[d] = imageSize.get(d);
+    }
+    const spacingValues = this.#geometry.getSpacing().getValues();
+
+    const filter = new LabelingFilter();
+    const allLabels = [];
+    for (const [segNumber, sliceMap] of this.#segmentCollection.getAll()) {
+      const segBuffer = new Uint8Array(totalSize);
+      for (const [sliceIndex, sliceBuf] of sliceMap) {
+        const sliceOffset = sliceIndex * sliceSize;
+        for (let l = 0; l < sliceBuf.length; ++l) {
+          if (sliceBuf[l] !== 0) {
+            segBuffer[sliceOffset + l] = segNumber;
+          }
+        }
+      }
+      const result = filter.run({
+        imageBuffer: segBuffer,
+        unitVectors,
+        sizes,
+        spacing: spacingValues,
+        totalSize
+      });
+      allLabels.push(...result.labels);
+    }
+
+    this.#postProcessLabels(allLabels);
+  }
+
+  /**
+   * Recalculate labels.
+   *
+   * @fires Image#labelingstart
+   * @fires Image#labelschanged
+   */
+  recalculateLabels() {
     this.dispatchEvent(new CustomEvent('labelingstart'));
 
-    this.#labelingThread.run(this.#buffer, this.#geometry);
+    const collection = this.#segmentCollection;
+    if (collection?.getHasOverlap() && collection.getAll().size > 0) {
+      this.#labelOverlapSegments();
+    } else {
+      // create thread if not done yet
+      if (this.#labelingThread === null) {
+        this.#labelingThread = new LabelingThread();
+
+        this.#labelingThread.ondone = (event) => {
+          this.#postProcessLabels(event.data.labels);
+          //TODO: This is temporary until a proper method of displaying
+          // diameters is implmented.
+          // ------
+          if (event.data.buffer) {
+            this.#buffer = event.data.buffer;
+            this.dispatchEvent(new CustomEvent('imagecontentchange'));
+          }
+          // ------
+        };
+      }
+      // run labeling thread
+      this.#labelingThread.run(this.#buffer, this.#geometry);
+    }
   }
 
   /**

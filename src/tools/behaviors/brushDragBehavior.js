@@ -91,6 +91,10 @@ export class BrushDragBehavior extends DragBehavior {
       this.#isInBlackListForGroup(layerGroup)) {
       return false;
     }
+    if (this.#hasOverlap(layerGroup)) {
+      logger.warn('Cannot paint on series with overlapping slices');
+      return false;
+    }
     if (typeof this.#maskPaint.getSelectedSegmentNumber() === 'undefined') {
       logger.warn(ERROR_MESSAGES.brush.noSelectedSegmentNumber);
       return false;
@@ -196,6 +200,24 @@ export class BrushDragBehavior extends DragBehavior {
       }
     }
     return false;
+  }
+
+  /**
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {boolean} True if series is blacklisted.
+   */
+  #hasOverlap(layerGroup) {
+    if (typeof layerGroup === 'undefined') {
+      throw new Error('No layergroup to check for overlap');
+    }
+    const viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer === 'undefined') {
+      throw new Error('No viewlayer to check for overlap');
+    }
+    const dataId = viewLayer.getDataId();
+    const dataCtrl = this.#app.getDataController();
+    const data = dataCtrl.get(dataId);
+    return data.image.getHasOverlap();
   }
 
   #setEraserModeForRightButton() {
