@@ -81,6 +81,7 @@ function createRoiBuffers(imageBuffer, geometry, segments) {
 /**
  * Collection of mask segments: stores per-segment, per-slice pixel data
  * and segment metadata. Builds the combined label map on demand.
+ * TODO: check if mergeable with MaskSegmentHelper.
  */
 export class SegmentCollection {
 
@@ -96,10 +97,6 @@ export class SegmentCollection {
    * @type {Map<number, Map<number, Uint8Array>>}
    */
   #segments = new Map();
-
-  getAll() {
-    return this.#segments;
-  }
 
   /**
    * Flag set to true when two segments share at least one voxel.
@@ -120,6 +117,16 @@ export class SegmentCollection {
    */
   constructor(geometry) {
     this.#geometry = geometry;
+  }
+
+  /**
+   * Get all the segments.
+   *
+   * @returns {Map<number, Map<number, Uint8Array>>} The segment buffers,
+   * indexed by segment number and slice index.
+   */
+  getAll() {
+    return this.#segments;
   }
 
   /**
@@ -199,11 +206,12 @@ export class SegmentCollection {
 
   /**
    * Check whether any two segments share at least one voxel.
-   * Only valid after getLabelMap() has been called.
    *
    * @returns {boolean} True if overlap was detected.
    */
   getHasOverlap() {
+    // ensure label map is built and hasOverlap flag is set
+    this.getLabelMap();
     return this.#hasOverlap;
   }
 
