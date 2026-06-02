@@ -32,7 +32,10 @@ import {Geometry} from '../image/geometry.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
 import {Point, Point3D} from '../math/point.js';
 import {Index} from '../math/index.js';
-import {isAboveEpsilon} from '../math/number.js';
+import {
+  REAL_WORLD_EPSILON,
+  isAboveEpsilon
+} from '../math/number.js';
 import {logger} from '../utils/logger.js';
 import {arraySortEquals} from '../utils/array.js';
 import {Size} from './size.js';
@@ -628,8 +631,8 @@ export class MaskFactory {
   #checkDistance(frameOrigin, refOrigin, index) {
     const dist = frameOrigin.getDistance(refOrigin);
     // expecting a difference of 1e-4
-    if (dist > 1e-4) {
-      if (dist < 1e-2) {
+    if (dist > REAL_WORLD_EPSILON) {
+      if (dist < REAL_WORLD_EPSILON * 100) {
         logger.warn(
           `Mask frame origin ${index} is far from reference origin (${dist}).`
         );
