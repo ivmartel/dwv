@@ -1,4 +1,5 @@
 import {ImageContour} from './imageContour.js';
+import {logger} from '../utils/logger.js';
 
 /**
  * @import {Geometry} from './geometry.js';
@@ -200,6 +201,9 @@ export class SegmentCollection {
       }
     }
 
+    if (this.#hasOverlap) {
+      logger.warn('SegmentCollection: detected overlapping segments');
+    }
     this.#labelMap = labelMap;
     return labelMap;
   }
