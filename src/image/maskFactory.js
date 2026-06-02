@@ -631,6 +631,7 @@ export class MaskFactory {
     frameOrigins, size, spacing, orientationMatrix, refOrigins) {
     const findPointIndex = function (arr, val) {
       return arr.findIndex(function (arrVal) {
+        // TODO use similar progressive? (original was 1e-4)
         return val.isSimilar(arrVal, 1e-2);
       });
     };
