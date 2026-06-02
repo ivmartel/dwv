@@ -618,6 +618,28 @@ export class MaskFactory {
   }
 
   /**
+   * Check the distance between a frame origin and a reference origin.
+   *
+   * @param {Point3D} frameOrigin The frame origin to check.
+   * @param {Point3D} refOrigin The reference origin to check against.
+   * @param {number} index The frame index, used for error message.
+   * @throws {Error} If distance is too high.
+   */
+  #checkDistance(frameOrigin, refOrigin, index) {
+    const dist = frameOrigin.getDistance(refOrigin);
+    // expecting a difference of 1e-4
+    if (dist > 1e-4) {
+      if (dist < 1e-2) {
+        logger.warn(
+          `Mask frame origin ${index} is far from reference origin (${dist}).`
+        );
+      } else {
+        throw new Error(`No reference origin for mask frame origin ${index}`);
+      }
+    }
+  }
+
+  /**
    * Get the mask geometry from reference image.
    *
    * @param {Point3D[]} frameOrigins The frame origins.
@@ -629,25 +651,15 @@ export class MaskFactory {
    */
   #getGeometryFromReference(
     frameOrigins, size, spacing, orientationMatrix, refOrigins) {
-    const findPointIndex = function (arr, val) {
-      return arr.findIndex(function (arrVal) {
-        // TODO use similar progressive? (original was 1e-4)
-        return val.isSimilar(arrVal, 1e-2);
-      });
-    };
 
     const maskOrigins = [];
     maskOrigins.push(frameOrigins[0]);
-    let previousIndex = findPointIndex(refOrigins, frameOrigins[0]);
-    if (previousIndex === -1) {
-      throw new Error('No index for first frame origin');
-    }
+    let previousIndex = frameOrigins[0].getClosest(refOrigins);
+    this.#checkDistance(frameOrigins[0], refOrigins[previousIndex], 0);
     for (let i = 1; i < frameOrigins.length; ++i) {
       const frameOrigin = frameOrigins[i];
-      const currentIndex = findPointIndex(refOrigins, frameOrigin);
-      if (currentIndex === -1) {
-        throw new Error(`No index for frame origin ${i}`);
-      }
+      const currentIndex = frameOrigin.getClosest(refOrigins);
+      this.#checkDistance(frameOrigin, refOrigins[currentIndex], i);
       if (currentIndex !== previousIndex + 1) {
         for (let j = previousIndex + 1; j < currentIndex; ++j) {
           maskOrigins.push(refOrigins[j]);
