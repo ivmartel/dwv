@@ -409,10 +409,10 @@ export class SegmentationUI {
             segments: imgMeta.custom.segments.slice(),
             viewHelper: new MaskSegmentViewHelper()
           };
-          // calculate labels
-          this.#calculateLabels(dataId);
           // add to list
           _segmentations.push(segmentation);
+          // calculate labels
+          this.#calculateLabels(dataId);
           // add to html
           this.#addSegmentationHtml(segmentation);
 
