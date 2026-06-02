@@ -630,7 +630,7 @@ export class MaskFactory {
    */
   #checkDistance(frameOrigin, refOrigin, index) {
     const dist = frameOrigin.getDistance(refOrigin);
-    // expecting a difference of 1e-4
+    // warn is bigger than epsilon, error if bigger than 100*epsilon
     if (dist > REAL_WORLD_EPSILON) {
       if (dist < REAL_WORLD_EPSILON * 100) {
         logger.warn(

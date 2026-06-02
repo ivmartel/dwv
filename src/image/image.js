@@ -1864,6 +1864,8 @@ export class Image extends EventTarget {
    * shared by two segments are attributed only to the first segment.
    * Run the filter once per segment on a clean per-segment buffer so
    * every segment gets its correct voxels counted.
+   * Warning: not using workers, so might be slow for large images
+   * with many segments.
    */
   #labelOverlapSegments() {
     const imageSize = this.#geometry.getSize();
