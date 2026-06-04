@@ -884,7 +884,8 @@ export class StageController extends EventTarget {
       'dataimageset', viewLayer.onimageset);
 
     // bind overlay data
-    if (typeof this.#options.overlayConfig !== 'undefined' &&
+    if (isBaseLayer &&
+      typeof this.#options.overlayConfig !== 'undefined' &&
       typeof this.#getInfoData !== 'undefined') {
       layerGroup.addInfoData(this.#getInfoData(dataId), dataId);
       layerGroup.bindInfoData(dataId);
