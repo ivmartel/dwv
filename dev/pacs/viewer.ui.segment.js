@@ -412,7 +412,6 @@ export class SegmentationUI {
           _segmentations.push(segmentation);
           // calculate labels
           this.#calculateLabels(dataId);
-          console.log('after calculate');
           // add to html
           this.#addSegmentationHtml(segmentation);
 
