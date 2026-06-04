@@ -356,8 +356,7 @@ export class SegmentationUI {
     const dataCtrl = this.#app.getDataController();
     const maskImage = dataCtrl.get(dataId).image;
 
-    if (typeof maskImage !== 'undefined' &&
-      maskImage.getMeta().Modality === 'SEG') {
+    if (typeof maskImage !== 'undefined' && maskImage.isMask()) {
       // setup html if needed
       if (!this.#rootDoc.getElementById('segmentation-list')) {
         this.#setupHtml();
@@ -413,6 +412,7 @@ export class SegmentationUI {
           _segmentations.push(segmentation);
           // calculate labels
           this.#calculateLabels(dataId);
+          console.log('after calculate');
           // add to html
           this.#addSegmentationHtml(segmentation);
 

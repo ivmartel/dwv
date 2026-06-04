@@ -499,6 +499,16 @@ export class Image extends EventTarget {
   }
 
   /**
+   * Check is the image is a mask.
+   *
+   * @returns {boolean} True if mask.
+   */
+  isMask() {
+    const modality = this.getMeta().Modality;
+    return modality === 'SEG' || modality === 'RTSTRUCT';
+  }
+
+  /**
    * Can the data be scrolled?
    *
    * @param {Matrix33} viewOrientation The view orientation.

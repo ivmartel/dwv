@@ -22,6 +22,10 @@ const TagKeys = {
   SOPClassUID: '00080016',
   Modality: '00080060',
   ReferencedSeriesSequence: '00081115',
+  // RT Structure Set series reference
+  ReferencedFrameOfReferenceSequence: '30060010',
+  RTReferencedStudySequence: '30060012',
+  RTReferencedSeriesSequence: '30060014',
   SeriesInstanceUID: '0020000E',
   Rows: '00280010',
   Columns: '00280011',
@@ -402,4 +406,34 @@ export function getReferencedSeriesUID(dataElements) {
     res = safeGet(refSeriesSq[0], TagKeys.SeriesInstanceUID);
   }
   return res;
+}
+
+/**
+ * Get the referenced series UID from an RT Structure Set.
+ *
+ * Path: ReferencedFrameOfReferenceSequence (3006,0010) →
+ *   RTReferencedStudySequence (3006,0012) →
+ *   RTReferencedSeriesSequence (3006,0014) →
+ *   SeriesInstanceUID (0020,000E).
+ *
+ * @param {Record<string, DataElement>} dataElements The data elements.
+ * @returns {string|undefined} The referenced series UID.
+ */
+export function getReferencedSeriesUIDFromRTStruct(dataElements) {
+  const refForSeq = safeGetAll(
+    dataElements, TagKeys.ReferencedFrameOfReferenceSequence);
+  if (typeof refForSeq === 'undefined') {
+    return undefined;
+  }
+  const rtRefStudySeq = safeGetAll(
+    refForSeq[0], TagKeys.RTReferencedStudySequence);
+  if (typeof rtRefStudySeq === 'undefined') {
+    return undefined;
+  }
+  const rtRefSeriesSeq = safeGetAll(
+    rtRefStudySeq[0], TagKeys.RTReferencedSeriesSequence);
+  if (typeof rtRefSeriesSeq === 'undefined') {
+    return undefined;
+  }
+  return safeGet(rtRefSeriesSeq[0], TagKeys.SeriesInstanceUID);
 }

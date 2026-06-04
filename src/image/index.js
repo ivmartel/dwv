@@ -32,6 +32,7 @@ import {
   MaskFactory,
   getDefaultDicomSegJson
 } from './maskFactory.js';
+import {RtStructFactory} from './rtStructFactory.js';
 import {PositionHelper} from './positionHelper.js';
 import {PlaneHelper} from './planeHelper.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
@@ -52,6 +53,7 @@ export {
   ImageContour,
   Label,
   MaskFactory,
+  RtStructFactory,
   MaskSegmentHelper,
   MaskSegmentViewHelper,
   PlaneHelper,
