@@ -2,6 +2,8 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 /**
  * @import {Geometry} from './geometry.js';
+ * @import {Size} from './size.js';
+ * @import {Spacing} from './spacing.js';
  */
 
 /**
@@ -15,17 +17,14 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
  */
 
 /**
- * Generate a worker message to send to the labeling worker.
+ * Generate a worker message with geometry metadata only.
  *
- * @param {TypedArray} imageBuffer The buffer to label.
- * @param {Geometry} imageGeometry The image geometry.
+ * @param {Size} imageSize The image size.
+ * @param {Spacing} imageSpacing The image spacing.
  *
- * @returns {object} The message to send to the worker.
+ * @returns {object} The geometry part of a worker message.
  */
-export function generateWorkerMessage(imageBuffer, imageGeometry) {
-  const imageSize = imageGeometry.getSize();
-  const imageSpacing = imageGeometry.getSpacing();
-
+export function generateGeometryMessage(imageSize, imageSpacing) {
   // We can't pass these metadata objects directly, so we will just
   // pull out what we need and pass that.
   const ndims = imageSize.length();
@@ -41,16 +40,31 @@ export function generateWorkerMessage(imageBuffer, imageGeometry) {
     sizes[d] = imageSize.get(d);
   }
 
-  const totalSize = imageSize.getTotalSize();
-
   return {
-    imageBuffer,
     unitVectors,
     sizes,
     spacing: imageSpacing.getValues(),
-    totalSize
+    totalSize: imageSize.getTotalSize()
   };
 }
+
+/**
+ * Generate a worker message to send to the labeling worker.
+ *
+ * @param {TypedArray} imageBuffer The buffer to label.
+ * @param {Geometry} imageGeometry The image geometry.
+ *
+ * @returns {object} The message to send to the worker.
+ */
+export function generateWorkerMessage(imageBuffer, imageGeometry) {
+  return {
+    imageBuffer,
+    ...generateGeometryMessage(
+      imageGeometry.getSize(), imageGeometry.getSpacing()
+    )
+  };
+}
+
 
 /**
  * Labeling worker task.
@@ -78,7 +92,7 @@ export class LabelingThread {
    *
    * @type {ThreadPool}
    */
-  #threadPool = new ThreadPool(1);
+  #threadPool = new ThreadPool(navigator?.hardwareConcurrency ?? 4);
 
   constructor() {
     this.#threadPool.onerror = ((e) => {
@@ -96,6 +110,7 @@ export class LabelingThread {
     // We can't just pass in an Image or we would get a circular dependency
 
     this.#threadPool.onworkitem = this.ondone;
+    this.#threadPool.onwork = () => {};
 
     const workerTask = new LabelingWorkerTask(
       generateWorkerMessage(imageBuffer, geometry),
@@ -104,6 +119,35 @@ export class LabelingThread {
 
     // add it the queue and run it
     this.#threadPool.addWorkerTask(workerTask);
+  }
+
+  /**
+   * Trigger a labels recalculation for overlapping segments.
+   * Spawns one worker task per segment for parallel execution.
+   *
+   * @param {{segNumber: number, size: Size, slices: {sliceIndex: number,
+   *   data: Uint8Array}[]}[]} segments Per-segment raw slice data
+   *   with global slice indices.
+   * @param {Geometry} geometry The full image geometry.
+   */
+  runOverlap(segments, geometry) {
+    const allLabels = [];
+
+    this.#threadPool.onworkitem = (event) => {
+      allLabels.push(...event.data.labels);
+    };
+    this.#threadPool.onwork = () => {
+      this.ondone({data: {labels: allLabels}});
+    };
+
+    for (const {segNumber, size, slices} of segments) {
+      const geoMsg = generateGeometryMessage(size, geometry.getSpacing());
+
+      this.#threadPool.addWorkerTask(new LabelingWorkerTask(
+        {segmentSlice: {segNumber, slices}, ...geoMsg},
+        {}
+      ));
+    }
   }
 
   /**

@@ -8,7 +8,7 @@ import {RescaleSlopeAndIntercept} from './rsi.js';
 import {ImageFactory} from './imageFactory.js';
 import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
-import {LabelingFilter} from './labelingFilter.js';
+import {Size} from './size.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
 import {ImageContour} from './imageContour.js';
@@ -1864,50 +1864,27 @@ export class Image extends EventTarget {
    * shared by two segments are attributed only to the first segment.
    * Run the filter once per segment on a clean per-segment buffer so
    * every segment gets its correct voxels counted.
-   * Warning: not using workers, so might be slow for large images
-   * with many segments.
    */
   #labelOverlapSegments() {
     const imageSize = this.#geometry.getSize();
-    const totalSize = imageSize.getTotalSize();
-    const sliceSize = imageSize.getDimSize(2);
-    const ndims = imageSize.length();
-    const unitVectors = Array(ndims).fill(0);
-    for (let d = 0; d < ndims; d++) {
-      unitVectors[d] = imageSize.getDimSize(d);
-    }
-    // full mask size
-    // TODO could be optimized to be the real
-    // size of the segments
-    const sizes = Array(ndims).fill(0);
-    for (let d = 0; d < ndims; d++) {
-      sizes[d] = imageSize.get(d);
-    }
-    const spacingValues = this.#geometry.getSpacing().getValues();
-
-    const filter = new LabelingFilter();
-    const allLabels = [];
+    const nx = imageSize.get(0);
+    const ny = imageSize.get(1);
+    const segments = [];
     for (const [segNumber, sliceMap] of this.#segmentCollection.getAll()) {
-      const segBuffer = new Uint8Array(totalSize);
+      const sliceIndices = [...sliceMap.keys()];
+      const minSlice = Math.min(...sliceIndices);
+      const size = new Size([nx, ny, Math.max(...sliceIndices) - minSlice + 1]);
+      const slices = [];
       for (const [sliceIndex, sliceBuf] of sliceMap) {
-        const sliceOffset = sliceIndex * sliceSize;
-        for (let l = 0; l < sliceBuf.length; ++l) {
-          if (sliceBuf[l] !== 0) {
-            segBuffer[sliceOffset + l] = segNumber;
-          }
-        }
+        slices.push({
+          sliceIndex: sliceIndex - minSlice,
+          data: new Uint8Array(sliceBuf)
+        });
       }
-      const result = filter.run({
-        imageBuffer: segBuffer,
-        unitVectors,
-        sizes,
-        spacing: spacingValues,
-        totalSize
-      });
-      allLabels.push(...result.labels);
+      segments.push({segNumber, size, slices});
     }
 
-    this.#postProcessLabels(allLabels);
+    this.#labelingThread.runOverlap(segments, this.#geometry);
   }
 
   /**
@@ -1919,27 +1896,27 @@ export class Image extends EventTarget {
   recalculateLabels() {
     this.dispatchEvent(new CustomEvent('labelingstart'));
 
+    // create thread if not done yet
+    if (this.#labelingThread === null) {
+      this.#labelingThread = new LabelingThread();
+
+      this.#labelingThread.ondone = (event) => {
+        this.#postProcessLabels(event.data.labels);
+        //TODO: This is temporary until a proper method of displaying
+        // diameters is implmented.
+        // ------
+        if (event.data.buffer) {
+          this.#buffer = event.data.buffer;
+          this.dispatchEvent(new CustomEvent('imagecontentchange'));
+        }
+        // ------
+      };
+    }
+
     const collection = this.#segmentCollection;
     if (collection?.getHasOverlap() && collection.getAll().size > 0) {
       this.#labelOverlapSegments();
     } else {
-      // create thread if not done yet
-      if (this.#labelingThread === null) {
-        this.#labelingThread = new LabelingThread();
-
-        this.#labelingThread.ondone = (event) => {
-          this.#postProcessLabels(event.data.labels);
-          //TODO: This is temporary until a proper method of displaying
-          // diameters is implmented.
-          // ------
-          if (event.data.buffer) {
-            this.#buffer = event.data.buffer;
-            this.dispatchEvent(new CustomEvent('imagecontentchange'));
-          }
-          // ------
-        };
-      }
-      // run labeling thread
       this.#labelingThread.run(this.#buffer, this.#geometry);
     }
   }
