@@ -31,6 +31,7 @@ const MetaTagKeys = {
 /**
  * Fill a closed polygon into a flat Uint8Array slice using a scanline
  * even-odd rule.
+ * Ref: {@link https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule}.
  *
  * @param {Uint8Array} buffer The mask buffer (all slices).
  * @param {number} sliceOffset Byte offset of the current slice in buffer.
@@ -63,8 +64,8 @@ function fillPolygon(buffer, sliceOffset, width, height, pts, value) {
     xs.sort((a, b) => a - b);
     // fill pairs
     for (let k = 0; k + 1 < xs.length; k += 2) {
-      const xStart = Math.max(0, Math.round(xs[k]));
-      const xEnd = Math.min(width - 1, Math.round(xs[k + 1]));
+      const xStart = Math.max(0, Math.ceil(xs[k]));
+      const xEnd = Math.min(width - 1, Math.floor(xs[k + 1]));
       for (let x = xStart; x <= xEnd; ++x) {
         buffer[sliceOffset + y * width + x] = value;
       }
@@ -162,12 +163,14 @@ export class RtStructFactory {
           continue;
         }
 
-        // convert 3D patient coords to image indices
+        // convert 3D patient coords to continuous pixel coords using
+        // worldToPoint (unlike worldToIndex, it does not apply Math.floor,
+        // preserving sub-pixel positions needed for correct rasterization)
         const pts2D = [];
         for (let i = 0; i < raw.length; i += 3) {
-          const idx = geo.worldToIndex(
+          const p = geo.worldToPoint(
             new Point([raw[i], raw[i + 1], raw[i + 2]]));
-          pts2D.push({x: idx.get(0), y: idx.get(1), z: idx.get(2)});
+          pts2D.push({x: p.getX(), y: p.getY(), z: p.getZ()});
         }
 
         // all points of a planar contour share the same z index
