@@ -126,14 +126,22 @@ export class LabelingThread {
    * Spawns one worker task per segment for parallel execution.
    *
    * @param {{segNumber: number, size: Size, slices: {sliceIndex: number,
-   *   data: Uint8Array}[]}[]} segments Per-segment raw slice data
-   *   with global slice indices.
+   *   data: Uint8Array}[], minSlice: number}[]} segments Per-segment raw slice
+   *   data with local (0-based) slice indices and the global minSlice offset.
    * @param {Geometry} geometry The full image geometry.
    */
   runOverlap(segments, geometry) {
     const allLabels = [];
+    const minSliceBySegNumber = new Map(
+      segments.map(({segNumber, minSlice}) => [segNumber, minSlice ?? 0])
+    );
 
     this.#threadPool.onworkitem = (event) => {
+      for (const label of event.data.labels) {
+        const sliceOffset = minSliceBySegNumber.get(label.id) ?? 0;
+        label.centroidIndex[2] += sliceOffset;
+        label.largestSliceZ += sliceOffset;
+      }
       allLabels.push(...event.data.labels);
     };
     this.#threadPool.onwork = () => {

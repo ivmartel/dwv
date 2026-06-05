@@ -1891,7 +1891,7 @@ export class Image extends EventTarget {
           data: new Uint8Array(sliceBuf)
         });
       }
-      segments.push({segNumber, size, slices});
+      segments.push({segNumber, size, slices, minSlice});
     }
 
     this.#labelingThread.runOverlap(segments, this.#geometry);
