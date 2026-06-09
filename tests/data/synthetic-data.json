@@ -675,7 +675,7 @@
 },
 {
     "name": "test-11",
-    "description": "DICOM SEG test data with two non-overlapping segments, referencing test-00.",
+    "description": "DICOM SEG test data with no overlapping segments (ref test-00).",
     "segmentSquares": {
         "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
         "2": {"minI": 12, "maxI": 18, "minJ": 12, "maxJ": 18}
@@ -845,7 +845,7 @@
 },
 {
     "name": "test-12",
-    "description": "DICOM SEG test data with two overlapping segments, referencing test-00.",
+    "description": "DICOM SEG test data with overlapping segments (ref test-00).",
     "segmentSquares": {
         "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
         "2": {"minI": 8, "maxI": 14, "minJ": 8, "maxJ": 14}
@@ -1015,7 +1015,7 @@
 },
 {
     "name": "test-13",
-    "description": "DICOM RTSTRUCT test data with two non-overlapping squares, referencing test-00.",
+    "description": "DICOM RTSTRUCT test data with no overlapping squares (ref test-00).",
     "tags": {
         "Modality": "RTSTRUCT",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
@@ -1107,7 +1107,7 @@
 },
 {
     "name": "test-14",
-    "description": "DICOM RTSTRUCT test data with two overlapping squares, referencing test-00.",
+    "description": "DICOM RTSTRUCT test data with overlapping squares (ref test-00).",
     "tags": {
         "Modality": "RTSTRUCT",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
