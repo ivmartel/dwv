@@ -792,5 +792,189 @@
             ]
         }
     }
+},
+{
+    "name": "test-12",
+    "description": "DICOM RTSTRUCT test data with two non-overlapping squares, referencing test-00.",
+    "tags": {
+        "Modality": "RTSTRUCT",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.14",
+        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.14",
+        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.14",
+        "PatientID": "0123456",
+        "PatientName": "dwv^PatientName",
+        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+        "StructureSetLabel": "RT Structure Set",
+        "ReferencedFrameOfReferenceSequence": {
+            "value": [
+                {
+                    "RTReferencedStudySequence": {
+                        "value": [
+                            {
+                                "RTReferencedSeriesSequence": {
+                                    "value": [
+                                        {
+                                            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "StructureSetROISequence": {
+            "value": [
+                {
+                    "ROINumber": 1,
+                    "ROIName": "Square1"
+                },
+                {
+                    "ROINumber": 2,
+                    "ROIName": "Square2"
+                }
+            ]
+        },
+        "RTROIObservationsSequence": {
+            "value": [
+                {
+                    "ReferencedROINumber": 1,
+                    "RTROIInterpretedType": "ORGAN",
+                    "ROIInterpreter": ""
+                },
+                {
+                    "ReferencedROINumber": 2,
+                    "RTROIInterpretedType": "ORGAN",
+                    "ROIInterpreter": ""
+                }
+            ]
+        },
+        "ROIContourSequence": {
+            "value": [
+                {
+                    "ReferencedROINumber": 1,
+                    "ROIDisplayColor": [255, 0, 0],
+                    "ContourSequence": {
+                        "value": [
+                            {
+                                "ContourGeometricType": "CLOSED_PLANAR",
+                                "NumberOfContourPoints": 4,
+                                "ContourData": [4, 4, 0, 10, 4, 0, 10, 10, 0, 4, 10, 0]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "ReferencedROINumber": 2,
+                    "ROIDisplayColor": [0, 255, 0],
+                    "ContourSequence": {
+                        "value": [
+                            {
+                                "ContourGeometricType": "CLOSED_PLANAR",
+                                "NumberOfContourPoints": 4,
+                                "ContourData": [12, 12, 0, 18, 12, 0, 18, 18, 0, 12, 18, 0]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+},
+{
+    "name": "test-13",
+    "description": "DICOM RTSTRUCT test data with two overlapping squares, referencing test-00.",
+    "tags": {
+        "Modality": "RTSTRUCT",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
+        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
+        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.13",
+        "PatientID": "0123456",
+        "PatientName": "dwv^PatientName",
+        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+        "StructureSetLabel": "RT Structure Set",
+        "ReferencedFrameOfReferenceSequence": {
+            "value": [
+                {
+                    "RTReferencedStudySequence": {
+                        "value": [
+                            {
+                                "RTReferencedSeriesSequence": {
+                                    "value": [
+                                        {
+                                            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "StructureSetROISequence": {
+            "value": [
+                {
+                    "ROINumber": 1,
+                    "ROIName": "Square1"
+                },
+                {
+                    "ROINumber": 2,
+                    "ROIName": "Square2"
+                }
+            ]
+        },
+        "RTROIObservationsSequence": {
+            "value": [
+                {
+                    "ReferencedROINumber": 1,
+                    "RTROIInterpretedType": "ORGAN",
+                    "ROIInterpreter": ""
+                },
+                {
+                    "ReferencedROINumber": 2,
+                    "RTROIInterpretedType": "ORGAN",
+                    "ROIInterpreter": ""
+                }
+            ]
+        },
+        "ROIContourSequence": {
+            "value": [
+                {
+                    "ReferencedROINumber": 1,
+                    "ROIDisplayColor": [255, 0, 0],
+                    "ContourSequence": {
+                        "value": [
+                            {
+                                "ContourGeometricType": "CLOSED_PLANAR",
+                                "NumberOfContourPoints": 4,
+                                "ContourData": [4, 4, 0, 10, 4, 0, 10, 10, 0, 4, 10, 0]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "ReferencedROINumber": 2,
+                    "ROIDisplayColor": [0, 255, 0],
+                    "ContourSequence": {
+                        "value": [
+                            {
+                                "ContourGeometricType": "CLOSED_PLANAR",
+                                "NumberOfContourPoints": 4,
+                                "ContourData": [8, 8, 0, 14, 8, 0, 14, 14, 0, 8, 14, 0]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
 }
 ]

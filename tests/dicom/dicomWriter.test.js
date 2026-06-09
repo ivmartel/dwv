@@ -505,7 +505,9 @@ describe('dicom', () => {
     // convert JSON to DICOM element object
     const dicomElements = getElementsFromJSONTags(jsonTags);
     // pixels (if possible)
-    if (config.tags.Modality !== 'KO') {
+    if (config.tags.Modality !== 'KO' &&
+      config.tags.Modality !== 'RTSTRUCT'
+    ) {
       if (config.tags.Modality === 'SEG') {
         // simple binary
         dicomElements['7FE00010'] = generateBinary(config.tags);
