@@ -509,6 +509,20 @@ export class Image extends EventTarget {
   }
 
   /**
+   * Get the UID of the series referenced by the mask, if any.
+   *
+   * @returns {string|undefined} The UID.
+   */
+  getMaskReferencedSeriesUID() {
+    let res;
+    // custom meta field for referenced series UID
+    if (this.isMask()) {
+      res = this.getMeta().custom.referencedSeriesUID;
+    }
+    return res;
+  }
+
+  /**
    * Can the data be scrolled?
    *
    * @param {Matrix33} viewOrientation The view orientation.

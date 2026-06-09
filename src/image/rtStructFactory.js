@@ -1,12 +1,22 @@
 import {getRTStructFromElements} from '../dicom/dicomRTStruct.js';
 import {MaskSegment} from '../dicom/dicomSegment.js';
 import {safeGet} from '../dicom/dataElement.js';
+import {
+  dateToDateObj,
+  getDicomDate,
+  dateToTimeObj,
+  getDicomTime,
+} from '../dicom/dicomDate.js';
+import {getReferencedSeriesUIDFromRTStruct} from '../dicom/dicomImage.js';
+import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {transferSyntaxKeywords} from '../dicom/dictionary.js';
 import {Image} from './image.js';
 import {ColourMap} from './luts.js';
 import {SegmentCollection} from './segmentCollection.js';
 import {RGB} from '../utils/colour.js';
 import {Point} from '../math/point.js';
 import {Index} from '../math/index.js';
+import {logger} from '../utils/logger.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
@@ -27,6 +37,258 @@ const MetaTagKeys = {
   SeriesNumber: '00200011',
   FrameOfReferenceUID: '00200052'
 };
+
+/**
+ * Required DICOM tags for RT Structure Set Storage.
+ *
+ * @type {Array<{name: string, enum: Array}>}
+ */
+const RTStructRequiredTags = [
+  {
+    name: 'TransferSyntaxUID',
+    enum: [transferSyntaxKeywords.ExplicitVRLittleEndian]
+  },
+  {name: 'MediaStorageSOPClassUID', enum: ['1.2.840.10008.5.1.4.1.1.481.3']},
+  {name: 'SOPClassUID', enum: ['1.2.840.10008.5.1.4.1.1.481.3']},
+  {name: 'Modality', enum: ['RTSTRUCT']},
+  {name: 'StructureSetLabel', enum: ['RT Structure Set']}
+];
+
+/**
+ * Get the default DICOM RT Structure Set tags as an object.
+ *
+ * @returns {object} The default tags.
+ */
+export function getDefaultDicomRTStructJson() {
+  const tags = {};
+  for (const tag of RTStructRequiredTags) {
+    tags[tag.name] = tag.enum[0];
+  }
+  return tags;
+}
+
+// Moore neighborhood directions clockwise from W.
+const CW_DIRS = [
+  [-1, 0],
+  [-1, -1],
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1]
+];
+
+// Map 'dx,dy' -> clockwise direction index.
+const DIR_IDX = {};
+for (let i = 0; i < 8; i++) {
+  DIR_IDX[`${CW_DIRS[i][0]},${CW_DIRS[i][1]}`] = i;
+}
+
+/**
+ * BFS (Breadth-First Search) flood-fill: mark all 8-connected
+ * pixels with `value` as visited.
+ *
+ * @param {Uint8Array} buffer The mask buffer.
+ * @param {number} sliceOffset Byte offset of the slice in buffer.
+ * @param {number} width Slice width.
+ * @param {number} height Slice height.
+ * @param {number} value Segment value.
+ * @param {number} startIdx Flat index of the seed pixel.
+ * @param {Uint8Array} visited Per-slice visited flags (length = width*height).
+ */
+function bfsMarkVisited(
+  buffer, sliceOffset, width, height, value, startIdx, visited) {
+  const queue = [startIdx];
+  visited[startIdx] = 1;
+  while (queue.length > 0) {
+    const idx = queue.shift();
+    const x = idx % width;
+    const y = (idx / width) | 0;
+    const neighbors = [
+      x > 0 ? idx - 1 : -1,
+      x < width - 1 ? idx + 1 : -1,
+      y > 0 ? idx - width : -1,
+      y < height - 1 ? idx + width : -1,
+      x > 0 && y > 0 ? idx - width - 1 : -1,
+      x < width - 1 && y > 0 ? idx - width + 1 : -1,
+      x > 0 && y < height - 1 ? idx + width - 1 : -1,
+      x < width - 1 && y < height - 1 ? idx + width + 1 : -1
+    ];
+    for (const ni of neighbors) {
+      if (ni !== -1 && !visited[ni] && buffer[sliceOffset + ni] === value) {
+        visited[ni] = 1;
+        queue.push(ni);
+      }
+    }
+  }
+}
+
+/**
+ * Trace the outer boundary of a connected foreground region using Moore
+ * neighborhood tracing (Jacob's stopping criterion).
+ *
+ * @param {Uint8Array} buffer The mask buffer.
+ * @param {number} sliceOffset Byte offset of the slice in buffer.
+ * @param {number} width Slice width.
+ * @param {number} height Slice height.
+ * @param {number} value Segment value.
+ * @param {number} sx X of the top-left pixel of the component.
+ * @param {number} sy Y of the top-left pixel of the component.
+ * @returns {{x: number, y: number}[]} Ordered boundary vertices.
+ */
+function mooreBoundary(buffer, sliceOffset, width, height, value, sx, sy) {
+  const boundary = [{x: sx, y: sy}];
+  let bx = sx;
+  let by = sy - 1; // conceptual pixel above start (may be out of bounds)
+  let cx = sx;
+  let cy = sy;
+
+  const maxIter = width * height * 2 + 1;
+  for (let iter = 0; iter < maxIter; iter++) {
+    const dIdx = DIR_IDX[`${bx - cx},${by - cy}`];
+    let foundX = -1;
+    let foundY = -1;
+    let newBx = bx;
+    let newBy = by;
+    for (let k = 1; k <= 8; k++) {
+      const idx = (dIdx + k) % 8;
+      const nx = cx + CW_DIRS[idx][0];
+      const ny = cy + CW_DIRS[idx][1];
+      if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
+        buffer[sliceOffset + ny * width + nx] === value) {
+        foundX = nx;
+        foundY = ny;
+        const prevIdx = (dIdx + k - 1) % 8;
+        newBx = cx + CW_DIRS[prevIdx][0];
+        newBy = cy + CW_DIRS[prevIdx][1];
+        break;
+      }
+    }
+    if (foundX === -1) {
+      // isolated pixel
+      break;
+    }
+    bx = newBx;
+    by = newBy;
+    cx = foundX;
+    cy = foundY;
+    // The start pixel is topmost-leftmost, so the trace can only return to it
+    // after completing one full loop — stop immediately on first return.
+    if (cx === sx && cy === sy) {
+      break;
+    }
+    boundary.push({x: cx, y: cy});
+  }
+  return boundary;
+}
+
+/**
+ * Extract polygon contours from a mask slice using Moore neighborhood tracing.
+ * Returns one polygon per connected region with the given segment value.
+ *
+ * @param {Uint8Array} buffer The mask buffer (all slices).
+ * @param {number} sliceOffset Byte offset of the slice in buffer.
+ * @param {number} width Slice width in pixels.
+ * @param {number} height Slice height in pixels.
+ * @param {number} value Segment value to trace.
+ * @returns {{x: number, y: number}[][]} One polygon per connected region.
+ */
+export function bufferToPolygons(buffer, sliceOffset, width, height, value) {
+  const n = width * height;
+  const visited = new Uint8Array(n);
+  const polygons = [];
+  for (let i = 0; i < n; i++) {
+    if (buffer[sliceOffset + i] === value && !visited[i]) {
+      const sx = i % width;
+      const sy = (i / width) | 0;
+      bfsMarkVisited(buffer, sliceOffset, width, height, value, i, visited);
+      const pts = mooreBoundary(
+        buffer, sliceOffset, width, height, value, sx, sy);
+      if (pts.length >= 3) {
+        polygons.push(pts);
+      }
+    }
+  }
+  return polygons;
+}
+
+/**
+ * Perpendicular distance from a point to the line through a and b.
+ *
+ * @param {{x: number, y: number}} pt The point.
+ * @param {{x: number, y: number}} a Line start.
+ * @param {{x: number, y: number}} b Line end.
+ * @returns {number} Distance in pixels.
+ */
+function ptSegDist(pt, a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  if (dx === 0 && dy === 0) {
+    return Math.sqrt((pt.x - a.x) ** 2 + (pt.y - a.y) ** 2);
+  }
+  const t = ((pt.x - a.x) * dx + (pt.y - a.y) * dy) / (dx * dx + dy * dy);
+  return Math.sqrt((pt.x - a.x - t * dx) ** 2 + (pt.y - a.y - t * dy) ** 2);
+}
+
+/**
+ * Simplify a polygon using the Ramer-Douglas-Peucker algorithm.
+ * Ref: {@link https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm}.
+ *
+ * @param {{x: number, y: number}[]} pts Input vertices.
+ * @param {number} epsilon Max allowed deviation in pixels.
+ * @returns {{x: number, y: number}[]} Simplified vertices.
+ */
+export function simplifyPolygon(pts, epsilon) {
+  if (pts.length <= 3) {
+    return pts;
+  }
+  /**
+   * Recursive function to perform RDP simplification.
+   *
+   * @param {number} start Start index of the segment.
+   * @param {number} end End index of the segment.
+   * @param {Array<{x: number, y: number}>} result Output array to
+   *   collect vertices.
+   * @returns {undefined}
+   */
+  function rdp(start, end, result) {
+    if (end <= start + 1) {
+      return;
+    }
+    let maxDist = 0;
+    let maxIdx = start;
+    for (let i = start + 1; i < end; i++) {
+      const d = ptSegDist(pts[i], pts[start], pts[end]);
+      if (d > maxDist) {
+        maxDist = d;
+        maxIdx = i;
+      }
+    }
+    if (maxDist > epsilon) {
+      rdp(start, maxIdx, result);
+      result.push(pts[maxIdx]);
+      rdp(maxIdx, end, result);
+    }
+  }
+
+  const result = [pts[0]];
+  rdp(0, pts.length - 1, result);
+  result.push(pts[pts.length - 1]);
+  return result;
+}
+
+/**
+ * Merge extra tags into a base tags object (mutates base).
+ *
+ * @param {object} tags Base tags object.
+ * @param {object} extra Tags to merge in.
+ */
+function mergeTags(tags, extra) {
+  for (const key of Object.keys(extra)) {
+    tags[key] = extra[key];
+  }
+}
 
 /**
  * Fill a closed polygon into a flat Uint8Array slice using a scanline
@@ -57,7 +319,15 @@ function fillPolygon(buffer, sliceOffset, width, height, pts, value) {
     for (let i = 0; i < n; ++i) {
       const p1 = pts[i];
       const p2 = pts[(i + 1) % n];
-      if ((p1.y <= y && p2.y > y) || (p2.y <= y && p1.y > y)) {
+      // Top-half-open rule for all rows except the last: edges firing at
+      // their lower endpoint but not their upper endpoint. For y=yMax the
+      // upper endpoint IS the polygon bottom, so switch to closed interval
+      // (and skip horizontal edges explicitly to avoid double-counting).
+      const inRange = y < yMax
+        ? (p1.y <= y && p2.y > y) || (p2.y <= y && p1.y > y)
+        : p1.y !== p2.y &&
+          ((p1.y <= y && p2.y >= y) || (p2.y <= y && p1.y >= y));
+      if (inRange) {
         xs.push(p1.x + (y - p1.y) / (p2.y - p1.y) * (p2.x - p1.x));
       }
     }
@@ -200,13 +470,20 @@ export class RtStructFactory {
 
     // build meta
     const safeGetLocal = (key) => safeGet(dataElements, key);
-    const meta = {Modality: 'RTSTRUCT', custom: {segments}};
+    const meta = {Modality: 'RTSTRUCT'};
     for (const key of Object.keys(MetaTagKeys)) {
       const val = safeGetLocal(MetaTagKeys[key]);
       if (typeof val !== 'undefined') {
         meta[key] = val;
       }
     }
+
+    // custom
+    meta.custom = {
+      segments,
+      referencedSeriesUID: getReferencedSeriesUIDFromRTStruct(dataElements)
+    };
+
     // carry length unit from reference image when available
     const refMeta = refImage.getMeta();
     if (typeof refMeta.lengthUnit !== 'undefined') {
@@ -215,5 +492,142 @@ export class RtStructFactory {
     image.setMeta(meta);
 
     return image;
+  }
+
+  /**
+   * Convert a mask {@link Image} into DICOM RT Structure Set elements.
+   *
+   * Traces each segment's pixel regions per slice using Moore neighborhood
+   * contour tracing, simplifies with Ramer-Douglas-Peucker, then maps the
+   * 2D pixel coordinates back to 3D patient-space coordinates.
+   *
+   * @param {Image} image The mask image.
+   * @param {MaskSegment[]} [segments] The mask segments; if omitted, taken
+   *   from image meta.
+   * @param {Image} [sourceImage] Source image (provides StudyInstanceUID).
+   * @param {Record<string, any>} [extraTags] Optional extra tags to merge.
+   * @returns {Record<string, DataElement>} The DICOM data elements.
+   */
+  toDicom(image, segments, sourceImage, extraTags) {
+    const tags = getDefaultDicomRTStructJson();
+
+    // copy patient/study/series tags from image meta
+    const meta = image.getMeta();
+    for (const key of Object.keys(MetaTagKeys)) {
+      const val = meta[key];
+      if (typeof val !== 'undefined') {
+        tags[key] = val;
+      }
+    }
+
+    // use image segments if not provided
+    if (typeof segments === 'undefined') {
+      segments = meta.custom?.segments ?? [];
+    }
+
+    // keep source image StudyInstanceUID and referenced series when available
+    if (typeof sourceImage !== 'undefined') {
+      const sourceMeta = sourceImage.getMeta();
+      tags.StudyInstanceUID = sourceMeta.StudyInstanceUID;
+      tags.ReferencedFrameOfReferenceSequence = {
+        value: [{
+          FrameOfReferenceUID: tags.FrameOfReferenceUID ?? '',
+          RTReferencedStudySequence: {
+            value: [{
+              ReferencedSOPInstanceUID: sourceMeta.StudyInstanceUID ?? '',
+              RTReferencedSeriesSequence: {
+                value: [{
+                  SeriesInstanceUID: sourceMeta.SeriesInstanceUID ?? ''
+                }]
+              }
+            }]
+          }
+        }]
+      };
+    }
+
+    // content date/time
+    const now = new Date();
+    tags.StructureSetDate = getDicomDate(dateToDateObj(now));
+    tags.StructureSetTime = getDicomTime(dateToTimeObj(now));
+
+    const geometry = image.getGeometry();
+    const size = geometry.getSize();
+    const width = size.get(0);
+    const height = size.get(1);
+    const nSlices = size.get(2);
+    const sliceSize = width * height;
+    const buffer = /** @type {Uint8Array} */ (image.getBuffer());
+    const hasOverlap = image.getHasOverlap();
+    const allSegmentFrames = hasOverlap
+      ? image.getSegmentCollection()?.getAll()
+      : undefined;
+
+    const roiItems = [];
+    const contourItems = [];
+    const obsItems = [];
+
+    for (const segment of segments) {
+      const segNum = segment.number;
+      const colour = segment.displayRGBValue ?? {r: 255, g: 0, b: 0};
+
+      roiItems.push({
+        ROINumber: segNum,
+        ROIName: segment.label,
+        ReferencedFrameOfReferenceUID: tags.FrameOfReferenceUID ?? ''
+      });
+
+      obsItems.push({
+        ObservationNumber: segNum,
+        ReferencedROINumber: segNum,
+        RTROIInterpretedType: 'ORGAN',
+        ROIInterpreter: ''
+      });
+
+      // collect contour sequences across all slices
+      const contourSeq = [];
+      const segFrames = allSegmentFrames?.get(segNum);
+      for (let z = 0; z < nSlices; z++) {
+        const polygons = hasOverlap && segFrames?.has(z)
+          ? bufferToPolygons(segFrames.get(z), 0, width, height, segNum)
+          : bufferToPolygons(buffer, z * sliceSize, width, height, segNum);
+        for (const polygon of polygons) {
+          const simplified = simplifyPolygon(polygon, 1.0);
+          if (simplified.length < 3) {
+            logger.warn(
+              'Saving RT Struct with thin contour, not well supported'
+            );
+            continue;
+          }
+          // convert 2D pixel coords to 3D patient-space coords
+          const points3D = [];
+          for (const pt of simplified) {
+            const world = geometry.indexToWorld(new Index([pt.x, pt.y, z]));
+            points3D.push(world.get(0), world.get(1), world.get(2));
+          }
+          contourSeq.push({
+            ContourGeometricType: 'CLOSED_PLANAR',
+            NumberOfContourPoints: simplified.length,
+            ContourData: points3D
+          });
+        }
+      }
+
+      contourItems.push({
+        ReferencedROINumber: segNum,
+        ROIDisplayColor: [colour.r, colour.g, colour.b],
+        ContourSequence: {value: contourSeq}
+      });
+    }
+
+    tags.StructureSetROISequence = {value: roiItems};
+    tags.ROIContourSequence = {value: contourItems};
+    tags.RTROIObservationsSequence = {value: obsItems};
+
+    if (typeof extraTags !== 'undefined') {
+      mergeTags(tags, extraTags);
+    }
+
+    return getElementsFromJSONTags(tags);
   }
 }
