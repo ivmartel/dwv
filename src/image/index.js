@@ -32,6 +32,12 @@ import {
   MaskFactory,
   getDefaultDicomSegJson
 } from './maskFactory.js';
+import {
+  RtStructFactory,
+  getDefaultDicomRTStructJson,
+  bufferToPolygons,
+  simplifyPolygon
+} from './rtStructFactory.js';
 import {PositionHelper} from './positionHelper.js';
 import {PlaneHelper} from './planeHelper.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
@@ -52,6 +58,7 @@ export {
   ImageContour,
   Label,
   MaskFactory,
+  RtStructFactory,
   MaskSegmentHelper,
   MaskSegmentViewHelper,
   PlaneHelper,
@@ -68,4 +75,7 @@ export {
   createView,
   equalWl,
   getDefaultDicomSegJson,
+  getDefaultDicomRTStructJson,
+  bufferToPolygons,
+  simplifyPolygon,
 };

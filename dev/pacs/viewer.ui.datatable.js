@@ -580,7 +580,7 @@ export class DataTableUI {
 
     if (
       initialLayer.getViewController &&
-      initialLayer.getViewController().getModality() === 'SEG'
+      initialLayer.getViewController().isMask()
     ) {
       const fillOpacityId = `fill-opacity-${dataId}`;
       // callback

@@ -39,7 +39,9 @@ function getObjectUrlFromTags(config) {
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromJSONTags(config.tags);
   // pixels
-  if (config.tags.Modality !== 'KO') {
+  if (config.tags.Modality !== 'KO' &&
+    config.tags.Modality !== 'RTSTRUCT'
+  ) {
     if (config.tags.Modality === 'SEG') {
       // simple binary
       dicomElements['7FE00010'] =

@@ -12,7 +12,8 @@ import {
   getImage2DSize,
   getSpacingFromMeasure,
   getDicomMeasureItem,
-  getDicomPlaneOrientationItem
+  getDicomPlaneOrientationItem,
+  getReferencedSeriesUID
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
@@ -605,7 +606,8 @@ export class MaskFactory {
     meta.custom = {
       segments,
       frameInfos,
-      SOPInstanceUID: safeGetLocal(TagKeys.SOPInstanceUID)
+      SOPInstanceUID: safeGetLocal(TagKeys.SOPInstanceUID),
+      referencedSeriesUID: getReferencedSeriesUID(dataElements)
     };
 
     // get length unit from ref image

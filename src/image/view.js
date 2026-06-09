@@ -311,7 +311,7 @@ export class View extends EventTarget {
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return this.#image.getMeta().Modality === 'SEG';
+    return this.#image.isMask();
   }
 
   /**

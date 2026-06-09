@@ -23,7 +23,15 @@ import {
   DicomCode,
   getSegmentationCode
 } from './dicomCode.js';
-import {getReferencedSeriesUID} from './dicomImage.js';
+import {
+  getReferencedSeriesUID,
+  getReferencedSeriesUIDFromRTStruct
+} from './dicomImage.js';
+import {
+  getRTStructFromElements,
+  RTROIContour,
+  RTROI
+} from './dicomRTStruct.js';
 import {
   DicomSRContent,
   getSRContent,
@@ -59,6 +67,10 @@ export {
   getSRContent,
   getDicomSRContentItem,
   getReferencedSeriesUID,
+  getReferencedSeriesUIDFromRTStruct,
+  getRTStructFromElements,
+  RTROIContour,
+  RTROI,
   getManufacturer,
   getNormalisedManufacturer,
   hasDicomPrefix,

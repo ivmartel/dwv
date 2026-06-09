@@ -507,6 +507,7 @@ export class BrushMaskPaint extends EventTarget {
       value: referenceSeriesTag
     };
     firstSliceMeta.custom = {
+      referencedSeriesUID: tags.SeriesInstanceUID,
       frameInfos: [
         {
           dimIndex: [1, 1],

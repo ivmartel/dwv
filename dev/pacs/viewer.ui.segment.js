@@ -6,8 +6,8 @@ import {
 import {logger} from '../../src/utils/logger.js';
 import {i18n} from '../../src/utils/i18n.js';
 import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
-import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {MaskFactory} from '../../src/image/maskFactory.js';
+import {RtStructFactory} from '../../src/image/rtStructFactory.js';
 import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
 import {
@@ -152,7 +152,8 @@ const prefixes = {
   delete: 'delete-',
   addSegment: 'add-segment-',
   selectEraser: 'select-eraser-',
-  save: 'save-',
+  saveSeg: 'save-seg-',
+  saveRtss: 'save-rtss-',
   volumes: 'span-volumes-',
   info: 'info-',
   li: 'li-'
@@ -356,8 +357,7 @@ export class SegmentationUI {
     const dataCtrl = this.#app.getDataController();
     const maskImage = dataCtrl.get(dataId).image;
 
-    if (typeof maskImage !== 'undefined' &&
-      maskImage.getMeta().Modality === 'SEG') {
+    if (typeof maskImage !== 'undefined' && maskImage.isMask()) {
       // setup html if needed
       if (!this.#rootDoc.getElementById('segmentation-list')) {
         this.#setupHtml();
@@ -940,18 +940,47 @@ export class SegmentationUI {
     const target = event.target;
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
-      getRootFromHtmlId(prefixes.save, target.id));
+      getRootFromHtmlId(prefixes.saveSeg, target.id));
     const segmentationName = getSegmentationHtmlId(segmentationIndex);
+    const fileName = `${segmentationName}-seg`;
     const segmentation = _segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
+    // save
+    this.#saveData(dataId, fileName);
+  };
 
-    // get data
+  /**
+   * Handle a RTSS save from UI.
+   *
+   * @param {MouseEvent} event HTML event.
+   */
+  #onRtssSave = (event) => {
+    const target = event.target;
+    // get segmentation
+    const segmentationIndex = splitSegmentationHtmlId(
+      getRootFromHtmlId(prefixes.saveRtss, target.id));
+    const segmentationName = getSegmentationHtmlId(segmentationIndex);
+    const fileName = `${segmentationName}-rtss`;
+    const segmentation = _segmentations[segmentationIndex];
+    const dataId = segmentation.dataId;
+    // save
+    this.#saveData(dataId, fileName, true);
+  };
+
+  /**
+   * Save a segmentation or RTSS.
+   *
+   * @param {string} dataId The data id.
+   * @param {string} fileName The file name.
+   * @param {boolean} asRtss Whether to save as RTSS.
+   */
+  #saveData(dataId, fileName, asRtss = false) {
     const dataCtrl = this.#app.getDataController();
     const maskData = dataCtrl.get(dataId);
     if (typeof maskData === 'undefined') {
       throw new Error('Cannot save without mask image');
     }
-    const refSeriesUID = getReferencedSeriesUID(maskData.meta);
+    const refSeriesUID = maskData.image.getMaskReferencedSeriesUID();
     if (typeof refSeriesUID === 'undefined') {
       throw new Error('Cannot save without referenced UID');
     }
@@ -964,7 +993,12 @@ export class SegmentationUI {
       throw new Error('Cannot save without source image');
     }
     // dicom elements
-    const fac = new MaskFactory();
+    let fac;
+    if (asRtss) {
+      fac = new RtStructFactory();
+    } else {
+      fac = new MaskFactory();
+    }
     const dicomElements = fac.toDicom(
       maskData.image,
       maskData.image.getMeta().custom.segments,
@@ -991,7 +1025,7 @@ export class SegmentationUI {
       // update generate button
       const element = document.createElement('a');
       element.href = window.URL.createObjectURL(blob);
-      element.download = `${segmentationName}.dcm`;
+      element.download = `${fileName}.dcm`;
       // trigger download
       element.click();
       URL.revokeObjectURL(element.href);
@@ -1049,10 +1083,15 @@ export class SegmentationUI {
     nameDiv.appendChild(document.createTextNode(segmentationName));
 
     // save button
-    const saveButton = getButton('Save');
-    saveButton.title = 'Save segmentation';
-    saveButton.id = getHtmlId(prefixes.save, segmentationName);
-    saveButton.onclick = this.#onSegmentationSave;
+    const saveSegButton = getButton('Save');
+    saveSegButton.title = 'Save SEG';
+    saveSegButton.id = getHtmlId(prefixes.saveSeg, segmentationName);
+    saveSegButton.onclick = this.#onSegmentationSave;
+
+    const saveRtssButton = getButton('Save');
+    saveRtssButton.title = 'Save RTSS';
+    saveRtssButton.id = getHtmlId(prefixes.saveRtss, segmentationName);
+    saveRtssButton.onclick = this.#onRtssSave;
 
     // add button
     const addButton = getButton('Add');
@@ -1064,7 +1103,8 @@ export class SegmentationUI {
     const actionGroupDiv = document.createElement('div');
     actionGroupDiv.id = `${segmentationName}-actions`;
     actionGroupDiv.className = 'data-item-actions';
-    actionGroupDiv.appendChild(saveButton);
+    actionGroupDiv.appendChild(saveSegButton);
+    actionGroupDiv.appendChild(saveRtssButton);
     actionGroupDiv.appendChild(addButton);
 
     // segment list

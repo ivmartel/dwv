@@ -2,6 +2,7 @@ import {mergeObjects} from '../utils/operator.js';
 import {MaskFactory} from '../image/maskFactory.js';
 import {ImageFactory} from '../image/imageFactory.js';
 import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
+import {RtStructFactory} from '../image/rtStructFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet} from '../dicom/dataElement.js';
@@ -10,7 +11,10 @@ import {
   getPostLoadVolumeIdTagValue
 } from '../dicom/dicomVolume.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
-import {getReferencedSeriesUID} from '../dicom/dicomImage.js';
+import {
+  getReferencedSeriesUID,
+  getReferencedSeriesUIDFromRTStruct
+} from '../dicom/dicomImage.js';
 
 /**
  * @import {Image} from '../image/image.js';
@@ -626,6 +630,20 @@ export class DataController extends EventTarget {
       factory = new AnnotationGroupFactory();
       if (typeof factory.checkElements(data.meta) === 'undefined') {
         data.annotationGroup = factory.create(data.meta);
+      }
+    } else if (modality === 'RTSTRUCT') {
+      // RT structure set: rasterize contours into a mask image
+      const referencedSeriesUID =
+        getReferencedSeriesUIDFromRTStruct(data.meta);
+      const refDataId = this.getDataIdFromSeriesUid(referencedSeriesUID);
+      if (typeof refDataId === 'undefined') {
+        throw new Error(
+          'Cannot create RT struct: referenced series is not loaded');
+      }
+      factory = new RtStructFactory();
+      if (typeof factory.checkElements(data.meta) === 'undefined') {
+        data.image = factory.create(
+          data.meta, this.#dataList[refDataId].image);
       }
     }
 
