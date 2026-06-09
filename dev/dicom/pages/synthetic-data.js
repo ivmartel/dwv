@@ -45,7 +45,12 @@ function getObjectUrlFromTags(config) {
     if (config.tags.Modality === 'SEG') {
       // simple binary
       dicomElements['7FE00010'] =
-        generatePixelDataFromJSONTags(config.tags, 'binary');
+        generatePixelDataFromJSONTags(
+          config.tags, {
+            pixelGeneratorName: 'binary',
+            segmentSquares: config.segmentSquares
+          }
+        );
     } else {
       // default to grad square
       dicomElements['7FE00010'] =

@@ -675,7 +675,11 @@
 },
 {
     "name": "test-11",
-    "description": "DICOM SEG test data.",
+    "description": "DICOM SEG test data with two non-overlapping segments, referencing test-00.",
+    "segmentSquares": {
+        "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
+        "2": {"minI": 12, "maxI": 18, "minJ": 12, "maxJ": 18}
+    },
     "tags": {
         "Modality": "SEG",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
@@ -696,7 +700,8 @@
         "BitsAllocated": 1,
         "BitsStored": 1,
         "HighBit": 0,
-        "NumberOfFrames": 1,
+        "NumberOfFrames": 2,
+        "SegmentsOverlap": "NO",
         "SegmentationType": "BINARY",
         "DimensionOrganizationType": "3D",
         "DimensionOrganizationSequence": {
@@ -717,7 +722,7 @@
             "value": [
                 {
                     "SegmentNumber": 1,
-                    "SegmentLabel": "Segment1",
+                    "SegmentLabel": "Square1",
                     "SegmentAlgorithmType": "AUTOMATIC",
                     "RecommendedDisplayCIELabValue": [34886, 53483, 50172],
                     "SegmentedPropertyCategoryCodeSequence": {
@@ -726,7 +731,6 @@
                                 "CodeMeaning": "Segmentation",
                                 "CodeValue": "113076",
                                 "CodingSchemeDesignator": "DCM"
-
                             }
                         ]
                     },
@@ -736,7 +740,30 @@
                                 "CodeMeaning": "Segmentation",
                                 "CodeValue": "113076",
                                 "CodingSchemeDesignator": "DCM"
-
+                            }
+                        ]
+                    }
+                },
+                {
+                    "SegmentNumber": 2,
+                    "SegmentLabel": "Square2",
+                    "SegmentAlgorithmType": "AUTOMATIC",
+                    "RecommendedDisplayCIELabValue": [57499, 10746, 49716],
+                    "SegmentedPropertyCategoryCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113076",
+                                "CodingSchemeDesignator": "DCM"
+                            }
+                        ]
+                    },
+                    "SegmentedPropertyTypeCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113076",
+                                "CodingSchemeDesignator": "DCM"
                             }
                         ]
                     }
@@ -788,6 +815,29 @@
                             }
                         ]
                     }
+                },
+                {
+                    "FrameContentSequence": {
+                        "value": [
+                            {
+                                "DimensionIndexValues": [2, 1]
+                            }
+                        ]
+                    },
+                    "PlanePositionSequence": {
+                        "value": [
+                            {
+                                "ImagePositionPatient": [0, 0, 0]
+                            }
+                        ]
+                    },
+                    "SegmentIdentificationSequence": {
+                        "value": [
+                            {
+                                "ReferencedSegmentNumber": 2
+                            }
+                        ]
+                    }
                 }
             ]
         }
@@ -795,6 +845,176 @@
 },
 {
     "name": "test-12",
+    "description": "DICOM SEG test data with two overlapping segments, referencing test-00.",
+    "segmentSquares": {
+        "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
+        "2": {"minI": 8, "maxI": 14, "minJ": 8, "maxJ": 14}
+    },
+    "tags": {
+        "Modality": "SEG",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
+        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
+        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
+        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
+        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.13",
+        "PatientID": "0123456",
+        "PatientName": "dwv^PatientName",
+        "OtherPatientNames": "dwv^PatientOtherName",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 1,
+        "BitsStored": 1,
+        "HighBit": 0,
+        "NumberOfFrames": 2,
+        "SegmentsOverlap": "YES",
+        "SegmentationType": "BINARY",
+        "DimensionOrganizationType": "3D",
+        "DimensionOrganizationSequence": {
+            "value": [
+                {
+                    "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319"
+                }
+            ]
+        },
+        "ReferencedSeriesSequence": {
+            "value": [
+                {
+                    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
+                }
+            ]
+        },
+        "SegmentSequence": {
+            "value": [
+                {
+                    "SegmentNumber": 1,
+                    "SegmentLabel": "Square1",
+                    "SegmentAlgorithmType": "AUTOMATIC",
+                    "RecommendedDisplayCIELabValue": [34886, 53483, 50172],
+                    "SegmentedPropertyCategoryCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113076",
+                                "CodingSchemeDesignator": "DCM"
+                            }
+                        ]
+                    },
+                    "SegmentedPropertyTypeCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113076",
+                                "CodingSchemeDesignator": "DCM"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "SegmentNumber": 2,
+                    "SegmentLabel": "Square2",
+                    "SegmentAlgorithmType": "AUTOMATIC",
+                    "RecommendedDisplayCIELabValue": [57499, 10746, 49716],
+                    "SegmentedPropertyCategoryCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113076",
+                                "CodingSchemeDesignator": "DCM"
+                            }
+                        ]
+                    },
+                    "SegmentedPropertyTypeCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113076",
+                                "CodingSchemeDesignator": "DCM"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "SharedFunctionalGroupsSequence": {
+            "value": [
+                {
+                    "PixelMeasuresSequence": {
+                        "value": [
+                            {
+                                "PixelSpacing": [1, 1],
+                                "SpacingBetweenSlices": 1
+                            }
+                        ]
+                    },
+                    "PlaneOrientationSequence": {
+                        "value": [
+                            {
+                                "ImageOrientationPatient": [1, 0, 0, 0, 1, 0]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "PerFrameFunctionalGroupsSequence": {
+            "value": [
+                {
+                    "FrameContentSequence": {
+                        "value": [
+                            {
+                                "DimensionIndexValues": [1, 1]
+                            }
+                        ]
+                    },
+                    "PlanePositionSequence": {
+                        "value": [
+                            {
+                                "ImagePositionPatient": [0, 0, 0]
+                            }
+                        ]
+                    },
+                    "SegmentIdentificationSequence": {
+                        "value": [
+                            {
+                                "ReferencedSegmentNumber": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "FrameContentSequence": {
+                        "value": [
+                            {
+                                "DimensionIndexValues": [2, 1]
+                            }
+                        ]
+                    },
+                    "PlanePositionSequence": {
+                        "value": [
+                            {
+                                "ImagePositionPatient": [0, 0, 0]
+                            }
+                        ]
+                    },
+                    "SegmentIdentificationSequence": {
+                        "value": [
+                            {
+                                "ReferencedSegmentNumber": 2
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+},
+{
+    "name": "test-13",
     "description": "DICOM RTSTRUCT test data with two non-overlapping squares, referencing test-00.",
     "tags": {
         "Modality": "RTSTRUCT",
@@ -886,16 +1106,16 @@
     }
 },
 {
-    "name": "test-13",
+    "name": "test-14",
     "description": "DICOM RTSTRUCT test data with two overlapping squares, referencing test-00.",
     "tags": {
         "Modality": "RTSTRUCT",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
         "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
+        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.15",
+        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.15",
         "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.13",
+        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.15",
         "PatientID": "0123456",
         "PatientName": "dwv^PatientName",
         "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",

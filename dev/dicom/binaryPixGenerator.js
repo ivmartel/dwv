@@ -8,13 +8,7 @@ export class BinaryPixGenerator {
   #numberOfFrames;
   #shape = 'square';
 
-  #minI;
-  #minJ;
-  #maxI;
-  #maxJ;
-
-  #middleI;
-  #middleJ;
+  #squares;
 
   /**
    * @param {object} options The generator options.
@@ -28,16 +22,23 @@ export class BinaryPixGenerator {
       this.#shape = options.shape;
     }
 
-    const borderI = Math.ceil(this.#numberOfColumns * 0.25);
-    const borderJ = Math.ceil(this.#numberOfRows * 0.25);
+    if (typeof options.segmentSquares !== 'undefined') {
+      this.#squares = options.segmentSquares;
+    } else {
+      // default square
+      const borderI = Math.ceil(this.#numberOfColumns * 0.25);
+      const borderJ = Math.ceil(this.#numberOfRows * 0.25);
+      this.#squares = {};
+      for (let f = 0; f < this.#numberOfFrames; ++f) {
+        this.#squares[String(f + 1)] = {
+          minI: borderI,
+          maxI: this.#numberOfColumns - borderI,
+          minJ: borderJ,
+          maxJ: this.#numberOfRows - borderJ
+        };
+      }
+    }
 
-    this.#minI = borderI;
-    this.#minJ = borderJ;
-    this.#maxI = this.#numberOfColumns - borderI;
-    this.#maxJ = this.#numberOfRows - borderJ;
-
-    this.#middleI = this.#minI + Math.floor((this.#maxI - this.#minI) * 0.5);
-    this.#middleJ = this.#minJ + Math.floor((this.#maxJ - this.#minJ) * 0.5);
   }
 
   /**
@@ -48,7 +49,7 @@ export class BinaryPixGenerator {
     for (let f = 0; f < this.#numberOfFrames; ++f) {
       for (let j = 0; j < this.#numberOfRows; ++j) {
         for (let i = 0; i < this.#numberOfColumns; ++i) {
-          pixelBuffer[offset] = this.#getValue(i, j);
+          pixelBuffer[offset] = this.#getValue(i, j, f);
           ++offset;
         }
       }
@@ -58,14 +59,15 @@ export class BinaryPixGenerator {
   /**
    * @param {number} i The column index.
    * @param {number} j The row index.
+   * @param {number} f The frame index.
    * @returns {number} The value.
    */
-  #getValue = (i, j) => {
+  #getValue = (i, j, f) => {
     let res = 0;
     if (this.#shape === 'square') {
-      res = this.#getValueSquare(i, j);
+      res = this.#getValueSquare(i, j, f);
     } else if (this.#shape === 'diamond') {
-      res = this.#getValueDiamond(i, j);
+      res = this.#getValueDiamond(i, j, f);
     }
     return res;
   };
@@ -73,23 +75,31 @@ export class BinaryPixGenerator {
   /**
    * @param {number} i The column index.
    * @param {number} j The row index.
+   * @param {number} f The frame index.
    * @returns {number} The value.
    */
-  #getValueSquare = (i, j) => {
-    const inRange = i >= this.#minI && i < this.#maxI &&
-      j >= this.#minJ && j < this.#maxJ;
+  #getValueSquare = (i, j, f) => {
+    const sq = this.#squares[String(f + 1)];
+    const inRange = i >= sq.minI && i < sq.maxI &&
+      j >= sq.minJ && j < sq.maxJ;
     return inRange ? 1 : 0;
   };
 
   /**
    * @param {number} i The column index.
    * @param {number} j The row index.
+   * @param {number} f The frame index.
    * @returns {number} The value.
    */
-  #getValueDiamond = (i, j) => {
+  #getValueDiamond = (i, j, f) => {
     let res = 0;
-    const n = j < this.#middleJ ? j - this.#minJ : this.#maxJ - j;
-    if (Math.abs(i - this.#middleI) < n) {
+
+    const sq = this.#squares[String(f + 1)];
+    const middleI = sq.minI + Math.floor((sq.maxI - sq.minI) * 0.5);
+    const middleJ = sq.minJ + Math.floor((sq.maxJ - sq.minJ) * 0.5);
+
+    const n = j < middleJ ? j - sq.minJ : sq.maxJ - j;
+    if (Math.abs(i - middleI) < n) {
       res = 1;
     }
     return res;

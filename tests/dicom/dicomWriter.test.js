@@ -426,9 +426,12 @@ describe('dicom', () => {
    * Simple BinaryPixGenerator.
    *
    * @param {object} tags The input tags.
+   * @param {object} segmentSquares Per-segment square bounds
+   *   keyed by segment number string. Each entry has
+   *   {minI, maxI, minJ, maxJ}.
    * @returns {object} The pixel buffer.
    */
-  function generateBinary(tags) {
+  function generateBinary(tags, segmentSquares) {
 
     const numberOfColumns = tags.Columns;
     const numberOfRows = tags.Rows;
@@ -439,26 +442,17 @@ describe('dicom', () => {
     const dataLength = numberOfRows * numberOfColumns * numberOfFrames;
     const pixelBuffer = new Uint8Array(dataLength);
 
-    const borderI = Math.ceil(numberOfColumns * 0.25);
-    const borderJ = Math.ceil(numberOfRows * 0.25);
-
-    const minI = borderI;
-    const minJ = borderJ;
-    const maxI = numberOfColumns - borderI;
-    const maxJ = numberOfRows - borderJ;
-
-    const getFunc = function (i, j) {
-      const inRange = i >= minI && i < maxI &&
-        j >= minJ && j < maxJ;
-      return inRange ? 1 : 0;
-    };
-
     // main loop
     let offset = 0;
     for (let f = 0; f < numberOfFrames; ++f) {
+      // use frame + 1 as segment number
+      const {minI, maxI, minJ, maxJ} = segmentSquares[String(f + 1)];
+
       for (let j = 0; j < numberOfRows; ++j) {
         for (let i = 0; i < numberOfColumns; ++i) {
-          pixelBuffer[offset] = getFunc(i, j);
+          const inRange = i >= minI && i < maxI &&
+            j >= minJ && j < maxJ;
+          pixelBuffer[offset] = inRange ? 1 : 0;
           ++offset;
         }
       }
@@ -510,7 +504,9 @@ describe('dicom', () => {
     ) {
       if (config.tags.Modality === 'SEG') {
         // simple binary
-        dicomElements['7FE00010'] = generateBinary(config.tags);
+        dicomElements['7FE00010'] = generateBinary(
+          config.tags, config.segmentSquares
+        );
       } else {
         // grad square
         dicomElements['7FE00010'] = generateGradSquare(config.tags);

@@ -70,27 +70,30 @@ export function checkTags(tags, requiredTags, withLog) {
  * Get the DICOM pixel data from a DICOM tags object.
  *
  * @param {object} tags The DICOM tags object.
- * @param {string} [pixGeneratorName] The name of a pixel generator,
- * defaults to gradSquare.
- * @param {number} [sliceNumber] The slice number,
- * default to 0.
- * @param {Array} [images] The images to pass to the generator.
- * @param {number} [numberOfSlices] The result number of slices,
- * default to 1.
+ * @param {object} [options] The options for pixel generation.
+ * @param {string} [options.pixelGeneratorName] The name of the pixel generator
+ *   to use, defaults to gradSquare.
+ * @param {number} [options.sliceNumber] The slice number,
+ *   default to 0.
+ * @param {Array} [options.images] The images to pass to the generator.
+ * @param {number} [options.numberOfSlices] The result number of slices,
+ *   default to 1.
  * @returns {object} The DICOM pixel data element.
  */
 export function generatePixelDataFromJSONTags(
-  tags, pixGeneratorName, sliceNumber, images, numberOfSlices) {
-
+  tags, options) {
+  if (typeof options === 'undefined') {
+    options = {};
+  }
   // default
-  if (typeof pixGeneratorName === 'undefined') {
-    pixGeneratorName = 'gradSquare';
+  if (typeof options.pixelGeneratorName === 'undefined') {
+    options.pixelGeneratorName = 'gradSquare';
   }
-  if (typeof sliceNumber === 'undefined') {
-    sliceNumber = 0;
+  if (typeof options.sliceNumber === 'undefined') {
+    options.sliceNumber = 0;
   }
-  if (typeof numberOfSlices === 'undefined') {
-    numberOfSlices = 1;
+  if (typeof options.numberOfSlices === 'undefined') {
+    options.numberOfSlices = 1;
   }
 
   // check tags
@@ -101,7 +104,10 @@ export function generatePixelDataFromJSONTags(
   // extract info from tags
   const numberOfRows = tags.Rows;
   const numberOfColumns = tags.Columns;
-  const numberOfFrames = tags.NumberOfFrames;
+  let numberOfFrames = 1;
+  if (typeof tags.NumberOfFrames !== 'undefined') {
+    numberOfFrames = tags.NumberOfFrames;
+  }
   const bitsAllocated = tags.BitsAllocated;
   const pixelRepresentation = tags.PixelRepresentation;
   const samplesPerPixel = tags.SamplesPerPixel;
@@ -109,7 +115,7 @@ export function generatePixelDataFromJSONTags(
   const photometricInterpretation = tags.PhotometricInterpretation.trim();
 
   const sliceLength = numberOfRows * numberOfColumns;
-  const dataLength = sliceLength * samplesPerPixel;
+  const dataLength = sliceLength * numberOfFrames * samplesPerPixel;
 
   // check values
   if (samplesPerPixel !== 1 && samplesPerPixel !== 3) {
@@ -149,27 +155,31 @@ export function generatePixelDataFromJSONTags(
     bitsAllocated, pixelRepresentation, dataLength);
 
   // pixels generator
-  if (typeof _pixelGenerators[pixGeneratorName] === 'undefined') {
-    throw new Error(`Unknown PixelData generator: ${pixGeneratorName}`);
+  if (typeof _pixelGenerators[options.pixelGeneratorName] === 'undefined') {
+    throw new Error(
+      `Unknown PixelData generator: ${options.pixelGeneratorName}`
+    );
   }
-  const GeneratorClass = _pixelGenerators[pixGeneratorName].generator;
+  const GeneratorClass = _pixelGenerators[options.pixelGeneratorName].generator;
   const generator = new GeneratorClass({
     numberOfColumns,
     numberOfRows,
-    numberOfSlices,
+    numberOfSlices: options.numberOfSlices,
     numberOfFrames,
     numberOfSamples,
     numberOfColourPlanes,
     photometricInterpretation,
-    imageOrientationPatient: tags.ImageOrientationPatient
+    imageOrientationPatient: tags.ImageOrientationPatient,
+    segmentSquares: options.segmentSquares
   });
-  if (typeof generator.setImages !== 'undefined') {
-    generator.setImages(images);
+  if (typeof generator.setImages !== 'undefined' &&
+    typeof options.images !== 'undefined') {
+    generator.setImages(options.images);
   }
   if (typeof generator.setNumberOfSlices !== 'undefined') {
-    generator.setNumberOfSlices(numberOfSlices);
+    generator.setNumberOfSlices(options.numberOfSlices);
   }
-  generator.generate(pixels, sliceNumber);
+  generator.generate(pixels, options.sliceNumber);
 
   // create and return the DICOM element
   let vr = 'OW';

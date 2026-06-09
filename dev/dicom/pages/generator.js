@@ -171,7 +171,13 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   const dicomElements = getElementsFromJSONTags(tags);
   // pixels
   dicomElements['7FE00010'] = generatePixelDataFromJSONTags(
-    tags, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
+    tags, {
+      pixelGeneratorName,
+      sliceNumber,
+      images: _images,
+      numberOfSlices
+    }
+  );
 
   // create writer
   const writer = new DicomWriter();

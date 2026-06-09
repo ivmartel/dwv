@@ -63,12 +63,12 @@ describe('RtStructFactory', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Non-overlapping squares — test-12
+  // Non-overlapping squares — test-13
   // Square 1: col=4..10, row=4..10 | Square 2: col=12..18, row=12..18
   // -------------------------------------------------------------------------
 
   test('create: non-overlapping squares, no overlap flag', () => {
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-13');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -87,7 +87,7 @@ describe('RtStructFactory', () => {
   });
 
   test('create: non-overlapping squares pixel values in label map', () => {
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-13');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -102,7 +102,7 @@ describe('RtStructFactory', () => {
   });
 
   test('create: non-overlapping squares segment collection', () => {
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-13');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -128,7 +128,7 @@ describe('RtStructFactory', () => {
   });
 
   test('toDicom: non-overlapping squares round-trip', () => {
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-13');
     const factory = new RtStructFactory();
     const refImage = buildRefImage();
     const image = factory.create(configToElements(config), refImage);
@@ -167,7 +167,7 @@ describe('RtStructFactory', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Overlapping squares — test-13
+  // Overlapping squares — test-14
   // Square 1: col=4..10, row=4..10 | Square 2: col=8..14, row=8..14
   // -------------------------------------------------------------------------
 
@@ -175,7 +175,7 @@ describe('RtStructFactory', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
       .mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-14');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -204,7 +204,7 @@ describe('RtStructFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-14');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -222,7 +222,7 @@ describe('RtStructFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-14');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -257,7 +257,7 @@ describe('RtStructFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-14');
     const factory = new RtStructFactory();
     const refImage = buildRefImage();
     const image = factory.create(configToElements(config), refImage);
