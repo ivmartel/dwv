@@ -597,15 +597,12 @@ export class BrushMaskPaint extends EventTarget {
     // reference UID
     const refSeriesUID = mask.getMaskReferencedSeriesUID();
     // search app for the data ID of this SeriesUID...
-    let ids = [];
+    let dataId;
     if (refSeriesUID !== 'undefined') {
       const dataCtrl = this.#app.getDataController();
-      ids = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
+      dataId = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
     }
-    let dataId = '0';
-    if (ids.length > 0) {
-      dataId = ids[0];
-    } else {
+    if (typeof dataId === 'undefined') {
       // mask with no reference data...
       logger.warn(
         formatString(ERROR_MESSAGES.brush.cannotFindSourceData, refSeriesUID));
