@@ -814,6 +814,20 @@
                 "ReferencedSegmentNumber": 1
               }
             ]
+          },
+          "DerivationImageSequence": {
+            "value": [
+              {
+                "SourceImageSequence": {
+                  "value": [
+                    {
+                      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                      "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
@@ -835,6 +849,20 @@
             "value": [
               {
                 "ReferencedSegmentNumber": 2
+              }
+            ]
+          },
+          "DerivationImageSequence": {
+            "value": [
+              {
+                "SourceImageSequence": {
+                  "value": [
+                    {
+                      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                      "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -984,6 +1012,20 @@
                 "ReferencedSegmentNumber": 1
               }
             ]
+          },
+          "DerivationImageSequence": {
+            "value": [
+              {
+                "SourceImageSequence": {
+                  "value": [
+                    {
+                      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                      "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
@@ -1005,6 +1047,20 @@
             "value": [
               {
                 "ReferencedSegmentNumber": 2
+              }
+            ]
+          },
+          "DerivationImageSequence": {
+            "value": [
+              {
+                "SourceImageSequence": {
+                  "value": [
+                    {
+                      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                      "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                    }
+                  ]
+                }
               }
             ]
           }
