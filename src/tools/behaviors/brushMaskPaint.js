@@ -588,62 +588,29 @@ export class BrushMaskPaint extends EventTarget {
   }
 
   /**
-   * Get the first referenced UID of a mask image.
-   *
-   * @param {object} meta The mask image meta.
-   * @returns {string|undefined} The UID.
-   */
-  #getReferenceDataUID(meta) {
-    const customMeta = meta.custom;
-    const frameInfos = customMeta.frameInfos;
-    if (frameInfos.length === 0) {
-      return;
-    }
-    // DerivationImageSequence (0008,9124)
-    const derivationImages = frameInfos[0].derivationImages;
-    if (typeof derivationImages === 'undefined') {
-      return;
-    }
-    if (derivationImages.length === 0) {
-      return;
-    }
-    // SourceImageSequence (0008,2112)
-    const sourceImages = derivationImages[0].sourceImages;
-    if (typeof sourceImages === 'undefined') {
-      return;
-    }
-    if (sourceImages.length === 0) {
-      return;
-    }
-    // ReferencedSOPInstanceUID (0008,1155)
-    return sourceImages[0].referencedSOPInstanceUID;
-  }
-
-  /**
-   * Get the source data id from the mask image meta.
+   * Get the source data id from the mask image.
    *
    * @param {Image} mask The mask image.
    * @returns {string} The source data id.
    */
   #getSourceDataIdFromMask(mask) {
-    // get source id from mask meta
-    const meta = mask.getMeta();
-    const sourceDataUID = this.#getReferenceDataUID(meta);
-    // search app for the data ID of this SOPInstanceUID...
+    // reference UID
+    const refSeriesUID = mask.getMaskReferencedSeriesUID();
+    // search app for the data ID of this SeriesUID...
     let ids = [];
-    if (sourceDataUID !== 'undefined') {
+    if (refSeriesUID !== 'undefined') {
       const dataCtrl = this.#app.getDataController();
-      ids = dataCtrl.getDataIdsFromSopUids([sourceDataUID]);
+      ids = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
     }
-    let sourceDataId = '0';
+    let dataId = '0';
     if (ids.length > 0) {
-      sourceDataId = ids[0];
+      dataId = ids[0];
     } else {
-      // mask with no source data...
+      // mask with no reference data...
       logger.warn(
-        formatString(ERROR_MESSAGES.brush.cannotFindSourceData, sourceDataUID));
+        formatString(ERROR_MESSAGES.brush.cannotFindSourceData, refSeriesUID));
     }
-    return sourceDataId;
+    return dataId;
   }
 
   /**
@@ -716,16 +683,16 @@ export class BrushMaskPaint extends EventTarget {
     const viewController = viewLayer.getViewController();
     const savedPosition = viewController.getCurrentPosition();
 
-    const searchMaskMeta = {
-      Modality: 'SEG'
-    };
+    const segMeta = {Modality: 'SEG'};
+    const rtssMeta = {Modality: 'RTSTRUCT'};
 
     // update existing mask from current vl or create a new one
     let maskVl;
     let maskVc;
     let sourcePosition;
     let sourceImage;
-    if (viewController.equalImageMeta(searchMaskMeta)) {
+    if (viewController.equalImageMeta(segMeta) ||
+      viewController.equalImageMeta(rtssMeta)) {
       this.#mask = this.#getMaskImage(this.#maskDataId);
       // get source image
       const sourceDataId = this.#getSourceDataIdFromMask(this.#mask);
