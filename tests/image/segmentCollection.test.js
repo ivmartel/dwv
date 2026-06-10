@@ -1,10 +1,11 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, afterEach} from 'vitest';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
+import * as loggerModule from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'image/segmentCollection.js' file.
@@ -66,6 +67,10 @@ function makeSeg(number) {
 // ---------------------------------------------------------------------------
 
 describe('SegmentCollection', () => {
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   // -------------------------------------------------------------------------
   // getLabelMap — basic construction
@@ -144,6 +149,9 @@ describe('SegmentCollection', () => {
   });
 
   test('getHasOverlap is true when two segments share a voxel', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
+
     // both segments cover offset 1 of slice 0
     const geom = makeGeometry(3, 1, 1);
     const collection = new SegmentCollection(geom);
@@ -151,11 +159,21 @@ describe('SegmentCollection', () => {
     collection.addFrame(2, makePixelBuffer(3, [1, 2]), 0, 0, 3, 2);
 
     assert.equal(collection.getHasOverlap(), true, 'overlap at offset 1');
+
+    assert.ok(
+      warnSpy.mock.calls.some(
+        ([msg]) => msg === 'SegmentCollection: detected overlapping segments'
+      ),
+      'overlap warning logged during create'
+    );
+
   });
 
   test(
     'getLabelMap first-wins: lower segment number keeps overlap voxel',
     () => {
+      vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+
       // seg 1 and seg 2 both cover offset 1; seg 1 is added first
       const geom = makeGeometry(3, 1, 1);
       const collection = new SegmentCollection(geom);
@@ -170,6 +188,8 @@ describe('SegmentCollection', () => {
   test(
     'getHasOverlap works correctly before getLabelMap is called explicitly',
     () => {
+      vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+
       // Regression: flag must be valid even if getLabelMap was never called
       const geom = makeGeometry(2, 1, 1);
       const collection = new SegmentCollection(geom);
