@@ -1,0 +1,357 @@
+import {describe, test, assert, vi, afterEach} from 'vitest';
+import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
+import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
+import {getSegment} from '../../src/dicom/dicomSegment.js';
+import {safeGetAll} from '../../src/dicom/dataElement.js';
+import {MaskFactory} from '../../src/image/maskFactory.js';
+import {Image} from '../../src/image/image.js';
+import {Geometry} from '../../src/image/geometry.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Point3D} from '../../src/math/point.js';
+import * as loggerModule from '../../src/utils/logger.js';
+
+import syntheticData from '/tests/data/synthetic-data.json';
+
+/**
+ * Tests for the 'image/maskFactory.js' file.
+ */
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a minimal reference Image matching test-00 geometry.
+ *
+ * @returns {Image} The reference image.
+ */
+function buildRefImage() {
+  const config = syntheticData.find(c => c.name === 'test-00');
+  const tags = config.tags;
+  const geo = new Geometry(
+    [new Point3D(0, 0, 0)],
+    new Size([tags.Columns, tags.Rows, 1]),
+    new Spacing([1, 1, 1])
+  );
+  const buffer = new Uint16Array(tags.Columns * tags.Rows);
+  const image = new Image(geo, buffer, [tags.SOPInstanceUID]);
+  image.setMeta({
+    SeriesInstanceUID: tags.SeriesInstanceUID,
+    StudyInstanceUID: tags.StudyInstanceUID,
+    SOPClassUID: tags.SOPClassUID
+  });
+  return image;
+}
+
+/**
+ * Parse synthetic SEG config tags into DICOM data elements.
+ *
+ * @param {object} config A synthetic-data entry.
+ * @returns {Record<string, object>} DICOM data elements.
+ */
+function configToElements(config) {
+  return getElementsFromJSONTags(structuredClone(config.tags));
+}
+
+/**
+ * Build a binary pixel buffer encoding the per-segment squares
+ * defined in config.segmentSquares.
+ *
+ * @param {object} config A synthetic-data SEG entry with segmentSquares.
+ * @returns {Uint8Array} Flat pixel buffer (rows × cols × nFrames).
+ */
+function buildPixelBuffer(config) {
+  const tags = config.tags;
+  const width = tags.Columns;
+  const height = tags.Rows;
+  const nFrames = tags.NumberOfFrames;
+  const buffer = new Uint8Array(width * height * nFrames);
+  const perFrameSeq = tags.PerFrameFunctionalGroupsSequence.value;
+  for (let f = 0; f < nFrames; ++f) {
+    const segNum =
+      perFrameSeq[f].SegmentIdentificationSequence.value[0]
+        .ReferencedSegmentNumber;
+    const sq = config.segmentSquares[String(segNum)];
+    if (sq) {
+      for (let j = sq.minJ; j < sq.maxJ; ++j) {
+        for (let i = sq.minI; i < sq.maxI; ++i) {
+          buffer[f * width * height + j * width + i] = 1;
+        }
+      }
+    }
+  }
+  return buffer;
+}
+
+/**
+ * Extract the segment array from DICOM data elements.
+ *
+ * @param {Record<string, object>} elements DICOM data elements.
+ * @returns {Array} Array of MaskSegment objects.
+ */
+function getSegmentsFromElements(elements) {
+  const segSeq = safeGetAll(elements, '00620002');
+  return segSeq ? segSeq.map(item => getSegment(item)) : [];
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+describe('MaskFactory', () => {
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // -------------------------------------------------------------------------
+  // Non-overlapping squares — test-11
+  // Square 1: col=4..10, row=4..10 | Square 2: col=12..18, row=12..18
+  // -------------------------------------------------------------------------
+
+  test('create: non-overlapping squares, no overlap flag', () => {
+    const config = syntheticData.find(c => c.name === 'test-11');
+    const factory = new MaskFactory();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), buildRefImage()
+    );
+
+    const meta = image.getMeta();
+    const segments = meta.custom.segments;
+    assert.equal(segments.length, 2, 'two segments created');
+    assert.equal(segments[0].label, 'Square1', 'segment 1 name');
+    assert.equal(segments[1].label, 'Square2', 'segment 2 name');
+    assert.equal(image.getHasOverlap(), false, 'no overlap detected');
+    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    assert.equal(
+      image.getMaskReferencedSeriesUID(),
+      refConfig.tags.SeriesInstanceUID,
+      'referencedSeriesUID matches test-00'
+    );
+  });
+
+  test('create: non-overlapping squares pixel values in label map', () => {
+    const config = syntheticData.find(c => c.name === 'test-11');
+    const factory = new MaskFactory();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), buildRefImage()
+    );
+
+    const buf = image.getBuffer();
+    const width = 32;
+    // square 1 center at (col=7, row=7)
+    assert.equal(buf[7 * width + 7], 1, 'square 1 center is segment 1');
+    // square 2 center at (col=15, row=15)
+    assert.equal(buf[15 * width + 15], 2, 'square 2 center is segment 2');
+    // gap between the two squares
+    assert.equal(buf[11 * width + 11], 0, 'gap between squares is background');
+  });
+
+  test('create: non-overlapping squares segment collection', () => {
+    const config = syntheticData.find(c => c.name === 'test-11');
+    const factory = new MaskFactory();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), buildRefImage()
+    );
+
+    const collection = image.getSegmentCollection();
+    assert.ok(collection !== undefined, 'segment collection exists');
+
+    const all = collection.getAll();
+    assert.equal(all.size, 2, 'two per-segment entries');
+
+    const width = 32;
+    const seg1 = all.get(1)?.get(0);
+    const seg2 = all.get(2)?.get(0);
+    assert.ok(seg1 !== undefined, 'segment 1 slice 0 present');
+    assert.ok(seg2 !== undefined, 'segment 2 slice 0 present');
+
+    // segment 1 covers col=4..10, row=4..10
+    assert.equal(seg1[7 * width + 7], 1, 'seg 1 buf: center pixel = 1');
+    assert.equal(seg1[15 * width + 15], 0, 'seg 1 buf: sq 2 pixel = 0');
+
+    // segment 2 covers col=12..18, row=12..18
+    assert.equal(seg2[15 * width + 15], 2, 'seg 2 buf: center pixel = 2');
+    assert.equal(seg2[7 * width + 7], 0, 'seg 2 buf: sq 1 pixel = 0');
+  });
+
+  test('toDicom: non-overlapping squares round-trip', () => {
+    const config = syntheticData.find(c => c.name === 'test-11');
+    const factory = new MaskFactory();
+    const refImage = buildRefImage();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), refImage
+    );
+    const segments = image.getMeta().custom.segments;
+    const outElements = factory.toDicom(image, segments, refImage);
+
+    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    assert.equal(
+      getReferencedSeriesUID(outElements),
+      refConfig.tags.SeriesInstanceUID,
+      'output referencedSeriesUID matches test-00'
+    );
+
+    const inSegs = getSegmentsFromElements(configToElements(config));
+    const outSegs = getSegmentsFromElements(outElements);
+
+    assert.equal(outSegs.length, inSegs.length, 'same segment count');
+    for (let i = 0; i < inSegs.length; i++) {
+      assert.equal(outSegs[i].label, inSegs[i].label, `seg ${i + 1} label`);
+      assert.equal(
+        outSegs[i].displayRGBValue.r,
+        inSegs[i].displayRGBValue.r,
+        `seg ${i + 1} red`
+      );
+      assert.equal(
+        outSegs[i].displayRGBValue.g,
+        inSegs[i].displayRGBValue.g,
+        `seg ${i + 1} green`
+      );
+      assert.equal(
+        outSegs[i].displayRGBValue.b,
+        inSegs[i].displayRGBValue.b,
+        `seg ${i + 1} blue`
+      );
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // Overlapping squares — test-12
+  // Square 1: col=4..10, row=4..10 | Square 2: col=8..14, row=8..14
+  // -------------------------------------------------------------------------
+
+  test('create: overlapping squares, overlap flag detected', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
+
+    const config = syntheticData.find(c => c.name === 'test-12');
+    const factory = new MaskFactory();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), buildRefImage()
+    );
+
+    assert.ok(
+      warnSpy.mock.calls.some(
+        ([msg]) => msg === 'SegmentCollection: detected overlapping segments'
+      ),
+      'overlap warning logged during create'
+    );
+
+    const meta = image.getMeta();
+    const segments = meta.custom.segments;
+    assert.equal(segments.length, 2, 'two segments created');
+    assert.equal(segments[0].label, 'Square1', 'segment 1 name');
+    assert.equal(segments[1].label, 'Square2', 'segment 2 name');
+    assert.equal(image.getHasOverlap(), true, 'overlap detected');
+    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    assert.equal(
+      image.getMaskReferencedSeriesUID(),
+      refConfig.tags.SeriesInstanceUID,
+      'referencedSeriesUID matches test-00'
+    );
+  });
+
+  test('create: overlapping squares pixel values in label map', () => {
+    // hide logging
+    vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+
+    const config = syntheticData.find(c => c.name === 'test-12');
+    const factory = new MaskFactory();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), buildRefImage()
+    );
+
+    const buf = image.getBuffer();
+    const width = 32;
+    // square 1 exclusive area center at (col=6, row=6)
+    assert.equal(buf[6 * width + 6], 1, 'sq 1 exclusive area is seg 1');
+    // square 2 exclusive area center at (col=12, row=12)
+    assert.equal(buf[12 * width + 12], 2, 'sq 2 exclusive area is seg 2');
+    // overlap center at (col=9, row=9); seg 1 wins
+    assert.equal(buf[9 * width + 9], 1, 'overlap pixel retains first segment');
+  });
+
+  test('create: overlapping squares segment collection', () => {
+    // hide logging
+    vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+
+    const config = syntheticData.find(c => c.name === 'test-12');
+    const factory = new MaskFactory();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), buildRefImage()
+    );
+
+    const collection = image.getSegmentCollection();
+    assert.ok(collection !== undefined, 'segment collection exists');
+
+    const all = collection.getAll();
+    assert.equal(all.size, 2, 'two per-segment entries');
+
+    const width = 32;
+    const seg1 = all.get(1)?.get(0);
+    const seg2 = all.get(2)?.get(0);
+    assert.ok(seg1 !== undefined, 'segment 1 slice 0 present');
+    assert.ok(seg2 !== undefined, 'segment 2 slice 0 present');
+
+    // segment 1 covers col=4..10, row=4..10
+    assert.equal(seg1[6 * width + 6], 1, 'seg 1 buf: exclusive pixel = 1');
+    // segment 2 covers col=8..14, row=8..14
+    assert.equal(seg2[12 * width + 12], 2, 'seg 2 buf: exclusive pixel = 2');
+
+    // overlap zone at (col=9, row=9)
+    assert.equal(seg1[9 * width + 9], 1, 'seg 1 buf: overlap pixel = 1');
+    assert.equal(seg2[9 * width + 9], 2, 'seg 2 buf: overlap pixel = 2');
+    // label map: first segment wins
+    assert.equal(
+      image.getBuffer()[9 * width + 9], 1,
+      'label map: overlap pixel = 1 (first wins)'
+    );
+  });
+
+  test('toDicom: overlapping squares round-trip', () => {
+    // hide logging
+    vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+
+    const config = syntheticData.find(c => c.name === 'test-12');
+    const factory = new MaskFactory();
+    const refImage = buildRefImage();
+    const image = factory.create(
+      configToElements(config), buildPixelBuffer(config), refImage
+    );
+    const segments = image.getMeta().custom.segments;
+    const outElements = factory.toDicom(image, segments, refImage);
+
+    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    assert.equal(
+      getReferencedSeriesUID(outElements),
+      refConfig.tags.SeriesInstanceUID,
+      'output referencedSeriesUID matches test-00'
+    );
+
+    const inSegs = getSegmentsFromElements(configToElements(config));
+    const outSegs = getSegmentsFromElements(outElements);
+
+    assert.equal(outSegs.length, inSegs.length, 'same segment count');
+    for (let i = 0; i < inSegs.length; i++) {
+      assert.equal(outSegs[i].label, inSegs[i].label, `seg ${i + 1} label`);
+      assert.equal(
+        outSegs[i].displayRGBValue.r,
+        inSegs[i].displayRGBValue.r,
+        `seg ${i + 1} red`
+      );
+      assert.equal(
+        outSegs[i].displayRGBValue.g,
+        inSegs[i].displayRGBValue.g,
+        `seg ${i + 1} green`
+      );
+      assert.equal(
+        outSegs[i].displayRGBValue.b,
+        inSegs[i].displayRGBValue.b,
+        `seg ${i + 1} blue`
+      );
+    }
+  });
+
+});
