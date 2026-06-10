@@ -1,1200 +1,1200 @@
 [
 {
-    "name": "test-00",
-    "description": "Simple test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.1",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.1",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11
-    }
+  "name": "test-00",
+  "description": "Simple test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.1",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.1",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11
+  }
 },
 {
-    "name": "test-01",
-    "description": "PixelRepresentation=1 test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.2",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.2",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.2",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 1,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11
-    }
+  "name": "test-01",
+  "description": "PixelRepresentation=1 test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.2",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.2",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.2",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 1,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11
+  }
 },
 {
-    "name": "test-02",
-    "description": "8bits RGB test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.3",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.3",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.3",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "RGB",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 3,
-        "PlanarConfiguration": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 8,
-        "BitsStored": 8,
-        "HighBit": 7
-    }
+  "name": "test-02",
+  "description": "8bits RGB test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.3",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.3",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.3",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "RGB",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 3,
+    "PlanarConfiguration": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 8,
+    "BitsStored": 8,
+    "HighBit": 7
+  }
 },
 {
-    "name": "test-03",
-    "description": "Explicit length sequence test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.4",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.4",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.4",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11,
-        "ReferencedImageSequence": {
-            "undefinedLength": false,
-            "value": [
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-                },
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-                }
-            ]
+  "name": "test-03",
+  "description": "Explicit length sequence test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.4",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.4",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.4",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11,
+    "ReferencedImageSequence": {
+      "undefinedLength": false,
+      "value": [
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+        },
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
         }
+      ]
     }
+  }
 },
 {
-    "name": "test-04",
-    "description": "Implicit length sequence test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.5",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.5",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.5",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11,
-        "ReferencedImageSequence": {
-            "undefinedLength": true,
-            "value": [
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-                },
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-                }
-            ]
+  "name": "test-04",
+  "description": "Implicit length sequence test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.5",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.5",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.5",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11,
+    "ReferencedImageSequence": {
+      "undefinedLength": true,
+      "value": [
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+        },
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
         }
+      ]
     }
+  }
 },
 {
-    "name": "test-05",
-    "description": "Massive sequence test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.6",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.6",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.6",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11,
-        "ReferencedImageSequence": {
-            "undefinedLength": false,
-            "value": [
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-                },
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-                },
-                {}
-            ]
+  "name": "test-05",
+  "description": "Massive sequence test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.6",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.6",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.6",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11,
+    "ReferencedImageSequence": {
+      "undefinedLength": false,
+      "value": [
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
         },
-        "SourceImageSequence": {
-            "undefinedLength": true,
-            "value": [
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-                },
-                {
-                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-                },
-                0
-            ]
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
         },
-        "ReferencedPatientSequence": {},
-        "ReferencedOverlaySequence": 0,
-        "ReferringPhysicianIdentificationSequence": {
-            "undefinedLength": false,
-            "value": []
-        },
-        "ConsultingPhysicianIdentificationSequence": {
-            "undefinedLength": true,
-            "value": 0
-        },
-        "ReferencedStudySequence": {
-            "undefinedLength": false,
-            "value": [
-                {
-                    "PurposeOfReferenceCodeSequence": {
-                        "value": [
-                            {
-                                "CodeValue": "123456"
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "ReferencedSeriesSequence": {
-            "undefinedLength": true,
-            "value": [
-                {
-                    "PurposeOfReferenceCodeSequence": {
-                        "value": [
-                            {
-                                "CodeValue": "789101"
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "ReferencedInstanceSequence": {
-            "undefinedLength": false,
-            "value": [
-                {
-                    "PurposeOfReferenceCodeSequence": {}
-                }
-            ]
-        },
-        "ReferencedVisitSequence": {
-            "undefinedLength": true,
-            "value": [
-                {
-                    "PurposeOfReferenceCodeSequence": 0
-                }
-            ]
-        }
-    }
-},
-{
-    "name": "test-06",
-    "description": "Private tags test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.7",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.7",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.7",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11,
-        "PrivateNumber": 42,
-        "PrivateSequence": {
-            "undefinedLength": true,
-            "value": [
-                {
-                    "Rows": 64,
-                    "PrivateNumber": 1701
-                }
-            ]
-        }
+        {}
+      ]
     },
-    "privateDictionary": {
-        "0011": {
-            "0000": ["UL", "1", "GenericGroupLength"],
-            "0001": ["US", "1", "PrivateNumber"],
-            "0002": ["SQ", "1", "PrivateSequence"]
-        }
+    "SourceImageSequence": {
+      "undefinedLength": true,
+      "value": [
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+        },
+        {
+          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+          "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+        },
+        0
+      ]
     },
-    "useUnVrForPrivateSq": false
-},
-{
-    "name": "test-07",
-    "description": "Private tags and VR=UN for private SQ test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.8",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.8",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.8",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11,
-        "PrivateNumber": 42,
-        "PrivateSequence": {
-            "undefinedLength": true,
-            "value": [
-                {
-                    "Rows": 64,
-                    "PrivateNumber": 1701
-                }
-            ]
-        }
+    "ReferencedPatientSequence": {},
+    "ReferencedOverlaySequence": 0,
+    "ReferringPhysicianIdentificationSequence": {
+      "undefinedLength": false,
+      "value": []
     },
-    "privateDictionary": {
-        "0011": {
-            "0000": ["UL", "1", "GenericGroupLength"],
-            "0001": ["US", "1", "PrivateNumber"],
-            "0002": ["SQ", "1", "PrivateSequence"]
-        }
+    "ConsultingPhysicianIdentificationSequence": {
+      "undefinedLength": true,
+      "value": 0
     },
-    "useUnVrForPrivateSq": true
-},
-{
-    "name": "test-08",
-    "description": "All VRs test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.9",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.9",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.9",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11,
-        "SmallestImagePixelValue": 0,
-        "PrivateSQ": {
+    "ReferencedStudySequence": {
+      "undefinedLength": false,
+      "value": [
+        {
+          "PurposeOfReferenceCodeSequence": {
             "value": [
-                {
-                    "PrivateAE": "AE",
-                    "PrivateAS": "001D",
-                    "PrivateAT": ["(AFAF,0101)", "(AFAF,0202)"],
-                    "PrivateCS": "CODE_STRING_00",
-                    "PrivateDA": "20220124",
-                    "PrivateDS": ["-1.23456789e-15", "1.23456789e-15"],
-                    "PrivateDT": "20220124173730.999999",
-                    "PrivateFD": [-1.23456789e-308, 1.23456789e-308],
-                    "PrivateFL": [-1.1749999727240737e-38, 1.1749999727240737e-38],
-                    "PrivateIS": "1234",
-                    "PrivateLO": "LOng string",
-                    "PrivateLT": "Long Text",
-                    "PrivateOB": [0, 0],
-                    "PrivateOD": "0",
-                    "PrivateOF": 0,
-                    "PrivateOL": 0,
-                    "PrivateOV": "0",
-                    "PrivateOW": 0,
-                    "PrivatePN": "Tarquin^Fin-tim-lin-bin-whin-bim-lim-bus^-stop-Ftang-Ftang-Ole-Biscuitbarrel",
-                    "PrivateSH": "SHort string",
-                    "PrivateSL": [-2147483648, 2147483647],
-                    "PrivateSS": [-32768, 32767],
-                    "PrivateST": "Short text",
-                    "PrivateSV": ["-9223372036854775808", "9223372036854775807"],
-                    "PrivateTM": "173730.999999",
-                    "PrivateUC": "Unlimited Characters",
-                    "PrivateUI": "1.2.840.10008.5.1.4.1.1.481.13",
-                    "PrivateUL": [0, 4294967295],
-                    "PrivateUN": 0,
-                    "PrivateUR": "https://github.com/ivmartel/dwv",
-                    "PrivateUS": [0, 65535],
-                    "PrivateUT": "Unlimited Text",
-                    "PrivateUV": ["0", "18446744073709551615"]
-                }
+              {
+                "CodeValue": "123456"
+              }
             ]
+          }
         }
+      ]
     },
-    "privateDictionary": {
-        "0011": {
-            "0000": ["UL", "1", "GenericGroupLength"],
-            "0001": ["AE", "1", "PrivateAE"],
-            "0002": ["AS", "1", "PrivateAS"],
-            "0003": ["AT", "1", "PrivateAT"],
-            "0004": ["CS", "1", "PrivateCS"],
-            "0005": ["DA", "1", "PrivateDA"],
-            "0006": ["DS", "1", "PrivateDS"],
-            "0007": ["DT", "1", "PrivateDT"],
-            "0008": ["FL", "1", "PrivateFL"],
-            "0009": ["FD", "1", "PrivateFD"],
-            "0010": ["IS", "1", "PrivateIS"],
-            "0011": ["LO", "1", "PrivateLO"],
-            "0012": ["LT", "1", "PrivateLT"],
-            "0013": ["OB", "1", "PrivateOB"],
-            "0014": ["OD", "1", "PrivateOD"],
-            "0015": ["OF", "1", "PrivateOF"],
-            "0016": ["OL", "1", "PrivateOL"],
-            "0017": ["OV", "1", "PrivateOV"],
-            "0018": ["OW", "1", "PrivateOW"],
-            "0019": ["PN", "1", "PrivatePN"],
-            "0020": ["SH", "1", "PrivateSH"],
-            "0021": ["SL", "1", "PrivateSL"],
-            "0022": ["SQ", "1", "PrivateSQ"],
-            "0023": ["SS", "1", "PrivateSS"],
-            "0024": ["ST", "1", "PrivateST"],
-            "0025": ["SV", "1", "PrivateSV"],
-            "0026": ["TM", "1", "PrivateTM"],
-            "0027": ["UC", "1", "PrivateUC"],
-            "0028": ["UI", "1", "PrivateUI"],
-            "0029": ["UL", "1", "PrivateUL"],
-            "0030": ["UN", "1", "PrivateUN"],
-            "0031": ["UR", "1", "PrivateUR"],
-            "0032": ["US", "1", "PrivateUS"],
-            "0033": ["UT", "1", "PrivateUT"],
-            "0034": ["UV", "1", "PrivateUV"]
-        }
-    }
-},
-{
-    "name": "test-09",
-    "description": "UTF-8 charset test data.",
-    "tags": {
-        "Modality": "MR",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.10",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.10",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.10",
-        "SpecificCharacterSet": "ISO_IR 192",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "déjà-ñu greek: ελληνικά arab: اَلْعَرَبِيَّةُ chinese: 中文",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "ImageType": ["ORIGINAL", "PRIMARY"],
-        "ImageOrientationPatient": [1,0,0,0,1,0],
-        "ImagePositionPatient": [0,0,0],
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "PixelSpacing": [1, 1],
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11
-    }
-},
-{
-    "name": "test-10",
-    "description": "DICOM KOS test data (non image)",
-    "tags": {
-        "Modality": "KO",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.11",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.11",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.11",
-        "ReferencedRequestSequence": {
-           "value": [
-                {
-                    "StudyInstanceUID": "2.25.230835838210269490877844054010808345443",
-                    "RequestedProcedureID": "dwv_test"
-                }
-           ]
-        },
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "ValueType": "CONTAINER",
-        "ConceptNameCodeSequence": {
-           "value": [
-                {
-                    "CodeValue": "113000",
-                    "CodingSchemeDesignator": "DCM",
-                    "CodeMeaning": "Of Interest"
-                }
-           ]
-        },
-        "ContinuityOfContent": "SEPARATE",
-        "CurrentRequestedProcedureEvidenceSequence": {
-           "value": [
-                {
-                    "ReferencedSeriesSequence": {
-                        "value": [
-                            {
-                                "ReferencedSOPSequence": {
-                                    "value": [
-                                        {
-                                            "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                                            "ReferencedSOPInstanceUID": "2.25.51126593097902404226932870779417104050",
-                                            "PurposeOfReferenceCodeSequence": {
-                                                "value": [
-                                                    {
-                                                        "CodeMeaning": "T2 Weighted MR Signal Intensity",
-                                                        "CodeValue": "110805",
-                                                        "CodingSchemeDesignator": "DCM"
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                "SeriesInstanceUID": "2.25.206839906826617044056015540662886375802"
-                            },
-                            {
-                                "ReferencedSOPSequence": {
-                                    "value": [
-                                        {
-                                            "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                                            "ReferencedSOPInstanceUID": "2.25.62556427195710041737905331842356312599",
-                                            "PurposeOfReferenceCodeSequence": {
-                                                "value": [
-                                                    {
-                                                        "CodeMeaning": "Diffusion weighted",
-                                                        "CodeValue": "113043",
-                                                        "CodingSchemeDesignator": "DCM"
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                "SeriesInstanceUID": "2.25.189184214038560157073115315824215251609"
-                            },
-                            {
-                                "ReferencedSOPSequence": {
-                                    "value": [
-                                        {
-                                            "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                                            "ReferencedSOPInstanceUID": "2.25.193221069050960432374504797359086480739",
-                                            "PurposeOfReferenceCodeSequence": {
-                                                "value": [
-                                                    {
-                                                        "CodeMeaning": "Dynamic Contrast-Enhanced Acquisition",
-                                                        "CodeValue": "130567",
-                                                        "CodingSchemeDesignator": "DCM"
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                "SeriesInstanceUID": "2.25.321841946232175181479892615314528451144"
-                            }
-                        ]
-                    },
-                    "StudyInstanceUID": "2.25.230835838210269490877844054010808345443"
-                }
-            ]
-        },
-        "ContentSequence": {
+    "ReferencedSeriesSequence": {
+      "undefinedLength": true,
+      "value": [
+        {
+          "PurposeOfReferenceCodeSequence": {
             "value": [
-                {
-                    "RelationshipType": "CONTAINS",
-                    "ValueType": "TEXT",
-                    "ConceptNameCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Key Object Description",
-                                "CodeValue": "113012",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "RelationshipType": "CONTAINS",
-                    "ValueType": "IMAGE",
-                    "ReferencedSOPSequence": {
-                        "value": [
-                            {
-                                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                                "ReferencedSOPInstanceUID": "2.25.51126593097902404226932870779417104050"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "RelationshipType": "CONTAINS",
-                    "ValueType": "IMAGE",
-                    "ReferencedSOPSequence": {
-                        "value": [
-                            {
-                                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                                "ReferencedSOPInstanceUID": "2.25.62556427195710041737905331842356312599"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "RelationshipType": "CONTAINS",
-                    "ValueType": "IMAGE",
-                    "ReferencedSOPSequence": {
-                        "value": [
-                            {
-                                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                                "ReferencedSOPInstanceUID": "2.25.193221069050960432374504797359086480739"
-                            }
-                        ]
-                    }
-                }
+              {
+                "CodeValue": "789101"
+              }
             ]
+          }
         }
-    }
-},
-{
-    "name": "test-11",
-    "description": "DICOM SEG test data with no overlapping segments (ref test-00).",
-    "segmentSquares": {
-        "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
-        "2": {"minI": 12, "maxI": 18, "minJ": 12, "maxJ": 18}
+      ]
     },
-    "tags": {
-        "Modality": "SEG",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.12",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.12",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.12",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "BitsAllocated": 1,
-        "BitsStored": 1,
-        "HighBit": 0,
-        "NumberOfFrames": 2,
-        "SegmentsOverlap": "NO",
-        "SegmentationType": "BINARY",
-        "DimensionOrganizationType": "3D",
-        "DimensionOrganizationSequence": {
-            "value": [
-                {
-                    "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319"
-                }
-            ]
-        },
-        "ReferencedSeriesSequence": {
-            "value": [
-                {
-                    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
-                }
-            ]
-        },
-        "SegmentSequence": {
-            "value": [
-                {
-                    "SegmentNumber": 1,
-                    "SegmentLabel": "Square1",
-                    "SegmentAlgorithmType": "AUTOMATIC",
-                    "RecommendedDisplayCIELabValue": [34886, 53483, 50172],
-                    "SegmentedPropertyCategoryCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    },
-                    "SegmentedPropertyTypeCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "SegmentNumber": 2,
-                    "SegmentLabel": "Square2",
-                    "SegmentAlgorithmType": "AUTOMATIC",
-                    "RecommendedDisplayCIELabValue": [57499, 10746, 49716],
-                    "SegmentedPropertyCategoryCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    },
-                    "SegmentedPropertyTypeCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "SharedFunctionalGroupsSequence": {
-            "value": [
-                {
-                    "PixelMeasuresSequence": {
-                        "value": [
-                            {
-                                "PixelSpacing": [1, 1],
-                                "SpacingBetweenSlices": 1
-                            }
-                        ]
-                    },
-                    "PlaneOrientationSequence": {
-                        "value": [
-                            {
-                                "ImageOrientationPatient": [1, 0, 0, 0, 1, 0]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "PerFrameFunctionalGroupsSequence": {
-            "value": [
-                {
-                    "FrameContentSequence": {
-                        "value": [
-                            {
-                                "DimensionIndexValues": [1, 1]
-                            }
-                        ]
-                    },
-                    "PlanePositionSequence": {
-                        "value": [
-                            {
-                                "ImagePositionPatient": [0, 0, 0]
-                            }
-                        ]
-                    },
-                    "SegmentIdentificationSequence": {
-                        "value": [
-                            {
-                                "ReferencedSegmentNumber": 1
-                            }
-                        ]
-                    }
-                },
-                {
-                    "FrameContentSequence": {
-                        "value": [
-                            {
-                                "DimensionIndexValues": [2, 1]
-                            }
-                        ]
-                    },
-                    "PlanePositionSequence": {
-                        "value": [
-                            {
-                                "ImagePositionPatient": [0, 0, 0]
-                            }
-                        ]
-                    },
-                    "SegmentIdentificationSequence": {
-                        "value": [
-                            {
-                                "ReferencedSegmentNumber": 2
-                            }
-                        ]
-                    }
-                }
-            ]
+    "ReferencedInstanceSequence": {
+      "undefinedLength": false,
+      "value": [
+        {
+          "PurposeOfReferenceCodeSequence": {}
         }
-    }
-},
-{
-    "name": "test-12",
-    "description": "DICOM SEG test data with overlapping segments (ref test-00).",
-    "segmentSquares": {
-        "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
-        "2": {"minI": 8, "maxI": 14, "minJ": 8, "maxJ": 14}
+      ]
     },
-    "tags": {
-        "Modality": "SEG",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.13",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "OtherPatientNames": "dwv^PatientOtherName",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "BitsAllocated": 1,
-        "BitsStored": 1,
-        "HighBit": 0,
-        "NumberOfFrames": 2,
-        "SegmentsOverlap": "YES",
-        "SegmentationType": "BINARY",
-        "DimensionOrganizationType": "3D",
-        "DimensionOrganizationSequence": {
-            "value": [
-                {
-                    "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319"
-                }
-            ]
-        },
-        "ReferencedSeriesSequence": {
-            "value": [
-                {
-                    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
-                }
-            ]
-        },
-        "SegmentSequence": {
-            "value": [
-                {
-                    "SegmentNumber": 1,
-                    "SegmentLabel": "Square1",
-                    "SegmentAlgorithmType": "AUTOMATIC",
-                    "RecommendedDisplayCIELabValue": [34886, 53483, 50172],
-                    "SegmentedPropertyCategoryCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    },
-                    "SegmentedPropertyTypeCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "SegmentNumber": 2,
-                    "SegmentLabel": "Square2",
-                    "SegmentAlgorithmType": "AUTOMATIC",
-                    "RecommendedDisplayCIELabValue": [57499, 10746, 49716],
-                    "SegmentedPropertyCategoryCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    },
-                    "SegmentedPropertyTypeCodeSequence": {
-                        "value": [
-                            {
-                                "CodeMeaning": "Segmentation",
-                                "CodeValue": "113076",
-                                "CodingSchemeDesignator": "DCM"
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "SharedFunctionalGroupsSequence": {
-            "value": [
-                {
-                    "PixelMeasuresSequence": {
-                        "value": [
-                            {
-                                "PixelSpacing": [1, 1],
-                                "SpacingBetweenSlices": 1
-                            }
-                        ]
-                    },
-                    "PlaneOrientationSequence": {
-                        "value": [
-                            {
-                                "ImageOrientationPatient": [1, 0, 0, 0, 1, 0]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "PerFrameFunctionalGroupsSequence": {
-            "value": [
-                {
-                    "FrameContentSequence": {
-                        "value": [
-                            {
-                                "DimensionIndexValues": [1, 1]
-                            }
-                        ]
-                    },
-                    "PlanePositionSequence": {
-                        "value": [
-                            {
-                                "ImagePositionPatient": [0, 0, 0]
-                            }
-                        ]
-                    },
-                    "SegmentIdentificationSequence": {
-                        "value": [
-                            {
-                                "ReferencedSegmentNumber": 1
-                            }
-                        ]
-                    }
-                },
-                {
-                    "FrameContentSequence": {
-                        "value": [
-                            {
-                                "DimensionIndexValues": [2, 1]
-                            }
-                        ]
-                    },
-                    "PlanePositionSequence": {
-                        "value": [
-                            {
-                                "ImagePositionPatient": [0, 0, 0]
-                            }
-                        ]
-                    },
-                    "SegmentIdentificationSequence": {
-                        "value": [
-                            {
-                                "ReferencedSegmentNumber": 2
-                            }
-                        ]
-                    }
-                }
-            ]
+    "ReferencedVisitSequence": {
+      "undefinedLength": true,
+      "value": [
+        {
+          "PurposeOfReferenceCodeSequence": 0
         }
+      ]
     }
+  }
 },
 {
-    "name": "test-13",
-    "description": "DICOM RTSTRUCT test data with no overlapping squares (ref test-00).",
-    "tags": {
-        "Modality": "RTSTRUCT",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.14",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.14",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.14",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "StructureSetLabel": "RT Structure Set",
-        "ReferencedFrameOfReferenceSequence": {
-            "value": [
-                {
-                    "RTReferencedStudySequence": {
-                        "value": [
-                            {
-                                "RTReferencedSeriesSequence": {
-                                    "value": [
-                                        {
-                                            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "StructureSetROISequence": {
-            "value": [
-                {
-                    "ROINumber": 1,
-                    "ROIName": "Square1"
-                },
-                {
-                    "ROINumber": 2,
-                    "ROIName": "Square2"
-                }
-            ]
-        },
-        "RTROIObservationsSequence": {
-            "value": [
-                {
-                    "ReferencedROINumber": 1,
-                    "RTROIInterpretedType": "ORGAN",
-                    "ROIInterpreter": ""
-                },
-                {
-                    "ReferencedROINumber": 2,
-                    "RTROIInterpretedType": "ORGAN",
-                    "ROIInterpreter": ""
-                }
-            ]
-        },
-        "ROIContourSequence": {
-            "value": [
-                {
-                    "ReferencedROINumber": 1,
-                    "ROIDisplayColor": [255, 0, 0],
-                    "ContourSequence": {
-                        "value": [
-                            {
-                                "ContourGeometricType": "CLOSED_PLANAR",
-                                "NumberOfContourPoints": 4,
-                                "ContourData": [4, 4, 0, 10, 4, 0, 10, 10, 0, 4, 10, 0]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "ReferencedROINumber": 2,
-                    "ROIDisplayColor": [0, 255, 0],
-                    "ContourSequence": {
-                        "value": [
-                            {
-                                "ContourGeometricType": "CLOSED_PLANAR",
-                                "NumberOfContourPoints": 4,
-                                "ContourData": [12, 12, 0, 18, 12, 0, 18, 18, 0, 12, 18, 0]
-                            }
-                        ]
-                    }
-                }
-            ]
+  "name": "test-06",
+  "description": "Private tags test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.7",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.7",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.7",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11,
+    "PrivateNumber": 42,
+    "PrivateSequence": {
+      "undefinedLength": true,
+      "value": [
+        {
+          "Rows": 64,
+          "PrivateNumber": 1701
         }
+      ]
     }
+  },
+  "privateDictionary": {
+    "0011": {
+      "0000": ["UL", "1", "GenericGroupLength"],
+      "0001": ["US", "1", "PrivateNumber"],
+      "0002": ["SQ", "1", "PrivateSequence"]
+    }
+  },
+  "useUnVrForPrivateSq": false
 },
 {
-    "name": "test-14",
-    "description": "DICOM RTSTRUCT test data with overlapping squares (ref test-00).",
-    "tags": {
-        "Modality": "RTSTRUCT",
-        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
-        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
-        "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.15",
-        "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.15",
-        "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
-        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.15",
-        "PatientID": "0123456",
-        "PatientName": "dwv^PatientName",
-        "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
-        "StructureSetLabel": "RT Structure Set",
-        "ReferencedFrameOfReferenceSequence": {
-            "value": [
-                {
-                    "RTReferencedStudySequence": {
-                        "value": [
-                            {
-                                "RTReferencedSeriesSequence": {
-                                    "value": [
-                                        {
-                                            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        "StructureSetROISequence": {
-            "value": [
-                {
-                    "ROINumber": 1,
-                    "ROIName": "Square1"
-                },
-                {
-                    "ROINumber": 2,
-                    "ROIName": "Square2"
-                }
-            ]
-        },
-        "RTROIObservationsSequence": {
-            "value": [
-                {
-                    "ReferencedROINumber": 1,
-                    "RTROIInterpretedType": "ORGAN",
-                    "ROIInterpreter": ""
-                },
-                {
-                    "ReferencedROINumber": 2,
-                    "RTROIInterpretedType": "ORGAN",
-                    "ROIInterpreter": ""
-                }
-            ]
-        },
-        "ROIContourSequence": {
-            "value": [
-                {
-                    "ReferencedROINumber": 1,
-                    "ROIDisplayColor": [255, 0, 0],
-                    "ContourSequence": {
-                        "value": [
-                            {
-                                "ContourGeometricType": "CLOSED_PLANAR",
-                                "NumberOfContourPoints": 4,
-                                "ContourData": [4, 4, 0, 10, 4, 0, 10, 10, 0, 4, 10, 0]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "ReferencedROINumber": 2,
-                    "ROIDisplayColor": [0, 255, 0],
-                    "ContourSequence": {
-                        "value": [
-                            {
-                                "ContourGeometricType": "CLOSED_PLANAR",
-                                "NumberOfContourPoints": 4,
-                                "ContourData": [8, 8, 0, 14, 8, 0, 14, 14, 0, 8, 14, 0]
-                            }
-                        ]
-                    }
-                }
-            ]
+  "name": "test-07",
+  "description": "Private tags and VR=UN for private SQ test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.8",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.8",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.8",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11,
+    "PrivateNumber": 42,
+    "PrivateSequence": {
+      "undefinedLength": true,
+      "value": [
+        {
+          "Rows": 64,
+          "PrivateNumber": 1701
         }
+      ]
     }
+  },
+  "privateDictionary": {
+    "0011": {
+      "0000": ["UL", "1", "GenericGroupLength"],
+      "0001": ["US", "1", "PrivateNumber"],
+      "0002": ["SQ", "1", "PrivateSequence"]
+    }
+  },
+  "useUnVrForPrivateSq": true
+},
+{
+  "name": "test-08",
+  "description": "All VRs test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.9",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.9",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.9",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11,
+    "SmallestImagePixelValue": 0,
+    "PrivateSQ": {
+      "value": [
+        {
+          "PrivateAE": "AE",
+          "PrivateAS": "001D",
+          "PrivateAT": ["(AFAF,0101)", "(AFAF,0202)"],
+          "PrivateCS": "CODE_STRING_00",
+          "PrivateDA": "20220124",
+          "PrivateDS": ["-1.23456789e-15", "1.23456789e-15"],
+          "PrivateDT": "20220124173730.999999",
+          "PrivateFD": [-1.23456789e-308, 1.23456789e-308],
+          "PrivateFL": [-1.1749999727240737e-38, 1.1749999727240737e-38],
+          "PrivateIS": "1234",
+          "PrivateLO": "LOng string",
+          "PrivateLT": "Long Text",
+          "PrivateOB": [0, 0],
+          "PrivateOD": "0",
+          "PrivateOF": 0,
+          "PrivateOL": 0,
+          "PrivateOV": "0",
+          "PrivateOW": 0,
+          "PrivatePN": "Tarquin^Fin-tim-lin-bin-whin-bim-lim-bus^-stop-Ftang-Ftang-Ole-Biscuitbarrel",
+          "PrivateSH": "SHort string",
+          "PrivateSL": [-2147483648, 2147483647],
+          "PrivateSS": [-32768, 32767],
+          "PrivateST": "Short text",
+          "PrivateSV": ["-9223372036854775808", "9223372036854775807"],
+          "PrivateTM": "173730.999999",
+          "PrivateUC": "Unlimited Characters",
+          "PrivateUI": "1.2.840.10008.5.1.4.1.1.481.13",
+          "PrivateUL": [0, 4294967295],
+          "PrivateUN": 0,
+          "PrivateUR": "https://github.com/ivmartel/dwv",
+          "PrivateUS": [0, 65535],
+          "PrivateUT": "Unlimited Text",
+          "PrivateUV": ["0", "18446744073709551615"]
+        }
+      ]
+    }
+  },
+  "privateDictionary": {
+    "0011": {
+      "0000": ["UL", "1", "GenericGroupLength"],
+      "0001": ["AE", "1", "PrivateAE"],
+      "0002": ["AS", "1", "PrivateAS"],
+      "0003": ["AT", "1", "PrivateAT"],
+      "0004": ["CS", "1", "PrivateCS"],
+      "0005": ["DA", "1", "PrivateDA"],
+      "0006": ["DS", "1", "PrivateDS"],
+      "0007": ["DT", "1", "PrivateDT"],
+      "0008": ["FL", "1", "PrivateFL"],
+      "0009": ["FD", "1", "PrivateFD"],
+      "0010": ["IS", "1", "PrivateIS"],
+      "0011": ["LO", "1", "PrivateLO"],
+      "0012": ["LT", "1", "PrivateLT"],
+      "0013": ["OB", "1", "PrivateOB"],
+      "0014": ["OD", "1", "PrivateOD"],
+      "0015": ["OF", "1", "PrivateOF"],
+      "0016": ["OL", "1", "PrivateOL"],
+      "0017": ["OV", "1", "PrivateOV"],
+      "0018": ["OW", "1", "PrivateOW"],
+      "0019": ["PN", "1", "PrivatePN"],
+      "0020": ["SH", "1", "PrivateSH"],
+      "0021": ["SL", "1", "PrivateSL"],
+      "0022": ["SQ", "1", "PrivateSQ"],
+      "0023": ["SS", "1", "PrivateSS"],
+      "0024": ["ST", "1", "PrivateST"],
+      "0025": ["SV", "1", "PrivateSV"],
+      "0026": ["TM", "1", "PrivateTM"],
+      "0027": ["UC", "1", "PrivateUC"],
+      "0028": ["UI", "1", "PrivateUI"],
+      "0029": ["UL", "1", "PrivateUL"],
+      "0030": ["UN", "1", "PrivateUN"],
+      "0031": ["UR", "1", "PrivateUR"],
+      "0032": ["US", "1", "PrivateUS"],
+      "0033": ["UT", "1", "PrivateUT"],
+      "0034": ["UV", "1", "PrivateUV"]
+    }
+  }
+},
+{
+  "name": "test-09",
+  "description": "UTF-8 charset test data.",
+  "tags": {
+    "Modality": "MR",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.10",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.10",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.10",
+    "SpecificCharacterSet": "ISO_IR 192",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "déjà-ñu greek: ελληνικά arab: اَلْعَرَبِيَّةُ chinese: 中文",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "ImageOrientationPatient": [1,0,0,0,1,0],
+    "ImagePositionPatient": [0,0,0],
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "PixelSpacing": [1, 1],
+    "BitsAllocated": 16,
+    "BitsStored": 12,
+    "HighBit": 11
+  }
+},
+{
+  "name": "test-10",
+  "description": "DICOM KOS test data (non image)",
+  "tags": {
+    "Modality": "KO",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.11",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.11",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.11",
+    "ReferencedRequestSequence": {
+       "value": [
+        {
+          "StudyInstanceUID": "2.25.230835838210269490877844054010808345443",
+          "RequestedProcedureID": "dwv_test"
+        }
+       ]
+    },
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "ValueType": "CONTAINER",
+    "ConceptNameCodeSequence": {
+       "value": [
+        {
+          "CodeValue": "113000",
+          "CodingSchemeDesignator": "DCM",
+          "CodeMeaning": "Of Interest"
+        }
+       ]
+    },
+    "ContinuityOfContent": "SEPARATE",
+    "CurrentRequestedProcedureEvidenceSequence": {
+       "value": [
+        {
+          "ReferencedSeriesSequence": {
+            "value": [
+              {
+                "ReferencedSOPSequence": {
+                  "value": [
+                    {
+                      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                      "ReferencedSOPInstanceUID": "2.25.51126593097902404226932870779417104050",
+                      "PurposeOfReferenceCodeSequence": {
+                        "value": [
+                          {
+                            "CodeMeaning": "T2 Weighted MR Signal Intensity",
+                            "CodeValue": "110805",
+                            "CodingSchemeDesignator": "DCM"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "SeriesInstanceUID": "2.25.206839906826617044056015540662886375802"
+              },
+              {
+                "ReferencedSOPSequence": {
+                  "value": [
+                    {
+                      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                      "ReferencedSOPInstanceUID": "2.25.62556427195710041737905331842356312599",
+                      "PurposeOfReferenceCodeSequence": {
+                        "value": [
+                          {
+                            "CodeMeaning": "Diffusion weighted",
+                            "CodeValue": "113043",
+                            "CodingSchemeDesignator": "DCM"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "SeriesInstanceUID": "2.25.189184214038560157073115315824215251609"
+              },
+              {
+                "ReferencedSOPSequence": {
+                  "value": [
+                    {
+                      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                      "ReferencedSOPInstanceUID": "2.25.193221069050960432374504797359086480739",
+                      "PurposeOfReferenceCodeSequence": {
+                        "value": [
+                          {
+                            "CodeMeaning": "Dynamic Contrast-Enhanced Acquisition",
+                            "CodeValue": "130567",
+                            "CodingSchemeDesignator": "DCM"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "SeriesInstanceUID": "2.25.321841946232175181479892615314528451144"
+              }
+            ]
+          },
+          "StudyInstanceUID": "2.25.230835838210269490877844054010808345443"
+        }
+      ]
+    },
+    "ContentSequence": {
+      "value": [
+        {
+          "RelationshipType": "CONTAINS",
+          "ValueType": "TEXT",
+          "ConceptNameCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Key Object Description",
+                "CodeValue": "113012",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          }
+        },
+        {
+          "RelationshipType": "CONTAINS",
+          "ValueType": "IMAGE",
+          "ReferencedSOPSequence": {
+            "value": [
+              {
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPInstanceUID": "2.25.51126593097902404226932870779417104050"
+              }
+            ]
+          }
+        },
+        {
+          "RelationshipType": "CONTAINS",
+          "ValueType": "IMAGE",
+          "ReferencedSOPSequence": {
+            "value": [
+              {
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPInstanceUID": "2.25.62556427195710041737905331842356312599"
+              }
+            ]
+          }
+        },
+        {
+          "RelationshipType": "CONTAINS",
+          "ValueType": "IMAGE",
+          "ReferencedSOPSequence": {
+            "value": [
+              {
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPInstanceUID": "2.25.193221069050960432374504797359086480739"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+},
+{
+  "name": "test-11",
+  "description": "DICOM SEG test data with no overlapping segments (ref test-00).",
+  "segmentSquares": {
+    "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
+    "2": {"minI": 12, "maxI": 18, "minJ": 12, "maxJ": 18}
+  },
+  "tags": {
+    "Modality": "SEG",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.12",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.12",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.12",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "BitsAllocated": 1,
+    "BitsStored": 1,
+    "HighBit": 0,
+    "NumberOfFrames": 2,
+    "SegmentsOverlap": "NO",
+    "SegmentationType": "BINARY",
+    "DimensionOrganizationType": "3D",
+    "DimensionOrganizationSequence": {
+      "value": [
+        {
+          "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319"
+        }
+      ]
+    },
+    "ReferencedSeriesSequence": {
+      "value": [
+        {
+          "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
+        }
+      ]
+    },
+    "SegmentSequence": {
+      "value": [
+        {
+          "SegmentNumber": 1,
+          "SegmentLabel": "Square1",
+          "SegmentAlgorithmType": "AUTOMATIC",
+          "RecommendedDisplayCIELabValue": [34886, 53483, 50172],
+          "SegmentedPropertyCategoryCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          },
+          "SegmentedPropertyTypeCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          }
+        },
+        {
+          "SegmentNumber": 2,
+          "SegmentLabel": "Square2",
+          "SegmentAlgorithmType": "AUTOMATIC",
+          "RecommendedDisplayCIELabValue": [57499, 10746, 49716],
+          "SegmentedPropertyCategoryCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          },
+          "SegmentedPropertyTypeCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "SharedFunctionalGroupsSequence": {
+      "value": [
+        {
+          "PixelMeasuresSequence": {
+            "value": [
+              {
+                "PixelSpacing": [1, 1],
+                "SpacingBetweenSlices": 1
+              }
+            ]
+          },
+          "PlaneOrientationSequence": {
+            "value": [
+              {
+                "ImageOrientationPatient": [1, 0, 0, 0, 1, 0]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "PerFrameFunctionalGroupsSequence": {
+      "value": [
+        {
+          "FrameContentSequence": {
+            "value": [
+              {
+                "DimensionIndexValues": [1, 1]
+              }
+            ]
+          },
+          "PlanePositionSequence": {
+            "value": [
+              {
+                "ImagePositionPatient": [0, 0, 0]
+              }
+            ]
+          },
+          "SegmentIdentificationSequence": {
+            "value": [
+              {
+                "ReferencedSegmentNumber": 1
+              }
+            ]
+          }
+        },
+        {
+          "FrameContentSequence": {
+            "value": [
+              {
+                "DimensionIndexValues": [2, 1]
+              }
+            ]
+          },
+          "PlanePositionSequence": {
+            "value": [
+              {
+                "ImagePositionPatient": [0, 0, 0]
+              }
+            ]
+          },
+          "SegmentIdentificationSequence": {
+            "value": [
+              {
+                "ReferencedSegmentNumber": 2
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+},
+{
+  "name": "test-12",
+  "description": "DICOM SEG test data with overlapping segments (ref test-00).",
+  "segmentSquares": {
+    "1": {"minI": 4, "maxI": 10, "minJ": 4, "maxJ": 10},
+    "2": {"minI": 8, "maxI": 14, "minJ": 8, "maxJ": 14}
+  },
+  "tags": {
+    "Modality": "SEG",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.13",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.13",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "OtherPatientNames": "dwv^PatientOtherName",
+    "PhotometricInterpretation": "MONOCHROME2",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "SamplesPerPixel": 1,
+    "PixelRepresentation": 0,
+    "Rows": 32,
+    "Columns": 32,
+    "BitsAllocated": 1,
+    "BitsStored": 1,
+    "HighBit": 0,
+    "NumberOfFrames": 2,
+    "SegmentsOverlap": "YES",
+    "SegmentationType": "BINARY",
+    "DimensionOrganizationType": "3D",
+    "DimensionOrganizationSequence": {
+      "value": [
+        {
+          "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319"
+        }
+      ]
+    },
+    "ReferencedSeriesSequence": {
+      "value": [
+        {
+          "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
+        }
+      ]
+    },
+    "SegmentSequence": {
+      "value": [
+        {
+          "SegmentNumber": 1,
+          "SegmentLabel": "Square1",
+          "SegmentAlgorithmType": "AUTOMATIC",
+          "RecommendedDisplayCIELabValue": [34886, 53483, 50172],
+          "SegmentedPropertyCategoryCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          },
+          "SegmentedPropertyTypeCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          }
+        },
+        {
+          "SegmentNumber": 2,
+          "SegmentLabel": "Square2",
+          "SegmentAlgorithmType": "AUTOMATIC",
+          "RecommendedDisplayCIELabValue": [57499, 10746, 49716],
+          "SegmentedPropertyCategoryCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          },
+          "SegmentedPropertyTypeCodeSequence": {
+            "value": [
+              {
+                "CodeMeaning": "Segmentation",
+                "CodeValue": "113076",
+                "CodingSchemeDesignator": "DCM"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "SharedFunctionalGroupsSequence": {
+      "value": [
+        {
+          "PixelMeasuresSequence": {
+            "value": [
+              {
+                "PixelSpacing": [1, 1],
+                "SpacingBetweenSlices": 1
+              }
+            ]
+          },
+          "PlaneOrientationSequence": {
+            "value": [
+              {
+                "ImageOrientationPatient": [1, 0, 0, 0, 1, 0]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "PerFrameFunctionalGroupsSequence": {
+      "value": [
+        {
+          "FrameContentSequence": {
+            "value": [
+              {
+                "DimensionIndexValues": [1, 1]
+              }
+            ]
+          },
+          "PlanePositionSequence": {
+            "value": [
+              {
+                "ImagePositionPatient": [0, 0, 0]
+              }
+            ]
+          },
+          "SegmentIdentificationSequence": {
+            "value": [
+              {
+                "ReferencedSegmentNumber": 1
+              }
+            ]
+          }
+        },
+        {
+          "FrameContentSequence": {
+            "value": [
+              {
+                "DimensionIndexValues": [2, 1]
+              }
+            ]
+          },
+          "PlanePositionSequence": {
+            "value": [
+              {
+                "ImagePositionPatient": [0, 0, 0]
+              }
+            ]
+          },
+          "SegmentIdentificationSequence": {
+            "value": [
+              {
+                "ReferencedSegmentNumber": 2
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+},
+{
+  "name": "test-13",
+  "description": "DICOM RTSTRUCT test data with no overlapping squares (ref test-00).",
+  "tags": {
+    "Modality": "RTSTRUCT",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.14",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.14",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.14",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "StructureSetLabel": "RT Structure Set",
+    "ReferencedFrameOfReferenceSequence": {
+      "value": [
+        {
+          "RTReferencedStudySequence": {
+            "value": [
+              {
+                "RTReferencedSeriesSequence": {
+                  "value": [
+                    {
+                      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "StructureSetROISequence": {
+      "value": [
+        {
+          "ROINumber": 1,
+          "ROIName": "Square1"
+        },
+        {
+          "ROINumber": 2,
+          "ROIName": "Square2"
+        }
+      ]
+    },
+    "RTROIObservationsSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "RTROIInterpretedType": "ORGAN",
+          "ROIInterpreter": ""
+        },
+        {
+          "ReferencedROINumber": 2,
+          "RTROIInterpretedType": "ORGAN",
+          "ROIInterpreter": ""
+        }
+      ]
+    },
+    "ROIContourSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "ROIDisplayColor": [255, 0, 0],
+          "ContourSequence": {
+            "value": [
+              {
+                "ContourGeometricType": "CLOSED_PLANAR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [4, 4, 0, 10, 4, 0, 10, 10, 0, 4, 10, 0]
+              }
+            ]
+          }
+        },
+        {
+          "ReferencedROINumber": 2,
+          "ROIDisplayColor": [0, 255, 0],
+          "ContourSequence": {
+            "value": [
+              {
+                "ContourGeometricType": "CLOSED_PLANAR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [12, 12, 0, 18, 12, 0, 18, 18, 0, 12, 18, 0]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+},
+{
+  "name": "test-14",
+  "description": "DICOM RTSTRUCT test data with overlapping squares (ref test-00).",
+  "tags": {
+    "Modality": "RTSTRUCT",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.15",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83798073110115.20251202141946.15",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.8311611710012173.20251202141946.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.15",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "StructureSetLabel": "RT Structure Set",
+    "ReferencedFrameOfReferenceSequence": {
+      "value": [
+        {
+          "RTReferencedStudySequence": {
+            "value": [
+              {
+                "RTReferencedSeriesSequence": {
+                  "value": [
+                    {
+                      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.83101114105101115.20251202141946.1"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "StructureSetROISequence": {
+      "value": [
+        {
+          "ROINumber": 1,
+          "ROIName": "Square1"
+        },
+        {
+          "ROINumber": 2,
+          "ROIName": "Square2"
+        }
+      ]
+    },
+    "RTROIObservationsSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "RTROIInterpretedType": "ORGAN",
+          "ROIInterpreter": ""
+        },
+        {
+          "ReferencedROINumber": 2,
+          "RTROIInterpretedType": "ORGAN",
+          "ROIInterpreter": ""
+        }
+      ]
+    },
+    "ROIContourSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "ROIDisplayColor": [255, 0, 0],
+          "ContourSequence": {
+            "value": [
+              {
+                "ContourGeometricType": "CLOSED_PLANAR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [4, 4, 0, 10, 4, 0, 10, 10, 0, 4, 10, 0]
+              }
+            ]
+          }
+        },
+        {
+          "ReferencedROINumber": 2,
+          "ROIDisplayColor": [0, 255, 0],
+          "ContourSequence": {
+            "value": [
+              {
+                "ContourGeometricType": "CLOSED_PLANAR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [8, 8, 0, 14, 8, 0, 14, 14, 0, 8, 14, 0]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
 }
 ]
