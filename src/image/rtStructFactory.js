@@ -135,7 +135,7 @@ function bfsMarkVisited(
  * @param {number} value Segment value.
  * @param {number} sx X of the top-left pixel of the component.
  * @param {number} sy Y of the top-left pixel of the component.
- * @returns {{x: number, y: number}[]} Ordered boundary vertices.
+ * @returns {Array.<{x: number, y: number}>} Ordered boundary vertices.
  */
 function mooreBoundary(buffer, sliceOffset, width, height, value, sx, sy) {
   const boundary = [{x: sx, y: sy}];
@@ -192,7 +192,8 @@ function mooreBoundary(buffer, sliceOffset, width, height, value, sx, sy) {
  * @param {number} width Slice width in pixels.
  * @param {number} height Slice height in pixels.
  * @param {number} value Segment value to trace.
- * @returns {{x: number, y: number}[][]} One polygon per connected region.
+ * @returns {Array.<Array.<{x: number, y: number}>>} One polygon per
+ * connected region.
  */
 export function bufferToPolygons(buffer, sliceOffset, width, height, value) {
   const n = width * height;
@@ -235,9 +236,9 @@ function ptSegDist(pt, a, b) {
  * Simplify a polygon using the Ramer-Douglas-Peucker algorithm.
  * Ref: {@link https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm}.
  *
- * @param {{x: number, y: number}[]} pts Input vertices.
+ * @param {Array.<{x: number, y: number}>} pts Input vertices.
  * @param {number} epsilon Max allowed deviation in pixels.
- * @returns {{x: number, y: number}[]} Simplified vertices.
+ * @returns {Array.<{x: number, y: number}>} Simplified vertices.
  */
 export function simplifyPolygon(pts, epsilon) {
   if (pts.length <= 3) {
@@ -299,7 +300,7 @@ function mergeTags(tags, extra) {
  * @param {number} sliceOffset Byte offset of the current slice in buffer.
  * @param {number} width Slice width in pixels.
  * @param {number} height Slice height in pixels.
- * @param {{x: number, y: number}[]} pts Polygon vertices in pixel coords.
+ * @param {Array.<{x: number, y: number}>} pts Polygon vertices in pixel coords.
  * @param {number} value Segment number to write.
  */
 function fillPolygon(buffer, sliceOffset, width, height, pts, value) {

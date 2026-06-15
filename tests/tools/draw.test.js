@@ -30,7 +30,7 @@ function makeDrawApp(overrides = {}) {
   const stgCtrlKeys = ['getDrawLayers', 'getActiveLayerGroup'];
   const stgCtrlOverrides = {};
   const appOverrides = {};
-  /** @type {ReturnType<typeof vi.fn>|undefined} */
+  /** @type {Function|undefined} */
   let addToUndoStackOverride;
   for (const [k, v] of Object.entries(overrides)) {
     if (k === 'addToUndoStack') {

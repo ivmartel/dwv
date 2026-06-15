@@ -125,8 +125,9 @@ export class LabelingThread {
    * Trigger a labels recalculation for overlapping segments.
    * Spawns one worker task per segment for parallel execution.
    *
-   * @param {{segNumber: number, size: Size, slices: {sliceIndex: number,
-   *   data: Uint8Array}[], minSlice: number}[]} segments Per-segment raw slice
+   * @param {Array.<{segNumber: number, size: Size,
+   *   slices: Array.<{sliceIndex: number, data: Uint8Array}>,
+   *   minSlice: number}>} segments Per-segment raw slice
    *   data with local (0-based) slice indices and the global minSlice offset.
    * @param {Geometry} geometry The full image geometry.
    */
