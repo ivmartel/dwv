@@ -1809,8 +1809,8 @@ __metadata:
   linkType: hard
 
 "@microsoft/api-extractor@npm:^7.58.7":
-  version: 7.58.7
-  resolution: "@microsoft/api-extractor@npm:7.58.7"
+  version: 7.58.9
+  resolution: "@microsoft/api-extractor@npm:7.58.9"
   dependencies:
     "@microsoft/api-extractor-model": "npm:7.33.8"
     "@microsoft/tsdoc": "npm:~0.16.0"
@@ -1818,7 +1818,7 @@ __metadata:
     "@rushstack/node-core-library": "npm:5.23.1"
     "@rushstack/rig-package": "npm:0.7.3"
     "@rushstack/terminal": "npm:0.24.0"
-    "@rushstack/ts-command-line": "npm:5.3.9"
+    "@rushstack/ts-command-line": "npm:5.3.10"
     diff: "npm:~8.0.2"
     minimatch: "npm:10.2.3"
     resolve: "npm:~1.22.1"
@@ -1827,7 +1827,7 @@ __metadata:
     typescript: "npm:5.9.3"
   bin:
     api-extractor: bin/api-extractor
-  checksum: 10c0/307bb8c5a689160ae798c231c7a9722df14bbf5963a08d12d0f6a8998959015da3d62ba08e15eea37deae0ac61685d11f4cc765999f2339ffd14ebc1e9bd5c82
+  checksum: 10c0/6432d8129712fc4b4f7ca3b202f87b05ca04e4f623aeb60ab942726f45ab96260de3cfd6006e0b169389abfacf403a45ed1d073a74ac4b5cc42410c0edc7b369
   languageName: node
   linkType: hard
 
@@ -2229,15 +2229,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rushstack/ts-command-line@npm:5.3.9":
-  version: 5.3.9
-  resolution: "@rushstack/ts-command-line@npm:5.3.9"
+"@rushstack/ts-command-line@npm:5.3.10":
+  version: 5.3.10
+  resolution: "@rushstack/ts-command-line@npm:5.3.10"
   dependencies:
     "@rushstack/terminal": "npm:0.24.0"
     "@types/argparse": "npm:1.0.38"
     argparse: "npm:~1.0.9"
     string-argv: "npm:~0.3.1"
-  checksum: 10c0/353589c9dbd53dd81cafa059c488a573ff12472b25387863fca9eebd47ae2312cf614689c27ce50eaefba1a7d112539950e7a5c1ea8b15e255a60977659b50fb
+  checksum: 10c0/309d1a11778be57ff9ef1e1664012ed3ec09fe1ac6e290f5d0d56a6164fe19f8aff98478e39f4a24364b110b9d61e4b1e9199ace19bda2b3809ccde0958b57f3
   languageName: node
   linkType: hard
 
