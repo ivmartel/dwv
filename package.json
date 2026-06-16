@@ -45,7 +45,7 @@
     "babel-plugin-istanbul": "^8.0.0",
     "benchmark": "^2.1.4",
     "canvas": "^3.2.1",
-    "clean-jsdoc-theme": "^4.3.0",
+    "clean-jsdoc-theme": "^5.0.0",
     "eslint": "^10.4.0",
     "eslint-plugin-jsdoc": "^63.0.0",
     "github-release-notes": "0.17.2",
