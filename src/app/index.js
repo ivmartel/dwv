@@ -6,6 +6,7 @@ import {
   ToolConfig
 } from './application.js';
 import {DicomData} from './dataController.js';
+import {DataController} from './dataController.js';
 import {DrawController} from './drawController.js';
 import {StageController} from './stageController.js';
 import {ToolboxController} from './toolboxController.js';
@@ -17,6 +18,7 @@ export {
   App,
   AppOptions,
   DicomData,
+  DataController,
   DrawController,
   StageController,
   ToolboxController,
