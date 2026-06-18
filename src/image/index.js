@@ -42,6 +42,7 @@ import {PositionHelper} from './positionHelper.js';
 import {PlaneHelper} from './planeHelper.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
+import {SegmentCollection} from './segmentCollection.js';
 import {Diameter, Diameters, Label} from './label.js';
 
 
@@ -61,6 +62,7 @@ export {
   RtStructFactory,
   MaskSegmentHelper,
   MaskSegmentViewHelper,
+  SegmentCollection,
   PlaneHelper,
   PositionHelper,
   RescaleSlopeAndIntercept,
