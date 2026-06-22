@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
-    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-env": "^8.0.2",
     "@eslint/js": "^10.0.1",
     "@microsoft/api-extractor": "^7.58.7",
     "@stylistic/eslint-plugin": "^5.10.0",
