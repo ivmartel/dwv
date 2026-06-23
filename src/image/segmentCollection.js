@@ -12,21 +12,19 @@ import {logger} from '../utils/logger.js';
  * Create ROI slice buffers.
  *
  * @param {Uint8Array} imageBuffer The mask image buffer.
- * @param {Geometry} geometry The mask geometry.
  * @param {MaskSegment[]} segments The mask segments.
+ * @param {number} sliceSize The size of a slice.
  * @param {number} sliceOffset The slice offset.
  * @returns {Record<number, Uint8Array>} The ROI slice image buffers,
  * indexed by segment index (segment.number - 1).
  */
 function createRoiSliceBuffers(
   imageBuffer,
-  geometry,
   segments,
+  sliceSize,
   sliceOffset
 ) {
   // create binary mask buffers
-  const size = geometry.getSize();
-  const sliceSize = size.getDimSize(2);
   /** @type {Record<number, Uint8Array>} */
   const buffers = {};
   for (let o = 0; o < sliceSize; ++o) {
@@ -65,7 +63,7 @@ function createRoiBuffers(imageBuffer, geometry, segments) {
     const sliceOffset = k * sliceSize;
     // create slice buffers
     const buffers = createRoiSliceBuffers(
-      imageBuffer, geometry, segments, sliceOffset);
+      imageBuffer, segments, sliceSize, sliceOffset);
     // store slice buffers
     const keys0 = Object.keys(buffers);
     for (const key0 of keys0) {
