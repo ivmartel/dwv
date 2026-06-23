@@ -6,7 +6,7 @@ Message: `Not a valid DICOM file (no magic DICM word found)`
 
 Context: Loading a DICOM file.
 
-All DICOM files should start with the DICOM prefix `DICM` (see [tutorial-conformance.html#validity](./tutorial-conformance.html#validity) for some exceptions and more details).
+All DICOM files should start with the DICOM prefix `DICM` (see [conformance#validity](../conformance/#validity) for some exceptions and more details).
 
 To fix the data you can use tolerant conversion tools such as [gdcm](http://gdcm.sourceforge.net/wiki/index.php/Main_Page). Convert the data to raw with `gdcmconv --raw -i {in-dcm_file_path} -o {out-dcm_file_path}`.
 

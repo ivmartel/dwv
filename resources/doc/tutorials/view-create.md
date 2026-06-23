@@ -1,4 +1,4 @@
-This page is part of the dwv [architecture](./tutorial-architecture.html) description and
+This page is part of the dwv [architecture](../architecture/) description and
 describes the dwv view creation.
 
 Summary:
@@ -16,20 +16,20 @@ canvas array data:
 
 1. Extract the data from the recreated 3D volume using position and orientation
    and abstracted folowing the [iterator pattern](https://en.wikipedia.org/wiki/Iterator_pattern)
-   (see [image/iterator.js](./global.html#range))
+   (see [image/iterator.js](../../source/src/image/iterator-js/))
 1. From stored type range to physical range using a [Modality LUT](http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.html): rescale slope and intercept are used
    in the conversion equation: `y = slope * x + intercept`
-   (see [image/modalityLut.js](./ModalityLut.html))
+   (see [image/modalityLut.js](../modalitylut/))
 1. Select part of the range using a [VOI LUT](http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#table_C.11-2) (Value Of Interest): window width and level (or centre)
    allow to focus on a specific range (especially useful for normed data such
    as in CT)
-   (see [image/windowLut.js](./WindowLut.html))
+   (see [image/windowLut.js](../windowlut/))
 1. Assign a colour to each values using a colour map
-   (see [image/luts.js](./global.html#luts))
+   (see [image/luts.js](../../source/src/image/luts-js/))
 1. You now have the [canvas](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) data!
 
 ![sequence-view-creation](sequence-view-creation.png)
 
 *View generation sequence.*
 
-All this is materialised in the `generateImageData*` functions called from the [View](./View.html) class.
+All this is materialised in the `generateImageData*` functions called from the [View](../view/) class.

@@ -1,4 +1,4 @@
-This page is part of the dwv [architecture](./tutorial-architecture.html) description and
+This page is part of the dwv [architecture](../architecture/) description and
 describes the dwv load process.
 
 Summary:
@@ -8,7 +8,7 @@ Summary:
 
 ## Load classes
 
-Data can come from 3 types of source: url (via a [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)), file (via a [FileReader](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)) or directly as a memory buffer. The 3 'meta' loaders responsible for each source are: [UrlsLoader](./UrlsLoader.html), [FilesLoader](./FilesLoader.html) and [MemoryLoader](./MemoryLoader.html).
+Data can come from 3 types of source: url (via a [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)), file (via a [FileReader](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)) or directly as a memory buffer. The 3 'meta' loaders responsible for each source are: [UrlsLoader](../urlsloader/), [FilesLoader](../filesloader/) and [MemoryLoader](../memoryloader/).
 
 ![classes-io](classes-io.png)
 
@@ -16,18 +16,18 @@ Data can come from 3 types of source: url (via a [XMLHttpRequest](https://develo
 
 Each 'meta' loader retrieves the data and passes it to a specialised loader according
 to its answer to the `canLoadUrl` or `canLoadFile` call. Specialised loaders will
-typically convert the binary retrieved data into a local class, for example an [Image](./Image.html).
+typically convert the binary retrieved data into a local class, for example an [Image](../image/).
 
 The current specialised loaders are:
 
-- [DicomDataLoader](./DicomDataLoader.html): for DICOM data
-- [JSONTextLoader](./JSONTextLoader.html): for JSON data
-- [RawImageLoader](./RawImageLoader.html): for image formats supported by the browser
-- [RawVideoLoader](./RawVideoLoader.html): for video formats supported by the browser
-- [ZipLoader](./ZipLoader.html): for data compressed in a ZIP file
+- [DicomDataLoader](../dicomdataloader/): for DICOM data
+- [JSONTextLoader](../jsontextloader/): for JSON data
+- [RawImageLoader](../rawimageloader/): for image formats supported by the browser
+- [RawVideoLoader](../rawvideoloader/): for video formats supported by the browser
+- [ZipLoader](../ziploader/): for data compressed in a ZIP file
 
-The main specialised loader, the [DicomDataLoader](./DicomDataLoader.html), parses the binary dicom file
-to extract all the meta data and then creates an [Image](./Image.html), at first with only one slice.
+The main specialised loader, the [DicomDataLoader](../dicomdataloader/), parses the binary dicom file
+to extract all the meta data and then creates an [Image](../image/), at first with only one slice.
 When multiple items are loaded, it will append the extracted data to the first image to create a multi slice
 image. Note that the dicom image data can be stored in a compressed format, in that case the DICOM loader will
 decompress the data to create the image.

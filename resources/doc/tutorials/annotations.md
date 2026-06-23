@@ -1,4 +1,4 @@
-This page is part of the dwv [architecture](./tutorial-architecture.html) description and
+This page is part of the dwv [architecture](../architecture/) description and
 describes the dwv annotations.
 
 Summary:
@@ -11,15 +11,15 @@ The DICOM SR strucutre used to store annotations is based on the 'DICOM SR for c
 document from David A. Clunie ([ref](https://docs.google.com/document/d/1bR6m7foTCzofoZKeIRN5YreBrkjgMcBfNA7r9wXEGR4/edit?tab=t.0)).
 
 SCOORD items are translated according to their `Graphic Type` ((0070,0023) see [part03/sect_C.18.6](https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2)):
-- Point -> [Point2D](./Point2D.html)
+- Point -> [Point2D](../point2d/)
 - Multipoint: not used
 - Polyline ->
-  - [Line](./Line.html): if open shape and 2 points
-  - [Protractor](./Protractor.html): if open shape and 3 points
-  - [Rectangle](./Rectangle.html): if closed shape with 5 points that form 4 perpendicular lines
-  - [ROI](./ROI.html): if closed shape and not rectangle
-- Circle -> [Circle](./Circle.html)
-- Ellipse -> [Ellipse](./Ellipse.html)
+  - [Line](../line/): if open shape and 2 points
+  - [Protractor](../protractor/): if open shape and 3 points
+  - [Rectangle](../rectangle/): if closed shape with 5 points that form 4 perpendicular lines
+  - [ROI](../roi/): if closed shape and not rectangle
+- Circle -> [Circle](../circle/)
+- Ellipse -> [Ellipse](../ellipse/)
 
 Closed shapes are polylines that have the same point as first and last item in their point list.
 

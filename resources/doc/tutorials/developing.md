@@ -31,8 +31,8 @@ For the application behaviour, check these tools:
 1.  Fix all current [issues](https://github.com/ivmartel/dwv/issues)
 1.  Check that help information is in sync
 1.  Check the [build status](https://github.com/ivmartel/dwv/actions)
-1.  Check DICOM [conformance](./tutorial-conformance.html) by loading the test [data](https://github.com/ivmartel/dwv/tree/master/data)
-1.  Check [integrations](./tutorial-integrations.html) by launching dwv in some PACS
+1.  Check DICOM [conformance](../conformance/) by loading the test [data](https://github.com/ivmartel/dwv/tree/master/data)
+1.  Check [integrations](../integrations/) by launching dwv in some PACS
 1.  Check module integration
 1.  Create release:
     1. run the `resources/scripts/prep-release` script with the release and previous version
@@ -41,6 +41,6 @@ For the application behaviour, check these tools:
 1.  Create release from [github releases](https://github.com/ivmartel/dwv/releases) (creates the tag)
 1.  Create the doc for the release `yarn run doc` and push it on the `gh-pages` branch
 1.  Publish npm package: `npm publish` in the main directory on the `master` branch
-1.  Check the examples: on class doc or [examples](./tutorial-examples.html)
+1.  Check the examples: on class doc or [examples](../examples/)
 1.  Create snapshots
 1.  Update dependent plugins: wordpress [dicom-support](https://wordpress.org/plugins/dicom-support/), [dwv-orthanc-plugin](https://github.com/ivmartel/dwv-orthanc-plugin), [dwv-dcm4chee-web](https://github.com/ivmartel/dwv-dcm4chee-web)

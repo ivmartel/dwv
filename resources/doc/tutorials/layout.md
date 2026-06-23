@@ -1,4 +1,4 @@
-This page is part of the dwv [architecture](./tutorial-architecture.html) description and
+This page is part of the dwv [architecture](../architecture/) description and
 describes the dwv layering mechanism.
 
 Summary:
@@ -8,17 +8,17 @@ Summary:
 
 ## View config
 
-The library uses a `dataId` indexed list of view configurations ([ViewConfig](./ViewConfig.html)) mainly to provide the `divId` of the HTML element where to generate the canvas associated to dicom data. It also allows to set window/level, colour map, orientation and opacity. The `*` allows to use the same configuration for all data. The `App` class provides various methods to manipulate the 'DataViewConfig'.
+The library uses a `dataId` indexed list of view configurations ([ViewConfig](../viewconfig/)) mainly to provide the `divId` of the HTML element where to generate the canvas associated to dicom data. It also allows to set window/level, colour map, orientation and opacity. The `*` allows to use the same configuration for all data. The `App` class provides various methods to manipulate the 'DataViewConfig'.
 
 ## Layers
 
 ![classes-layers](classes-layers.png)
 
-The first level is the [Stage](./Stage.html), this class handles a list of [LayerGroup](./LayerGroup.html) for optional synchronisation. A layerGroup is
-a group of layers associated to an HTML element, for now of type `View` ([ViewLayer](./ViewLayer.html)) or `Draw` ([DrawLayer](./DrawLayer.html)). The configuration of the stage
-is done at the creation of the app. See [app::init](./App.html#init) method for details. Each layer class will
-create its own HTML div with an id created by [getLayerDivId](./global.html#getLayerDivId). Layers
-will typically contain a HTML canvas to display its content. Use the [getLayerDetailsFromEvent](./global.html#getLayerDetailsFromEvent) method to extract the layer details from an event generated from a layer canvas.
+The first level is the [Stage](../stage/), this class handles a list of [LayerGroup](../layergroup/) for optional synchronisation. A layerGroup is
+a group of layers associated to an HTML element, for now of type `View` ([ViewLayer](../viewlayer/)) or `Draw` ([DrawLayer](../drawlayer/)). The configuration of the stage
+is done at the creation of the app. See [app::init](../app/#init) method for details. Each layer class will
+create its own HTML div with an id created by [getLayerDivId](../global/#getlayerdivid). Layers
+will typically contain a HTML canvas to display its content. Use the [getLayerDetailsFromEvent](../global/#getlayerdetailsfromevent) method to extract the layer details from an event generated from a layer canvas.
 You can then access the layer group object via the app `getLayerGroupByDivId` method.
 
 ![classes-layers-view](classes-layers-view.png)
@@ -27,5 +27,5 @@ The View class contains a 2D view of the image that could be 3D + t. Layers foll
 
 ![classes-layers-draw](classes-layers-draw.png)
 
-In the case of the draw, the model is the [AnnotationGroup](./AnnotationGroup.html), the view is the DrawLayer and the controller is the DrawController.
+In the case of the draw, the model is the [AnnotationGroup](../annotationgroup/), the view is the DrawLayer and the controller is the DrawController.
 The shape will use the ViewController for quantification when it needs to access the underlying pixel values.
