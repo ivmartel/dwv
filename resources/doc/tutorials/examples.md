@@ -4,31 +4,31 @@ Some fiddles for you to play... Some are bundled with the code, scroll below the
 
 DICOM parsing:
 
-- [parser example #1](./DicomParser.html#DicomParser): parse DICOM data and display a tag
+- [parser example #1](../dicomparser/#dicomparser): parse DICOM data and display a tag
 
 DICOM writing:
 
-- [writer example #1](./DicomWriter.html#DicomWriter): parse DICOM data and write it back
+- [writer example #1](../dicomwriter/#dicomwriter): parse DICOM data and write it back
 
 Image creation:
 
-- [image example #1](./Image.html#Image): parse DICOM data and create an image
+- [image example #1](../image/#image): parse DICOM data and create an image
 
 Displays:
 
-- [display example #1](./App.html#App) ([gist](https://gist.github.com/ivmartel/7415ca9b21209e83b5e713d838529795)): the simplest DICOM display example!
+- [display example #1](../app/#app) ([gist](https://gist.github.com/ivmartel/7415ca9b21209e83b5e713d838529795)): the simplest DICOM display example!
 - [display example #1.1](https://jsfiddle.net/ivmartel/jkcmj0px/): any number of displays you want (_jsfiddle_)
-- [display example #1.2](./App.html#init): manual render
-- [display example #2](./WindowLevel.html#WindowLevel): with window/level
+- [display example #1.2](../app/#init): manual render
+- [display example #2](../windowlevel/#windowlevel): with window/level
 - [display example #2.1](https://jsfiddle.net/ivmartel/fugw49be/): with draw tool (_jsfiddle_)
-- [display example #2.2](./ZoomAndPan.html#ZoomAndPan): with zoom and pan
-- [display example #2.3](./Opacity.html#Opacity): with opacity
-- [display example #3](./Scroll.html#Scroll): with multiple slices with or without a slider
+- [display example #2.2](../zoomandpan/#zoomandpan): with zoom and pan
+- [display example #2.3](../opacity/#opacity): with opacity
+- [display example #3](../scroll/#scroll): with multiple slices with or without a slider
 
 Extending dwv:
 
-- [custom tool example #1](./global.html#toolList): add a custom tool
-- [custom tool options example #1](./global.html#toolOptions): add a custom shape
+- [custom tool example #1](../global/#toollist): add a custom tool
+- [custom tool options example #1](../global/#tooloptions): add a custom shape
 
 All the ones of jsfiddle: [ivmartel/fiddles](https://jsfiddle.net/user/ivmartel/fiddles/).
 

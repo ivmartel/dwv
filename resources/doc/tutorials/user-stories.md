@@ -9,7 +9,7 @@ Definitions:
 - _URL_: the data is accessed via a URL which resolves to data published on the same server as the application or on one that allows Cross-Origin Resource Sharing (CORS). A _discrete_ URL is a URL that represents a single file or medium. A _multipart_ URL represents a document that's comprised of multiple component parts (see wikipedia [MIME#Multipart_messages](https://en.wikipedia.org/wiki/MIME#Multipart_messages)).
 - _ZIP_: archive file format that supports lossless data compression. A ZIP file may contain one or more files or directories that may have been compressed (see wikipedia [ZIP](<https://en.wikipedia.org/wiki/ZIP_(file_format)>)).
 
-Note: for more details about which parts of the DICOM standard are supported, see the DICOM [conformance](./tutorial-conformance.html) page.
+Note: for more details about which parts of the DICOM standard are supported, see the DICOM [conformance](../conformance/) page.
 
 ### DWV-REQ-IO-01-001 Load DICOM file(s)
 The user can load DICOM data provided as one or multiple HTML File(s) representing DICOM files.

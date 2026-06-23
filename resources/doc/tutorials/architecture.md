@@ -1,6 +1,6 @@
 This page is the entry point for the dwv architecture description. See:
 
-- [Data load](./tutorial-data-load.html)
-- [Layout](./tutorial-layout.html)
-- [View creation](./tutorial-view-create.html)
-- [Annotations](./tutorial-annotations.html)
+- [Data load](../data-load/)
+- [Layout](../layout/)
+- [View creation](../view-create/)
+- [Annotations](../annotations/)

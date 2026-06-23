@@ -1,4 +1,4 @@
-This page details some integrations of dwv. These PACS integrations use the Web Access to Dicom Object (WADO-URI) protocol (see [conformance](./tutorial-conformance.html#wado-uri)). The PACS handles the searching and once the data is found allows the user to launch the viewer.
+This page details some integrations of dwv. These PACS integrations use the Web Access to Dicom Object (WADO-URI) protocol (see [conformance](../conformance/#wado-uri)). The PACS handles the searching and once the data is found allows the user to launch the viewer.
 
 Quick summary: [Orthanc](#orthanc) &#x2705;, [Google](#google) &#x2705;, [Conquest](#conquest) &#x2705;, [dcm4chee](#dcm4chee) &#x2705;
 
