@@ -1,4 +1,4 @@
-This page is part of the dwv [architecture](../architecture/) description and
+This page is part of the dwv [architecture](/tutorials/architecture) description and
 describes the dwv load process.
 
 Summary:
