@@ -216,7 +216,7 @@ export class DicomData {
     const meta1IdNum = getVolumeIdTagValue(meta);
     let meta1Id;
     if (typeof meta1IdNum !== 'undefined') {
-      meta1Id = meta1IdNum.toString();
+      meta1Id = `-${meta1IdNum}`;
     }
     this.meta = mergeMeta(this.meta, meta, meta1Id);
   }

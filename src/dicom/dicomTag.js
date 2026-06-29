@@ -422,6 +422,9 @@ export function getTagFromDictionary(tagName) {
  */
 function getSimpleElementReducer(dataElements) {
   return function (accumulator, currentValue) {
+    if (currentValue === 'mergeId') {
+      return accumulator;
+    }
     // get the tag name
     const tag = getTagFromKey(currentValue);
     let tagName = tag.getNameFromDictionary();

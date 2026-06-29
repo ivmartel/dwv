@@ -50,7 +50,8 @@ describe('utils', () => {
 
     // test #00: simple
     const ref00 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: [1]},
       b: {value: {
         0: [1],
@@ -67,7 +68,8 @@ describe('utils', () => {
     const obj011 = {id: {value: ['0']}, a: {value: [1]}, b: {value: [1]}};
     const obj012 = {id: {value: ['1']}, a: {value: [1]}, b: {value: [2]}};
     const ref01 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: [1]},
       b: {value: {
         0: [1],
@@ -82,7 +84,8 @@ describe('utils', () => {
 
     // test #02: merge with already merged
     const obj021 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: [1]},
       b: {value: {
         0: [1],
@@ -91,7 +94,8 @@ describe('utils', () => {
     };
     const obj022 = {id: {value: ['2']}, a: {value: [1]}, b: {value: [2]}};
     const ref02 = {
-      id: {value: ['0', '1', '2'], merged: true},
+      mergeId: ['0', '1', '2'],
+      id: {value: {0: ['0'], 1: ['1'], 2: ['2']}},
       a: {value: [1]},
       b: {value: {
         0: [1],
@@ -107,7 +111,8 @@ describe('utils', () => {
 
     // test #03: merge with already merged that contains a repeated value
     const obj031 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: [1]},
       b: {value: {
         0: [1],
@@ -116,7 +121,8 @@ describe('utils', () => {
     };
     const obj032 = {id: {value: ['2']}, a: {value: [2]}, b: {value: [3]}};
     const ref03 = {
-      id: {value: ['0', '1', '2'], merged: true},
+      mergeId: ['0', '1', '2'],
+      id: {value: {0: ['0'], 1: ['1'], 2: ['2']}},
       a: {value: {
         0: [1],
         1: [1],
@@ -138,7 +144,8 @@ describe('utils', () => {
     const obj101 = {id: {value: ['0']}, a: {value: [1]}};
     const obj102 = {id: {value: ['1']}, a: {value: [2]}, b: {value: [1]}};
     const ref10 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: {
         0: [1],
         1: [2]
@@ -158,7 +165,8 @@ describe('utils', () => {
     const obj111 = {id: {value: ['0']}, a: {value: [1]}, b: {value: [1]}};
     const obj112 = {id: {value: ['1']}, a: {value: [2]}};
     const ref11 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: {
         0: [1],
         1: [2]
@@ -178,7 +186,8 @@ describe('utils', () => {
     const obj121 = {id: {value: ['0']}, a: {value: [1]}, b: {}};
     const obj122 = {id: {value: ['1']}, a: {value: [2]}, b: {value: [1]}};
     const ref12 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: {
         0: [1],
         1: [2]
@@ -198,7 +207,8 @@ describe('utils', () => {
     const obj131 = {id: {value: ['0']}, a: {value: [1]}, b: {value: [1]}};
     const obj132 = {id: {value: ['1']}, a: {value: [2]}, b: {}};
     const ref13 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: {
         0: [1],
         1: [2]
@@ -228,7 +238,7 @@ describe('utils', () => {
       JSON.stringify(obj_i02),
       JSON.stringify({id: {value: ['1']}, a: {value: [2]}, b: {value: [2]}}),
       'merge does not mutate second object (simple)');
-    obj_i01.id.value[0] = 'modified';
+    obj_i01.id.value = ['modified'];
     assert.equal(
       JSON.stringify(res_i0),
       res_i0_str,
@@ -237,7 +247,8 @@ describe('utils', () => {
     // immutability: merge with already merged must not change first object,
     //   and modifying input must not change the merged object
     const obj_i11 = {
-      id: {value: ['0', '1'], merged: true},
+      mergeId: ['0', '1'],
+      id: {value: {0: ['0'], 1: ['1']}},
       a: {value: [1]},
       b: {value: {0: [1], 1: [2]}}
     };
@@ -247,12 +258,13 @@ describe('utils', () => {
     assert.equal(
       JSON.stringify(obj_i11),
       JSON.stringify({
-        id: {value: ['0', '1'], merged: true},
+        mergeId: ['0', '1'],
+        id: {value: {0: ['0'], 1: ['1']}},
         a: {value: [1]},
         b: {value: {0: [1], 1: [2]}}
       }),
       'merge does not mutate first object (already merged)');
-    obj_i11.id.value.push('extra');
+    obj_i11.id.value[0] = ['modified'];
     obj_i11.b.value[0] = [99];
     assert.equal(
       JSON.stringify(res_i1),
@@ -263,7 +275,8 @@ describe('utils', () => {
     const obj_s01 = {id: {value: ['0']}, a: {value: [1]}, b: {value: [1]}};
     const obj_s02 = {id: {value: ['1']}, a: {value: [1]}, b: {value: [2]}};
     const ref_s0 = {
-      id: {value: ['0_s', '1_s'], merged: true},
+      mergeId: ['0_s', '1_s'],
+      id: {value: {'0_s': ['0'], '1_s': ['1']}},
       a: {value: [1]},
       b: {value: {
         '0_s': [1],
@@ -278,7 +291,8 @@ describe('utils', () => {
 
     // test with idSuffix: merge with already merged
     const obj_s11 = {
-      id: {value: ['0_s', '1_s'], merged: true},
+      mergeId: ['0_s', '1_s'],
+      id: {value: {'0_s': ['0'], '1_s': ['1']}},
       a: {value: [1]},
       b: {value: {
         '0_s': [1],
@@ -287,7 +301,8 @@ describe('utils', () => {
     };
     const obj_s12 = {id: {value: ['2']}, a: {value: [1]}, b: {value: [3]}};
     const ref_s1 = {
-      id: {value: ['0_s', '1_s', '2_s'], merged: true},
+      mergeId: ['0_s', '1_s', '2_s'],
+      id: {value: {'0_s': ['0'], '1_s': ['1'], '2_s': ['2']}},
       a: {value: [1]},
       b: {value: {
         '0_s': [1],

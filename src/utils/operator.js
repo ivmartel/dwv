@@ -15,7 +15,12 @@ import {arrayEquals} from './array.js';
  * Merged objects will be in the form of:
  * <code>
  * {
- *   idKey: {valueKey: ['0','1','2'], merged: true},
+ *   mergeId: ['0','1','2'],
+ *   idKey: {valueKey: {
+ *     0: ['0'],
+ *     1: ['1'],
+ *     2: ['2']
+ *   }},
  *   key0: {valueKey: {
  *     0: ["abc"],
  *     1: ["def"],
@@ -47,66 +52,61 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
   // check id key
   if (!idKey) {
     throw new Error(`Cannot merge object with an undefined id key: ${idKey}`);
-  } else {
-    if (!Object.prototype.hasOwnProperty.call(obj1, idKey)) {
-      throw new Error(`Id key not found in first object while merging: ${
-        idKey }, obj: ${obj1}`);
-    }
-    if (!Object.prototype.hasOwnProperty.call(obj2, idKey)) {
-      throw new Error(`Id key not found in second object while merging: ${
-        idKey }, obj: ${obj2}`);
-    }
+  }
+  if (obj1[idKey] === undefined) {
+    throw new Error(`Id key not found in first object while merging: ${
+      idKey }, obj: ${obj1}`);
+  }
+  if (obj2[idKey] === undefined) {
+    throw new Error(`Id key not found in second object while merging: ${
+      idKey }, obj: ${obj2}`);
   }
   // check value key
   if (!valueKey) {
     throw new Error(`Cannot merge object with an undefined value key: ${
       valueKey }`);
   }
-
-  // check if merged object
-  let mergedObj1 = false;
-  if (Object.prototype.hasOwnProperty.call(obj1[idKey], 'merged') &&
-    obj1[idKey].merged) {
-    mergedObj1 = true;
-  }
-  // handle the id part
-  if (!Object.prototype.hasOwnProperty.call(obj1[idKey], valueKey)) {
+  if (obj1[idKey][valueKey] === undefined) {
     throw new Error(`Id value not found in first object while merging: ${
       idKey }, valueKey: ${valueKey}, ojb: ${obj1}`);
   }
-  if (!Object.prototype.hasOwnProperty.call(obj2[idKey], valueKey)) {
+  if (obj2[idKey][valueKey] === undefined) {
     throw new Error(`Id value not found in second object while merging: ${
       idKey }, valueKey: ${valueKey}, ojb: ${obj2}`);
   }
-  let id1 = obj1[idKey][valueKey];
+
+  // check if obj1 is already a merged object
+  const isMergedObj1 = obj1.mergeId !== undefined;
+
+  // compute the id for obj2 (with suffix)
   const id2 = obj2[idKey][valueKey][0] + idSuffix;
-  // create own id property on the merged object (do not reference obj1)
-  res[idKey] = {...obj1[idKey], [valueKey]: [...obj1[idKey][valueKey]]};
-  if (mergedObj1) {
-    // check if array does not include id2
-    for (let k = 0; k < id1.length; ++k) {
-      if (id1[k] === id2) {
+
+  // build mergeId: the list of ids used as value-dict keys
+  let id1;
+  if (isMergedObj1) {
+    // check if id2 is not in mergeId
+    for (const mergedId of obj1.mergeId) {
+      if (mergedId === id2) {
         throw new Error(`The first object already contains id2: ${
-          id2 }, id1: ${id1}`);
+          id2 }, id1: ${obj1.mergeId}`);
       }
     }
-    res[idKey][valueKey].push(id2);
+    id1 = obj1.mergeId;
+    res.mergeId = [...obj1.mergeId, id2];
   } else {
-    id1 = id1[0] + idSuffix;
+    id1 = obj1[idKey][valueKey][0] + idSuffix;
+    // check for id equality
     if (id1 === id2) {
       throw new Error(`Cannot merge object with same ids: ${
         id1 }, id2: ${id2}`);
     }
-    // add suffix to first key
-    res[idKey][valueKey][0] = id1;
-    // add second key
-    res[idKey][valueKey].push(id2);
-    // mark as merged
-    res[idKey].merged = true;
+    res.mergeId = [id1, id2];
   }
 
-  // get keys
-  const keys1 = Object.keys(obj1);
+  // get keys (excluding 'mergeId' which is built separately)
+  const keys1 = Object.keys(obj1).filter(function (k) {
+    return k !== 'mergeId';
+  });
   // keys2 without duplicates of keys1
   const keys2 = Object.keys(obj2).filter(function (item) {
     return keys1.indexOf(item) < 0;
@@ -114,65 +114,56 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
   const keys = keys1.concat(keys2);
 
   // loop through keys
-  for (let i = 0; i < keys.length; ++i) {
-    const key = keys[i];
-    if (key !== idKey) {
-      // first
-      let value1;
-      let subValue1;
-      if (Object.prototype.hasOwnProperty.call(obj1, key)) {
-        value1 = obj1[key];
-        if (Object.prototype.hasOwnProperty.call(value1, valueKey)) {
-          subValue1 = value1[valueKey];
-        }
-      }
-      // second
-      let value2;
-      let subValue2;
-      if (Object.prototype.hasOwnProperty.call(obj2, key)) {
-        value2 = obj2[key];
-        if (Object.prototype.hasOwnProperty.call(value2, valueKey)) {
-          subValue2 = value2[valueKey];
-        }
-      }
-      // result value (own copy to avoid mutating input objects)
-      let value;
-      if (typeof value1 !== 'undefined') {
-        value = {...value1};
-      } else if (typeof value2 !== 'undefined') {
-        value = {...value2};
-      }
-      // create merge object if different values
-      if (!arrayEquals(subValue1, subValue2)) {
-        // add to merged object or create new
-        if (mergedObj1) {
-          if (Array.isArray(subValue1)) {
-            // merged object with repeated value
-            // copy it with the index list
-            value[valueKey] = {};
-            for (let j = 0; j < id1.length; ++j) {
-              value[valueKey][id1[j]] = subValue1;
-            }
-          } else {
-            value[valueKey] = {...subValue1};
-          }
-          // undefined subValue1
-          if (typeof value[valueKey] === 'undefined') {
-            value[valueKey] = {};
-          }
-          // add obj2 value
-          value[valueKey][id2] = subValue2;
-        } else {
-          // create merge object
-          const newValue = {};
-          newValue[id1] = subValue1;
-          newValue[id2] = subValue2;
-          value[valueKey] = newValue;
-        }
-      }
-      // store value in result object
-      res[key] = value;
+  for (const key of keys) {
+    // first
+    const value1 = obj1[key];
+    let subValue1;
+    if (value1 !== undefined) {
+      subValue1 = value1[valueKey];
     }
+    // second
+    const value2 = obj2[key];
+    let subValue2;
+    if (value2 !== undefined) {
+      subValue2 = value2[valueKey];
+    }
+    // result value (own copy to avoid mutating input objects)
+    let value;
+    if (value1 !== undefined) {
+      value = {...value1};
+    } else if (value2 !== undefined) {
+      value = {...value2};
+    }
+    // create merge object if different values
+    if (!arrayEquals(subValue1, subValue2)) {
+      // add to merged object or create new
+      if (isMergedObj1) {
+        if (Array.isArray(subValue1)) {
+          // repeated value: expand to dict with all existing ids
+          value[valueKey] = {};
+          for (let j = 0; j < id1.length; ++j) {
+            value[valueKey][id1[j]] = subValue1;
+          }
+        } else {
+          value[valueKey] = {...subValue1};
+        }
+        // undefined subValue1
+        if (typeof value[valueKey] === 'undefined') {
+          value[valueKey] = {};
+        }
+        // add obj2 value
+        value[valueKey][id2] = subValue2;
+      } else {
+        // create merge object
+        const newValue = {};
+        newValue[id1] = subValue1;
+        newValue[id2] = subValue2;
+        value[valueKey] = newValue;
+      }
+    }
+    // store value in result object
+    res[key] = value;
   }
+  console.log('merge', res.mergeId);
   return res;
 }
