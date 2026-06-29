@@ -42,12 +42,7 @@ import {arrayEquals} from './array.js';
  * (to differentiate time points for example).
  * @returns {object} The merged object.
  */
-export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
-  // default suffix to empty string
-  if (typeof idSuffix === 'undefined') {
-    idSuffix = '';
-  }
-
+export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix = '') {
   const res = {};
   // check id key
   if (!idKey) {
@@ -85,11 +80,9 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
   let id1;
   if (isMergedObj1) {
     // check if id2 is not in mergeId
-    for (const mergedId of obj1.mergeId) {
-      if (mergedId === id2) {
-        throw new Error(`The first object already contains id2: ${
-          id2 }, id1: ${obj1.mergeId}`);
-      }
+    if (obj1.mergeId.includes(id2)) {
+      throw new Error(`The first object already contains id2: ${
+        id2 }, id1: ${obj1.mergeId}`);
     }
     id1 = obj1.mergeId;
     res.mergeId = [...obj1.mergeId, id2];
@@ -103,15 +96,9 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
     res.mergeId = [id1, id2];
   }
 
-  // get keys (excluding 'mergeId' which is built separately)
-  const keys1 = Object.keys(obj1).filter(function (k) {
-    return k !== 'mergeId';
-  });
-  // keys2 without duplicates of keys1
-  const keys2 = Object.keys(obj2).filter(function (item) {
-    return keys1.indexOf(item) < 0;
-  });
-  const keys = keys1.concat(keys2);
+  // get keys (excluding 'mergeId' which is built separately), no duplicates
+  const keys1 = Object.keys(obj1).filter(k => k !== 'mergeId');
+  const keys = [...new Set([...keys1, ...Object.keys(obj2)])];
 
   // loop through keys
   for (const key of keys) {
@@ -147,23 +134,17 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
         } else {
           value[valueKey] = {...subValue1};
         }
-        // undefined subValue1
-        if (typeof value[valueKey] === 'undefined') {
-          value[valueKey] = {};
-        }
         // add obj2 value
         value[valueKey][id2] = subValue2;
       } else {
-        // create merge object
-        const newValue = {};
-        newValue[id1] = subValue1;
-        newValue[id2] = subValue2;
-        value[valueKey] = newValue;
+        value[valueKey] = {
+          [id1]: subValue1,
+          [id2]: subValue2
+        };
       }
     }
     // store value in result object
     res[key] = value;
   }
-  console.log('merge', res.mergeId);
   return res;
 }
