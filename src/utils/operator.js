@@ -80,8 +80,8 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
   }
   let id1 = obj1[idKey][valueKey];
   const id2 = obj2[idKey][valueKey][0] + idSuffix;
-  // update id key
-  res[idKey] = obj1[idKey];
+  // create own id property on the merged object (do not reference obj1)
+  res[idKey] = {...obj1[idKey], [valueKey]: [...obj1[idKey][valueKey]]};
   if (mergedObj1) {
     // check if array does not include id2
     for (let k = 0; k < id1.length; ++k) {
@@ -135,13 +135,12 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
           subValue2 = value2[valueKey];
         }
       }
-      // result value
+      // result value (own copy to avoid mutating input objects)
       let value;
-      // use existing to copy properties
       if (typeof value1 !== 'undefined') {
-        value = value1;
+        value = {...value1};
       } else if (typeof value2 !== 'undefined') {
-        value = value2;
+        value = {...value2};
       }
       // create merge object if different values
       if (!arrayEquals(subValue1, subValue2)) {
@@ -155,7 +154,7 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix) {
               value[valueKey][id1[j]] = subValue1;
             }
           } else {
-            value[valueKey] = subValue1;
+            value[valueKey] = {...subValue1};
           }
           // undefined subValue1
           if (typeof value[valueKey] === 'undefined') {
