@@ -6,7 +6,10 @@ import {
 import {logger} from '../../src/utils/logger.js';
 import {i18n} from '../../src/utils/i18n.js';
 import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
-import {MaskFactory} from '../../src/image/maskFactory.js';
+import {
+  MaskFactory,
+  mergeMaskImages
+} from '../../src/image/maskFactory.js';
 import {RtStructFactory} from '../../src/image/rtStructFactory.js';
 import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
@@ -154,6 +157,8 @@ const prefixes = {
   selectEraser: 'select-eraser-',
   saveSeg: 'save-seg-',
   saveRtss: 'save-rtss-',
+  mergeSaveSeg: 'merge-save-seg-',
+  mergeSaveRtss: 'merge-save-rtss-',
   volumes: 'span-volumes-',
   info: 'info-',
   li: 'li-'
@@ -234,6 +239,13 @@ export class SegmentationUI {
    * @type {boolean}
    */
   #withOverlapCheck = true;
+
+  /**
+   * With merge flag.
+   *
+   * @type {boolean}
+   */
+  #withMerge = true;
 
   /**
    * @param {App} app The associated application.
@@ -428,6 +440,15 @@ export class SegmentationUI {
           }
         }
       }
+
+      if (this.#withMerge && _segmentations.length > 1) {
+        const mergeSegButton =
+          this.#rootDoc.getElementById(`${prefixes.mergeSaveSeg}0`);
+        mergeSegButton.disabled = false;
+        const mergeRtssButton =
+          this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
+        mergeRtssButton.disabled = false;
+      }
     }
   };
 
@@ -477,6 +498,10 @@ export class SegmentationUI {
     if (this.#withOverlapCheck) {
       const overlapChecker = this.#getSegmentationOverlapHtml();
       this.#getContainerDiv().appendChild(overlapChecker);
+    }
+    if (this.#withMerge) {
+      const mergeHtml = this.#getSegmentationMergeHtml();
+      this.#getContainerDiv().appendChild(mergeHtml);
     }
   }
 
@@ -946,7 +971,12 @@ export class SegmentationUI {
     const segmentation = _segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
     // save
-    this.#saveData(dataId, fileName);
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(dataId);
+    if (typeof maskData === 'undefined') {
+      throw new Error('Cannot save SEG without mask image');
+    }
+    this.#saveData(maskData.image, fileName);
   };
 
   /**
@@ -964,23 +994,52 @@ export class SegmentationUI {
     const segmentation = _segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
     // save
-    this.#saveData(dataId, fileName, true);
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(dataId);
+    if (typeof maskData === 'undefined') {
+      throw new Error('Cannot save RTSS without mask image');
+    }
+    this.#saveData(maskData.image, fileName, true);
+  };
+
+  /**
+   * Handle a segmentation save from UI.
+   *
+   * @param {MouseEvent} event HTML event.
+   */
+  #onMergeSave = (event) => {
+    const target = event.target;
+    // get format
+    const asRtss = target.id.startsWith(prefixes.mergeSaveRtss);
+    // merge first two masks
+    const dataCtrl = this.#app.getDataController();
+    const maskId0 = _segmentations[0].dataId;
+    const maskImage0 = dataCtrl.get(maskId0).image;
+    const maskId1 = _segmentations[1].dataId;
+    const maskImage1 = dataCtrl.get(maskId1).image;
+
+    const mergedImage = mergeMaskImages(maskImage0, maskImage1);
+
+    // save
+    let fileName;
+    if (asRtss) {
+      fileName = 'merged-segmentation-rtss';
+    } else {
+      fileName = 'merged-segmentation-seg';
+    }
+    this.#saveData(mergedImage, fileName, asRtss);
   };
 
   /**
    * Save a segmentation or RTSS.
    *
-   * @param {string} dataId The data id.
+   * @param {Image} maskImage The mask data.
    * @param {string} fileName The file name.
    * @param {boolean} asRtss Whether to save as RTSS.
    */
-  #saveData(dataId, fileName, asRtss = false) {
+  #saveData(maskImage, fileName, asRtss = false) {
     const dataCtrl = this.#app.getDataController();
-    const maskData = dataCtrl.get(dataId);
-    if (typeof maskData === 'undefined') {
-      throw new Error('Cannot save without mask image');
-    }
-    const refSeriesUID = maskData.image.getMaskReferencedSeriesUID();
+    const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
     if (typeof refSeriesUID === 'undefined') {
       throw new Error('Cannot save without referenced UID');
     }
@@ -1000,8 +1059,8 @@ export class SegmentationUI {
       fac = new MaskFactory();
     }
     const dicomElements = fac.toDicom(
-      maskData.image,
-      maskData.image.getMeta().custom.segments,
+      maskImage,
+      maskImage.getMeta().custom.segments,
       sourceData.image,
       {
         MediaStorageSOPInstanceUID: '1.2.3.4.5.6',
@@ -1260,4 +1319,38 @@ export class SegmentationUI {
 
     return overlapChecker;
   }
+
+  /**
+   * Get the HTML for the segmentation merge.
+   *
+   * @returns {HTMLLIElement} The HTML element.
+   */
+  #getSegmentationMergeHtml() {
+    // create main div
+    const mergeDiv = document.createElement('div');
+    mergeDiv.id = 'segmentation-merge';
+
+    // label
+    const mergeLabel = document.createElement('label');
+    mergeLabel.innerHTML = 'Merge Segmentation 0 & 1:';
+    mergeDiv.appendChild(mergeLabel);
+
+    const saveSegButton = getButton('Save');
+    saveSegButton.disabled = true;
+    saveSegButton.title = 'Merge and Save SEG';
+    saveSegButton.id = getHtmlId(prefixes.mergeSaveSeg, '0');
+    saveSegButton.onclick = this.#onMergeSave;
+
+    const saveRtssButton = getButton('Save');
+    saveRtssButton.disabled = true;
+    saveRtssButton.title = 'Merge and Save RTSS';
+    saveRtssButton.id = getHtmlId(prefixes.mergeSaveRtss, '0');
+    saveRtssButton.onclick = this.#onMergeSave;
+
+    mergeDiv.appendChild(saveSegButton);
+    mergeDiv.appendChild(saveRtssButton);
+
+    return mergeDiv;
+  }
+
 }; // SegmentationUI

@@ -3,8 +3,9 @@ import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGetAll} from '../../src/dicom/dataElement.js';
-import {MaskFactory} from '../../src/image/maskFactory.js';
+import {MaskFactory, mergeMaskImages} from '../../src/image/maskFactory.js';
 import {Image} from '../../src/image/image.js';
+import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
@@ -353,5 +354,170 @@ describe('MaskFactory', () => {
       );
     }
   });
+
+});
+
+// ---------------------------------------------------------------------------
+// mergeMaskImages tests
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a minimal single-segment mask using the test-00 geometry.
+ *
+ * @param {number} segNumber The segment number.
+ * @param {string} label The segment label.
+ * @param {number} pixelStart First pixel index to mark as foreground.
+ * @param {number} pixelCount Number of contiguous foreground pixels.
+ * @returns {Image} The mask image.
+ */
+function buildSingleSegmentMask(segNumber, label, pixelStart, pixelCount) {
+  const config = syntheticData.find(c => c.name === 'test-00');
+  const tags = config.tags;
+  const geometry = new Geometry(
+    [new Point3D(0, 0, 0)],
+    new Size([tags.Columns, tags.Rows, 1]),
+    new Spacing([1, 1, 1])
+  );
+  const sliceSize = tags.Columns * tags.Rows;
+  const sliceBuf = new Uint8Array(sliceSize);
+  for (let p = pixelStart; p < pixelStart + pixelCount; ++p) {
+    sliceBuf[p] = 1;
+  }
+  const collection = new SegmentCollection(geometry);
+  collection.addFrame(segNumber, sliceBuf, 0, 0, sliceSize, segNumber);
+  const labelMap = collection.getLabelMap();
+  const image = new Image(geometry, labelMap, [`uid-${segNumber}`]);
+  image.setSegmentCollection(collection);
+  const segment = {number: segNumber, label};
+  image.setMeta({
+    Modality: 'SEG',
+    custom: {
+      segments: [segment],
+      referencedSeriesUID: tags.SeriesInstanceUID,
+    }
+  });
+  return image;
+}
+
+describe('mergeMaskImages', () => {
+
+  test('merge: segments from both masks appear in merged metadata', () => {
+    const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
+    const mask2 = buildSingleSegmentMask(2, 'Seg2', 100, 16);
+    const merged = mergeMaskImages(mask1, mask2);
+    const segments = merged.getMeta().custom.segments;
+    assert.equal(segments.length, 2, 'merged has 2 segments');
+    assert.equal(segments[0].number, 1, 'first segment number');
+    assert.equal(segments[0].label, 'Seg1', 'first segment label');
+    assert.equal(segments[1].number, 2, 'second segment number');
+    assert.equal(segments[1].label, 'Seg2', 'second segment label');
+  });
+
+  test('merge: pixel data from both masks present in label map', () => {
+    const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
+    const mask2 = buildSingleSegmentMask(2, 'Seg2', 100, 16);
+    const merged = mergeMaskImages(mask1, mask2);
+    const buf = merged.getBuffer();
+    assert.equal(buf[0], 1, 'mask1 pixel region has value 1');
+    assert.equal(buf[100], 2, 'mask2 pixel region has value 2');
+    assert.equal(buf[50], 0, 'gap between regions is background');
+  });
+
+  test('merge: conflicting segment number in mask2 is remapped', () => {
+    const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
+    const mask2 = buildSingleSegmentMask(1, 'Seg1b', 100, 16);
+    const merged = mergeMaskImages(mask1, mask2);
+    const segments = merged.getMeta().custom.segments;
+    assert.equal(segments.length, 2, 'merged has 2 segments');
+    assert.equal(segments[0].number, 1, 'mask1 segment keeps number 1');
+    assert.equal(segments[1].number, 2, 'mask2 segment remapped to 2');
+    const buf = merged.getBuffer();
+    assert.equal(buf[0], 1, 'mask1 pixels keep value 1');
+    assert.equal(buf[100], 2, 'mask2 pixels use new value 2');
+  });
+
+  test('merge: segment collection contains both segments', () => {
+    const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
+    const mask2 = buildSingleSegmentMask(2, 'Seg2', 100, 16);
+    const merged = mergeMaskImages(mask1, mask2);
+    const all = merged.getSegmentCollection().getAll();
+    assert.ok(all.has(1), 'collection has segment 1');
+    assert.ok(all.has(2), 'collection has segment 2');
+  });
+
+  test('merge round-trip via toDicom: NumberOfFrames matches combined input',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-11');
+      const factory = new MaskFactory();
+      const mask1 = factory.create(
+        configToElements(config), buildPixelBuffer(config), buildRefImage()
+      );
+      const mask2 = factory.create(
+        configToElements(config), buildPixelBuffer(config), buildRefImage()
+      );
+      const merged = mergeMaskImages(mask1, mask2);
+      const mergedSegments = merged.getMeta().custom.segments;
+      const outElements =
+        factory.toDicom(merged, mergedSegments, buildRefImage());
+      const nFrames =
+        parseInt(outElements['00280008'].value[0], 10);
+      assert.equal(
+        nFrames,
+        parseInt(config.tags.NumberOfFrames, 10) * 2,
+        'merged NumberOfFrames equals 2 × input frames'
+      );
+    }
+  );
+
+  test('merge: brush mask (no #segments) as mask2 pixel data is preserved',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-00');
+      const tags = config.tags;
+      const sliceSize = tags.Columns * tags.Rows;
+      const brushBuf = new Uint8Array(sliceSize);
+      for (let p = 100; p < 116; ++p) {
+        brushBuf[p] = 2;
+      }
+      const brushGeometry = new Geometry(
+        [new Point3D(0, 0, 0)],
+        new Size([tags.Columns, tags.Rows, 1]),
+        new Spacing([1, 1, 1])
+      );
+      const brushMask = new Image(brushGeometry, brushBuf, ['uid-brush']);
+      brushMask.setupSegmentCollection();
+      brushMask.setMeta({Modality: 'SEG', custom: {}});
+      const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
+      const merged = mergeMaskImages(mask1, brushMask);
+      const buf = merged.getBuffer();
+      assert.equal(buf[0], 1, 'DICOM mask pixels present');
+      assert.equal(buf[100], 2, 'brush mask pixels present');
+      assert.equal(buf[50], 0, 'gap is background');
+    }
+  );
+
+  test('merge: brush mask (no #segments) as mask1 pixel data is preserved',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-00');
+      const tags = config.tags;
+      const sliceSize = tags.Columns * tags.Rows;
+      const brushBuf = new Uint8Array(sliceSize);
+      for (let p = 0; p < 16; ++p) {
+        brushBuf[p] = 1;
+      }
+      const brushGeometry = new Geometry(
+        [new Point3D(0, 0, 0)],
+        new Size([tags.Columns, tags.Rows, 1]),
+        new Spacing([1, 1, 1])
+      );
+      const brushMask = new Image(brushGeometry, brushBuf, ['uid-brush']);
+      brushMask.setupSegmentCollection();
+      brushMask.setMeta({Modality: 'SEG', custom: {}});
+      const mask2 = buildSingleSegmentMask(2, 'Seg2', 100, 16);
+      const merged = mergeMaskImages(brushMask, mask2);
+      const buf = merged.getBuffer();
+      assert.equal(buf[0], 1, 'brush mask pixels present');
+      assert.equal(buf[100], 2, 'DICOM mask pixels present');
+    }
+  );
 
 });

@@ -28,11 +28,10 @@ function createRoiSliceBuffers(
   /** @type {Record<number, Uint8Array>} */
   const buffers = {};
   for (let o = 0; o < sliceSize; ++o) {
-    const inputOffset = sliceOffset + o;
-    const pixelValue = imageBuffer[inputOffset];
+    const pixelValue = imageBuffer[sliceOffset + o];
     for (const segment of segments) {
-      const segmentIndex = segment.number - 1;
       if (pixelValue === segment.number) {
+        const segmentIndex = segment.number - 1;
         if (buffers[segmentIndex] === undefined) {
           buffers[segmentIndex] = new Uint8Array(sliceSize);
         }
@@ -233,8 +232,19 @@ export class SegmentCollection {
    */
   getSegmentBuffers(segments) {
     if (this.#segments.size === 0) {
-      // brush path: no per-segment data, reconstruct from label map
-      return createRoiBuffers(this.#labelMap, this.#geometry, segments);
+      // brush path: no per-segment data, reconstruct from label map;
+      // when segments metadata is absent, discover numbers from the buffer
+      let segs = segments;
+      if (segs.length === 0 && typeof this.#labelMap !== 'undefined') {
+        const found = new Set();
+        for (let i = 0; i < this.#labelMap.length; ++i) {
+          if (this.#labelMap[i] !== 0) {
+            found.add(this.#labelMap[i]);
+          }
+        }
+        segs = [...found].map(n => ({number: n}));
+      }
+      return createRoiBuffers(this.#labelMap, this.#geometry, segs);
     }
     // MaskFactory path: use per-segment per-slice buffers directly so that
     // pixels in overlap zones are present for every segment, not just the

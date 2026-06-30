@@ -908,3 +908,137 @@ export class MaskFactory {
   }
 
 } // class MaskFactory
+
+/**
+ * Merge two mask images into a new combined mask image.
+ *
+ * Segments from mask2 that share a segment number with mask1 are renumbered
+ * (bumped to the next available number) to avoid conflicts. Both masks must
+ * reference the same geometry (same spatial volume).
+ * Brush-painted masks (no per-segment SegmentCollection data) are supported.
+ *
+ * The returned image can be saved with the standard
+ * `new MaskFactory().toDicom(merged, undefined, sourceImage)` workflow.
+ *
+ * @param {Image} mask1 The first mask (provides base geometry and meta).
+ * @param {Image} mask2 The second mask to merge into mask1.
+ * @returns {Image} The new merged mask image.
+ */
+export function mergeMaskImages(mask1, mask2) {
+  const geometry = mask1.getGeometry();
+  const sliceSize = geometry.getSize().getDimSize(2);
+  const segments1 = mask1.getMeta().custom?.segments ?? [];
+  const segments2 = mask2.getMeta().custom?.segments ?? [];
+
+  // getSegmentBuffers handles both DICOM and brush paths; for brush masks
+  // with no segments metadata it auto-discovers numbers from the label map
+  const roiBuffers1 =
+    mask1.getSegmentCollection().getSegmentBuffers(segments1);
+  const roiBuffers2 =
+    mask2.getSegmentCollection().getSegmentBuffers(segments2);
+
+  // seg numbers from segments or roiBUffers
+  let segNums1;
+  if (segments1.length > 0) {
+    segNums1 = segments1.map(s => s.number);
+  } else {
+    // roiBuffers keys are segIndex = segNum - 1
+    segNums1 = Object.keys(roiBuffers1).map(k => Number(k) + 1);
+  }
+  let segNums2;
+  if (segments2.length > 0) {
+    segNums2 = segments2.map(s => s.number);
+  } else {
+    // roiBuffers keys are segIndex = segNum - 1
+    segNums2 = Object.keys(roiBuffers2).map(k => Number(k) + 1);
+  }
+
+  // remap mask2 segment numbers that conflict with mask1
+  const usedNumbers = new Set(segNums1);
+  let nextNumber = usedNumbers.size > 0 ? Math.max(...usedNumbers) + 1 : 1;
+  /** @type {Map<number, number>} */
+  const remap = new Map();
+  for (const num2 of segNums2) {
+    if (usedNumbers.has(num2)) {
+      const newNum = nextNumber++;
+      logger.warn(
+        'mergeMaskImages: segment number conflict, ' +
+        `remapping ${num2} to ${newNum}`
+      );
+      remap.set(num2, newNum);
+    } else {
+      remap.set(num2, num2);
+      usedNumbers.add(num2);
+    }
+  }
+
+  const mergedSegments = [
+    ...segments1,
+    ...segments2.map(seg => ({...seg, number: remap.get(seg.number)}))
+  ];
+
+  const mergedCollection = new SegmentCollection(geometry);
+
+  // add frames from mask1
+  const hasRGB1 = mask1.getPhotometricInterpretation() === 'PALETTE COLOR';
+  for (const [segIdxStr, slices] of Object.entries(roiBuffers1)) {
+    const segNum = Number(segIdxStr) + 1;
+    const seg1 = segments1.find(s => s.number === segNum);
+    const value = hasRGB1 ? segNum : (seg1?.displayValue ?? segNum);
+    for (const [sliceIdxStr, sliceBuf] of Object.entries(slices)) {
+      mergedCollection.addFrame(
+        segNum, sliceBuf, 0, Number(sliceIdxStr), sliceSize, value
+      );
+    }
+  }
+
+  // add frames from mask2
+  const hasRGB2 = mask2.getPhotometricInterpretation() === 'PALETTE COLOR';
+  for (const [segIdxStr, slices] of Object.entries(roiBuffers2)) {
+    const segNum = Number(segIdxStr) + 1;
+    const newSegNum = remap.get(segNum);
+    const seg2 = segments2.find(s => s.number === segNum);
+    const value = hasRGB2 ? newSegNum : (seg2?.displayValue ?? newSegNum);
+    for (const [sliceIdxStr, sliceBuf] of Object.entries(slices)) {
+      mergedCollection.addFrame(
+        newSegNum, sliceBuf, 0, Number(sliceIdxStr), sliceSize, value
+      );
+    }
+  }
+
+  const uids = geometry.getOrigins().map((_, i) => i.toString());
+  const mergedImage = new Image(geometry, mergedCollection.getLabelMap(), uids);
+  mergedImage.setSegmentCollection(mergedCollection);
+
+  // set palette colour map if possible
+  if (hasRGB1 || hasRGB2) {
+    const p1 = mask1.getPaletteColourMap();
+    const redLut = p1 ? [...p1.red] : new Array(256).fill(0);
+    const greenLut = p1 ? [...p1.green] : new Array(256).fill(0);
+    const blueLut = p1 ? [...p1.blue] : new Array(256).fill(0);
+    const p2 = mask2.getPaletteColourMap();
+    if (p2) {
+      for (const num of segNums2) {
+        const newSegNum = remap.get(num);
+        redLut[newSegNum] = p2.red[num];
+        greenLut[newSegNum] = p2.green[num];
+        blueLut[newSegNum] = p2.blue[num];
+      }
+    }
+    mergedImage.setPhotometricInterpretation('PALETTE COLOR');
+    mergedImage.setPaletteColourMap(new ColourMap(redLut, greenLut, blueLut));
+  } else {
+    mergedImage.setPhotometricInterpretation(
+      mask1.getPhotometricInterpretation()
+    );
+  }
+
+  const mergedMeta = structuredClone(mask1.getMeta());
+  if (typeof mergedMeta.custom === 'undefined') {
+    mergedMeta.custom = {};
+  }
+  mergedMeta.custom.segments = mergedSegments;
+  mergedImage.setMeta(mergedMeta);
+
+  return mergedImage;
+}

@@ -30,7 +30,8 @@ import {
 } from './windowLevel.js';
 import {
   MaskFactory,
-  getDefaultDicomSegJson
+  getDefaultDicomSegJson,
+  mergeMaskImages
 } from './maskFactory.js';
 import {
   RtStructFactory,
@@ -78,6 +79,7 @@ export {
   equalWl,
   getDefaultDicomSegJson,
   getDefaultDicomRTStructJson,
+  mergeMaskImages,
   bufferToPolygons,
   simplifyPolygon,
 };
