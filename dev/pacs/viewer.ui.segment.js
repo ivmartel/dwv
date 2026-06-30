@@ -234,6 +234,13 @@ export class SegmentationUI {
   #rootDoc = document;
 
   /**
+   * With RTSS flag.
+   *
+   * @type {boolean}
+   */
+  #withRtss = true;
+
+  /**
    * With overlap check flag.
    *
    * @type {boolean}
@@ -445,9 +452,11 @@ export class SegmentationUI {
         const mergeSegButton =
           this.#rootDoc.getElementById(`${prefixes.mergeSaveSeg}0`);
         mergeSegButton.disabled = false;
-        const mergeRtssButton =
-          this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
-        mergeRtssButton.disabled = false;
+        if (this.#withRtss) {
+          const mergeRtssButton =
+            this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
+          mergeRtssButton.disabled = false;
+        }
       }
     }
   };
@@ -1163,7 +1172,9 @@ export class SegmentationUI {
     actionGroupDiv.id = `${segmentationName}-actions`;
     actionGroupDiv.className = 'data-item-actions';
     actionGroupDiv.appendChild(saveSegButton);
-    actionGroupDiv.appendChild(saveRtssButton);
+    if (this.#withRtss) {
+      actionGroupDiv.appendChild(saveRtssButton);
+    }
     actionGroupDiv.appendChild(addButton);
 
     // segment list
@@ -1348,7 +1359,9 @@ export class SegmentationUI {
     saveRtssButton.onclick = this.#onMergeSave;
 
     mergeDiv.appendChild(saveSegButton);
-    mergeDiv.appendChild(saveRtssButton);
+    if (this.#withRtss) {
+      mergeDiv.appendChild(saveRtssButton);
+    }
 
     return mergeDiv;
   }
