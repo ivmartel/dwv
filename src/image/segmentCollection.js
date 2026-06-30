@@ -12,7 +12,7 @@ import {logger} from '../utils/logger.js';
  * Create ROI slice buffers.
  *
  * @param {Uint8Array} imageBuffer The mask image buffer.
- * @param {MaskSegment[]} segments The mask segments.
+ * @param {number[]} segmentNumbers The mask segment numbers.
  * @param {number} sliceSize The size of a slice.
  * @param {number} sliceOffset The slice offset.
  * @returns {Record<number, Uint8Array>} The ROI slice image buffers,
@@ -20,7 +20,7 @@ import {logger} from '../utils/logger.js';
  */
 function createRoiSliceBuffers(
   imageBuffer,
-  segments,
+  segmentNumbers,
   sliceSize,
   sliceOffset
 ) {
@@ -29,9 +29,9 @@ function createRoiSliceBuffers(
   const buffers = {};
   for (let o = 0; o < sliceSize; ++o) {
     const pixelValue = imageBuffer[sliceOffset + o];
-    for (const segment of segments) {
-      if (pixelValue === segment.number) {
-        const segmentIndex = segment.number - 1;
+    for (const segmentNumber of segmentNumbers) {
+      if (pixelValue === segmentNumber) {
+        const segmentIndex = segmentNumber - 1;
         if (buffers[segmentIndex] === undefined) {
           buffers[segmentIndex] = new Uint8Array(sliceSize);
         }
@@ -47,11 +47,11 @@ function createRoiSliceBuffers(
  *
  * @param {Uint8Array} imageBuffer The mask image buffer.
  * @param {Geometry} geometry The mask geometry.
- * @param {MaskSegment[]} segments The mask segments.
+ * @param {number[]} segmentNumbers The mask segment numbers.
  * @returns {Record<string, Record<number, Uint8Array>>} The ROI buffers,
  * indexed by segment index (segment.number - 1) and slice index.
  */
-function createRoiBuffers(imageBuffer, geometry, segments) {
+function createRoiBuffers(imageBuffer, geometry, segmentNumbers) {
   const size = geometry.getSize();
 
   // image buffer to multi frame
@@ -62,7 +62,7 @@ function createRoiBuffers(imageBuffer, geometry, segments) {
     const sliceOffset = k * sliceSize;
     // create slice buffers
     const buffers = createRoiSliceBuffers(
-      imageBuffer, segments, sliceSize, sliceOffset);
+      imageBuffer, segmentNumbers, sliceSize, sliceOffset);
     // store slice buffers
     const keys0 = Object.keys(buffers);
     for (const key0 of keys0) {
@@ -234,17 +234,17 @@ export class SegmentCollection {
     if (this.#segments.size === 0) {
       // brush path: no per-segment data, reconstruct from label map;
       // when segments metadata is absent, discover numbers from the buffer
-      let segs = segments;
-      if (segs.length === 0 && typeof this.#labelMap !== 'undefined') {
+      let segNumbers = segments.map(segment => segment.number);
+      if (segNumbers.length === 0 && typeof this.#labelMap !== 'undefined') {
         const found = new Set();
         for (let i = 0; i < this.#labelMap.length; ++i) {
           if (this.#labelMap[i] !== 0) {
             found.add(this.#labelMap[i]);
           }
         }
-        segs = [...found].map(n => ({number: n}));
+        segNumbers = Array.from(found);
       }
-      return createRoiBuffers(this.#labelMap, this.#geometry, segs);
+      return createRoiBuffers(this.#labelMap, this.#geometry, segNumbers);
     }
     // MaskFactory path: use per-segment per-slice buffers directly so that
     // pixels in overlap zones are present for every segment, not just the
