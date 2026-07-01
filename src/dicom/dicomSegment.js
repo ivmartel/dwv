@@ -10,11 +10,12 @@ import {
   getDicomCodeItem
 } from './dicomCode.js';
 import {logger} from '../utils/logger.js';
-import {RGB} from '../utils/colour.js';
+import {getDefaultColour} from '../utils/colour.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
  * @import {DicomCode} from './dicomCode.js';
+ * @import {RGB} from '../utils/colour.js';
  */
 
 /**
@@ -31,45 +32,6 @@ const TagKeys = {
   SegmentedPropertyTypeCodeSequence: '0062000F',
   TrackingID: '00620020',
   TrackingUID: '00620021'
-};
-
-/**
- * Get a default RGB colour for a segment.
- *
- * @param {number} segmentNumber The segment number.
- * @returns {RGB} A colour.
- */
-function getDefaultColour(segmentNumber) {
-  // ITK snap colours
-  const colours = [
-    new RGB(0, 0, 0),
-    new RGB(255, 0, 0),
-    new RGB(0, 255, 0),
-    new RGB(0, 0, 255),
-    new RGB(255, 255, 0),
-    new RGB(0, 255, 255),
-    new RGB(255, 0, 255),
-    new RGB(255, 239, 213),
-    new RGB(0, 0, 205),
-    new RGB(205, 133, 63),
-    new RGB(210, 180, 140),
-    new RGB(102, 205, 170),
-    new RGB(0, 0, 128),
-    new RGB(0, 139, 139),
-    new RGB(46, 139, 87),
-    new RGB(255, 228, 225)
-  ];
-  let colour;
-  if (segmentNumber < colours.length) {
-    colour = colours[segmentNumber];
-  } else {
-    colour = new RGB(
-      Math.random() * 255,
-      Math.random() * 255,
-      Math.random() * 255
-    );
-  }
-  return colour;
 };
 
 /**
