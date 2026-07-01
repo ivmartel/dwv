@@ -1,4 +1,10 @@
 import {safeGet, safeGetAll} from './dataElement.js';
+import {
+  cielabToSrgb,
+  uintLabToLab
+} from '../utils/colour.js';
+import {logger} from '../utils/logger.js';
+import {getDefaultColour} from '../utils/colour.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
@@ -8,6 +14,7 @@ import {safeGet, safeGetAll} from './dataElement.js';
  * Related DICOM tag keys.
  */
 const TagKeys = {
+  RecommendedDisplayCIELabValue: '0062000D',
   // Structure Set ROI Sequence (3006,0020)
   StructureSetROISequence: '30060020',
   ROINumber: '30060022',
@@ -107,13 +114,26 @@ export function getRTStructFromElements(dataElements) {
 
     // parse display colour
     const colorValues = safeGetAll(contourItem, TagKeys.ROIDisplayColor);
-    let colour = {r: 255, g: 0, b: 0};
+    const cielabValues = safeGetAll(
+      contourItem, TagKeys.RecommendedDisplayCIELabValue
+    );
+    let colour;
     if (typeof colorValues !== 'undefined' && colorValues.length === 3) {
       colour = {
         r: parseInt(colorValues[0], 10),
         g: parseInt(colorValues[1], 10),
         b: parseInt(colorValues[2], 10)
       };
+    } else if (typeof cielabValues !== 'undefined' &&
+      cielabValues.length === 3) {
+      colour = cielabToSrgb(uintLabToLab({
+        l: cielabValues[0],
+        a: cielabValues[1],
+        b: cielabValues[2]
+      }));
+    } else {
+      logger.warn('No recommended colour for contour, using default');
+      colour = getDefaultColour(roiNum);
     }
 
     // parse contours
