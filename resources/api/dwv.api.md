@@ -958,6 +958,9 @@ export class Matrix33 {
     toString(): string;
 }
 
+// @public
+export function mergeMaskImages(mask1: Image_2, mask2: Image_2): Image_2;
+
 // @public (undocumented)
 export namespace NormalisedManufacturers {
     let // (undocumented)
