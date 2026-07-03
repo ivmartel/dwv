@@ -926,6 +926,9 @@ export class MaskFactory {
  */
 export function mergeMaskImages(mask1, mask2) {
   const geometry = mask1.getGeometry();
+  if (!geometry.isSimilar(mask2.getGeometry(), REAL_WORLD_EPSILON)) {
+    throw new Error('mergeMaskImages: masks must have equal geometries');
+  }
   const sliceSize = geometry.getSize().getDimSize(2);
   const segments1 = mask1.getMeta().custom?.segments ?? [];
   const segments2 = mask2.getMeta().custom?.segments ?? [];
