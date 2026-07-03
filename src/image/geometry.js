@@ -508,6 +508,24 @@ export class Geometry {
   }
 
   /**
+   * Check for similarity for origin and orientation, equality
+   * for size and spacing.
+   *
+   * @param {Geometry} rhs The object to compare to.
+   * @param {number} [tol] Optional number comparison tolerance,
+   *   defaults to Number.EPSILON.
+   * @returns {boolean} True if both objects are equal.
+   */
+  isSimilar(rhs, tol) {
+    return rhs !== null &&
+      typeof rhs !== 'undefined' &&
+      this.getOrigin().isSimilar(rhs.getOrigin(), tol) &&
+      this.getSize().equals(rhs.getSize()) &&
+      this.getSpacing().equals(rhs.getSpacing()) &&
+      this.getOrientation().isSimilar(rhs.getOrientation(), tol);
+  }
+
+  /**
    * Check that a point is within bounds.
    *
    * @param {Point} point The point to check.

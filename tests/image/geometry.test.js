@@ -4,6 +4,7 @@ import {Index} from '../../src/math/index.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Geometry} from '../../src/image/geometry.js';
+import {Matrix33, getIdentityMat33} from '../../src/math/matrix.js';
 
 /**
  * Tests for the 'image/geometry.js' file.
@@ -93,6 +94,66 @@ describe('image', () => {
       const resPoint2 = imgGeometry1.worldToIndex(theoPoint);
       assert.ok(index.equals(resPoint2), `worldToIndex #1-${i}`);
     }
+  });
+
+  /**
+   * Tests for {@link Geometry#isSimilar}.
+   *
+   * @function module:tests/image~geometryIsSimilar
+   */
+  test('Geometry isSimilar', () => {
+    const size = new Size([3, 3, 2]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origin = new Point3D(0, 0, 0);
+    const orientation = getIdentityMat33();
+    const geom = new Geometry([origin], size, spacing, orientation);
+
+    // identical geometry is similar
+    const geomSame = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing, getIdentityMat33());
+    assert.ok(geom.isSimilar(geomSame), 'identical geometries are similar');
+
+    // origin within default tolerance (Number.EPSILON) is similar
+    const eps = Number.EPSILON / 2;
+    const geomOriginClose = new Geometry(
+      [new Point3D(eps, eps, eps)], size, spacing, getIdentityMat33());
+    assert.ok(
+      geom.isSimilar(geomOriginClose), 'origin within epsilon is similar');
+
+    // origin outside tolerance is not similar
+    const geomOriginFar = new Geometry(
+      [new Point3D(0.1, 0, 0)], size, spacing, getIdentityMat33());
+    assert.notOk(
+      geom.isSimilar(geomOriginFar), 'origin outside tolerance is not similar');
+
+    // origin outside default but within custom tolerance is similar
+    assert.ok(
+      geom.isSimilar(geomOriginFar, 0.2),
+      'origin within custom tolerance is similar');
+
+    // different size is not similar
+    const geomDiffSize = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([4, 3, 2]), spacing, getIdentityMat33());
+    assert.notOk(
+      geom.isSimilar(geomDiffSize), 'different size is not similar');
+
+    // different spacing is not similar
+    const geomDiffSpacing = new Geometry(
+      [new Point3D(0, 0, 0)], size, new Spacing([2, 1, 1]), getIdentityMat33());
+    assert.notOk(
+      geom.isSimilar(geomDiffSpacing), 'different spacing is not similar');
+
+    // different orientation is not similar
+    const rotValues = [0, -1, 0, 1, 0, 0, 0, 0, 1];
+    const rotOrientation = new Matrix33(rotValues);
+    const geomDiffOrient = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing, rotOrientation);
+    assert.notOk(
+      geom.isSimilar(geomDiffOrient), 'different orientation is not similar');
+
+    // null/undefined are not similar
+    assert.notOk(geom.isSimilar(null), 'null is not similar');
+    assert.notOk(geom.isSimilar(undefined), 'undefined is not similar');
   });
 
 });
