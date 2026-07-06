@@ -927,8 +927,7 @@ export class MaskFactory {
 export function mergeMaskImages(mask1, mask2) {
   const geometry1 = mask1.getGeometry();
   const geometry2 = mask2.getGeometry();
-  if (!geometry1.getSpacing().equals(
-    geometry2.getSpacing(), REAL_WORLD_EPSILON)) {
+  if (!geometry1.getSpacing().equals(geometry2.getSpacing())) {
     throw new Error('mergeMaskImages: masks must have similar spacings');
   }
   if (!geometry1.getOrientation().isSimilar(
