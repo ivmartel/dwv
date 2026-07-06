@@ -1359,23 +1359,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/bhasha@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "@clean-jsdoc-theme/bhasha@npm:5.0.5"
+"@clean-jsdoc-theme/bhasha@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "@clean-jsdoc-theme/bhasha@npm:5.0.6"
   dependencies:
-    "@clean-jsdoc-theme/utils": "npm:^5.0.5"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
     preact: "npm:^10.22.0"
-  checksum: 10c0/6ee5966908550d640683d1ce08e492a7308e198b82c76509d0d2bd4818213f0c74c0611183d81c89d2c3dcac9eabe2793ec10a68acddba9e1c749a092cb9290e
+  checksum: 10c0/8deeb504a6bb0e132f55248c76323cd69c175d1ccdbdcdbb9c8a866fe626a74d91fec06269bd5c15c9fd841815174f442619aa5abf4916a1fd1ed99956a85e4b
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/dwar@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "@clean-jsdoc-theme/dwar@npm:5.0.5"
+"@clean-jsdoc-theme/dwar@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "@clean-jsdoc-theme/dwar@npm:5.0.6"
   dependencies:
-    "@clean-jsdoc-theme/rang": "npm:^5.0.5"
-    "@clean-jsdoc-theme/setu": "npm:^5.0.5"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.5"
+    "@clean-jsdoc-theme/rang": "npm:^5.0.6"
+    "@clean-jsdoc-theme/setu": "npm:^5.0.6"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
     "@mdx-js/mdx": "npm:^3.0.0"
     "@shikijs/rehype": "npm:^4.2.0"
     esbuild: "npm:^0.21.5"
@@ -1385,32 +1385,32 @@ __metadata:
     remark-frontmatter: "npm:^5"
     remark-gfm: "npm:^4"
     shiki: "npm:^4.2.0"
-  checksum: 10c0/b0df96a485bb9552dc644dbe1d9901f22dd93d1a753a9dfa9909e230ef75c00ee840a38388cf519b72f0c45fb0b4b1f433edb1d952da71004efe852fef7b6a27
+  checksum: 10c0/b6de90aab0e02725907e19d51e051138aa302b33a4dcdaefb3e265453bd51b7cfbe02cf5b11d28104a503d286f54056c1930451bfc531c0c71fb3a0c80a2db0e
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/rang@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "@clean-jsdoc-theme/rang@npm:5.0.5"
+"@clean-jsdoc-theme/rang@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "@clean-jsdoc-theme/rang@npm:5.0.6"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.0.5"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.5"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.0.6"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     lucide-preact: "npm:^1.17.0"
     lz-string: "npm:^1.5.0"
     preact: "npm:^10.22.0"
     tailwind-merge: "npm:^3.6.0"
-  checksum: 10c0/35b98e7081cd0e7d23e71b5cc7f1c3ec737bf542251d204c5d4ada7048c0a8d8449a552a221539ebe60183b88d393afec8b448b17f1a41e8573d3d8839178e5e
+  checksum: 10c0/8b23b3487038af4b292a6ea0f37550775a9e63f40c9e61f0838ab1454ec5fbd4068d49ff7d95300b98658cf2714a96d94078a9690ca34dda4b7bffc37485c0c4
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/setu@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "@clean-jsdoc-theme/setu@npm:5.0.5"
+"@clean-jsdoc-theme/setu@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "@clean-jsdoc-theme/setu@npm:5.0.6"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.0.5"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.5"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.0.6"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
     "@jsdoc/salty": "npm:^0.2.12"
     hast-util-from-html: "npm:^2.0.3"
     hast-util-to-html: "npm:^9.0.5"
@@ -1422,16 +1422,16 @@ __metadata:
     mdast-util-to-markdown: "npm:^2.1.2"
     micromark-extension-gfm: "npm:^3.0.0"
     turndown: "npm:^7.2.4"
-  checksum: 10c0/ca689ab9d4edb02d10e74899e0a59689b233a3bd6a4e4a285d51dd9e612df0e7734079671e94b3eb52c040a9011dd7fb12f005fbaf43480fe9c466da4bf306e0
+  checksum: 10c0/e53816fa4e6dd6571938b3b2f5c40898462c4c35916094116516277a95431e8c08c9f64a90068e38f652dba2eafc504092c563f44c887a6c7dc8dfba90ab6efa
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/utils@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "@clean-jsdoc-theme/utils@npm:5.0.5"
+"@clean-jsdoc-theme/utils@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "@clean-jsdoc-theme/utils@npm:5.0.6"
   dependencies:
     zod: "npm:^4.3.6"
-  checksum: 10c0/ee478506cd770a0be03c5731ae7bd6b50b94e4f7c3654b8958dda09377a8bba55d3c41665edbbdd3dfa810f9c35a149d2902bb796f48fd1a2ad8cb6bb3852663
+  checksum: 10c0/90954aaa1ea711dfffdbdb772160fc01c40d630e14d6455f9580d670825f4476f8b8ac7c2297c391e6e50e88cda54b2436b10e9735ff8d4f7da7f9ce39c9156b
   languageName: node
   linkType: hard
 
@@ -4647,18 +4647,18 @@ __metadata:
   linkType: hard
 
 "clean-jsdoc-theme@npm:^5.0.3":
-  version: 5.0.5
-  resolution: "clean-jsdoc-theme@npm:5.0.5"
+  version: 5.0.6
+  resolution: "clean-jsdoc-theme@npm:5.0.6"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.0.5"
-    "@clean-jsdoc-theme/dwar": "npm:^5.0.5"
-    "@clean-jsdoc-theme/rang": "npm:^5.0.5"
-    "@clean-jsdoc-theme/setu": "npm:^5.0.5"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.5"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.0.6"
+    "@clean-jsdoc-theme/dwar": "npm:^5.0.6"
+    "@clean-jsdoc-theme/rang": "npm:^5.0.6"
+    "@clean-jsdoc-theme/setu": "npm:^5.0.6"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
     ora: "npm:^9.3.0"
   peerDependencies:
     jsdoc: ">=4.x"
-  checksum: 10c0/2c1e5d403fe584c4bad8f50855a0913704ca4756792f731a0df908d21d996e92d530195abc151247585425d32b1c4bf12effd8484822d4431ae5f35fb14ecdc0
+  checksum: 10c0/7211bb9a4e1631219fb756d328484b57c79eaa383b18e804d8c97b6749b8a0b7f5a17871c523cde2188db37fa1050e5f6bc1b04a7c32991e1e590f3e67dd92bb
   languageName: node
   linkType: hard
 
