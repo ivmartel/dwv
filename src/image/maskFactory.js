@@ -925,11 +925,17 @@ export class MaskFactory {
  * @returns {Image} The new merged mask image.
  */
 export function mergeMaskImages(mask1, mask2) {
-  const geometry = mask1.getGeometry();
-  if (!geometry.isSimilar(mask2.getGeometry(), REAL_WORLD_EPSILON)) {
-    throw new Error('mergeMaskImages: masks must have equal geometries');
+  const geometry1 = mask1.getGeometry();
+  const geometry2 = mask2.getGeometry();
+  if (!geometry1.getSpacing().equals(
+    geometry2.getSpacing(), REAL_WORLD_EPSILON)) {
+    throw new Error('mergeMaskImages: masks must have similar spacings');
   }
-  const sliceSize = geometry.getSize().getDimSize(2);
+  if (!geometry1.getOrientation().isSimilar(
+    geometry2.getOrientation(), REAL_WORLD_EPSILON)) {
+    throw new Error('mergeMaskImages: masks must have similar orientations');
+  }
+  const sliceSize = geometry1.getSize().getDimSize(2);
   const segments1 = mask1.getMeta().custom?.segments ?? [];
   const segments2 = mask2.getMeta().custom?.segments ?? [];
 
@@ -980,7 +986,7 @@ export function mergeMaskImages(mask1, mask2) {
     ...segments2.map(seg => ({...seg, number: remap.get(seg.number)}))
   ];
 
-  const mergedCollection = new SegmentCollection(geometry);
+  const mergedCollection = new SegmentCollection(geometry1);
 
   // add frames from mask1
   const hasRGB1 = mask1.getPhotometricInterpretation() === 'PALETTE COLOR';
@@ -1009,8 +1015,9 @@ export function mergeMaskImages(mask1, mask2) {
     }
   }
 
-  const uids = geometry.getOrigins().map((_, i) => i.toString());
-  const mergedImage = new Image(geometry, mergedCollection.getLabelMap(), uids);
+  const uids = geometry1.getOrigins().map((_, i) => i.toString());
+  const mergedImage = new Image(
+    geometry1, mergedCollection.getLabelMap(), uids);
   mergedImage.setSegmentCollection(mergedCollection);
 
   // set palette colour map if possible
