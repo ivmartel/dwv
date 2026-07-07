@@ -295,4 +295,86 @@ describe('RtStructFactory', () => {
     }
   });
 
+  // -------------------------------------------------------------------------
+  // Square with a hole — test-15
+  // Outer square: col=4..20, row=4..20 | Hole: col=10..14, row=10..14
+  // -------------------------------------------------------------------------
+
+  test('create: square with hole punches out the hole', () => {
+    const config = syntheticData.find(c => c.name === 'test-15');
+    const factory = new RtStructFactory();
+    const image = factory.create(configToElements(config), buildRefImage());
+
+    const buf = image.getBuffer();
+    const width = 32;
+    // outer, outside the hole
+    assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
+    // inside the hole
+    assert.equal(buf[12 * width + 12], 0, 'hole area is background');
+    // fully outside the square
+    assert.equal(buf[2 * width + 2], 0, 'outside square is background');
+  });
+
+  test('toDicom: square with hole round-trip preserves the hole', () => {
+    const config = syntheticData.find(c => c.name === 'test-15');
+    const factory = new RtStructFactory();
+    const refImage = buildRefImage();
+    const image = factory.create(configToElements(config), refImage);
+    const outElements = factory.toDicom(image, undefined, refImage);
+
+    const outRois = getRTStructFromElements(outElements);
+    assert.equal(outRois.length, 1, 'one ROI');
+    assert.equal(
+      outRois[0].contours.length, 2,
+      'outer boundary and hole are both written as contours'
+    );
+    for (const c of outRois[0].contours) {
+      assert.equal(
+        c.type, 'CLOSEDPLANAR_XOR',
+        'hole-bearing contours are tagged CLOSEDPLANAR_XOR'
+      );
+    }
+
+    // re-import the round-tripped RTSS and check the hole survived
+    const roundTripImage = factory.create(outElements, refImage);
+    const buf = roundTripImage.getBuffer();
+    const width = 32;
+    assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
+    assert.equal(buf[12 * width + 12], 0, 'hole area is background');
+    assert.equal(buf[2 * width + 2], 0, 'outside square is background');
+  });
+
+  test('create: accepts CLOSEDPLANAR_XOR contours and punches out the hole',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-16');
+      const factory = new RtStructFactory();
+      const image = factory.create(configToElements(config), buildRefImage());
+
+      const buf = image.getBuffer();
+      const width = 32;
+      assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
+      assert.equal(buf[12 * width + 12], 0, 'hole area is background');
+      assert.equal(buf[2 * width + 2], 0, 'outside square is background');
+    });
+
+  test(
+    'create: keyhole-style single contour with bridge produces correct hole',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-17');
+      const factory = new RtStructFactory();
+      const image = factory.create(configToElements(config), buildRefImage());
+
+      const buf = image.getBuffer();
+      const width = 32;
+      assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
+      assert.equal(buf[12 * width + 12], 0, 'hole area is background');
+      assert.equal(buf[2 * width + 2], 0, 'outside square is background');
+      // bridge runs along row 12: pixels in the ring on that row must
+      // still be filled (the zero-width bridge must not leak into the fill)
+      assert.equal(
+        buf[12 * width + 6], 1,
+        'ring pixel on the bridge row is filled, not leaked into the hole'
+      );
+    });
+
 });

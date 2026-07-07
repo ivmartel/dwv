@@ -292,44 +292,51 @@ function mergeTags(tags, extra) {
 }
 
 /**
- * Fill a closed polygon into a flat Uint8Array slice using a scanline
- * even-odd rule.
+ * Fill one or more closed polygons into a flat Uint8Array slice using a
+ * scanline even-odd rule applied across all of their edges together.
+ * Passing an outer contour together with a nested inner contour therefore
+ * punches a hole where the inner contour lies, matching how DICOM
+ * CLOSEDPLANAR_XOR (and, by convention, plain CLOSED_PLANAR) contours on
+ * the same ROI/slice combine (see PS3.3 C.8.8.6).
  * Ref: {@link https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule}.
  *
  * @param {Uint8Array} buffer The mask buffer (all slices).
  * @param {number} sliceOffset Byte offset of the current slice in buffer.
  * @param {number} width Slice width in pixels.
  * @param {number} height Slice height in pixels.
- * @param {Array.<{x: number, y: number}>} pts Polygon vertices in pixel coords.
+ * @param {Array.<Array.<{x: number, y: number}>>} polygonsList Polygons
+ *   (outer and/or hole contours) in pixel coords, filled together.
  * @param {number} value Segment number to write.
  */
-function fillPolygon(buffer, sliceOffset, width, height, pts, value) {
-  const n = pts.length;
-  if (n < 3) {
+function fillPolygons(buffer, sliceOffset, width, height, polygonsList, value) {
+  const polygons = polygonsList.filter((pts) => pts.length >= 3);
+  if (polygons.length === 0) {
     return;
   }
 
-  const yMin = Math.max(0,
-    Math.floor(Math.min(...pts.map((p) => p.y))));
-  const yMax = Math.min(height - 1,
-    Math.ceil(Math.max(...pts.map((p) => p.y))));
+  const allYs = polygons.flatMap((pts) => pts.map((p) => p.y));
+  const yMin = Math.max(0, Math.floor(Math.min(...allYs)));
+  const yMax = Math.min(height - 1, Math.ceil(Math.max(...allYs)));
 
   for (let y = yMin; y <= yMax; ++y) {
-    // find x-intersections at scanline y
+    // find x-intersections at scanline y across all polygons
     const xs = [];
-    for (let i = 0; i < n; ++i) {
-      const p1 = pts[i];
-      const p2 = pts[(i + 1) % n];
-      // Top-half-open rule for all rows except the last: edges firing at
-      // their lower endpoint but not their upper endpoint. For y=yMax the
-      // upper endpoint IS the polygon bottom, so switch to closed interval
-      // (and skip horizontal edges explicitly to avoid double-counting).
-      const inRange = y < yMax
-        ? (p1.y <= y && p2.y > y) || (p2.y <= y && p1.y > y)
-        : p1.y !== p2.y &&
-          ((p1.y <= y && p2.y >= y) || (p2.y <= y && p1.y >= y));
-      if (inRange) {
-        xs.push(p1.x + (y - p1.y) / (p2.y - p1.y) * (p2.x - p1.x));
+    for (const pts of polygons) {
+      const n = pts.length;
+      for (let i = 0; i < n; ++i) {
+        const p1 = pts[i];
+        const p2 = pts[(i + 1) % n];
+        // Top-half-open rule for all rows except the last: edges firing at
+        // their lower endpoint but not their upper endpoint. For y=yMax the
+        // upper endpoint IS the polygon bottom, so switch to closed interval
+        // (and skip horizontal edges explicitly to avoid double-counting).
+        const inRange = y < yMax
+          ? (p1.y <= y && p2.y > y) || (p2.y <= y && p1.y > y)
+          : p1.y !== p2.y &&
+            ((p1.y <= y && p2.y >= y) || (p2.y <= y && p1.y >= y));
+        if (inRange) {
+          xs.push(p1.x + (y - p1.y) / (p2.y - p1.y) * (p2.x - p1.x));
+        }
       }
     }
     xs.sort((a, b) => a - b);
@@ -342,6 +349,100 @@ function fillPolygon(buffer, sliceOffset, width, height, pts, value) {
       }
     }
   }
+}
+
+/**
+ * Flood-fill background pixels reachable from the slice border without
+ * crossing any `value`-valued foreground pixel. Used to tell apart plain
+ * outside background from background fully enclosed by foreground (holes).
+ *
+ * @param {Uint8Array} buffer The mask buffer (all slices).
+ * @param {number} sliceOffset Byte offset of the slice in buffer.
+ * @param {number} width Slice width in pixels.
+ * @param {number} height Slice height in pixels.
+ * @param {number} value Segment value to treat as foreground.
+ * @returns {Uint8Array} Per-slice flags, 1 where reachable from the border.
+ */
+function markOutsideBackground(buffer, sliceOffset, width, height, value) {
+  const outside = new Uint8Array(width * height);
+  const queue = [];
+  /**
+   * @param {number} idx Flat pixel index.
+   */
+  function tryVisit(idx) {
+    if (!outside[idx] && buffer[sliceOffset + idx] !== value) {
+      outside[idx] = 1;
+      queue.push(idx);
+    }
+  }
+  for (let x = 0; x < width; ++x) {
+    tryVisit(x);
+    tryVisit((height - 1) * width + x);
+  }
+  for (let y = 0; y < height; ++y) {
+    tryVisit(y * width);
+    tryVisit(y * width + width - 1);
+  }
+  while (queue.length > 0) {
+    const idx = queue.shift();
+    const x = idx % width;
+    const y = (idx / width) | 0;
+    if (x > 0) {
+      tryVisit(idx - 1);
+    }
+    if (x < width - 1) {
+      tryVisit(idx + 1);
+    }
+    if (y > 0) {
+      tryVisit(idx - width);
+    }
+    if (y < height - 1) {
+      tryVisit(idx + width);
+    }
+    if (x > 0 && y > 0) {
+      tryVisit(idx - width - 1);
+    }
+    if (x < width - 1 && y > 0) {
+      tryVisit(idx - width + 1);
+    }
+    if (x > 0 && y < height - 1) {
+      tryVisit(idx + width - 1);
+    }
+    if (x < width - 1 && y < height - 1) {
+      tryVisit(idx + width + 1);
+    }
+  }
+  return outside;
+}
+
+/**
+ * Find polygons for background regions fully enclosed by `value`-valued
+ * foreground (ie holes), traced the same way as foreground regions.
+ *
+ * @param {Uint8Array} buffer The mask buffer (all slices).
+ * @param {number} sliceOffset Byte offset of the slice in buffer.
+ * @param {number} width Slice width in pixels.
+ * @param {number} height Slice height in pixels.
+ * @param {number} value Segment value to trace holes for.
+ * @returns {Array.<Array.<{x: number, y: number}>>} One polygon per
+ * enclosed hole region.
+ */
+function findHolePolygons(buffer, sliceOffset, width, height, value) {
+  const n = width * height;
+  const outside = markOutsideBackground(
+    buffer, sliceOffset, width, height, value);
+  const holeBuffer = new Uint8Array(n);
+  let anyHole = false;
+  for (let i = 0; i < n; ++i) {
+    if (buffer[sliceOffset + i] !== value && !outside[i]) {
+      holeBuffer[i] = 1;
+      anyHole = true;
+    }
+  }
+  if (!anyHole) {
+    return [];
+  }
+  return bufferToPolygons(holeBuffer, 0, width, height, 1);
 }
 
 /**
@@ -424,8 +525,17 @@ export class RtStructFactory {
       greenLut[segNum] = roi.colour.g;
       blueLut[segNum] = roi.colour.b;
 
+      // group this ROI's contours by slice: a slice can hold several
+      // contours (outer boundary plus nested hole boundaries) that must be
+      // rasterized together with an even-odd rule, not one by one, or a
+      // hole contour would just add more filled area instead of punching
+      // one out. CLOSED_PLANAR relies on this being an implicit convention
+      // (containment/even-odd); CLOSEDPLANAR_XOR makes the same combination
+      // explicit (PS3.3 C.8.8.6) - treat both the same way.
+      const polygonsByZ = new Map();
       for (const contour of roi.contours) {
-        if (contour.type !== 'CLOSED_PLANAR') {
+        if (contour.type !== 'CLOSED_PLANAR' &&
+          contour.type !== 'CLOSEDPLANAR_XOR') {
           continue;
         }
         const raw = contour.points3D;
@@ -450,9 +560,17 @@ export class RtStructFactory {
           continue;
         }
 
-        // rasterize into a per-slice binary buffer then hand off to collection
+        if (!polygonsByZ.has(z)) {
+          polygonsByZ.set(z, []);
+        }
+        polygonsByZ.get(z).push(pts2D);
+      }
+
+      // rasterize each slice's contours together into a binary buffer
+      // then hand off to the collection
+      for (const [z, polygons] of polygonsByZ) {
         const tmpSlice = new Uint8Array(sliceSize);
-        fillPolygon(tmpSlice, 0, width, height, pts2D, 1);
+        fillPolygons(tmpSlice, 0, width, height, polygons, 1);
         collection.addFrame(segNum, tmpSlice, 0, z, sliceSize, segNum);
       }
     }
@@ -589,9 +707,24 @@ export class RtStructFactory {
       const contourSeq = [];
       const segFrames = allSegmentFrames?.get(segNum);
       for (let z = 0; z < nSlices; z++) {
-        const polygons = hasOverlap && segFrames?.has(z)
-          ? bufferToPolygons(segFrames.get(z), 0, width, height, segNum)
-          : bufferToPolygons(buffer, z * sliceSize, width, height, segNum);
+        const useOverlapFrame = hasOverlap && segFrames?.has(z);
+        const sliceBuffer = useOverlapFrame ? segFrames.get(z) : buffer;
+        const sliceOffset = useOverlapFrame ? 0 : z * sliceSize;
+        const outerPolygons = bufferToPolygons(
+          sliceBuffer, sliceOffset, width, height, segNum);
+        // enclosed background regions are written as their own nested
+        // contours in the same ContourSequence. When there is a hole, tag
+        // the group as CLOSEDPLANAR_XOR so readers combine them via an
+        // explicit XOR/even-odd rule (PS3.3 C.8.8.6) instead of relying on
+        // the older CLOSED_PLANAR containment convention; single/disjoint
+        // contours keep the more broadly supported CLOSED_PLANAR.
+        const holePolygons = outerPolygons.length > 0
+          ? findHolePolygons(sliceBuffer, sliceOffset, width, height, segNum)
+          : [];
+        const polygons = outerPolygons.concat(holePolygons);
+        const geometricType = holePolygons.length > 0
+          ? 'CLOSEDPLANAR_XOR'
+          : 'CLOSED_PLANAR';
         for (const polygon of polygons) {
           const simplified = simplifyPolygon(polygon, 1.0);
           if (simplified.length < 3) {
@@ -607,7 +740,7 @@ export class RtStructFactory {
             points3D.push(world.get(0), world.get(1), world.get(2));
           }
           contourSeq.push({
-            ContourGeometricType: 'CLOSED_PLANAR',
+            ContourGeometricType: geometricType,
             NumberOfContourPoints: simplified.length,
             ContourData: points3D
           });

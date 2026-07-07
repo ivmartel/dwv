@@ -1252,5 +1252,238 @@
       ]
     }
   }
+},
+{
+  "name": "test-15",
+  "description": "DICOM RTSTRUCT test data with a square that has a hole (ref test-00).",
+  "tags": {
+    "Modality": "RTSTRUCT",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.16",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.16",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.16",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "StructureSetLabel": "RT Structure Set",
+    "ReferencedFrameOfReferenceSequence": {
+      "value": [
+        {
+          "RTReferencedStudySequence": {
+            "value": [
+              {
+                "RTReferencedSeriesSequence": {
+                  "value": [
+                    {
+                      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "StructureSetROISequence": {
+      "value": [
+        {
+          "ROINumber": 1,
+          "ROIName": "SquareWithHole"
+        }
+      ]
+    },
+    "RTROIObservationsSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "RTROIInterpretedType": "ORGAN",
+          "ROIInterpreter": ""
+        }
+      ]
+    },
+    "ROIContourSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "ROIDisplayColor": [255, 0, 0],
+          "ContourSequence": {
+            "value": [
+              {
+                "ContourGeometricType": "CLOSED_PLANAR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [4, 4, 0, 20, 4, 0, 20, 20, 0, 4, 20, 0]
+              },
+              {
+                "ContourGeometricType": "CLOSED_PLANAR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [10, 10, 0, 14, 10, 0, 14, 14, 0, 10, 14, 0]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+},
+{
+  "name": "test-16",
+  "description": "DICOM RTSTRUCT test data with a square that has a hole, contours explicitly tagged CLOSEDPLANAR_XOR (ref test-00).",
+  "tags": {
+    "Modality": "RTSTRUCT",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.17",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.17",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.17",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "StructureSetLabel": "RT Structure Set",
+    "ReferencedFrameOfReferenceSequence": {
+      "value": [
+        {
+          "RTReferencedStudySequence": {
+            "value": [
+              {
+                "RTReferencedSeriesSequence": {
+                  "value": [
+                    {
+                      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "StructureSetROISequence": {
+      "value": [
+        {
+          "ROINumber": 1,
+          "ROIName": "SquareWithHole"
+        }
+      ]
+    },
+    "RTROIObservationsSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "RTROIInterpretedType": "ORGAN",
+          "ROIInterpreter": ""
+        }
+      ]
+    },
+    "ROIContourSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "ROIDisplayColor": [255, 0, 0],
+          "ContourSequence": {
+            "value": [
+              {
+                "ContourGeometricType": "CLOSEDPLANAR_XOR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [4, 4, 0, 20, 4, 0, 20, 20, 0, 4, 20, 0]
+              },
+              {
+                "ContourGeometricType": "CLOSEDPLANAR_XOR",
+                "NumberOfContourPoints": 4,
+                "ContourData": [10, 10, 0, 14, 10, 0, 14, 14, 0, 10, 14, 0]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+},
+{
+  "name": "test-17",
+  "description": "DICOM RTSTRUCT test data with a square that has a hole, encoded as a single self-touching 'keyhole' contour with a zero-width bridge instead of separate nested contours (ref test-00).",
+  "tags": {
+    "Modality": "RTSTRUCT",
+    "SOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.481.3",
+    "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.18",
+    "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.18",
+    "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+    "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.18",
+    "PatientID": "0123456",
+    "PatientName": "dwv^PatientName",
+    "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+    "StructureSetLabel": "RT Structure Set",
+    "ReferencedFrameOfReferenceSequence": {
+      "value": [
+        {
+          "RTReferencedStudySequence": {
+            "value": [
+              {
+                "RTReferencedSeriesSequence": {
+                  "value": [
+                    {
+                      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "StructureSetROISequence": {
+      "value": [
+        {
+          "ROINumber": 1,
+          "ROIName": "SquareWithHoleKeyhole"
+        }
+      ]
+    },
+    "RTROIObservationsSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "RTROIInterpretedType": "ORGAN",
+          "ROIInterpreter": ""
+        }
+      ]
+    },
+    "ROIContourSequence": {
+      "value": [
+        {
+          "ReferencedROINumber": 1,
+          "ROIDisplayColor": [255, 0, 0],
+          "ContourSequence": {
+            "value": [
+              {
+                "ContourGeometricType": "CLOSED_PLANAR",
+                "NumberOfContourPoints": 12,
+                "ContourData": [
+                  4, 12, 0,
+                  4, 4, 0,
+                  20, 4, 0,
+                  20, 20, 0,
+                  4, 20, 0,
+                  4, 12, 0,
+                  10, 12, 0,
+                  10, 10, 0,
+                  14, 10, 0,
+                  14, 14, 0,
+                  10, 14, 0,
+                  10, 12, 0
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
 }
 ]
