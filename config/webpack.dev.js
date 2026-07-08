@@ -21,6 +21,7 @@ export default merge(webpackCommon, {
     anonymiser: './dev/dicom/pages/anonymiser.js',
     generator: './dev/dicom/pages/generator.js',
     synthetic: './dev/dicom/pages/synthetic-data.js',
+    diff: './dev/dicom/pages/diff.js',
     colourmaps: './dev/image/pages/colourmaps.js'
   },
   devServer: {
@@ -53,6 +54,10 @@ export default merge(webpackCommon, {
       {
         directory: './node_modules/benchmark',
         publicPath: '/node_modules/benchmark'
+      },
+      {
+        directory: './node_modules/diff2html',
+        publicPath: '/node_modules/diff2html'
       }
     ],
   },
@@ -74,6 +79,12 @@ export default merge(webpackCommon, {
       filename: 'dev/dicom/pages/synthetic-data.html',
       scriptLoading: 'module',
       chunks: ['synthetic']
+    }),
+    new HtmlWebpackPlugin({
+      template: './dev/dicom/pages/diff.html',
+      filename: 'dev/dicom/pages/diff.html',
+      scriptLoading: 'module',
+      chunks: ['diff']
     }),
     new HtmlWebpackPlugin({
       template: './dev/image/pages/colourmaps.html',
