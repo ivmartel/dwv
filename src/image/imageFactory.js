@@ -3,6 +3,7 @@ import {Spacing} from './spacing.js';
 import {Geometry} from './geometry.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {WindowLevel} from './windowLevel.js';
+import {WindowPreset} from './windowPreset.js';
 import {Image} from './image.js';
 import {ColourMap} from './luts.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
@@ -192,7 +193,7 @@ function getPaletteColourMap(dataElements) {
  *
  * @param {Record<string, DataElement>} dataElements The data elements.
  * @param {number} intensityFactor The intensity factor.
- * @returns {object|undefined} The presets.
+ * @returns {Record<string, WindowPreset>|undefined} The presets.
  */
 function getWindowPresets(dataElements, intensityFactor) {
   let windowPresets;
@@ -219,13 +220,13 @@ function getWindowPresets(dataElements, intensityFactor) {
         if (width < 1) {
           width = 1;
         }
-        windowPresets[name] = {
-          wl: [new WindowLevel(
+        windowPresets[name] = new WindowPreset(
+          name,
+          [new WindowLevel(
             center * intensityFactor,
             width
-          )],
-          name
-        };
+          )]
+        );
       }
       if (width === 0) {
         logger.warn('Zero window width found in DICOM.');

@@ -8,6 +8,7 @@ import {
   equalWl,
   validateWindowLevel
 } from './windowLevel.js';
+import {WindowPreset} from './windowPreset.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
 import {
   generateImageDataPaletteColor,
@@ -123,9 +124,9 @@ export class View extends EventTarget {
    * Window presets.
    * Minmax will be filled at first use (see view.setWindowLevelPreset).
    *
-   * @type {object}
+   * @type {Record<string, WindowPreset>}
    */
-  #windowPresets = {minmax: {name: 'minmax'}};
+  #windowPresets = {minmax: new WindowPreset('minmax')};
 
   /**
    * Current window preset name.
@@ -561,7 +562,7 @@ export class View extends EventTarget {
   /**
    * Get the window presets.
    *
-   * @returns {object} The window presets.
+   * @returns {Record<string, WindowPreset>} The window presets.
    */
   getWindowPresets() {
     return this.#windowPresets;
@@ -579,7 +580,7 @@ export class View extends EventTarget {
   /**
    * Set the window presets.
    *
-   * @param {object} presets The window presets.
+   * @param {Record<string, WindowPreset>} presets The window presets.
    */
   setWindowPresets(presets) {
     this.#windowPresets = presets;
@@ -588,7 +589,7 @@ export class View extends EventTarget {
   /**
    * Add window presets to the existing ones.
    *
-   * @param {object} presets The window presets.
+   * @param {Record<string, WindowPreset>} presets The window presets.
    */
   addWindowPresets(presets) {
     const keys = Object.keys(presets);
@@ -927,10 +928,7 @@ export class View extends EventTarget {
         } else {
           // add if not present
           this.addWindowPresets({
-            manual: {
-              wl: [wlBound],
-              name: 'manual'
-            }
+            manual: new WindowPreset('manual', [wlBound])
           });
         }
       }

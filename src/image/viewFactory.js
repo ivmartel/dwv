@@ -1,6 +1,7 @@
 import {custom} from '../app/custom.js';
 import {View} from './view.js';
 import {WindowLevel} from './windowLevel.js';
+import {WindowPreset} from './windowPreset.js';
 
 /**
  * @import {Image} from './image.js';
@@ -44,6 +45,9 @@ export class ViewFactory {
     }
 
     // window level presets
+    /**
+     * @type {Record<string, WindowPreset>}
+     */
     let windowPresets = {};
     // image presets
     if (typeof image.getMeta().windowPresets !== 'undefined') {
@@ -54,7 +58,7 @@ export class ViewFactory {
     // for each slice... It will be filled at first use
     // (see view.setWindowLevelPreset).
     // Order is important, if no wl from DICOM, this will be the default.
-    windowPresets.minmax = {name: 'minmax'};
+    windowPresets.minmax = new WindowPreset('minmax');
     // optional modality presets
     const modality = image.getMeta().Modality;
     let wlPresets;
@@ -66,10 +70,10 @@ export class ViewFactory {
     }
     for (const key in wlPresets) {
       const preset = wlPresets[key];
-      windowPresets[key] = {
-        wl: [new WindowLevel(preset.center, preset.width)],
-        name: key
-      };
+      windowPresets[key] = new WindowPreset(
+        key,
+        [new WindowLevel(preset.center, preset.width)]
+      );
     }
 
     // store

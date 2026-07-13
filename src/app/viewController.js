@@ -19,6 +19,7 @@ import {PositionHelper} from '../image/positionHelper.js';
 /**
  * @import {View} from '../image/view.js';
  * @import {WindowLevel} from '../image/windowLevel.js';
+ * @import {WindowPreset} from '../image/windowPreset.js';
  * @import {Point} from '../math/point.js';
  * @import {Scalar2D} from '../math/scalar.js';
  * @import {Matrix33} from '../math/matrix.js';
@@ -156,7 +157,7 @@ export class ViewController {
   /**
    * Add window/level presets to the view.
    *
-   * @param {object} presets A preset object.
+   * @param {Record<string, WindowPreset>} presets A preset object.
    * @returns {object} The list of presets.
    */
   addWindowLevelPresets(presets) {
