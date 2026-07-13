@@ -1,4 +1,5 @@
 import {mergeObjects} from '../utils/operator.js';
+import {logger} from '../utils/logger.js';
 import {MaskFactory} from '../image/maskFactory.js';
 import {ImageFactory} from '../image/imageFactory.js';
 import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
@@ -8,8 +9,9 @@ import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet} from '../dicom/dataElement.js';
 import {
   getVolumeIdTagValue,
-  getPostLoadVolumeIdTagValue
+  postLoadVolumeIdCandidates
 } from '../dicom/dicomVolume.js';
+import {custom} from './custom.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 import {
   getReferencedSeriesUID,
@@ -46,10 +48,13 @@ export const dataEventNames = [
  *
  * @param {Record<string, DataElement>} meta0 The first data to merge.
  * @param {Record<string, DataElement>} meta1 The second data to merge.
- * @param {string} meta1Id A meta1 specific id.
+ * @param {Function} [secondIdGetter] Function `(meta) => number|undefined`
+ * called on each raw (not yet merged) meta to get its second id, added
+ * as a suffix to disambiguate metas that would otherwise share the
+ * same base id.
  * @returns {Record<string, DataElement>} The merged data.
  */
-function mergeMeta(meta0, meta1, meta1Id) {
+function mergeMeta(meta0, meta1, secondIdGetter) {
   // update meta data
   let idKey;
   if (typeof meta1['00020010'] !== 'undefined') {
@@ -58,14 +63,13 @@ function mergeMeta(meta0, meta1, meta1Id) {
   } else {
     idKey = 'imageUid';
   }
-  // possible time suffix
   // merge
   return mergeObjects(
     meta0,
     meta1,
     idKey,
     'value',
-    meta1Id
+    secondIdGetter
   );
 }
 
@@ -213,12 +217,7 @@ export class DicomData {
    * @param {Record<string, DataElement>} meta The data to merge.
    */
   #mergeMeta(meta) {
-    const meta1IdNum = getVolumeIdTagValue(meta);
-    let meta1Id;
-    if (typeof meta1IdNum !== 'undefined') {
-      meta1Id = `-${meta1IdNum}`;
-    }
-    this.meta = mergeMeta(this.meta, meta, meta1Id);
+    this.meta = mergeMeta(this.meta, meta, getVolumeIdTagValue);
   }
 }
 
@@ -258,8 +257,11 @@ export class DicomSliceDataList {
    * @returns {{image, meta}} The result data.
    */
   buildData() {
+    const originList = this.#getOriginList();
+
     // get and check the number of slices per volumes
-    const numberOfSlicesPerVolumes = this.#getNumberOfSlicesPerVolumes();
+    const numberOfSlicesPerVolumes =
+      this.#getNumberOfSlicesPerVolumes(originList);
     if (typeof numberOfSlicesPerVolumes === 'undefined') {
       throw new Error('Non constant number of slices per volumes');
     }
@@ -270,9 +272,9 @@ export class DicomSliceDataList {
       throw new Error('Duplicate origins but just one slice per volume');
     }
 
-    // get indices per volumes
-    const volsIndices = this.#getVolumesIndices(
-      numberOfSlicesPerVolumes, getPostLoadVolumeIdTagValue);
+    // guess the volume id tag and get indices per volumes
+    const {volsIndices, volumeIndexGetter} = this.#guessVolumesIndices(
+      originList, numberOfSlicesPerVolumes);
 
     if (typeof volsIndices === 'undefined') {
       throw new Error('Cannot create image for multi-volume');
@@ -284,15 +286,14 @@ export class DicomSliceDataList {
     for (let i = 0; i < volsIndices.length; ++i) {
       const indices = volsIndices[i];
       // meta
-      // TODO fix slow when in indices loop
+      // intentionaly limited to first items,
+      // merged object is too big and slow when it contains
+      // all the info
       const sliceMeta = this.#list[indices[0]].meta;
       if (typeof meta === 'undefined') {
         meta = sliceMeta;
       } else {
-        const sliceMetaId = `${i}:${
-          getPostLoadVolumeIdTagValue(sliceMeta) }`;
-        meta = mergeMeta(
-          meta, sliceMeta, sliceMetaId);
+        meta = mergeMeta(meta, sliceMeta, volumeIndexGetter);
       }
       // image
       for (const index of indices) {
@@ -309,8 +310,57 @@ export class DicomSliceDataList {
   }
 
   /**
+   * Guess the post load volume id getter and derive the indices per
+   * volume from it. If `custom.getPostLoadVolumeIdTagValue` is
+   * registered, it is used as-is (no guessing). Otherwise, since the
+   * tag that discriminates volumes is only knowable once the whole
+   * data is loaded, candidate getters are tried in order and the
+   * first one that produces a valid, consistent per-volume grouping
+   * is kept.
+   *
+   * @param {object[]} originList The list of origins and their
+   *   occurences, as returned by #getOriginList.
+   * @param {number} numberOfSlicesPerVolumes The number of
+   *   expected slices per volumes.
+   * @returns {{volsIndices: number[][]|undefined,
+   *   volumeIndexGetter: Function|undefined}} The indices per volume
+   *   and the getter that produced them, both undefined if no
+   *   candidate worked.
+   */
+  #guessVolumesIndices(originList, numberOfSlicesPerVolumes) {
+    if (typeof custom.getPostLoadVolumeIdTagValue !== 'undefined') {
+      const volumeIndexGetter = custom.getPostLoadVolumeIdTagValue;
+      return {
+        volsIndices: this.#getVolumesIndices(
+          originList, numberOfSlicesPerVolumes, volumeIndexGetter),
+        volumeIndexGetter
+      };
+    }
+
+    const candidates = typeof custom.postLoadVolumeIdCandidates !== 'undefined'
+      ? custom.postLoadVolumeIdCandidates
+      : postLoadVolumeIdCandidates;
+    for (const candidate of candidates) {
+      const volsIndices = this.#getVolumesIndices(
+        originList, numberOfSlicesPerVolumes, candidate.getter);
+      if (typeof volsIndices !== 'undefined') {
+        logger.debug(
+          `Using '${candidate.name}' as temporal position identifier`);
+        return {volsIndices, volumeIndexGetter: candidate.getter};
+      }
+    }
+
+    return {
+      volsIndices: undefined,
+      volumeIndexGetter: undefined
+    };
+  }
+
+  /**
    * Get the list of indices per volume.
    *
+   * @param {object[]} originList The list of origins and their
+   *   occurences, as returned by #getOriginList.
    * @param {number} numberOfSlicesPerVolumes The number of
    *   expected slices per volumes.
    * @param {Function} volumeIndexGetter A function to get the volume index from
@@ -318,8 +368,7 @@ export class DicomSliceDataList {
    * @returns {number[][]|undefined} List of indices per volume or
    *   undefined if something went wrong.
    */
-  #getVolumesIndices(numberOfSlicesPerVolumes, volumeIndexGetter) {
-    const originList = this.#getOriginList();
+  #getVolumesIndices(originList, numberOfSlicesPerVolumes, volumeIndexGetter) {
     const volumesIndices = [];
     const volIndexValues = [];
     for (const item of originList) {
@@ -372,11 +421,12 @@ export class DicomSliceDataList {
   /**
    * Get the number of slices per volumes of a data.
    *
+   * @param {object[]} originList The list of origins and their
+   *   occurences, as returned by #getOriginList.
    * @returns {number|undefined} The number of slices per volumes or
    *   undefined if non constant between volumes.
    */
-  #getNumberOfSlicesPerVolumes() {
-    const originList = this.#getOriginList();
+  #getNumberOfSlicesPerVolumes(originList) {
     if (originList.length === 0) {
       return 0;
     }

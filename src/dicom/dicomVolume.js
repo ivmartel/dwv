@@ -28,7 +28,11 @@ const TagKeys = {
   DiffusionBValue: '00189087',
   DiffusionBValueAT: '(0018,9087)',
   FrameContentSequence: '00209111',
-  DimensionIndexValues: '00209157'
+  DimensionIndexValues: '00209157',
+  TemporalPositionIdentifier: '00200100',
+  EchoTime: '00180081',
+  TriggerTime: '00181060',
+  InversionTime: '00180082'
 };
 
 /**
@@ -320,24 +324,57 @@ export function getVolumeIdTagValue(elements) {
 }
 
 /**
- * Get the volume id from a list of tags parsed after the load finishes.
- * Default uses acquisition time.
+ * Create a getter that reads a numeric value from a single tag.
  *
- * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {number|undefined} The id value if available.
+ * @param {string} key The tag key.
+ * @param {Function} parse The string to number parser to use.
+ * @returns {Function} The getter, returns undefined if the tag is absent.
  */
-export function getPostLoadVolumeIdTagValue(elements) {
-  let res;
-
-  if (typeof custom.getPostLoadVolumeIdTagValue !== 'undefined') {
-    res = custom.getPostLoadVolumeIdTagValue(elements);
-  } else {
-    // constant acquisition time for volumes
-    const acqTime = safeGet(elements, TagKeys.AcquisitionTime);
-    if (typeof acqTime !== 'undefined') {
-      res = parseFloat(acqTime);
+function makeNumericTagGetter(key, parse) {
+  return function (elements) {
+    let res;
+    const value = safeGet(elements, key);
+    if (typeof value !== 'undefined') {
+      res = parse(value);
     }
-  }
-
-  return res;
+    return res;
+  };
 }
+
+/**
+ * Ordered list of candidate post load volume id getters. Since the tag
+ * that actually discriminates volumes is not known until the full data
+ * is loaded, `DicomSliceDataList` tries these in order and keeps the
+ * first one that produces a valid, consistent per-volume grouping.
+ * Most explicit/reliable discriminators come first, AcquisitionTime
+ * (the historical default) comes last.
+ *
+ * @type {{name: string, getter: Function}[]}
+ */
+export const postLoadVolumeIdCandidates = [
+  {
+    name: 'TemporalPositionIdentifier',
+    getter: makeNumericTagGetter(
+      TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10))
+  },
+  {
+    name: 'DiffusionBValue',
+    getter: getMRVolumeIdTagValue
+  },
+  {
+    name: 'EchoTime',
+    getter: makeNumericTagGetter(TagKeys.EchoTime, parseFloat)
+  },
+  {
+    name: 'TriggerTime',
+    getter: makeNumericTagGetter(TagKeys.TriggerTime, parseFloat)
+  },
+  {
+    name: 'InversionTime',
+    getter: makeNumericTagGetter(TagKeys.InversionTime, parseFloat)
+  },
+  {
+    name: 'AcquisitionTime',
+    getter: makeNumericTagGetter(TagKeys.AcquisitionTime, parseFloat)
+  }
+];

@@ -38,11 +38,15 @@ import {arrayEquals} from './array.js';
  * @param {object} obj2 The second object.
  * @param {string} idKey The key to use as index for duplicate values.
  * @param {string} valueKey The key to use to access object values.
- * @param {string} [idSuffix] Optional suffix to add to id value
- * (to differentiate time points for example).
+ * @param {Function} [secondIdGetter] Function `(obj) => number|undefined`
+ * called on each raw (not yet merged) object to get its second id, added
+ * as a suffix to its base id to disambiguate objects that would
+ * otherwise share the same base id (to differentiate time points for
+ * example). Defaults to no second id.
  * @returns {object} The merged object.
  */
-export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix = '') {
+export function mergeObjects(
+  obj1, obj2, idKey, valueKey, secondIdGetter = () => undefined) {
   const res = {};
   // check id key
   if (!idKey) {
@@ -73,8 +77,14 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix = '') {
   // check if obj1 is already a merged object
   const isMergedObj1 = obj1.mergeId !== undefined;
 
-  // compute the id for obj2 (with suffix)
-  const id2 = obj2[idKey][valueKey][0] + idSuffix;
+  // format the id suffix from the second id, no suffix if undefined
+  const getIdSuffix = function (obj) {
+    const secondId = secondIdGetter(obj);
+    return typeof secondId !== 'undefined' ? `-${secondId}` : '';
+  };
+
+  // create the id for obj2: its own base value plus its own suffix
+  const id2 = obj2[idKey][valueKey][0] + getIdSuffix(obj2);
 
   // build mergeId: the list of ids used as value-dict keys
   let id1;
@@ -87,7 +97,8 @@ export function mergeObjects(obj1, obj2, idKey, valueKey, idSuffix = '') {
     id1 = obj1.mergeId;
     res.mergeId = [...obj1.mergeId, id2];
   } else {
-    id1 = obj1[idKey][valueKey][0] + idSuffix;
+    // create the id for obj1: its own base value plus its own suffix
+    id1 = obj1[idKey][valueKey][0] + getIdSuffix(obj1);
     // check for id equality
     if (id1 === id2) {
       throw new Error(`Cannot merge object with same ids: ${

@@ -60,6 +60,16 @@ export const custom = {
   getPostLoadVolumeIdTagValue: undefined,
 
   /**
+   * Ordered list of candidate post load volume id getters, tried in
+   * order until one produces a valid per-volume grouping. Overrides
+   * the default list from `dicomVolume.js`. Ignored if
+   * `getPostLoadVolumeIdTagValue` is set.
+   *
+   * @type {{name: string, getter: Function}[]}
+   */
+  postLoadVolumeIdCandidates: undefined,
+
+  /**
    * Get the pixel data unit from a list of dicom tags.
    * Not used for PET data with SUV values.
    *
