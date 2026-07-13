@@ -1359,58 +1359,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/bhasha@npm:^5.0.6":
-  version: 5.0.6
-  resolution: "@clean-jsdoc-theme/bhasha@npm:5.0.6"
+"@clean-jsdoc-theme/bhasha@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@clean-jsdoc-theme/bhasha@npm:5.0.7"
   dependencies:
-    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.7"
     preact: "npm:^10.22.0"
-  checksum: 10c0/8deeb504a6bb0e132f55248c76323cd69c175d1ccdbdcdbb9c8a866fe626a74d91fec06269bd5c15c9fd841815174f442619aa5abf4916a1fd1ed99956a85e4b
+  checksum: 10c0/5153de1722c70442b993f3696e8372b92783132ea4de31c9fe135427458a84c26dcb7df2b8a1a5c73024399ce9c7ef24293de62e58477bca23075253e19d183f
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/dwar@npm:^5.0.6":
-  version: 5.0.6
-  resolution: "@clean-jsdoc-theme/dwar@npm:5.0.6"
+"@clean-jsdoc-theme/dwar@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@clean-jsdoc-theme/dwar@npm:5.0.7"
   dependencies:
-    "@clean-jsdoc-theme/rang": "npm:^5.0.6"
-    "@clean-jsdoc-theme/setu": "npm:^5.0.6"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
+    "@clean-jsdoc-theme/rang": "npm:^5.0.7"
+    "@clean-jsdoc-theme/setu": "npm:^5.0.7"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.7"
     "@mdx-js/mdx": "npm:^3.0.0"
     "@shikijs/rehype": "npm:^4.2.0"
-    esbuild: "npm:^0.21.5"
+    esbuild: "npm:^0.28.0"
     pagefind: "npm:^1.1.0"
     preact: "npm:^10.22.0"
     preact-render-to-string: "npm:^6.5.13"
     remark-frontmatter: "npm:^5"
     remark-gfm: "npm:^4"
     shiki: "npm:^4.2.0"
-  checksum: 10c0/b6de90aab0e02725907e19d51e051138aa302b33a4dcdaefb3e265453bd51b7cfbe02cf5b11d28104a503d286f54056c1930451bfc531c0c71fb3a0c80a2db0e
+  checksum: 10c0/49e37b996c0e87f7b68d997ef2d30828d3d54d5459851c456a0db4583fb41c1e2284c1d23e4cf4707ffecf4aeb13f87d3dce6138a07e69c9d1f311fea64ce754
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/rang@npm:^5.0.6":
-  version: 5.0.6
-  resolution: "@clean-jsdoc-theme/rang@npm:5.0.6"
+"@clean-jsdoc-theme/rang@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@clean-jsdoc-theme/rang@npm:5.0.7"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.0.6"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.0.7"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.7"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     lucide-preact: "npm:^1.17.0"
     lz-string: "npm:^1.5.0"
     preact: "npm:^10.22.0"
     tailwind-merge: "npm:^3.6.0"
-  checksum: 10c0/8b23b3487038af4b292a6ea0f37550775a9e63f40c9e61f0838ab1454ec5fbd4068d49ff7d95300b98658cf2714a96d94078a9690ca34dda4b7bffc37485c0c4
+  checksum: 10c0/8ae516ce97ffc8cde1a3f9e3fefa8c47d5161134ddb83e354e7fa12241d31b7c1406ae92c9657bc42df9facb94efbb21c85aeb4dee2676439d3fc5a8dea6fff2
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/setu@npm:^5.0.6":
-  version: 5.0.6
-  resolution: "@clean-jsdoc-theme/setu@npm:5.0.6"
+"@clean-jsdoc-theme/setu@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@clean-jsdoc-theme/setu@npm:5.0.7"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.0.6"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.0.7"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.7"
     "@jsdoc/salty": "npm:^0.2.12"
     hast-util-from-html: "npm:^2.0.3"
     hast-util-to-html: "npm:^9.0.5"
@@ -1422,16 +1422,16 @@ __metadata:
     mdast-util-to-markdown: "npm:^2.1.2"
     micromark-extension-gfm: "npm:^3.0.0"
     turndown: "npm:^7.2.4"
-  checksum: 10c0/e53816fa4e6dd6571938b3b2f5c40898462c4c35916094116516277a95431e8c08c9f64a90068e38f652dba2eafc504092c563f44c887a6c7dc8dfba90ab6efa
+  checksum: 10c0/56268b1050cf4b2f4f59abc8c0e38e83f9642b4280633c278130c19768fadabe3349833522ab86a90a31075d87bb4ab6aa21e61facf4330a986226aaa584a39a
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/utils@npm:^5.0.6":
-  version: 5.0.6
-  resolution: "@clean-jsdoc-theme/utils@npm:5.0.6"
+"@clean-jsdoc-theme/utils@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@clean-jsdoc-theme/utils@npm:5.0.7"
   dependencies:
     zod: "npm:^4.3.6"
-  checksum: 10c0/90954aaa1ea711dfffdbdb772160fc01c40d630e14d6455f9580d670825f4476f8b8ac7c2297c391e6e50e88cda54b2436b10e9735ff8d4f7da7f9ce39c9156b
+  checksum: 10c0/0a535bc9918b5a6d5e25c821ad4c33b1d3fd04c60bc41b70118db35126bb5b336857bba8ebac5db98c83512329d11f47648268988f27ee05eeada9c46d97d403
   languageName: node
   linkType: hard
 
@@ -1548,163 +1548,184 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@esbuild/aix-ppc64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/aix-ppc64@npm:0.21.5"
+"@esbuild/aix-ppc64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/aix-ppc64@npm:0.28.1"
   conditions: os=aix & cpu=ppc64
   languageName: node
   linkType: hard
 
-"@esbuild/android-arm64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/android-arm64@npm:0.21.5"
+"@esbuild/android-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/android-arm64@npm:0.28.1"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
 
-"@esbuild/android-arm@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/android-arm@npm:0.21.5"
+"@esbuild/android-arm@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/android-arm@npm:0.28.1"
   conditions: os=android & cpu=arm
   languageName: node
   linkType: hard
 
-"@esbuild/android-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/android-x64@npm:0.21.5"
+"@esbuild/android-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/android-x64@npm:0.28.1"
   conditions: os=android & cpu=x64
   languageName: node
   linkType: hard
 
-"@esbuild/darwin-arm64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/darwin-arm64@npm:0.21.5"
+"@esbuild/darwin-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/darwin-arm64@npm:0.28.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@esbuild/darwin-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/darwin-x64@npm:0.21.5"
+"@esbuild/darwin-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/darwin-x64@npm:0.28.1"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@esbuild/freebsd-arm64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/freebsd-arm64@npm:0.21.5"
+"@esbuild/freebsd-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/freebsd-arm64@npm:0.28.1"
   conditions: os=freebsd & cpu=arm64
   languageName: node
   linkType: hard
 
-"@esbuild/freebsd-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/freebsd-x64@npm:0.21.5"
+"@esbuild/freebsd-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/freebsd-x64@npm:0.28.1"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@esbuild/linux-arm64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-arm64@npm:0.21.5"
+"@esbuild/linux-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-arm64@npm:0.28.1"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@esbuild/linux-arm@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-arm@npm:0.21.5"
+"@esbuild/linux-arm@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-arm@npm:0.28.1"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@esbuild/linux-ia32@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-ia32@npm:0.21.5"
+"@esbuild/linux-ia32@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-ia32@npm:0.28.1"
   conditions: os=linux & cpu=ia32
   languageName: node
   linkType: hard
 
-"@esbuild/linux-loong64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-loong64@npm:0.21.5"
+"@esbuild/linux-loong64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-loong64@npm:0.28.1"
   conditions: os=linux & cpu=loong64
   languageName: node
   linkType: hard
 
-"@esbuild/linux-mips64el@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-mips64el@npm:0.21.5"
+"@esbuild/linux-mips64el@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-mips64el@npm:0.28.1"
   conditions: os=linux & cpu=mips64el
   languageName: node
   linkType: hard
 
-"@esbuild/linux-ppc64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-ppc64@npm:0.21.5"
+"@esbuild/linux-ppc64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-ppc64@npm:0.28.1"
   conditions: os=linux & cpu=ppc64
   languageName: node
   linkType: hard
 
-"@esbuild/linux-riscv64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-riscv64@npm:0.21.5"
+"@esbuild/linux-riscv64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-riscv64@npm:0.28.1"
   conditions: os=linux & cpu=riscv64
   languageName: node
   linkType: hard
 
-"@esbuild/linux-s390x@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-s390x@npm:0.21.5"
+"@esbuild/linux-s390x@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-s390x@npm:0.28.1"
   conditions: os=linux & cpu=s390x
   languageName: node
   linkType: hard
 
-"@esbuild/linux-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/linux-x64@npm:0.21.5"
+"@esbuild/linux-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/linux-x64@npm:0.28.1"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@esbuild/netbsd-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/netbsd-x64@npm:0.21.5"
+"@esbuild/netbsd-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/netbsd-arm64@npm:0.28.1"
+  conditions: os=netbsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/netbsd-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/netbsd-x64@npm:0.28.1"
   conditions: os=netbsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@esbuild/openbsd-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/openbsd-x64@npm:0.21.5"
+"@esbuild/openbsd-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/openbsd-arm64@npm:0.28.1"
+  conditions: os=openbsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/openbsd-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/openbsd-x64@npm:0.28.1"
   conditions: os=openbsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@esbuild/sunos-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/sunos-x64@npm:0.21.5"
+"@esbuild/openharmony-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/openharmony-arm64@npm:0.28.1"
+  conditions: os=openharmony & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/sunos-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/sunos-x64@npm:0.28.1"
   conditions: os=sunos & cpu=x64
   languageName: node
   linkType: hard
 
-"@esbuild/win32-arm64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/win32-arm64@npm:0.21.5"
+"@esbuild/win32-arm64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/win32-arm64@npm:0.28.1"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@esbuild/win32-ia32@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/win32-ia32@npm:0.21.5"
+"@esbuild/win32-ia32@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/win32-ia32@npm:0.28.1"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@esbuild/win32-x64@npm:0.21.5":
-  version: 0.21.5
-  resolution: "@esbuild/win32-x64@npm:0.21.5"
+"@esbuild/win32-x64@npm:0.28.1":
+  version: 0.28.1
+  resolution: "@esbuild/win32-x64@npm:0.28.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -4814,18 +4835,18 @@ __metadata:
   linkType: hard
 
 "clean-jsdoc-theme@npm:^5.0.3":
-  version: 5.0.6
-  resolution: "clean-jsdoc-theme@npm:5.0.6"
+  version: 5.0.7
+  resolution: "clean-jsdoc-theme@npm:5.0.7"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.0.6"
-    "@clean-jsdoc-theme/dwar": "npm:^5.0.6"
-    "@clean-jsdoc-theme/rang": "npm:^5.0.6"
-    "@clean-jsdoc-theme/setu": "npm:^5.0.6"
-    "@clean-jsdoc-theme/utils": "npm:^5.0.6"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.0.7"
+    "@clean-jsdoc-theme/dwar": "npm:^5.0.7"
+    "@clean-jsdoc-theme/rang": "npm:^5.0.7"
+    "@clean-jsdoc-theme/setu": "npm:^5.0.7"
+    "@clean-jsdoc-theme/utils": "npm:^5.0.7"
     ora: "npm:^9.3.0"
   peerDependencies:
     jsdoc: ">=4.x"
-  checksum: 10c0/7211bb9a4e1631219fb756d328484b57c79eaa383b18e804d8c97b6749b8a0b7f5a17871c523cde2188db37fa1050e5f6bc1b04a7c32991e1e590f3e67dd92bb
+  checksum: 10c0/673e7af7e49092f27d4e84010146999521008900318faeeeecddd4f2688089609daba0f28719d2e032ee4c2cc9bff54dc10ca8058b9def0f39e3d853a30dba3e
   languageName: node
   linkType: hard
 
@@ -6164,33 +6185,36 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.21.5":
-  version: 0.21.5
-  resolution: "esbuild@npm:0.21.5"
+"esbuild@npm:^0.28.0":
+  version: 0.28.1
+  resolution: "esbuild@npm:0.28.1"
   dependencies:
-    "@esbuild/aix-ppc64": "npm:0.21.5"
-    "@esbuild/android-arm": "npm:0.21.5"
-    "@esbuild/android-arm64": "npm:0.21.5"
-    "@esbuild/android-x64": "npm:0.21.5"
-    "@esbuild/darwin-arm64": "npm:0.21.5"
-    "@esbuild/darwin-x64": "npm:0.21.5"
-    "@esbuild/freebsd-arm64": "npm:0.21.5"
-    "@esbuild/freebsd-x64": "npm:0.21.5"
-    "@esbuild/linux-arm": "npm:0.21.5"
-    "@esbuild/linux-arm64": "npm:0.21.5"
-    "@esbuild/linux-ia32": "npm:0.21.5"
-    "@esbuild/linux-loong64": "npm:0.21.5"
-    "@esbuild/linux-mips64el": "npm:0.21.5"
-    "@esbuild/linux-ppc64": "npm:0.21.5"
-    "@esbuild/linux-riscv64": "npm:0.21.5"
-    "@esbuild/linux-s390x": "npm:0.21.5"
-    "@esbuild/linux-x64": "npm:0.21.5"
-    "@esbuild/netbsd-x64": "npm:0.21.5"
-    "@esbuild/openbsd-x64": "npm:0.21.5"
-    "@esbuild/sunos-x64": "npm:0.21.5"
-    "@esbuild/win32-arm64": "npm:0.21.5"
-    "@esbuild/win32-ia32": "npm:0.21.5"
-    "@esbuild/win32-x64": "npm:0.21.5"
+    "@esbuild/aix-ppc64": "npm:0.28.1"
+    "@esbuild/android-arm": "npm:0.28.1"
+    "@esbuild/android-arm64": "npm:0.28.1"
+    "@esbuild/android-x64": "npm:0.28.1"
+    "@esbuild/darwin-arm64": "npm:0.28.1"
+    "@esbuild/darwin-x64": "npm:0.28.1"
+    "@esbuild/freebsd-arm64": "npm:0.28.1"
+    "@esbuild/freebsd-x64": "npm:0.28.1"
+    "@esbuild/linux-arm": "npm:0.28.1"
+    "@esbuild/linux-arm64": "npm:0.28.1"
+    "@esbuild/linux-ia32": "npm:0.28.1"
+    "@esbuild/linux-loong64": "npm:0.28.1"
+    "@esbuild/linux-mips64el": "npm:0.28.1"
+    "@esbuild/linux-ppc64": "npm:0.28.1"
+    "@esbuild/linux-riscv64": "npm:0.28.1"
+    "@esbuild/linux-s390x": "npm:0.28.1"
+    "@esbuild/linux-x64": "npm:0.28.1"
+    "@esbuild/netbsd-arm64": "npm:0.28.1"
+    "@esbuild/netbsd-x64": "npm:0.28.1"
+    "@esbuild/openbsd-arm64": "npm:0.28.1"
+    "@esbuild/openbsd-x64": "npm:0.28.1"
+    "@esbuild/openharmony-arm64": "npm:0.28.1"
+    "@esbuild/sunos-x64": "npm:0.28.1"
+    "@esbuild/win32-arm64": "npm:0.28.1"
+    "@esbuild/win32-ia32": "npm:0.28.1"
+    "@esbuild/win32-x64": "npm:0.28.1"
   dependenciesMeta:
     "@esbuild/aix-ppc64":
       optional: true
@@ -6226,9 +6250,15 @@ __metadata:
       optional: true
     "@esbuild/linux-x64":
       optional: true
+    "@esbuild/netbsd-arm64":
+      optional: true
     "@esbuild/netbsd-x64":
       optional: true
+    "@esbuild/openbsd-arm64":
+      optional: true
     "@esbuild/openbsd-x64":
+      optional: true
+    "@esbuild/openharmony-arm64":
       optional: true
     "@esbuild/sunos-x64":
       optional: true
@@ -6240,7 +6270,7 @@ __metadata:
       optional: true
   bin:
     esbuild: bin/esbuild
-  checksum: 10c0/fa08508adf683c3f399e8a014a6382a6b65542213431e26206c0720e536b31c09b50798747c2a105a4bbba1d9767b8d3615a74c2f7bf1ddf6d836cd11eb672de
+  checksum: 10c0/29cd456a79ce35ac2c7e05fe871330416b2c395c045d849653f843e51378d6e0d6e774d6dcd01b35f4e83238a29bf8decd04fcd34b3780c589a250b21e5f92bb
   languageName: node
   linkType: hard
 
