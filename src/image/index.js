@@ -45,7 +45,7 @@ import {MaskSegmentHelper} from './maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
 import {SegmentCollection} from './segmentCollection.js';
 import {Diameter, Diameters, Label} from './label.js';
-
+import {WindowPreset} from './windowPreset.js';
 
 export {
   Annotation,
@@ -72,6 +72,7 @@ export {
   Spacing,
   View,
   WindowLevel,
+  WindowPreset,
   luts,
   createImage,
   createMaskImage,
