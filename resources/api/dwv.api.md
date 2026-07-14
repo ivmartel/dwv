@@ -296,6 +296,11 @@ export namespace custom {
     let // (undocumented)
     getPostLoadVolumeIdTagValue: any;
     let // (undocumented)
+    postLoadVolumeIdCandidates: {
+        name: string;
+        getter: Function;
+    }[];
+    let // (undocumented)
     getTagPixelUnit: any;
 }
 
@@ -558,6 +563,7 @@ export class Geometry {
     indexToWorld(index: Index): Point;
     isInBounds(point: Point): boolean;
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
+    isSimilar(rhs: Geometry, tol?: number): boolean;
     pointToWorld(point: Point3D): Point3D;
     setInitialTime(time: number): void;
     toString(): string;
@@ -1376,7 +1382,7 @@ export class Vector3D {
 // @public
 export class View extends EventTarget {
     constructor(image: Image_2);
-    addWindowPresets(presets: object): void;
+    addWindowPresets(presets: Record<string, WindowPreset>): void;
     generateImageData(data: ImageData, index: Index): void;
     getAlphaFunction(): (value: number[] | number, index: number) => number;
     getColourMap(): string;
@@ -1394,7 +1400,7 @@ export class View extends EventTarget {
     getScrollDimIndex(): number;
     getWindowLevel(): WindowLevel;
     getWindowLevelMinMax(): WindowLevel;
-    getWindowPresets(): object;
+    getWindowPresets(): Record<string, WindowPreset>;
     getWindowPresetsNames(): string[];
     includesImageUid(uid: string): boolean;
     isAquisitionOrientation(): boolean;
@@ -1413,7 +1419,7 @@ export class View extends EventTarget {
     setWindowLevelMinMax(): void;
     setWindowLevelPreset(name: string, silent?: boolean): void;
     setWindowLevelPresetById(id: number, silent?: boolean): void;
-    setWindowPresets(presets: object): void;
+    setWindowPresets(presets: Record<string, WindowPreset>): void;
 }
 
 // @public
@@ -1433,7 +1439,7 @@ export class ViewConfig {
 // @public
 export class ViewController {
     constructor(view: View);
-    addWindowLevelPresets(presets: object): object;
+    addWindowLevelPresets(presets: Record<string, WindowPreset>): object;
     bindImageAndLayer(viewLayer: ViewLayer): void;
     canQuantifyImage(): boolean;
     canScroll(): boolean;
@@ -1569,6 +1575,14 @@ export class WindowLevel {
     constructor(center: number, width: number);
     center: number;
     width: number;
+}
+
+// @public
+export class WindowPreset {
+    constructor(name: string, wl?: WindowLevel[], perslice?: boolean);
+    name: string;
+    perslice: boolean | undefined;
+    wl: WindowLevel[] | undefined;
 }
 
 // @public
