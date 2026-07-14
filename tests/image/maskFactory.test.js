@@ -401,6 +401,10 @@ function buildSingleSegmentMask(segNumber, label, pixelStart, pixelCount) {
 
 describe('mergeMaskImages', () => {
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   test('merge: segments from both masks appear in merged metadata', () => {
     const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
     const mask2 = buildSingleSegmentMask(2, 'Seg2', 100, 16);
@@ -424,6 +428,8 @@ describe('mergeMaskImages', () => {
   });
 
   test('merge: conflicting segment number in mask2 is remapped', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
     const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
     const mask2 = buildSingleSegmentMask(1, 'Seg1b', 100, 16);
     const merged = mergeMaskImages(mask1, mask2);
@@ -434,6 +440,11 @@ describe('mergeMaskImages', () => {
     const buf = merged.getBuffer();
     assert.equal(buf[0], 1, 'mask1 pixels keep value 1');
     assert.equal(buf[100], 2, 'mask2 pixels use new value 2');
+    assert.equal(warnSpy.mock.calls.length, 1, 'remap warning logged once');
+    assert.equal(
+      warnSpy.mock.calls[0][0],
+      'mergeMaskImages: segment number conflict, remapping 1 to 2'
+    );
   });
 
   test('merge: segment collection contains both segments', () => {
@@ -447,6 +458,8 @@ describe('mergeMaskImages', () => {
 
   test('merge round-trip via toDicom: NumberOfFrames matches combined input',
     () => {
+      const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+        .mockImplementation(() => {});
       const config = syntheticData.find(c => c.name === 'test-11');
       const factory = new MaskFactory();
       const mask1 = factory.create(
@@ -465,6 +478,25 @@ describe('mergeMaskImages', () => {
         nFrames,
         parseInt(config.tags.NumberOfFrames, 10) * 2,
         'merged NumberOfFrames equals 2 × input frames'
+      );
+      // mask2 has the same segment numbers as mask1 and occupies the same
+      // physical space, so both the remap and the overlap detection warn
+      const warnMsgs = warnSpy.mock.calls.map(([msg]) => msg);
+      assert.ok(
+        warnMsgs.includes(
+          'mergeMaskImages: segment number conflict, remapping 1 to 3'
+        ),
+        'segment 1 remap warning logged'
+      );
+      assert.ok(
+        warnMsgs.includes(
+          'mergeMaskImages: segment number conflict, remapping 2 to 4'
+        ),
+        'segment 2 remap warning logged'
+      );
+      assert.ok(
+        warnMsgs.includes('SegmentCollection: detected overlapping segments'),
+        'overlap warning logged for co-located remapped segments'
       );
     }
   );

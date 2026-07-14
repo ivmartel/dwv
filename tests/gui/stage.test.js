@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {describe, test, assert, vi, afterEach} from 'vitest';
 import {Stage} from '../../src/gui/stage.js';
+import * as loggerModule from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'gui/stage.js' file.
@@ -58,11 +59,17 @@ describe('gui/Stage', () => {
   });
 
   test('setActiveLayerGroup ignores an invalid index', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
     const stage = new Stage();
     const lg0 = stage.addLayerGroup(makeDiv('lg0'));
     stage.setActiveLayerGroup(0);
     stage.setActiveLayerGroup(99);
     assert.equal(stage.getActiveLayerGroup(), lg0);
+    assert.equal(warnSpy.mock.calls.length, 1);
+    assert.equal(
+      warnSpy.mock.calls[0][0],
+      'No layer group to set as active with index: 99');
   });
 
   test('getLayerGroupByDivId returns the correct group or undefined', () => {

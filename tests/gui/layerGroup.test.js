@@ -9,6 +9,7 @@ import {
   getLayerDetailsFromEvent,
   getScaledOffset,
 } from '../../src/gui/layerGroup.js';
+import * as loggerModule from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'gui/layerGroup.js' file.
@@ -573,6 +574,8 @@ describe('gui', () => {
   });
 
   test('setShowCrosshair get/set round-trips correctly', () => {
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
     const div = document.createElement('div');
     div.id = 'lg0';
     document.body.appendChild(div);
@@ -580,6 +583,8 @@ describe('gui', () => {
     assert.equal(lg.getShowCrosshair(), false);
     lg.setShowCrosshair(true);
     assert.equal(lg.getShowCrosshair(), true);
+    assert.equal(warnSpy.mock.calls.length, 1);
+    assert.equal(warnSpy.mock.calls[0][0], 'No layer to show crosshair');
     lg.setShowCrosshair(false);
     assert.equal(lg.getShowCrosshair(), false);
   });
