@@ -974,6 +974,10 @@ export class Image extends EventTarget {
       ) {
         continue;
       }
+      // allow for different series time (for multi-volume)
+      if (key === 'SeriesTime') {
+        continue;
+      }
 
       if (this.#meta[key] !== rhs.getMeta()[key]) {
         const message = `Cannot append a slice with different ${ key
