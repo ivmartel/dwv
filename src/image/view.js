@@ -277,6 +277,14 @@ export class View extends EventTarget {
   setImage(image) {
     this.#image = image;
 
+    // resync window presets
+    const imagePresets = image.getMeta().windowPresets;
+    if (typeof imagePresets !== 'undefined') {
+      for (const key of Object.keys(imagePresets)) {
+        this.#windowPresets[key] = imagePresets[key];
+      }
+    }
+
     // default to middle index
     if (typeof this.getCurrentPosition() === 'undefined') {
       this.setCurrentIndex(this.#getMiddleIndex(), true);
@@ -499,6 +507,7 @@ export class View extends EventTarget {
       const offset = this.#image.getSecondaryOffset(currentIndex);
       const currentPreset = this.#windowPresets[this.#currentPresetName];
       const sliceWl = currentPreset.wl[offset];
+      console.log('getwl', sliceWl, offset, currentPreset.wl.length);
       // set window level: will send a change event, mark it as silent as
       // this change is always triggered by a position change
       if (typeof sliceWl !== 'undefined') {
