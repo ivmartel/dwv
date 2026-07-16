@@ -10,6 +10,8 @@ import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 import {Image} from '../../src/image/image.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {Matrix33} from '../../src/math/matrix.js';
+import {WindowLevel, equalWl} from '../../src/image/windowLevel.js';
+import {WindowPreset} from '../../src/image/windowPreset.js';
 
 /**
  * Tests for the 'image/image.js' file.
@@ -318,6 +320,70 @@ describe('image', () => {
     assert.ok(
       compareArrayOfVectors(imgGeometry2.getOrigins(), sliceOrigins2),
       'Slice positions (append between)');
+  });
+
+  /**
+   * Tests for {@link Image} append slice window presets merge.
+   *
+   * @function module:tests/image~imageAppendSliceWindowPresets
+   */
+  test('Image append slice window presets', () => {
+    const size = 2;
+    const sliceSize = new Size([size, size, 1]);
+    const sliceSpacing = new Spacing([1, 1, 1]);
+    const numberOfFiles = 4;
+
+    /**
+     * Create a single slice image with a 'Default' window preset.
+     *
+     * @param {number} z The slice z origin.
+     * @param {WindowLevel} wl The slice window level.
+     * @returns {Image} The created image.
+     */
+    function createSliceWithPreset(z, wl) {
+      const geometry = new Geometry(
+        [new Point3D(0, 0, z)], sliceSize, sliceSpacing);
+      const buffer = new Int16Array(size * size);
+      const image = new Image(geometry, buffer, [`${z}`]);
+      image.setMeta({
+        numberOfFiles,
+        windowPresets: {
+          Default: new WindowPreset('Default', [wl])
+        }
+      });
+      return image;
+    }
+
+    // slice window levels: same value for 0 and 1, diverging after
+    const wl0 = new WindowLevel(100, 200);
+    const wl1 = new WindowLevel(100, 200);
+    const wl2 = new WindowLevel(150, 250);
+    const wl3 = new WindowLevel(300, 400);
+    const wls = [wl0, wl1, wl2, wl3];
+
+    // base image (first loaded slice)
+    const image = createSliceWithPreset(0, wl0);
+
+    // append remaining slices, in order
+    for (let z = 1; z < numberOfFiles; ++z) {
+      image.appendSlice(createSliceWithPreset(z, wls[z]));
+    }
+
+    const preset = image.getMeta().windowPresets.Default;
+    assert.equal(preset.perslice, true,
+      'preset flagged as perslice after a diverging slice');
+    assert.equal(preset.wl.length, numberOfFiles,
+      'wl array has one entry per slice');
+    // slice 0 (base) and slices from the first detected divergence (2)
+    // onward have their own tracked window level; slice 1 was merged
+    // while still indistinguishable from slice 0
+    assert.ok(equalWl(preset.wl[0], wls[0]), 'slice 0 kept its own value');
+    assert.equal(preset.wl[1], wls[0],
+      'slice 1 merged before divergence was detected, set as wl[0]');
+    for (let z = 2; z < numberOfFiles; ++z) {
+      assert.ok(equalWl(preset.wl[z], wls[z]),
+        `slice ${z} kept its own window level`);
+    }
   });
 
   /**
