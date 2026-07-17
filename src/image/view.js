@@ -507,7 +507,6 @@ export class View extends EventTarget {
       const offset = this.#image.getSecondaryOffset(currentIndex);
       const currentPreset = this.#windowPresets[this.#currentPresetName];
       const sliceWl = currentPreset.wl[offset];
-      console.log('getwl', sliceWl, offset, currentPreset.wl.length);
       // set window level: will send a change event, mark it as silent as
       // this change is always triggered by a position change
       if (typeof sliceWl !== 'undefined') {

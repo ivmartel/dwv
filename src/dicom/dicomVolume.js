@@ -7,6 +7,7 @@ import {
   NormalisedManufacturers,
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
+import {logger} from '../utils/logger.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
@@ -252,7 +253,7 @@ function getDiffusionBValue(elements) {
     if (typeof res === 'undefined') {
       res = getNonStandardDiffusionBValueFromEMR(elements);
       if (typeof res !== 'undefined') {
-        console.log('got b-value for enhanced MR from non standard tag');
+        logger.debug('Got b-value for enhanced MR from non standard tag');
       }
     }
   } else if (sopClassUID === SOPClassUIDs.MR) {
