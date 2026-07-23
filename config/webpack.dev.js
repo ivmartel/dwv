@@ -140,10 +140,6 @@ export default merge(webpackCommon, {
         type: 'asset/resource'
       },
       {
-        test: /\.json/,
-        type: 'asset/source'
-      },
-      {
         test: /\.dcm/,
         generator: {
           dataUrl: {
