@@ -904,10 +904,12 @@ export class MaskSegment {
     algorithmType: string;
     displayRGBValue: RGB | undefined;
     displayValue: number | undefined;
+    interpretedType: string | undefined;
     label: string;
     number: number;
     propertyCategoryCode: DicomCode | undefined;
     propertyTypeCode: DicomCode | undefined;
+    roiInterpreter: string | undefined;
     trackingId: string | undefined;
     trackingUid: string | undefined;
 }
@@ -1170,8 +1172,11 @@ export class RTROI {
         b: number;
     };
     contours: RTROIContour[];
+    generationAlgorithm: string | undefined;
+    interpretedType: string | undefined;
     name: string;
     number: number;
+    roiInterpreter: string | undefined;
 }
 
 // @public
