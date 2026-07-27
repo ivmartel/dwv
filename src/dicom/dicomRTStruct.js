@@ -19,6 +19,7 @@ const TagKeys = {
   StructureSetROISequence: '30060020',
   ROINumber: '30060022',
   ROIName: '30060026',
+  ROIGenerationAlgorithm: '30060036',
   // ROI Contour Sequence (3006,0039)
   ROIContourSequence: '30060039',
   ReferencedROINumber: '30060084',
@@ -26,7 +27,11 @@ const TagKeys = {
   ContourSequence: '30060040',
   ContourGeometricType: '30060042',
   NumberOfContourPoints: '30060046',
-  ContourData: '30060050'
+  ContourData: '30060050',
+  // RT ROI Observations Sequence (3006,0080)
+  RTROIObservationsSequence: '30060080',
+  RTROIInterpretedType: '300600A4',
+  ROIInterpreter: '300600A6'
 };
 
 /**
@@ -75,6 +80,27 @@ export class RTROI {
   colour;
 
   /**
+   * ROI generation algorithm (e.g. 'MANUAL', 'SEMIAUTOMATIC', 'AUTOMATIC').
+   *
+   * @type {string|undefined}
+   */
+  generationAlgorithm;
+
+  /**
+   * RT ROI interpreted type (e.g. 'GTV', 'CTV', 'PTV', 'ORGAN').
+   *
+   * @type {string|undefined}
+   */
+  interpretedType;
+
+  /**
+   * Name of the person who interpreted the ROI.
+   *
+   * @type {string|undefined}
+   */
+  roiInterpreter;
+
+  /**
    * List of contours belonging to this ROI.
    *
    * @type {RTROIContour[]}
@@ -89,15 +115,36 @@ export class RTROI {
  * @returns {RTROI[]} The list of RT ROIs.
  */
 export function getRTStructFromElements(dataElements) {
-  // build ROINumber → name map from StructureSetROISequence
+  // build ROINumber → name/algorithm maps from StructureSetROISequence
   const roiNameMap = {};
+  const roiGenerationAlgorithmMap = {};
   const roiSeq = safeGetAll(dataElements, TagKeys.StructureSetROISequence);
   if (typeof roiSeq !== 'undefined') {
     for (const roiItem of roiSeq) {
       const num = safeGet(roiItem, TagKeys.ROINumber);
       const name = safeGet(roiItem, TagKeys.ROIName);
+      const generationAlgorithm =
+        safeGet(roiItem, TagKeys.ROIGenerationAlgorithm);
       if (typeof num !== 'undefined') {
         roiNameMap[num] = name ?? `ROI ${num}`;
+        roiGenerationAlgorithmMap[num] = generationAlgorithm;
+      }
+    }
+  }
+
+  // build ReferencedROINumber → interpreted type/interpreter map
+  // from RTROIObservationsSequence
+  const roiObservationMap = {};
+  const obsSeq = safeGetAll(
+    dataElements, TagKeys.RTROIObservationsSequence);
+  if (typeof obsSeq !== 'undefined') {
+    for (const obsItem of obsSeq) {
+      const num = safeGet(obsItem, TagKeys.ReferencedROINumber);
+      if (typeof num !== 'undefined') {
+        roiObservationMap[num] = {
+          interpretedType: safeGet(obsItem, TagKeys.RTROIInterpretedType),
+          roiInterpreter: safeGet(obsItem, TagKeys.ROIInterpreter)
+        };
       }
     }
   }
@@ -157,6 +204,9 @@ export function getRTStructFromElements(dataElements) {
     const roi = new RTROI();
     roi.number = typeof roiNum !== 'undefined' ? parseInt(roiNum, 10) : 0;
     roi.name = roiNameMap[roi.number] ?? `ROI ${roi.number}`;
+    roi.generationAlgorithm = roiGenerationAlgorithmMap[roi.number];
+    roi.interpretedType = roiObservationMap[roi.number]?.interpretedType;
+    roi.roiInterpreter = roiObservationMap[roi.number]?.roiInterpreter;
     roi.colour = colour;
     roi.contours = contours;
     rois.push(roi);

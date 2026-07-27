@@ -102,6 +102,18 @@ export class MaskSegment {
    * @type {string|undefined}
    */
   trackingId;
+  /**
+   * RT ROI interpreted type (3006,00A4), only used for RTSTRUCT segments.
+   *
+   * @type {string|undefined}
+   */
+  interpretedType;
+  /**
+   * RT ROI interpreter name (3006,00A6), only used for RTSTRUCT segments.
+   *
+   * @type {string|undefined}
+   */
+  roiInterpreter;
 
   /**
    * @param {number} number The segment number.

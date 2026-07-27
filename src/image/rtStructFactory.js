@@ -516,7 +516,10 @@ export class RtStructFactory {
       const roi = rois[roiIndex];
       const segNum = roiIndex + 1; // 1-based segment number
 
-      const segment = new MaskSegment(segNum, roi.name, 'MANUAL');
+      const segment = new MaskSegment(
+        segNum, roi.name, roi.generationAlgorithm ?? 'MANUAL');
+      segment.interpretedType = roi.interpretedType;
+      segment.roiInterpreter = roi.roiInterpreter;
       segment.displayRGBValue = new RGB(
         roi.colour.r, roi.colour.g, roi.colour.b);
       segments.push(segment);
@@ -693,14 +696,15 @@ export class RtStructFactory {
       roiItems.push({
         ROINumber: segNum,
         ROIName: segment.label,
-        ReferencedFrameOfReferenceUID: tags.FrameOfReferenceUID ?? ''
+        ReferencedFrameOfReferenceUID: tags.FrameOfReferenceUID ?? '',
+        ROIGenerationAlgorithm: segment.algorithmType ?? 'MANUAL'
       });
 
       obsItems.push({
         ObservationNumber: segNum,
         ReferencedROINumber: segNum,
-        RTROIInterpretedType: 'ORGAN',
-        ROIInterpreter: ''
+        RTROIInterpretedType: segment.interpretedType ?? 'ORGAN',
+        ROIInterpreter: segment.roiInterpreter ?? ''
       });
 
       // collect contour sequences across all slices
