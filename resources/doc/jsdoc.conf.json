@@ -1,54 +1,54 @@
 {
-    "plugins": ["node_modules/jsdoc/plugins/markdown"],
-    "markdown": {
-      "idInHeadings": true
-    },
-    "source": {
-      "include": [
-        "src",
-        "tests"
-      ]
-    },
-    "templates": {
-      "default": {
-        "staticFiles": {
-          "include": ["resources/doc/img"]
-        }
-      }
-    },
-    "opts": {
-      "strict": true,
-      "recurse": true,
-      "readme": "resources/doc/readme-doc.md",
-      "destination": "build/doc",
-      "template": "node_modules/clean-jsdoc-theme/dist",
-      "tutorials": "resources/doc/tutorials",
-      "package": "package.json",
-      "siteName": "DWV",
-      "sectionOrder": [
-        "Tutorials"
-      ],
-      "menu": [
-        {
-          "id": "home"
-        },
-        {
-          "title": "GitHub",
-          "link": "https://github.com/ivmartel/dwv",
-          "icon": "simpleicons:github"
-        },
-        {
-          "title": "npm",
-          "link": "https://www.npmjs.com/package/dwv",
-          "icon": "simpleicons:npm"
-        }
-      ],
-      "playground": {
-        "providers": ["codepen"],
-        "enableForAllExamples": true,
-        "codepen": {
-          "html": "<div id='dwv'><div id='layerGroup0'></div></div>"
-        }
+  "plugins": ["node_modules/jsdoc/plugins/markdown"],
+  "markdown": {
+    "idInHeadings": true
+  },
+  "source": {
+    "include": [
+      "src",
+      "tests"
+    ]
+  },
+  "templates": {
+    "default": {
+      "staticFiles": {
+        "include": ["resources/doc/img"]
       }
     }
+  },
+  "opts": {
+    "strict": true,
+    "recurse": true,
+    "readme": "resources/doc/readme-doc.md",
+    "destination": "build/doc",
+    "template": "node_modules/clean-jsdoc-theme/dist",
+    "tutorials": "resources/doc/tutorials",
+    "package": "package.json",
+    "siteName": "DWV",
+    "sectionOrder": [
+      "Tutorials"
+    ],
+    "menu": [
+      {
+        "id": "home"
+      },
+      {
+        "title": "GitHub",
+        "link": "https://github.com/ivmartel/dwv",
+        "icon": "simpleicons:github"
+      },
+      {
+        "title": "npm",
+        "link": "https://www.npmjs.com/package/dwv",
+        "icon": "simpleicons:npm"
+      }
+    ],
+    "playground": {
+      "providers": ["codepen"],
+      "enableForAllExamples": true,
+      "codepen": {
+        "html": "<div id='dwv'><div id='layerGroup0'></div></div>"
+      }
+    }
+  }
 }
