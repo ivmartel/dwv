@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "es2022",
+    "module": "esnext",
     "moduleResolution": "node10",
     "lib": ["es2022", "dom"],
     "types": [],
     "declaration": true,
     "allowJs": true,
     "checkJs": true,
+    "resolveJsonModule": true,
     "emitDeclarationOnly": true,
     "declarationMap": true,
     "strict": false,

@@ -5404,6 +5404,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dcmstdtojs@npm:0.2.0":
+  version: 0.2.0
+  resolution: "dcmstdtojs@npm:0.2.0"
+  checksum: 10c0/655e070c586bbd2058dc85bba08677a10a72f32eeb881ba08074a7fc02ea45094ae6d8301f3cbd232b62b566200367e2374a0c4e838f799bc33a1d049a6473e4
+  languageName: node
+  linkType: hard
+
 "debug@npm:2.6.9, debug@npm:^2.2.0":
   version: 2.6.9
   resolution: "debug@npm:2.6.9"
@@ -5795,6 +5802,7 @@ __metadata:
     benchmark: "npm:^2.1.4"
     canvas: "npm:^3.2.1"
     clean-jsdoc-theme: "npm:^5.0.3"
+    dcmstdtojs: "npm:0.2.0"
     diff: "npm:^9.0.0"
     diff2html: "npm:^3.4.56"
     eslint: "npm:^10.4.0"

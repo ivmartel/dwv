@@ -30,6 +30,7 @@
     ">1%, last 2 versions, not dead"
   ],
   "dependencies": {
+    "dcmstdtojs": "0.2.0",
     "jszip": "^3.10.1",
     "konva": "~10.3.0",
     "magic-wand-tool": "~1.1.7"
