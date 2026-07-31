@@ -22,6 +22,7 @@ import {logger} from '../utils/logger.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {SimpleDataElements} from '../dicom/simpleDataElements.js';
  */
 
 /**
@@ -59,9 +60,10 @@ const RTStructRequiredTags = [
 /**
  * Get the default DICOM RT Structure Set tags as an object.
  *
- * @returns {object} The default tags.
+ * @returns {SimpleDataElements} The default tags.
  */
 export function getDefaultDicomRTStructJson() {
+  /** @type {SimpleDataElements} */
   const tags = {};
   for (const tag of RTStructRequiredTags) {
     tags[tag.name] = tag.enum[0];
@@ -284,8 +286,8 @@ export function simplifyPolygon(pts, epsilon) {
 /**
  * Merge extra tags into a base tags object (mutates base).
  *
- * @param {object} tags Base tags object.
- * @param {object} extra Tags to merge in.
+ * @param {SimpleDataElements} tags Base tags object.
+ * @param {SimpleDataElements} extra Tags to merge in.
  */
 function mergeTags(tags, extra) {
   for (const key of Object.keys(extra)) {
@@ -629,7 +631,7 @@ export class RtStructFactory {
    * @param {MaskSegment[]} [segments] The mask segments; if omitted, taken
    *   from image meta.
    * @param {Image} [sourceImage] Source image (provides StudyInstanceUID).
-   * @param {Record<string, any>} [extraTags] Optional extra tags to merge.
+   * @param {SimpleDataElements} [extraTags] Optional extra tags to merge.
    * @returns {Record<string, DataElement>} The DICOM data elements.
    */
   toDicom(image, segments, sourceImage, extraTags) {

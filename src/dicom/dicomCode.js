@@ -1,5 +1,6 @@
 /**
  * @import {DataElement} from './dataElement.js';
+ * @import {SimpleDataElements} from './simpleDataElements.js';
  */
 
 /**
@@ -124,10 +125,11 @@ export function getCode(dataElements) {
  * Get a simple dicom element item from a code object.
  *
  * @param {DicomCode} code The code object.
- * @returns {Record<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleDataElements} The item as a list of (key, value) pairs.
  */
 export function getDicomCodeItem(code) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleDataElements} */
   const item = {};
   // value
   if (typeof code.value !== 'undefined') {

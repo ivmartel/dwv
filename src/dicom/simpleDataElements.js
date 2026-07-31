@@ -7,12 +7,37 @@ import {DataElement} from './dataElement.js';
 import {logger} from '../utils/logger.js';
 
 /**
+ * A simple (non sequence) tag value: either a single primitive
+ *   or, for multi-valued VRs, an array of primitives.
+ *
+ * @typedef {string | number | string[] | number[]} SimpleTagValue
+ */
+
+/**
+ * A simple sequence (VR=SQ) tag value.
+ *
+ * @typedef {object} SimpleSequenceValue
+ * @property {SimpleDataElements[]} value The sequence items.
+ * @property {boolean} [undefinedLength] Undefined length flag.
+ */
+
+/**
+ * The meta data as simple elements: indexed by tag name instead of
+ *   tag key, with direct values (no element object) for non sequence,
+ *   non merged tags.
+ *
+ * @typedef {Record<string, SimpleTagValue | SimpleSequenceValue>}
+ *   SimpleDataElements
+ */
+
+/**
  * Get an array reducer to reduce an array of tag keys taken from
  *   the input dataElements and return as simple elements.
  *
  * @param {Record<string, DataElement>} dataElements The meta data
  *   index by tag keys.
- * @returns {any} An array reducer callbackFn.
+ * @returns {(accumulator: SimpleDataElements, currentValue: string) =>
+ *   SimpleDataElements} An array reducer callbackFn.
  */
 function getSimpleElementReducer(dataElements) {
   return function (accumulator, currentValue) {
@@ -61,7 +86,7 @@ function getSimpleElementReducer(dataElements) {
  *
  * @param {Record<string, DataElement>} metaData The meta data
  *   index by tag keys.
- * @returns {Record<string, any>} The simple elements.
+ * @returns {SimpleDataElements} The simple elements.
  */
 export function getAsSimpleElements(metaData) {
   const meta = structuredClone(metaData);
@@ -74,12 +99,13 @@ export function getAsSimpleElements(metaData) {
  * tag names instead of keys and direct values (no value property) for
  * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {Record<string, any>} simpleTags The 'simple' DICOM
+ * @param {SimpleDataElements} simpleTags The 'simple' DICOM
  *   tags object.
  * @returns {Record<string, DataElement>} The DICOM elements.
  */
 export function getElementsFromJSONTags(simpleTags) {
   const keys = Object.keys(simpleTags);
+  /** @type {Record<string, DataElement>} */
   const dataElements = {};
   for (const key of keys) {
     // get the DICOM element definition from its name
@@ -95,11 +121,12 @@ export function getElementsFromJSONTags(simpleTags) {
     const simpleTag = simpleTags[key];
     if (vr === 'SQ') {
       const items = [];
-      if (typeof simpleTag.undefinedLength !== 'undefined') {
-        undefinedLength = simpleTag.undefinedLength;
+      const simpleSeq = /** @type {SimpleSequenceValue} */ (simpleTag);
+      if (typeof simpleSeq.undefinedLength !== 'undefined') {
+        undefinedLength = simpleSeq.undefinedLength;
       }
-      if (Array.isArray(simpleTag.value)) {
-        for (const item of simpleTag.value) {
+      if (Array.isArray(simpleSeq.value)) {
+        for (const item of simpleSeq.value) {
           items.push(getElementsFromJSONTags(item));
         }
       } else {
@@ -121,7 +148,5 @@ export function getElementsFromJSONTags(simpleTags) {
     // store
     dataElements[tag.getKey()] = dataElement;
   }
-  // return
-  // @ts-expect-error
   return dataElements;
 }

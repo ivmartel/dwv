@@ -478,6 +478,7 @@ export class BrushMaskPaint extends EventTarget {
     const imagePosPat = sourceGeometry.getOrigins()[imgK];
 
     // default tags
+    /** @type {Record<string, any>} */
     const firstSliceMeta = getDefaultDicomSegJson();
     // dicom seg dimension
     const dimension = getDimensionOrganization();

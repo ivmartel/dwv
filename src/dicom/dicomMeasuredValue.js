@@ -6,6 +6,7 @@ import {
 /**
  * @import {DataElement} from './dataElement.js';
  * @import {DicomCode} from './dicomCode.js';
+ * @import {SimpleDataElements} from './simpleDataElements.js';
  */
 
 /**
@@ -100,10 +101,11 @@ export function getMeasuredValue(dataElements) {
  * Get a simple dicom element item from a measured value object.
  *
  * @param {MeasuredValue} value The measured value object.
- * @returns {Record<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleDataElements} The item as a list of (key, value) pairs.
  */
 export function getDicomMeasuredValueItem(value) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleDataElements} */
   const item = {};
 
   if (typeof value.measurementUnitsCode !== 'undefined') {

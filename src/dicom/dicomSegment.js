@@ -16,6 +16,7 @@ import {getDefaultColour} from '../utils/colour.js';
  * @import {DataElement} from './dataElement.js';
  * @import {DicomCode} from './dicomCode.js';
  * @import {RGB} from '../utils/colour.js';
+ * @import {SimpleDataElements} from './simpleDataElements.js';
  */
 
 /**
@@ -281,7 +282,7 @@ export function isSimilarSegment(seg1, seg2) {
  * Get a dicom simple tag from a segment object.
  *
  * @param {MaskSegment} segment The segment object.
- * @returns {Record<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleDataElements} The item as a list of (key, value) pairs.
  */
 export function getDicomSegmentItem(segment) {
   let algoType = segment.algorithmType;

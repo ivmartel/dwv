@@ -1,5 +1,6 @@
 /**
  * @import {DataElement} from './dataElement.js';
+ * @import {SimpleDataElements} from './simpleDataElements.js';
  */
 
 /**
@@ -78,10 +79,11 @@ export function getSpatialCoordinate3D(dataElements) {
  * Get a simple dicom element item from a scoord3d object.
  *
  * @param {SpatialCoordinate3D} scoord The scoord3d object.
- * @returns {Record<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleDataElements} The item as a list of (key, value) pairs.
  */
 export function getDicomSpatialCoordinate3DItem(scoord) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleDataElements} */
   const item = {};
 
   if (typeof scoord.graphicData !== 'undefined') {

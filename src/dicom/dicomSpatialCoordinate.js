@@ -10,6 +10,7 @@ import {BidimensionalLine} from '../math/bidimensionalLine.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
+ * @import {SimpleDataElements} from './simpleDataElements.js';
  */
 
 /**
@@ -100,10 +101,11 @@ export function getSpatialCoordinate(dataElements) {
  * Get a simple dicom element item from a scoord object.
  *
  * @param {SpatialCoordinate} scoord The scoord object.
- * @returns {Record<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleDataElements} The item as a list of (key, value) pairs.
  */
 export function getDicomSpatialCoordinateItem(scoord) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleDataElements} */
   const item = {};
 
   if (typeof scoord.pixelOriginInterpretation !== 'undefined') {

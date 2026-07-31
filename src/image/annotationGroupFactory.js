@@ -52,6 +52,7 @@ import {Point2D, Point3D} from '../math/point.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {SimpleDataElements} from '../dicom/simpleDataElements.js';
  */
 
 /**
@@ -74,8 +75,8 @@ const TagKeys = {
 /**
  * Merge two tag lists.
  *
- * @param {object} tags1 Base list, will be modified.
- * @param {object} tags2 List to merge.
+ * @param {SimpleDataElements} tags1 Base list, will be modified.
+ * @param {SimpleDataElements} tags2 List to merge.
  */
 function mergeTags(tags1, tags2) {
   const keys2 = Object.keys(tags2);
@@ -1409,7 +1410,7 @@ export class AnnotationGroupFactory {
    * TID 1500 template.
    *
    * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {Record<string, any>} [extraTags] Optional list of extra tags.
+   * @param {SimpleDataElements} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(annotationGroup, extraTags) {
@@ -1665,7 +1666,7 @@ export class AnnotationGroupFactory {
    *   the TID 4100 template.
    *
    * @param {CADReport} report The CAD report.
-   * @param {Record<string, any>} [extraTags] Optional list of extra tags.
+   * @param {SimpleDataElements} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicomCADReport(report, extraTags) {

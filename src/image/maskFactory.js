@@ -24,6 +24,7 @@ import {
   getDicomSegmentItem,
 } from '../dicom/dicomSegment.js';
 import {
+  DicomSegmentFrameInfo,
   getSegmentFrameInfo,
   getDicomSegmentFrameInfoItem,
   getDimensionOrganization,
@@ -49,6 +50,7 @@ import {DataElement} from '../dicom/dataElement.js';
  * @import {Matrix33} from '../math/matrix.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
  * @import {Spacing} from '../image/spacing.js';
+ * @import {SimpleDataElements} from '../dicom/simpleDataElements.js';
  */
 
 /**
@@ -138,8 +140,8 @@ function getComparePosPat(orientation) {
 /**
  * Merge two tag lists.
  *
- * @param {object} tags1 Base list, will be modified.
- * @param {object} tags2 List to merge.
+ * @param {SimpleDataElements} tags1 Base list, will be modified.
+ * @param {SimpleDataElements} tags2 List to merge.
  */
 function mergeTags(tags1, tags2) {
   const keys2 = Object.keys(tags2);
@@ -285,9 +287,10 @@ const RequiredDicomTags = [
 /**
  * Get the default DICOM seg tags as an object.
  *
- * @returns {object} The default tags.
+ * @returns {SimpleDataElements} The default tags.
  */
 export function getDefaultDicomSegJson() {
+  /** @type {SimpleDataElements} */
   const tags = {};
   for (const tag of RequiredDicomTags) {
     tags[tag.name] = tag.enum[0];
@@ -593,6 +596,7 @@ export class MaskFactory {
       image.setPaletteColourMap(paletteColourMap);
     }
     // meta information
+    /** @type {Record<string, any>} */
     const meta = getDefaultDicomSegJson();
 
     // meta tags
@@ -750,7 +754,7 @@ export class MaskFactory {
    * @param {Image} image The mask image.
    * @param {MaskSegment[]} segments The mask segments.
    * @param {Image} sourceImage The source image.
-   * @param {Record<string, any>} [extraTags] Optional list of extra tags.
+   * @param {SimpleDataElements} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(
@@ -829,11 +833,17 @@ export class MaskFactory {
         // frame info
         const posPat = image.getGeometry().getOrigins()[key1];
         const posPatArray = [posPat.getX(), posPat.getY(), posPat.getZ()];
-        const frameInfo = {
-          dimIndex: [number40, keys1.length - k1],
-          imagePosPat: posPatArray,
-          refSegmentNumber: number40
-        };
+        // const frameInfo = {
+        //   dimIndex: [number40, keys1.length - k1],
+        //   imagePosPat: posPatArray,
+        //   refSegmentNumber: number40
+        // };
+        const frameInfo = new DicomSegmentFrameInfo(
+          [number40, keys1.length - k1],
+          posPatArray,
+          undefined,
+          number40
+        );
         // derivation image info
         if (sourceImage !== undefined) {
           const sourceGeometry = sourceImage.getGeometry();

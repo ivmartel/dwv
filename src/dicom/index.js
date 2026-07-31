@@ -1,9 +1,5 @@
 import {DataElement} from './dataElement.js';
 import {
-  getAsSimpleElements,
-  getElementsFromJSONTags
-} from './simpleDataElements.js';
-import {
   getDwvVersion,
   getTypedArray,
   getReverseOrientation,
@@ -51,6 +47,9 @@ import {
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
 
+// also export typedefs
+export * from './simpleDataElements.js';
+
 export {
   DataElement,
   DicomCode,
@@ -65,11 +64,9 @@ export {
   addTagsToDictionary,
   getDwvVersion,
   getUID,
-  getElementsFromJSONTags,
   getSegmentationCode,
   getTypedArray,
   getTagFromKey,
-  getAsSimpleElements,
   getDicomTagInfo,
   getDicomTagGroupName,
   getPixelDataTag,
