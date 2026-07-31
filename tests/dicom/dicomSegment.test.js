@@ -7,7 +7,7 @@ import {
 } from '../../src/dicom/dicomSegment.js';
 import {
   getElementsFromJSONTags
-} from '../../src/dicom/simpleDataElements.js';
+} from '../../src/dicom/simpleTagValues.js';
 import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour.js';
 
 /**

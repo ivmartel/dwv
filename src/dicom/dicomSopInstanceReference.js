@@ -1,6 +1,6 @@
 /**
  * @import {DataElement} from './dataElement.js';
- * @import {SimpleDataElements} from './simpleDataElements.js';
+ * @import {SimpleTagValues} from './simpleTagValues.js';
  */
 
 /**
@@ -63,11 +63,11 @@ export function getSopInstanceReference(dataElements) {
  * Get a simple dicom element item from a SOP reference object.
  *
  * @param {SopInstanceReference} ref The SOP reference object.
- * @returns {SimpleDataElements} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomSopInstanceReferenceItem(ref) {
   // dicom item (tags are in group/element order)
-  /** @type {SimpleDataElements} */
+  /** @type {SimpleTagValues} */
   const item = {};
 
   if (typeof ref.referencedSOPClassUID !== 'undefined') {

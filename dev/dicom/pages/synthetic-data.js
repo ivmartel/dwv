@@ -4,7 +4,7 @@ import {
 } from '../../../src/dicom/dicomWriter.js';
 import {
   getElementsFromJSONTags
-} from '../../../src/dicom/simpleDataElements.js';
+} from '../../../src/dicom/simpleTagValues.js';
 import {
   generatePixelDataFromJSONTags,
 } from '../dicomGenerator.js';

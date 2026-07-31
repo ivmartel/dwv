@@ -6,7 +6,7 @@ import {
   App
 } from '../../src/app/application.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
-import {getAsSimpleElements} from '../../src/dicom/simpleDataElements.js';
+import {getAsSimpleElements} from '../../src/dicom/simpleTagValues.js';
 import {getSRContent} from '../../src/dicom/dicomSRContent.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';

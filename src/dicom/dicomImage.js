@@ -12,7 +12,7 @@ import {logger} from '../utils/logger.js';
 /**
  * @import {Matrix33} from '../math/matrix.js';
  * @import {DataElement} from './dataElement.js';
- * @import {SimpleDataElements} from './simpleDataElements.js';
+ * @import {SimpleTagValues} from './simpleTagValues.js';
  */
 
 /**
@@ -307,7 +307,7 @@ export function getOrientationMatrix(dataElements) {
  * Get a dicom item from a measure sequence.
  *
  * @param {Spacing} spacing The spacing object.
- * @returns {SimpleDataElements} The dicom item.
+ * @returns {SimpleTagValues} The dicom item.
  */
 export function getDicomMeasureItem(spacing) {
   return {
@@ -320,7 +320,7 @@ export function getDicomMeasureItem(spacing) {
  * Get a dicom element from a plane orientation sequence.
  *
  * @param {Matrix33} orientation The image orientation.
- * @returns {SimpleDataElements} The dicom element.
+ * @returns {SimpleTagValues} The dicom element.
  */
 export function getDicomPlaneOrientationItem(orientation) {
   return {

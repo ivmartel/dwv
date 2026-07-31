@@ -1,7 +1,7 @@
 import {describe, test, assert} from 'vitest';
 import {
   getElementsFromJSONTags
-} from '../../src/dicom/simpleDataElements.js';
+} from '../../src/dicom/simpleTagValues.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';

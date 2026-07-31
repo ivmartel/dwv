@@ -11,7 +11,7 @@ import {getReferencedSeriesUIDFromRTStruct} from '../dicom/dicomImage.js';
 import {
   getElementsFromJSONTags,
   mergeTags
-} from '../dicom/simpleDataElements.js';
+} from '../dicom/simpleTagValues.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
 import {Image} from './image.js';
 import {ColourMap} from './luts.js';
@@ -23,7 +23,7 @@ import {logger} from '../utils/logger.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
- * @import {SimpleDataElements} from '../dicom/simpleDataElements.js';
+ * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
  */
 
 /**
@@ -61,10 +61,10 @@ const RTStructRequiredTags = [
 /**
  * Get the default DICOM RT Structure Set tags as an object.
  *
- * @returns {SimpleDataElements} The default tags.
+ * @returns {SimpleTagValues} The default tags.
  */
 export function getDefaultDicomRTStructJson() {
-  /** @type {SimpleDataElements} */
+  /** @type {SimpleTagValues} */
   const tags = {};
   for (const tag of RTStructRequiredTags) {
     tags[tag.name] = tag.enum[0];
@@ -620,7 +620,7 @@ export class RtStructFactory {
    * @param {MaskSegment[]} [segments] The mask segments; if omitted, taken
    *   from image meta.
    * @param {Image} [sourceImage] Source image (provides StudyInstanceUID).
-   * @param {SimpleDataElements} [extraTags] Optional extra tags to merge.
+   * @param {SimpleTagValues} [extraTags] Optional extra tags to merge.
    * @returns {Record<string, DataElement>} The DICOM data elements.
    */
   toDicom(image, segments, sourceImage, extraTags) {

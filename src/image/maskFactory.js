@@ -19,7 +19,7 @@ import {Tag} from '../dicom/dicomTag.js';
 import {
   getElementsFromJSONTags,
   mergeTags
-} from '../dicom/simpleDataElements.js';
+} from '../dicom/simpleTagValues.js';
 import {
   getSegment,
   getDicomSegmentItem,
@@ -51,7 +51,7 @@ import {DataElement} from '../dicom/dataElement.js';
  * @import {Matrix33} from '../math/matrix.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
  * @import {Spacing} from '../image/spacing.js';
- * @import {SimpleDataElements} from '../dicom/simpleDataElements.js';
+ * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
  */
 
 /**
@@ -272,10 +272,10 @@ const RequiredDicomTags = [
 /**
  * Get the default DICOM seg tags as an object.
  *
- * @returns {SimpleDataElements} The default tags.
+ * @returns {SimpleTagValues} The default tags.
  */
 export function getDefaultDicomSegJson() {
-  /** @type {SimpleDataElements} */
+  /** @type {SimpleTagValues} */
   const tags = {};
   for (const tag of RequiredDicomTags) {
     tags[tag.name] = tag.enum[0];
@@ -739,7 +739,7 @@ export class MaskFactory {
    * @param {Image} image The mask image.
    * @param {MaskSegment[]} segments The mask segments.
    * @param {Image} sourceImage The source image.
-   * @param {SimpleDataElements} [extraTags] Optional list of extra tags.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(

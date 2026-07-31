@@ -48,7 +48,7 @@ import {
 } from './dicomManufacturer.js';
 
 // also export typedefs
-export * from './simpleDataElements.js';
+export * from './simpleTagValues.js';
 
 export {
   DataElement,

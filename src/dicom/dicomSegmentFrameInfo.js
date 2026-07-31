@@ -10,7 +10,7 @@ import {
 /**
  * @import {DataElement} from './dataElement.js';
  * @import {Spacing} from '../image/spacing.js';
- * @import {SimpleDataElements} from './simpleDataElements.js';
+ * @import {SimpleTagValues} from './simpleTagValues.js';
  */
 
 /**
@@ -298,7 +298,7 @@ export function isEqualSegmentFrameInfo(dsfi1, dsfi2) {
  * Get a dicom item from a frame information object.
  *
  * @param {DicomSegmentFrameInfo} frameInfo The frame information object.
- * @returns {SimpleDataElements} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomSegmentFrameInfoItem(frameInfo) {
   const item = {

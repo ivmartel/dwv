@@ -1,7 +1,7 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
 import {
   getElementsFromJSONTags
-} from '../../src/dicom/simpleDataElements.js';
+} from '../../src/dicom/simpleTagValues.js';
 import {getRTStructFromElements} from '../../src/dicom/dicomRTStruct.js';
 import {
   getReferencedSeriesUIDFromRTStruct

@@ -7,7 +7,7 @@ import {
 } from '../../src/dicom/dicomSegmentFrameInfo.js';
 import {
   getElementsFromJSONTags
-} from '../../src/dicom/simpleDataElements.js';
+} from '../../src/dicom/simpleTagValues.js';
 
 /**
  * Tests for the 'dicom/dicomSegmentFrameInfo.js' file.

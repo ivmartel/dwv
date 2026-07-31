@@ -11,7 +11,7 @@ import {
 } from '../../src/dicom/dicomCode.js';
 import {
   getElementsFromJSONTags
-} from '../../src/dicom/simpleDataElements.js';
+} from '../../src/dicom/simpleTagValues.js';
 
 /**
  * Tests for the 'dicom/dicomCode.js' file.

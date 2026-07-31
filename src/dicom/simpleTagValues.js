@@ -17,27 +17,27 @@ import {logger} from '../utils/logger.js';
  * A simple sequence (VR=SQ) tag value.
  *
  * @typedef {object} SimpleSequenceValue
- * @property {SimpleDataElements[]} value The sequence items.
+ * @property {SimpleTagValues[]} value The sequence items.
  * @property {boolean} [undefinedLength] Undefined length flag.
  */
 
 /**
- * The meta data as simple elements: indexed by tag name instead of
+ * The meta data as simple tag values: indexed by tag name instead of
  *   tag key, with direct values (no element object) for non sequence,
  *   non merged tags.
  *
  * @typedef {Record<string, SimpleTagValue | SimpleSequenceValue>}
- *   SimpleDataElements
+ *   SimpleTagValues
  */
 
 /**
  * Get an array reducer to reduce an array of tag keys taken from
- *   the input dataElements and return as simple elements.
+ *   the input dataElements and return as simple tag values.
  *
  * @param {Record<string, DataElement>} dataElements The meta data
  *   index by tag keys.
- * @returns {(accumulator: SimpleDataElements, currentValue: string) =>
- *   SimpleDataElements} An array reducer callbackFn.
+ * @returns {(accumulator: SimpleTagValues, currentValue: string) =>
+ *   SimpleTagValues} An array reducer callbackFn.
  */
 function getSimpleElementReducer(dataElements) {
   return function (accumulator, currentValue) {
@@ -80,13 +80,13 @@ function getSimpleElementReducer(dataElements) {
 }
 
 /**
- * Get the meta data as simple elements:
+ * Get the meta data as simple tag values:
  * - indexed by tag names instead of tag keys,
  * - no element object, just value if not sequence nor merged item.
  *
  * @param {Record<string, DataElement>} metaData The meta data
  *   index by tag keys.
- * @returns {SimpleDataElements} The simple elements.
+ * @returns {SimpleTagValues} The simple tag values.
  */
 export function getAsSimpleElements(metaData) {
   const meta = structuredClone(metaData);
@@ -94,11 +94,11 @@ export function getAsSimpleElements(metaData) {
 }
 
 /**
- * Merge a simple data element list into another. Mutates the
+ * Merge a simple tag value list into another. Mutates the
  * first input.
  *
- * @param {SimpleDataElements} list1 Base list, will be modified.
- * @param {SimpleDataElements} list2 List to merge into tags1.
+ * @param {SimpleTagValues} list1 Base list, will be modified.
+ * @param {SimpleTagValues} list2 List to merge into tags1.
  */
 export function mergeTags(list1, list2) {
   const keys2 = Object.keys(list2);
@@ -116,7 +116,7 @@ export function mergeTags(list1, list2) {
  * tag names instead of keys and direct values (no value property) for
  * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {SimpleDataElements} simpleTags The 'simple' DICOM
+ * @param {SimpleTagValues} simpleTags The 'simple' DICOM
  *   tags object.
  * @returns {Record<string, DataElement>} The DICOM elements.
  */

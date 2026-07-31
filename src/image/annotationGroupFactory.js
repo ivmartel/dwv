@@ -35,7 +35,7 @@ import {
   getAsSimpleElements,
   getElementsFromJSONTags,
   mergeTags
-} from '../dicom/simpleDataElements.js';
+} from '../dicom/simpleTagValues.js';
 import {ImageReference} from '../dicom/dicomImageReference.js';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference.js';
 import {
@@ -53,7 +53,7 @@ import {Point2D, Point3D} from '../math/point.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
- * @import {SimpleDataElements} from '../dicom/simpleDataElements.js';
+ * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
  */
 
 /**
@@ -1395,7 +1395,7 @@ export class AnnotationGroupFactory {
    * TID 1500 template.
    *
    * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {SimpleDataElements} [extraTags] Optional list of extra tags.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(annotationGroup, extraTags) {
@@ -1651,7 +1651,7 @@ export class AnnotationGroupFactory {
    *   the TID 4100 template.
    *
    * @param {CADReport} report The CAD report.
-   * @param {SimpleDataElements} [extraTags] Optional list of extra tags.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicomCADReport(report, extraTags) {
