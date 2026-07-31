@@ -39,7 +39,7 @@ import {logger} from '../utils/logger.js';
  * @returns {(accumulator: SimpleTagValues, currentValue: string) =>
  *   SimpleTagValues} An array reducer callbackFn.
  */
-function getSimpleElementReducer(dataElements) {
+function getDataElementsReducer(dataElements) {
   return function (accumulator, currentValue) {
     if (currentValue === 'mergeId') {
       return accumulator;
@@ -67,7 +67,7 @@ function getSimpleElementReducer(dataElements) {
       for (let i = 0; i < currentMeta.value.length; ++i) {
         const item = currentMeta.value[i];
         tagValue.value.push(Object.keys(item).reduce(
-          getSimpleElementReducer(item), {}));
+          getDataElementsReducer(item), {}));
       }
     } else if (currentMeta.value.length === 1) {
       tagValue = currentMeta.value[0];
@@ -90,7 +90,7 @@ function getSimpleElementReducer(dataElements) {
  */
 export function getAsSimpleElements(metaData) {
   const meta = structuredClone(metaData);
-  return Object.keys(meta).reduce(getSimpleElementReducer(meta), {});
+  return Object.keys(meta).reduce(getDataElementsReducer(meta), {});
 }
 
 /**
@@ -98,7 +98,7 @@ export function getAsSimpleElements(metaData) {
  * first input.
  *
  * @param {SimpleTagValues} list1 Base list, will be modified.
- * @param {SimpleTagValues} list2 List to merge into tags1.
+ * @param {SimpleTagValues} list2 List to merge into list1.
  */
 export function mergeTags(list1, list2) {
   const keys2 = Object.keys(list2);
