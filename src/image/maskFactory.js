@@ -16,7 +16,9 @@ import {
   getReferencedSeriesUID
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {
+  getElementsFromJSONTags
+} from '../dicom/simpleDataElements.js';
 import {
   getSegment,
   getDicomSegmentItem,

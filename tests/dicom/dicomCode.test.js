@@ -9,7 +9,9 @@ import {
   getConceptNameCode,
   getMeasurementUnitsCode
 } from '../../src/dicom/dicomCode.js';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
+import {
+  getElementsFromJSONTags
+} from '../../src/dicom/simpleDataElements.js';
 
 /**
  * Tests for the 'dicom/dicomCode.js' file.

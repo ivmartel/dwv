@@ -1,9 +1,10 @@
 import {addTagsToDictionary} from '../../../src/dicom/dictionary.js';
 import {
-  getElementsFromJSONTags,
   DicomWriter
 } from '../../../src/dicom/dicomWriter.js';
-
+import {
+  getElementsFromJSONTags
+} from '../../../src/dicom/simpleDataElements.js';
 import {
   generatePixelDataFromJSONTags,
 } from '../dicomGenerator.js';

@@ -3,9 +3,11 @@ import {describe, test, assert, vi} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {
   DicomWriter,
-  getElementsFromJSONTags,
   getUID
 } from '../../src/dicom/dicomWriter.js';
+import {
+  getElementsFromJSONTags
+} from '../../src/dicom/simpleDataElements.js';
 import {
   getPixelDataTag
 } from '../../src/dicom/dicomTag.js';

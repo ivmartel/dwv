@@ -1,5 +1,7 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
+import {
+  getElementsFromJSONTags
+} from '../../src/dicom/simpleDataElements.js';
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGetAll} from '../../src/dicom/dataElement.js';

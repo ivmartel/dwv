@@ -5,7 +5,9 @@ import {
   getSegment,
   getDicomSegmentItem
 } from '../../src/dicom/dicomSegment.js';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
+import {
+  getElementsFromJSONTags
+} from '../../src/dicom/simpleDataElements.js';
 import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour.js';
 
 /**

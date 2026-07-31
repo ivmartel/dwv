@@ -8,7 +8,9 @@ import {
   getDicomTime,
 } from '../dicom/dicomDate.js';
 import {getReferencedSeriesUIDFromRTStruct} from '../dicom/dicomImage.js';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {
+  getElementsFromJSONTags
+} from '../dicom/simpleDataElements.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
 import {Image} from './image.js';
 import {ColourMap} from './luts.js';

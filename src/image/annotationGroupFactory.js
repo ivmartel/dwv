@@ -31,8 +31,10 @@ import {
 } from '../dicom/dicomParser.js';
 import {MeasuredValue} from '../dicom/dicomMeasuredValue.js';
 import {NumericMeasurement} from '../dicom/dicomNumericMeasurement.js';
-import {getAsSimpleElements} from '../dicom/dataElement.js';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {
+  getAsSimpleElements,
+  getElementsFromJSONTags
+} from '../dicom/simpleDataElements.js';
 import {ImageReference} from '../dicom/dicomImageReference.js';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference.js';
 import {

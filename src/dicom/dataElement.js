@@ -1,6 +1,3 @@
-import {getTagFromKey} from './dicomTag.js';
-import {getDicomTagInfo} from './dicomTagInfo.js';
-
 /**
  * @import {Tag} from './dicomTag.js';
  */
@@ -153,64 +150,3 @@ export function checkDataElement(element, name, values) {
   return warning;
 }
 
-/**
- * Get an array reducer to reduce an array of tag keys taken from
- *   the input dataElements and return as simple elements.
- *
- * @param {Record<string, DataElement>} dataElements The meta data
- *   index by tag keys.
- * @returns {any} An array reducer callbackFn.
- */
-function getSimpleElementReducer(dataElements) {
-  return function (accumulator, currentValue) {
-    if (currentValue === 'mergeId') {
-      return accumulator;
-    }
-    // get the tag name
-    const tag = getTagFromKey(currentValue);
-    const tagInfo = getDicomTagInfo(tag);
-    let tagName = tagInfo?.getName();
-    if (typeof tagName === 'undefined') {
-      // add 'x' to list private at end
-      tagName = `x${tag.getKey()}`;
-    }
-    const currentMeta = dataElements[currentValue];
-    // remove undefined properties
-    for (const property in currentMeta) {
-      if (typeof currentMeta[property] === 'undefined') {
-        delete currentMeta[property];
-      }
-    }
-    let tagValue;
-    // recurse for sequences
-    if (currentMeta.vr === 'SQ') {
-      tagValue = {value: []};
-      // valid for 1D array, not for merged data elements
-      for (let i = 0; i < currentMeta.value.length; ++i) {
-        const item = currentMeta.value[i];
-        tagValue.value.push(Object.keys(item).reduce(
-          getSimpleElementReducer(item), {}));
-      }
-    } else if (currentMeta.value.length === 1) {
-      tagValue = currentMeta.value[0];
-    } else {
-      tagValue = currentMeta.value;
-    }
-    accumulator[tagName] = tagValue;
-    return accumulator;
-  };
-}
-
-/**
- * Get the meta data as simple elements:
- * - indexed by tag names instead of tag keys,
- * - no element object, just value if not sequence nor merged item.
- *
- * @param {Record<string, DataElement>} metaData The meta data
- *   index by tag keys.
- * @returns {Record<string, any>} The simple elements.
- */
-export function getAsSimpleElements(metaData) {
-  const meta = structuredClone(metaData);
-  return Object.keys(meta).reduce(getSimpleElementReducer(meta), {});
-}

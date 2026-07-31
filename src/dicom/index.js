@@ -1,7 +1,8 @@
+import {DataElement} from './dataElement.js';
 import {
   getAsSimpleElements,
-  DataElement
-} from './dataElement.js';
+  getElementsFromJSONTags
+} from './simpleDataElements.js';
 import {
   getDwvVersion,
   getTypedArray,
@@ -11,7 +12,6 @@ import {
 } from './dicomParser.js';
 import {
   getUID,
-  getElementsFromJSONTags,
   DicomWriter,
   WriterRule
 } from './dicomWriter.js';

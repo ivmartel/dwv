@@ -7,7 +7,9 @@ import {Geometry} from '../../image/geometry.js';
 import {ColourMap} from '../../image/luts.js';
 import {getDefaultDicomSegJson} from '../../image/maskFactory.js';
 import {getDwvUIDPrefix} from '../../dicom/dicomParser.js';
-import {getElementsFromJSONTags} from '../../dicom/dicomWriter.js';
+import {
+  getElementsFromJSONTags
+} from '../../dicom/simpleDataElements.js';
 import {DicomData} from '../../app/dataController.js';
 import {ViewConfig} from '../../app/application.js';
 import {
