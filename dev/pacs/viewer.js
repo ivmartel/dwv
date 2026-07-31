@@ -6,7 +6,7 @@ import {
   App
 } from '../../src/app/application.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
-import {getAsSimpleElements} from '../../src/dicom/simpleTagValues.js';
+import {getAsSimpleTagValues} from '../../src/dicom/simpleTagValues.js';
 import {getSRContent} from '../../src/dicom/dicomSRContent.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
@@ -493,7 +493,7 @@ function logMetaData(dataId, loadType) {
 
   // log tags for data with transfer syntax (dicom)
   if (typeof meta['00020010'] !== 'undefined') {
-    console.log(`metadata data:${dataId}`, getAsSimpleElements(meta));
+    console.log(`metadata data:${dataId}`, getAsSimpleTagValues(meta));
   } else {
     console.log(`metadata data:${dataId}`, meta);
   }

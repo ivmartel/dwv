@@ -9,8 +9,8 @@ import {
 } from '../dicom/dicomDate.js';
 import {getReferencedSeriesUIDFromRTStruct} from '../dicom/dicomImage.js';
 import {
-  getElementsFromJSONTags,
-  mergeTags
+  getElementsFromSimpleTagValues,
+  mergeTagValues
 } from '../dicom/simpleTagValues.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
 import {Image} from './image.js';
@@ -756,9 +756,9 @@ export class RtStructFactory {
     tags.RTROIObservationsSequence = {value: obsItems};
 
     if (typeof extraTags !== 'undefined') {
-      mergeTags(tags, extraTags);
+      mergeTagValues(tags, extraTags);
     }
 
-    return getElementsFromJSONTags(tags);
+    return getElementsFromSimpleTagValues(tags);
   }
 }

@@ -10,7 +10,7 @@ import {
   getMeasurementUnitsCode
 } from '../../src/dicom/dicomCode.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 
 /**
@@ -41,7 +41,7 @@ describe('dicom', () => {
       `${testName} code from simple element`);
 
     // simple dicom element -> dicom element
-    const codeElements = getElementsFromJSONTags(codeSimpleElements);
+    const codeElements = getElementsFromSimpleTagValues(codeSimpleElements);
     // dicom element -> code
     const code2 = getCode(codeElements);
     // compare

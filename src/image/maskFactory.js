@@ -17,8 +17,8 @@ import {
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
 import {
-  getElementsFromJSONTags,
-  mergeTags
+  getElementsFromSimpleTagValues,
+  mergeTagValues
 } from '../dicom/simpleTagValues.js';
 import {
   getSegment,
@@ -886,11 +886,11 @@ export class MaskFactory {
 
     // merge extra tags if provided
     if (extraTags !== undefined) {
-      mergeTags(tags, extraTags);
+      mergeTagValues(tags, extraTags);
     }
 
     // convert JSON to DICOM element object
-    const dicomElements = getElementsFromJSONTags(tags);
+    const dicomElements = getElementsFromSimpleTagValues(tags);
 
     // pixel value length: divide by 8 to trigger binary write
     const sliceSize = size.getDimSize(2);

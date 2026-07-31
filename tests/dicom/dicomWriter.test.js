@@ -6,7 +6,7 @@ import {
   getUID
 } from '../../src/dicom/dicomWriter.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 import {
   getPixelDataTag
@@ -501,7 +501,7 @@ describe('dicom', () => {
     // pass tags clone to avoid modifications (for ex by padElement)
     const jsonTags = structuredClone(config.tags);
     // convert JSON to DICOM element object
-    const dicomElements = getElementsFromJSONTags(jsonTags);
+    const dicomElements = getElementsFromSimpleTagValues(jsonTags);
     // pixels (if possible)
     if (config.tags.Modality !== 'KO' &&
       config.tags.Modality !== 'RTSTRUCT'

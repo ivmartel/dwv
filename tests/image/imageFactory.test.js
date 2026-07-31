@@ -1,6 +1,6 @@
 import {describe, test, assert} from 'vitest';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {Geometry} from '../../src/image/geometry.js';
@@ -25,7 +25,7 @@ import syntheticData from '/tests/data/synthetic-data.json';
  * @returns {Record<string, object>} DICOM data elements.
  */
 function configToElements(config) {
-  return getElementsFromJSONTags(structuredClone(config.tags));
+  return getElementsFromSimpleTagValues(structuredClone(config.tags));
 }
 
 /**

@@ -4,7 +4,7 @@ import {
   DicomWriter
 } from '../../../src/dicom/dicomWriter.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../../src/dicom/simpleTagValues.js';
 import {
   getOrientationName,
@@ -170,7 +170,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${sliceNumber}`;
   tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
-  const dicomElements = getElementsFromJSONTags(tags);
+  const dicomElements = getElementsFromSimpleTagValues(tags);
   // pixels
   dicomElements['7FE00010'] = generatePixelDataFromJSONTags(
     tags, {

@@ -8,7 +8,7 @@ import {ColourMap} from '../../image/luts.js';
 import {getDefaultDicomSegJson} from '../../image/maskFactory.js';
 import {getDwvUIDPrefix} from '../../dicom/dicomParser.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../dicom/simpleTagValues.js';
 import {DicomData} from '../../app/dataController.js';
 import {ViewConfig} from '../../app/application.js';
@@ -538,7 +538,7 @@ export class BrushMaskPaint extends EventTarget {
 
     // fires load events and renders data
     // (will create viewLayer for it)
-    const elements = getElementsFromJSONTags(firstSliceMeta);
+    const elements = getElementsFromSimpleTagValues(firstSliceMeta);
     const data = new DicomData(elements);
     data.image = this.#mask;
     const dataCtrl = this.#app.getDataController();

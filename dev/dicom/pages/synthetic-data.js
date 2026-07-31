@@ -3,7 +3,7 @@ import {
   DicomWriter
 } from '../../../src/dicom/dicomWriter.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../../src/dicom/simpleTagValues.js';
 import {
   generatePixelDataFromJSONTags,
@@ -38,7 +38,7 @@ function getObjectUrlFromTags(config) {
     }
   }
   // convert JSON to DICOM element object
-  const dicomElements = getElementsFromJSONTags(config.tags);
+  const dicomElements = getElementsFromSimpleTagValues(config.tags);
   // pixels
   if (config.tags.Modality !== 'KO' &&
     config.tags.Modality !== 'RTSTRUCT'

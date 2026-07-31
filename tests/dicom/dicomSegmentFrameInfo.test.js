@@ -6,7 +6,7 @@ import {
   getDicomSegmentFrameInfoItem
 } from '../../src/dicom/dicomSegmentFrameInfo.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 
 /**
@@ -47,7 +47,8 @@ describe('dicom', () => {
       `${testName} frame info from simple element`);
 
     // simple dicom element -> dicom element
-    const segmentElements = getElementsFromJSONTags(frameInfoSimpleElements);
+    const segmentElements =
+      getElementsFromSimpleTagValues(frameInfoSimpleElements);
     // dicom element -> frame info
     const frameInfo2 = getSegmentFrameInfo(segmentElements);
     // compare

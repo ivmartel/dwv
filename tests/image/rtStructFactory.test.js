@@ -1,6 +1,6 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 import {getRTStructFromElements} from '../../src/dicom/dicomRTStruct.js';
 import {
@@ -51,7 +51,7 @@ function buildRefImage() {
  * @returns {Record<string, object>} DICOM data elements.
  */
 function configToElements(config) {
-  return getElementsFromJSONTags(structuredClone(config.tags));
+  return getElementsFromSimpleTagValues(structuredClone(config.tags));
 }
 
 // ---------------------------------------------------------------------------

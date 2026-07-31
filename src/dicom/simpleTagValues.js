@@ -84,13 +84,13 @@ function getDataElementsReducer(dataElements) {
  * - indexed by tag names instead of tag keys,
  * - no element object, just value if not sequence nor merged item.
  *
- * @param {Record<string, DataElement>} metaData The meta data
+ * @param {Record<string, DataElement>} dataElements The data elements
  *   index by tag keys.
  * @returns {SimpleTagValues} The simple tag values.
  */
-export function getAsSimpleElements(metaData) {
-  const meta = structuredClone(metaData);
-  return Object.keys(meta).reduce(getDataElementsReducer(meta), {});
+export function getAsSimpleTagValues(dataElements) {
+  const deClone = structuredClone(dataElements);
+  return Object.keys(deClone).reduce(getDataElementsReducer(deClone), {});
 }
 
 /**
@@ -100,7 +100,7 @@ export function getAsSimpleElements(metaData) {
  * @param {SimpleTagValues} list1 Base list, will be modified.
  * @param {SimpleTagValues} list2 List to merge into list1.
  */
-export function mergeTags(list1, list2) {
+export function mergeTagValues(list1, list2) {
   const keys2 = Object.keys(list2);
   for (const key2 of keys2) {
     if (list1[key2] !== undefined) {
@@ -120,7 +120,7 @@ export function mergeTags(list1, list2) {
  *   tags object.
  * @returns {Record<string, DataElement>} The DICOM elements.
  */
-export function getElementsFromJSONTags(simpleTags) {
+export function getElementsFromSimpleTagValues(simpleTags) {
   const keys = Object.keys(simpleTags);
   /** @type {Record<string, DataElement>} */
   const dataElements = {};
@@ -144,7 +144,7 @@ export function getElementsFromJSONTags(simpleTags) {
       }
       if (Array.isArray(simpleSeq.value)) {
         for (const item of simpleSeq.value) {
-          items.push(getElementsFromJSONTags(item));
+          items.push(getElementsFromSimpleTagValues(item));
         }
       } else {
         logger.debug('Non array simpleTag SQ value');

@@ -6,7 +6,7 @@ import {
   getDicomSegmentItem
 } from '../../src/dicom/dicomSegment.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour.js';
 
@@ -69,7 +69,8 @@ describe('dicom', () => {
       `${testName} segment from simple element`);
 
     // simple dicom element -> dicom element
-    const segmentElements = getElementsFromJSONTags(segmentSimpleElements);
+    const segmentElements =
+      getElementsFromSimpleTagValues(segmentSimpleElements);
     // dicom element -> segment
     const segment2 = getSegment(segmentElements);
     // compare

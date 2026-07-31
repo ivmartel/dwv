@@ -32,9 +32,9 @@ import {
 import {MeasuredValue} from '../dicom/dicomMeasuredValue.js';
 import {NumericMeasurement} from '../dicom/dicomNumericMeasurement.js';
 import {
-  getAsSimpleElements,
-  getElementsFromJSONTags,
-  mergeTags
+  getAsSimpleTagValues,
+  getElementsFromSimpleTagValues,
+  mergeTagValues
 } from '../dicom/simpleTagValues.js';
 import {ImageReference} from '../dicom/dicomImageReference.js';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference.js';
@@ -1057,7 +1057,7 @@ export class AnnotationGroupFactory {
       const evidenceSqElement = {
         [evidenceTagKey]: evidenceSq
       };
-      const evidences = getAsSimpleElements(evidenceSqElement);
+      const evidences = getAsSimpleTagValues(evidenceSqElement);
       annotationGroup.setMetaValue(
         'CurrentRequestedProcedureEvidenceSequence',
         evidences.CurrentRequestedProcedureEvidenceSequence
@@ -1467,10 +1467,10 @@ export class AnnotationGroupFactory {
 
     // merge extra tags if provided
     if (typeof extraTags !== 'undefined') {
-      mergeTags(tags, extraTags);
+      mergeTagValues(tags, extraTags);
     }
 
-    return getElementsFromJSONTags(tags);
+    return getElementsFromSimpleTagValues(tags);
   }
 
   /**
@@ -1764,10 +1764,10 @@ export class AnnotationGroupFactory {
 
     // merge extra tags if provided
     if (typeof extraTags !== 'undefined') {
-      mergeTags(tags, extraTags);
+      mergeTagValues(tags, extraTags);
     }
 
-    return getElementsFromJSONTags(tags);
+    return getElementsFromSimpleTagValues(tags);
   }
 
 }
