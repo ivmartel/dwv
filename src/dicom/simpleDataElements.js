@@ -94,6 +94,23 @@ export function getAsSimpleElements(metaData) {
 }
 
 /**
+ * Merge a simple data element list into another. Mutates the
+ * first input.
+ *
+ * @param {SimpleDataElements} list1 Base list, will be modified.
+ * @param {SimpleDataElements} list2 List to merge into tags1.
+ */
+export function mergeTags(list1, list2) {
+  const keys2 = Object.keys(list2);
+  for (const key2 of keys2) {
+    if (list1[key2] !== undefined) {
+      logger.debug(`Overwritting tag: ${key2}`);
+    }
+    list1[key2] = list2[key2];
+  }
+}
+
+/**
  * Get the DICOM elements from a 'simple' DICOM tags object.
  * The input object is a simplified version of the oficial DICOM json with
  * tag names instead of keys and direct values (no value property) for

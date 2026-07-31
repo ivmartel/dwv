@@ -17,7 +17,8 @@ import {
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromJSONTags,
+  mergeTags
 } from '../dicom/simpleDataElements.js';
 import {
   getSegment,
@@ -135,22 +136,6 @@ function getComparePosPat(orientation) {
     const p2 = invOrientation.multiplyArray3D(pos2);
     return p1[2] - p2[2];
   };
-}
-
-/**
- * Merge two tag lists.
- *
- * @param {SimpleDataElements} tags1 Base list, will be modified.
- * @param {SimpleDataElements} tags2 List to merge.
- */
-function mergeTags(tags1, tags2) {
-  const keys2 = Object.keys(tags2);
-  for (const tagName2 of keys2) {
-    if (tags1[tagName2] !== undefined) {
-      logger.debug(`Overwritting tag: ${tagName2}`);
-    }
-    tags1[tagName2] = tags2[tagName2];
-  }
 }
 
 /**

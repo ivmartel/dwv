@@ -33,7 +33,8 @@ import {MeasuredValue} from '../dicom/dicomMeasuredValue.js';
 import {NumericMeasurement} from '../dicom/dicomNumericMeasurement.js';
 import {
   getAsSimpleElements,
-  getElementsFromJSONTags
+  getElementsFromJSONTags,
+  mergeTags
 } from '../dicom/simpleDataElements.js';
 import {ImageReference} from '../dicom/dicomImageReference.js';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference.js';
@@ -71,22 +72,6 @@ const TagKeys = {
   PatientSex: '00100040',
   CurrentRequestedProcedureEvidenceSequence: '0040A375'
 };
-
-/**
- * Merge two tag lists.
- *
- * @param {SimpleDataElements} tags1 Base list, will be modified.
- * @param {SimpleDataElements} tags2 List to merge.
- */
-function mergeTags(tags1, tags2) {
-  const keys2 = Object.keys(tags2);
-  for (const tagName2 of keys2) {
-    if (tags1[tagName2] !== undefined) {
-      logger.debug(`Overwritting tag: ${tagName2}`);
-    }
-    tags1[tagName2] = tags2[tagName2];
-  }
-}
 
 /**
  * Response evaluation class.

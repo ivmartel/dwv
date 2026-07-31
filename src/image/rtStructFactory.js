@@ -9,7 +9,8 @@ import {
 } from '../dicom/dicomDate.js';
 import {getReferencedSeriesUIDFromRTStruct} from '../dicom/dicomImage.js';
 import {
-  getElementsFromJSONTags
+  getElementsFromJSONTags,
+  mergeTags
 } from '../dicom/simpleDataElements.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
 import {Image} from './image.js';
@@ -281,18 +282,6 @@ export function simplifyPolygon(pts, epsilon) {
   rdp(0, pts.length - 1, result);
   result.push(pts[pts.length - 1]);
   return result;
-}
-
-/**
- * Merge extra tags into a base tags object (mutates base).
- *
- * @param {SimpleDataElements} tags Base tags object.
- * @param {SimpleDataElements} extra Tags to merge in.
- */
-function mergeTags(tags, extra) {
-  for (const key of Object.keys(extra)) {
-    tags[key] = extra[key];
-  }
 }
 
 /**
