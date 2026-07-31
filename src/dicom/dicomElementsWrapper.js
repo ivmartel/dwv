@@ -15,6 +15,7 @@ import {
   getTagFromKey
 } from './dicomTag.js';
 import {isNativeLittleEndian} from './dataReader.js';
+import {getDicomTagInfo} from './dicomTagInfo.js';
 
 /**
  * @import {Tag} from './dicomTag.js';
@@ -158,7 +159,7 @@ function getElementAsString(tag, dicomElement, prefix) {
   prefix = prefix || '';
 
   // get tag anme from dictionary
-  const tagName = tag.getNameFromDictionary();
+  const tagName = getDicomTagInfo(tag).getName();
 
   let deSize = dicomElement.value.length;
   let isOtherVR = false;

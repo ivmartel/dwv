@@ -6,6 +6,7 @@ import {
   isAnyPixelDataTag,
   hasAnyPixelDataElement
 } from './dicomTag.js';
+import {getDicomTagInfo} from './dicomTagInfo.js';
 import {
   is32bitVLVR,
   isCharSetStringVR,
@@ -873,7 +874,7 @@ export class DicomParser {
     if (tag.isWithVR()) {
       // implicit VR
       if (implicit) {
-        vr = tag.getVrFromDictionary();
+        vr = getDicomTagInfo(tag).getVr();
         if (typeof vr === 'undefined') {
           vr = 'UN';
         }

@@ -5,7 +5,6 @@ import {
 } from './dictionary.js';
 import {
   Tag,
-  getTagFromDictionary,
   getTagFromKey,
   getItemTag,
   getItemDelimitationItemTag,
@@ -16,6 +15,11 @@ import {
   isItemDelimitationItemTag,
   tagCompareFunction
 } from './dicomTag.js';
+import {
+  getDicomTagInfo,
+  getDicomTagGroupName,
+  getTagFromDictionary,
+} from './dicomTagInfo.js';
 import {
   getDwvUIDPrefix,
   getImplementationClassUID,
@@ -442,7 +446,8 @@ export class DicomWriter {
           let isKey = false;
           if (key.length === 8) {
             const tag = getTagFromKey(key);
-            isKey = typeof tag.getNameFromDictionary() !== 'undefined';
+            const tagInfo = getDicomTagInfo(tag);
+            isKey = typeof tagInfo?.getName() !== 'undefined';
           }
           // get tag key, rules can use key or tag name
           let tagKey;
@@ -507,8 +512,9 @@ export class DicomWriter {
    */
   getElementToWrite(element) {
     // get group and tag string name
-    const groupName = element.tag.getGroupName();
-    const tagName = element.tag.getNameFromDictionary();
+    const groupName = getDicomTagGroupName(element.tag);
+    const tagInfo = getDicomTagInfo(element.tag);
+    const tagName = tagInfo?.getName();
 
     // apply rules:
     let rule;
@@ -931,7 +937,7 @@ export class DicomWriter {
           element, element.value, isImplicit, bitsAllocated);
 
         // tag group name
-        groupName = element.tag.getGroupName();
+        groupName = getDicomTagGroupName(element.tag);
 
         // prefix
         if (groupName === 'Meta Element') {
@@ -960,14 +966,15 @@ export class DicomWriter {
     // add compulsory tags to output data if not present
     for (const key of missingTags) {
       const tag = getTagFromKey(key);
-      const dataElement = new DataElement(tag.getVrFromDictionary());
+      const tagInfo = getDicomTagInfo(tag);
+      const dataElement = new DataElement(tagInfo.getVr());
       dataElement.tag = tag;
       // rules are indexed by key or tag name
       let value;
       if (typeof this.#rules[key] !== 'undefined') {
         value = this.#rules[key].value;
       } else {
-        const name = tag.getNameFromDictionary();
+        const name = tagInfo?.getName();
         value = this.#rules[name].value;
       }
       // add element
@@ -1257,7 +1264,7 @@ export class DicomWriter {
  */
 function checkAndFixUnknownVR(element, isLittleEndian) {
   if (element.vr === 'UN') {
-    const dictVr = element.tag.getVrFromDictionary();
+    const dictVr = getDicomTagInfo(element.tag)?.getVr();
     if (typeof dictVr !== 'undefined' && element.vr !== dictVr) {
       element.vr = dictVr;
       // cast typed array value from Uint8 to vr type
@@ -1324,7 +1331,8 @@ function getUint8ToVrValue(value, vr, isLittleEndian) {
  */
 function getDataElement(tagName) {
   const tag = getTagFromDictionary(tagName);
-  const element = new DataElement(tag.getVrFromDictionary());
+  const tagInfo = getDicomTagInfo(tag);
+  const element = new DataElement(tagInfo?.getVr());
   element.tag = tag;
   return element;
 }
@@ -1378,7 +1386,8 @@ export function getElementsFromJSONTags(simpleTags) {
     if (typeof tag === 'undefined') {
       continue;
     }
-    const vr = tag.getVrFromDictionary();
+    const tagInfo = getDicomTagInfo(tag);
+    const vr = tagInfo?.getVr();
     // tag value
     let value;
     let undefinedLength = false;

@@ -7,9 +7,11 @@ import {
   getUID
 } from '../../src/dicom/dicomWriter.js';
 import {
-  getTagFromDictionary,
   getPixelDataTag
 } from '../../src/dicom/dicomTag.js';
+import {
+  getTagFromDictionary,
+} from '../../src/dicom/dicomTagInfo.js';
 import {
   dictionary,
   transferSyntaxKeywords

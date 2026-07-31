@@ -1,4 +1,7 @@
-import {DataElement} from './dataElement.js';
+import {
+  getAsSimpleElements,
+  DataElement
+} from './dataElement.js';
 import {
   getDwvVersion,
   getTypedArray,
@@ -17,8 +20,12 @@ import {
   Tag,
   getTagFromKey,
   getPixelDataTag,
-  getAsSimpleElements
 } from './dicomTag.js';
+import {
+  TagInfo,
+  getDicomTagInfo,
+  getDicomTagGroupName
+} from './dicomTagInfo.js';
 import {
   DicomCode,
   getSegmentationCode
@@ -52,6 +59,7 @@ export {
   DicomWriter,
   MaskSegment,
   Tag,
+  TagInfo,
   WriterRule,
   NormalisedManufacturers,
   addTagsToDictionary,
@@ -62,6 +70,8 @@ export {
   getTypedArray,
   getTagFromKey,
   getAsSimpleElements,
+  getDicomTagInfo,
+  getDicomTagGroupName,
   getPixelDataTag,
   getReverseOrientation,
   getSRContent,

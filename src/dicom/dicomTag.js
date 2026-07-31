@@ -1,8 +1,3 @@
-import {
-  dictionary,
-  tagGroups
-} from './dictionary.js';
-
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
  */
@@ -66,12 +61,12 @@ export class Tag {
   }
 
   /**
-   * Get as string representation of the tag: 'key: name'.
+   * Get as string representation of the tag: '(group,element)'.
    *
    * @returns {string} A string representing the tag.
    */
   toString() {
-    return `${this.getKey()}: ${this.getNameFromDictionary()}`;
+    return `(${this.#group},${this.#element})`;
   }
 
   /**
@@ -94,15 +89,6 @@ export class Tag {
    */
   getKey() {
     return this.#group + this.#element;
-  }
-
-  /**
-   * Get the group name as defined in TagGroups.
-   *
-   * @returns {string} The name.
-   */
-  getGroupName() {
-    return tagGroups[this.#group];
   }
 
   /**
@@ -130,63 +116,6 @@ export class Tag {
    */
   isPrivate() {
     return parseInt(this.#group, 16) % 2 === 1;
-  }
-
-  /**
-   * Get the tag info from the dicom dictionary.
-   *
-   * @returns {string[]|undefined} The info as [vr, multiplicity, name].
-   */
-  #getInfoFromDictionary() {
-    let info;
-    if (typeof dictionary[this.#group] !== 'undefined' &&
-      typeof dictionary[this.#group][this.#element] !==
-      'undefined') {
-      info = dictionary[this.#group][this.#element];
-    }
-    return info;
-  }
-
-  /**
-   * Get the tag Value Representation (VR) from the dicom dictionary.
-   *
-   * @returns {string|undefined} The VR.
-   */
-  getVrFromDictionary() {
-    let vr;
-    const info = this.#getInfoFromDictionary();
-    if (typeof info !== 'undefined') {
-      vr = info[0];
-    }
-    return vr;
-  }
-
-  /**
-   * Get the multiplicity from the dicom dictionary.
-   *
-   * @returns {number|undefined} The multiplicity.
-   */
-  getMultiplicityFromDictionary() {
-    let multiplicity;
-    const info = this.#getInfoFromDictionary();
-    if (typeof info !== 'undefined') {
-      multiplicity = parseInt(info[1], 10);
-    }
-    return multiplicity;
-  }
-
-  /**
-   * Get the tag name from the dicom dictionary.
-   *
-   * @returns {string|undefined} The VR.
-   */
-  getNameFromDictionary() {
-    let name;
-    const info = this.#getInfoFromDictionary();
-    if (typeof info !== 'undefined') {
-      name = info[2];
-    }
-    return name;
   }
 
 } // Tag class
@@ -374,101 +303,3 @@ export function hasAnyPixelDataElement(elements) {
   return typeof getAnyPixelDataElement(elements) !== 'undefined';
 }
 
-/**
- * Get a tag from the dictionary using a tag string name.
- *
- * @param {string} tagName The tag string name.
- * @returns {Tag|undefined} The tag object or null if not found.
- */
-export function getTagFromDictionary(tagName) {
-  if (typeof tagName === 'undefined' || tagName === null) {
-    return null;
-  }
-  let group = null;
-  let element = null;
-  const dict = dictionary;
-  const keys0 = Object.keys(dict);
-  let keys1;
-  let foundTag = false;
-  // search through dictionary
-  for (let k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {
-    group = keys0[k0];
-    keys1 = Object.keys(dict[group]);
-    for (let k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1) {
-      element = keys1[k1];
-      if (dict[group][element][2] === tagName) {
-        foundTag = true;
-        break;
-      }
-    }
-    if (foundTag) {
-      break;
-    }
-  }
-  let tag;
-  if (foundTag) {
-    tag = new Tag(group, element);
-  }
-  return tag;
-}
-
-/**
- * Get an array reducer to reduce an array of tag keys taken from
- *   the input dataElements and return as simple elements.
- *
- * @param {Record<string, DataElement>} dataElements The meta data
- *   index by tag keys.
- * @returns {any} An array reducer callbackFn.
- */
-function getSimpleElementReducer(dataElements) {
-  return function (accumulator, currentValue) {
-    if (currentValue === 'mergeId') {
-      return accumulator;
-    }
-    // get the tag name
-    const tag = getTagFromKey(currentValue);
-    let tagName = tag.getNameFromDictionary();
-    if (typeof tagName === 'undefined') {
-      // add 'x' to list private at end
-      tagName = `x${tag.getKey()}`;
-    }
-    const currentMeta = dataElements[currentValue];
-    // remove undefined properties
-    for (const property in currentMeta) {
-      if (typeof currentMeta[property] === 'undefined') {
-        delete currentMeta[property];
-      }
-    }
-    let tagValue;
-    // recurse for sequences
-    if (currentMeta.vr === 'SQ') {
-      tagValue = {value: []};
-      // valid for 1D array, not for merged data elements
-      for (let i = 0; i < currentMeta.value.length; ++i) {
-        const item = currentMeta.value[i];
-        tagValue.value.push(Object.keys(item).reduce(
-          getSimpleElementReducer(item), {}));
-      }
-    } else if (currentMeta.value.length === 1) {
-      tagValue = currentMeta.value[0];
-    } else {
-      tagValue = currentMeta.value;
-    }
-    accumulator[tagName] = tagValue;
-    return accumulator;
-  };
-}
-
-/**
- * Get the meta data as simple elements:
- * - indexed by tag names instead of tag keys,
- * - no element object, just value if not sequence nor merged item.
- *
- * @param {Record<string, DataElement>} metaData The meta data
- *   index by tag keys.
- * @returns {Record<string, any>} The simple elements.
- */
-export function getAsSimpleElements(metaData) {
-  const meta = structuredClone(metaData);
-  return Object.keys(meta).reduce(getSimpleElementReducer(meta), {});
-}
