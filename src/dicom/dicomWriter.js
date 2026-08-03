@@ -967,7 +967,7 @@ export class DicomWriter {
     for (const key of missingTags) {
       const tag = getTagFromKey(key);
       const tagInfo = getDicomTagInfo(tag);
-      const dataElement = new DataElement(tagInfo.getVr());
+      const dataElement = new DataElement(tagInfo?.getVr());
       dataElement.tag = tag;
       // rules are indexed by key or tag name
       let value;
