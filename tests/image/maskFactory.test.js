@@ -675,4 +675,61 @@ describe('mergeMaskImages', () => {
   }
   );
 
+  test('merge: result geometry is the same regardless of input order',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-00');
+      const tags = config.tags;
+      const sliceSize = tags.Columns * tags.Rows;
+
+      // narrow mask: single slice at z=1 only
+      const narrowGeometry = new Geometry(
+        [new Point3D(0, 0, 1)],
+        new Size([tags.Columns, tags.Rows, 1]),
+        new Spacing([1, 1, 1])
+      );
+      const narrowCollection = new SegmentCollection(narrowGeometry);
+      const narrowSliceBuf = new Uint8Array(sliceSize);
+      narrowSliceBuf[0] = 1;
+      narrowCollection.addFrame(1, narrowSliceBuf, 0, 0, sliceSize, 1);
+      const narrowMask = new Image(
+        narrowGeometry, narrowCollection.getLabelMap(), ['uid-narrow']);
+      narrowMask.setSegmentCollection(narrowCollection);
+      narrowMask.setMeta({
+        Modality: 'SEG',
+        custom: {segments: [{number: 1, label: 'Seg1'}]}
+      });
+
+      // wide mask: 3 slices (z=0,1,2)
+      const wideGeometry = new Geometry(
+        [new Point3D(0, 0, 0), new Point3D(0, 0, 1), new Point3D(0, 0, 2)],
+        new Size([tags.Columns, tags.Rows, 3]),
+        new Spacing([1, 1, 1])
+      );
+      const wideCollection = new SegmentCollection(wideGeometry);
+      for (let k = 0; k < 3; ++k) {
+        const sliceBuf = new Uint8Array(sliceSize);
+        sliceBuf[50] = 1;
+        wideCollection.addFrame(2, sliceBuf, 0, k, sliceSize, 2);
+      }
+      const wideMask = new Image(
+        wideGeometry, wideCollection.getLabelMap(),
+        ['uid-wide-a', 'uid-wide-b', 'uid-wide-c']);
+      wideMask.setSegmentCollection(wideCollection);
+      wideMask.setMeta({
+        Modality: 'SEG',
+        custom: {segments: [{number: 2, label: 'Seg2'}]}
+      });
+
+      const mergedNarrowFirst = mergeMaskImages(narrowMask, wideMask);
+      const mergedWideFirst = mergeMaskImages(wideMask, narrowMask);
+
+      assert.ok(
+        mergedNarrowFirst.getGeometry().equals(mergedWideFirst.getGeometry()),
+        'merged geometry does not depend on argument order');
+      assert.equal(
+        mergedNarrowFirst.getGeometry().getSize().get(2), 3,
+        'merged geometry keeps the wider (3-slice) range either way');
+    }
+  );
+
 });
