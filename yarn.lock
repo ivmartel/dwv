@@ -2381,8 +2381,8 @@ __metadata:
   linkType: hard
 
 "@microsoft/api-extractor@npm:^7.58.7":
-  version: 7.58.11
-  resolution: "@microsoft/api-extractor@npm:7.58.11"
+  version: 7.58.12
+  resolution: "@microsoft/api-extractor@npm:7.58.12"
   dependencies:
     "@microsoft/api-extractor-model": "npm:7.33.10"
     "@microsoft/tsdoc": "npm:~0.16.0"
@@ -2399,7 +2399,7 @@ __metadata:
     typescript: "npm:5.9.3"
   bin:
     api-extractor: bin/api-extractor
-  checksum: 10c0/9bfd0dbb722e7b7ce474243e79d3f5f9f31d4d92ac97b8fb1ae64e10cd0a251d8b683d3361ed4110fcc713e0e453260fc487a097b0cb740a7dddd034dd0ac980
+  checksum: 10c0/5ba8ef91c63a6061d5221c5013d375e61aba8c0bfd017ddb1250386a2f55a2d0f04fe1e617c0e5928489bf64e5f91267e8e9c8746350a5e858903c32237926a8
   languageName: node
   linkType: hard
 
