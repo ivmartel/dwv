@@ -874,7 +874,7 @@ export class DicomParser {
     if (tag.isWithVR()) {
       // implicit VR
       if (implicit) {
-        vr = getDicomTagInfo(tag).getVr();
+        vr = getDicomTagInfo(tag)?.getVr();
         if (typeof vr === 'undefined') {
           vr = 'UN';
         }

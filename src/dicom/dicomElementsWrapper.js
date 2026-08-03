@@ -159,7 +159,7 @@ function getElementAsString(tag, dicomElement, prefix) {
   prefix = prefix || '';
 
   // get tag anme from dictionary
-  const tagName = getDicomTagInfo(tag).getName();
+  const tagName = getDicomTagInfo(tag)?.getName();
 
   let deSize = dicomElement.value.length;
   let isOtherVR = false;
