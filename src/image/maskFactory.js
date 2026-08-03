@@ -911,13 +911,15 @@ export class MaskFactory {
  *
  * Segments from mask2 that share a segment number with mask1 are renumbered
  * (bumped to the next available number) to avoid conflicts. Both masks must
- * reference the same geometry (same spatial volume).
+ * share the same spacing and orientation; the wider of the two geometries
+ * (the one with more slices) is used as the merged geometry, so a mask
+ * that only covers a sub-range of the other's slices does not get clipped.
  * Brush-painted masks (no per-segment SegmentCollection data) are supported.
  *
  * The returned image can be saved with the standard
  * `new MaskFactory().toDicom(merged, undefined, sourceImage)` workflow.
  *
- * @param {Image} mask1 The first mask (provides base geometry and meta).
+ * @param {Image} mask1 The first mask (provides meta).
  * @param {Image} mask2 The second mask to merge into mask1.
  * @returns {Image} The new merged mask image.
  */
@@ -931,7 +933,51 @@ export function mergeMaskImages(mask1, mask2) {
     geometry2.getOrientation(), REAL_WORLD_EPSILON)) {
     throw new Error('mergeMaskImages: masks must have similar orientations');
   }
-  const sliceSize = geometry1.getSize().getDimSize(2);
+
+  // use the wider geometry (more slices) as the merged geometry so that
+  // a mask covering fewer slices than the other does not get clipped
+  const mask2IsWider =
+    geometry2.getSize().get(2) > geometry1.getSize().get(2);
+  const baseGeometry = mask2IsWider ? geometry2 : geometry1;
+  const baseOrigins = baseGeometry.getOrigins();
+  const sliceSize = baseGeometry.getSize().getDimSize(2);
+
+  // slice indices from getSegmentBuffers are local to each mask's own
+  // geometry; map the non-base mask's indices to their matching slice
+  // in the base geometry by origin position, since the two masks are
+  // not guaranteed to share the same slice count, ordering or coverage
+  const getSliceIndexMap = function (fromGeometry, fromLabel) {
+    const fromOrigins = fromGeometry.getOrigins();
+    return fromOrigins.map((fromOrigin, index) => {
+      let closestIndex = -1;
+      let minDist = Infinity;
+      for (let i = 0; i < baseOrigins.length; ++i) {
+        const dist = fromOrigin.getDistance(baseOrigins[i]);
+        if (dist < minDist) {
+          minDist = dist;
+          closestIndex = i;
+        }
+      }
+      if (minDist > REAL_WORLD_EPSILON * 100) {
+        throw new Error(
+          `mergeMaskImages: mask${fromLabel} slice ${index
+          } has no matching slice in the merged geometry`
+        );
+      }
+      if (minDist > REAL_WORLD_EPSILON) {
+        logger.warn(
+          `mergeMaskImages: mask${fromLabel} slice ${index
+          } is far from its closest merged-geometry slice (${minDist}).`
+        );
+      }
+      return closestIndex;
+    });
+  };
+  const sliceIndexMap1 = mask2IsWider
+    ? getSliceIndexMap(geometry1, '1') : undefined;
+  const sliceIndexMap2 = mask2IsWider
+    ? undefined : getSliceIndexMap(geometry2, '2');
+
   const segments1 = mask1.getMeta().custom?.segments ?? [];
   const segments2 = mask2.getMeta().custom?.segments ?? [];
 
@@ -982,7 +1028,7 @@ export function mergeMaskImages(mask1, mask2) {
     ...segments2.map(seg => ({...seg, number: remap.get(seg.number)}))
   ];
 
-  const mergedCollection = new SegmentCollection(geometry1);
+  const mergedCollection = new SegmentCollection(baseGeometry);
 
   // add frames from mask1
   const hasRGB1 = mask1.getPhotometricInterpretation() === 'PALETTE COLOR';
@@ -991,8 +1037,11 @@ export function mergeMaskImages(mask1, mask2) {
     const seg1 = segments1.find(s => s.number === segNum);
     const value = hasRGB1 ? segNum : (seg1?.displayValue ?? segNum);
     for (const [sliceIdxStr, sliceBuf] of Object.entries(slices)) {
+      const localIndex = Number(sliceIdxStr);
+      const baseIndex = sliceIndexMap1
+        ? sliceIndexMap1[localIndex] : localIndex;
       mergedCollection.addFrame(
-        segNum, sliceBuf, 0, Number(sliceIdxStr), sliceSize, value
+        segNum, sliceBuf, 0, baseIndex, sliceSize, value
       );
     }
   }
@@ -1005,15 +1054,18 @@ export function mergeMaskImages(mask1, mask2) {
     const seg2 = segments2.find(s => s.number === segNum);
     const value = hasRGB2 ? newSegNum : (seg2?.displayValue ?? newSegNum);
     for (const [sliceIdxStr, sliceBuf] of Object.entries(slices)) {
+      const localIndex = Number(sliceIdxStr);
+      const baseIndex = sliceIndexMap2
+        ? sliceIndexMap2[localIndex] : localIndex;
       mergedCollection.addFrame(
-        newSegNum, sliceBuf, 0, Number(sliceIdxStr), sliceSize, value
+        newSegNum, sliceBuf, 0, baseIndex, sliceSize, value
       );
     }
   }
 
-  const uids = geometry1.getOrigins().map((_, i) => i.toString());
+  const uids = baseOrigins.map((_, i) => i.toString());
   const mergedImage = new Image(
-    geometry1, mergedCollection.getLabelMap(), uids);
+    baseGeometry, mergedCollection.getLabelMap(), uids);
   mergedImage.setSegmentCollection(mergedCollection);
 
   // set palette colour map if possible

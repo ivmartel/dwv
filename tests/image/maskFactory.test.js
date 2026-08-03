@@ -554,4 +554,125 @@ describe('mergeMaskImages', () => {
     }
   );
 
+  test('merge: mask2 local slice index is remapped to mask1 slice position',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-00');
+      const tags = config.tags;
+      const sliceSize = tags.Columns * tags.Rows;
+
+      // mask1: 3 slices (z=0,1,2), segment 1 only on the slice at z=1
+      const geometry1 = new Geometry(
+        [new Point3D(0, 0, 0), new Point3D(0, 0, 1), new Point3D(0, 0, 2)],
+        new Size([tags.Columns, tags.Rows, 3]),
+        new Spacing([1, 1, 1])
+      );
+      const collection1 = new SegmentCollection(geometry1);
+      const sliceBuf1 = new Uint8Array(sliceSize);
+      sliceBuf1[0] = 1;
+      collection1.addFrame(1, sliceBuf1, 0, 1, sliceSize, 1);
+      const mask1 = new Image(
+        geometry1, collection1.getLabelMap(), ['uid-1a', 'uid-1b', 'uid-1c']);
+      mask1.setSegmentCollection(collection1);
+      mask1.setMeta({
+        Modality: 'SEG',
+        custom: {segments: [{number: 1, label: 'Seg1'}]}
+      });
+
+      // mask2: single-slice mask whose only slice sits at z=1 (mask1's
+      // 2nd slice) but whose own local slice index is 0, not 1: local and
+      // mask1-relative slice indices intentionally disagree
+      const geometry2 = new Geometry(
+        [new Point3D(0, 0, 1)],
+        new Size([tags.Columns, tags.Rows, 1]),
+        new Spacing([1, 1, 1])
+      );
+      const collection2 = new SegmentCollection(geometry2);
+      const sliceBuf2 = new Uint8Array(sliceSize);
+      sliceBuf2[100] = 1;
+      collection2.addFrame(2, sliceBuf2, 0, 0, sliceSize, 2);
+      const mask2 = new Image(
+        geometry2, collection2.getLabelMap(), ['uid-2']);
+      mask2.setSegmentCollection(collection2);
+      mask2.setMeta({
+        Modality: 'SEG',
+        custom: {segments: [{number: 2, label: 'Seg2'}]}
+      });
+
+      const merged = mergeMaskImages(mask1, mask2);
+      const buf = merged.getBuffer();
+      assert.equal(
+        buf[sliceSize + 0], 1, 'mask1 pixel stays on its own slice (z=1)');
+      assert.equal(
+        buf[sliceSize + 100], 2,
+        'mask2 pixel is remapped to matching mask1 slice (z=1)');
+      assert.equal(
+        buf[100], 0,
+        'mask2 pixel must not leak into mask1 slice 0 (z=0)');
+    }
+  );
+
+  test('merge: wider mask2 geometry is used as merged geometry, ' +
+    'mask1 not clipped',
+  () => {
+    const config = syntheticData.find(c => c.name === 'test-00');
+    const tags = config.tags;
+    const sliceSize = tags.Columns * tags.Rows;
+
+    // mask1: single slice at z=1 only
+    const geometry1 = new Geometry(
+      [new Point3D(0, 0, 1)],
+      new Size([tags.Columns, tags.Rows, 1]),
+      new Spacing([1, 1, 1])
+    );
+    const collection1 = new SegmentCollection(geometry1);
+    const sliceBuf1 = new Uint8Array(sliceSize);
+    sliceBuf1[0] = 1;
+    collection1.addFrame(1, sliceBuf1, 0, 0, sliceSize, 1);
+    const mask1 = new Image(
+      geometry1, collection1.getLabelMap(), ['uid-1']);
+    mask1.setSegmentCollection(collection1);
+    mask1.setMeta({
+      Modality: 'SEG',
+      custom: {segments: [{number: 1, label: 'Seg1'}]}
+    });
+
+    // mask2: wider than mask1, 3 slices (z=0,1,2), segment 2 on every slice
+    const geometry2 = new Geometry(
+      [new Point3D(0, 0, 0), new Point3D(0, 0, 1), new Point3D(0, 0, 2)],
+      new Size([tags.Columns, tags.Rows, 3]),
+      new Spacing([1, 1, 1])
+    );
+    const collection2 = new SegmentCollection(geometry2);
+    const sliceBuf2a = new Uint8Array(sliceSize);
+    sliceBuf2a[50] = 1;
+    collection2.addFrame(2, sliceBuf2a, 0, 0, sliceSize, 2);
+    const sliceBuf2b = new Uint8Array(sliceSize);
+    sliceBuf2b[100] = 1;
+    collection2.addFrame(2, sliceBuf2b, 0, 1, sliceSize, 2);
+    const sliceBuf2c = new Uint8Array(sliceSize);
+    sliceBuf2c[150] = 1;
+    collection2.addFrame(2, sliceBuf2c, 0, 2, sliceSize, 2);
+    const mask2 = new Image(
+      geometry2, collection2.getLabelMap(), ['uid-2a', 'uid-2b', 'uid-2c']);
+    mask2.setSegmentCollection(collection2);
+    mask2.setMeta({
+      Modality: 'SEG',
+      custom: {segments: [{number: 2, label: 'Seg2'}]}
+    });
+
+    const merged = mergeMaskImages(mask1, mask2);
+    assert.equal(
+      merged.getGeometry().getSize().get(2), 3,
+      'merged geometry keeps mask2 full slice range (not clipped to mask1)');
+    const buf = merged.getBuffer();
+    assert.equal(buf[50], 2, 'mask2 pixel present on slice 0 (z=0)');
+    assert.equal(
+      buf[sliceSize + 0], 1, 'mask1 pixel correctly placed on slice 1 (z=1)');
+    assert.equal(
+      buf[sliceSize + 100], 2, 'mask2 pixel present on slice 1 (z=1)');
+    assert.equal(
+      buf[2 * sliceSize + 150], 2, 'mask2 pixel present on slice 2 (z=2)');
+  }
+  );
+
 });
