@@ -66,8 +66,8 @@ export class AnnotationGroupFactory {
     create(dataElements: Record<string, DataElement>): AnnotationGroup;
     createCADReport(dataElements: Record<string, DataElement>): CADReport | undefined;
     getWarning(): string | undefined;
-    toDicom(annotationGroup: AnnotationGroup, extraTags?: Record<string, any>): Record<string, DataElement>;
-    toDicomCADReport(report: CADReport, extraTags?: Record<string, any>): Record<string, DataElement>;
+    toDicom(annotationGroup: AnnotationGroup, extraTags?: SimpleTagValues): Record<string, DataElement>;
+    toDicomCADReport(report: CADReport, extraTags?: SimpleTagValues): Record<string, DataElement>;
 }
 
 // @public
@@ -573,22 +573,28 @@ export class Geometry {
 }
 
 // @public
-export function getAsSimpleElements(metaData: Record<string, DataElement>): Record<string, any>;
+export function getAsSimpleTagValues(dataElements: Record<string, DataElement>): SimpleTagValues;
 
 // @public
-export function getDefaultDicomRTStructJson(): object;
+export function getDefaultDicomRTStructJson(): SimpleTagValues;
 
 // @public
-export function getDefaultDicomSegJson(): object;
+export function getDefaultDicomSegJson(): SimpleTagValues;
 
 // @public
-export function getDicomSRContentItem(content: DicomSRContent): Record<string, any>;
+export function getDicomSRContentItem(content: DicomSRContent): SimpleTagValues;
+
+// @public
+export function getDicomTagGroupName(tag: Tag): string | undefined;
+
+// @public
+export function getDicomTagInfo(tag: Tag): TagInfo | undefined;
 
 // @public
 export function getDwvVersion(): string;
 
 // @public
-export function getElementsFromJSONTags(simpleTags: Record<string, any>): Record<string, DataElement>;
+export function getElementsFromSimpleTagValues(simpleTags: SimpleTagValues): Record<string, DataElement>;
 
 // @public
 export function getEllipseIndices(center: Index, radius: number[], dir: number[]): Index[];
@@ -894,7 +900,7 @@ export class MaskFactory {
     checkElements(_dicomElements: Record<string, DataElement>): string | undefined;
     create(dataElements: Record<string, DataElement>, pixelBuffer: Uint8Array, refImage?: Image_2): Image_2;
     getWarning(): string | undefined;
-    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: Record<string, any>): Record<string, DataElement>;
+    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
 }
 
 // @public
@@ -968,6 +974,9 @@ export class Matrix33 {
 
 // @public
 export function mergeMaskImages(mask1: Image_2, mask2: Image_2): Image_2;
+
+// @public
+export function mergeTagValues(list1: SimpleTagValues, list2: SimpleTagValues): void;
 
 // @public (undocumented)
 export namespace NormalisedManufacturers {
@@ -1190,7 +1199,7 @@ export class RtStructFactory {
     checkElements(_dataElements: Record<string, DataElement>): string | undefined;
     create(dataElements: Record<string, DataElement>, refImage: Image_2): Image_2;
     getWarning(): string | undefined;
-    toDicom(image: Image_2, segments?: MaskSegment[], sourceImage?: Image_2, extraTags?: Record<string, any>): Record<string, DataElement>;
+    toDicom(image: Image_2, segments?: MaskSegment[], sourceImage?: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
 }
 
 // @public
@@ -1228,6 +1237,18 @@ export class SegmentCollection {
     getSegmentBuffers(segments: MaskSegment[]): Record<string, Record<number, Uint8Array>>;
     setLabelMap(buffer: Uint8Array): void;
 }
+
+// @public
+export type SimpleSequenceValue = {
+    value: SimpleTagValues[];
+    undefinedLength?: boolean;
+};
+
+// @public
+export type SimpleTagValue = string | number | string[] | number[];
+
+// @public
+export type SimpleTagValues = Record<string, SimpleTagValue | SimpleSequenceValue>;
 
 // @public
 export function simplifyPolygon(pts: Array<{
@@ -1323,14 +1344,18 @@ export class Tag {
     equals(rhs: Tag): boolean;
     getElement(): string;
     getGroup(): string;
-    getGroupName(): string;
     getKey(): string;
-    getMultiplicityFromDictionary(): number | undefined;
-    getNameFromDictionary(): string | undefined;
-    getVrFromDictionary(): string | undefined;
     isPrivate(): boolean;
     isWithVR(): boolean;
     toString(): string;
+}
+
+// @public
+export class TagInfo {
+    constructor(vr: string, multiplicity: number, name: string);
+    getMultiplicity(): number;
+    getName(): string;
+    getVr(): string;
 }
 
 // @public
