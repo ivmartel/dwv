@@ -55,7 +55,7 @@
     "globals": "^17.6.0",
     "html-webpack-plugin": "^5.6.6",
     "jsdoc": "^4.0.5",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "typescript": "5.6.3",
     "vitest": "^4.1.7",
     "webpack": "^5.107.2",
