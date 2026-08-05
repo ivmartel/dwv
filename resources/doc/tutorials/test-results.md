@@ -2,9 +2,9 @@
 
 ## Context
 
-Commit: [279ee93](https://github.com/ivmartel/dwv/commit/279ee9345d08cf84e4d2d46a0a4513fa62a067f8)
+Commit: [c133362](https://github.com/ivmartel/dwv/commit/c1333624ff69df9045c65346b91f3408151bbeae)
 
-Date: Tue May 26 2026 15:32:15 GMT+0200 (Central European Summer Time)
+Date: Wed Aug 05 2026 15:23:44 GMT+0200 (Central European Summer Time)
 
 Environement: jsdom ^28.0.0
 
@@ -13,7 +13,7 @@ Success: 379 ✅
 
 Failed: 0 ❌
 
-(total: 379, skipped: 0, total time: 11941ms)
+(total: 379, skipped: 0, total time: 14119ms)
 
 ## Tests details
 
@@ -956,6 +956,100 @@ Failed: 0 ❌
 
 - Vector3D dotProduct: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_math.html#~vector3d-dotproduct))
+### utils
+
+- toStringId: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~tostringid))
+
+- arrayMap: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraymap))
+
+- arrayContains: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraycontains))
+
+- arraySortEquals: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraysortequals))
+
+- Parse multipart: ✅
+(URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url), [jsdoc](module-tests_utils.html#~parse-multipart))
+
+- isEqualRgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isequalrgb))
+
+- ybrToRgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ybrtorgb))
+
+- hexToRgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~hextorgb))
+
+- isDarkColour: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isdarkcolour))
+
+- cielab to ciexyz: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-ciexyz))
+
+- ciexyz to cielab: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-cielab))
+
+- ciexyz to srgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-srgb))
+
+- srgb to ciexyz: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-ciexyz))
+
+- cielab to rgb: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-rgb))
+
+- srgb to cielab: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-cielab))
+
+- i18n: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~i18n))
+
+- logging: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~logging))
+
+- Merge objects: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~merge-objects))
+
+- CapitaliseFirstLetter: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~capitalisefirstletter))
+
+- StartsWith: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~startswith))
+
+- EndsWith: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~endswith))
+
+- getFlags: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getflags))
+
+- ReplaceFlags: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~replaceflags))
+
+- getFileExtension: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getfileextension))
+
+- precisionRound: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~precisionround))
+
+- ThreadPool class: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~threadpool-class))
+
+- UndoStack: ✅
+(URS [#DWV-REQ-UI-08-002 (Draw action undo/redo)](tutorial-user-stories.html#dwv-req-ui-08-002-draw-action-undo%2Fredo), [jsdoc](module-tests_utils.html#~undostack))
+
+- getUrlFromUri: ✅
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~geturlfromuri))
+
+- splitUri: ✅
+(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~splituri))
+
+- getURIQuery: ✅
+(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~geturiquery))
+
+- Parse Manifest: ✅
+(URS [#DWV-REQ-IO-02-006 (Load Data Manifest URL)](tutorial-user-stories.html#dwv-req-io-02-006-load-data-manifest-url), [jsdoc](module-tests_utils.html#~parse-manifest))
 ### state
 
 - Read v01 state line: ✅
@@ -1071,100 +1165,6 @@ Failed: 0 ❌
 
 - Read v05 state ruler multi-slice: ✅
 (⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-ruler-multi-slice))
-### utils
-
-- toStringId: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~tostringid))
-
-- arrayMap: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraymap))
-
-- arrayContains: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraycontains))
-
-- arraySortEquals: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraysortequals))
-
-- Parse multipart: ✅
-(URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url), [jsdoc](module-tests_utils.html#~parse-multipart))
-
-- isEqualRgb: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isequalrgb))
-
-- ybrToRgb: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ybrtorgb))
-
-- hexToRgb: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~hextorgb))
-
-- isDarkColour: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~isdarkcolour))
-
-- cielab to ciexyz: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-ciexyz))
-
-- ciexyz to cielab: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-cielab))
-
-- ciexyz to srgb: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~ciexyz-to-srgb))
-
-- srgb to ciexyz: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-ciexyz))
-
-- cielab to rgb: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~cielab-to-rgb))
-
-- srgb to cielab: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~srgb-to-cielab))
-
-- i18n: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~i18n))
-
-- logging: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~logging))
-
-- Merge objects: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~merge-objects))
-
-- CapitaliseFirstLetter: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~capitalisefirstletter))
-
-- StartsWith: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~startswith))
-
-- EndsWith: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~endswith))
-
-- getFlags: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getflags))
-
-- ReplaceFlags: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~replaceflags))
-
-- getFileExtension: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~getfileextension))
-
-- precisionRound: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~precisionround))
-
-- ThreadPool class: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~threadpool-class))
-
-- UndoStack: ✅
-(URS [#DWV-REQ-UI-08-002 (Draw action undo/redo)](tutorial-user-stories.html#dwv-req-ui-08-002-draw-action-undo%2Fredo), [jsdoc](module-tests_utils.html#~undostack))
-
-- getUrlFromUri: ✅
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~geturlfromuri))
-
-- splitUri: ✅
-(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~splituri))
-
-- getURIQuery: ✅
-(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~geturiquery))
-
-- Parse Manifest: ✅
-(URS [#DWV-REQ-IO-02-006 (Load Data Manifest URL)](tutorial-user-stories.html#dwv-req-io-02-006-load-data-manifest-url), [jsdoc](module-tests_utils.html#~parse-manifest))
 
 ## Traceability
 

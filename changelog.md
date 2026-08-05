@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.36.4](https://github.com/ivmartel/dwv/releases/tag/v0.36.4) - 05/08/2026
+
+### Fixed
+
+- Allow for different SeriesTime in image append check [#2257](https://github.com/ivmartel/dwv/issues/2257)
+
+---
+
 ## [v0.36.3](https://github.com/ivmartel/dwv/releases/tag/v0.36.3) - 26/05/2026
 
 ### Fixed
