@@ -923,6 +923,10 @@ export class Image {
       ) {
         continue;
       }
+      // allow for different series time
+      if (key === 'SeriesTime') {
+        continue;
+      }
 
       if (this.#meta[key] !== rhs.getMeta()[key]) {
         const message = 'Cannot append a slice with different ' + key +
