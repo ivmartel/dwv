@@ -115,6 +115,29 @@ function equalPosPat(pos1, pos2) {
 }
 
 /**
+ * Check if an array of position patients includes a given one.
+ *
+ * @param {*[]} arr The array of position patients.
+ * @param {*} val The position patient to look for.
+ * @returns {boolean} True if included.
+ */
+function includesPosPat(arr, val) {
+  return arr.some(function (arrVal) {
+    return equalPosPat(val, arrVal);
+  });
+}
+
+/**
+ * Create a {@link Point3D} from an array.
+ *
+ * @param {number[]} arr The input array.
+ * @returns {Point3D} The point.
+ */
+function point3DFromArray(arr) {
+  return new Point3D(arr[0], arr[1], arr[2]);
+}
+
+/**
  * @callback compareFn
  * @param {object} a The first object.
  * @param {object} b The first object.
@@ -391,46 +414,6 @@ export class MaskFactory {
       paletteColourMap = new ColourMap(redLut, greenLut, blueLut);
     }
 
-    // Shared Functional Groups Sequence
-    let spacing;
-    let imageOrientationPatient;
-    const sharedFunctionalGroupsSeq =
-      safeGetAllLocal(TagKeys.SharedFunctionalGroupsSequence);
-    if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
-      // should be only one
-      const funcGroup0 = sharedFunctionalGroupsSeq[0];
-      // Plane Orientation Sequence
-      if (typeof funcGroup0[TagKeys.PlaneOrientationSequence] !== 'undefined') {
-        const planeOrientationSeq =
-          funcGroup0[TagKeys.PlaneOrientationSequence];
-        if (planeOrientationSeq.value.length !== 0) {
-          // should be only one
-          imageOrientationPatient =
-            planeOrientationSeq.value[0][TagKeys.ImageOrientationPatient].value;
-        } else {
-          logger.warn(
-            'No shared functional group plane orientation sequence items.');
-        }
-      }
-      // Pixel Measures Sequence
-      if (typeof funcGroup0[TagKeys.PixelMeasuresSequence] !== 'undefined') {
-        const pixelMeasuresSeq = funcGroup0[TagKeys.PixelMeasuresSequence];
-        if (pixelMeasuresSeq.value.length !== 0) {
-          // should be only one
-          spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
-        } else {
-          logger.warn(
-            'No shared functional group pixel measure sequence items.');
-        }
-      }
-    }
-
-    const includesPosPat = function (arr, val) {
-      return arr.some(function (arrVal) {
-        return equalPosPat(val, arrVal);
-      });
-    };
-
     const findPointIndex = function (arr, val) {
       return arr.findIndex(function (arrVal) {
         return val.equals(arrVal);
@@ -454,79 +437,17 @@ export class MaskFactory {
         getSegmentFrameInfo(perFrameFuncGroupSequence[j]));
     }
 
-    // check frame infos
-    const framePosPats = [];
-    for (let ii = 0; ii < frameInfos.length; ++ii) {
-      if (!includesPosPat(framePosPats, frameInfos[ii].imagePosPat)) {
-        framePosPats.push(frameInfos[ii].imagePosPat);
-      }
-      // store orientation if needed, avoid multi
-      if (typeof frameInfos[ii].imageOrientationPatient !== 'undefined') {
-        if (typeof imageOrientationPatient === 'undefined') {
-          imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
-        } else if (!arraySortEquals(
-          imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
-          throw new Error('Unsupported multi orientation dicom seg.');
-        }
-      }
-      // store spacing if needed, avoid multi
-      if (typeof frameInfos[ii].spacing !== 'undefined') {
-        if (typeof spacing === 'undefined') {
-          spacing = frameInfos[ii].spacing;
-        } else if (!spacing.equals(frameInfos[ii].spacing)) {
-          throw new Error('Unsupported multi resolution dicom seg.');
-        }
-      }
-    }
-
-    // check spacing and orientation
-    if (typeof spacing === 'undefined') {
-      throw new Error('No spacing found for DICOM SEG');
-    }
-    if (spacing.length() !== 3) {
-      throw new Error('Incomplete spacing found for DICOM SEG');
-    }
-    if (typeof imageOrientationPatient === 'undefined') {
-      throw new Error('No imageOrientationPatient found for DICOM SEG');
-    }
-    // orientation
-    const orientationMatrix = getOrientationFromCosines(
-      imageOrientationPatient.map((item) => parseFloat(item))
-    );
-    if (typeof orientationMatrix === 'undefined') {
-      throw new Error('Invalid imageOrientationPatient found for DICOM SEG');
-    }
-
-    // sort positions patient
-    framePosPats.sort(getComparePosPat(orientationMatrix));
-
-    const point3DFromArray = function (arr) {
-      return new Point3D(arr[0], arr[1], arr[2]);
-    };
-
-    // frame origins
-    const frameOrigins = [];
-    for (const framePosPat of framePosPats) {
-      frameOrigins.push(point3DFromArray(framePosPat));
-    }
-
-    let geometry;
+    // geometry
+    let refOrigins;
     if (typeof refImage !== 'undefined') {
-      geometry = this.#getGeometryFromReference(
-        frameOrigins,
-        size,
-        spacing,
-        orientationMatrix,
-        refImage.getGeometry().getOrigins()
-      );
-    } else {
-      geometry = this.#calculateGeometry(
-        frameOrigins,
-        size,
-        spacing,
-        orientationMatrix
-      );
+      refOrigins = refImage.getGeometry().getOrigins();
     }
+    const geometry = this.#getGeometry(
+      dataElements,
+      size,
+      frameInfos,
+      refOrigins
+    );
 
     const numberOfSlices = geometry.getSize().get(2);
 
@@ -614,6 +535,153 @@ export class MaskFactory {
   }
 
   /**
+   * Get the mask geometry from DICOM elements and frame infos.
+   *
+   * @param {DataElements} dataElements The DICOM data elements.
+   * @param {Size} size The mask temporary size.
+   * @param {DicomSegmentFrameInfo[]} frameInfos The per-frame infos.
+   * @param {Point3D[]} [refOrigins] Reference origins used to complete
+   *   gaps, if not present the code will calculate them.
+   * @returns {Geometry} The mask geometry.
+   * @throws {Error} Error for missing or wrong data.
+   */
+  #getGeometry(dataElements, size, frameInfos, refOrigins) {
+    // Shared Functional Groups Sequence
+    let spacing;
+    let imageOrientationPatient;
+    const sharedFunctionalGroupsSeq =
+      safeGetAll(dataElements, TagKeys.SharedFunctionalGroupsSequence);
+    if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
+      // should be only one
+      const funcGroup0 = sharedFunctionalGroupsSeq[0];
+      // Plane Orientation Sequence
+      if (typeof funcGroup0[TagKeys.PlaneOrientationSequence] !== 'undefined') {
+        const planeOrientationSeq =
+          funcGroup0[TagKeys.PlaneOrientationSequence];
+        if (planeOrientationSeq.value.length !== 0) {
+          // should be only one
+          imageOrientationPatient =
+            planeOrientationSeq.value[0][TagKeys.ImageOrientationPatient].value;
+        } else {
+          logger.warn(
+            'No shared functional group plane orientation sequence items.');
+        }
+      }
+      // Pixel Measures Sequence
+      if (typeof funcGroup0[TagKeys.PixelMeasuresSequence] !== 'undefined') {
+        const pixelMeasuresSeq = funcGroup0[TagKeys.PixelMeasuresSequence];
+        if (pixelMeasuresSeq.value.length !== 0) {
+          // should be only one
+          spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
+        } else {
+          logger.warn(
+            'No shared functional group pixel measure sequence items.');
+        }
+      }
+    }
+
+    // check frame infos
+    const framePosPats = [];
+    for (let ii = 0; ii < frameInfos.length; ++ii) {
+      if (!includesPosPat(framePosPats, frameInfos[ii].imagePosPat)) {
+        framePosPats.push(frameInfos[ii].imagePosPat);
+      }
+      // store orientation if needed, avoid multi
+      if (typeof frameInfos[ii].imageOrientationPatient !== 'undefined') {
+        if (typeof imageOrientationPatient === 'undefined') {
+          imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
+        } else if (!arraySortEquals(
+          imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
+          throw new Error('Unsupported multi orientation dicom seg.');
+        }
+      }
+      // store spacing if needed, avoid multi
+      if (typeof frameInfos[ii].spacing !== 'undefined') {
+        if (typeof spacing === 'undefined') {
+          spacing = frameInfos[ii].spacing;
+        } else if (!spacing.equals(frameInfos[ii].spacing)) {
+          throw new Error('Unsupported multi resolution dicom seg.');
+        }
+      }
+    }
+
+    // check spacing and orientation
+    if (typeof spacing === 'undefined') {
+      throw new Error('No spacing found for DICOM SEG');
+    }
+    if (spacing.length() !== 3) {
+      throw new Error('Incomplete spacing found for DICOM SEG');
+    }
+    if (typeof imageOrientationPatient === 'undefined') {
+      throw new Error('No imageOrientationPatient found for DICOM SEG');
+    }
+    // orientation
+    const orientationMatrix = getOrientationFromCosines(
+      imageOrientationPatient.map((item) => parseFloat(item))
+    );
+    if (typeof orientationMatrix === 'undefined') {
+      throw new Error('Invalid imageOrientationPatient found for DICOM SEG');
+    }
+
+    // sort positions patient
+    framePosPats.sort(getComparePosPat(orientationMatrix));
+
+    // frame origins
+    const frameOrigins = [];
+    for (const framePosPat of framePosPats) {
+      frameOrigins.push(point3DFromArray(framePosPat));
+    }
+
+    return this.#createGeometry(
+      frameOrigins, size, spacing, orientationMatrix, refOrigins);
+  }
+
+  /**∫
+   * @param {Point3D[]} frameOrigins The frame origins.
+   * @param {Size} size The mask temporary size.
+   * @param {Spacing} spacing The mask spcing.
+   * @param {Matrix33} orientationMatrix The mask orientation.
+   * @param {Point3D[]} refOrigins The reference image origins.
+   * @returns {Geometry} The final mask geometry.
+  */
+  #createGeometry(
+    frameOrigins,
+    size,
+    spacing,
+    orientationMatrix,
+    refOrigins) {
+
+    let maskOrigins;
+    if (typeof refOrigins !== 'undefined') {
+      maskOrigins = this.#getMaskOriginsFromReference(
+        frameOrigins,
+        refOrigins
+      );
+    } else {
+      logger.warn('Guessing image geometry for DICOM SEG');
+
+      // tmp geometry with correct spacing but only one slice
+      const baseGeometry = new Geometry(
+        [frameOrigins[0]], size, spacing, orientationMatrix);
+
+      maskOrigins = this.#getMaskOriginsFromGeometry(
+        frameOrigins,
+        baseGeometry
+      );
+    }
+
+    // final geometry
+    const geometry = new Geometry(
+      [frameOrigins[0]], size, spacing, orientationMatrix);
+    // append origins
+    for (let m = 1; m < maskOrigins.length; ++m) {
+      geometry.appendOrigin(maskOrigins[m], m);
+    }
+
+    return geometry;
+  }
+
+  /**
    * Check the distance between a frame origin and a reference origin.
    *
    * @param {Point3D} frameOrigin The frame origin to check.
@@ -636,18 +704,17 @@ export class MaskFactory {
   }
 
   /**
-   * Get the mask geometry from reference image.
+   * Get the mask origins using reference origins to complete
+   * the frame origins if with gaps.
    *
    * @param {Point3D[]} frameOrigins The frame origins.
-   * @param {Size} size The mask temporary size.
-   * @param {Spacing} spacing The mask spcing.
-   * @param {Matrix33} orientationMatrix The mask orientation.
    * @param {Point3D[]} refOrigins The reference image origins.
-   * @returns {Geometry} The final mask geometry.
+   * @returns {Point3D[]} The continous mask origins.
    */
-  #getGeometryFromReference(
-    frameOrigins, size, spacing, orientationMatrix, refOrigins) {
-
+  #getMaskOriginsFromReference(
+    frameOrigins,
+    refOrigins) {
+    // continous mask origin list
     const maskOrigins = [];
     maskOrigins.push(frameOrigins[0]);
     let previousIndex = frameOrigins[0].getClosest(refOrigins);
@@ -665,33 +732,20 @@ export class MaskFactory {
       previousIndex = currentIndex;
     }
 
-    // final geometry
-    const geometry = new Geometry(
-      [frameOrigins[0]], size, spacing, orientationMatrix);
-    // append origins
-    for (let m = 1; m < maskOrigins.length; ++m) {
-      geometry.appendOrigin(maskOrigins[m], m);
-    }
-
-    return geometry;
+    return maskOrigins;
   }
 
   /**
-   * Calculate the mask geometry from frame origins.
+   * Get the mask origins using a base geometry to complete
+   * the frame origins if with gaps.
    *
    * @param {Point3D[]} frameOrigins The frame origins.
-   * @param {Size} size The mask temporary size.
-   * @param {Spacing} spacing The mask spcing.
-   * @param {Matrix33} orientationMatrix The mask orientation.
-   * @returns {Geometry} The final mask geometry.
+   * @param {Geometry} baseGeometry The base geometry.
+   * @returns {Point3D[]} The continous mask origins.
    */
-  #calculateGeometry(frameOrigins, size, spacing, orientationMatrix) {
-    logger.warn('Guessing image geometry for DICOM SEG');
-
-    // tmp geometry with correct spacing but only one slice
-    const tmpGeometry = new Geometry(
-      [frameOrigins[0]], size, spacing, orientationMatrix);
-
+  #getMaskOriginsFromGeometry(
+    frameOrigins,
+    baseGeometry) {
     // add possibly missing origins
     const maskOrigins = [];
     maskOrigins.push(frameOrigins[0]);
@@ -699,7 +753,7 @@ export class MaskFactory {
     for (let g = 1; g < frameOrigins.length; ++g) {
       ++sliceIndex;
       let index = new Index([0, 0, sliceIndex]);
-      let point = tmpGeometry.indexToWorld(index).get3D();
+      let point = baseGeometry.indexToWorld(index).get3D();
       const frameOrigin = frameOrigins[g];
       // check if more pos pats are needed
       let dist = frameOrigin.getDistance(point);
@@ -711,7 +765,7 @@ export class MaskFactory {
         maskOrigins.push(point);
         ++sliceIndex;
         index = new Index([0, 0, sliceIndex]);
-        point = tmpGeometry.indexToWorld(index).get3D();
+        point = baseGeometry.indexToWorld(index).get3D();
         dist = frameOrigin.getDistance(point);
         if (dist > distPrevious) {
           throw new Error(
@@ -722,15 +776,7 @@ export class MaskFactory {
       maskOrigins.push(frameOrigin);
     }
 
-    // final geometry
-    const geometry = new Geometry(
-      [frameOrigins[0]], size, spacing, orientationMatrix);
-    // append origins
-    for (let m = 1; m < maskOrigins.length; ++m) {
-      geometry.appendOrigin(maskOrigins[m], m);
-    }
-
-    return geometry;
+    return maskOrigins;
   }
 
   /**

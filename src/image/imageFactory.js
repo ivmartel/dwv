@@ -238,6 +238,67 @@ function getWindowPresets(dataElements, intensityFactor) {
 }
 
 /**
+ * Get the image geometry from DICOM elements.
+ *
+ * @param {DataElements} dataElements The DICOM data elements.
+ * @returns {Geometry} The image geometry.
+ */
+function getGeometry(dataElements) {
+  const size2D = getImage2DSize(dataElements);
+  const sizeValues = [size2D[0], size2D[1], 1];
+
+  // NumberOfFrames
+  const numberOfFrames = safeGet(dataElements, TagKeys.NumberOfFrames);
+  if (typeof numberOfFrames !== 'undefined') {
+    const number = parseInt(numberOfFrames, 10);
+    if (number > 1) {
+      sizeValues.push(number);
+    }
+  }
+
+  // image size
+  const size = new Size(sizeValues);
+
+  // image spacing
+  let spacingValues = [1, 1, 1];
+  const spacing2D = getPixelSpacing(dataElements);
+  if (typeof spacing2D !== 'undefined') {
+    spacingValues = [spacing2D[0], spacing2D[1], 1];
+  } else {
+    // try pixel aspect ratio
+    const ratio = getPixelAspectRatio(dataElements);
+    if (typeof ratio !== 'undefined') {
+      spacingValues = [ratio[0], ratio[1], 1];
+      logger.warn('Use pixel aspect ratio as spacing');
+    }
+  }
+  const spacing = new Spacing(spacingValues);
+
+  // ImagePositionPatient
+  const imagePositionPatient =
+    safeGetAll(dataElements, TagKeys.ImagePositionPatient);
+  // slice position
+  let slicePosition = new Array(0, 0, 0);
+  if (typeof imagePositionPatient !== 'undefined') {
+    slicePosition = [
+      parseFloat(imagePositionPatient[0]),
+      parseFloat(imagePositionPatient[1]),
+      parseFloat(imagePositionPatient[2])
+    ];
+  }
+
+  // Image orientation patient
+  const orientationMatrix = getOrientationMatrix(dataElements);
+
+  // geometry
+  const origin = new Point3D(
+    slicePosition[0], slicePosition[1], slicePosition[2]);
+  const time = getVolumeIdTagValue(dataElements);
+
+  return new Geometry([origin], size, spacing, orientationMatrix, time);
+}
+
+/**
  * {@link Image} factory.
  */
 export class ImageFactory {
@@ -318,61 +379,12 @@ export class ImageFactory {
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
     };
-    const safeGetAllLocal = function (key) {
-      return safeGetAll(dataElements, key);
-    };
-
-    const size2D = getImage2DSize(dataElements);
-    const sizeValues = [size2D[0], size2D[1], 1];
-
-    // NumberOfFrames
-    const numberOfFrames = safeGetLocal(TagKeys.NumberOfFrames);
-    if (typeof numberOfFrames !== 'undefined') {
-      const number = parseInt(numberOfFrames, 10);
-      if (number > 1) {
-        sizeValues.push(number);
-      }
-    }
-
-    // image size
-    const size = new Size(sizeValues);
-
-    // image spacing
-    let spacingValues = [1, 1, 1];
-    const spacing2D = getPixelSpacing(dataElements);
-    if (typeof spacing2D !== 'undefined') {
-      spacingValues = [spacing2D[0], spacing2D[1], 1];
-    } else {
-      // try pixel aspect ratio
-      const ratio = getPixelAspectRatio(dataElements);
-      if (typeof ratio !== 'undefined') {
-        spacingValues = [ratio[0], ratio[1], 1];
-        logger.warn('Use pixel aspect ratio as spacing');
-      }
-    }
-    const spacing = new Spacing(spacingValues);
-
-    // ImagePositionPatient
-    const imagePositionPatient = safeGetAllLocal(TagKeys.ImagePositionPatient);
-    // slice position
-    let slicePosition = new Array(0, 0, 0);
-    if (typeof imagePositionPatient !== 'undefined') {
-      slicePosition = [
-        parseFloat(imagePositionPatient[0]),
-        parseFloat(imagePositionPatient[1]),
-        parseFloat(imagePositionPatient[2])
-      ];
-    }
-
-    // Image orientation patient
-    const orientationMatrix = getOrientationMatrix(dataElements);
 
     // geometry
-    const origin = new Point3D(
-      slicePosition[0], slicePosition[1], slicePosition[2]);
-    const time = getVolumeIdTagValue(dataElements);
-    const geometry = new Geometry(
-      [origin], size, spacing, orientationMatrix, time);
+    const geometry = getGeometry(dataElements);
+    const numberOfPixels = geometry.getSize().getTotalSize();
+    // needed for unit
+    const spacing2D = getPixelSpacing(dataElements);
 
     // SOP Instance UID
     const sopInstanceUid = safeGetLocal(TagKeys.SOPInstanceUID);
@@ -384,12 +396,12 @@ export class ImageFactory {
     }
 
     // check buffer size
-    const bufferSize = size.getTotalSize() * samplesPerPixel;
+    const bufferSize = numberOfPixels * samplesPerPixel;
     if (bufferSize !== pixelBuffer.length) {
       logger.warn(`Badly sized pixel buffer: ${
         pixelBuffer.length } != ${bufferSize}`);
       if (bufferSize < pixelBuffer.length) {
-        pixelBuffer = pixelBuffer.slice(0, size.getTotalSize());
+        pixelBuffer = pixelBuffer.slice(0, numberOfPixels);
       } else {
         throw new Error('Underestimated buffer size, can\'t fix it...');
       }
