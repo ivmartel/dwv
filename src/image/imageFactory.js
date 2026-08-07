@@ -13,9 +13,16 @@ import {
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
-import {getRootGeometry} from '../dicom/dicomGeometry.js';
+import {
+  includesPosPat,
+  getRootGeometry,
+  getFramesGeometry
+} from '../dicom/dicomGeometry.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {logger} from '../utils/logger.js';
+import {
+  getSegmentFrameInfosFromRoot
+} from '../dicom/dicomSegmentFrameInfo.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
@@ -311,8 +318,35 @@ export class ImageFactory {
       return safeGet(dataElements, key);
     };
 
-    // geometry
-    const geometry = getRootGeometry(dataElements);
+    let geometry;
+    // possible geometry from frame infos
+    const frameInfos =
+      getSegmentFrameInfosFromRoot(dataElements);
+    if (typeof frameInfos !== 'undefined') {
+      // check unique pos pats
+      const framePosPats = [];
+      let uniquePospats = true;
+      for (const frameInfo of frameInfos) {
+        if (!includesPosPat(framePosPats, frameInfo.imagePosPat)) {
+          framePosPats.push(frameInfo.imagePosPat);
+        } else {
+          uniquePospats = false;
+          break;
+        }
+      }
+      // use frame info for geometry if unique pos pats,
+      // revert to root geometry if not.
+      if (uniquePospats) {
+        logger.log('Using frame infos for geometry');
+        geometry = getFramesGeometry(dataElements, frameInfos);
+      }
+    }
+    // try root geometry
+    if (typeof geometry === 'undefined') {
+      geometry = getRootGeometry(dataElements);
+    }
+
+    // number of pixels
     const numberOfPixels = geometry.getSize().getTotalSize();
     // needed for unit
     const spacing2D = getPixelSpacing(dataElements);
