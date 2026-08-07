@@ -121,7 +121,7 @@ function equalPosPat(pos1, pos2) {
  * @param {*} val The position patient to look for.
  * @returns {boolean} True if included.
  */
-function includesPosPat(arr, val) {
+export function includesPosPat(arr, val) {
   return arr.some(function (arrVal) {
     return equalPosPat(val, arrVal);
   });
