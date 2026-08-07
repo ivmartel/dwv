@@ -206,11 +206,15 @@ export function getSegmentFrameInfo(dataElements) {
   const frameContentSq = dataElements[TagKeys.FrameContentSequence].value;
   // Dimension Index Value
   const dimIndex = frameContentSq[0][TagKeys.DimensionIndexValue].value;
-  // Segment Identification Sequence (required, only one)
-  const segmentIdSq = dataElements[TagKeys.SegmentIdentificationSequence].value;
-  // Referenced Segment Number
-  const refSegmentNumber =
-    parseInt(segmentIdSq[0][TagKeys.ReferencedSegmentNumber].value[0], 10);
+  // Referenced Segment Number (can be undefined for non SEG)
+  let refSegmentNumber;
+  // Segment Identification Sequence (required for SEG, only one)
+  const segmentIdSq = dataElements[TagKeys.SegmentIdentificationSequence];
+  if (typeof segmentIdSq !== 'undefined') {
+    const item0 = segmentIdSq.value[0];
+    refSegmentNumber =
+      parseInt(item0[TagKeys.ReferencedSegmentNumber].value[0], 10);
+  }
   // Plane Position Sequence (required, only one)
   const planePosSq = dataElements[TagKeys.PlanePositionSequence].value;
   // Image Position (Patient) (conditionally required)
