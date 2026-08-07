@@ -1,6 +1,3 @@
-import {Size} from './size.js';
-import {Spacing} from './spacing.js';
-import {Geometry} from './geometry.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {WindowLevel} from './windowLevel.js';
 import {WindowPreset} from './windowPreset.js';
@@ -10,17 +7,14 @@ import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
   getPixelSpacing,
-  getPixelAspectRatio,
   getTagPixelUnit,
-  getOrientationMatrix,
   getPhotometricInterpretation,
   isMonochrome,
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
-import {getVolumeIdTagValue} from '../dicom/dicomVolume.js';
+import {getRootGeometry} from '../dicom/dicomGeometry.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
-import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
 
 /**
@@ -39,8 +33,6 @@ const TagKeys = {
   SOPClassUID: '00080016',
   SOPInstanceUID: '00080018',
   Modality: '00080060',
-  NumberOfFrames: '00280008',
-  ImagePositionPatient: '00200032',
   SamplesPerPixel: '00280002',
   PlanarConfiguration: '00280006',
   RescaleSlope: '00281053',
@@ -238,67 +230,6 @@ function getWindowPresets(dataElements, intensityFactor) {
 }
 
 /**
- * Get the image geometry from DICOM elements.
- *
- * @param {DataElements} dataElements The DICOM data elements.
- * @returns {Geometry} The image geometry.
- */
-function getGeometry(dataElements) {
-  const size2D = getImage2DSize(dataElements);
-  const sizeValues = [size2D[0], size2D[1], 1];
-
-  // NumberOfFrames
-  const numberOfFrames = safeGet(dataElements, TagKeys.NumberOfFrames);
-  if (typeof numberOfFrames !== 'undefined') {
-    const number = parseInt(numberOfFrames, 10);
-    if (number > 1) {
-      sizeValues.push(number);
-    }
-  }
-
-  // image size
-  const size = new Size(sizeValues);
-
-  // image spacing
-  let spacingValues = [1, 1, 1];
-  const spacing2D = getPixelSpacing(dataElements);
-  if (typeof spacing2D !== 'undefined') {
-    spacingValues = [spacing2D[0], spacing2D[1], 1];
-  } else {
-    // try pixel aspect ratio
-    const ratio = getPixelAspectRatio(dataElements);
-    if (typeof ratio !== 'undefined') {
-      spacingValues = [ratio[0], ratio[1], 1];
-      logger.warn('Use pixel aspect ratio as spacing');
-    }
-  }
-  const spacing = new Spacing(spacingValues);
-
-  // ImagePositionPatient
-  const imagePositionPatient =
-    safeGetAll(dataElements, TagKeys.ImagePositionPatient);
-  // slice position
-  let slicePosition = new Array(0, 0, 0);
-  if (typeof imagePositionPatient !== 'undefined') {
-    slicePosition = [
-      parseFloat(imagePositionPatient[0]),
-      parseFloat(imagePositionPatient[1]),
-      parseFloat(imagePositionPatient[2])
-    ];
-  }
-
-  // Image orientation patient
-  const orientationMatrix = getOrientationMatrix(dataElements);
-
-  // geometry
-  const origin = new Point3D(
-    slicePosition[0], slicePosition[1], slicePosition[2]);
-  const time = getVolumeIdTagValue(dataElements);
-
-  return new Geometry([origin], size, spacing, orientationMatrix, time);
-}
-
-/**
  * {@link Image} factory.
  */
 export class ImageFactory {
@@ -381,7 +312,7 @@ export class ImageFactory {
     };
 
     // geometry
-    const geometry = getGeometry(dataElements);
+    const geometry = getRootGeometry(dataElements);
     const numberOfPixels = geometry.getSize().getTotalSize();
     // needed for unit
     const spacing2D = getPixelSpacing(dataElements);

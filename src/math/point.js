@@ -286,6 +286,16 @@ export function getEqualPoint3DFunction(point) {
 }
 
 /**
+ * Create a {@link Point3D} from an array.
+ *
+ * @param {number[]} arr The input array.
+ * @returns {Point3D} The point.
+ */
+export function point3DFromArray(arr) {
+  return new Point3D(arr[0], arr[1], arr[2]);
+}
+
+/**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the point values.

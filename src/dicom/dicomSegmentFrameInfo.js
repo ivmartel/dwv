@@ -6,6 +6,9 @@ import {
   DcmCodes,
   getDcmDicomCode
 } from './dicomCode.js';
+import {
+  safeGetAll
+} from '../dicom/dataElement.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
@@ -29,7 +32,8 @@ const TagKeys = {
   ImagePosition: '00200032',
   PlaneOrientationSequence: '00209116',
   ImageOrientation: '00200037',
-  PixelMeasuresSequence: '00289110'
+  PixelMeasuresSequence: '00289110',
+  PerFrameFunctionalGroupsSequence: '52009230'
 };
 
 /**
@@ -250,6 +254,37 @@ export function getSegmentFrameInfo(dataElements) {
   }
 
   return frameInfo;
+}
+
+/**
+ * Get the list of DicomSegmentFrameInfo from the root list of data elements.
+ *
+ * @param {Record<string, DataElement>} dataElements The root dicom element.
+ * @param {number} numberOfFrames The number of frames.
+ * @returns {DicomSegmentFrameInfo[]|undefined} The list of frame
+ *   information object.
+ */
+export function getSegmentFrameInfosFromRoot(dataElements, numberOfFrames) {
+  // Per-frame Functional Groups Sequence
+  const perFrameFuncGroupSequence =
+    safeGetAll(dataElements, TagKeys.PerFrameFunctionalGroupsSequence);
+
+  let frameInfos;
+  if (typeof perFrameFuncGroupSequence !== 'undefined') {
+    // check size
+    if (numberOfFrames !== perFrameFuncGroupSequence.length) {
+      throw new Error(
+        'perFrameFuncGroupSequence meta and numberOfFrames are not equal.');
+    }
+    // create frame info object from per frame func
+    frameInfos = [];
+    for (let j = 0; j < perFrameFuncGroupSequence.length; ++j) {
+      frameInfos.push(
+        getSegmentFrameInfo(perFrameFuncGroupSequence[j]));
+    }
+  }
+
+  return frameInfos;
 }
 
 /**
