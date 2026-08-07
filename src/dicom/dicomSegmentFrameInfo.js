@@ -264,7 +264,8 @@ export function getSegmentFrameInfo(dataElements) {
  * Get the list of DicomSegmentFrameInfo from the root list of data elements.
  *
  * @param {Record<string, DataElement>} dataElements The root dicom element.
- * @param {number} numberOfFrames The number of frames.
+ * @param {number} [numberOfFrames] Optional number of frames to compare
+ *   with per frame sequence size.
  * @returns {DicomSegmentFrameInfo[]|undefined} The list of frame
  *   information object.
  */
@@ -276,7 +277,8 @@ export function getSegmentFrameInfosFromRoot(dataElements, numberOfFrames) {
   let frameInfos;
   if (typeof perFrameFuncGroupSequence !== 'undefined') {
     // check size
-    if (numberOfFrames !== perFrameFuncGroupSequence.length) {
+    if (typeof numberOfFrames !== 'undefined' &&
+      numberOfFrames !== perFrameFuncGroupSequence.length) {
       throw new Error(
         'perFrameFuncGroupSequence meta and numberOfFrames are not equal.');
     }
