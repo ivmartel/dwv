@@ -203,7 +203,13 @@ export function getSegmentFrameInfo(dataElements) {
     }
   }
   // Frame Content Sequence (required, only one)
+  if (typeof dataElements[TagKeys.FrameContentSequence] === 'undefined') {
+    throw new Error('Missing frame content sequence');
+  }
   const frameContentSq = dataElements[TagKeys.FrameContentSequence].value;
+  if (frameContentSq.length === 0) {
+    throw new Error('Empty frame content sequence');
+  }
   // Dimension Index Value
   const dimIndex = frameContentSq[0][TagKeys.DimensionIndexValue].value;
   // Referenced Segment Number (can be undefined for non SEG)
@@ -216,7 +222,13 @@ export function getSegmentFrameInfo(dataElements) {
       parseInt(item0[TagKeys.ReferencedSegmentNumber].value[0], 10);
   }
   // Plane Position Sequence (required, only one)
+  if (typeof dataElements[TagKeys.PlanePositionSequence] === 'undefined') {
+    throw new Error('Missing plane position sequence');
+  }
   const planePosSq = dataElements[TagKeys.PlanePositionSequence].value;
+  if (planePosSq.length === 0) {
+    throw new Error('Empty plane position sequence');
+  }
   // Image Position (Patient) (conditionally required)
   const imagePosPat = planePosSq[0][TagKeys.ImagePosition].value;
   for (let p = 0; p < imagePosPat.length; ++p) {
