@@ -297,7 +297,7 @@ function createFrameGeometry(
 }
 
 /**
- * Get the frames geometry from DICOM elements and frame infos.
+ * Get the frames geometry from root DICOM elements and per-frame infos.
  *
  * @param {DataElements} dataElements The DICOM data elements.
  * @param {DicomSegmentFrameInfo[]} frameInfos The per-frame infos.
@@ -357,7 +357,7 @@ export function getFramesGeometry(dataElements, frameInfos, refOrigins) {
         imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
       } else if (!arraySortEquals(
         imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
-        throw new Error('Unsupported multi orientation dicom seg.');
+        throw new Error('Unsupported multi orientation frames geometry.');
       }
     }
     // store spacing if needed, avoid multi
