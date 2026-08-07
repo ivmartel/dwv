@@ -273,8 +273,6 @@ function createFrameGeometry(
       refOrigins
     );
   } else {
-    logger.warn('Completing origins from calculated origins');
-
     // tmp geometry with correct spacing but only one slice
     const baseGeometry = new Geometry(
       [frameOrigins[0]], size, spacing, orientationMatrix);
