@@ -337,7 +337,7 @@ export class ImageFactory {
       // use frame info for geometry if unique pos pats,
       // revert to root geometry if not.
       if (uniquePospats) {
-        logger.log('Using frame infos for geometry');
+        logger.debug('Using frame infos for geometry');
         geometry = getFramesGeometry(dataElements, frameInfos);
       }
     }
