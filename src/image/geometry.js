@@ -19,6 +19,30 @@ import {Matrix33} from '../math/matrix.js';
 export const DIRECTION_EPSILON = 1e-6;
 
 /**
+ * @callback comparePointFn
+ * @param {Point3D} a The first point.
+ * @param {Point3D} b The first point.
+ * @returns {number} >0 to sort a after b, <0 to sort a before b,
+ *   0 to not change order.
+ */
+
+/**
+ * Get a point compare function using Z coordinate difference.
+ * Compares de-oriented points using the input orientation inverse.
+ *
+ * @param {Matrix33} orientation The orientation matrix.
+ * @returns {comparePointFn} The point compare function.
+ */
+function getComparePoint3D(orientation) {
+  const invOrientation = orientation.getInverse();
+  return function (point1, point2) {
+    const p1 = invOrientation.multiplyPoint3D(point1);
+    const p2 = invOrientation.multiplyPoint3D(point2);
+    return p1.getZ() - p2.getZ();
+  };
+}
+
+/**
  * 2D/3D Geometry class.
  */
 export class Geometry {
@@ -193,6 +217,13 @@ export class Geometry {
    */
   getOrigins() {
     return this.#origins;
+  }
+
+  /**
+   * Sort origins by Z position ascending.
+   */
+  sortOrigins() {
+    this.#origins.sort(getComparePoint3D(this.#orientation));
   }
 
   /**

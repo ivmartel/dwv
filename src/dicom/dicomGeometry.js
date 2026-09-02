@@ -128,30 +128,6 @@ export function includesPosPat(arr, val) {
 }
 
 /**
- * @callback compareFn
- * @param {object} a The first object.
- * @param {object} b The first object.
- * @returns {number} >0 to sort a after b, <0 to sort a before b,
- *   0 to not change order.
- */
-
-/**
- * Get a position patient compare function accroding to an
- * input orientation.
- *
- * @param {Matrix33} orientation The orientation matrix.
- * @returns {compareFn} The position compare function.
- */
-function getComparePosPat(orientation) {
-  const invOrientation = orientation.getInverse();
-  return function (pos1, pos2) {
-    const p1 = invOrientation.multiplyArray3D(pos1);
-    const p2 = invOrientation.multiplyArray3D(pos2);
-    return p1[2] - p2[2];
-  };
-}
-
-/**
  * Check the distance between a frame origin and a reference origin.
  *
  * @param {Point3D} frameOrigin The frame origin to check.
@@ -386,9 +362,6 @@ export function getFramesGeometry(dataElements, frameInfos, refOrigins) {
     throw new Error(
       'Invalid imageOrientationPatient found for frames geometry');
   }
-
-  // sort positions patient
-  framePosPats.sort(getComparePosPat(orientationMatrix));
 
   // frame origins
   const frameOrigins = [];

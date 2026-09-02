@@ -339,6 +339,7 @@ export class ImageFactory {
       if (uniquePospats) {
         logger.debug('Using frame infos for geometry');
         geometry = getFramesGeometry(dataElements, frameInfos);
+        geometry.sortOrigins();
       }
     }
     // try root geometry

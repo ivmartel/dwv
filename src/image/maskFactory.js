@@ -365,6 +365,7 @@ export class MaskFactory {
       frameInfos,
       refOrigins
     );
+    geometry.sortOrigins();
 
     const numberOfSlices = geometry.getSize().get(2);
 
