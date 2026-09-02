@@ -11,7 +11,11 @@ import {
 } from './dicomImage.js';
 import {getVolumeIdTagValue} from './dicomVolume.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
-import {Point3D, point3DFromArray} from '../math/point.js';
+import {
+  Point3D,
+  point3DFromArray,
+  includesPoint3D
+} from '../math/point.js';
 import {Index} from '../math/index.js';
 import {
   REAL_WORLD_EPSILON,
@@ -101,30 +105,6 @@ export function getRootGeometry(dataElements) {
   const time = getVolumeIdTagValue(dataElements);
 
   return new Geometry([origin], size, spacing, orientationMatrix, time);
-}
-
-/**
- * Check two position patients for equality.
- *
- * @param {*} pos1 The first position patient.
- * @param {*} pos2 The second position patient.
- * @returns {boolean} True is equal.
- */
-function equalPosPat(pos1, pos2) {
-  return JSON.stringify(pos1) === JSON.stringify(pos2);
-}
-
-/**
- * Check if an array of position patients includes a given one.
- *
- * @param {*[]} arr The array of position patients.
- * @param {*} val The position patient to look for.
- * @returns {boolean} True if included.
- */
-export function includesPosPat(arr, val) {
-  return arr.some(function (arrVal) {
-    return equalPosPat(val, arrVal);
-  });
 }
 
 /**
@@ -320,10 +300,12 @@ export function getFramesGeometry(dataElements, frameInfos, refOrigins) {
   }
 
   // check frame infos
-  const framePosPats = [];
+  const frameOrigins = [];
   for (let ii = 0; ii < frameInfos.length; ++ii) {
-    if (!includesPosPat(framePosPats, frameInfos[ii].imagePosPat)) {
-      framePosPats.push(frameInfos[ii].imagePosPat);
+    // populate frame origins
+    const frameOrigin = point3DFromArray(frameInfos[ii].imagePosPat);
+    if (!includesPoint3D(frameOrigins, frameOrigin)) {
+      frameOrigins.push(frameOrigin);
     }
     // store orientation if needed, avoid multi
     if (typeof frameInfos[ii].imageOrientationPatient !== 'undefined') {
@@ -361,12 +343,6 @@ export function getFramesGeometry(dataElements, frameInfos, refOrigins) {
   if (typeof orientationMatrix === 'undefined') {
     throw new Error(
       'Invalid imageOrientationPatient found for frames geometry');
-  }
-
-  // frame origins
-  const frameOrigins = [];
-  for (const framePosPat of framePosPats) {
-    frameOrigins.push(point3DFromArray(framePosPat));
   }
 
   return createFrameGeometry(

@@ -3,6 +3,10 @@ import {WindowLevel} from './windowLevel.js';
 import {WindowPreset} from './windowPreset.js';
 import {Image} from './image.js';
 import {ColourMap} from './luts.js';
+import {
+  point3DFromArray,
+  includesPoint3D
+} from '../math/point.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
@@ -14,7 +18,6 @@ import {
 } from '../dicom/dicomImage.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 import {
-  includesPosPat,
   getRootGeometry,
   getFramesGeometry
 } from '../dicom/dicomGeometry.js';
@@ -323,20 +326,21 @@ export class ImageFactory {
     const frameInfos =
       getSegmentFrameInfosFromRoot(dataElements);
     if (typeof frameInfos !== 'undefined') {
-      // check unique pos pats
-      const framePosPats = [];
-      let uniquePospats = true;
+      // check unique origins
+      const frameOrigins = [];
+      let uniqueOrigins = true;
       for (const frameInfo of frameInfos) {
-        if (!includesPosPat(framePosPats, frameInfo.imagePosPat)) {
-          framePosPats.push(frameInfo.imagePosPat);
+        const frameOrigin = point3DFromArray(frameInfo.imagePosPat);
+        if (!includesPoint3D(frameOrigins, frameOrigin)) {
+          frameOrigins.push(frameOrigin);
         } else {
-          uniquePospats = false;
+          uniqueOrigins = false;
           break;
         }
       }
       // use frame info for geometry if unique pos pats,
       // revert to root geometry if not.
-      if (uniquePospats) {
+      if (uniqueOrigins) {
         logger.debug('Using frame infos for geometry');
         geometry = getFramesGeometry(dataElements, frameInfos);
         geometry.sortOrigins();

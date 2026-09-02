@@ -286,6 +286,19 @@ export function getEqualPoint3DFunction(point) {
 }
 
 /**
+ * Check if an array of Point3D includes a given one.
+ *
+ * @param {Point3D[]} arr The array of Point3D.
+ * @param {Point3D} val The Point3D to look for.
+ * @returns {boolean} True if included.
+ */
+export function includesPoint3D(arr, val) {
+  return arr.some(function (arrVal) {
+    return val.equals(arrVal);
+  });
+}
+
+/**
  * Create a {@link Point3D} from an array.
  *
  * @param {number[]} arr The input array.
