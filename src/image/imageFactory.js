@@ -5,7 +5,8 @@ import {Image} from './image.js';
 import {ColourMap} from './luts.js';
 import {
   point3DFromArray,
-  includesPoint3D
+  includesPoint3D,
+  getEqualPoint3DFunction
 } from '../math/point.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
@@ -321,6 +322,12 @@ export class ImageFactory {
       return safeGet(dataElements, key);
     };
 
+    // Sample per pixels
+    let samplesPerPixel = safeGetLocal(TagKeys.SamplesPerPixel);
+    if (typeof samplesPerPixel === 'undefined') {
+      samplesPerPixel = 1;
+    }
+
     let geometry;
     // possible geometry from frame infos
     const frameInfos =
@@ -344,6 +351,35 @@ export class ImageFactory {
         logger.debug('Using frame infos for geometry');
         geometry = getFramesGeometry(dataElements, frameInfos);
         geometry.sortOrigins();
+
+        // pixelBuffer is in per-frame (encoding) order, which can
+        // differ from the spatial order sortOrigins just applied to
+        // the geometry; work out where each frame now lands and only
+        // reorder the buffer if that order actually changed.
+        const sortedOrigins = geometry.getOrigins();
+        const sliceIndices = frameOrigins.map(function (frameOrigin) {
+          const sliceIndex = sortedOrigins.findIndex(
+            getEqualPoint3DFunction(frameOrigin));
+          if (sliceIndex === -1) {
+            throw new Error('Cannot find frame origin in sorted origins');
+          }
+          return sliceIndex;
+        });
+        const needsRemap = sliceIndices.some(function (sliceIndex, f) {
+          return sliceIndex !== f;
+        });
+        if (needsRemap) {
+          const size2D = getImage2DSize(dataElements);
+          const sliceSize = size2D[0] * size2D[1] * samplesPerPixel;
+          const sortedBuffer = pixelBuffer.slice();
+          for (let f = 0; f < frameInfos.length; ++f) {
+            sortedBuffer.set(
+              pixelBuffer.subarray(f * sliceSize, (f + 1) * sliceSize),
+              sliceIndices[f] * sliceSize
+            );
+          }
+          pixelBuffer = sortedBuffer;
+        }
       }
     }
     // try root geometry
@@ -358,12 +394,6 @@ export class ImageFactory {
 
     // SOP Instance UID
     const sopInstanceUid = safeGetLocal(TagKeys.SOPInstanceUID);
-
-    // Sample per pixels
-    let samplesPerPixel = safeGetLocal(TagKeys.SamplesPerPixel);
-    if (typeof samplesPerPixel === 'undefined') {
-      samplesPerPixel = 1;
-    }
 
     // check buffer size
     const bufferSize = numberOfPixels * samplesPerPixel;
