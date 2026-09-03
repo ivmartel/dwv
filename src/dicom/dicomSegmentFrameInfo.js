@@ -26,6 +26,11 @@ const TagKeys = {
   ReferencedSOPInstanceUID: '00081155',
   FrameContentSequence: '00209111',
   DimensionIndexValue: '00209157',
+  DimensionOrganizationSequence: '00209221',
+  DimensionOrganizationUID: '00209164',
+  DimensionIndexSequence: '00209222',
+  DimensionIndexPointer: '00209165',
+  DimensionDescriptionLabel: '00209421',
   SegmentIdentificationSequence: '0062000A',
   ReferencedSegmentNumber: '0062000B',
   PlanePositionSequence: '00209113',
@@ -44,16 +49,16 @@ const TagKeys = {
  */
 export function getDimensionOrganization(dataElements) {
   // Dimension Organization Sequence (required)
-  const orgSq = dataElements['00209221'];
+  const orgSq = dataElements[TagKeys.DimensionOrganizationSequence];
   if (typeof orgSq === 'undefined' || orgSq.value.length !== 1) {
     throw new Error('Unsupported dimension organization sequence length');
   }
   // Dimension Organization UID
-  const orgUID = orgSq.value[0]['00209164'].value[0];
+  const orgUID = orgSq.value[0][TagKeys.DimensionOrganizationUID].value[0];
 
   // Dimension Index Sequence (conditionally required)
   const indices = [];
-  const indexSqElem = dataElements['00209222'];
+  const indexSqElem = dataElements[TagKeys.DimensionIndexSequence];
   if (typeof indexSqElem !== 'undefined') {
     const indexSq = indexSqElem.value;
     // expecting 2D index
@@ -63,21 +68,23 @@ export function getDimensionOrganization(dataElements) {
     let indexPointer;
     for (let i = 0; i < indexSq.length; ++i) {
       // Dimension Organization UID (required)
-      const indexOrg = indexSq[i]['00209164'].value[0];
+      const indexOrg = indexSq[i][TagKeys.DimensionOrganizationUID].value[0];
       if (indexOrg !== orgUID) {
         throw new Error(
           'Dimension Index Sequence contains a unknown Dimension Organization');
       }
       // Dimension Index Pointer (required)
-      indexPointer = indexSq[i]['00209165'].value[0];
+      indexPointer = indexSq[i][TagKeys.DimensionIndexPointer].value[0];
 
       const index = {
         DimensionOrganizationUID: indexOrg,
         DimensionIndexPointer: indexPointer
       };
       // Dimension Description Label (optional)
-      if (typeof indexSq[i]['00209421'] !== 'undefined') {
-        index.DimensionDescriptionLabel = indexSq[i]['00209421'].value[0];
+      const descriptionLabelEl =
+        indexSq[i][TagKeys.DimensionDescriptionLabel];
+      if (typeof descriptionLabelEl !== 'undefined') {
+        index.DimensionDescriptionLabel = descriptionLabelEl.value[0];
       }
       // store
       indices.push(index);
