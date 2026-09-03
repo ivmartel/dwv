@@ -172,7 +172,7 @@ export class DicomSegmentFrameInfo {
  * Get a frame information object from a dicom element.
  *
  * @param {Record<string, DataElement>} dataElements The dicom element.
- * @returns {DicomSegmentFrameInfo} A frame information object.
+ * @returns {DicomSegmentFrameInfo|undefined} A frame information object.
  */
 export function getSegmentFrameInfo(dataElements) {
   // Derivation Image Sequence
@@ -211,11 +211,13 @@ export function getSegmentFrameInfo(dataElements) {
   }
   // Frame Content Sequence (required, only one)
   if (typeof dataElements[TagKeys.FrameContentSequence] === 'undefined') {
-    throw new Error('Missing frame content sequence');
+    logger.info('Missing frame content sequence');
+    return;
   }
   const frameContentSq = dataElements[TagKeys.FrameContentSequence].value;
   if (frameContentSq.length === 0) {
-    throw new Error('Empty frame content sequence');
+    logger.info('Empty frame content sequence');
+    return;
   }
   // Dimension Index Value
   const dimIndex = frameContentSq[0][TagKeys.DimensionIndexValue].value;
@@ -230,11 +232,13 @@ export function getSegmentFrameInfo(dataElements) {
   }
   // Plane Position Sequence (required, only one)
   if (typeof dataElements[TagKeys.PlanePositionSequence] === 'undefined') {
-    throw new Error('Missing plane position sequence');
+    logger.info('Missing plane position sequence');
+    return;
   }
   const planePosSq = dataElements[TagKeys.PlanePositionSequence].value;
   if (planePosSq.length === 0) {
-    throw new Error('Empty plane position sequence');
+    logger.info('Empty plane position sequence');
+    return;
   }
   // Image Position (Patient) (conditionally required)
   const imagePosPat = planePosSq[0][TagKeys.ImagePosition].value;
