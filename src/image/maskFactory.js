@@ -24,11 +24,11 @@ import {
   getDicomSegmentItem,
 } from '../dicom/dicomSegment.js';
 import {
-  DicomSegmentFrameInfo,
-  getSegmentFrameInfosFromRoot,
-  getDicomSegmentFrameInfoItem,
+  DicomFunctionalGroup,
+  getPerFrameFunctionalGroups,
+  getDicomFunctionalGroupItem,
   getDimensionOrganization,
-} from '../dicom/dicomSegmentFrameInfo.js';
+} from '../dicom/dicomFunctionalGroup.js';
 import {getFramesGeometry} from '../dicom/dicomGeometry.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
 import {Image} from '../image/image.js';
@@ -349,9 +349,9 @@ export class MaskFactory {
     };
 
     // Per-frame Functional Groups Sequence
-    const frameInfos =
-      getSegmentFrameInfosFromRoot(dataElements, numberOfFrames);
-    if (typeof frameInfos === 'undefined') {
+    const funcGroups =
+      getPerFrameFunctionalGroups(dataElements, numberOfFrames);
+    if (typeof funcGroups === 'undefined') {
       throw new Error('Missing or empty per frame functional sequence');
     }
 
@@ -362,7 +362,7 @@ export class MaskFactory {
     }
     const geometry = getFramesGeometry(
       dataElements,
-      frameInfos,
+      funcGroups,
       refOrigins
     );
     geometry.sortOrigins();
@@ -380,9 +380,9 @@ export class MaskFactory {
 
     const maskOrigins = geometry.getOrigins();
     let sliceIndex;
-    for (let f = 0; f < frameInfos.length; ++f) {
+    for (let f = 0; f < funcGroups.length; ++f) {
       // get the slice index from the position in the mask origins array
-      const frameOrigin = point3DFromArray(frameInfos[f].imagePosPat);
+      const frameOrigin = point3DFromArray(funcGroups[f].imagePosPat);
       sliceIndex = findPointIndex(maskOrigins, frameOrigin);
       // should not be possible but just in case...
       if (sliceIndex === -1) {
@@ -390,7 +390,7 @@ export class MaskFactory {
       }
       // get the frame display value
       const frameSegment = segments.find(
-        getFindSegmentFunc(frameInfos[f].refSegmentNumber)
+        getFindSegmentFunc(funcGroups[f].refSegmentNumber)
       );
       const value = hasDisplayRGBValue
         ? frameSegment.number
@@ -435,7 +435,7 @@ export class MaskFactory {
     // custom
     meta.custom = {
       segments,
-      frameInfos,
+      frameInfos: funcGroups,
       SOPInstanceUID: safeGetLocal(TagKeys.SOPInstanceUID),
       referencedSeriesUID: getReferencedSeriesUID(dataElements)
     };
@@ -517,7 +517,7 @@ export class MaskFactory {
     // image buffer to multi frame
     const roiBuffers = image.getSegmentCollection().getSegmentBuffers(segments);
 
-    const frameInfos = [];
+    const funcGroups = [];
 
     // flatten buffer array
     const finalBuffers = [];
@@ -537,12 +537,7 @@ export class MaskFactory {
         // frame info
         const posPat = image.getGeometry().getOrigins()[key1];
         const posPatArray = [posPat.getX(), posPat.getY(), posPat.getZ()];
-        // const frameInfo = {
-        //   dimIndex: [number40, keys1.length - k1],
-        //   imagePosPat: posPatArray,
-        //   refSegmentNumber: number40
-        // };
-        const frameInfo = new DicomSegmentFrameInfo(
+        const funcGroup = new DicomFunctionalGroup(
           [number40, keys1.length - k1],
           posPatArray,
           undefined,
@@ -554,7 +549,7 @@ export class MaskFactory {
           const sourceIndex = sourceGeometry.worldToIndex(
             new Point([posPat.getX(), posPat.getY(), posPat.getZ()])
           );
-          frameInfo.derivationImages = [
+          funcGroup.derivationImages = [
             {
               sourceImages: [
                 {
@@ -574,19 +569,19 @@ export class MaskFactory {
               (sourceImage.getMeta()).SOPClassUID
           });
         }
-        frameInfos.push(frameInfo);
+        funcGroups.push(funcGroup);
       }
     }
 
     tags.NumberOfFrames = finalBuffers.length.toString();
 
-    // frame infos
-    const frameInfosTag = [];
-    for (const frameInfo of frameInfos) {
-      frameInfosTag.push(getDicomSegmentFrameInfoItem(frameInfo));
+    // frame functional groups
+    const funcGroupsTag = [];
+    for (const funcGroup of funcGroups) {
+      funcGroupsTag.push(getDicomFunctionalGroupItem(funcGroup));
     }
     tags.PerFrameFunctionalGroupsSequence = {
-      value: frameInfosTag
+      value: funcGroupsTag
     };
 
     // also store referenced SOPs in ReferencedSeriesSequence

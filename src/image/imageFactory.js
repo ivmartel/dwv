@@ -25,8 +25,8 @@ import {
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {logger} from '../utils/logger.js';
 import {
-  getSegmentFrameInfosFromRoot
-} from '../dicom/dicomSegmentFrameInfo.js';
+  getPerFrameFunctionalGroups
+} from '../dicom/dicomFunctionalGroup.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
@@ -329,15 +329,15 @@ export class ImageFactory {
     }
 
     let geometry;
-    // possible geometry from frame infos
-    const frameInfos =
-      getSegmentFrameInfosFromRoot(dataElements);
-    if (typeof frameInfos !== 'undefined') {
+    // possible geometry from frame functional groups
+    const funcGroups =
+      getPerFrameFunctionalGroups(dataElements);
+    if (typeof funcGroups !== 'undefined') {
       // check unique origins
       const frameOrigins = [];
       let uniqueOrigins = true;
-      for (const frameInfo of frameInfos) {
-        const frameOrigin = point3DFromArray(frameInfo.imagePosPat);
+      for (const funcGroup of funcGroups) {
+        const frameOrigin = point3DFromArray(funcGroup.imagePosPat);
         if (!includesPoint3D(frameOrigins, frameOrigin)) {
           frameOrigins.push(frameOrigin);
         } else {
@@ -345,11 +345,11 @@ export class ImageFactory {
           break;
         }
       }
-      // use frame info for geometry if unique pos pats,
+      // use functional group for geometry if unique pos pats,
       // revert to root geometry if not.
       if (uniqueOrigins) {
         logger.debug('Using frame infos for geometry');
-        geometry = getFramesGeometry(dataElements, frameInfos);
+        geometry = getFramesGeometry(dataElements, funcGroups);
         geometry.sortOrigins();
 
         // pixelBuffer is in per-frame (encoding) order, which can
@@ -372,7 +372,7 @@ export class ImageFactory {
           const size2D = getImage2DSize(dataElements);
           const sliceSize = size2D[0] * size2D[1] * samplesPerPixel;
           const sortedBuffer = pixelBuffer.slice();
-          for (let f = 0; f < frameInfos.length; ++f) {
+          for (let f = 0; f < funcGroups.length; ++f) {
             sortedBuffer.set(
               pixelBuffer.subarray(f * sliceSize, (f + 1) * sliceSize),
               sliceIndices[f] * sliceSize

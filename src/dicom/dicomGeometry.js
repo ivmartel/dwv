@@ -27,7 +27,7 @@ import {logger} from '../utils/logger.js';
 /**
  * @import {DataElement} from './dataElement.js';
  * @import {Matrix33} from '../math/matrix.js';
- * @import {DicomSegmentFrameInfo} from './dicomSegmentFrameInfo.js';
+ * @import {DicomFunctionalGroup} from './dicomFunctionalGroup.js';
  */
 
 /**
@@ -254,13 +254,17 @@ function createFrameGeometry(
  * Get the frames geometry from root DICOM elements and per-frame infos.
  *
  * @param {DataElements} dataElements The DICOM data elements.
- * @param {DicomSegmentFrameInfo[]} frameInfos The per-frame infos.
+ * @param {DicomFunctionalGroup[]} perFrameFuncGroups The per-frame
+ * functional groups.
  * @param {Point3D[]} [refOrigins] Reference origins used to complete
  *   gaps, if not present the code will calculate them.
  * @returns {Geometry} The geometry.
  * @throws {Error} Error for missing or wrong data.
  */
-export function getFramesGeometry(dataElements, frameInfos, refOrigins) {
+export function getFramesGeometry(
+  dataElements,
+  perFrameFuncGroups,
+  refOrigins) {
   // image size
   const size2D = getImage2DSize(dataElements);
   const size = new Size([size2D[0], size2D[1], 1]);
@@ -301,26 +305,28 @@ export function getFramesGeometry(dataElements, frameInfos, refOrigins) {
 
   // check frame infos
   const frameOrigins = [];
-  for (let ii = 0; ii < frameInfos.length; ++ii) {
+  for (let ii = 0; ii < perFrameFuncGroups.length; ++ii) {
     // populate frame origins
-    const frameOrigin = point3DFromArray(frameInfos[ii].imagePosPat);
+    const frameOrigin = point3DFromArray(perFrameFuncGroups[ii].imagePosPat);
     if (!includesPoint3D(frameOrigins, frameOrigin)) {
       frameOrigins.push(frameOrigin);
     }
     // store orientation if needed, avoid multi
-    if (typeof frameInfos[ii].imageOrientationPatient !== 'undefined') {
+    if (typeof perFrameFuncGroups[ii].imageOrientationPatient !== 'undefined') {
       if (typeof imageOrientationPatient === 'undefined') {
-        imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
+        imageOrientationPatient =
+          perFrameFuncGroups[ii].imageOrientationPatient;
       } else if (!arraySortEquals(
-        imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
+        imageOrientationPatient,
+        perFrameFuncGroups[ii].imageOrientationPatient)) {
         throw new Error('Unsupported multi orientation frames geometry.');
       }
     }
     // store spacing if needed, avoid multi
-    if (typeof frameInfos[ii].spacing !== 'undefined') {
+    if (typeof perFrameFuncGroups[ii].spacing !== 'undefined') {
       if (typeof spacing === 'undefined') {
-        spacing = frameInfos[ii].spacing;
-      } else if (!spacing.equals(frameInfos[ii].spacing)) {
+        spacing = perFrameFuncGroups[ii].spacing;
+      } else if (!spacing.equals(perFrameFuncGroups[ii].spacing)) {
         throw new Error('Unsupported multi resolution frames geometry.');
       }
     }

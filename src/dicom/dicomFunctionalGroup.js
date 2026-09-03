@@ -8,7 +8,7 @@ import {
 } from './dicomCode.js';
 import {
   safeGetAll
-} from '../dicom/dataElement.js';
+} from './dataElement.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
@@ -110,12 +110,13 @@ export function getDimensionOrganization(dataElements) {
 }
 
 /**
- * DICOM segment frame info: item of a
+ * DICOM functional group: item of a
+ *  SharedFunctionalGroupsSequence (5200,9229) or
  *  PerframeFunctionalGroupsSequence (5200,9230).
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.16.html}.
  */
-export class DicomSegmentFrameInfo {
+export class DicomFunctionalGroup {
   /**
    * The dimension index.
    *
@@ -169,12 +170,12 @@ export class DicomSegmentFrameInfo {
 }
 
 /**
- * Get a frame information object from a dicom element.
+ * Get a functional group object from a dicom element.
  *
  * @param {Record<string, DataElement>} dataElements The dicom element.
- * @returns {DicomSegmentFrameInfo|undefined} A frame information object.
+ * @returns {DicomFunctionalGroup|undefined} A functional group object.
  */
-export function getSegmentFrameInfo(dataElements) {
+export function getFunctionalGroup(dataElements) {
   // Derivation Image Sequence
   const derivationImages = [];
   if (typeof dataElements[TagKeys.DerivationImageSequence] !== 'undefined') {
@@ -245,7 +246,7 @@ export function getSegmentFrameInfo(dataElements) {
   for (let p = 0; p < imagePosPat.length; ++p) {
     imagePosPat[p] = parseFloat(imagePosPat[p]);
   }
-  const frameInfo = new DicomSegmentFrameInfo(
+  const funcGroup = new DicomFunctionalGroup(
     dimIndex,
     imagePosPat,
     derivationImages,
@@ -260,7 +261,7 @@ export function getSegmentFrameInfo(dataElements) {
       const frameImageOrientation =
         framePlaneOrientationSeq.value[0][TagKeys.ImageOrientation].value;
       if (typeof frameImageOrientation !== 'undefined') {
-        frameInfo.imageOrientationPatient = frameImageOrientation;
+        funcGroup.imageOrientationPatient = frameImageOrientation;
       }
     }
   }
@@ -272,7 +273,7 @@ export function getSegmentFrameInfo(dataElements) {
       const frameSpacing =
         getSpacingFromMeasure(framePixelMeasuresSeq.value[0]);
       if (typeof frameSpacing !== 'undefined') {
-        frameInfo.spacing = frameSpacing;
+        funcGroup.spacing = frameSpacing;
       }
     } else {
       logger.warn(
@@ -280,24 +281,25 @@ export function getSegmentFrameInfo(dataElements) {
     }
   }
 
-  return frameInfo;
+  return funcGroup;
 }
 
 /**
- * Get the list of DicomSegmentFrameInfo from the root list of data elements.
+ * Get the list of per frame DicomFunctionalGroup from the root list
+ * of data elements.
  *
  * @param {Record<string, DataElement>} dataElements The root dicom element.
  * @param {number} [numberOfFrames] Optional number of frames to compare
  *   with per frame sequence size.
- * @returns {DicomSegmentFrameInfo[]|undefined} The list of frame
+ * @returns {DicomFunctionalGroup[]|undefined} The list of frame
  *   information object.
  */
-export function getSegmentFrameInfosFromRoot(dataElements, numberOfFrames) {
+export function getPerFrameFunctionalGroups(dataElements, numberOfFrames) {
   // Per-frame Functional Groups Sequence
   const perFrameFuncGroupSequence =
     safeGetAll(dataElements, TagKeys.PerFrameFunctionalGroupsSequence);
 
-  let frameInfos;
+  let funcGroups;
   if (typeof perFrameFuncGroupSequence !== 'undefined') {
     // check size
     if (typeof numberOfFrames !== 'undefined' &&
@@ -306,41 +308,40 @@ export function getSegmentFrameInfosFromRoot(dataElements, numberOfFrames) {
         'perFrameFuncGroupSequence meta and numberOfFrames are not equal.');
     }
     // create frame info object from per frame func
-    frameInfos = [];
-    for (let j = 0; j < perFrameFuncGroupSequence.length; ++j) {
-      frameInfos.push(
-        getSegmentFrameInfo(perFrameFuncGroupSequence[j]));
+    funcGroups = [];
+    for (const item of perFrameFuncGroupSequence) {
+      funcGroups.push(getFunctionalGroup(item));
     }
   }
 
-  return frameInfos;
+  return funcGroups;
 }
 
 /**
- * Check if two frame info objects are equal.
+ * Check if two functional group objects are equal.
  *
- * @param {DicomSegmentFrameInfo} dsfi1 The first frame info.
- * @param {DicomSegmentFrameInfo} dsfi2 The second frame info.
- * @returns {boolean} True if both frame info are equal.
+ * @param {DicomFunctionalGroup} group1 The first frame info.
+ * @param {DicomFunctionalGroup} group2 The second frame info.
+ * @returns {boolean} True if both groups are equal.
  */
-export function isEqualSegmentFrameInfo(dsfi1, dsfi2) {
+export function isEqualFunctionalGroup(group1, group2) {
   // basics
-  if (typeof dsfi1 === 'undefined' ||
-    typeof dsfi2 === 'undefined' ||
-    dsfi1 === null ||
-    dsfi2 === null) {
+  if (typeof group1 === 'undefined' ||
+    typeof group2 === 'undefined' ||
+    group1 === null ||
+    group2 === null) {
     return false;
   }
   let isEqual =
-    arrayEquals(dsfi1.dimIndex, dsfi2.dimIndex) &&
-    arrayEquals(dsfi1.imagePosPat, dsfi2.imagePosPat) &&
-    dsfi1.refSegmentNumber === dsfi2.refSegmentNumber;
+    arrayEquals(group1.dimIndex, group2.dimIndex) &&
+    arrayEquals(group1.imagePosPat, group2.imagePosPat) &&
+    group1.refSegmentNumber === group2.refSegmentNumber;
 
   isEqual = isEqual &&
-    dsfi1.derivationImages.length === dsfi2.derivationImages.length;
-  for (let i = 0; i < dsfi1.derivationImages.length; ++i) {
-    const derivationImage1 = dsfi1.derivationImages[i];
-    const derivationImage2 = dsfi2.derivationImages[i];
+    group1.derivationImages.length === group2.derivationImages.length;
+  for (let i = 0; i < group1.derivationImages.length; ++i) {
+    const derivationImage1 = group1.derivationImages[i];
+    const derivationImage2 = group2.derivationImages[i];
     isEqual = isEqual &&
       derivationImage1.sourceImages.length ===
       derivationImage2.sourceImages.length;
@@ -359,37 +360,37 @@ export function isEqualSegmentFrameInfo(dsfi1, dsfi2) {
 }
 
 /**
- * Get a dicom item from a frame information object.
+ * Get a dicom item from a functional group object.
  *
- * @param {DicomSegmentFrameInfo} frameInfo The frame information object.
+ * @param {DicomFunctionalGroup} funcGroup The functional group object.
  * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
-export function getDicomSegmentFrameInfoItem(frameInfo) {
+export function getDicomFunctionalGroupItem(funcGroup) {
   const item = {
     FrameContentSequence: {
       value: [
         {
-          DimensionIndexValues: frameInfo.dimIndex
+          DimensionIndexValues: funcGroup.dimIndex
         }
       ]
     },
     PlanePositionSequence: {
       value: [
         {
-          ImagePositionPatient: frameInfo.imagePosPat
+          ImagePositionPatient: funcGroup.imagePosPat
         }
       ]
     },
     SegmentIdentificationSequence: {
       value: [
         {
-          ReferencedSegmentNumber: frameInfo.refSegmentNumber
+          ReferencedSegmentNumber: funcGroup.refSegmentNumber
         }
       ]
     }
   };
   // optional DerivationImageSequence
-  if (frameInfo.derivationImages !== undefined) {
+  if (funcGroup.derivationImages !== undefined) {
     const sourceImgPurposeOfReferenceCode =
       getDicomCodeItem(
         getDcmDicomCode(DcmCodes.SourceImageForImageProcessingOperation)
@@ -398,7 +399,7 @@ export function getDicomSegmentFrameInfoItem(frameInfo) {
       getDicomCodeItem(getDcmDicomCode(DcmCodes.Segmentation));
 
     const derivationImageItems = [];
-    for (const derivationImage of frameInfo.derivationImages) {
+    for (const derivationImage of funcGroup.derivationImages) {
       const sourceImages = [];
       for (const sourceImage of derivationImage.sourceImages) {
         sourceImages.push({
