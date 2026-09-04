@@ -206,64 +206,23 @@ function completeOriginsFromGeometry(
 }
 
 /**
- * Create a geometry from frame data.
- *
- * @param {Point3D[]} frameOrigins The frame origins.
- * @param {Size} size The size.
- * @param {Spacing} spacing The spacing.
- * @param {Matrix33} orientationMatrix The orientation.
- * @param {Point3D[]} [refOrigins] The reference image origins.
- * @returns {Geometry} The final geometry.
- */
-function createFrameGeometry(
-  frameOrigins,
-  size,
-  spacing,
-  orientationMatrix,
-  refOrigins) {
-
-  let resOrigins;
-  if (typeof refOrigins !== 'undefined') {
-    resOrigins = completeOriginsFromReference(
-      frameOrigins,
-      refOrigins
-    );
-  } else {
-    // tmp geometry with correct spacing but only one slice
-    const baseGeometry = new Geometry(
-      [frameOrigins[0]], size, spacing, orientationMatrix);
-
-    resOrigins = completeOriginsFromGeometry(
-      frameOrigins,
-      baseGeometry
-    );
-  }
-
-  // final geometry
-  const geometry = new Geometry(
-    [frameOrigins[0]], size, spacing, orientationMatrix);
-  // append origins
-  for (let m = 1; m < resOrigins.length; ++m) {
-    geometry.appendOrigin(resOrigins[m], m);
-  }
-
-  return geometry;
-}
-
-/**
  * Get the frames geometry from root DICOM elements and per-frame infos.
  *
  * @param {DataElements} dataElements The DICOM data elements.
  * @param {DicomFunctionalGroup[]} perFrameFuncGroups The per-frame
- * functional groups.
+ *   functional groups.
+ * @param {boolean} [completeOrigins] Flag to complete origins if gaps,
+ *   defaults to false.
  * @param {Point3D[]} [refOrigins] Reference origins used to complete
- *   gaps, if not present the code will calculate them.
+ *   gaps, if not present the code will calculate them if completeOrigins
+ *   is true.
  * @returns {Geometry} The geometry.
  * @throws {Error} Error for missing or wrong data.
  */
 export function getFramesGeometry(
   dataElements,
   perFrameFuncGroups,
+  completeOrigins,
   refOrigins) {
   // image size
   const size2D = getImage2DSize(dataElements);
@@ -351,6 +310,27 @@ export function getFramesGeometry(
       'Invalid imageOrientationPatient found for frames geometry');
   }
 
-  return createFrameGeometry(
-    frameOrigins, size, spacing, orientationMatrix, refOrigins);
+  let origins;
+  if (typeof completeOrigins === 'undefined' ||
+    completeOrigins === false) {
+    origins = frameOrigins;
+  } else if (typeof refOrigins !== 'undefined') {
+    origins = completeOriginsFromReference(frameOrigins, refOrigins);
+  } else {
+    // tmp geometry with correct spacing but only one slice
+    const baseGeometry = new Geometry(
+      [frameOrigins[0]], size, spacing, orientationMatrix);
+
+    origins = completeOriginsFromGeometry(frameOrigins, baseGeometry);
+  }
+
+  // final geometry
+  const geometry = new Geometry(
+    [origins[0]], size, spacing, orientationMatrix);
+  // append origins
+  for (let m = 1; m < origins.length; ++m) {
+    geometry.appendOrigin(origins[m], m);
+  }
+
+  return geometry;
 }

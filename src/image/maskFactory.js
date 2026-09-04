@@ -363,6 +363,7 @@ export class MaskFactory {
     const geometry = getFramesGeometry(
       dataElements,
       funcGroups,
+      true,
       refOrigins
     );
     geometry.sortOrigins();
