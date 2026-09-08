@@ -1,6 +1,9 @@
 import {Size} from '../image/size.js';
 import {Spacing} from '../image/spacing.js';
-import {Geometry} from '../image/geometry.js';
+import {
+  Geometry,
+  getSliceGeometrySpacing
+} from '../image/geometry.js';
 import {safeGet, safeGetAll} from './dataElement.js';
 import {
   getImage2DSize,
@@ -295,9 +298,6 @@ export function getFramesGeometry(
   if (typeof spacing === 'undefined') {
     throw new Error('No spacing found for frames geometry');
   }
-  if (spacing.length() !== 3) {
-    throw new Error('Incomplete spacing found for frames geometry');
-  }
   if (typeof imageOrientationPatient === 'undefined') {
     throw new Error('No imageOrientationPatient found for frames geometry');
   }
@@ -314,6 +314,13 @@ export function getFramesGeometry(
   if (typeof completeOrigins === 'undefined' ||
     completeOrigins === false) {
     origins = frameOrigins;
+    const geoSpacing = getSliceGeometrySpacing(origins);
+    if (spacing.length() === 2) {
+      spacing = new Spacing([spacing.get(0), spacing.get(1), geoSpacing]);
+    } else if (spacing.get(2) !== geoSpacing) {
+      logger.debug(`Different tag spacing from geo spacing: ${
+        spacing.get(2)} - ${geoSpacing}`);
+    }
   } else if (typeof refOrigins !== 'undefined') {
     origins = completeOriginsFromReference(frameOrigins, refOrigins);
   } else {
@@ -322,6 +329,10 @@ export function getFramesGeometry(
       [frameOrigins[0]], size, spacing, orientationMatrix);
 
     origins = completeOriginsFromGeometry(frameOrigins, baseGeometry);
+  }
+
+  if (spacing.length() !== 3) {
+    throw new Error('Incomplete spacing found for frames geometry');
   }
 
   // final geometry
