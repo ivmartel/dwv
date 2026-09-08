@@ -14,7 +14,12 @@ import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
-import syntheticData from '/tests/data/synthetic-data.json';
+import syntheticImgData from '/tests/data/synthetic-img.json';
+import syntheticSegData from '/tests/data/synthetic-seg.json';
+
+// test-img-00 (img) is used throughout as a reference image, alongside
+// the SEG entries under test.
+const syntheticData = [...syntheticImgData, ...syntheticSegData];
 
 /**
  * Tests for the 'image/maskFactory.js' file.
@@ -25,12 +30,12 @@ import syntheticData from '/tests/data/synthetic-data.json';
 // ---------------------------------------------------------------------------
 
 /**
- * Build a minimal reference Image matching test-00 geometry.
+ * Build a minimal reference Image matching test-img-00 geometry.
  *
  * @returns {Image} The reference image.
  */
 function buildRefImage() {
-  const config = syntheticData.find(c => c.name === 'test-00');
+  const config = syntheticData.find(c => c.name === 'test-img-00');
   const tags = config.tags;
   const geo = new Geometry(
     [new Point3D(0, 0, 0)],
@@ -109,12 +114,12 @@ describe('MaskFactory', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Non-overlapping squares — test-11
+  // Non-overlapping squares — test-seg-00
   // Square 1: col=4..10, row=4..10 | Square 2: col=12..18, row=12..18
   // -------------------------------------------------------------------------
 
   test('create: non-overlapping squares, no overlap flag', () => {
-    const config = syntheticData.find(c => c.name === 'test-11');
+    const config = syntheticData.find(c => c.name === 'test-seg-00');
     const factory = new MaskFactory();
     const image = factory.create(
       configToElements(config), buildPixelBuffer(config), buildRefImage()
@@ -126,16 +131,16 @@ describe('MaskFactory', () => {
     assert.equal(segments[0].label, 'Square1', 'segment 1 name');
     assert.equal(segments[1].label, 'Square2', 'segment 2 name');
     assert.equal(image.getHasOverlap(), false, 'no overlap detected');
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       image.getMaskReferencedSeriesUID(),
       refConfig.tags.SeriesInstanceUID,
-      'referencedSeriesUID matches test-00'
+      'referencedSeriesUID matches test-img-00'
     );
   });
 
   test('create: non-overlapping squares pixel values in label map', () => {
-    const config = syntheticData.find(c => c.name === 'test-11');
+    const config = syntheticData.find(c => c.name === 'test-seg-00');
     const factory = new MaskFactory();
     const image = factory.create(
       configToElements(config), buildPixelBuffer(config), buildRefImage()
@@ -152,7 +157,7 @@ describe('MaskFactory', () => {
   });
 
   test('create: non-overlapping squares segment collection', () => {
-    const config = syntheticData.find(c => c.name === 'test-11');
+    const config = syntheticData.find(c => c.name === 'test-seg-00');
     const factory = new MaskFactory();
     const image = factory.create(
       configToElements(config), buildPixelBuffer(config), buildRefImage()
@@ -180,7 +185,7 @@ describe('MaskFactory', () => {
   });
 
   test('toDicom: non-overlapping squares round-trip', () => {
-    const config = syntheticData.find(c => c.name === 'test-11');
+    const config = syntheticData.find(c => c.name === 'test-seg-00');
     const factory = new MaskFactory();
     const refImage = buildRefImage();
     const image = factory.create(
@@ -189,11 +194,11 @@ describe('MaskFactory', () => {
     const segments = image.getMeta().custom.segments;
     const outElements = factory.toDicom(image, segments, refImage);
 
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       getReferencedSeriesUID(outElements),
       refConfig.tags.SeriesInstanceUID,
-      'output referencedSeriesUID matches test-00'
+      'output referencedSeriesUID matches test-img-00'
     );
 
     const inSegs = getSegmentsFromElements(configToElements(config));
@@ -221,7 +226,7 @@ describe('MaskFactory', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Overlapping squares — test-12
+  // Overlapping squares — test-seg-01
   // Square 1: col=4..10, row=4..10 | Square 2: col=8..14, row=8..14
   // -------------------------------------------------------------------------
 
@@ -229,7 +234,7 @@ describe('MaskFactory', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
       .mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-seg-01');
     const factory = new MaskFactory();
     const image = factory.create(
       configToElements(config), buildPixelBuffer(config), buildRefImage()
@@ -248,11 +253,11 @@ describe('MaskFactory', () => {
     assert.equal(segments[0].label, 'Square1', 'segment 1 name');
     assert.equal(segments[1].label, 'Square2', 'segment 2 name');
     assert.equal(image.getHasOverlap(), true, 'overlap detected');
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       image.getMaskReferencedSeriesUID(),
       refConfig.tags.SeriesInstanceUID,
-      'referencedSeriesUID matches test-00'
+      'referencedSeriesUID matches test-img-00'
     );
   });
 
@@ -260,7 +265,7 @@ describe('MaskFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-seg-01');
     const factory = new MaskFactory();
     const image = factory.create(
       configToElements(config), buildPixelBuffer(config), buildRefImage()
@@ -280,7 +285,7 @@ describe('MaskFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-seg-01');
     const factory = new MaskFactory();
     const image = factory.create(
       configToElements(config), buildPixelBuffer(config), buildRefImage()
@@ -317,7 +322,7 @@ describe('MaskFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-12');
+    const config = syntheticData.find(c => c.name === 'test-seg-01');
     const factory = new MaskFactory();
     const refImage = buildRefImage();
     const image = factory.create(
@@ -326,11 +331,11 @@ describe('MaskFactory', () => {
     const segments = image.getMeta().custom.segments;
     const outElements = factory.toDicom(image, segments, refImage);
 
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       getReferencedSeriesUID(outElements),
       refConfig.tags.SeriesInstanceUID,
-      'output referencedSeriesUID matches test-00'
+      'output referencedSeriesUID matches test-img-00'
     );
 
     const inSegs = getSegmentsFromElements(configToElements(config));
@@ -364,7 +369,7 @@ describe('MaskFactory', () => {
 // ---------------------------------------------------------------------------
 
 /**
- * Build a minimal single-segment mask using the test-00 geometry.
+ * Build a minimal single-segment mask using the test-img-00 geometry.
  *
  * @param {number} segNumber The segment number.
  * @param {string} label The segment label.
@@ -373,7 +378,7 @@ describe('MaskFactory', () => {
  * @returns {Image} The mask image.
  */
 function buildSingleSegmentMask(segNumber, label, pixelStart, pixelCount) {
-  const config = syntheticData.find(c => c.name === 'test-00');
+  const config = syntheticData.find(c => c.name === 'test-img-00');
   const tags = config.tags;
   const geometry = new Geometry(
     [new Point3D(0, 0, 0)],
@@ -462,7 +467,7 @@ describe('mergeMaskImages', () => {
     () => {
       const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
         .mockImplementation(() => {});
-      const config = syntheticData.find(c => c.name === 'test-11');
+      const config = syntheticData.find(c => c.name === 'test-seg-00');
       const factory = new MaskFactory();
       const mask1 = factory.create(
         configToElements(config), buildPixelBuffer(config), buildRefImage()
@@ -505,7 +510,7 @@ describe('mergeMaskImages', () => {
 
   test('merge: brush mask (no #segments) as mask2 pixel data is preserved',
     () => {
-      const config = syntheticData.find(c => c.name === 'test-00');
+      const config = syntheticData.find(c => c.name === 'test-img-00');
       const tags = config.tags;
       const sliceSize = tags.Columns * tags.Rows;
       const brushBuf = new Uint8Array(sliceSize);
@@ -531,7 +536,7 @@ describe('mergeMaskImages', () => {
 
   test('merge: brush mask (no #segments) as mask1 pixel data is preserved',
     () => {
-      const config = syntheticData.find(c => c.name === 'test-00');
+      const config = syntheticData.find(c => c.name === 'test-img-00');
       const tags = config.tags;
       const sliceSize = tags.Columns * tags.Rows;
       const brushBuf = new Uint8Array(sliceSize);
@@ -556,7 +561,7 @@ describe('mergeMaskImages', () => {
 
   test('merge: mask2 local slice index is remapped to mask1 slice position',
     () => {
-      const config = syntheticData.find(c => c.name === 'test-00');
+      const config = syntheticData.find(c => c.name === 'test-img-00');
       const tags = config.tags;
       const sliceSize = tags.Columns * tags.Rows;
 
@@ -614,7 +619,7 @@ describe('mergeMaskImages', () => {
   test('merge: wider mask2 geometry is used as merged geometry, ' +
     'mask1 not clipped',
   () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const tags = config.tags;
     const sliceSize = tags.Columns * tags.Rows;
 
@@ -677,7 +682,7 @@ describe('mergeMaskImages', () => {
 
   test('merge: result geometry is the same regardless of input order',
     () => {
-      const config = syntheticData.find(c => c.name === 'test-00');
+      const config = syntheticData.find(c => c.name === 'test-img-00');
       const tags = config.tags;
       const sliceSize = tags.Columns * tags.Rows;
 

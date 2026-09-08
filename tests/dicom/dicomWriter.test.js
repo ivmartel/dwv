@@ -27,7 +27,18 @@ import {b64urlToArrayBuffer} from './utils.js';
 // test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm?inline';
 import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm?inline';
-import syntheticData from '/tests/data/synthetic-data.json';
+import syntheticImgData from '/tests/data/synthetic-img.json';
+import syntheticSegData from '/tests/data/synthetic-seg.json';
+import syntheticRtssData from '/tests/data/synthetic-rtss.json';
+import syntheticKosData from '/tests/data/synthetic-kos.json';
+
+// this suite iterates over all synthetic entries regardless of modality
+const syntheticData = [
+  ...syntheticImgData,
+  ...syntheticSegData,
+  ...syntheticRtssData,
+  ...syntheticKosData
+];
 
 /**
  * Tests for the 'dicom/dicomWriter.js' file.

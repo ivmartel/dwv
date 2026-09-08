@@ -14,7 +14,12 @@ import {
  */
 function setup() {
   // create lists
-  getFileConfigsHtmlList('synthetic-data');
+  getFileConfigsHtmlList([
+    'synthetic-img',
+    'synthetic-seg',
+    'synthetic-rtss',
+    'synthetic-kos'
+  ]);
 }
 
 /**
@@ -100,22 +105,40 @@ function getConfigsHtmlList(configs) {
 }
 
 /**
- * Get the list of configs and display them with a download link.
+ * Fetch a single JSON config file.
  *
- * @param {string} fileName The input file name.
+ * @param {string} fileName The input file name (without extension).
+ * @returns {Promise<Array>} The parsed configs.
  */
-function getFileConfigsHtmlList(fileName) {
+function fetchFileConfigs(fileName) {
   const url = `/tests/data/${fileName}.json`;
-  const request = new XMLHttpRequest();
-  request.open('GET', url, true);
-  request.onerror = function (event) {
-    console.error(event);
-  };
-  request.onload = function (/*event*/) {
-    const configs = JSON.parse(this.responseText);
-    displayConfigs(configs);
-  };
-  request.send(null);
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.onerror = function (event) {
+      reject(event);
+    };
+    request.onload = function (/*event*/) {
+      resolve(JSON.parse(this.responseText));
+    };
+    request.send(null);
+  });
+}
+
+/**
+ * Get the list of configs from several files and display them
+ * with a download link.
+ *
+ * @param {string[]} fileNames The input file names (without extension).
+ */
+function getFileConfigsHtmlList(fileNames) {
+  Promise.all(fileNames.map(fetchFileConfigs))
+    .then(function (configsPerFile) {
+      displayConfigs(configsPerFile.flat());
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
 }
 
 /**

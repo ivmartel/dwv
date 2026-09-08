@@ -8,7 +8,7 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 
-import syntheticData from '/tests/data/synthetic-data.json';
+import syntheticData from '/tests/data/synthetic-img.json';
 
 /**
  * Tests for the 'image/imageFactory.js' file.
@@ -51,12 +51,12 @@ function buildPixelBuffer(config) {
 describe('ImageFactory', () => {
 
   // -------------------------------------------------------------------------
-  // Simple MR test — test-00
+  // Simple MR test — test-img-00
   // 32×32, MONOCHROME2, PixelSpacing=[1,1], no rescale, no window presets
   // -------------------------------------------------------------------------
 
-  test('checkElements: valid test-00 returns no warning', () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+  test('checkElements: valid test-img-00 returns no warning', () => {
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const elements = configToElements(config);
     // add minimal pixel data element so checkElements passes
     elements['7FE00010'] = {value: buildPixelBuffer(config)};
@@ -67,8 +67,8 @@ describe('ImageFactory', () => {
     assert.equal(warning, undefined, 'no warning for valid MR data');
   });
 
-  test('create: geometry matches test-00 tags', () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+  test('create: geometry matches test-img-00 tags', () => {
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const tags = config.tags;
     const elements = configToElements(config);
     const buffer = buildPixelBuffer(config);
@@ -100,8 +100,8 @@ describe('ImageFactory', () => {
       geo.getSpacing().get(1), tags.PixelSpacing[1], 'spacing y matches');
   });
 
-  test('create: meta tags match test-00 tags', () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+  test('create: meta tags match test-img-00 tags', () => {
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const tags = config.tags;
     const elements = configToElements(config);
     const buffer = buildPixelBuffer(config);
@@ -132,7 +132,7 @@ describe('ImageFactory', () => {
   });
 
   test('create: length unit is mm when PixelSpacing is present', () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const elements = configToElements(config);
     const buffer = buildPixelBuffer(config);
 
@@ -144,7 +144,7 @@ describe('ImageFactory', () => {
 
   test('create: default RSI (slope=1, intercept=0) when no rescale tags',
     () => {
-      const config = syntheticData.find(c => c.name === 'test-00');
+      const config = syntheticData.find(c => c.name === 'test-img-00');
       const elements = configToElements(config);
       const buffer = buildPixelBuffer(config);
 
@@ -157,8 +157,8 @@ describe('ImageFactory', () => {
     }
   );
 
-  test('create: no window presets when no window tags in test-00', () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+  test('create: no window presets when no window tags in test-img-00', () => {
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const elements = configToElements(config);
     const buffer = buildPixelBuffer(config);
 
@@ -171,7 +171,7 @@ describe('ImageFactory', () => {
   });
 
   test('create: pixel buffer values are preserved', () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const elements = configToElements(config);
     const buffer = buildPixelBuffer(config);
 
@@ -188,7 +188,7 @@ describe('ImageFactory', () => {
   });
 
   test('create: SOPInstanceUID used as frame UID', () => {
-    const config = syntheticData.find(c => c.name === 'test-00');
+    const config = syntheticData.find(c => c.name === 'test-img-00');
     const tags = config.tags;
     const elements = configToElements(config);
     const buffer = buildPixelBuffer(config);

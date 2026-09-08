@@ -14,7 +14,12 @@ import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
-import syntheticData from '/tests/data/synthetic-data.json';
+import syntheticImgData from '/tests/data/synthetic-img.json';
+import syntheticRtssData from '/tests/data/synthetic-rtss.json';
+
+// test-img-00 (img) is used throughout as a reference image, alongside
+// the RTSTRUCT entries under test.
+const syntheticData = [...syntheticImgData, ...syntheticRtssData];
 
 /**
  * Tests for the 'image/rtStructFactory.js' file.
@@ -25,13 +30,13 @@ import syntheticData from '/tests/data/synthetic-data.json';
 // ---------------------------------------------------------------------------
 
 /**
- * Build a minimal reference Image matching test-00 geometry:
+ * Build a minimal reference Image matching test-img-00 geometry:
  * 32×32×1, unit spacing, identity orientation, origin at (0,0,0).
  *
  * @returns {Image} The reference image.
  */
 function buildRefImage() {
-  const config = syntheticData.find(c => c.name === 'test-00');
+  const config = syntheticData.find(c => c.name === 'test-img-00');
   const tags = config.tags;
   const geo = new Geometry(
     [new Point3D(0, 0, 0)],
@@ -65,12 +70,12 @@ describe('RtStructFactory', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Non-overlapping squares — test-13
+  // Non-overlapping squares — test-rtss-00
   // Square 1: col=4..10, row=4..10 | Square 2: col=12..18, row=12..18
   // -------------------------------------------------------------------------
 
   test('create: non-overlapping squares, no overlap flag', () => {
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-rtss-00');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -80,16 +85,16 @@ describe('RtStructFactory', () => {
     assert.equal(segments[0].label, 'Square1', 'segment 1 name');
     assert.equal(segments[1].label, 'Square2', 'segment 2 name');
     assert.equal(image.getHasOverlap(), false, 'no overlap detected');
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       image.getMaskReferencedSeriesUID(),
       refConfig.tags.SeriesInstanceUID,
-      'referencedSeriesUID matches test-00'
+      'referencedSeriesUID matches test-img-00'
     );
   });
 
   test('create: non-overlapping squares pixel values in label map', () => {
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-rtss-00');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -104,7 +109,7 @@ describe('RtStructFactory', () => {
   });
 
   test('create: non-overlapping squares segment collection', () => {
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-rtss-00');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -130,17 +135,17 @@ describe('RtStructFactory', () => {
   });
 
   test('toDicom: non-overlapping squares round-trip', () => {
-    const config = syntheticData.find(c => c.name === 'test-13');
+    const config = syntheticData.find(c => c.name === 'test-rtss-00');
     const factory = new RtStructFactory();
     const refImage = buildRefImage();
     const image = factory.create(configToElements(config), refImage);
     const outElements = factory.toDicom(image, undefined, refImage);
 
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       getReferencedSeriesUIDFromRTStruct(outElements),
       refConfig.tags.SeriesInstanceUID,
-      'output referencedSeriesUID matches test-00'
+      'output referencedSeriesUID matches test-img-00'
     );
 
     const inRois = getRTStructFromElements(configToElements(config));
@@ -169,7 +174,7 @@ describe('RtStructFactory', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Overlapping squares — test-14
+  // Overlapping squares — test-rtss-01
   // Square 1: col=4..10, row=4..10 | Square 2: col=8..14, row=8..14
   // -------------------------------------------------------------------------
 
@@ -177,7 +182,7 @@ describe('RtStructFactory', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
       .mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-14');
+    const config = syntheticData.find(c => c.name === 'test-rtss-01');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -194,11 +199,11 @@ describe('RtStructFactory', () => {
     assert.equal(segments[0].label, 'Square1', 'segment 1 name');
     assert.equal(segments[1].label, 'Square2', 'segment 2 name');
     assert.equal(image.getHasOverlap(), true, 'overlap detected');
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       image.getMaskReferencedSeriesUID(),
       refConfig.tags.SeriesInstanceUID,
-      'referencedSeriesUID matches test-00'
+      'referencedSeriesUID matches test-img-00'
     );
   });
 
@@ -206,7 +211,7 @@ describe('RtStructFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-14');
+    const config = syntheticData.find(c => c.name === 'test-rtss-01');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -224,7 +229,7 @@ describe('RtStructFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-14');
+    const config = syntheticData.find(c => c.name === 'test-rtss-01');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -259,17 +264,17 @@ describe('RtStructFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-14');
+    const config = syntheticData.find(c => c.name === 'test-rtss-01');
     const factory = new RtStructFactory();
     const refImage = buildRefImage();
     const image = factory.create(configToElements(config), refImage);
     const outElements = factory.toDicom(image, undefined, refImage);
 
-    const refConfig = syntheticData.find(c => c.name === 'test-00');
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
     assert.equal(
       getReferencedSeriesUIDFromRTStruct(outElements),
       refConfig.tags.SeriesInstanceUID,
-      'output referencedSeriesUID matches test-00'
+      'output referencedSeriesUID matches test-img-00'
     );
 
     const inRois = getRTStructFromElements(configToElements(config));
@@ -298,12 +303,12 @@ describe('RtStructFactory', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Square with a hole — test-15
+  // Square with a hole — test-rtss-02
   // Outer square: col=4..20, row=4..20 | Hole: col=10..14, row=10..14
   // -------------------------------------------------------------------------
 
   test('create: square with hole punches out the hole', () => {
-    const config = syntheticData.find(c => c.name === 'test-15');
+    const config = syntheticData.find(c => c.name === 'test-rtss-02');
     const factory = new RtStructFactory();
     const image = factory.create(configToElements(config), buildRefImage());
 
@@ -318,7 +323,7 @@ describe('RtStructFactory', () => {
   });
 
   test('toDicom: square with hole round-trip preserves the hole', () => {
-    const config = syntheticData.find(c => c.name === 'test-15');
+    const config = syntheticData.find(c => c.name === 'test-rtss-02');
     const factory = new RtStructFactory();
     const refImage = buildRefImage();
     const image = factory.create(configToElements(config), refImage);
@@ -348,7 +353,7 @@ describe('RtStructFactory', () => {
 
   test('create: accepts CLOSEDPLANAR_XOR contours and punches out the hole',
     () => {
-      const config = syntheticData.find(c => c.name === 'test-16');
+      const config = syntheticData.find(c => c.name === 'test-rtss-03');
       const factory = new RtStructFactory();
       const image = factory.create(configToElements(config), buildRefImage());
 
@@ -362,7 +367,7 @@ describe('RtStructFactory', () => {
   test(
     'create: keyhole-style single contour with bridge produces correct hole',
     () => {
-      const config = syntheticData.find(c => c.name === 'test-17');
+      const config = syntheticData.find(c => c.name === 'test-rtss-04');
       const factory = new RtStructFactory();
       const image = factory.create(configToElements(config), buildRefImage());
 
