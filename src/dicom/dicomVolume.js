@@ -338,29 +338,6 @@ function getTemporalPositionIndex(elements) {
 }
 
 /**
- * Get the volume id from a list of tags. Default
- * returns MR diffusion b-value.
- *
- * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {number|undefined} The id value if available.
- */
-export function getVolumeIdTagValue(elements) {
-  let res;
-
-  if (typeof custom.getVolumeIdTagValue !== 'undefined') {
-    res = custom.getVolumeIdTagValue(elements);
-  } else {
-    // MR (and enhanced MR) volume id
-    const volumeId = getMRVolumeIdTagValue(elements);
-    if (typeof volumeId !== 'undefined') {
-      res = volumeId;
-    }
-  }
-
-  return res;
-}
-
-/**
  * Create a getter that reads a numeric value from a single tag.
  *
  * @param {string} key The tag key.
@@ -379,6 +356,46 @@ function makeNumericTagGetter(key, parse) {
 }
 
 /**
+ * Get the TemporalPositionIdentifier tag value.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {number|undefined} The value, if present.
+ */
+const getTemporalPositionIdentifier = makeNumericTagGetter(
+  TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10));
+
+/**
+ * Get the volume id from a list of tags. Default
+ * returns MR diffusion b-value.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {number|undefined} The id value if available.
+ */
+export function getVolumeIdTagValue(elements) {
+  let res;
+
+  if (typeof custom.getVolumeIdTagValue !== 'undefined') {
+    res = custom.getVolumeIdTagValue(elements);
+  } else {
+    // classic multi-frame temporal position
+    res = getTemporalPositionIdentifier(elements);
+    // enhanced multi-frame temporal position
+    if (typeof res === 'undefined') {
+      res = getTemporalPositionIndex(elements);
+    }
+    // MR (and enhanced MR) volume id
+    if (typeof res === 'undefined') {
+      const volumeId = getMRVolumeIdTagValue(elements);
+      if (typeof volumeId !== 'undefined') {
+        res = volumeId;
+      }
+    }
+  }
+
+  return res;
+}
+
+/**
  * Ordered list of candidate post load volume id getters. Since the tag
  * that actually discriminates volumes is not known until the full data
  * is loaded, `DicomSliceDataList` tries these in order and keeps the
@@ -391,8 +408,7 @@ function makeNumericTagGetter(key, parse) {
 export const postLoadVolumeIdCandidates = [
   {
     name: 'TemporalPositionIdentifier',
-    getter: makeNumericTagGetter(
-      TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10))
+    getter: getTemporalPositionIdentifier
   },
   {
     name: 'TemporalPositionIndex',
