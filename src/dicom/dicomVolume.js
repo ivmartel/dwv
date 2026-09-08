@@ -31,6 +31,7 @@ const TagKeys = {
   FrameContentSequence: '00209111',
   DimensionIndexValues: '00209157',
   TemporalPositionIdentifier: '00200100',
+  TemporalPositionIndex: '00209128',
   EchoTime: '00180081',
   TriggerTime: '00181060',
   InversionTime: '00180082'
@@ -302,6 +303,41 @@ function getMRVolumeIdTagValue(elements) {
 }
 
 /**
+ * Get the tag time value for enhanced multi-frame images.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {number|undefined} The value, if present.
+ */
+function getTemporalPositionIndex(elements) {
+  let res;
+
+  const perFrameGroupSeq =
+    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+  if (typeof perFrameGroupSeq === 'undefined') {
+    return undefined;
+  }
+  for (const group of perFrameGroupSeq) {
+    const frameContentSeq = safeGetAll(group, TagKeys.FrameContentSequence);
+    if (typeof frameContentSeq === 'undefined') {
+      continue;
+    }
+    const tpi = safeGet(frameContentSeq[0], TagKeys.TemporalPositionIndex);
+    if (typeof tpi !== 'undefined') {
+      const index = parseInt(tpi, 10);
+      if (typeof res === 'undefined') {
+        res = index;
+      } else if (res !== index) {
+        // varying temporal position within one file: this file does not
+        // represent a single temporal position, candidate is not usable
+        logger.debug('Unhandled varying TemporalPositionIndex');
+        return undefined;
+      }
+    }
+  }
+  return res;
+}
+
+/**
  * Get the volume id from a list of tags. Default
  * returns MR diffusion b-value.
  *
@@ -357,6 +393,10 @@ export const postLoadVolumeIdCandidates = [
     name: 'TemporalPositionIdentifier',
     getter: makeNumericTagGetter(
       TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10))
+  },
+  {
+    name: 'TemporalPositionIndex',
+    getter: getTemporalPositionIndex
   },
   {
     name: 'DiffusionBValue',
