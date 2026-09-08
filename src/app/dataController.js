@@ -168,7 +168,7 @@ export class DicomData {
   }
 
   /**
-   * Append slice and update meta data.
+   * Append data and update meta data.
    *
    * @param {DicomData} data The data to append.
    */
@@ -177,11 +177,11 @@ export class DicomData {
     // if there was, then the image must be created when
     // the load finishes via a DicomSliceDataList.buildImage
     if (!this.#hasDuplicateOrigin) {
-      // append slice to current image
+      // append image to current image
       if (typeof this.image !== 'undefined' &&
         typeof data.image !== 'undefined'
       ) {
-        this.#appendSlice(data.image);
+        this.#appendImage(data.image);
       }
 
       this.#mergeMeta(data.meta);
@@ -189,14 +189,24 @@ export class DicomData {
   }
 
   /**
-   * Append a slice image to this image.
+   * Append an image to this image.
    *
    * @param {Image} image The image to append.
    */
-  #appendSlice(image) {
+  #appendImage(image) {
+    const geom1 = image.getGeometry();
+
+    // a multi-slice image is a whole new time point (for example one
+    // complete multi-frame 3D dataset per time point): repeated Z
+    // origins across such images are expected, not a duplicate-origin
+    // conflict, so go straight to appendImage.
+    if (geom1.getSize().get(2) > 1) {
+      this.image.appendVolume(image);
+      return;
+    }
+
     // check if append is possible
     const geom0 = this.image.getGeometry();
-    const geom1 = image.getGeometry();
     const canAppend = geom0.canAppendOrigin(
       geom1.getOrigin(), geom1.getInitialTime());
 

@@ -323,6 +323,90 @@ describe('image', () => {
   });
 
   /**
+   * Tests for {@link Image#appendVolume}.
+   *
+   * @function module:tests/image~imageAppendVolume
+   */
+  test('Image appendVolume', () => {
+    const size = 2;
+    const volSize = new Size([size, size, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origin0 = new Point3D(0, 0, 0);
+    const origin1 = new Point3D(0, 0, 1);
+
+    /**
+     * Create a 2-slice volume Image filled with a constant value,
+     * optionally tagged with an initial (tag-derived) time.
+     *
+     * @param {number} value The constant fill value.
+     * @param {number} [time] Optional initial time.
+     * @param {number} [nSlices] Optional number of slices (defaults to 2).
+     * @returns {Image} The created image.
+     */
+    function makeVolumeImage(value, time, nSlices) {
+      nSlices = typeof nSlices === 'undefined' ? 2 : nSlices;
+      const geometry = new Geometry(
+        [origin0], volSize, spacing, undefined, time);
+      if (nSlices > 1) {
+        geometry.appendOrigin(origin1, 1, time);
+      }
+      const totalSize = size * size * nSlices;
+      const buffer = new Int16Array(totalSize);
+      buffer.fill(value);
+      const image = new Image(geometry, buffer, [`uid${value}`]);
+      image.setMeta({numberOfFiles: 3});
+      return image;
+    }
+
+    // base image: an untagged (no time) 2-slice volume
+    const baseImage = makeVolumeImage(0);
+
+    // missing time value on rhs throws
+    const noTimeImage = makeVolumeImage(9);
+    assert.throws(
+      () => baseImage.appendVolume(noTimeImage),
+      /Missing time value/);
+
+    // mismatched slice count throws
+    const badImage = makeVolumeImage(9, 3, 1);
+    assert.throws(
+      () => baseImage.appendVolume(badImage),
+      /different number of slices/);
+
+    // append time 2 first (out of temporal order arrival): only times
+    // {0, 2} exist so far, so time 2 is at rank 1 (not raw value 2) in
+    // the 4th (time) dimension until time 1 is also inserted below
+    const vol2 = makeVolumeImage(2, 2);
+    baseImage.appendVolume(vol2);
+    assert.equal(
+      baseImage.getGeometry().getSize().get(3), 2, 'time dimension is 2');
+    assert.equal(baseImage.getValue(0, 0, 0, 0), 0, 'time0 slice0');
+    assert.equal(baseImage.getValue(0, 0, 1, 0), 0, 'time0 slice1');
+    assert.equal(baseImage.getValue(0, 0, 0, 1), 2, 'time2 slice0 (rank 1)');
+    assert.equal(baseImage.getValue(0, 0, 1, 1), 2, 'time2 slice1 (rank 1)');
+
+    // append time 1: must land between time 0 and time 2
+    const vol1 = makeVolumeImage(1, 1);
+    baseImage.appendVolume(vol1);
+    assert.equal(
+      baseImage.getGeometry().getSize().get(3), 3, 'time dimension is 3');
+    assert.equal(baseImage.getValue(0, 0, 0, 0), 0, 'time0 slice0 (after)');
+    assert.equal(baseImage.getValue(0, 0, 1, 0), 0, 'time0 slice1 (after)');
+    assert.equal(baseImage.getValue(0, 0, 0, 1), 1, 'time1 slice0');
+    assert.equal(baseImage.getValue(0, 0, 1, 1), 1, 'time1 slice1');
+    assert.equal(baseImage.getValue(0, 0, 0, 2), 2, 'time2 slice0 (after)');
+    assert.equal(baseImage.getValue(0, 0, 1, 2), 2, 'time2 slice1 (after)');
+    assert.equal(
+      baseImage.getImageUid(new Index([0, 0, 0, 1])), 'uid1',
+      'imageUid at time1 slice0');
+
+    // duplicate time throws
+    assert.throws(
+      () => baseImage.appendVolume(vol1),
+      /already exists/);
+  });
+
+  /**
    * Tests for {@link Image} append slice window presets merge.
    *
    * @function module:tests/image~imageAppendSliceWindowPresets

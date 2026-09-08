@@ -39,6 +39,34 @@ function makeDataElement(vr, value) {
 }
 
 /**
+ * Create a 2-slice volume DicomData tagged with a given initial
+ * (tag-derived) time, for testing Image#appendImage via
+ * DicomData#appendData.
+ *
+ * @param {number} time The initial time.
+ * @param {string} uid The image uid.
+ * @param {number} value The constant fill value.
+ * @returns {DicomData} The volume data.
+ */
+function makeVolumeData(time, uid, value) {
+  const size = new Size([2, 2, 1]);
+  const spacing = new Spacing([1, 1, 1]);
+  const origin0 = new Point3D(0, 0, 0);
+  const origin1 = new Point3D(0, 0, 1);
+  const geometry = new Geometry([origin0], size, spacing, undefined, time);
+  geometry.appendOrigin(origin1, 1, time);
+  const buffer = new Int16Array(2 * 2 * 2);
+  buffer.fill(value);
+  const image = new Image(geometry, buffer, [uid]);
+  image.setMeta({numberOfFiles: 2});
+  const data = new DicomData({
+    imageUid: makeDataElement('UI', [uid])
+  });
+  data.image = image;
+  return data;
+}
+
+/**
  * Create a single slice DicomData at a given z origin with the
  * given meta tags.
  *
@@ -117,6 +145,38 @@ describe('app', () => {
     dc0.reset();
     assert.deepEqual(dc0.getDataIds(), [], 'dataIds after reset');
   });
+
+  /**
+   * Tests for {@link DicomData#appendData} appending a whole
+   * multi-slice image as a new time point (via Image#appendImage).
+   *
+   * @function module:tests/app~dicomDataAppendDataImage
+   */
+  test('DicomData appendData appends a multi-slice image as a time point',
+    () => {
+      const data0 = makeVolumeData(0, 'uid0', 0);
+      const dicomData = new DicomData(data0.meta);
+      dicomData.image = data0.image;
+
+      // same z origins as data0: expected for a second time point,
+      // not a duplicate-origin conflict
+      const data1 = makeVolumeData(1, 'uid1', 1);
+      dicomData.appendData(data1);
+
+      assert.equal(dicomData.hasDuplicateOrigin(), false,
+        'no duplicate origin flagged for multi-slice append');
+      assert.equal(
+        dicomData.image.getGeometry().getSize().get(3), 2,
+        'time dimension is 2');
+      assert.equal(
+        dicomData.image.getValue(0, 0, 0, 0), 0, 'time0 slice0');
+      assert.equal(
+        dicomData.image.getValue(0, 0, 1, 0), 0, 'time0 slice1');
+      assert.equal(
+        dicomData.image.getValue(0, 0, 0, 1), 1, 'time1 slice0');
+      assert.equal(
+        dicomData.image.getValue(0, 0, 1, 1), 1, 'time1 slice1');
+    });
 
   /**
    * Tests for {@link DicomSliceDataList#buildData}.

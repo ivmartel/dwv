@@ -385,7 +385,7 @@ export class Geometry {
    * @returns {BooleanResult} Result with success set to true if
    *   the geometry is compatible.
    */
-  canAppend(rhs) {
+  canAppendSlice(rhs) {
     // check size
     const rhsSize = rhs.getSize();
     if (rhsSize.get(2) !== 1) {
@@ -420,6 +420,54 @@ export class Geometry {
       this.canAppendOrigin(rhs.getOrigin(), rhs.getInitialTime());
     if (!canAppendOrigin.success) {
       return canAppendOrigin;
+    }
+
+    return new BooleanResult(true);
+  }
+
+  /**
+   * Check if another geometry (describing a whole volume, not just
+   * one slice) can be appended to this one as a new time point.
+   *
+   * @param {Geometry} rhs The geometry to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the geometry is compatible.
+   */
+  canAppendVolume(rhs) {
+    if (typeof rhs.getInitialTime() === 'undefined') {
+      return {
+        success: false,
+        message: 'Missing time value for image append'
+      };
+    }
+
+    const size = this.getSize();
+    const rhsSize = rhs.getSize();
+    if (size.get(0) !== rhsSize.get(0)) {
+      return {
+        success: false,
+        message: 'Cannot append an image with different number of columns'
+      };
+    }
+    if (size.get(1) !== rhsSize.get(1)) {
+      return {
+        success: false,
+        message: 'Cannot append an image with different number of rows'
+      };
+    }
+    if (size.get(2) !== rhsSize.get(2)) {
+      return {
+        success: false,
+        message: 'Cannot append an image with different number of slices'
+      };
+    }
+    // check orientation
+    if (!this.getOrientation().isSimilar(
+      rhs.getOrientation(), DIRECTION_EPSILON)) {
+      return {
+        success: false,
+        message: 'Cannot append an image with different orientation'
+      };
     }
 
     return new BooleanResult(true);
@@ -498,6 +546,40 @@ export class Geometry {
   appendFrame(origin, time) {
     // add origin to list
     this.#timeOrigins[time] = [origin];
+    // increment third dimension
+    const sizeValues = this.#size.getValues();
+    const spacingValues = this.#spacing.getValues();
+    if (sizeValues.length === 4) {
+      sizeValues[3] += 1;
+    } else {
+      sizeValues.push(2);
+      spacingValues.push(1);
+    }
+    this.#size = new Size(sizeValues);
+    this.#spacing = new Spacing(spacingValues);
+  }
+
+  /**
+   * Append a whole volume (one full set of slice origins) to the
+   * geometry as a new time point. Unlike `appendFrame`, which only
+   * stores a single origin per new time, this stores all of them
+   * (for example when merging several complete multi-frame 3D
+   * datasets into one 4D volume, one dataset per time point).
+   *
+   * @param {Point3D[]} origins The origins of the volume, one per slice.
+   * @param {number} time The time index for this volume.
+   */
+  appendVolume(origins, time) {
+    if (this.hasSlicesAtTime(time)) {
+      throw new Error(`Cannot append volume, time ${time} already exists`);
+    }
+    if (origins.length !== this.getSize().get(2)) {
+      throw new Error(
+        `Cannot append a volume with a different number of slices: ${
+          origins.length} != ${this.getSize().get(2)}`);
+    }
+    // add origins to list
+    this.#timeOrigins[time] = origins.slice();
     // increment third dimension
     const sizeValues = this.#size.getValues();
     const spacingValues = this.#spacing.getValues();

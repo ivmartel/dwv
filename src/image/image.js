@@ -942,7 +942,7 @@ export class Image extends EventTarget {
    * @returns {BooleanResult} Result with success set to true if
    *   the image can be appended.
    */
-  canAppend(rhs) {
+  canAppendSlice(rhs) {
     // check input
     if (rhs === null) {
       return {
@@ -952,11 +952,24 @@ export class Image extends EventTarget {
     }
 
     // check geometry
-    const geoCanAppend = this.#geometry.canAppend(rhs.getGeometry());
+    const geoCanAppend = this.#geometry.canAppendSlice(rhs.getGeometry());
     if (!geoCanAppend.success) {
       return geoCanAppend;
     }
 
+    return this.#checkMetaEquality(rhs);
+  }
+
+  /**
+   * Check photometric interpretation and meta data equality against
+   * a candidate slice or image to append. Shared by `canAppendSlice`
+   * and `canAppendImage`.
+   *
+   * @param {Image} rhs The image to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the meta data is compatible.
+   */
+  #checkMetaEquality(rhs) {
     if (this.#photometricInterpretation !==
       rhs.getPhotometricInterpretation()) {
       return {
@@ -993,6 +1006,32 @@ export class Image extends EventTarget {
   }
 
   /**
+   * Check if another (complete, possibly multi-slice) image can be
+   * appended to this one as a new time point.
+   *
+   * @param {Image} rhs The image to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the image can be appended.
+   */
+  canAppendVolume(rhs) {
+    // check input
+    if (rhs === null) {
+      return {
+        success: false,
+        message: 'Cannot append null volume'
+      };
+    }
+
+    // check geometry
+    const geoCanAppend = this.#geometry.canAppendVolume(rhs.getGeometry());
+    if (!geoCanAppend.success) {
+      return geoCanAppend;
+    }
+
+    return this.#checkMetaEquality(rhs);
+  }
+
+  /**
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
@@ -1000,7 +1039,7 @@ export class Image extends EventTarget {
    */
   appendSlice(rhs) {
     // check if possible
-    const canAppend = this.canAppend(rhs);
+    const canAppend = this.canAppendSlice(rhs);
     if (!canAppend.success) {
       throw new Error(canAppend.message);
     }
@@ -1135,6 +1174,172 @@ export class Image extends EventTarget {
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
               fullSliceIndex, 0, rhsPreset.wl[0]);
+          }
+        } else {
+          // if not defined (it should be), store all
+          windowPresets[pkey] = rhsPresets[pkey];
+        }
+      }
+    }
+    /**
+     * Image geometry change event.
+     *
+     * @event Image#imagegeometrychange
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     */
+    this.dispatchEvent(new CustomEvent('imagegeometrychange'));
+  }
+
+  /**
+   * Append a whole compatible image as a new time point (for example
+   * merging several complete multi-frame 3D datasets into one 4D
+   * volume, one dataset per time point). The time point is taken from
+   * `rhs`'s geometry (`getInitialTime()`, typically tag-derived, for
+   * example from TemporalPositionIndex) and can be out of arrival
+   * order; unlike `appendSlice`, `rhs` here is a whole volume (more
+   * than one slice), not a single 2D slice.
+   *
+   * @param {Image} rhs The image to append.
+   * @fires Image#imagegeometrychange
+   */
+  appendVolume(rhs) {
+    // check if possible
+    const canAppendVolume = this.canAppendVolume(rhs);
+    if (!canAppendVolume.success) {
+      throw new Error(canAppendVolume.message);
+    }
+
+    // update ranges
+    const rhsRange = rhs.getDataRange();
+    const range = this.getDataRange();
+    this.#dataRange = {
+      min: Math.min(rhsRange.min, range.min),
+      max: Math.max(rhsRange.max, range.max),
+    };
+    const rhsResRange = rhs.getRescaledDataRange();
+    const resRange = this.getRescaledDataRange();
+    this.#rescaledDataRange = {
+      min: Math.min(rhsResRange.min, resRange.min),
+      max: Math.max(rhsResRange.max, resRange.max),
+    };
+
+    const time = rhs.getGeometry().getInitialTime();
+
+    // bootstrap time bookkeeping: the base image itself must occupy
+    // a proper time slot before a second time point can be added
+    if (typeof this.#geometry.getCurrentNumberOfSlicesBeforeTime(time) ===
+      'undefined') {
+      const baseTime = this.#geometry.getInitialTime();
+      this.#geometry.setInitialTime(
+        typeof baseTime !== 'undefined' ? baseTime : 0);
+    }
+
+    // total number of slices before this volume is registered
+    const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
+
+    // update geometry
+    const rhsOrigins = rhs.getGeometry().getOrigins();
+    const numberOfNewSlices = rhsOrigins.length;
+    this.#geometry.appendVolume(rhsOrigins, time);
+
+    const size = this.#geometry.getSize();
+    const sliceSize = this.#numberOfComponents * size.getDimSize(2);
+    // one whole volume (all its slices), since numberOfFiles counts
+    // timepoints/files here, not individual 2D slices
+    const volumeSize = this.#numberOfComponents * size.getDimSize(3);
+
+    // create full buffer if not done yet
+    if (typeof this.#meta.numberOfFiles === 'undefined') {
+      throw new Error('Missing number of files for buffer manipulation.');
+    }
+    const fullBufferSize = volumeSize * this.#meta.numberOfFiles;
+    if (this.#buffer.length !== fullBufferSize) {
+      this.#realloc(fullBufferSize);
+
+      if (this.#contour.isInitialized()) {
+        this.#contour.realloc(
+          /** @type {Uint8Array} */ (this.#buffer),
+          this.#geometry.getSize()
+        );
+      }
+    }
+
+    // linear index of this volume's first slice
+    const numberOfSlicesBeforeTime =
+      this.#geometry.getCurrentNumberOfSlicesBeforeTime(time);
+    const indexOffset = numberOfSlicesBeforeTime * sliceSize;
+    const insertSize = numberOfNewSlices * sliceSize;
+    const maxOffset = totalSlices * sliceSize;
+    // move content if needed
+    if (indexOffset < maxOffset) {
+      this.#buffer.set(
+        this.#buffer.subarray(indexOffset, maxOffset),
+        indexOffset + insertSize
+      );
+
+      if (this.#contour.isInitialized()) {
+        const contourSliceSize = size.getDimSize(2) * 3;
+        const contourIndexOffset =
+          numberOfSlicesBeforeTime * contourSliceSize;
+        const contourMaxOffset = totalSlices * contourSliceSize;
+        this.#contour.shiftSlice(
+          contourIndexOffset,
+          contourSliceSize * numberOfNewSlices,
+          contourMaxOffset
+        );
+      }
+    }
+    // add new volume content (rhs buffer is one contiguous block)
+    this.#buffer.set(rhs.getBuffer(), indexOffset);
+
+    // update rsi
+    // (rhs should just have one rsi, applied to all its slices)
+    for (let s = 0; s < numberOfNewSlices; ++s) {
+      this.setRescaleSlopeAndIntercept(
+        rhs.getRescaleSlopeAndIntercept(), numberOfSlicesBeforeTime + s);
+    }
+
+    // current number of images
+    const numberOfImages = this.#imageUids.length;
+
+    // insert sop instance UIDs (same uid for every slice of rhs)
+    for (let s = 0; s < numberOfNewSlices; ++s) {
+      this.#imageUids.splice(
+        numberOfSlicesBeforeTime + s, 0, rhs.getImageUid());
+    }
+
+    // update window presets
+    if (typeof this.#meta.windowPresets !== 'undefined') {
+      const windowPresets = this.#meta.windowPresets;
+      const rhsPresets = rhs.getMeta().windowPresets;
+      const keys = Object.keys(rhsPresets);
+      let pkey;
+      for (let i = 0; i < keys.length; ++i) {
+        pkey = keys[i];
+        const rhsPreset = rhsPresets[pkey];
+        const windowPreset = windowPresets[pkey];
+        if (typeof windowPreset !== 'undefined') {
+          // if not set or false, check perslice
+          if (typeof windowPreset.perslice === 'undefined' ||
+            windowPreset.perslice === false) {
+            // if different preset.wl, mark it as perslice
+            if (!equalWl(windowPreset.wl[0], rhsPreset.wl[0])) {
+              windowPreset.perslice = true;
+              // fill wl array with copy of wl[0]
+              // (loop on number of images minus the existing one)
+              for (let j = 0; j < numberOfImages - 1; ++j) {
+                windowPreset.wl.push(windowPreset.wl[0]);
+              }
+            }
+          }
+          // store (first) rhs preset.wl if needed, once per new slice
+          if (typeof windowPreset.perslice !== 'undefined' &&
+            windowPreset.perslice === true) {
+            for (let s = 0; s < numberOfNewSlices; ++s) {
+              windowPresets[pkey].wl.splice(
+                numberOfSlicesBeforeTime + s, 0, rhsPreset.wl[0]);
+            }
           }
         } else {
           // if not defined (it should be), store all
