@@ -343,5 +343,13 @@ export function getFramesGeometry(
     geometry.appendOrigin(origins[m], m);
   }
 
+  // stamp a tag-derived time (for example TemporalPositionIndex), so a
+  // whole multi-frame file can later be appended as one timepoint
+  // (see Image.appendVolume)
+  const time = getVolumeIdTagValue(dataElements);
+  if (typeof time !== 'undefined') {
+    geometry.setInitialTime(time);
+  }
+
   return geometry;
 }
