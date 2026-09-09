@@ -170,10 +170,10 @@ function displayConfigs(configs) {
     content.append(title);
 
     for (const config of configs) {
-      // name in json is 'test-##', replace test
+      // name in json is 'test-img-##', replace test
       //   with the short string of the group
       config.name = dataGroup.short +
-        config.name.substring(config.name.length - 3);
+        config.name.substring(4);
       // set transfer syntax
       config.tags.TransferSyntaxUID = dataGroup.syntax;
     }
