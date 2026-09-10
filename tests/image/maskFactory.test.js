@@ -5,6 +5,7 @@ import {
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGetAll} from '../../src/dicom/dataElement.js';
+import {ImageFactory} from '../../src/image/imageFactory.js';
 import {MaskFactory, mergeMaskImages} from '../../src/image/maskFactory.js';
 import {Image} from '../../src/image/image.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
@@ -13,6 +14,8 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
+
+import {generateDicomElements} from '../../dev/dicom/dicomGenerator.js';
 
 import syntheticImgData from '/tests/data/synthetic-img.json';
 import syntheticSegData from '/tests/data/synthetic-seg.json';
@@ -30,29 +33,6 @@ const syntheticData = [...syntheticImgData, ...syntheticSegData];
 // ---------------------------------------------------------------------------
 
 /**
- * Build a minimal reference Image matching test-img-00 geometry.
- *
- * @returns {Image} The reference image.
- */
-function buildRefImage() {
-  const config = syntheticData.find(c => c.name === 'test-img-00');
-  const tags = config.tags;
-  const geo = new Geometry(
-    [new Point3D(0, 0, 0)],
-    new Size([tags.Columns, tags.Rows, 1]),
-    new Spacing([1, 1, 1])
-  );
-  const buffer = new Uint16Array(tags.Columns * tags.Rows);
-  const image = new Image(geo, buffer, [tags.SOPInstanceUID]);
-  image.setMeta({
-    SeriesInstanceUID: tags.SeriesInstanceUID,
-    StudyInstanceUID: tags.StudyInstanceUID,
-    SOPClassUID: tags.SOPClassUID
-  });
-  return image;
-}
-
-/**
  * Parse synthetic SEG config tags into DICOM data elements.
  *
  * @param {object} config A synthetic-data entry.
@@ -63,33 +43,36 @@ function configToElements(config) {
 }
 
 /**
- * Build a binary pixel buffer encoding the per-segment squares
- * defined in config.segmentSquares.
+ * Build a minimal reference Image matching test-img-00 geometry.
  *
- * @param {object} config A synthetic-data SEG entry with segmentSquares.
- * @returns {Uint8Array} Flat pixel buffer (rows × cols × nFrames).
+ * @returns {Image} The reference image.
  */
-function buildPixelBuffer(config) {
+function buildRefImage() {
+  const config = syntheticData.find(c => c.name === 'test-img-00');
   const tags = config.tags;
-  const width = tags.Columns;
-  const height = tags.Rows;
-  const nFrames = tags.NumberOfFrames;
-  const buffer = new Uint8Array(width * height * nFrames);
-  const perFrameSeq = tags.PerFrameFunctionalGroupsSequence.value;
-  for (let f = 0; f < nFrames; ++f) {
-    const segNum =
-      perFrameSeq[f].SegmentIdentificationSequence.value[0]
-        .ReferencedSegmentNumber;
-    const sq = config.segmentSquares[String(segNum)];
-    if (sq) {
-      for (let j = sq.minJ; j < sq.maxJ; ++j) {
-        for (let i = sq.minI; i < sq.maxI; ++i) {
-          buffer[f * width * height + j * width + i] = 1;
-        }
-      }
-    }
-  }
-  return buffer;
+  tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+  const genOptions = {pixelGeneratorName: 'gradSquare'};
+  const elements = generateDicomElements(tags, genOptions);
+  const buffer = elements['7FE00010'].value;
+  const factory = new ImageFactory();
+  return factory.create(elements, buffer, 1);
+}
+
+/**
+ * Build a mask Image matching test-img-00 geometry.
+ *
+ * @param {string} configName The config name.
+ * @returns {Image} The reference image.
+ */
+function buildMaskImage(configName) {
+  const config = syntheticData.find(c => c.name === configName);
+  const tags = structuredClone(config.tags);
+  tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+  const genOptions = {segmentSquares: config.segmentSquares};
+  const elements = generateDicomElements(tags, genOptions);
+  const buffer = elements['7FE00010'].value;
+  const factory = new MaskFactory();
+  return factory.create(elements, buffer, buildRefImage());
 }
 
 /**
@@ -119,11 +102,7 @@ describe('MaskFactory', () => {
   // -------------------------------------------------------------------------
 
   test('create: non-overlapping squares, no overlap flag', () => {
-    const config = syntheticData.find(c => c.name === 'test-seg-00');
-    const factory = new MaskFactory();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), buildRefImage()
-    );
+    const image = buildMaskImage('test-seg-00');
 
     const meta = image.getMeta();
     const segments = meta.custom.segments;
@@ -140,11 +119,7 @@ describe('MaskFactory', () => {
   });
 
   test('create: non-overlapping squares pixel values in label map', () => {
-    const config = syntheticData.find(c => c.name === 'test-seg-00');
-    const factory = new MaskFactory();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), buildRefImage()
-    );
+    const image = buildMaskImage('test-seg-00');
 
     const buf = image.getBuffer();
     const width = 32;
@@ -157,11 +132,7 @@ describe('MaskFactory', () => {
   });
 
   test('create: non-overlapping squares segment collection', () => {
-    const config = syntheticData.find(c => c.name === 'test-seg-00');
-    const factory = new MaskFactory();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), buildRefImage()
-    );
+    const image = buildMaskImage('test-seg-00');
 
     const collection = image.getSegmentCollection();
     assert.ok(collection !== undefined, 'segment collection exists');
@@ -186,11 +157,10 @@ describe('MaskFactory', () => {
 
   test('toDicom: non-overlapping squares round-trip', () => {
     const config = syntheticData.find(c => c.name === 'test-seg-00');
-    const factory = new MaskFactory();
     const refImage = buildRefImage();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), refImage
-    );
+    const image = buildMaskImage('test-seg-00');
+
+    const factory = new MaskFactory();
     const segments = image.getMeta().custom.segments;
     const outElements = factory.toDicom(image, segments, refImage);
 
@@ -234,11 +204,7 @@ describe('MaskFactory', () => {
     const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
       .mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-seg-01');
-    const factory = new MaskFactory();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), buildRefImage()
-    );
+    const image = buildMaskImage('test-seg-01');
 
     assert.ok(
       warnSpy.mock.calls.some(
@@ -265,11 +231,7 @@ describe('MaskFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-seg-01');
-    const factory = new MaskFactory();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), buildRefImage()
-    );
+    const image = buildMaskImage('test-seg-01');
 
     const buf = image.getBuffer();
     const width = 32;
@@ -285,11 +247,7 @@ describe('MaskFactory', () => {
     // hide logging
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-seg-01');
-    const factory = new MaskFactory();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), buildRefImage()
-    );
+    const image = buildMaskImage('test-seg-01');
 
     const collection = image.getSegmentCollection();
     assert.ok(collection !== undefined, 'segment collection exists');
@@ -323,11 +281,10 @@ describe('MaskFactory', () => {
     vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
     const config = syntheticData.find(c => c.name === 'test-seg-01');
-    const factory = new MaskFactory();
     const refImage = buildRefImage();
-    const image = factory.create(
-      configToElements(config), buildPixelBuffer(config), refImage
-    );
+    const image = buildMaskImage('test-seg-01');
+
+    const factory = new MaskFactory();
     const segments = image.getMeta().custom.segments;
     const outElements = factory.toDicom(image, segments, refImage);
 
@@ -469,12 +426,8 @@ describe('mergeMaskImages', () => {
         .mockImplementation(() => {});
       const config = syntheticData.find(c => c.name === 'test-seg-00');
       const factory = new MaskFactory();
-      const mask1 = factory.create(
-        configToElements(config), buildPixelBuffer(config), buildRefImage()
-      );
-      const mask2 = factory.create(
-        configToElements(config), buildPixelBuffer(config), buildRefImage()
-      );
+      const mask1 = buildMaskImage('test-seg-00');
+      const mask2 = buildMaskImage('test-seg-00');
       const merged = mergeMaskImages(mask1, mask2);
       const mergedSegments = merged.getMeta().custom.segments;
       const outElements =

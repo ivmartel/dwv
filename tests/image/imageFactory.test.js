@@ -1,50 +1,16 @@
 import {describe, beforeAll, test, assert} from 'vitest';
-import {
-  getElementsFromSimpleTagValues
-} from '../../src/dicom/simpleTagValues.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
+import {generateDicomElements} from '../../dev/dicom/dicomGenerator.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
 
 /**
  * Tests for the 'image/imageFactory.js' file.
  */
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Parse a synthetic-img config tags into DICOM data elements.
- *
- * @param {object} config A synthetic-img entry.
- * @returns {Record<string, object>} DICOM data elements.
- */
-function configToElements(config) {
-  return getElementsFromSimpleTagValues(structuredClone(config.tags));
-}
-
-/**
- * Build a flat pixel buffer for the given config (rows x columns x
- * samples per pixel).
- *
- * @param {object} config A synthetic-img entry.
- * @returns {Uint16Array} Flat pixel buffer.
- */
-function buildPixelBuffer(config) {
-  const tags = config.tags;
-  const samplesPerPixel = tags.SamplesPerPixel ?? 1;
-  const size = tags.Columns * tags.Rows * samplesPerPixel;
-  const buffer = new Uint16Array(size);
-  for (let i = 0; i < size; ++i) {
-    buffer[i] = i % 256;
-  }
-  return buffer;
-}
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -67,10 +33,11 @@ describe('ImageFactory', () => {
     let buffer;
 
     beforeAll(() => {
-      buffer = buildPixelBuffer(config);
-      const elements = configToElements(config);
-      // add minimal pixel data element so checkElements passes
-      elements['7FE00010'] = {value: buffer};
+      const tagsCopy = structuredClone(config.tags);
+      tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+      const genOptions = {pixelGeneratorName: 'gradSquare'};
+      const elements = generateDicomElements(tagsCopy, genOptions);
+      buffer = elements['7FE00010'].value;
 
       const factory = new ImageFactory();
       warning = factory.checkElements(elements);

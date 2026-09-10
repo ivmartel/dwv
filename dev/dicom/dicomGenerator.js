@@ -52,6 +52,7 @@ import JSZip from 'jszip';
  * @property {boolean} useUnVrForPrivateSq The use
  *   UN VR for private sequence flag..
  * @property {Object} writerRules The writer rules.
+ * @property {boolean} addMissingTags Writer add missing flag.
  */
 
 // List of pixel generators
@@ -279,8 +280,11 @@ export function generateDicomElements(tags, genOptions) {
   } else if (orientationName === Orientation.Sagittal) {
     tags.ImagePositionPatient = [genOptions.sliceNumber * sliceSpacing, 0, 0];
   }
+  if (typeof genOptions.numberOfSlices !== 'undefined' &&
+    genOptions.numberOfSlices > 1) {
+    tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${genOptions.sliceNumber}`;
+  }
   // instance number
-  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${genOptions.sliceNumber}`;
   tags.InstanceNumber = genOptions.sliceNumber.toString();
 
   // convert JSON to DICOM element object
@@ -313,7 +317,7 @@ export function generateSliceBuffer(
     writer.setUseUnVrForPrivateSq(writerOptions.useUnVrForPrivateSq);
   }
   if (typeof writerOptions.writerRules !== 'undefined') {
-    writer.setRules(writerOptions.writerRules);
+    writer.setRules(writerOptions.writerRules, writerOptions.addMissingTags);
   }
   return writer.getBuffer(dicomElements);
 }

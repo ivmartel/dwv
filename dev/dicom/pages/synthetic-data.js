@@ -1,12 +1,6 @@
 import {addTagsToDictionary} from '../../../src/dicom/dictionary.js';
 import {
-  DicomWriter
-} from '../../../src/dicom/dicomWriter.js';
-import {
-  getElementsFromSimpleTagValues
-} from '../../../src/dicom/simpleTagValues.js';
-import {
-  generatePixelDataFromJSONTags,
+  generateSliceBuffer,
 } from '../dicomGenerator.js';
 
 /**
@@ -42,32 +36,16 @@ function getObjectUrlFromTags(config) {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
     }
   }
-  // convert JSON to DICOM element object
-  const dicomElements = getElementsFromSimpleTagValues(config.tags);
-  // pixels
-  if (config.tags.Modality !== 'KO' &&
-    config.tags.Modality !== 'RTSTRUCT'
-  ) {
-    if (config.tags.Modality === 'SEG') {
-      // simple binary
-      dicomElements['7FE00010'] =
-        generatePixelDataFromJSONTags(
-          config.tags, {
-            pixelGeneratorName: 'binary',
-            segmentSquares: config.segmentSquares
-          }
-        );
-    } else {
-      // default to grad square
-      dicomElements['7FE00010'] =
-        generatePixelDataFromJSONTags(config.tags);
-    }
-  }
 
-  // create DICOM buffer
-  const writer = new DicomWriter();
-  writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
-  const dicomBuffer = writer.getBuffer(dicomElements);
+  // generate buffer
+  const genOptions = {};
+  if (typeof config.segmentSquares !== 'undefined') {
+    genOptions.segmentSquares = config.segmentSquares;
+  }
+  const writerOptions = {useUnVrForPrivateSq};
+  const dicomBuffer = generateSliceBuffer(
+    config.tags, genOptions, writerOptions
+  );
 
   // blob and then url
   const blob = new Blob([dicomBuffer], {type: 'application/dicom'});

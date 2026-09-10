@@ -6,18 +6,13 @@ import {
   getUID
 } from '../../src/dicom/dicomWriter.js';
 import {
-  getElementsFromSimpleTagValues
-} from '../../src/dicom/simpleTagValues.js';
-import {
-  getPixelDataTag
-} from '../../src/dicom/dicomTag.js';
-import {
   getTagFromDictionary,
 } from '../../src/dicom/dicomTagInfo.js';
 import {
   dictionary,
   transferSyntaxKeywords
 } from '../../src/dicom/dictionary.js';
+import {generateSliceBuffer} from '../../dev/dicom/dicomGenerator.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
 /**
@@ -332,157 +327,6 @@ describe('dicom', () => {
   }
 
   /**
-   * Simple GradSquarePixGenerator.
-   *
-   * @param {object} tags The input tags.
-   * @returns {object} The pixel buffer.
-   */
-  function generateGradSquare(tags) {
-
-    const numberOfColumns = tags.Columns;
-    const numberOfRows = tags.Rows;
-    const isRGB = tags.PhotometricInterpretation.trim() === 'RGB';
-    const samplesPerPixel = tags.SamplesPerPixel;
-
-    let numberOfSamples = 1;
-    let numberOfColourPlanes = 1;
-    if (samplesPerPixel === 3) {
-      const planarConfiguration = tags.PlanarConfiguration;
-      if (planarConfiguration === 0) {
-        numberOfSamples = 3;
-      } else {
-        numberOfColourPlanes = 3;
-      }
-    }
-
-    const dataLength = numberOfRows * numberOfColumns * samplesPerPixel;
-
-    const bitsAllocated = tags.BitsAllocated;
-    const pixelRepresentation = tags.PixelRepresentation;
-    let pixelBuffer;
-    if (bitsAllocated === 8) {
-      if (pixelRepresentation === 0) {
-        pixelBuffer = new Uint8Array(dataLength);
-      } else {
-        pixelBuffer = new Int8Array(dataLength);
-      }
-    } else if (bitsAllocated === 16) {
-      if (pixelRepresentation === 0) {
-        pixelBuffer = new Uint16Array(dataLength);
-      } else {
-        pixelBuffer = new Int16Array(dataLength);
-      }
-    }
-
-    // full grad square
-    // const borderI = 0;
-    // const borderJ = 0;
-    // ~centered grad square
-    const borderI = Math.ceil(numberOfColumns * 0.25);
-    const borderJ = Math.ceil(numberOfRows * 0.25);
-
-    const minI = borderI;
-    const minJ = borderJ;
-    const maxI = numberOfColumns - borderI;
-    const maxJ = numberOfRows - borderJ;
-
-    const background = 0;
-    const max = 255;
-    let maxNoBounds = 1;
-
-    const getValue = function (i, j) {
-      let value = background;
-      if (i >= minI && i <= maxI &&
-        j >= minJ && j <= maxJ) {
-        value += Math.round((i + j) * (max / maxNoBounds));
-      }
-      return [value];
-    };
-
-    const getRGB = function (i, j) {
-      let value = getValue(i, j);
-      if (value > 255) {
-        value = 200;
-      }
-      return [value, 0, 0];
-    };
-
-    maxNoBounds = getValue(maxI, maxJ) / max;
-
-    const getFunc = isRGB ? getRGB : getValue;
-
-    // main loop
-    let offset = 0;
-    for (let c = 0; c < numberOfColourPlanes; ++c) {
-      for (let j = 0; j < numberOfRows; ++j) {
-        for (let i = 0; i < numberOfColumns; ++i) {
-          for (let s = 0; s < numberOfSamples; ++s) {
-            if (numberOfColourPlanes !== 1) {
-              pixelBuffer[offset] = getFunc(i, j)[c];
-            } else {
-              pixelBuffer[offset] = getFunc(i, j)[s];
-            }
-            ++offset;
-          }
-        }
-      }
-    }
-
-    const pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
-    return {
-      tag: getPixelDataTag(),
-      vr: bitsAllocated === 8 ? 'OB' : 'OW',
-      vl: pixVL,
-      value: pixelBuffer
-    };
-  }
-
-  /**
-   * Simple BinaryPixGenerator.
-   *
-   * @param {object} tags The input tags.
-   * @param {object} segmentSquares Per-segment square bounds
-   *   keyed by segment number string. Each entry has
-   *   {minI, maxI, minJ, maxJ}.
-   * @returns {object} The pixel buffer.
-   */
-  function generateBinary(tags, segmentSquares) {
-
-    const numberOfColumns = tags.Columns;
-    const numberOfRows = tags.Rows;
-    let numberOfFrames = 1;
-    if (typeof tags.NumberOfFrames !== 'undefined') {
-      numberOfFrames = tags.NumberOfFrames;
-    }
-    const dataLength = numberOfRows * numberOfColumns * numberOfFrames;
-    const pixelBuffer = new Uint8Array(dataLength);
-
-    // main loop
-    let offset = 0;
-    for (let f = 0; f < numberOfFrames; ++f) {
-      // use frame + 1 as segment number
-      const {minI, maxI, minJ, maxJ} = segmentSquares[String(f + 1)];
-
-      for (let j = 0; j < numberOfRows; ++j) {
-        for (let i = 0; i < numberOfColumns; ++i) {
-          const inRange = i >= minI && i < maxI &&
-            j >= minJ && j < maxJ;
-          pixelBuffer[offset] = inRange ? 1 : 0;
-          ++offset;
-        }
-      }
-    }
-
-    const pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
-    return {
-      tag: getPixelDataTag(),
-      vr: 'OB',
-      vl: pixVL,
-      value: pixelBuffer
-    };
-  }
-
-  /**
    * Test a JSON config: write a DICOM file and read it back.
    *
    * @param {object} config A JSON config representing DICOM tags.
@@ -511,37 +355,24 @@ describe('dicom', () => {
     }
     // pass tags clone to avoid modifications (for ex by padElement)
     const jsonTags = structuredClone(config.tags);
-    // convert JSON to DICOM element object
-    const dicomElements = getElementsFromSimpleTagValues(jsonTags);
-    // pixels (if possible)
-    if (config.tags.Modality !== 'KO' &&
-      config.tags.Modality !== 'RTSTRUCT'
-    ) {
-      if (config.tags.Modality === 'SEG') {
-        // simple binary
-        dicomElements['7FE00010'] = generateBinary(
-          config.tags, config.segmentSquares
-        );
-      } else {
-        // grad square
-        dicomElements['7FE00010'] = generateGradSquare(config.tags);
-      }
-    }
 
-    // create writer
-    const writer = new DicomWriter();
-    writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
+    // generate buffer
+    const genOptions = {};
+    if (typeof config.segmentSquares !== 'undefined') {
+      genOptions.segmentSquares = config.segmentSquares;
+    }
+    const writerOptions = {useUnVrForPrivateSq};
     if (typeof writerRules !== 'undefined') {
-      writer.setRules(writerRules, true);
+      writerOptions.writerRules = writerRules;
+      writerOptions.addMissingTags = true;
     }
-
-    // create DICOM buffer
     let dicomBuffer;
     try {
-      dicomBuffer = writer.getBuffer(dicomElements);
+      dicomBuffer = generateSliceBuffer(
+        jsonTags, genOptions, writerOptions
+      );
     } catch (error) {
       assert.ok(false, `Caught error: ${error}`);
-      return;
     }
 
     // parse the buffer
