@@ -5,7 +5,7 @@ import {
 
 import {
   _pixelGenerators,
-  generateSlices,
+  generateSlicesZip,
   addDates
 } from '../dicomGenerator.js';
 
@@ -118,7 +118,7 @@ function onGenerate() {
 
   console.log('Generating slices...');
 
-  generateSlices(
+  generateSlicesZip(
     tags,
     zipCallback,
     {

@@ -325,7 +325,7 @@ export function generateSliceBuffer(
  * @param {Function} zipCallback Callback once zip is ready.
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
  */
-export function generateSlices(
+export function generateSlicesZip(
   tags,
   zipCallback,
   genOptions) {
