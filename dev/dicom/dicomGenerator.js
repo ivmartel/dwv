@@ -296,14 +296,14 @@ export function generateDicomElements(tags, genOptions) {
 }
 
 /**
- * Generate one slice.
+ * Generate one slice buffer.
  *
  * @param {object} tags The tags.
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
  * @param {WriterOptions} [writerOptions] The options for dicom write.
- * @returns {Blob} A blob with the slice DICOM data.
+ * @returns {ArrayBuffer} A buffer with the slice DICOM data.
  */
-export function generateSlice(
+export function generateSliceBuffer(
   tags, genOptions, writerOptions) {
   // generate elements
   const dicomElements = generateDicomElements(tags, genOptions);
@@ -315,9 +315,7 @@ export function generateSlice(
   if (typeof writerOptions.writerRules !== 'undefined') {
     writer.setRules(writerOptions.writerRules);
   }
-  const dicomBuffer = writer.getBuffer(dicomElements);
-  // view as Blob to allow download
-  return new Blob([dicomBuffer], {type: 'application/dicom'});
+  return writer.getBuffer(dicomElements);
 }
 
 /**
@@ -340,10 +338,10 @@ export function generateSlices(
 
   const zip = new JSZip();
   // generate slices
-  let blob;
   for (let k = 0; k < genOptions.numberOfSlices; ++k) {
     genOptions.sliceNumber = k;
-    blob = generateSlice(tags, genOptions);
+    const buffer = generateSliceBuffer(tags, genOptions);
+    const blob = new Blob([buffer], {type: 'application/dicom'});
     zip.file(`dwv-generated-slice${k}.dcm`, blob);
   }
   // finish
