@@ -1,19 +1,12 @@
 import {logger} from '../../../src/utils/logger.js';
 import {
   getUID,
-  DicomWriter
 } from '../../../src/dicom/dicomWriter.js';
-import {
-  getElementsFromSimpleTagValues
-} from '../../../src/dicom/simpleTagValues.js';
-import {
-  getOrientationName,
-  Orientation,
-} from '../../../src/math/orientation.js';
 
 import {
-  generatePixelDataFromJSONTags,
-  _pixelGenerators
+  _pixelGenerators,
+  generateSlice,
+  addDates
 } from '../dicomGenerator.js';
 
 // importing directly in generator.html seems to work...
@@ -39,30 +32,24 @@ function setup() {
   const generateButton = document.getElementById('generate');
   generateButton.onclick = onGenerate;
 
-  const tags = JSON.parse(document.getElementById('tags').value);
+  const tags = JSON.parse(getTagsText());
   if (tags) {
-    // set study date
-    const now = new Date();
-    tags.StudyDate = now.getFullYear().toString() +
-      (now.getMonth() + 1).toString().padStart(2, '0') +
-      now.getDate().toString().padStart(2, '0');
-    tags.StudyTime = now.getHours().toString().padStart(2, '0') +
-      now.getMinutes().toString().padStart(2, '0') +
-      now.getSeconds().toString().padStart(2, '0');
+    // dates
+    addDates(tags);
     // UID
     if (typeof tags.StudyInstanceUID === 'undefined') {
       tags.StudyInstanceUID = getUID('StudyInstanceUID');
       tags.StudyID = 10000;
     }
     if (typeof tags.StudyDescription === 'undefined') {
-      tags.StudyDescription = 'dwv generated data';
+      tags.StudyDescription = 'dwv generated study';
     }
     if (typeof tags.SeriesInstanceUID === 'undefined') {
       tags.SeriesInstanceUID = getUID('SeriesInstanceUID');
       tags.SeriesNumber = tags.StudyID + 10;
     }
     if (typeof tags.SeriesDescription === 'undefined') {
-      tags.SeriesDescription = 'Test data #0';
+      tags.SeriesDescription = 'dwv generated series';
     }
     tags.SOPInstanceUID = getUID('SOPInstanceUID');
     // write back
@@ -77,9 +64,21 @@ function setup() {
  * @returns {string} The name of the selected pixel generator.
  */
 function getPixelGeneratorName() {
-  const tags = JSON.parse(document.getElementById('tags').value);
-  // optional pixel generator (cannot be propagated)
-  return tags.PixelData;
+  return document.getElementById('pixgenerator').value;
+}
+
+/**
+ * @returns {string} The tags.
+ */
+function getTagsText() {
+  return document.getElementById('tags').value;
+}
+
+/**
+ * @returns {number} The number of slices.
+ */
+function getNumberOfSlices() {
+  return parseInt(document.getElementById('numberofslices').value, 10);
 }
 
 /**
@@ -94,19 +93,25 @@ function onGenerate() {
   if (!isValidTags()) {
     return;
   }
+
+  // get tags from the textarea
+  const tags = JSON.parse(getTagsText());
+
   const pixelGeneratorName = getPixelGeneratorName();
 
   // imported directly in generator.html, seems to work...
   // eslint-disable-next-line no-undef
   const zip = new JSZip();
 
-  const numberOfSlices = document.getElementById('numberofslices').value;
+  const numberOfSlices = getNumberOfSlices();
 
   console.log('Generating slices...');
   let blob;
   for (let k = 0; k < numberOfSlices; ++k) {
     try {
-      blob = generateSlice(pixelGeneratorName, k);
+      blob = generateSlice(
+        tags, pixelGeneratorName, numberOfSlices, k, _images
+      );
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -138,58 +143,6 @@ function onGenerate() {
 }
 
 /**
- *
- * @param {string} pixelGeneratorName The name of the pixel generator.
- * @param {number} sliceNumber The slice to generate.
- * @returns {Blob} A blob with the slice DICOM data.
- */
-function generateSlice(pixelGeneratorName, sliceNumber) {
-  const numberOfSlices = document.getElementById('numberofslices').value;
-
-  // get tags from the textarea
-  const tags = JSON.parse(document.getElementById('tags').value);
-  // remove extra
-  delete tags.PixelData;
-  // image position
-  let sliceSpacing = 1;
-  if (typeof tags.SliceThickness !== 'undefined') {
-    sliceSpacing = tags.SliceThickness;
-  } else if (typeof tags.PixelSpacing !== 'undefined') {
-    sliceSpacing = tags.PixelSpacing[0];
-  }
-  const orientationName =
-    getOrientationName(tags.ImageOrientationPatient);
-  if (orientationName === Orientation.Axial) {
-    tags.ImagePositionPatient = [0, 0, sliceNumber * sliceSpacing];
-  } else if (orientationName === Orientation.Coronal) {
-    tags.ImagePositionPatient = [0, sliceNumber * sliceSpacing, 0];
-  } else if (orientationName === Orientation.Sagittal) {
-    tags.ImagePositionPatient = [sliceNumber * sliceSpacing, 0, 0];
-  }
-  // instance number
-  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${sliceNumber}`;
-  tags.InstanceNumber = sliceNumber.toString();
-  // convert JSON to DICOM element object
-  const dicomElements = getElementsFromSimpleTagValues(tags);
-  // pixels
-  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(
-    tags, {
-      pixelGeneratorName,
-      sliceNumber,
-      images: _images,
-      numberOfSlices
-    }
-  );
-
-  // create writer
-  const writer = new DicomWriter();
-  const dicomBuffer = writer.getBuffer(dicomElements);
-
-  // view as Blob to allow download
-  return new Blob([dicomBuffer], {type: 'application/dicom'});
-}
-
-/**
  * Save the tags as a JSON file.
  */
 function onSaveTags() {
@@ -198,9 +151,9 @@ function onSaveTags() {
     return;
   }
   // get text from the textarea
-  const text = document.getElementById('tags').value;
+  const tagsText = getTagsText();
   // view as Blob to allow download
-  const blob = new Blob([text], {type: 'text/plain'});
+  const blob = new Blob([tagsText], {type: 'text/plain'});
   // update save button
   const element = document.getElementById('save');
   element.download = (_tagsFile === null ? 'tags.json' : _tagsFile.name);
@@ -214,7 +167,7 @@ function onSaveTags() {
  */
 function isValidTags() {
   try {
-    JSON.parse(document.getElementById('tags').value);
+    JSON.parse(getTagsText());
   } catch {
     alert('The JSON is not valid, please check it with JSONLint.');
     return false;
@@ -226,8 +179,8 @@ function isValidTags() {
  * Open JSONLint to check the tags.
  */
 function launchJSONLint() {
-  const text = document.getElementById('tags').value;
-  const link = `http://jsonlint.com/?json=${encodeURIComponent(text)}`;
+  const tagsText = getTagsText();
+  const link = `http://jsonlint.com/?json=${encodeURIComponent(tagsText)}`;
   window.open(link);
 }
 
@@ -284,7 +237,7 @@ function onInputImageFiles(event) {
       image.onload = function () {
         if (_images.length === 0) {
           // update tags if needed at first image load
-          const tags = JSON.parse(document.getElementById('tags').value);
+          const tags = JSON.parse(getTagsText());
           if (checkTags(tags, this)) {
             alert('Updating tags to input image meta data.');
             document.getElementById('tags').value =

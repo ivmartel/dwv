@@ -1,6 +1,16 @@
 
 import {getTypedArray} from '../../src/dicom/dicomParser.js';
 import {getPixelDataTag} from '../../src/dicom/dicomTag.js';
+import {
+  getOrientationName,
+  Orientation,
+} from '../../src/math/orientation.js';
+import {
+  getElementsFromSimpleTagValues
+} from '../../src/dicom/simpleTagValues.js';
+import {
+  DicomWriter
+} from '../../src/dicom/dicomWriter.js';
 
 import {
   BinaryPixGenerator
@@ -213,3 +223,115 @@ export function getImageDataData(image) {
   // data.data
   return imageData.data;
 };
+
+/**
+ *
+ * @param {object} tags The tags.
+ * @param {string} pixelGeneratorName The name of the pixel generator.
+ * @param {number} numberOfSlices The number of slices.
+ * @param {number} sliceNumber The slice to generate.
+ * @param {any} images Images to use as pixel data.
+ * @returns {dicomElements} The dicom elements.
+ */
+export function generateDicomElements(
+  tags,
+  pixelGeneratorName,
+  numberOfSlices,
+  sliceNumber,
+  images
+) {
+  // image position
+  let sliceSpacing = 1;
+  if (typeof tags.SliceThickness !== 'undefined') {
+    sliceSpacing = tags.SliceThickness;
+  } else if (typeof tags.PixelSpacing !== 'undefined') {
+    sliceSpacing = tags.PixelSpacing[0];
+  }
+  const orientationName =
+    getOrientationName(tags.ImageOrientationPatient);
+  if (orientationName === Orientation.Axial) {
+    tags.ImagePositionPatient = [0, 0, sliceNumber * sliceSpacing];
+  } else if (orientationName === Orientation.Coronal) {
+    tags.ImagePositionPatient = [0, sliceNumber * sliceSpacing, 0];
+  } else if (orientationName === Orientation.Sagittal) {
+    tags.ImagePositionPatient = [sliceNumber * sliceSpacing, 0, 0];
+  }
+  // instance number
+  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${sliceNumber}`;
+  tags.InstanceNumber = sliceNumber.toString();
+  // convert JSON to DICOM element object
+  const dicomElements = getElementsFromSimpleTagValues(tags);
+  // pixels
+  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(
+    tags, {
+      pixelGeneratorName,
+      sliceNumber,
+      images,
+      numberOfSlices
+    }
+  );
+  return dicomElements;
+}
+
+/**
+ *
+ * @param {object} tags The tags.
+ * @param {string} pixelGeneratorName The name of the pixel generator.
+ * @param {number} numberOfSlices The number of slices.
+ * @param {number} sliceNumber The slice to generate.
+ * @param {any} images Images to use as pixel data.
+ * @returns {Blob} A blob with the slice DICOM data.
+ */
+export function generateSlice(
+  tags,
+  pixelGeneratorName,
+  numberOfSlices,
+  sliceNumber,
+  images) {
+  const dicomElements = generateDicomElements(
+    tags,
+    pixelGeneratorName,
+    numberOfSlices,
+    sliceNumber,
+    images
+  );
+
+  // create writer
+  const writer = new DicomWriter();
+  const dicomBuffer = writer.getBuffer(dicomElements);
+
+  // view as Blob to allow download
+  return new Blob([dicomBuffer], {type: 'application/dicom'});
+}
+
+/**
+ * Add dates to input tags.
+ *
+ * @param {object} tags The tags.
+ */
+export function addDates(tags) {
+  // set study date
+  const now = new Date();
+  const dateStr = now.getFullYear().toString() +
+    (now.getMonth() + 1).toString().padStart(2, '0') +
+    now.getDate().toString().padStart(2, '0');
+  const timeStr = now.getHours().toString().padStart(2, '0') +
+    now.getMinutes().toString().padStart(2, '0') +
+    now.getSeconds().toString().padStart(2, '0');
+
+  // study
+  if (typeof tags.StudyDate === 'undefined') {
+    tags.StudyDate = dateStr;
+  }
+  if (typeof tags.StudyTime === 'undefined') {
+    tags.StudyTime = timeStr;
+  }
+
+  // study
+  if (typeof tags.SeriesDate === 'undefined') {
+    tags.SeriesDate = dateStr;
+  }
+  if (typeof tags.SeriesTime === 'undefined') {
+    tags.SeriesTime = timeStr;
+  }
+}
