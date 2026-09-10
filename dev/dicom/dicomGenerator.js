@@ -77,19 +77,22 @@ export function checkTags(tags, requiredTags, withLog) {
   }
   return check;
 }
+/**
+ * @typedef {Object} GenerateOptions
+ * @property {string} pixelGeneratorName The name of
+ *   the pixel generator to use, defaults to gradSquare.
+ * @property {number} numberOfSlices The result number of slices,
+ *   default to 1.
+ * @property {number} sliceNumber The slice number,
+ *   default to 0.
+ * @property {Array} images The images to pass to the generator.
+ */
 
 /**
  * Get the DICOM pixel data from a DICOM tags object.
  *
  * @param {object} tags The DICOM tags object.
- * @param {object} [options] The options for pixel generation.
- * @param {string} [options.pixelGeneratorName] The name of the pixel generator
- *   to use, defaults to gradSquare.
- * @param {number} [options.sliceNumber] The slice number,
- *   default to 0.
- * @param {Array} [options.images] The images to pass to the generator.
- * @param {number} [options.numberOfSlices] The result number of slices,
- *   default to 1.
+ * @param {GenerateOptions} [options] The options for pixel generation.
  * @returns {object} The DICOM pixel data element.
  */
 export function generatePixelDataFromJSONTags(
@@ -230,19 +233,17 @@ export function getImageDataData(image) {
  * Generate dicom elements.
  *
  * @param {object} tags The tags.
- * @param {string} pixelGeneratorName The name of the pixel generator.
- * @param {number} numberOfSlices The number of slices.
- * @param {number} sliceNumber The slice to generate.
- * @param {any} images Images to use as pixel data.
+ * @param {GenerateOptions} [options] The options for pixel generation.
  * @returns {dicomElements} The dicom elements.
  */
-export function generateDicomElements(
-  tags,
-  pixelGeneratorName,
-  numberOfSlices,
-  sliceNumber,
-  images
-) {
+export function generateDicomElements(tags, options) {
+  if (typeof options === 'undefined') {
+    options = {};
+  }
+  if (typeof options.sliceNumber === 'undefined') {
+    options.sliceNumber = 0;
+  }
+
   // image position
   let sliceSpacing = 1;
   if (typeof tags.SliceThickness !== 'undefined') {
@@ -253,26 +254,20 @@ export function generateDicomElements(
   const orientationName =
     getOrientationName(tags.ImageOrientationPatient);
   if (orientationName === Orientation.Axial) {
-    tags.ImagePositionPatient = [0, 0, sliceNumber * sliceSpacing];
+    tags.ImagePositionPatient = [0, 0, options.sliceNumber * sliceSpacing];
   } else if (orientationName === Orientation.Coronal) {
-    tags.ImagePositionPatient = [0, sliceNumber * sliceSpacing, 0];
+    tags.ImagePositionPatient = [0, options.sliceNumber * sliceSpacing, 0];
   } else if (orientationName === Orientation.Sagittal) {
-    tags.ImagePositionPatient = [sliceNumber * sliceSpacing, 0, 0];
+    tags.ImagePositionPatient = [options.sliceNumber * sliceSpacing, 0, 0];
   }
   // instance number
-  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${sliceNumber}`;
-  tags.InstanceNumber = sliceNumber.toString();
+  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${options.sliceNumber}`;
+  tags.InstanceNumber = options.sliceNumber.toString();
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromSimpleTagValues(tags);
   // pixels
-  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(
-    tags, {
-      pixelGeneratorName,
-      sliceNumber,
-      images,
-      numberOfSlices
-    }
-  );
+  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(tags, options);
+
   return dicomElements;
 }
 
@@ -280,31 +275,15 @@ export function generateDicomElements(
  * Generate one slice.
  *
  * @param {object} tags The tags.
- * @param {string} pixelGeneratorName The name of the pixel generator.
- * @param {number} numberOfSlices The number of slices.
- * @param {number} sliceNumber The slice to generate.
- * @param {any} images Images to use as pixel data.
+ * @param {GenerateOptions} [options] The options for pixel generation.
  * @returns {Blob} A blob with the slice DICOM data.
  */
-export function generateSlice(
-  tags,
-  pixelGeneratorName,
-  numberOfSlices,
-  sliceNumber,
-  images) {
+export function generateSlice(tags, options) {
   // generate elements
-  const dicomElements = generateDicomElements(
-    tags,
-    pixelGeneratorName,
-    numberOfSlices,
-    sliceNumber,
-    images
-  );
-
+  const dicomElements = generateDicomElements(tags, options);
   // create writer
   const writer = new DicomWriter();
   const dicomBuffer = writer.getBuffer(dicomElements);
-
   // view as Blob to allow download
   return new Blob([dicomBuffer], {type: 'application/dicom'});
 }
@@ -313,24 +292,26 @@ export function generateSlice(
  * Generate multipe slices and create zip.
  *
  * @param {object} tags The tags.
- * @param {string} pixelGeneratorName The name of the pixel generator.
- * @param {number} numberOfSlices The number of slices.
- * @param {any} images Images to use as pixel data.
  * @param {Function} zipCallback Callback once zip is ready.
+ * @param {GenerateOptions} [options] The options for pixel generation.
  */
 export function generateSlices(
   tags,
-  pixelGeneratorName,
-  numberOfSlices,
-  images,
-  zipCallback) {
+  zipCallback,
+  options) {
+  if (typeof options === 'undefined') {
+    options = {};
+  }
+  if (typeof options.numberOfSlices === 'undefined') {
+    options.numberOfSlices = 1;
+  }
+
   const zip = new JSZip();
   // generate slices
   let blob;
-  for (let k = 0; k < numberOfSlices; ++k) {
-    blob = generateSlice(
-      tags, pixelGeneratorName, numberOfSlices, k, images
-    );
+  for (let k = 0; k < options.numberOfSlices; ++k) {
+    options.sliceNumber = k;
+    blob = generateSlice(tags, options);
     zip.file(`dwv-generated-slice${k}.dcm`, blob);
   }
   // finish

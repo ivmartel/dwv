@@ -120,10 +120,13 @@ function onGenerate() {
 
   generateSlices(
     tags,
-    pixelGeneratorName,
-    numberOfSlices,
-    _images,
-    zipCallback);
+    zipCallback,
+    {
+      pixelGeneratorName,
+      numberOfSlices,
+      _images
+    }
+  );
 }
 
 /**
