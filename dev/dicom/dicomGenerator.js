@@ -114,16 +114,12 @@ export function generatePixelDataFromJSONTags(
   }
   // defaults
   if (typeof genOptions.pixelGeneratorName === 'undefined') {
-    if (tags.Modality !== 'KO' &&
-      tags.Modality !== 'RTSTRUCT'
-    ) {
-      if (tags.Modality === 'SEG') {
-        // simple binary generator
-        genOptions.pixelGeneratorName = 'binary';
-      } else {
-        // grad square generator
-        genOptions.pixelGeneratorName = 'gradSquare';
-      }
+    if (tags.Modality === 'SEG') {
+      // simple binary generator
+      genOptions.pixelGeneratorName = 'binary';
+    } else {
+      // grad square generator
+      genOptions.pixelGeneratorName = 'gradSquare';
     }
   }
   if (typeof genOptions.sliceNumber === 'undefined') {
@@ -290,7 +286,11 @@ export function generateDicomElements(tags, genOptions) {
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromSimpleTagValues(tags);
   // pixels
-  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(tags, genOptions);
+  const isImageModality = tags.Modality !== 'KO' &&
+    tags.Modality !== 'RTSTRUCT';
+  if (isImageModality) {
+    dicomElements['7FE00010'] = generatePixelDataFromJSONTags(tags, genOptions);
+  }
 
   return dicomElements;
 }
