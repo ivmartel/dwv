@@ -97,7 +97,8 @@ function getConfigsHtmlList(configs) {
     // list element
     const li = document.createElement('li');
     li.append(link);
-    li.appendChild(document.createTextNode(`: ${configs[i].description}`));
+    li.appendChild(document.createTextNode(
+      `: ${configs[i].tags.SeriesDescription}`));
     // append to list
     ul.append(li);
   }

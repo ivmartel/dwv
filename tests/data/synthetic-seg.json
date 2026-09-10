@@ -1,7 +1,6 @@
 [
   {
     "name": "test-seg-00",
-    "description": "DICOM SEG test data with no overlapping segments (ref test-00).",
     "segmentSquares": {
       "1": {
         "minI": 4,
@@ -24,6 +23,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.12",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.12",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "SEG test data with no overlapping segments (ref test-00)",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -241,7 +242,6 @@
   },
   {
     "name": "test-seg-01",
-    "description": "DICOM SEG test data with overlapping segments (ref test-00).",
     "segmentSquares": {
       "1": {
         "minI": 4,
@@ -264,6 +264,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.13",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.13",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "SEG test data with overlapping segments (ref test-00)",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",

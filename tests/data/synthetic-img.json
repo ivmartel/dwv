@@ -1,7 +1,6 @@
 [
   {
     "name": "test-img-00",
-    "description": "Simple test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -10,6 +9,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "simple test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -47,7 +48,6 @@
   },
   {
     "name": "test-img-01",
-    "description": "PixelRepresentation=1 test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -56,6 +56,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.2",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.2",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "PixelRepresentation=1 test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -93,7 +95,6 @@
   },
   {
     "name": "test-img-02",
-    "description": "8bits RGB test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -102,6 +103,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.3",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.3",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "8bits RGB test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -140,7 +143,6 @@
   },
   {
     "name": "test-img-03",
-    "description": "Explicit length sequence test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -149,6 +151,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.4",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.4",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "explicit length sequence test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -199,7 +203,6 @@
   },
   {
     "name": "test-img-04",
-    "description": "Implicit length sequence test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -208,6 +211,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.5",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.5",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "implicit length sequence test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -258,7 +263,6 @@
   },
   {
     "name": "test-img-05",
-    "description": "Massive sequence test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -267,6 +271,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.6",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.6",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "large sequence test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -386,7 +392,6 @@
   },
   {
     "name": "test-img-06",
-    "description": "Private tags test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -395,6 +400,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.7",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.7",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "private tags test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -462,7 +469,6 @@
   },
   {
     "name": "test-img-07",
-    "description": "Private tags and VR=UN for private SQ test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -471,6 +477,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.8",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.8",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "private tags and VR=UN for private SQ test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -538,7 +546,6 @@
   },
   {
     "name": "test-img-08",
-    "description": "All VRs test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -547,6 +554,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.9",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.9",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "all VRs test image",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",
       "OtherPatientNames": "dwv^PatientOtherName",
@@ -836,7 +845,6 @@
   },
   {
     "name": "test-img-09",
-    "description": "UTF-8 charset test image.",
     "tags": {
       "Modality": "MR",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
@@ -845,6 +853,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.10",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.10",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "UTF-8 charset test image",
       "SpecificCharacterSet": "ISO_IR 192",
       "PatientID": "0123456",
       "PatientName": "dwv^PatientName",

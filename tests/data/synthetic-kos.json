@@ -1,7 +1,6 @@
 [
   {
     "name": "test-kos-00",
-    "description": "DICOM KOS test data (non image)",
     "tags": {
       "Modality": "KO",
       "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
@@ -10,6 +9,8 @@
       "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.11",
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.11",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "KOS test data (non image)",
       "ReferencedRequestSequence": {
         "value": [
           {
