@@ -5,7 +5,7 @@ import {
 
 import {
   _pixelGenerators,
-  generateSlice,
+  generateSlices,
   addDates
 } from '../dicomGenerator.js';
 
@@ -94,33 +94,11 @@ function onGenerate() {
     return;
   }
 
-  // get tags from the textarea
   const tags = JSON.parse(getTagsText());
-
   const pixelGeneratorName = getPixelGeneratorName();
-
-  // imported directly in generator.html, seems to work...
-  // eslint-disable-next-line no-undef
-  const zip = new JSZip();
-
   const numberOfSlices = getNumberOfSlices();
 
-  console.log('Generating slices...');
-  let blob;
-  for (let k = 0; k < numberOfSlices; ++k) {
-    try {
-      blob = generateSlice(
-        tags, pixelGeneratorName, numberOfSlices, k, _images
-      );
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
-      return;
-    }
-    zip.file(`dwv-generated-slice${k}.dcm`, blob);
-  }
-
-  zip.generateAsync({type: 'blob'}).then(function (zipBlob) {
+  const zipCallback = function (zipBlob) {
     console.log('Zipping data...');
     const element = document.getElementById('generate');
     element.download = 'dwv-generated.zip';
@@ -136,10 +114,16 @@ function onGenerate() {
     setTimeout(function () {
       URL.revokeObjectURL(element.href);
     }, 2E3); // 2s
-  }, function (error) {
-    console.error(error);
-    alert(error.message);
-  });
+  };
+
+  console.log('Generating slices...');
+
+  generateSlices(
+    tags,
+    pixelGeneratorName,
+    numberOfSlices,
+    _images,
+    zipCallback);
 }
 
 /**

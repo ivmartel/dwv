@@ -30,6 +30,8 @@ import {
   SquarePixGenerator
 } from './squarePixGenerator.js';
 
+import JSZip from 'jszip';
+
 // List of pixel generators
 export const _pixelGenerators = {
   binary: {generator: BinaryPixGenerator},
@@ -225,6 +227,7 @@ export function getImageDataData(image) {
 };
 
 /**
+ * Generate dicom elements.
  *
  * @param {object} tags The tags.
  * @param {string} pixelGeneratorName The name of the pixel generator.
@@ -274,6 +277,7 @@ export function generateDicomElements(
 }
 
 /**
+ * Generate one slice.
  *
  * @param {object} tags The tags.
  * @param {string} pixelGeneratorName The name of the pixel generator.
@@ -288,6 +292,7 @@ export function generateSlice(
   numberOfSlices,
   sliceNumber,
   images) {
+  // generate elements
   const dicomElements = generateDicomElements(
     tags,
     pixelGeneratorName,
@@ -304,6 +309,33 @@ export function generateSlice(
   return new Blob([dicomBuffer], {type: 'application/dicom'});
 }
 
+/**
+ * Generate multipe slices and create zip.
+ *
+ * @param {object} tags The tags.
+ * @param {string} pixelGeneratorName The name of the pixel generator.
+ * @param {number} numberOfSlices The number of slices.
+ * @param {any} images Images to use as pixel data.
+ * @param {Function} zipCallback Callback once zip is ready.
+ */
+export function generateSlices(
+  tags,
+  pixelGeneratorName,
+  numberOfSlices,
+  images,
+  zipCallback) {
+  const zip = new JSZip();
+  // generate slices
+  let blob;
+  for (let k = 0; k < numberOfSlices; ++k) {
+    blob = generateSlice(
+      tags, pixelGeneratorName, numberOfSlices, k, images
+    );
+    zip.file(`dwv-generated-slice${k}.dcm`, blob);
+  }
+  // finish
+  zip.generateAsync({type: 'blob'}).then(zipCallback);
+}
 /**
  * Add dates to input tags.
  *
