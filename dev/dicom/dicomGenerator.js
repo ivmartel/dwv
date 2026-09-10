@@ -32,6 +32,28 @@ import {
 
 import JSZip from 'jszip';
 
+/**
+ * @typedef {Object} GenerateOptions
+ * @property {string} pixelGeneratorName The name of
+ *   the pixel generator to use, defaults to gradSquare.
+ * @property {number} numberOfSlices The result number of slices,
+ *   default to 1.
+ * @property {number} sliceNumber The slice number,
+ *   default to 0.
+ * @property {Array} images The images to pass to file
+ *   capable generators.
+ * @property {object} segmentSquares Per-segment square bounds
+ *   keyed by segment number string. Each entry has
+ *   {minI, maxI, minJ, maxJ}.
+ */
+
+/**
+ * @typedef {Object} WriterOptions
+ * @property {boolean} useUnVrForPrivateSq The use
+ *   UN VR for private sequence flag..
+ * @property {Object} writerRules The writer rules.
+ */
+
 // List of pixel generators
 export const _pixelGenerators = {
   binary: {generator: BinaryPixGenerator},
@@ -77,38 +99,38 @@ export function checkTags(tags, requiredTags, withLog) {
   }
   return check;
 }
-/**
- * @typedef {Object} GenerateOptions
- * @property {string} pixelGeneratorName The name of
- *   the pixel generator to use, defaults to gradSquare.
- * @property {number} numberOfSlices The result number of slices,
- *   default to 1.
- * @property {number} sliceNumber The slice number,
- *   default to 0.
- * @property {Array} images The images to pass to the generator.
- */
 
 /**
  * Get the DICOM pixel data from a DICOM tags object.
  *
  * @param {object} tags The DICOM tags object.
- * @param {GenerateOptions} [options] The options for pixel generation.
+ * @param {GenerateOptions} [genOptions] The options for pixel generation.
  * @returns {object} The DICOM pixel data element.
  */
 export function generatePixelDataFromJSONTags(
-  tags, options) {
-  if (typeof options === 'undefined') {
-    options = {};
+  tags, genOptions) {
+  if (typeof genOptions === 'undefined') {
+    genOptions = {};
   }
-  // default
-  if (typeof options.pixelGeneratorName === 'undefined') {
-    options.pixelGeneratorName = 'gradSquare';
+  // defaults
+  if (typeof genOptions.pixelGeneratorName === 'undefined') {
+    if (tags.Modality !== 'KO' &&
+      tags.Modality !== 'RTSTRUCT'
+    ) {
+      if (tags.Modality === 'SEG') {
+        // simple binary generator
+        genOptions.pixelGeneratorName = 'binary';
+      } else {
+        // grad square generator
+        genOptions.pixelGeneratorName = 'gradSquare';
+      }
+    }
   }
-  if (typeof options.sliceNumber === 'undefined') {
-    options.sliceNumber = 0;
+  if (typeof genOptions.sliceNumber === 'undefined') {
+    genOptions.sliceNumber = 0;
   }
-  if (typeof options.numberOfSlices === 'undefined') {
-    options.numberOfSlices = 1;
+  if (typeof genOptions.numberOfSlices === 'undefined') {
+    genOptions.numberOfSlices = 1;
   }
 
   // check tags
@@ -170,31 +192,32 @@ export function generatePixelDataFromJSONTags(
     bitsAllocated, pixelRepresentation, dataLength);
 
   // pixels generator
-  if (typeof _pixelGenerators[options.pixelGeneratorName] === 'undefined') {
+  if (typeof _pixelGenerators[genOptions.pixelGeneratorName] === 'undefined') {
     throw new Error(
-      `Unknown PixelData generator: ${options.pixelGeneratorName}`
+      `Unknown PixelData generator: ${genOptions.pixelGeneratorName}`
     );
   }
-  const GeneratorClass = _pixelGenerators[options.pixelGeneratorName].generator;
+  const GeneratorClass =
+    _pixelGenerators[genOptions.pixelGeneratorName].generator;
   const generator = new GeneratorClass({
     numberOfColumns,
     numberOfRows,
-    numberOfSlices: options.numberOfSlices,
+    numberOfSlices: genOptions.numberOfSlices,
     numberOfFrames,
     numberOfSamples,
     numberOfColourPlanes,
     photometricInterpretation,
     imageOrientationPatient: tags.ImageOrientationPatient,
-    segmentSquares: options.segmentSquares
+    segmentSquares: genOptions.segmentSquares
   });
   if (typeof generator.setImages !== 'undefined' &&
-    typeof options.images !== 'undefined') {
-    generator.setImages(options.images);
+    typeof genOptions.images !== 'undefined') {
+    generator.setImages(genOptions.images);
   }
   if (typeof generator.setNumberOfSlices !== 'undefined') {
-    generator.setNumberOfSlices(options.numberOfSlices);
+    generator.setNumberOfSlices(genOptions.numberOfSlices);
   }
-  generator.generate(pixels, options.sliceNumber);
+  generator.generate(pixels, genOptions.sliceNumber);
 
   // create and return the DICOM element
   let vr = 'OW';
@@ -233,15 +256,15 @@ export function getImageDataData(image) {
  * Generate dicom elements.
  *
  * @param {object} tags The tags.
- * @param {GenerateOptions} [options] The options for pixel generation.
+ * @param {GenerateOptions} [genOptions] The options for pixel generation.
  * @returns {dicomElements} The dicom elements.
  */
-export function generateDicomElements(tags, options) {
-  if (typeof options === 'undefined') {
-    options = {};
+export function generateDicomElements(tags, genOptions) {
+  if (typeof genOptions === 'undefined') {
+    genOptions = {};
   }
-  if (typeof options.sliceNumber === 'undefined') {
-    options.sliceNumber = 0;
+  if (typeof genOptions.sliceNumber === 'undefined') {
+    genOptions.sliceNumber = 0;
   }
 
   // image position
@@ -254,19 +277,20 @@ export function generateDicomElements(tags, options) {
   const orientationName =
     getOrientationName(tags.ImageOrientationPatient);
   if (orientationName === Orientation.Axial) {
-    tags.ImagePositionPatient = [0, 0, options.sliceNumber * sliceSpacing];
+    tags.ImagePositionPatient = [0, 0, genOptions.sliceNumber * sliceSpacing];
   } else if (orientationName === Orientation.Coronal) {
-    tags.ImagePositionPatient = [0, options.sliceNumber * sliceSpacing, 0];
+    tags.ImagePositionPatient = [0, genOptions.sliceNumber * sliceSpacing, 0];
   } else if (orientationName === Orientation.Sagittal) {
-    tags.ImagePositionPatient = [options.sliceNumber * sliceSpacing, 0, 0];
+    tags.ImagePositionPatient = [genOptions.sliceNumber * sliceSpacing, 0, 0];
   }
   // instance number
-  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${options.sliceNumber}`;
-  tags.InstanceNumber = options.sliceNumber.toString();
+  tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${genOptions.sliceNumber}`;
+  tags.InstanceNumber = genOptions.sliceNumber.toString();
+
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromSimpleTagValues(tags);
   // pixels
-  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(tags, options);
+  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(tags, genOptions);
 
   return dicomElements;
 }
@@ -275,14 +299,22 @@ export function generateDicomElements(tags, options) {
  * Generate one slice.
  *
  * @param {object} tags The tags.
- * @param {GenerateOptions} [options] The options for pixel generation.
+ * @param {GenerateOptions} [genOptions] The options for pixel generation.
+ * @param {WriterOptions} [writerOptions] The options for dicom write.
  * @returns {Blob} A blob with the slice DICOM data.
  */
-export function generateSlice(tags, options) {
+export function generateSlice(
+  tags, genOptions, writerOptions) {
   // generate elements
-  const dicomElements = generateDicomElements(tags, options);
+  const dicomElements = generateDicomElements(tags, genOptions);
   // create writer
   const writer = new DicomWriter();
+  if (typeof writerOptions.useUnVrForPrivateSq !== 'undefined') {
+    writer.setUseUnVrForPrivateSq(writerOptions.useUnVrForPrivateSq);
+  }
+  if (typeof writerOptions.writerRules !== 'undefined') {
+    writer.setRules(writerOptions.writerRules);
+  }
   const dicomBuffer = writer.getBuffer(dicomElements);
   // view as Blob to allow download
   return new Blob([dicomBuffer], {type: 'application/dicom'});
@@ -293,25 +325,25 @@ export function generateSlice(tags, options) {
  *
  * @param {object} tags The tags.
  * @param {Function} zipCallback Callback once zip is ready.
- * @param {GenerateOptions} [options] The options for pixel generation.
+ * @param {GenerateOptions} [genOptions] The options for pixel generation.
  */
 export function generateSlices(
   tags,
   zipCallback,
-  options) {
-  if (typeof options === 'undefined') {
-    options = {};
+  genOptions) {
+  if (typeof genOptions === 'undefined') {
+    genOptions = {};
   }
-  if (typeof options.numberOfSlices === 'undefined') {
-    options.numberOfSlices = 1;
+  if (typeof genOptions.numberOfSlices === 'undefined') {
+    genOptions.numberOfSlices = 1;
   }
 
   const zip = new JSZip();
   // generate slices
   let blob;
-  for (let k = 0; k < options.numberOfSlices; ++k) {
-    options.sliceNumber = k;
-    blob = generateSlice(tags, options);
+  for (let k = 0; k < genOptions.numberOfSlices; ++k) {
+    genOptions.sliceNumber = k;
+    blob = generateSlice(tags, genOptions);
     zip.file(`dwv-generated-slice${k}.dcm`, blob);
   }
   // finish
