@@ -8993,8 +8993,8 @@ __metadata:
   linkType: hard
 
 "konva@npm:~10.3.0":
-  version: 10.3.2
-  resolution: "konva@npm:10.3.2"
+  version: 10.3.3
+  resolution: "konva@npm:10.3.3"
   peerDependencies:
     canvas: ^3.0.0
     skia-canvas: ^3.0.0
@@ -9003,7 +9003,7 @@ __metadata:
       optional: true
     skia-canvas:
       optional: true
-  checksum: 10c0/09725d1a350958f2ce6df1528d2f31005d8b2d15247808e26841a39480b5bcbe1b81d90e3eff6154346599362090a748e051db52f00b3be054755b66a5b30bb0
+  checksum: 10c0/b963d4d6688e28c8e7b8e9ce18841a0832226fe03fe2936e15a39c75a90f38808535d0f6d09b1de8e48b6cba8475c0675241cd2dc2e94a801152b19a33be5656
   languageName: node
   linkType: hard
 
