@@ -334,11 +334,13 @@ export function generateSliceBuffer(
  * @param {object} tags The tags.
  * @param {Function} zipCallback Callback once zip is ready.
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
+ * @param {WriterOptions} [writerOptions] The options for dicom write.
  */
 export function generateSlicesZip(
   tags,
   zipCallback,
-  genOptions) {
+  genOptions,
+  WriterOptions) {
   if (typeof genOptions === 'undefined') {
     genOptions = {};
   }
@@ -350,13 +352,14 @@ export function generateSlicesZip(
   // generate slices
   for (let k = 0; k < genOptions.numberOfSlices; ++k) {
     genOptions.sliceNumber = k;
-    const buffer = generateSliceBuffer(tags, genOptions);
+    const buffer = generateSliceBuffer(tags, genOptions, WriterOptions);
     const blob = new Blob([buffer], {type: 'application/dicom'});
     zip.file(`dwv-generated-slice${k}.dcm`, blob);
   }
   // finish
   zip.generateAsync({type: 'blob'}).then(zipCallback);
 }
+
 /**
  * Add dates to input tags.
  *
