@@ -274,6 +274,20 @@ export function isImageModality(modality) {
 }
 
 /**
+ * Is an input modality a multi slice image modality.
+ *
+ * @param {string} modality The data modality
+ * @returns {boolean} True if multi-slice type.
+ */
+export function isMultiSliceModality(modality) {
+  let res = false;
+  if (typeof modality !== 'undefined') {
+    res = isImageModality(modality) && modality !== 'SEG';
+  }
+  return res;
+}
+
+/**
  * Generate dicom elements.
  *
  * @param {object} tags The tags.

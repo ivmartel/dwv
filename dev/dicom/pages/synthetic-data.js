@@ -1,5 +1,9 @@
 import {addTagsToDictionary} from '../../../src/dicom/dictionary.js';
-import {generateSliceBuffers} from '../dicomGenerator.js';
+import {
+  generateSliceBuffers,
+  isMultiSliceModality,
+  zipBuffers
+} from '../dicomGenerator.js';
 
 /**
  * Setup.
@@ -15,12 +19,13 @@ function setup() {
 }
 
 /**
- * Create an object url from (JSON) tags.
+ * Create DICOM buffers from (JSON) tags.
  *
  * @param {object} config The data configuration.
- * @returns {string} The object URL.
+ * @param {number} [numberOfSlices] The number of slices.
+ * @returns {ArrayBuffer[]} The list of buffers.
  */
-function getObjectUrlFromTags(config) {
+function getBuffersFromTags(config, numberOfSlices = 1) {
   // add private tags to dict if present
   let useUnVrForPrivateSq = false;
   if (typeof config.privateDictionary !== 'undefined') {
@@ -36,18 +41,60 @@ function getObjectUrlFromTags(config) {
   }
 
   // generate buffer
-  const genOptions = {};
+  const genOptions = {numberOfSlices};
   if (typeof config.segmentSquares !== 'undefined') {
     genOptions.segmentSquares = config.segmentSquares;
   }
   const writerOptions = {useUnVrForPrivateSq};
-  const dicomBuffer = generateSliceBuffers(
-    config.tags, genOptions, writerOptions
-  )[0];
+  return generateSliceBuffers(config.tags, genOptions, writerOptions);
+}
 
-  // blob and then url
-  const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-  return URL.createObjectURL(blob);
+/**
+ * Get a single slice link.
+ *
+ * @param {object} config The data configuration.
+ * @returns {HTMLLinkElement} The link.
+ */
+function getSingleSliceLink(config) {
+  const link = document.createElement('a');
+  try {
+    const buffer = getBuffersFromTags(config)[0];
+    const blob = new Blob([buffer], {type: 'application/dicom'});
+    link.href = URL.createObjectURL(blob);
+  } catch (error) {
+    console.log('data:', config.name);
+    console.error(error);
+  }
+  const fileName = `dwv-generated-${config.name}.dcm`;
+  link.download = fileName;
+  link.appendChild(document.createTextNode('dcm'));
+  return link;
+}
+
+/**
+ * Get a multi-slice link.
+ *
+ * @param {object} config The data configuration.
+ * @returns {HTMLLinkElement} The link.
+ */
+function getMultipleSliceLink(config) {
+  const link = document.createElement('a');
+  const fileName = `dwv-generated-${config.name}.zip`;
+
+  const zipCallback = function (zipBlob) {
+    link.download = fileName;
+    link.href = URL.createObjectURL(zipBlob);
+  };
+
+  try {
+    const buffers = getBuffersFromTags(config, 5);
+    zipBuffers(buffers, zipCallback);
+  } catch (error) {
+    console.log('data:', config.name);
+    console.error(error);
+  }
+  link.appendChild(document.createTextNode('zip'));
+  return link;
 }
 
 /**
@@ -59,22 +106,15 @@ function getObjectUrlFromTags(config) {
 function getConfigsHtmlList(configs) {
   const ul = document.createElement('ul');
   for (const config of configs) {
-    // download link
-    const link = document.createElement('a');
-    try {
-      link.href = getObjectUrlFromTags(config);
-    } catch (error) {
-      console.log('data:', config.name);
-      console.error(error);
-    }
-    const fileName = `dwv-generated-${config.name}.dcm`;
-    link.download = fileName;
-    link.appendChild(document.createTextNode(fileName));
     // list element
     const li = document.createElement('li');
-    li.append(link);
     li.appendChild(document.createTextNode(
-      `: ${config.tags.SeriesDescription}`));
+      `${config.name}: ${config.tags.SeriesDescription}: `));
+    li.append(getSingleSliceLink(config));
+    if (isMultiSliceModality(config.tags.Modality)) {
+      li.appendChild(document.createTextNode(', '));
+      li.append(getMultipleSliceLink(config));
+    }
     // append to list
     ul.append(li);
   }
