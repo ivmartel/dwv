@@ -1,7 +1,5 @@
 import {addTagsToDictionary} from '../../../src/dicom/dictionary.js';
-import {
-  generateSliceBuffer,
-} from '../dicomGenerator.js';
+import {generateSliceBuffers} from '../dicomGenerator.js';
 
 /**
  * Setup.
@@ -43,9 +41,9 @@ function getObjectUrlFromTags(config) {
     genOptions.segmentSquares = config.segmentSquares;
   }
   const writerOptions = {useUnVrForPrivateSq};
-  const dicomBuffer = generateSliceBuffer(
+  const dicomBuffer = generateSliceBuffers(
     config.tags, genOptions, writerOptions
-  );
+  )[0];
 
   // blob and then url
   const blob = new Blob([dicomBuffer], {type: 'application/dicom'});

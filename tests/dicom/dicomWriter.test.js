@@ -12,7 +12,7 @@ import {
   dictionary,
   transferSyntaxKeywords
 } from '../../src/dicom/dictionary.js';
-import {generateSliceBuffer} from '../../dev/dicom/dicomGenerator.js';
+import {generateSliceBuffers} from '../../dev/dicom/dicomGenerator.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
 /**
@@ -368,9 +368,10 @@ describe('dicom', () => {
     }
     let dicomBuffer;
     try {
-      dicomBuffer = generateSliceBuffer(
+      // only one buffer
+      dicomBuffer = generateSliceBuffers(
         jsonTags, genOptions, writerOptions
-      );
+      )[0];
     } catch (error) {
       assert.ok(false, `Caught error: ${error}`);
     }

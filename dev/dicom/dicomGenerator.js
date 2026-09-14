@@ -260,6 +260,20 @@ export function getImageDataData(image) {
 };
 
 /**
+ * Is an input modality an image modality.
+ *
+ * @param {string} modality The data modality
+ * @returns {boolean} True if image type.
+ */
+export function isImageModality(modality) {
+  let res = false;
+  if (typeof modality !== 'undefined') {
+    res = modality !== 'KO' && modality !== 'RTSTRUCT';
+  }
+  return res;
+}
+
+/**
  * Generate dicom elements.
  *
  * @param {object} tags The tags.
@@ -300,9 +314,7 @@ export function generateDicomElements(tags, genOptions) {
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromSimpleTagValues(tags);
   // pixels
-  const isImageModality = tags.Modality !== 'KO' &&
-    tags.Modality !== 'RTSTRUCT';
-  if (isImageModality) {
+  if (isImageModality(tags.Modality)) {
     dicomElements['7FE00010'] = generatePixelDataFromJSONTags(tags, genOptions);
   }
 
@@ -317,7 +329,7 @@ export function generateDicomElements(tags, genOptions) {
  * @param {WriterOptions} [writerOptions] The options for dicom write.
  * @returns {ArrayBuffer} A buffer with the slice DICOM data.
  */
-export function generateSliceBuffer(
+function generateSliceBuffer(
   tags, genOptions, writerOptions) {
   // generate elements
   const dicomElements = generateDicomElements(tags, genOptions);
@@ -335,31 +347,42 @@ export function generateSliceBuffer(
 }
 
 /**
- * Generate multipe slices and create zip.
+ * Generate multiple slice buffer.
  *
  * @param {object} tags The tags.
- * @param {Function} zipCallback Callback once zip is ready.
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
  * @param {WriterOptions} [writerOptions] The options for dicom write.
+ * @returns {ArrayBuffer[]} An array of buffers with the slice DICOM data.
  */
-export function generateSlicesZip(
-  tags,
-  zipCallback,
-  genOptions,
-  WriterOptions) {
+export function generateSliceBuffers(
+  tags, genOptions, writerOptions) {
   if (typeof genOptions === 'undefined') {
     genOptions = {};
   }
   if (typeof genOptions.numberOfSlices === 'undefined') {
     genOptions.numberOfSlices = 1;
   }
-
-  const zip = new JSZip();
-  // generate slices
+  const buffers = [];
   for (let k = 0; k < genOptions.numberOfSlices; ++k) {
     genOptions.sliceNumber = k;
-    const buffer = generateSliceBuffer(tags, genOptions, WriterOptions);
-    const blob = new Blob([buffer], {type: 'application/dicom'});
+    buffers.push(generateSliceBuffer(tags, genOptions, writerOptions));
+  }
+  return buffers;
+}
+
+/**
+ * Generate multipe slices and create zip.
+ *
+ * @param {ArrayBuffer[]} buffers The dicom buffers.
+ * @param {Function} zipCallback Callback once zip is ready.
+ */
+export function zipBuffers(
+  buffers,
+  zipCallback) {
+  const zip = new JSZip();
+  // generate slices
+  for (let k = 0; k < buffers.length; ++k) {
+    const blob = new Blob([buffers[k]], {type: 'application/dicom'});
     zip.file(`dwv-generated-slice${k}.dcm`, blob);
   }
   // finish
