@@ -313,11 +313,13 @@ export function generateSliceBuffer(
   const dicomElements = generateDicomElements(tags, genOptions);
   // create writer
   const writer = new DicomWriter();
-  if (typeof writerOptions.useUnVrForPrivateSq !== 'undefined') {
-    writer.setUseUnVrForPrivateSq(writerOptions.useUnVrForPrivateSq);
-  }
-  if (typeof writerOptions.writerRules !== 'undefined') {
-    writer.setRules(writerOptions.writerRules, writerOptions.addMissingTags);
+  if (typeof writerOptions !== 'undefined') {
+    if (typeof writerOptions.useUnVrForPrivateSq !== 'undefined') {
+      writer.setUseUnVrForPrivateSq(writerOptions.useUnVrForPrivateSq);
+    }
+    if (typeof writerOptions.writerRules !== 'undefined') {
+      writer.setRules(writerOptions.writerRules, writerOptions.addMissingTags);
+    }
   }
   return writer.getBuffer(dicomElements);
 }
