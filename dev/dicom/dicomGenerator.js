@@ -29,6 +29,9 @@ import {
 import {
   SquarePixGenerator
 } from './squarePixGenerator.js';
+import {
+  StringPixGenerator
+} from './stringPixGenerator.js';
 
 import JSZip from 'jszip';
 
@@ -61,7 +64,8 @@ export const _pixelGenerators = {
   file: {generator: FilePixGenerator, checkTags: fileCheckTags},
   gradSquare: {generator: GradSquarePixGenerator},
   mpr: {generator: MPRPixGenerator, checkTags: mprCheckTags},
-  square: {generator: SquarePixGenerator}
+  square: {generator: SquarePixGenerator},
+  string: {generator: StringPixGenerator}
 };
 
 // List of required tags for generating pixel data
@@ -120,7 +124,7 @@ export function generatePixelDataFromJSONTags(
       genOptions.pixelGeneratorName = 'binary';
     } else {
       // grad square generator
-      genOptions.pixelGeneratorName = 'gradSquare';
+      genOptions.pixelGeneratorName = 'string';
     }
   }
   if (typeof genOptions.sliceNumber === 'undefined') {
