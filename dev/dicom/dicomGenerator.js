@@ -48,6 +48,8 @@ import JSZip from 'jszip';
  * @property {object} segmentSquares Per-segment square bounds
  *   keyed by segment number string. Each entry has
  *   {minI, maxI, minJ, maxJ}.
+ * @property {string} modality The DICOM modality to generate pixel
+ *   data for, defaults to the tags' Modality.
  */
 
 /**
@@ -133,6 +135,9 @@ export function generatePixelDataFromJSONTags(
   if (typeof genOptions.numberOfSlices === 'undefined') {
     genOptions.numberOfSlices = 1;
   }
+  if (typeof genOptions.modality === 'undefined') {
+    genOptions.modality = tags.Modality;
+  }
 
   // check tags
   if (!checkTags(tags, _requiredPixelTags, true)) {
@@ -209,7 +214,8 @@ export function generatePixelDataFromJSONTags(
     numberOfColourPlanes,
     photometricInterpretation,
     imageOrientationPatient: tags.ImageOrientationPatient,
-    segmentSquares: genOptions.segmentSquares
+    segmentSquares: genOptions.segmentSquares,
+    modality: genOptions.modality
   });
   if (typeof generator.setImages !== 'undefined' &&
     typeof genOptions.images !== 'undefined') {

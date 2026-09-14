@@ -1,5 +1,17 @@
 import {BRAIN_ROWS} from './brainShape.js';
 
+// typical max pixel value per modality
+const modalityMaxValues = {
+  CT: 3000,
+  MR: 4095,
+  PT: 32767,
+  CR: 4095,
+  DX: 4095,
+  MG: 4095,
+  US: 255
+};
+const defaultMaxValue = 255;
+
 /**
  * Get the grey level at a given pixel position, sampled (nearest
  * neighbour) from a reference square grey level grid.
@@ -37,7 +49,7 @@ export class StringPixGenerator {
   #isRGB;
 
   #background = 0;
-  #maxValue = 255;
+  #maxValue = defaultMaxValue;
   #maxLevel = 9;
 
   /**
@@ -50,6 +62,10 @@ export class StringPixGenerator {
     this.#numberOfColourPlanes = options.numberOfColourPlanes;
 
     this.#isRGB = options.photometricInterpretation === 'RGB';
+
+    if (typeof modalityMaxValues[options.modality] !== 'undefined') {
+      this.#maxValue = modalityMaxValues[options.modality];
+    }
 
     if (typeof options.shape !== 'undefined') {
       this.#shape = options.shape;
