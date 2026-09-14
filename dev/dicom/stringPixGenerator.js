@@ -63,7 +63,8 @@ export class StringPixGenerator {
 
     this.#isRGB = options.photometricInterpretation === 'RGB';
 
-    if (typeof modalityMaxValues[options.modality] !== 'undefined') {
+    if (!this.#isRGB &&
+      typeof modalityMaxValues[options.modality] !== 'undefined') {
       this.#maxValue = modalityMaxValues[options.modality];
     }
 
@@ -130,7 +131,7 @@ export class StringPixGenerator {
   #getRGB = (i, j, k) => {
     let value = this.#getValue(i, j, k);
     if (value > this.#maxValue) {
-      value = 200;
+      value = this.#maxValue;
     }
     return [value, 0, 0];
   };
