@@ -1,47 +1,28 @@
 import {BRAIN_ROWS} from './brainShape.js';
 
 /**
- * Decode hex-encoded pixel rows (as in BRAIN_ROWS) into grey values.
+ * Get the grey level at a given pixel position, sampled (nearest
+ * neighbour) from a reference square grey level grid.
  *
- * @param {string[]} rows The hex-encoded rows.
- * @returns {number[][]} The grey values, one array per row.
- */
-function hexRowsToPixels(rows) {
-  return rows.map((row) => {
-    const pixels = [];
-    for (let i = 0; i < row.length; i += 2) {
-      pixels.push(parseInt(row.substring(i, i + 2), 16));
-    }
-    return pixels;
-  });
-}
-
-/**
- * Get the grey value at a given pixel position, sampled (nearest
- * neighbour) from a reference square grey value grid.
- *
- * @param {number[][]} pixels The reference grid.
+ * @param {number[][]} levels The reference grid, values in [0, 9].
  * @param {number} i The column index.
  * @param {number} j The row index.
  * @param {number} numberOfColumns The image number of columns.
  * @param {number} numberOfRows The image number of rows.
- * @param {number} background The background value.
- * @returns {number} The grey value.
+ * @returns {number} The grey level, in [0, 9].
  */
-function sampleGrid(
-  pixels, i, j, numberOfColumns, numberOfRows, background) {
-  const refSize = pixels.length;
+function sampleGrid(levels, i, j, numberOfColumns, numberOfRows) {
+  const refSize = levels.length;
   const row = Math.min(
     refSize - 1, Math.floor(j * refSize / numberOfRows));
   const col = Math.min(
     refSize - 1, Math.floor(i * refSize / numberOfColumns));
 
-  const value = pixels[row][col];
-  return value === 0 ? background : value;
+  return levels[row][col];
 }
 
 /**
- * StringPixGenerator: generates pixel data from string arrays.
+ * StringPixGenerator: generates pixel data from grey value grids.
  */
 export class StringPixGenerator {
 
@@ -57,6 +38,7 @@ export class StringPixGenerator {
 
   #background = 0;
   #maxValue = 255;
+  #maxLevel = 9;
 
   /**
    * @param {object} options The generator options.
@@ -74,7 +56,7 @@ export class StringPixGenerator {
     }
 
     if (this.#shape === 'brain') {
-      this.#pixels = BRAIN_ROWS.map(hexRowsToPixels);
+      this.#pixels = BRAIN_ROWS;
     }
   }
 
@@ -111,11 +93,13 @@ export class StringPixGenerator {
    * @returns {number[]} The grey value.
    */
   #getValue = (i, j, k) => {
-    const value = sampleGrid(
+    const level = sampleGrid(
       this.#pixels[k], i, j,
       this.#numberOfColumns,
-      this.#numberOfRows,
-      this.#background);
+      this.#numberOfRows);
+    const value = level === 0
+      ? this.#background
+      : Math.round(level * this.#maxValue / this.#maxLevel);
     return [value];
   };
 
