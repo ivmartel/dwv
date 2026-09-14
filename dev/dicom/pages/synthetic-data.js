@@ -60,23 +60,23 @@ function getObjectUrlFromTags(config) {
  */
 function getConfigsHtmlList(configs) {
   const ul = document.createElement('ul');
-  for (let i = 0; i < configs.length; ++i) {
+  for (const config of configs) {
     // download link
     const link = document.createElement('a');
     try {
-      link.href = getObjectUrlFromTags(configs[i]);
+      link.href = getObjectUrlFromTags(config);
     } catch (error) {
-      console.log('data:', configs[i].name);
+      console.log('data:', config.name);
       console.error(error);
     }
-    const fileName = `dwv-generated-${configs[i].name}.dcm`;
+    const fileName = `dwv-generated-${config.name}.dcm`;
     link.download = fileName;
     link.appendChild(document.createTextNode(fileName));
     // list element
     const li = document.createElement('li');
     li.append(link);
     li.appendChild(document.createTextNode(
-      `: ${configs[i].tags.SeriesDescription}`));
+      `: ${config.tags.SeriesDescription}`));
     // append to list
     ul.append(li);
   }
