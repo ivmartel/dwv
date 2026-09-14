@@ -1063,6 +1063,8 @@ export class Image extends EventTarget {
     // possible time
     const timeId = rhs.getGeometry().getInitialTime();
 
+    const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
+
     // append frame if needed
     let isNewFrame = false;
     if (typeof timeId !== 'undefined' &&
@@ -1108,7 +1110,6 @@ export class Image extends EventTarget {
     }
     // offset of the input slice
     const indexOffset = fullSliceIndex * sliceSize;
-    const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
     const maxOffset = totalSlices * sliceSize;
     // move content if needed
     if (indexOffset < maxOffset) {
