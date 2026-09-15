@@ -134,4 +134,80 @@ describe('ImageFactory', () => {
 
   });
 
+  // build a 3D volume from multiple single-slice DICOM elements, the way
+  // the app assembles a series: one Image per slice via ImageFactory,
+  // combined with appendSlice.
+  describe('3D creation from generateDicomElements', () => {
+    const config = syntheticData[0];
+    const numberOfSlices = 4;
+
+    let image;
+    let sliceElementsList;
+
+    beforeAll(() => {
+      const tagsCopy = structuredClone(config.tags);
+      tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+      const genOptions = {
+        pixelGeneratorName: 'string',
+        numberOfSlices
+      };
+      sliceElementsList = generateDataElements(tagsCopy, genOptions);
+
+      const factory = new ImageFactory();
+      for (const sliceElements of sliceElementsList) {
+        const pixelBuffer = sliceElements['7FE00010'].value;
+        const sliceImage = factory.create(
+          sliceElements, pixelBuffer, numberOfSlices);
+        if (typeof image === 'undefined') {
+          image = sliceImage;
+        } else {
+          image.appendSlice(sliceImage);
+        }
+      }
+    });
+
+    test('geometry has one slice per generated element set', () => {
+      assert.equal(
+        image.getGeometry().getSize().get(2), numberOfSlices,
+        'slice count matches numberOfSlices'
+      );
+    });
+
+    test('slice origins are ordered along z with expected spacing', () => {
+      const origins = image.getGeometry().getOrigins();
+      assert.equal(origins.length, numberOfSlices, 'one origin per slice');
+      for (let i = 0; i < numberOfSlices; ++i) {
+        assert.equal(origins[i].getZ(), i, `slice ${i} z position`);
+      }
+    });
+
+    test('pixel buffer content of each slice is preserved', () => {
+      const sliceSize = config.tags.Rows * config.tags.Columns;
+      const fullBuffer = image.getBuffer();
+      for (let i = 0; i < numberOfSlices; ++i) {
+        const sliceBuffer = sliceElementsList[i]['7FE00010'].value;
+        assert.equal(
+          fullBuffer[i * sliceSize], sliceBuffer[0],
+          `slice ${i} first pixel matches`
+        );
+        assert.equal(
+          fullBuffer[i * sliceSize + sliceSize - 1],
+          sliceBuffer[sliceSize - 1],
+          `slice ${i} last pixel matches`
+        );
+      }
+    });
+
+    test('each slice SOPInstanceUID is included as an image UID', () => {
+      for (let i = 0; i < numberOfSlices; ++i) {
+        const uid = sliceElementsList[i]['00080018'].value[0];
+        assert.ok(
+          image.includesImageUid(uid),
+          `slice ${i} SOPInstanceUID included`
+        );
+      }
+    });
+
+  });
+
 });
