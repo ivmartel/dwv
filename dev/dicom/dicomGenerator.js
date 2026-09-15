@@ -36,6 +36,11 @@ import {
 import JSZip from 'jszip';
 
 /**
+ * @import {DataElement} from '../../src/dicom/dataElement.js;
+ * @import {SimpleTagValue} from '../../src/dicom/simpleTagValues.js;
+ */
+
+/**
  * @typedef {Object} GenerateOptions
  * @property {string} pixelGeneratorName The name of
  *   the pixel generator to use, defaults to gradSquare.
@@ -84,8 +89,8 @@ const _requiredPixelTags = [
 /**
  * Check a list of input tags against a required list.
  *
- * @param {object} tags The tags to check.
- * @param {Array} requiredTags Array of tag names.
+ * @param {Record<string, SimpleTagValue>} tags The tags to check.
+ * @param {string[]} requiredTags Array of tag names.
  * @param {boolean} withLog Flag to log errors or not.
  * @returns {boolean} True if all required tags are present in the input.
  */
@@ -110,9 +115,9 @@ export function checkTags(tags, requiredTags, withLog) {
 /**
  * Get the DICOM pixel data from a DICOM tags object.
  *
- * @param {object} tags The DICOM tags object.
+ * @param {Record<string, SimpleTagValue>} tags The DICOM tags object.
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
- * @returns {object} The DICOM pixel data element.
+ * @returns {DataElement} The DICOM pixel data element.
  */
 export function generatePixelDataFromJSONTags(
   tags, genOptions) {
@@ -290,11 +295,11 @@ export function isMultiSliceModality(modality) {
 /**
  * Generate dicom elements.
  *
- * @param {object} tags The tags.
+ * @param {Record<string, SimpleTagValue>} tags The tags.
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
- * @returns {dicomElements} The dicom elements.
+ * @returns {Record<string, DataElement>} The data elements.
  */
-export function generateDicomElements(tags, genOptions) {
+function generateSingleSliceDataElements(tags, genOptions) {
   if (typeof genOptions === 'undefined') {
     genOptions = {};
   }
@@ -336,17 +341,37 @@ export function generateDicomElements(tags, genOptions) {
 }
 
 /**
+ * Generate dicom data elements.
+ *
+ * @param {Record<string, SimpleTagValue>} tags The tags.
+ * @param {GenerateOptions} [genOptions] The options for pixel generation.
+ * @returns {Record<string, DataElement>[]} The list of data elements.
+ */
+export function generateDataElements(tags, genOptions) {
+  if (typeof genOptions === 'undefined') {
+    genOptions = {};
+  }
+  if (typeof genOptions.numberOfSlices === 'undefined') {
+    genOptions.numberOfSlices = 1;
+  }
+  const daList = [];
+  for (let k = 0; k < genOptions.numberOfSlices; ++k) {
+    genOptions.sliceNumber = k;
+    const da = generateSingleSliceDataElements(tags, genOptions);
+    daList.push(da);
+  }
+  return daList;
+}
+
+/**
  * Generate one slice buffer.
  *
- * @param {object} tags The tags.
- * @param {GenerateOptions} [genOptions] The options for pixel generation.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @param {WriterOptions} [writerOptions] The options for dicom write.
  * @returns {ArrayBuffer} A buffer with the slice DICOM data.
  */
 function generateSliceBuffer(
-  tags, genOptions, writerOptions) {
-  // generate elements
-  const dicomElements = generateDicomElements(tags, genOptions);
+  dataElements, writerOptions) {
   // create writer
   const writer = new DicomWriter();
   if (typeof writerOptions !== 'undefined') {
@@ -357,29 +382,22 @@ function generateSliceBuffer(
       writer.setRules(writerOptions.writerRules, writerOptions.addMissingTags);
     }
   }
-  return writer.getBuffer(dicomElements);
+  return writer.getBuffer(dataElements);
 }
 
 /**
  * Generate multiple slice buffer.
  *
- * @param {object} tags The tags.
- * @param {GenerateOptions} [genOptions] The options for pixel generation.
+ * @param {Record<string, DataElement>} dataElementsList The list
+ *   of data elements.
  * @param {WriterOptions} [writerOptions] The options for dicom write.
  * @returns {ArrayBuffer[]} An array of buffers with the slice DICOM data.
  */
 export function generateSliceBuffers(
-  tags, genOptions, writerOptions) {
-  if (typeof genOptions === 'undefined') {
-    genOptions = {};
-  }
-  if (typeof genOptions.numberOfSlices === 'undefined') {
-    genOptions.numberOfSlices = 1;
-  }
+  dataElementsList, writerOptions) {
   const buffers = [];
-  for (let k = 0; k < genOptions.numberOfSlices; ++k) {
-    genOptions.sliceNumber = k;
-    buffers.push(generateSliceBuffer(tags, genOptions, writerOptions));
+  for (const da of dataElementsList) {
+    buffers.push(generateSliceBuffer(da, writerOptions));
   }
   return buffers;
 }
@@ -406,7 +424,7 @@ export function zipBuffers(
 /**
  * Add dates to input tags.
  *
- * @param {object} tags The tags.
+ * @param {Record<string, SimpleTagValue>} tags The tags.
  */
 export function addDates(tags) {
   // set study date

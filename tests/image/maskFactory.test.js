@@ -15,7 +15,7 @@ import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
-import {generateDicomElements} from '../../dev/dicom/dicomGenerator.js';
+import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 
 import syntheticImgData from '/tests/data/synthetic-img.json';
 import syntheticSegData from '/tests/data/synthetic-seg.json';
@@ -52,7 +52,7 @@ function buildRefImage() {
   const tags = config.tags;
   tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
   const genOptions = {pixelGeneratorName: 'gradSquare'};
-  const elements = generateDicomElements(tags, genOptions);
+  const elements = generateDataElements(tags, genOptions)[0];
   const buffer = elements['7FE00010'].value;
   const factory = new ImageFactory();
   return factory.create(elements, buffer, 1);
@@ -69,7 +69,7 @@ function buildMaskImage(configName) {
   const tags = structuredClone(config.tags);
   tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
   const genOptions = {segmentSquares: config.segmentSquares};
-  const elements = generateDicomElements(tags, genOptions);
+  const elements = generateDataElements(tags, genOptions)[0];
   const buffer = elements['7FE00010'].value;
   const factory = new MaskFactory();
   return factory.create(elements, buffer, buildRefImage());

@@ -5,6 +5,7 @@ import {
 
 import {
   _pixelGenerators,
+  generateDataElements,
   generateSliceBuffers,
   zipBuffers,
   addDates
@@ -119,7 +120,7 @@ function onGenerate() {
 
   console.log('Generating slices...');
 
-  const buffers = generateSliceBuffers(
+  const dataElementsList = generateDataElements(
     tags,
     {
       pixelGeneratorName,
@@ -127,6 +128,7 @@ function onGenerate() {
       _images
     }
   );
+  const buffers = generateSliceBuffers(dataElementsList);
   zipBuffers(buffers, zipCallback);
 }
 

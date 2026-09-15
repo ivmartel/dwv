@@ -4,7 +4,7 @@ import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
-import {generateDicomElements} from '../../dev/dicom/dicomGenerator.js';
+import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
 
@@ -36,7 +36,7 @@ describe('ImageFactory', () => {
       const tagsCopy = structuredClone(config.tags);
       tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
       const genOptions = {pixelGeneratorName: 'gradSquare'};
-      const elements = generateDicomElements(tagsCopy, genOptions);
+      const elements = generateDataElements(tagsCopy, genOptions)[0];
       buffer = elements['7FE00010'].value;
 
       const factory = new ImageFactory();

@@ -1,5 +1,6 @@
 import {addTagsToDictionary} from '../../../src/dicom/dictionary.js';
 import {
+  generateDataElements,
   generateSliceBuffers,
   isMultiSliceModality,
   zipBuffers
@@ -40,13 +41,15 @@ function getBuffersFromTags(config, numberOfSlices = 1) {
     }
   }
 
-  // generate buffer
+  // generate data elements
   const genOptions = {numberOfSlices};
   if (typeof config.segmentSquares !== 'undefined') {
     genOptions.segmentSquares = config.segmentSquares;
   }
+  const dataElementsList = generateDataElements(config.tags, genOptions);
+  // generate buffers
   const writerOptions = {useUnVrForPrivateSq};
-  return generateSliceBuffers(config.tags, genOptions, writerOptions);
+  return generateSliceBuffers(dataElementsList, writerOptions);
 }
 
 /**
