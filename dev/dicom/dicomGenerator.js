@@ -299,7 +299,7 @@ export function isMultiSliceModality(modality) {
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
  * @returns {Record<string, DataElement>} The data elements.
  */
-function generateSingleSliceDataElements(tags, genOptions) {
+function generateSingleFileDataElements(tags, genOptions) {
   if (typeof genOptions === 'undefined') {
     genOptions = {};
   }
@@ -357,7 +357,7 @@ export function generateDataElements(tags, genOptions) {
   const daList = [];
   for (let k = 0; k < genOptions.numberOfSlices; ++k) {
     genOptions.sliceNumber = k;
-    const da = generateSingleSliceDataElements(tags, genOptions);
+    const da = generateSingleFileDataElements(tags, genOptions);
     daList.push(da);
   }
   return daList;
