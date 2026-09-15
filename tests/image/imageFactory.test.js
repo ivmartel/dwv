@@ -210,4 +210,81 @@ describe('ImageFactory', () => {
 
   });
 
+  // build an image from a single multiframe DICOM file (NumberOfFrames
+  // tag, one SOPInstanceUID, all frame pixel data in one buffer). With
+  // no per-frame position info (no PerFrameFunctionalGroupsSequence),
+  // the frames share the file's single spatial position and are stacked
+  // along the time dimension instead of z, unlike the spatially-stacked
+  // volume built via appendSlice above.
+  describe('multiframe creation from generateDataElements', () => {
+    const config = syntheticData[0];
+    const tags = config.tags;
+    const numberOfFrames = 3;
+
+    let image;
+    let buffer;
+
+    beforeAll(() => {
+      const tagsCopy = structuredClone(config.tags);
+      tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+      tagsCopy.NumberOfFrames = numberOfFrames;
+      const genOptions = {pixelGeneratorName: 'string'};
+      const elements = generateDataElements(tagsCopy, genOptions)[0];
+      buffer = elements['7FE00010'].value;
+
+      const factory = new ImageFactory();
+      factory.checkElements(elements);
+      image = factory.create(elements, buffer, 1);
+    });
+
+    test('geometry keeps a single spatial slice with frames as time', () => {
+      const size = image.getGeometry().getSize();
+      assert.equal(size.get(2), 1, 'single spatial slice');
+      assert.equal(size.length(), 4, 'geometry gains a time dimension');
+      assert.equal(
+        size.get(3), numberOfFrames, 'frame count matches NumberOfFrames');
+    });
+
+    test('meta numberOfFiles stays 1 for a single multiframe file', () => {
+      assert.equal(image.getMeta().numberOfFiles, 1, 'numberOfFiles');
+    });
+
+    test('pixel buffer holds all frames with distinct per-frame content',
+      () => {
+        const sliceSize = tags.Rows * tags.Columns;
+        assert.equal(
+          buffer.length, sliceSize * numberOfFrames,
+          'buffer holds all frames'
+        );
+        const imageBuffer = image.getBuffer();
+        const frames = [];
+        for (let f = 0; f < numberOfFrames; ++f) {
+          const start = f * sliceSize;
+          const end = start + sliceSize;
+          frames.push(Array.from(buffer.slice(start, end)));
+          assert.deepEqual(
+            Array.from(imageBuffer.slice(start, end)),
+            frames[f],
+            `frame ${f} pixel data is preserved`
+          );
+        }
+        // sanity check the generated data actually varies per frame,
+        // otherwise the preservation check above would be vacuous
+        // (e.g. a generator that only fills frame 0, leaving the rest
+        // zeroed, would still pass it)
+        assert.notDeepEqual(
+          frames[0], frames[1], 'frame 0 and frame 1 are not identical'
+        );
+      }
+    );
+
+    test('SOPInstanceUID used as frame UID', () => {
+      assert.ok(
+        image.includesImageUid(tags.SOPInstanceUID),
+        'SOPInstanceUID is in image UIDs'
+      );
+    });
+
+  });
+
 });

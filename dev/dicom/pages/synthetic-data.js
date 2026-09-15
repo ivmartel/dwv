@@ -78,6 +78,29 @@ function getSingleSliceLink(config) {
 }
 
 /**
+ * Get a single multiframe link.
+ *
+ * @param {object} config The data configuration.
+ * @returns {HTMLLinkElement} The link.
+ */
+function getSingleMultiframeLink(config) {
+  const link = document.createElement('a');
+  try {
+    config.tags.NumberOfFrames = 3;
+    const buffer = getBuffersFromTags(config)[0];
+    const blob = new Blob([buffer], {type: 'application/dicom'});
+    link.href = URL.createObjectURL(blob);
+  } catch (error) {
+    console.log('data:', config.name);
+    console.error(error);
+  }
+  const fileName = `dwv-generated-${config.name}-mf.dcm`;
+  link.download = fileName;
+  link.appendChild(document.createTextNode('mf-dcm'));
+  return link;
+}
+
+/**
  * Get a multi-slice link.
  *
  * @param {object} config The data configuration.
@@ -120,6 +143,8 @@ function getConfigsHtmlList(configs) {
     if (isMultiSliceModality(config.tags.Modality)) {
       li.appendChild(document.createTextNode(', '));
       li.append(getMultipleSliceLink(config));
+      li.appendChild(document.createTextNode(', '));
+      li.append(getSingleMultiframeLink(config));
     }
     // append to list
     ul.append(li);
