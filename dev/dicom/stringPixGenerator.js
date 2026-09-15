@@ -42,6 +42,7 @@ export class StringPixGenerator {
   #numberOfRows;
   #numberOfSamples;
   #numberOfColourPlanes;
+  #numberOfFrames;
 
   #shape = 'brain';
   #pixels;
@@ -60,6 +61,7 @@ export class StringPixGenerator {
     this.#numberOfRows = options.numberOfRows;
     this.#numberOfSamples = options.numberOfSamples;
     this.#numberOfColourPlanes = options.numberOfColourPlanes;
+    this.#numberOfFrames = options.numberOfFrames ?? 1;
 
     this.#isRGB = options.photometricInterpretation === 'RGB';
 
@@ -86,15 +88,17 @@ export class StringPixGenerator {
 
     let offset = 0;
     for (let c = 0; c < this.#numberOfColourPlanes; ++c) {
-      for (let j = 0; j < this.#numberOfRows; ++j) {
-        for (let i = 0; i < this.#numberOfColumns; ++i) {
-          for (let s = 0; s < this.#numberOfSamples; ++s) {
-            if (this.#numberOfColourPlanes !== 1) {
-              pixelBuffer[offset] = getFunc(i, j, sliceNumber)[c];
-            } else {
-              pixelBuffer[offset] = getFunc(i, j, sliceNumber)[s];
+      for (let f = 0; f < this.#numberOfFrames; ++f) {
+        for (let j = 0; j < this.#numberOfRows; ++j) {
+          for (let i = 0; i < this.#numberOfColumns; ++i) {
+            for (let s = 0; s < this.#numberOfSamples; ++s) {
+              if (this.#numberOfColourPlanes !== 1) {
+                pixelBuffer[offset] = getFunc(i, j, sliceNumber, f)[c];
+              } else {
+                pixelBuffer[offset] = getFunc(i, j, sliceNumber, f)[s];
+              }
+              ++offset;
             }
-            ++offset;
           }
         }
       }
@@ -107,11 +111,12 @@ export class StringPixGenerator {
    * @param {number} i The column index.
    * @param {number} j The row index.
    * @param {number} k The slice index.
+   * @param {number} f The frame index.
    * @returns {number[]} The grey value.
    */
-  #getValue = (i, j, k) => {
+  #getValue = (i, j, k, f) => {
     const level = sampleGrid(
-      this.#pixels[k], i, j,
+      this.#pixels[f][k], i, j,
       this.#numberOfColumns,
       this.#numberOfRows);
     const value = level === 0
@@ -128,8 +133,8 @@ export class StringPixGenerator {
    * @param {number} k The slice index.
    * @returns {number[]} The [R,G,B] values.
    */
-  #getRGB = (i, j, k) => {
-    let value = this.#getValue(i, j, k);
+  #getRGB = (i, j, k, f) => {
+    let value = this.#getValue(i, j, k, f);
     if (value > this.#maxValue) {
       value = this.#maxValue;
     }
