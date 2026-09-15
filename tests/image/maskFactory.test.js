@@ -51,7 +51,7 @@ function buildRefImage() {
   const config = syntheticData.find(c => c.name === 'test-img-00');
   const tags = config.tags;
   tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-  const genOptions = {pixelGeneratorName: 'gradSquare'};
+  const genOptions = {pixelGeneratorName: 'string'};
   const elements = generateDataElements(tags, genOptions)[0];
   const buffer = elements['7FE00010'].value;
   const factory = new ImageFactory();

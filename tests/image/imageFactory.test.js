@@ -35,7 +35,7 @@ describe('ImageFactory', () => {
     beforeAll(() => {
       const tagsCopy = structuredClone(config.tags);
       tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-      const genOptions = {pixelGeneratorName: 'gradSquare'};
+      const genOptions = {pixelGeneratorName: 'string'};
       const elements = generateDataElements(tagsCopy, genOptions)[0];
       buffer = elements['7FE00010'].value;
 

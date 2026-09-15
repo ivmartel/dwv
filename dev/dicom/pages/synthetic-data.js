@@ -42,7 +42,10 @@ function getBuffersFromTags(config, numberOfSlices = 1) {
   }
 
   // generate data elements
-  const genOptions = {numberOfSlices};
+  const genOptions = {
+    pixelGeneratorName: 'string',
+    numberOfSlices
+  };
   if (typeof config.segmentSquares !== 'undefined') {
     genOptions.segmentSquares = config.segmentSquares;
   }
