@@ -409,20 +409,22 @@ export function generateDataElements(tags, genOptions) {
   if (typeof genOptions === 'undefined') {
     genOptions = {};
   }
-  let maxLoop = 1;
-  let loopPropName;
+  let numberOfSlices = 1;
   if (typeof genOptions.numberOfSlices !== 'undefined') {
-    maxLoop = genOptions.numberOfSlices;
-    loopPropName = 'sliceNumber';
-  } else if (typeof genOptions.numberOfFrames !== 'undefined') {
-    maxLoop = genOptions.numberOfFrames;
-    loopPropName = 'frameNumber';
+    numberOfSlices = genOptions.numberOfSlices;
+  }
+  let numberOfFrames = 1;
+  if (typeof genOptions.numberOfFrames !== 'undefined') {
+    numberOfFrames = genOptions.numberOfFrames;
   }
   const daList = [];
-  for (let i = 0; i < maxLoop; ++i) {
-    genOptions[loopPropName] = i;
-    const da = generateSingleFileDataElements(tags, genOptions);
-    daList.push(da);
+  for (let f = 0; f < numberOfFrames; ++f) {
+    genOptions.frameNumber = f;
+    for (let k = 0; k < numberOfSlices; ++k) {
+      genOptions.sliceNumber = k;
+      const da = generateSingleFileDataElements(tags, genOptions);
+      daList.push(da);
+    }
   }
   return daList;
 }
