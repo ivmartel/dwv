@@ -376,4 +376,126 @@ describe('ImageFactory', () => {
     }
   );
 
+  // build a 4D volume from multiple files, each file itself a spatial
+  // multiframe 3D volume (frames3D) representing one time point, as
+  // created by dev/dicom/pages/synthetic-data.js's
+  // getMultipleSingleFrameMultiSliceLink. Each file is turned into its
+  // own z-stack Image via ImageFactory (as in the "multiframe
+  // multi-slice" case above), then the per-file volumes are combined
+  // with appendVolume rather than appendSlice, since each one is a
+  // whole volume (more than one slice) representing a new time point,
+  // not a single 2D slice.
+  describe(
+    'multiple single-frame multi-slice creation from generateDataElements',
+    () => {
+      const config = syntheticData[0];
+      const tags = config.tags;
+      const numberOfSlices = 3;
+      const numberOfFrames = 5;
+
+      let image;
+      let fileElementsList;
+
+      beforeAll(() => {
+        const tagsCopy = structuredClone(config.tags);
+        tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+        tagsCopy.NumberOfFrames = numberOfFrames;
+        const genOptions = {
+          pixelGeneratorName: 'string',
+          frames3D: true,
+          numberOfSlices
+        };
+        fileElementsList = generateDataElements(tagsCopy, genOptions);
+
+        const factory = new ImageFactory();
+        for (const elements of fileElementsList) {
+          const pixelBuffer = elements['7FE00010'].value;
+          const fileImage = factory.create(
+            elements, pixelBuffer, numberOfSlices);
+          if (typeof image === 'undefined') {
+            image = fileImage;
+          } else {
+            image.appendVolume(fileImage);
+          }
+        }
+      });
+
+      test('generates one multiframe file per slice position', () => {
+        assert.equal(
+          fileElementsList.length, numberOfSlices,
+          'one file per slice position'
+        );
+      });
+
+      test('geometry is 4D: spatial frames by z, files by time', () => {
+        const size = image.getGeometry().getSize();
+        assert.equal(size.length(), 4, 'geometry gains a time dimension');
+        assert.equal(
+          size.get(2), numberOfFrames,
+          'z size matches per-file frame count');
+        assert.equal(
+          size.get(3), numberOfSlices, 'time size matches file count');
+      });
+
+      test('frame origins are ordered along z with expected spacing', () => {
+        const origins = image.getGeometry().getOrigins();
+        assert.equal(origins.length, numberOfFrames, 'one origin per frame');
+        for (let i = 0; i < numberOfFrames; ++i) {
+          assert.equal(origins[i].getZ(), i, `frame ${i} z position`);
+        }
+      });
+
+      test('meta numberOfFiles matches the number of combined files', () => {
+        assert.equal(
+          image.getMeta().numberOfFiles, numberOfSlices, 'numberOfFiles');
+      });
+
+      test(
+        'pixel buffer holds every file and frame with distinct content',
+        () => {
+          const sliceSize = tags.Rows * tags.Columns;
+          const fullBuffer = image.getBuffer();
+          assert.equal(
+            fullBuffer.length, sliceSize * numberOfFrames * numberOfSlices,
+            'buffer holds every file and frame'
+          );
+
+          const frames = [];
+          for (let fileIndex = 0; fileIndex < numberOfSlices; ++fileIndex) {
+            const fileBuffer = fileElementsList[fileIndex]['7FE00010'].value;
+            for (let f = 0; f < numberOfFrames; ++f) {
+              const start = (fileIndex * numberOfFrames + f) * sliceSize;
+              const end = start + sliceSize;
+              const frame = Array.from(fullBuffer.slice(start, end));
+              assert.deepEqual(
+                frame,
+                Array.from(fileBuffer.slice(f * sliceSize, f * sliceSize +
+                sliceSize)),
+                `file ${fileIndex} frame ${f} pixel data is preserved`
+              );
+              frames.push(frame);
+            }
+          }
+          // sanity check the generated data actually varies, both across
+          // frames within a file (z) and across files at the same frame
+          // index (time), otherwise the preservation check above would
+          // be vacuous
+          assert.notDeepEqual(
+            frames[0], frames[1], 'frame 0 and frame 1 of file 0 differ');
+          assert.notDeepEqual(
+            frames[0], frames[numberOfFrames],
+            'frame 0 of file 0 and frame 0 of file 1 differ');
+        }
+      );
+
+      test('each file SOPInstanceUID is included as an image UID', () => {
+        for (const elements of fileElementsList) {
+          const uid = elements['00080018'].value[0];
+          assert.ok(image.includesImageUid(uid), `${uid} included`);
+        }
+      });
+
+    }
+  );
+
 });
