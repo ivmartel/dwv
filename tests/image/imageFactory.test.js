@@ -287,4 +287,93 @@ describe('ImageFactory', () => {
 
   });
 
+  // build an image from a single multiframe DICOM file that also carries
+  // per-frame spatial position (frames3D genOption: Shared/PerFrame
+  // FunctionalGroupsSequence with a PlanePositionSequence per frame), as
+  // created by dev/dicom/pages/synthetic-data.js's
+  // getSingleMultiFrameMultiSliceLink. Unlike the plain multiframe case
+  // above, the per-frame ImagePositionPatient lets ImageFactory build a
+  // genuine spatial z-stack (getFramesGeometry) from a single file,
+  // instead of falling back to a time dimension.
+  describe('multiframe multi-slice creation from generateDataElements',
+    () => {
+      const config = syntheticData[0];
+      const tags = config.tags;
+      const numberOfFrames = 5;
+
+      let image;
+      let buffer;
+
+      beforeAll(() => {
+        const tagsCopy = structuredClone(config.tags);
+        tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+        tagsCopy.NumberOfFrames = numberOfFrames;
+        const genOptions = {
+          pixelGeneratorName: 'string',
+          frames3D: true
+        };
+        const elements = generateDataElements(tagsCopy, genOptions)[0];
+        buffer = elements['7FE00010'].value;
+
+        const factory = new ImageFactory();
+        factory.checkElements(elements);
+        image = factory.create(elements, buffer, 1);
+      });
+
+      test('geometry is a genuine z-stack, not a time dimension', () => {
+        const size = image.getGeometry().getSize();
+        assert.equal(size.length(), 3, 'no extra time dimension');
+        assert.equal(
+          size.get(2), numberOfFrames, 'slice count matches NumberOfFrames');
+      });
+
+      test('frame origins are ordered along z with expected spacing', () => {
+        const origins = image.getGeometry().getOrigins();
+        assert.equal(origins.length, numberOfFrames, 'one origin per frame');
+        for (let i = 0; i < numberOfFrames; ++i) {
+          assert.equal(origins[i].getZ(), i, `frame ${i} z position`);
+        }
+      });
+
+      test('meta numberOfFiles stays 1 for a single multiframe file', () => {
+        assert.equal(image.getMeta().numberOfFiles, 1, 'numberOfFiles');
+      });
+
+      test('pixel buffer holds all frames with distinct per-frame content',
+        () => {
+          const sliceSize = tags.Rows * tags.Columns;
+          assert.equal(
+            buffer.length, sliceSize * numberOfFrames,
+            'buffer holds all frames'
+          );
+          const imageBuffer = image.getBuffer();
+          const frames = [];
+          for (let f = 0; f < numberOfFrames; ++f) {
+            const start = f * sliceSize;
+            const end = start + sliceSize;
+            frames.push(Array.from(buffer.slice(start, end)));
+            assert.deepEqual(
+              Array.from(imageBuffer.slice(start, end)),
+              frames[f],
+              `frame ${f} pixel data is preserved`
+            );
+          }
+          // sanity check the generated data actually varies per frame,
+          // otherwise the preservation check above would be vacuous
+          assert.notDeepEqual(
+            frames[0], frames[1], 'frame 0 and frame 1 are not identical'
+          );
+        }
+      );
+
+      test('SOPInstanceUID used as frame UID', () => {
+        assert.ok(
+          image.includesImageUid(tags.SOPInstanceUID),
+          'SOPInstanceUID is in image UIDs'
+        );
+      });
+
+    }
+  );
+
 });
