@@ -44,6 +44,8 @@ export class StringPixGenerator {
   #numberOfColourPlanes;
   #numberOfFrames;
 
+  #frames3D = false;
+
   #shape = 'brain';
   #pixels;
 
@@ -63,6 +65,10 @@ export class StringPixGenerator {
     this.#numberOfColourPlanes = options.numberOfColourPlanes;
     this.#numberOfFrames = options.numberOfFrames ?? 1;
 
+    if (typeof options.frames3D !== 'undefined') {
+      this.#frames3D = options.frames3D;
+    }
+
     this.#isRGB = options.photometricInterpretation === 'RGB';
 
     if (!this.#isRGB &&
@@ -76,6 +82,8 @@ export class StringPixGenerator {
 
     if (this.#shape === 'brain') {
       this.#pixels = BRAIN_ROWS;
+    } else {
+      throw new Error(`Unknown pixel generation shape: ${this.#shape}`);
     }
   }
 
@@ -92,11 +100,19 @@ export class StringPixGenerator {
         for (let j = 0; j < this.#numberOfRows; ++j) {
           for (let i = 0; i < this.#numberOfColumns; ++i) {
             for (let s = 0; s < this.#numberOfSamples; ++s) {
-              if (this.#numberOfColourPlanes !== 1) {
-                pixelBuffer[offset] = getFunc(i, j, sliceNumber, f)[c];
+              let values;
+              if (this.#frames3D) {
+                values = getFunc(i, j, f, sliceNumber);
               } else {
-                pixelBuffer[offset] = getFunc(i, j, sliceNumber, f)[s];
+                values = getFunc(i, j, sliceNumber, f);
               }
+              let value;
+              if (this.#numberOfColourPlanes !== 1) {
+                value = values[c];
+              } else {
+                value = values[s];
+              }
+              pixelBuffer[offset] = value;
               ++offset;
             }
           }

@@ -44,11 +44,10 @@ function getBuffersFromTags(config, numberOfSlices = 1) {
   // generate data elements
   const genOptions = {
     pixelGeneratorName: 'string',
-    numberOfSlices
+    numberOfSlices,
+    segmentSquares: config.segmentSquares,
+    frames3D: config.frames3D
   };
-  if (typeof config.segmentSquares !== 'undefined') {
-    genOptions.segmentSquares = config.segmentSquares;
-  }
   const dataElementsList = generateDataElements(config.tags, genOptions);
   // generate buffers
   const writerOptions = {useUnVrForPrivateSq};
@@ -56,12 +55,12 @@ function getBuffersFromTags(config, numberOfSlices = 1) {
 }
 
 /**
- * Get a single slice link.
+ * Get a single file link.
  *
  * @param {object} config The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
-function getSingleSliceLink(config) {
+function getSingleFileLink(config) {
   const link = document.createElement('a');
   try {
     const buffer = getBuffersFromTags(config)[0];
@@ -78,12 +77,13 @@ function getSingleSliceLink(config) {
 }
 
 /**
- * Get a single multiframe link.
+ * Get a single multi-frame link.
  *
- * @param {object} config The data configuration.
+ * @param {object} config0 The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
-function getSingleMultiframeLink(config) {
+function getSingleMultiFrameLink(config0) {
+  const config = structuredClone(config0);
   const link = document.createElement('a');
   try {
     config.tags.NumberOfFrames = 3;
@@ -101,6 +101,31 @@ function getSingleMultiframeLink(config) {
 }
 
 /**
+ * Get a single multi-frame multi-slice link.
+ *
+ * @param {object} config0 The data configuration.
+ * @returns {HTMLLinkElement} The link.
+ */
+function getSingleMultiFrameMultiSliceLink(config0) {
+  const config = structuredClone(config0);
+  const link = document.createElement('a');
+  try {
+    config.frames3D = true;
+    config.tags.NumberOfFrames = 5;
+    const buffer = getBuffersFromTags(config)[0];
+    const blob = new Blob([buffer], {type: 'application/dicom'});
+    link.href = URL.createObjectURL(blob);
+  } catch (error) {
+    console.log('data:', config.name);
+    console.error(error);
+  }
+  const fileName = `dwv-generated-${config.name}-mfms.dcm`;
+  link.download = fileName;
+  link.appendChild(document.createTextNode('mfms-dcm'));
+  return link;
+}
+
+/**
  * Get a multi-slice link.
  *
  * @param {object} config The data configuration.
@@ -108,7 +133,7 @@ function getSingleMultiframeLink(config) {
  */
 function getMultipleSliceLink(config) {
   const link = document.createElement('a');
-  const fileName = `dwv-generated-${config.name}.zip`;
+  const fileName = `dwv-generated-${config.name}-ms.zip`;
 
   const zipCallback = function (zipBlob) {
     link.download = fileName;
@@ -122,7 +147,7 @@ function getMultipleSliceLink(config) {
     console.log('data:', config.name);
     console.error(error);
   }
-  link.appendChild(document.createTextNode('zip'));
+  link.appendChild(document.createTextNode('ms-zip'));
   return link;
 }
 
@@ -139,12 +164,14 @@ function getConfigsHtmlList(configs) {
     const li = document.createElement('li');
     li.appendChild(document.createTextNode(
       `${config.name}: ${config.tags.SeriesDescription}: `));
-    li.append(getSingleSliceLink(config));
+    li.append(getSingleFileLink(config));
     if (isMultiSliceModality(config.tags.Modality)) {
       li.appendChild(document.createTextNode(', '));
-      li.append(getMultipleSliceLink(config));
+      li.append(getSingleMultiFrameLink(config));
       li.appendChild(document.createTextNode(', '));
-      li.append(getSingleMultiframeLink(config));
+      li.append(getSingleMultiFrameMultiSliceLink(config));
+      li.appendChild(document.createTextNode(', '));
+      li.append(getMultipleSliceLink(config));
     }
     // append to list
     ul.append(li);
@@ -195,17 +222,17 @@ function getFileConfigsHtmlList(fileNames) {
 function displayConfigs(configs) {
   const dataGroups = [
     {
-      name: 'Synthetic data Implicit VR Little Endian',
+      name: 'Synthetic data Implicit VR Little Endian (SILE)',
       short: 'sile',
       syntax: '1.2.840.10008.1.2'
     },
     {
-      name: 'Synthetic data Explicit VR Little Endian',
+      name: 'Synthetic data Explicit VR Little Endian (SELE)',
       short: 'sele',
       syntax: '1.2.840.10008.1.2.1'
     },
     {
-      name: 'Synthetic data Explicit VR Big Endian',
+      name: 'Synthetic data Explicit VR Big Endian (SEBE)',
       short: 'sebe',
       syntax: '1.2.840.10008.1.2.2'
     }

@@ -220,7 +220,8 @@ export function generatePixelDataFromJSONTags(
     photometricInterpretation,
     imageOrientationPatient: tags.ImageOrientationPatient,
     segmentSquares: genOptions.segmentSquares,
-    modality: genOptions.modality
+    modality: genOptions.modality,
+    frames3D: genOptions.frames3D
   });
   if (typeof generator.setImages !== 'undefined' &&
     typeof genOptions.images !== 'undefined') {
@@ -309,20 +310,70 @@ function generateSingleFileDataElements(tags, genOptions) {
 
   // image position
   let sliceSpacing = 1;
-  if (typeof tags.SliceThickness !== 'undefined') {
-    sliceSpacing = tags.SliceThickness;
+  if (typeof tags.SpacingBetweenSlices !== 'undefined') {
+    sliceSpacing = tags.SpacingBetweenSlices;
   } else if (typeof tags.PixelSpacing !== 'undefined') {
+    // assume cubic pixels
     sliceSpacing = tags.PixelSpacing[0];
   }
   const orientationName =
     getOrientationName(tags.ImageOrientationPatient);
-  if (orientationName === Orientation.Axial) {
-    tags.ImagePositionPatient = [0, 0, genOptions.sliceNumber * sliceSpacing];
-  } else if (orientationName === Orientation.Coronal) {
-    tags.ImagePositionPatient = [0, genOptions.sliceNumber * sliceSpacing, 0];
-  } else if (orientationName === Orientation.Sagittal) {
-    tags.ImagePositionPatient = [genOptions.sliceNumber * sliceSpacing, 0, 0];
+
+  const getIpp = function (sliceNumber) {
+    let ipp;
+    if (orientationName === Orientation.Axial) {
+      ipp = [0, 0, sliceNumber * sliceSpacing];
+    } else if (orientationName === Orientation.Coronal) {
+      ipp = [0, sliceNumber * sliceSpacing, 0];
+    } else if (orientationName === Orientation.Sagittal) {
+      ipp = [sliceNumber * sliceSpacing, 0, 0];
+    }
+    return ipp;
+  };
+
+  if (genOptions.frames3D) {
+    // store in func groups
+    const pixMesSq = {
+      value: [{
+        PixelSpacing: tags.PixelSpacing,
+        SpacingBetweenSlices: sliceSpacing
+      }]
+    };
+    const orientSq = {
+      value: [{
+        ImageOrientationPatient: tags.ImageOrientationPatient
+      }]
+    };
+    tags.SharedFunctionalGroupsSequence = {
+      value: [{
+        PixelMeasuresSequence: pixMesSq,
+        PlaneOrientationSequence: orientSq
+      }]
+    };
+
+    const perFrameValues = [];
+    for (let k = 0; k < tags.NumberOfFrames; ++k) {
+      perFrameValues.push({
+        FrameContentSequence: {
+          value: [{
+            DimensionIndexValues: [1, k, 1]
+          }]
+        },
+        PlanePositionSequence: {
+          value: [{
+            ImagePositionPatient: getIpp(k)
+          }]
+        }
+      });
+    }
+    tags.PerFrameFunctionalGroupsSequence = {
+      value: perFrameValues
+    };
+
+  } else {
+    tags.ImagePositionPatient = getIpp(genOptions.sliceNumber);
   }
+
   if (typeof genOptions.numberOfSlices !== 'undefined' &&
     genOptions.numberOfSlices > 1) {
     tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${genOptions.sliceNumber}`;
