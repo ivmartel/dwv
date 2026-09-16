@@ -230,7 +230,11 @@ export function generatePixelDataFromJSONTags(
   if (typeof generator.setNumberOfSlices !== 'undefined') {
     generator.setNumberOfSlices(genOptions.numberOfSlices);
   }
-  generator.generate(pixels, genOptions.sliceNumber);
+  generator.generate(
+    pixels,
+    genOptions.sliceNumber,
+    genOptions.frameNumber
+  );
 
   // create and return the DICOM element
   let vr = 'OW';
@@ -372,6 +376,9 @@ function generateSingleFileDataElements(tags, genOptions) {
 
   } else {
     tags.ImagePositionPatient = getIpp(genOptions.sliceNumber);
+    if (typeof genOptions.frameNumber !== 'undefined') {
+      tags.TemporalPositionIdentifier = genOptions.frameNumber;
+    }
   }
 
   if (typeof genOptions.numberOfSlices !== 'undefined' &&
@@ -402,12 +409,18 @@ export function generateDataElements(tags, genOptions) {
   if (typeof genOptions === 'undefined') {
     genOptions = {};
   }
-  if (typeof genOptions.numberOfSlices === 'undefined') {
-    genOptions.numberOfSlices = 1;
+  let maxLoop = 1;
+  let loopPropName;
+  if (typeof genOptions.numberOfSlices !== 'undefined') {
+    maxLoop = genOptions.numberOfSlices;
+    loopPropName = 'sliceNumber';
+  } else if (typeof genOptions.numberOfFrames !== 'undefined') {
+    maxLoop = genOptions.numberOfFrames;
+    loopPropName = 'frameNumber';
   }
   const daList = [];
-  for (let k = 0; k < genOptions.numberOfSlices; ++k) {
-    genOptions.sliceNumber = k;
+  for (let i = 0; i < maxLoop; ++i) {
+    genOptions[loopPropName] = i;
     const da = generateSingleFileDataElements(tags, genOptions);
     daList.push(da);
   }

@@ -90,21 +90,29 @@ export class StringPixGenerator {
   /**
    * @param {number[]} pixelBuffer The buffer.
    * @param {number} sliceNumber The slice index.
+   * @param {number} [frameNumber] Optional frame index.
    */
-  generate(pixelBuffer, sliceNumber) {
+  generate(pixelBuffer, sliceNumber, frameNumber) {
     const getFunc = this.#isRGB ? this.#getRGB : this.#getValue;
 
     let offset = 0;
+    let frameNum;
     for (let c = 0; c < this.#numberOfColourPlanes; ++c) {
       for (let f = 0; f < this.#numberOfFrames; ++f) {
+        if (typeof frameNumber !== 'undefined' &&
+          this.#numberOfFrames === 1) {
+          frameNum = frameNumber;
+        } else {
+          frameNum = f;
+        }
         for (let j = 0; j < this.#numberOfRows; ++j) {
           for (let i = 0; i < this.#numberOfColumns; ++i) {
             for (let s = 0; s < this.#numberOfSamples; ++s) {
               let values;
               if (this.#frames3D) {
-                values = getFunc(i, j, f, sliceNumber);
+                values = getFunc(i, j, frameNum, sliceNumber);
               } else {
-                values = getFunc(i, j, sliceNumber, f);
+                values = getFunc(i, j, sliceNumber, frameNum);
               }
               let value;
               if (this.#numberOfColourPlanes !== 1) {

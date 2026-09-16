@@ -24,9 +24,10 @@ function setup() {
  *
  * @param {object} config The data configuration.
  * @param {number} [numberOfSlices] The number of slices.
+ * @param {number} [numberOfFrames] The number of frames.
  * @returns {ArrayBuffer[]} The list of buffers.
  */
-function getBuffersFromTags(config, numberOfSlices = 1) {
+function getBuffersFromTags(config, numberOfSlices = 1, numberOfFrames = 1) {
   // add private tags to dict if present
   let useUnVrForPrivateSq = false;
   if (typeof config.privateDictionary !== 'undefined') {
@@ -44,10 +45,15 @@ function getBuffersFromTags(config, numberOfSlices = 1) {
   // generate data elements
   const genOptions = {
     pixelGeneratorName: 'string',
-    numberOfSlices,
     segmentSquares: config.segmentSquares,
     frames3D: config.frames3D
   };
+  if (numberOfSlices !== 1) {
+    genOptions.numberOfSlices = numberOfSlices;
+  }
+  if (numberOfFrames !== 1) {
+    genOptions.numberOfFrames = numberOfFrames;
+  }
   const dataElementsList = generateDataElements(config.tags, genOptions);
   // generate buffers
   const writerOptions = {useUnVrForPrivateSq};
@@ -152,6 +158,32 @@ function getMultipleSliceLink(config) {
 }
 
 /**
+ * Get a multi-frame link.
+ *
+ * @param {object} config The data configuration.
+ * @returns {HTMLLinkElement} The link.
+ */
+function getMultipleFrameLink(config) {
+  const link = document.createElement('a');
+  const fileName = `dwv-generated-${config.name}-mf.zip`;
+
+  const zipCallback = function (zipBlob) {
+    link.download = fileName;
+    link.href = URL.createObjectURL(zipBlob);
+  };
+
+  try {
+    const buffers = getBuffersFromTags(config, 1, 3);
+    zipBuffers(buffers, zipCallback);
+  } catch (error) {
+    console.log('data:', config.name);
+    console.error(error);
+  }
+  link.appendChild(document.createTextNode('mf-zip'));
+  return link;
+}
+
+/**
  * Create list from configs.
  *
  * @param {Array} configs An array of data cofiguration.
@@ -172,6 +204,8 @@ function getConfigsHtmlList(configs) {
       li.append(getSingleMultiFrameMultiSliceLink(config));
       li.appendChild(document.createTextNode(', '));
       li.append(getMultipleSliceLink(config));
+      li.appendChild(document.createTextNode(', '));
+      li.append(getMultipleFrameLink(config));
     }
     // append to list
     ul.append(li);
