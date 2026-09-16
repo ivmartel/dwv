@@ -304,7 +304,8 @@ export function isMultiSliceModality(modality) {
  * @param {GenerateOptions} [genOptions] The options for pixel generation.
  * @returns {Record<string, DataElement>} The data elements.
  */
-function generateSingleFileDataElements(tags, genOptions) {
+function generateSingleFileDataElements(tags0, genOptions) {
+  const tags = structuredClone(tags0);
   if (typeof genOptions === 'undefined') {
     genOptions = {};
   }
@@ -360,7 +361,8 @@ function generateSingleFileDataElements(tags, genOptions) {
       perFrameValues.push({
         FrameContentSequence: {
           value: [{
-            DimensionIndexValues: [1, k, 1]
+            DimensionIndexValues: [1, k, 1],
+            TemporalPositionIndex: genOptions.timeIndex
           }]
         },
         PlanePositionSequence: {
@@ -425,6 +427,9 @@ export function generateDataElements(tags, genOptions) {
     genOptions.frameNumber = f;
     for (let k = 0; k < numberOfSlices; ++k) {
       genOptions.sliceNumber = k;
+      if (genOptions.frames3D) {
+        genOptions.timeIndex = k;
+      }
       const da = generateSingleFileDataElements(tags, genOptions);
       daList.push(da);
     }

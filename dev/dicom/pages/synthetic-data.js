@@ -61,12 +61,12 @@ function getBuffersFromTags(config, numberOfSlices = 1, numberOfFrames = 1) {
 }
 
 /**
- * Get a single file link.
+ * Get a single-slice link (dcm file).
  *
  * @param {object} config The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
-function getSingleFileLink(config) {
+function getSingleSliceLink(config) {
   const link = document.createElement('a');
   try {
     const buffer = getBuffersFromTags(config)[0];
@@ -83,12 +83,12 @@ function getSingleFileLink(config) {
 }
 
 /**
- * Get a single multi-frame link.
+ * Get a multi-frame link (dcm file).
  *
  * @param {object} config0 The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
-function getSingleMultiFrameLink(config0) {
+function getMultiFrameLink(config0) {
   const config = structuredClone(config0);
   const link = document.createElement('a');
   try {
@@ -107,12 +107,12 @@ function getSingleMultiFrameLink(config0) {
 }
 
 /**
- * Get a single-frame multi-slice link.
+ * Get a single-frame multi-slice link (dcm file).
  *
  * @param {object} config0 The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
-function getSingleMultiFrameMultiSliceLink(config0) {
+function getSingleFrameMultiSliceLink(config0) {
   const config = structuredClone(config0);
   const link = document.createElement('a');
   try {
@@ -132,7 +132,7 @@ function getSingleMultiFrameMultiSliceLink(config0) {
 }
 
 /**
- * Get a multiple since slice link.
+ * Get a multiple single-slice link (zip file).
  *
  * @param {object} config The data configuration.
  * @returns {HTMLLinkElement} The link.
@@ -158,12 +158,12 @@ function getMultipleSingleSliceLink(config) {
 }
 
 /**
- * Get a multiple single frame link.
+ * Get a multiple single-frame link (zip file).
  *
  * @param {object} config The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
-function getMultipleFrameLink(config) {
+function getMultipleSingleFrameLink(config) {
   const link = document.createElement('a');
   const fileName = `dwv-generated-${config.name}-msf.zip`;
 
@@ -184,6 +184,35 @@ function getMultipleFrameLink(config) {
 }
 
 /**
+ * Get a multiple single-frame multi-slice link (zip file).
+ *
+ * @param {object} config0 The data configuration.
+ * @returns {HTMLLinkElement} The link.
+ */
+function getMultipleSingleFrameMultiSliceLink(config0) {
+  const config = structuredClone(config0);
+  const link = document.createElement('a');
+  const fileName = `dwv-generated-${config.name}-msfms.zip`;
+
+  const zipCallback = function (zipBlob) {
+    link.download = fileName;
+    link.href = URL.createObjectURL(zipBlob);
+  };
+
+  try {
+    config.frames3D = true;
+    config.tags.NumberOfFrames = 5;
+    const buffers = getBuffersFromTags(config, 3);
+    zipBuffers(buffers, zipCallback);
+  } catch (error) {
+    console.log('data:', config.name);
+    console.error(error);
+  }
+  link.appendChild(document.createTextNode('msfms.zip'));
+  return link;
+}
+
+/**
  * Create list from configs.
  *
  * @param {Array} configs An array of data cofiguration.
@@ -196,16 +225,18 @@ function getConfigsHtmlList(configs) {
     const li = document.createElement('li');
     li.appendChild(document.createTextNode(
       `${config.name}: ${config.tags.SeriesDescription}: `));
-    li.append(getSingleFileLink(config));
+    li.append(getSingleSliceLink(config));
     if (isMultiSliceModality(config.tags.Modality)) {
       li.appendChild(document.createTextNode(', '));
-      li.append(getSingleMultiFrameLink(config));
+      li.append(getMultiFrameLink(config));
       li.appendChild(document.createTextNode(', '));
-      li.append(getSingleMultiFrameMultiSliceLink(config));
+      li.append(getSingleFrameMultiSliceLink(config));
       li.appendChild(document.createTextNode(', '));
       li.append(getMultipleSingleSliceLink(config));
       li.appendChild(document.createTextNode(', '));
-      li.append(getMultipleFrameLink(config));
+      li.append(getMultipleSingleFrameLink(config));
+      li.appendChild(document.createTextNode(', '));
+      li.append(getMultipleSingleFrameMultiSliceLink(config));
     }
     // append to list
     ul.append(li);
