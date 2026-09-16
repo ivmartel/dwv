@@ -376,7 +376,10 @@ function generateSingleFileDataElements(tags, genOptions) {
 
   } else {
     tags.ImagePositionPatient = getIpp(genOptions.sliceNumber);
-    if (typeof genOptions.frameNumber !== 'undefined') {
+    if (typeof genOptions.frameNumber !== 'undefined' &&
+      typeof genOptions.numberOfFrames !== 'undefined' &&
+      genOptions.numberOfFrames > 1
+    ) {
       tags.TemporalPositionIdentifier = genOptions.frameNumber;
     }
   }
