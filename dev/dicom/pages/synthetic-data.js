@@ -102,12 +102,12 @@ function getSingleMultiFrameLink(config0) {
   }
   const fileName = `dwv-generated-${config.name}-mf.dcm`;
   link.download = fileName;
-  link.appendChild(document.createTextNode('mf-dcm'));
+  link.appendChild(document.createTextNode('mf.dcm'));
   return link;
 }
 
 /**
- * Get a single multi-frame multi-slice link.
+ * Get a single-frame multi-slice link.
  *
  * @param {object} config0 The data configuration.
  * @returns {HTMLLinkElement} The link.
@@ -125,9 +125,9 @@ function getSingleMultiFrameMultiSliceLink(config0) {
     console.log('data:', config.name);
     console.error(error);
   }
-  const fileName = `dwv-generated-${config.name}-mfms.dcm`;
+  const fileName = `dwv-generated-${config.name}-sfms.dcm`;
   link.download = fileName;
-  link.appendChild(document.createTextNode('mfms-dcm'));
+  link.appendChild(document.createTextNode('sfms.dcm'));
   return link;
 }
 
@@ -153,7 +153,7 @@ function getMultipleSingleSliceLink(config) {
     console.log('data:', config.name);
     console.error(error);
   }
-  link.appendChild(document.createTextNode('mss-zip'));
+  link.appendChild(document.createTextNode('mss.zip'));
   return link;
 }
 
@@ -179,7 +179,7 @@ function getMultipleFrameLink(config) {
     console.log('data:', config.name);
     console.error(error);
   }
-  link.appendChild(document.createTextNode('msf-zip'));
+  link.appendChild(document.createTextNode('msf.zip'));
   return link;
 }
 
