@@ -155,7 +155,7 @@ function getMultipleSliceLink(config) {
  * Create list from configs.
  *
  * @param {Array} configs An array of data cofiguration.
- * @returns {object} The html list element.
+ * @returns {HTMLUListElement} The html list element.
  */
 function getConfigsHtmlList(configs) {
   const ul = document.createElement('ul');
@@ -217,6 +217,27 @@ function getFileConfigsHtmlList(fileNames) {
 }
 
 /**
+ * Rename and set the transfer syntax of a clone of the input configs
+ * for a given data group, then create their html list.
+ *
+ * @param {object} configs Synthetic data configuration.
+ * @param {object} dataGroup The data group (name, short, syntax).
+ * @returns {HTMLUListElement} The html list element.
+ */
+function renderDataGroup(configs, dataGroup) {
+  const groupConfigs = structuredClone(configs);
+  for (const config of groupConfigs) {
+    // name in json is 'test-img-##', replace test
+    //   with the short string of the group
+    config.name = dataGroup.short +
+      config.name.substring(4);
+    // set transfer syntax
+    config.tags.TransferSyntaxUID = dataGroup.syntax;
+  }
+  return getConfigsHtmlList(groupConfigs);
+}
+
+/**
  * @param {object} configs Synthetic data configuration.
  */
 function displayConfigs(configs) {
@@ -238,22 +259,31 @@ function displayConfigs(configs) {
     }
   ];
 
-  for (const dataGroup of dataGroups) {
+  for (let index = 0; index < dataGroups.length; ++index) {
+    const dataGroup = dataGroups[index];
+
     const content = document.getElementById('content');
     const title = document.createElement('h2');
     title.appendChild(document.createTextNode(dataGroup.name));
     content.append(title);
 
-    for (const config of configs) {
-      // name in json is 'test-img-##', replace test
-      //   with the short string of the group
-      config.name = dataGroup.short +
-        config.name.substring(4);
-      // set transfer syntax
-      config.tags.TransferSyntaxUID = dataGroup.syntax;
+    if (index === 0) {
+      // generate the first group right away
+      content.append(renderDataGroup(configs, dataGroup));
+    } else {
+      // defer the other groups: only generate them on demand,
+      // triggered by a button, to avoid the upfront cost of
+      // creating data that may not be needed
+      const button = document.createElement('button');
+      button.appendChild(
+        document.createTextNode('Generate'));
+      button.addEventListener('click', function onClick() {
+        // replace the button in place so the list appears where the
+        // button was, not appended at the end of the shared content
+        button.replaceWith(renderDataGroup(configs, dataGroup));
+      });
+      content.append(button);
     }
-
-    content.append(getConfigsHtmlList(configs));
   }
 }
 
