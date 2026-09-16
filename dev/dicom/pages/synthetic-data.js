@@ -132,14 +132,14 @@ function getSingleMultiFrameMultiSliceLink(config0) {
 }
 
 /**
- * Get a multi-slice link.
+ * Get a multiple since slice link.
  *
  * @param {object} config The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
-function getMultipleSliceLink(config) {
+function getMultipleSingleSliceLink(config) {
   const link = document.createElement('a');
-  const fileName = `dwv-generated-${config.name}-ms.zip`;
+  const fileName = `dwv-generated-${config.name}-mss.zip`;
 
   const zipCallback = function (zipBlob) {
     link.download = fileName;
@@ -153,19 +153,19 @@ function getMultipleSliceLink(config) {
     console.log('data:', config.name);
     console.error(error);
   }
-  link.appendChild(document.createTextNode('ms-zip'));
+  link.appendChild(document.createTextNode('mss-zip'));
   return link;
 }
 
 /**
- * Get a multi-frame link.
+ * Get a multiple single frame link.
  *
  * @param {object} config The data configuration.
  * @returns {HTMLLinkElement} The link.
  */
 function getMultipleFrameLink(config) {
   const link = document.createElement('a');
-  const fileName = `dwv-generated-${config.name}-mf.zip`;
+  const fileName = `dwv-generated-${config.name}-msf.zip`;
 
   const zipCallback = function (zipBlob) {
     link.download = fileName;
@@ -179,7 +179,7 @@ function getMultipleFrameLink(config) {
     console.log('data:', config.name);
     console.error(error);
   }
-  link.appendChild(document.createTextNode('mf-zip'));
+  link.appendChild(document.createTextNode('msf-zip'));
   return link;
 }
 
@@ -203,7 +203,7 @@ function getConfigsHtmlList(configs) {
       li.appendChild(document.createTextNode(', '));
       li.append(getSingleMultiFrameMultiSliceLink(config));
       li.appendChild(document.createTextNode(', '));
-      li.append(getMultipleSliceLink(config));
+      li.append(getMultipleSingleSliceLink(config));
       li.appendChild(document.createTextNode(', '));
       li.append(getMultipleFrameLink(config));
     }
