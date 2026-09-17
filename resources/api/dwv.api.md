@@ -543,8 +543,10 @@ export class Geometry {
     constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     appendFrame(origin: Point3D, time: number): void;
     appendOrigin(origin: Point3D, index: number, time?: number): void;
-    canAppend(rhs: Geometry): BooleanResult;
+    appendVolume(origins: Point3D[], time: number): void;
     canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
+    canAppendSlice(rhs: Geometry): BooleanResult;
+    canAppendVolume(rhs: Geometry): BooleanResult;
     clone(): Geometry;
     equals(rhs: Geometry): boolean;
     getCurrentNumberOfSlicesBeforeTime(time: number): number | undefined;
@@ -566,6 +568,7 @@ export class Geometry {
     isSimilar(rhs: Geometry, tol?: number): boolean;
     pointToWorld(point: Point3D): Point3D;
     setInitialTime(time: number): void;
+    sortOrigins(): void;
     toString(): string;
     updateSliceSpacing(): void;
     worldToIndex(point: Point): Index;
@@ -673,10 +676,12 @@ class Image_2 extends EventTarget {
     appendFrame(time: number, origin: Point3D): void;
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
     appendSlice(rhs: Image_2): void;
+    appendVolume(rhs: Image_2): void;
     calculateDataRange(): object;
     calculateHistogram(): object;
     calculateRescaledDataRange(): object;
-    canAppend(rhs: Image_2): BooleanResult;
+    canAppendSlice(rhs: Image_2): BooleanResult;
+    canAppendVolume(rhs: Image_2): BooleanResult;
     canQuantify(): boolean;
     canScroll(viewOrientation: Matrix33): boolean;
     // @deprecated
