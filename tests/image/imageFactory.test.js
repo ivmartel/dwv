@@ -498,4 +498,114 @@ describe('ImageFactory', () => {
     }
   );
 
+  // build a 4D volume from multiple single-frame files that all share
+  // the same spatial position but differ by TemporalPositionIdentifier
+  // (a "cine" style series stored as separate single-frame instances),
+  // as created by dev/dicom/pages/synthetic-data.js's
+  // getMultipleSingleFrameLink. Each per-file Image has a single slice
+  // (no NumberOfFrames, no frames3D), so unlike the two cases above the
+  // files are combined with a plain Image#appendSlice loop, exactly as
+  // for the "3D creation" case; but since the files share one origin
+  // and each carries its own tag-derived time, appendSlice grows a
+  // time dimension instead of stacking along z.
+  describe('multiple single-frame creation from generateDataElements',
+    () => {
+      const config = syntheticData[0];
+      const tags = config.tags;
+      const numberOfFrames = 3;
+
+      let image;
+      let fileElementsList;
+
+      beforeAll(() => {
+        const tagsCopy = structuredClone(config.tags);
+        tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+        const genOptions = {
+          pixelGeneratorName: 'string',
+          numberOfFrames
+        };
+        fileElementsList = generateDataElements(tagsCopy, genOptions);
+
+        const factory = new ImageFactory();
+        for (const elements of fileElementsList) {
+          const pixelBuffer = elements['7FE00010'].value;
+          const fileImage = factory.create(
+            elements, pixelBuffer, numberOfFrames);
+          if (typeof image === 'undefined') {
+            image = fileImage;
+          } else {
+            image.appendSlice(fileImage);
+          }
+        }
+      });
+
+      test('generates one single-frame file per temporal position', () => {
+        assert.equal(
+          fileElementsList.length, numberOfFrames,
+          'one file per temporal position'
+        );
+      });
+
+      test('geometry keeps a single spatial slice, gains a time dimension',
+        () => {
+          const size = image.getGeometry().getSize();
+          assert.equal(size.length(), 4, 'geometry gains a time dimension');
+          assert.equal(size.get(2), 1, 'single spatial slice');
+          assert.equal(
+            size.get(3), numberOfFrames, 'time size matches file count');
+        }
+      );
+
+      test('all files share the same spatial origin', () => {
+        const origins = image.getGeometry().getOrigins();
+        assert.equal(origins.length, 1, 'single shared origin');
+        assert.deepEqual(
+          origins[0].getValues(), [0, 0, 0], 'origin at (0,0,0)');
+      });
+
+      test('meta numberOfFiles matches the number of combined files', () => {
+        assert.equal(
+          image.getMeta().numberOfFiles, numberOfFrames, 'numberOfFiles');
+      });
+
+      test('pixel buffer holds every file with distinct content', () => {
+        const sliceSize = tags.Rows * tags.Columns;
+        const fullBuffer = image.getBuffer();
+        assert.equal(
+          fullBuffer.length, sliceSize * numberOfFrames,
+          'buffer holds every file'
+        );
+
+        const frames = [];
+        for (let f = 0; f < numberOfFrames; ++f) {
+          const fileBuffer = fileElementsList[f]['7FE00010'].value;
+          const start = f * sliceSize;
+          const end = start + sliceSize;
+          const frame = Array.from(fullBuffer.slice(start, end));
+          assert.deepEqual(
+            frame, Array.from(fileBuffer),
+            `file ${f} pixel data is preserved`
+          );
+          frames.push(frame);
+        }
+        // sanity check the generated data actually varies per file,
+        // otherwise the preservation check above would be vacuous
+        assert.notDeepEqual(
+          frames[0], frames[1], 'file 0 and file 1 content differ'
+        );
+      });
+
+      test('SOPInstanceUID is included as an image UID', () => {
+        // note: getMultipleSingleFrameLink's files only vary by
+        // TemporalPositionIdentifier, not SOPInstanceUID, so all files
+        // share the same uid here
+        assert.ok(
+          image.includesImageUid(tags.SOPInstanceUID),
+          'SOPInstanceUID is in image UIDs'
+        );
+      });
+
+    }
+  );
+
 });
