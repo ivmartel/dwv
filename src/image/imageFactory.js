@@ -176,13 +176,13 @@ function getPaletteColourMap(dataElements) {
       logger.info(
         'Scaling 16bits color lut since the lut descriptor is 8.');
       let clone = redLutElement.value.slice(0);
-      // @ts-expect-error
+      // @ts-expect-error -- clone is a plain number[], it has no buffer
       redLut = Array.from(new Uint8Array(clone.buffer));
       clone = greenLutElement.value.slice(0);
-      // @ts-expect-error
+      // @ts-expect-error -- clone is a plain number[], it has no buffer
       greenLut = Array.from(new Uint8Array(clone.buffer));
       clone = blueLutElement.value.slice(0);
-      // @ts-expect-error
+      // @ts-expect-error -- clone is a plain number[], it has no buffer
       blueLut = Array.from(new Uint8Array(clone.buffer));
     }
     colourMap = new ColourMap(redLut, greenLut, blueLut);

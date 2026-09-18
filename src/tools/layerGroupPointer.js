@@ -435,9 +435,8 @@ export class LayerGroupPointer extends EventTarget {
       const delay = this.#longTouchToDblClickMs;
       if (delay !== null && delay !== undefined && delay > 0) {
         event.preventDefault();
-        // recommended type is ReturnType<typeof setTimeout> but
-        //   lint does not like it
-        // @ts-ignore
+        // @ts-expect-error -- recommended type is ReturnType<typeof
+        //   setTimeout> but lint does not like it
         this.#longTouchTimerId = setTimeout(() => {
           this.#longTouch(point, layerGroup);
         }, delay);

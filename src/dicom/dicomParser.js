@@ -191,7 +191,7 @@ export function hasDicomPrefix(buffer) {
 }
 
 // Zero-width space (u200B)
-// @ts-ignore
+// @ts-expect-error -- fromCharCode expects a number, not a string
 const ZWS = String.fromCharCode('u200B');
 
 /**

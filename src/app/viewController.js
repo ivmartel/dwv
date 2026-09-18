@@ -437,7 +437,7 @@ export class ViewController {
     const sliceGeometry =
       new Geometry([sliceOrigin], sliceSize, sliceSpacing);
     // slice image
-    // @ts-ignore
+    // @ts-expect-error -- sliceValues is a number[], Image expects a TypedArray
     return new Image(sliceGeometry, sliceValues);
   }
 

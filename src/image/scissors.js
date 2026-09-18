@@ -112,7 +112,7 @@ function computeGradient(greyscale) {
   // Flip and scale.
   for (y = 0; y < gradient.length; y++) {
     for (x = 0; x < gradient[y].length; x++) {
-      // @ts-ignore
+      // @ts-expect-error -- gradient is untyped, TS can't infer element type
       gradient[y][x] = 1 - (gradient[y][x] / max);
     }
   }

@@ -130,7 +130,7 @@ export function getViewFromDOMImage(domImage, origin, index) {
   image.setMeta(meta);
 
   // create data
-  // @ts-expect-error
+  // @ts-expect-error -- info is not shaped as Record<string, DataElement>
   const data = new DicomData(info);
   data.image = image;
 
@@ -225,7 +225,7 @@ export function getViewFromDOMVideo(
       meta.SeriesInstanceUID = seriesUID;
       image.setMeta(meta);
       // create data
-      // @ts-expect-error
+      // @ts-expect-error -- info is not shaped as Record<string, DataElement>
       const data = new DicomData(info);
       data.image = image;
       // call callback
