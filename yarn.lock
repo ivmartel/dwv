@@ -95,7 +95,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^8.0.1":
+"@babel/core@npm:^8.0.5":
   version: 8.0.5
   resolution: "@babel/core@npm:8.0.5"
   dependencies:
@@ -1246,7 +1246,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-env@npm:^8.0.2":
+"@babel/preset-env@npm:^8.0.5":
   version: 8.0.5
   resolution: "@babel/preset-env@npm:8.0.5"
   dependencies:
@@ -2515,7 +2515,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@microsoft/api-extractor@npm:^7.58.7":
+"@microsoft/api-extractor@npm:^7.59.1":
   version: 7.59.1
   resolution: "@microsoft/api-extractor@npm:7.59.1"
   dependencies:
@@ -3954,7 +3954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv-formats@npm:~3.0.1":
+"ajv-formats@npm:^3.0.1, ajv-formats@npm:~3.0.1":
   version: 3.0.1
   resolution: "ajv-formats@npm:3.0.1"
   dependencies:
@@ -4015,6 +4015,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ajv@npm:^8.20.0, ajv@npm:~8.20.0":
+  version: 8.20.0
+  resolution: "ajv@npm:8.20.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10c0/5df9a1c8f83863cde1bd3a9ddb426f599718f88e3dc9153616c79fb28e0be455335830d7f21d745576519f057b371352daa31047b6a33d7036fe08777d60cf2a
+  languageName: node
+  linkType: hard
+
 "ajv@npm:~8.18.0":
   version: 8.18.0
   resolution: "ajv@npm:8.18.0"
@@ -4024,18 +4036,6 @@ __metadata:
     json-schema-traverse: "npm:^1.0.0"
     require-from-string: "npm:^2.0.2"
   checksum: 10c0/e7517c426173513a07391be951879932bdf3348feaebd2199f5b901c20f99d60db8cd1591502d4d551dc82f594e82a05c4fe1c70139b15b8937f7afeaed9532f
-  languageName: node
-  linkType: hard
-
-"ajv@npm:~8.20.0":
-  version: 8.20.0
-  resolution: "ajv@npm:8.20.0"
-  dependencies:
-    fast-deep-equal: "npm:^3.1.3"
-    fast-uri: "npm:^3.0.1"
-    json-schema-traverse: "npm:^1.0.0"
-    require-from-string: "npm:^2.0.2"
-  checksum: 10c0/5df9a1c8f83863cde1bd3a9ddb426f599718f88e3dc9153616c79fb28e0be455335830d7f21d745576519f057b371352daa31047b6a33d7036fe08777d60cf2a
   languageName: node
   linkType: hard
 
@@ -4372,7 +4372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-istanbul@npm:^8.0.0":
+"babel-plugin-istanbul@npm:^8.0.2":
   version: 8.0.2
   resolution: "babel-plugin-istanbul@npm:8.0.2"
   dependencies:
@@ -4806,7 +4806,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"canvas@npm:^3.2.1":
+"canvas@npm:^3.2.3":
   version: 3.2.3
   resolution: "canvas@npm:3.2.3"
   dependencies:
@@ -4978,7 +4978,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clean-jsdoc-theme@npm:^5.0.3":
+"clean-jsdoc-theme@npm:^5.2.0":
   version: 5.2.0
   resolution: "clean-jsdoc-theme@npm:5.2.0"
   dependencies:
@@ -5927,25 +5927,25 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "dwv@workspace:."
   dependencies:
-    "@babel/core": "npm:^8.0.1"
-    "@babel/preset-env": "npm:^8.0.2"
+    "@babel/core": "npm:^8.0.5"
+    "@babel/preset-env": "npm:^8.0.5"
     "@eslint/js": "npm:^10.0.1"
-    "@microsoft/api-extractor": "npm:^7.58.7"
+    "@microsoft/api-extractor": "npm:^7.59.1"
     "@stylistic/eslint-plugin": "npm:^5.10.0"
     "@vitest/coverage-v8": "npm:^5.0.1"
     babel-loader: "npm:^10.1.1"
-    babel-plugin-istanbul: "npm:^8.0.0"
+    babel-plugin-istanbul: "npm:^8.0.2"
     benchmark: "npm:^2.1.4"
-    canvas: "npm:^3.2.1"
-    clean-jsdoc-theme: "npm:^5.0.3"
+    canvas: "npm:^3.2.3"
+    clean-jsdoc-theme: "npm:^5.2.0"
     dcmstdtojs: "npm:0.2.0"
     diff: "npm:^9.0.0"
     diff2html: "npm:^3.4.56"
-    eslint: "npm:^10.4.0"
-    eslint-plugin-jsdoc: "npm:^64.2.1"
-    github-release-notes: "npm:0.17.2"
-    globals: "npm:^17.6.0"
-    html-webpack-plugin: "npm:^5.6.6"
+    eslint: "npm:^10.10.0"
+    eslint-plugin-jsdoc: "npm:^64.3.9"
+    github-release-notes: "npm:0.17.3"
+    globals: "npm:^17.12.0"
+    html-webpack-plugin: "npm:^5.6.8"
     jsdoc: "npm:^4.0.5"
     jsdom: "npm:^30.0.1"
     jszip: "npm:^3.10.1"
@@ -5954,8 +5954,8 @@ __metadata:
     typescript: "npm:5.6.3"
     vite: "npm:^8.3.0"
     vitest: "npm:^5.0.1"
-    webpack: "npm:^5.107.2"
-    webpack-cli: "npm:^7.0.0"
+    webpack: "npm:^5.110.3"
+    webpack-cli: "npm:^7.2.3"
     webpack-dev-server: "npm:^6.0.0"
     webpack-merge: "npm:^6.0.1"
   languageName: unknown
@@ -6075,13 +6075,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.24.4":
-  version: 5.24.5
-  resolution: "enhanced-resolve@npm:5.24.5"
+"enhanced-resolve@npm:^5.25.0":
+  version: 5.25.1
+  resolution: "enhanced-resolve@npm:5.25.1"
   dependencies:
     graceful-fs: "npm:^4.2.4"
     tapable: "npm:^2.3.3"
-  checksum: 10c0/76c32ce5485ecea0ef808c9289bc6f7c49ce85142943598d89a23a846f2909556d3dc6db97a007442a48c185baad5514c1c76d20a2656497f9511d13ccfab73b
+  checksum: 10c0/c19ac10cd01f3c03648c0bc8fc981810490af6c10506e9ba4a300d57956c8948eeabf0e6af0d3bed91f37b89a775746664d5043c61c7c03a946f1a235013e955
   languageName: node
   linkType: hard
 
@@ -6463,9 +6463,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^64.2.1":
-  version: 64.3.9
-  resolution: "eslint-plugin-jsdoc@npm:64.3.9"
+"eslint-plugin-jsdoc@npm:^64.3.9":
+  version: 64.5.2
+  resolution: "eslint-plugin-jsdoc@npm:64.5.2"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.97.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -6484,7 +6484,11 @@ __metadata:
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/2ab4454fdfe8cdfdbb8eabe524564b90e9a264baa5d539fd81d878a39550e0685d2b60a51e9a4fe09f3b69822e13bdb023b84e1772dd5b6b62ec9c24bb2b7b82
+    typescript: "*"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/6a71dbba3d7a5e58384e39eb38e8750aa22684fac481baba25baf2f134e75e6bcfab22f8913964b5823fc67fac5faf99b259c2d5b02d60c011a4cf16ab3d3a25
   languageName: node
   linkType: hard
 
@@ -6521,7 +6525,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^10.4.0":
+"eslint@npm:^10.10.0":
   version: 10.10.0
   resolution: "eslint@npm:10.10.0"
   dependencies:
@@ -7368,9 +7372,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"github-release-notes@npm:0.17.2":
-  version: 0.17.2
-  resolution: "github-release-notes@npm:0.17.2"
+"github-release-notes@npm:0.17.3":
+  version: 0.17.3
+  resolution: "github-release-notes@npm:0.17.3"
   dependencies:
     babel-runtime: "npm:^6.26.0"
     base-64: "npm:^0.1.0"
@@ -7393,7 +7397,7 @@ __metadata:
     valid-url: "npm:^1.0.9"
   bin:
     gren: bin/gren.js
-  checksum: 10c0/30cabd1a2517493d2e0104ce9c956e1e946f23fa7b3949dd96d2810014a0e3190dbe4977bdb8c181d13709c04fbf87b1aa03c9af96efe56a434e976f3eab3a81
+  checksum: 10c0/5edaedf9a09638a332e457cd6c3f2870f375475d4714b3df951603a429752e7ec6d6699ccc4300df09e346b567043f09e386420a177f9ee4ea38ef07c1e46354
   languageName: node
   linkType: hard
 
@@ -7480,7 +7484,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^17.6.0":
+"globals@npm:^17.12.0":
   version: 17.12.0
   resolution: "globals@npm:17.12.0"
   checksum: 10c0/8325cf8818c848871d17c32974c2c74e9c5f09c1b0e04421886f64f21e77c3e95f3ba25586743895a73acd860ada151132481d87d44a1f12993ae7758a694d03
@@ -7951,7 +7955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-webpack-plugin@npm:^5.6.6":
+"html-webpack-plugin@npm:^5.6.8":
   version: 5.6.8
   resolution: "html-webpack-plugin@npm:5.6.8"
   dependencies:
@@ -11062,13 +11066,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"neo-async@npm:^2.6.2":
-  version: 2.6.2
-  resolution: "neo-async@npm:2.6.2"
-  checksum: 10c0/c2f5a604a54a8ec5438a342e1f356dff4bc33ccccdb6dc668d94fe8e5eccfc9d2c2eea6064b0967a767ba63b33763f51ccf2cd2441b461a7322656c1f06b3f5d
-  languageName: node
-  linkType: hard
-
 "no-case@npm:^3.0.4":
   version: 3.0.4
   resolution: "no-case@npm:3.0.4"
@@ -13288,6 +13285,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"schema-utils@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "schema-utils@npm:4.5.0"
+  dependencies:
+    "@types/json-schema": "npm:^7.0.15"
+    ajv: "npm:^8.20.0"
+    ajv-formats: "npm:^3.0.1"
+    ajv-keywords: "npm:^5.1.0"
+  checksum: 10c0/b2b8e6fc1b1f2abb30741a04e9d309879fd09afcea8c8aa163bdb380d8836ab4102f60a750cb1116c5e299f597cc8d59ee8f2bbee87dd7606d45e748ce901794
+  languageName: node
+  linkType: hard
+
 "selfsigned@npm:^5.5.0":
   version: 5.5.0
   resolution: "selfsigned@npm:5.5.0"
@@ -15252,7 +15261,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-cli@npm:^7.0.0":
+"webpack-cli@npm:^7.2.3":
   version: 7.2.3
   resolution: "webpack-cli@npm:7.2.3"
   dependencies:
@@ -15366,26 +15375,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.107.2":
-  version: 5.110.3
-  resolution: "webpack@npm:5.110.3"
+"webpack@npm:^5.110.3":
+  version: 5.111.0
+  resolution: "webpack@npm:5.111.0"
   dependencies:
     "@types/estree": "npm:^1.0.8"
     "@types/json-schema": "npm:^7.0.15"
     "@webassemblyjs/ast": "npm:^1.14.1"
     "@webassemblyjs/wasm-edit": "npm:^1.14.1"
     "@webassemblyjs/wasm-parser": "npm:^1.14.1"
-    acorn: "npm:^8.16.0"
     browserslist: "npm:^4.28.1"
     chrome-trace-event: "npm:^1.0.2"
-    enhanced-resolve: "npm:^5.24.4"
+    enhanced-resolve: "npm:^5.25.0"
     es-module-lexer: "npm:^2.1.0"
     events: "npm:^3.2.0"
     graceful-fs: "npm:^4.2.11"
     mime-db: "npm:^1.54.0"
     minimizer-webpack-plugin: "npm:^5.7.0"
-    neo-async: "npm:^2.6.2"
-    schema-utils: "npm:^4.3.3"
+    schema-utils: "npm:^4.5.0"
     tapable: "npm:^2.3.0"
     watchpack: "npm:^2.5.2"
     webpack-sources: "npm:^3.5.1"
@@ -15394,7 +15401,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10c0/e1c86317d2d04d33f670a0ad7095e1a8d410867360c327c2dfb14f589794d8ce9b0619998e6fe66aebcfdac6d2e6c9e6f7085adfc9e44cd7d39855654fe75ed4
+  checksum: 10c0/4b08f47bfead44215cd4f0aff83e5e98ae89c2b6339fdfba0267e873e9d330a9741ebe9f3d8aa12241ee3a297f8113f03544536ae7de0fc660d9660aea2f719f
   languageName: node
   linkType: hard
 
