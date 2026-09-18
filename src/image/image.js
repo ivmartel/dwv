@@ -935,7 +935,8 @@ export class Image extends EventTarget {
 
     // keep the segment collection's label map (brush masks alias it
     // directly to the buffer) pointing at the reallocated buffer
-    this.#segmentCollection?.setLabelMap(this.#buffer);
+    this.#segmentCollection?.setLabelMap(
+      /** @type {Uint8Array} */ (this.#buffer));
   }
 
 
