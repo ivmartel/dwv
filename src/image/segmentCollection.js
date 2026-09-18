@@ -206,6 +206,90 @@ export class SegmentCollection {
   }
 
   /**
+   * Split a flat label map offset into its slice index and the local
+   * (within-slice) offset used to index a per-segment slice buffer.
+   *
+   * @param {number} offset The offset in the label map.
+   * @returns {{sliceIndex: number, localOffset: number}} The split offset.
+   */
+  #splitOffset(offset) {
+    const sliceSize = this.#geometry.getSize().getDimSize(2);
+    const sliceIndex = Math.floor(offset / sliceSize);
+    return {
+      sliceIndex,
+      localOffset: offset - (sliceIndex * sliceSize)
+    };
+  }
+
+  /**
+   * Update the per-segment, per-slice buffers after a direct edit to the
+   * shared label map (for example brush painting on a mask loaded from
+   * DICOM, where the label map and the per-segment buffers are otherwise
+   * two separate structures). No-op when this collection has no
+   * per-segment data (brush-created masks), since the label map is
+   * already the source of truth in that case.
+   *
+   * @param {number} offset The offset in the label map that changed.
+   * @param {number} previousValue The segment number previously at offset.
+   * @param {number} newValue The segment number now at offset.
+   */
+  updateAtOffset(offset, previousValue, newValue) {
+    if (this.#segments.size === 0 || previousValue === newValue) {
+      return;
+    }
+    const sliceSize = this.#geometry.getSize().getDimSize(2);
+    const {sliceIndex, localOffset} = this.#splitOffset(offset);
+
+    if (previousValue !== 0) {
+      const sliceBuf = this.#segments.get(previousValue)?.get(sliceIndex);
+      if (typeof sliceBuf !== 'undefined') {
+        sliceBuf[localOffset] = 0;
+      }
+    }
+    if (newValue !== 0) {
+      if (!this.#segments.has(newValue)) {
+        this.#segments.set(newValue, new Map());
+      }
+      const sliceMap = this.#segments.get(newValue);
+      if (!sliceMap.has(sliceIndex)) {
+        sliceMap.set(sliceIndex, new Uint8Array(sliceSize));
+      }
+      sliceMap.get(sliceIndex)[localOffset] = newValue;
+    }
+  }
+
+  /**
+   * Get the value that a different, non-excluded segment holds at a given
+   * label map offset. Used when deleting a segment to restore a voxel that
+   * also belonged to another (overlapping) segment instead of losing that
+   * other segment's presence there. Segments are checked in insertion
+   * order, consistent with the first-wins policy used by {@link
+   * SegmentCollection#getLabelMap}.
+   *
+   * @param {number} offset The offset in the label map.
+   * @param {number} excludeSegmentNumber The segment number to ignore.
+   * @returns {number} The other segment's stored value at that offset,
+   *   or 0 if no other segment covers it.
+   */
+  getOtherValueAtOffset(offset, excludeSegmentNumber) {
+    if (this.#segments.size === 0) {
+      return 0;
+    }
+    const {sliceIndex, localOffset} = this.#splitOffset(offset);
+
+    for (const [segNumber, sliceMap] of this.#segments) {
+      if (segNumber === excludeSegmentNumber) {
+        continue;
+      }
+      const sliceBuf = sliceMap.get(sliceIndex);
+      if (typeof sliceBuf !== 'undefined' && sliceBuf[localOffset] !== 0) {
+        return sliceBuf[localOffset];
+      }
+    }
+    return 0;
+  }
+
+  /**
    * Check whether any two segments share at least one voxel.
    *
    * @returns {boolean} True if overlap was detected.

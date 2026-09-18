@@ -86,8 +86,14 @@ export class DeleteSegmentCommand extends Command {
    */
   execute() {
     if (this.#offsets.length !== 0) {
-      // remove from image
-      this.#mask.setAtOffsets(this.#offsets, 0);
+      // remove from image, restoring any voxel that another, still
+      // present segment also covers instead of blindly zeroing it
+      const collection = this.#mask.getSegmentCollection();
+      const segmentNumber = this.#segment.number;
+      const values = this.#offsets.map(function (offset) {
+        return collection?.getOtherValueAtOffset(offset, segmentNumber) ?? 0;
+      });
+      this.#mask.setAtOffsetsWithValues(this.#offsets, values);
     }
 
     // remove from segments

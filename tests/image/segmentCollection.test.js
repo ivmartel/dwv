@@ -288,6 +288,123 @@ describe('SegmentCollection', () => {
   });
 
   // -------------------------------------------------------------------------
+  // updateAtOffset — keeping per-segment buffers in sync with brush edits
+  // -------------------------------------------------------------------------
+
+  test(
+    'updateAtOffset is a no-op when there is no per-segment data',
+    () => {
+      const geom = makeGeometry(3, 1, 1);
+      const collection = new SegmentCollection(geom);
+      const buf = new Uint8Array([1, 0, 0]);
+      collection.setLabelMap(buf);
+
+      // brush path: label map is the only source of truth already
+      collection.updateAtOffset(1, 0, 1);
+
+      const segs = [makeSeg(1)];
+      const roiBuffers = collection.getSegmentBuffers(segs);
+      assert.equal(
+        roiBuffers[0][0][1], 0,
+        'brush path unaffected: reconstructed from (unedited) label map'
+      );
+    }
+  );
+
+  test(
+    'updateAtOffset reflects a brush edit into an existing segment ' +
+    '(loaded-mask path)',
+    () => {
+      // seg 1 originally covers offset 0 only
+      const geom = makeGeometry(3, 1, 1);
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, makePixelBuffer(3, [0]), 0, 0, 3, 1);
+
+      // simulate a brush stroke adding offset 2 to segment 1
+      collection.updateAtOffset(2, 0, 1);
+
+      const segs = [makeSeg(1)];
+      const roiBuffers = collection.getSegmentBuffers(segs);
+      assert.equal(roiBuffers[0][0][0], 1, 'original pixel still present');
+      assert.equal(roiBuffers[0][0][2], 1, 'brush-added pixel now present');
+    }
+  );
+
+  test(
+    'updateAtOffset removes a pixel from a segment when erased',
+    () => {
+      const geom = makeGeometry(3, 1, 1);
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, makePixelBuffer(3, [0, 1]), 0, 0, 3, 1);
+
+      // simulate erasing offset 1 (brush sets it back to 0)
+      collection.updateAtOffset(1, 1, 0);
+
+      const segs = [makeSeg(1)];
+      const roiBuffers = collection.getSegmentBuffers(segs);
+      assert.equal(roiBuffers[0][0][0], 1, 'untouched pixel still present');
+      assert.equal(roiBuffers[0][0][1], 0, 'erased pixel no longer present');
+    }
+  );
+
+  test(
+    'updateAtOffset moves a pixel from one existing segment to another',
+    () => {
+      const geom = makeGeometry(3, 1, 1);
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, makePixelBuffer(3, [0]), 0, 0, 3, 1);
+      collection.addFrame(2, makePixelBuffer(3, [2]), 0, 0, 3, 2);
+
+      // repaint offset 0 from segment 1 to segment 2
+      collection.updateAtOffset(0, 1, 2);
+
+      const segs = [makeSeg(1), makeSeg(2)];
+      const roiBuffers = collection.getSegmentBuffers(segs);
+      assert.equal(roiBuffers[0][0][0], 0, 'seg 1 no longer has offset 0');
+      assert.equal(roiBuffers[1][0][0], 1, 'seg 2 now has offset 0');
+      assert.equal(roiBuffers[1][0][2], 1, 'seg 2 keeps its original pixel');
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // getOtherValueAtOffset — overlap-aware segment deletion
+  // -------------------------------------------------------------------------
+
+  test(
+    'getOtherValueAtOffset returns the overlapping segment\'s value',
+    () => {
+      // seg 1 and seg 2 overlap at offset 1
+      const geom = makeGeometry(3, 1, 1);
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, makePixelBuffer(3, [0, 1]), 0, 0, 3, 1);
+      collection.addFrame(2, makePixelBuffer(3, [1, 2]), 0, 0, 3, 2);
+
+      assert.equal(
+        collection.getOtherValueAtOffset(1, 1), 2,
+        'seg 2 still covers offset 1 once seg 1 is excluded'
+      );
+      assert.equal(
+        collection.getOtherValueAtOffset(0, 1), 0,
+        'no other segment covers offset 0'
+      );
+    }
+  );
+
+  test(
+    'getOtherValueAtOffset returns 0 for a brush-created mask',
+    () => {
+      const geom = makeGeometry(3, 1, 1);
+      const collection = new SegmentCollection(geom);
+      collection.setLabelMap(new Uint8Array([1, 0, 2]));
+
+      assert.equal(
+        collection.getOtherValueAtOffset(0, 1), 0,
+        'no per-segment data to consult, brush path unaffected'
+      );
+    }
+  );
+
+  // -------------------------------------------------------------------------
   // getOrBuildUnionContour — caching
   // -------------------------------------------------------------------------
 

@@ -932,6 +932,10 @@ export class Image extends EventTarget {
     // force GC
     // eslint-disable-next-line no-useless-assignment
     tmpBuffer = null;
+
+    // keep the segment collection's label map (brush masks alias it
+    // directly to the buffer) pointing at the reallocated buffer
+    this.#segmentCollection?.setLabelMap(this.#buffer);
   }
 
 
@@ -1485,9 +1489,39 @@ export class Image extends EventTarget {
     let offset;
     for (let i = 0, leni = offsets.length; i < leni; ++i) {
       offset = offsets[i];
-      for (let j = 0; j < this.#numberOfComponents; ++j) {
-        this.#buffer[offset + j] = bufferValue[j];
+      if (this.#numberOfComponents === 1) {
+        const previousValue = this.#buffer[offset];
+        this.#buffer[offset] = bufferValue[0];
+        this.#segmentCollection?.updateAtOffset(
+          offset, previousValue, bufferValue[0]);
+      } else {
+        for (let j = 0; j < this.#numberOfComponents; ++j) {
+          this.#buffer[offset + j] = bufferValue[j];
+        }
       }
+    }
+    // fire imagecontentchange
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
+  }
+
+  /**
+   * Set the inner buffer values at given offsets, each to its own value.
+   * Used when a single uniform value cannot be used across all offsets,
+   * for example restoring the segment still present at a voxel that used
+   * to be hidden by an overlapping, now deleted, segment.
+   *
+   * @param {number[]} offsets List of offsets where to set the data.
+   * @param {number[]} values Per-offset values, same length as offsets.
+   * @fires Image#imagecontentchange
+   */
+  setAtOffsetsWithValues(offsets, values) {
+    for (let i = 0; i < offsets.length; ++i) {
+      const offset = offsets[i];
+      const value = values[i];
+      const previousValue = this.#buffer[offset];
+      this.#buffer[offset] = value;
+      this.#contour.resetAroundOffset(offset);
+      this.#segmentCollection?.updateAtOffset(offset, previousValue, value);
     }
     // fire imagecontentchange
     this.dispatchEvent(new CustomEvent('imagecontentchange'));
@@ -1534,6 +1568,7 @@ export class Image extends EventTarget {
         // write update value
         this.#buffer[offset] = value;
         this.#contour.resetAroundOffset(offset);
+        this.#segmentCollection?.updateAtOffset(offset, currentValue, value);
       }
       originalValuesLists.push(originalValues);
     }
@@ -1571,8 +1606,11 @@ export class Image extends EventTarget {
       let ival = iterator.next();
       while (!ival.done) {
         const offset = offsets[ival.index];
+        const previousValue = this.#buffer[offset];
         this.#buffer[offset] = ival.value;
         this.#contour.resetAroundOffset(offset);
+        this.#segmentCollection?.updateAtOffset(
+          offset, previousValue, ival.value);
         ival = iterator.next();
       }
     }
