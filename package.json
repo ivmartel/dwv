@@ -32,7 +32,7 @@
   "dependencies": {
     "dcmstdtojs": "0.2.0",
     "jszip": "^3.10.1",
-    "konva": "~10.3.0",
+    "konva": "~10.5.0",
     "magic-wand-tool": "~1.1.7"
   },
   "devDependencies": {
