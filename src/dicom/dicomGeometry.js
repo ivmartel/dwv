@@ -135,30 +135,39 @@ function checkDistance(frameOrigin, refOrigin, index) {
 /**
  * Complete origins using reference origins if with gaps.
  *
+ * `frameOrigins` are not assumed to be in reference (ascending) order:
+ * a DICOM file's `PerFrameFunctionalGroupsSequence` frame order is not
+ * guaranteed to be spatially sorted for any writer. Match each frame
+ * to its closest reference origin first, then rebuild the continuous
+ * run in ascending reference order, filling any true gaps
+ * from `refOrigins`.
+ *
  * @param {Point3D[]} frameOrigins The frame origins.
  * @param {Point3D[]} refOrigins The reference image origins.
- * @returns {Point3D[]} The continous origins.
+ * @returns {Point3D[]} The continous origins, in ascending reference order.
  */
 function completeOriginsFromReference(
   frameOrigins,
   refOrigins) {
-  // result
-  const resOrigins = [];
-
-  resOrigins.push(frameOrigins[0]);
-  let previousIndex = frameOrigins[0].getClosest(refOrigins);
-  checkDistance(frameOrigins[0], refOrigins[previousIndex], 0);
-  for (let i = 1; i < frameOrigins.length; ++i) {
+  // match each frame to its closest reference index, keeping the frame's
+  // own (authoritative) origin rather than the reference one
+  const frameByRefIndex = new Map();
+  for (let i = 0; i < frameOrigins.length; ++i) {
     const frameOrigin = frameOrigins[i];
-    const currentIndex = frameOrigin.getClosest(refOrigins);
-    checkDistance(frameOrigin, refOrigins[currentIndex], i);
-    if (currentIndex !== previousIndex + 1) {
-      for (let j = previousIndex + 1; j < currentIndex; ++j) {
-        resOrigins.push(refOrigins[j]);
-      }
-    }
-    resOrigins.push(frameOrigin);
-    previousIndex = currentIndex;
+    const refIndex = frameOrigin.getClosest(refOrigins);
+    checkDistance(frameOrigin, refOrigins[refIndex], i);
+    frameByRefIndex.set(refIndex, frameOrigin);
+  }
+
+  const refIndices = [...frameByRefIndex.keys()];
+  const minRefIndex = Math.min(...refIndices);
+  const maxRefIndex = Math.max(...refIndices);
+
+  // result, in ascending reference order, filling gaps from refOrigins
+  const resOrigins = [];
+  for (let j = minRefIndex; j <= maxRefIndex; ++j) {
+    resOrigins.push(
+      frameByRefIndex.has(j) ? frameByRefIndex.get(j) : refOrigins[j]);
   }
 
   return resOrigins;
