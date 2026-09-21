@@ -2,6 +2,7 @@ import {logger} from '../../utils/logger.js';
 import {Index} from '../../math/index.js';
 import {getEllipseIndices} from '../../math/ellipse.js';
 import {Image} from '../../image/image.js';
+import {MaskImage} from '../../image/maskImage.js';
 import {Size} from '../../image/size.js';
 import {Geometry} from '../../image/geometry.js';
 import {ColourMap} from '../../image/luts.js';
@@ -220,7 +221,7 @@ export class BrushMaskPaint extends EventTarget {
   #selectedSegmentNumber;
 
   /**
-   * @type {Image|undefined}
+   * @type {MaskImage|undefined}
    */
   #mask;
 
@@ -344,9 +345,13 @@ export class BrushMaskPaint extends EventTarget {
    * @param {Geometry} geometry The mask geometry.
    * @param {Point3D} origin The slice origin.
    * @param {object} meta The mask meta.
-   * @returns {Image} The slice.
+   * @param {boolean} [asMainMask] True to build the long-lived main mask
+   *   (a {@link MaskImage}, with its own {@link SegmentCollection}) instead
+   *   of a transient single-slice {@link Image} that will immediately be
+   *   passed to {@link Image#appendSlice} and discarded.
+   * @returns {Image|MaskImage} The slice.
    */
-  #createMaskImage(geometry, origin, meta) {
+  #createMaskImage(geometry, origin, meta, asMainMask = false) {
     // create data
     const sizeValues = geometry.getSize().getValues();
     sizeValues[2] = 1;
@@ -361,7 +366,9 @@ export class BrushMaskPaint extends EventTarget {
     values.fill(0);
     ++this.#uid;
     const uids = [this.#uid.toString()];
-    const maskSlice = new Image(maskGeometry, values, uids);
+    const maskSlice = asMainMask
+      ? new MaskImage(maskGeometry, values, uids)
+      : new Image(maskGeometry, values, uids);
     maskSlice.setMeta(meta);
     maskSlice.setPhotometricInterpretation('PALETTE COLOR');
     maskSlice.setPaletteColourMap(new ColourMap([0], [0], [0]));
@@ -528,13 +535,12 @@ export class BrushMaskPaint extends EventTarget {
     // get length unit from ref image
     firstSliceMeta.lengthUnit = sourceImage.getMeta().lengthUnit;
 
-    this.#mask = this.#createMaskImage(
+    this.#mask = /** @type {MaskImage} */ (this.#createMaskImage(
       sourceGeometry,
       imagePosPat,
-      firstSliceMeta
-    );
-
-    this.#mask.setupSegmentCollection();
+      firstSliceMeta,
+      true
+    ));
 
     // fires load events and renders data
     // (will create viewLayer for it)
@@ -593,7 +599,7 @@ export class BrushMaskPaint extends EventTarget {
   /**
    * Get the source data id from the mask image.
    *
-   * @param {Image} mask The mask image.
+   * @param {MaskImage} mask The mask image.
    * @returns {string} The source data id.
    */
   #getSourceDataIdFromMask(mask) {
@@ -644,7 +650,7 @@ export class BrushMaskPaint extends EventTarget {
    * Get the mask image.
    *
    * @param {string} maskDataId The mask data id.
-   * @returns {Image} The image.
+   * @returns {MaskImage} The image.
    */
   #getMaskImage(maskDataId) {
     if (typeof maskDataId === 'undefined') {
@@ -655,7 +661,7 @@ export class BrushMaskPaint extends EventTarget {
     if (typeof maskData === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskImageGetOffset);
     }
-    return maskData.image;
+    return /** @type {MaskImage} */ (maskData.image);
   }
 
   /**
@@ -834,7 +840,7 @@ export class BrushMaskPaint extends EventTarget {
     }
 
     const props = new DrawBrushCommandProperties();
-    props.mask = maskData.image;
+    props.mask = /** @type {MaskImage} */ (maskData.image);
     props.dataId = this.#maskDataId;
     props.offsetsLists = [offsets];
     props.mode = this.#brushMode;
@@ -915,7 +921,7 @@ export class BrushMaskPaint extends EventTarget {
       );
     }
     const props = new DrawBrushCommandProperties();
-    props.mask = maskData.image;
+    props.mask = /** @type {MaskImage} */ (maskData.image);
     props.dataId = this.#maskDataId;
     props.offsetsLists = this.#tmpOffsetsLists;
     props.mode = this.#brushMode;

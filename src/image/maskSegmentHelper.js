@@ -1,7 +1,7 @@
 import {logger} from '../utils/logger.js';
 
 /**
- * @import {Image} from './image.js';
+ * @import {MaskImage} from './maskImage.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
  */
 
@@ -15,7 +15,7 @@ export class MaskSegmentHelper {
   /**
    * The associated mask.
    *
-   * @type {Image}
+   * @type {MaskImage}
    */
   #mask;
 
@@ -27,7 +27,7 @@ export class MaskSegmentHelper {
   #segments;
 
   /**
-   * @param {Image} mask The associated mask image.
+   * @param {MaskImage} mask The associated mask image.
    */
   constructor(mask) {
     this.#mask = mask;
@@ -45,7 +45,7 @@ export class MaskSegmentHelper {
   /**
    * Get the associated mask image.
    *
-   * @returns {Image} The mask image.
+   * @returns {MaskImage} The mask image.
    */
   getMask() {
     return this.#mask;

@@ -259,6 +259,40 @@ export class SegmentCollection {
   }
 
   /**
+   * Re-index the per-segment, per-slice buffers after a slice insertion
+   * (from Image#appendSlice/appendVolume) that shifted existing slice
+   * content to make room for new slices. Unlike the shared label map
+   * (which aliases the image buffer, so the raw byte-level shift already
+   * covers it for free), `#segments` is keyed by slice index rather than
+   * buffer offset, so an insertion before an existing slice leaves its
+   * entries silently pointing at the wrong (pre-shift) slice index unless
+   * they are explicitly re-keyed here.
+   *
+   * @param {number} sliceIndexThreshold Slices at or after this index
+   *   (numbering as it was *before* the insertion) are shifted.
+   * @param {number} numberOfSlices Number of slices inserted.
+   */
+  shiftSlices(sliceIndexThreshold, numberOfSlices) {
+    if (this.#segments.size === 0 || numberOfSlices === 0) {
+      return;
+    }
+    for (const sliceMap of this.#segments.values()) {
+      const toShift = [...sliceMap.keys()]
+        .filter(sliceIndex => sliceIndex >= sliceIndexThreshold);
+      for (const sliceIndex of toShift) {
+        const sliceBuf = sliceMap.get(sliceIndex);
+        sliceMap.delete(sliceIndex);
+        sliceMap.set(sliceIndex + numberOfSlices, sliceBuf);
+      }
+    }
+    // the label map cache itself needs no update (it aliases the already
+    // shifted image buffer), but the union contour cache is keyed by
+    // segment content and would otherwise stay stale after a shift
+    this.#unionContour = undefined;
+    this.#unionContourKey = '';
+  }
+
+  /**
    * Get the value that a different, non-excluded segment holds at a given
    * label map offset. Used when deleting a segment to restore a voxel that
    * also belonged to another (overlapping) segment instead of losing that
@@ -287,6 +321,27 @@ export class SegmentCollection {
       }
     }
     return 0;
+  }
+
+  /**
+   * Create a deep copy of this collection: per-segment/per-slice buffers
+   * and the overlap flag are copied, the lazily-built label map and union
+   * contour caches are left unset (they rebuild on demand from the copied
+   * per-segment data, same as a freshly constructed collection).
+   *
+   * @returns {SegmentCollection} The copy.
+   */
+  clone() {
+    const copy = new SegmentCollection(this.#geometry);
+    for (const [segNumber, sliceMap] of this.#segments) {
+      const copiedSliceMap = new Map();
+      for (const [sliceIndex, sliceBuf] of sliceMap) {
+        copiedSliceMap.set(sliceIndex, sliceBuf.slice());
+      }
+      copy.#segments.set(segNumber, copiedSliceMap);
+    }
+    copy.#hasOverlap = this.#hasOverlap;
+    return copy;
   }
 
   /**

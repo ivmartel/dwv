@@ -3,31 +3,21 @@ import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
 import {arrayContains} from '../utils/array.js';
 import {getTypedArray} from '../dicom/dicomParser.js';
-import {valueRange} from './iterator.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
-import {ImageFactory} from './imageFactory.js';
-import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
-import {Size} from './size.js';
-import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
-import {ImageContour} from './imageContour.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
-import {SegmentCollection} from './segmentCollection.js';
 
 /**
  * @import {Geometry} from './geometry.js';
  * @import {Matrix33} from '../math/matrix.js';
  * @import {NumberRange} from '../math/number.js';
- * @import {DataElement} from '../dicom/dataElement.js';
  * @import {RGB} from '../utils/colour.js';
  * @import {ColourMap} from './luts.js';
  * @import {Point} from '../math/point.js';
- * @import {Label} from './label.js';
+ * @import {MaskImage} from './maskImage.js';
  */
-
-const ML_PER_MM = 0.001; // ml/mm^3
 
 
 /**
@@ -68,36 +58,6 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
   }
   // return index
   return new Index(values);
-}
-
-/**
- * Create an Image from DICOM elements.
- *
- * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {Image} The Image object.
- */
-export function createImage(elements) {
-  const factory = new ImageFactory();
-  return factory.create(
-    elements,
-    elements['7FE00010'].value[0],
-    1
-  );
-}
-
-/**
- * Create a mask Image from DICOM elements.
- *
- * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {Image} The mask Image object.
- */
-export function createMaskImage(elements) {
-  const factory = new MaskFactory();
-  return factory.create(
-    elements,
-    /** @type {Uint8Array} */
-    elements['7FE00010'].value[0]
-  );
 }
 
 /**
@@ -159,18 +119,23 @@ export class Image extends EventTarget {
    */
 
   /**
+   * Constructor signature shared by {@link Image} and its subclasses,
+   * used by {@link Image#clone} to build the copy via the concrete
+   * (possibly subclassed) constructor.
+   *
+   * @typedef {new (
+   *   geometry: Geometry,
+   *   buffer: TypedArray,
+   *   imageUids?: string[]
+   * ) => Image} ImageConstructor
+   */
+
+  /**
    * Data buffer.
    *
    * @type {TypedArray}
    */
   #buffer;
-
-  /**
-   * Image contour.
-   *
-   * @type {ImageContour}
-   */
-  #contour;
 
   /**
    * Whether the image has been resampled or not.
@@ -293,13 +258,6 @@ export class Image extends EventTarget {
   #histogram = null;
 
   /**
-   * The labeling thread.
-   *
-   * @type {LabelingThread}
-   */
-  #labelingThread;
-
-  /**
    * The resampling thread.
    *
    * @type {ResamplingThread}
@@ -314,13 +272,6 @@ export class Image extends EventTarget {
   #complete = false;
 
   /**
-   * Segment collection for mask (SEG) images.
-   *
-   * @type {SegmentCollection|undefined}
-   */
-  #segmentCollection;
-
-  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -333,9 +284,7 @@ export class Image extends EventTarget {
     this.#resamplingJobId = '0';
     this.#rawGeometry = null;
     this.#rawBuffer = null;
-    this.#contour = new ImageContour();
     this.#imageUids = imageUids;
-    this.#labelingThread = null;
     this.#resamplingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
@@ -364,41 +313,15 @@ export class Image extends EventTarget {
   }
 
   /**
-   * Set up a segment collection from the existing image buffer.
-   * Used for brush-painted masks (not created via MaskFactory).
-   */
-  setupSegmentCollection() {
-    this.#segmentCollection = new SegmentCollection(this.#geometry);
-    this.#segmentCollection.setLabelMap(
-      /** @type {Uint8Array} */ (this.#buffer)
-    );
-  }
-
-  /**
-   * Set the segment collection.
+   * Check whether the image has overlapping segments. Always false for a
+   * plain image; {@link MaskImage} overrides this with a real check.
    *
-   * @param {SegmentCollection} collection The segment collection.
-   */
-  setSegmentCollection(collection) {
-    this.#segmentCollection = collection;
-  }
-
-  /**
-   * Get the segment collection.
-   *
-   * @returns {SegmentCollection|undefined} The segment collection.
-   */
-  getSegmentCollection() {
-    return this.#segmentCollection;
-  }
-
-  /**
-   * Check whether the mask has overlapping segments.
-   *
-   * @returns {boolean} True if any two segments share at least one voxel.
+   * @returns {boolean} False.
+   * @deprecated Since v0.37, please use `instanceof MaskImage` and
+   *   `MaskImage#getHasOverlap` instead.
    */
   getHasOverlap() {
-    return this.#segmentCollection?.getHasOverlap() ?? false;
+    return false;
   }
 
   /**
@@ -502,24 +425,10 @@ export class Image extends EventTarget {
    * Check is the image is a mask.
    *
    * @returns {boolean} True if mask.
+   * @deprecated Since v0.37, please use `instanceof MaskImage` instead.
    */
   isMask() {
-    const modality = this.getMeta().Modality;
-    return modality === 'SEG' || modality === 'RTSTRUCT';
-  }
-
-  /**
-   * Get the UID of the series referenced by the mask, if any.
-   *
-   * @returns {string|undefined} The UID.
-   */
-  getMaskReferencedSeriesUID() {
-    let res;
-    // custom meta field for referenced series UID
-    if (this.isMask()) {
-      res = this.getMeta().custom.referencedSeriesUID;
-    }
-    return res;
+    return false;
   }
 
   /**
@@ -754,50 +663,6 @@ export class Image extends EventTarget {
   }
 
   /**
-   * Get the offsets where the buffer equals the input value.
-   * Loops through the whole volume, can get long for big data...
-   *
-   * @param {number|RGB} value The value to check.
-   * @returns {number[]} The list of offsets.
-   */
-  getOffsets(value) {
-    // value to array
-    let bufferValue;
-    if (typeof value === 'number') {
-      if (this.#numberOfComponents !== 1) {
-        throw new Error(
-          'Number of components is not 1 for getting single value.');
-      }
-      bufferValue = [value];
-    } else if (typeof value.r !== 'undefined' &&
-      typeof value.g !== 'undefined' &&
-      typeof value.b !== 'undefined') {
-      if (this.#numberOfComponents !== 3) {
-        throw new Error(
-          'Number of components is not 3 for getting RGB value.');
-      }
-      bufferValue = [value.r, value.g, value.b];
-    }
-
-    // main loop
-    const offsets = [];
-    let equal;
-    for (let i = 0; i < this.#buffer.length; i = i + this.#numberOfComponents) {
-      equal = true;
-      for (let j = 0; j < this.#numberOfComponents; ++j) {
-        if (this.#buffer[i + j] !== bufferValue[j]) {
-          equal = false;
-          break;
-        }
-      }
-      if (equal) {
-        offsets.push(i);
-      }
-    }
-    return offsets;
-  }
-
-  /**
    * Check if the input values are in the buffer.
    * Could loop through the whole volume, can get long for big data...
    *
@@ -889,8 +754,11 @@ export class Image extends EventTarget {
   clone() {
     // clone the image buffer
     const clonedBuffer = this.#buffer.slice(0);
-    // create the image copy
-    const copy = new Image(
+    // create the image copy (via the concrete constructor so a MaskImage
+    // clones into another MaskImage, see MaskImage#clone for the rest of
+    // the mask-specific state)
+    const Ctor = /** @type {ImageConstructor} */ (this.constructor);
+    const copy = new Ctor(
       this.getGeometry().clone(), clonedBuffer, this.#imageUids);
     // copy the RSI(s)
     if (this.isConstantRSI()) {
@@ -911,9 +779,23 @@ export class Image extends EventTarget {
   }
 
   /**
+   * Replace the inner buffer wholesale (as opposed to editing its content
+   * in place). Primarily intended for subclass use, where a private
+   * (`#`) field on this class isn't reachable directly.
+   *
+   * @param {TypedArray} newBuffer The new buffer.
+   * @fires Image#imagecontentchange
+   */
+  replaceBuffer(newBuffer) {
+    this.#buffer = newBuffer;
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
+  }
+
+  /**
    * Re-allocate buffer memory to an input size.
    *
    * @param {number} size The new size.
+   * @fires Image#imagebufferrealloc
    */
   #realloc(size) {
     // save buffer
@@ -933,12 +815,53 @@ export class Image extends EventTarget {
     // eslint-disable-next-line no-useless-assignment
     tmpBuffer = null;
 
-    // keep the segment collection's label map (brush masks alias it
-    // directly to the buffer) pointing at the reallocated buffer
-    this.#segmentCollection?.setLabelMap(
-      /** @type {Uint8Array} */ (this.#buffer));
+    /**
+     * Buffer reallocation event: internal-only signal (not part of
+     * {@link imageEventNames}) for a subclass to re-point any state
+     * aliased to the previous buffer instance, for example MaskImage's
+     * segment collection label map.
+     *
+     * @event Image#imagebufferrealloc
+     * @type {CustomEvent}
+     */
+    this.dispatchEvent(new CustomEvent('imagebufferrealloc'));
   }
 
+  /**
+   * Shift already-present buffer content to make room for a slice (or
+   * volume of slices) being inserted before the end of the buffer.
+   * No-op if the insertion point is already at (or past) the end.
+   *
+   * @param {number} indexOffset Buffer offset where the new content will
+   *   be written.
+   * @param {number} insertSize Buffer size of the content being inserted.
+   * @param {number} maxOffset Buffer offset marking the end of the
+   *   previously valid content.
+   * @fires Image#imagesliceshift
+   */
+  #shiftSlice(indexOffset, insertSize, maxOffset) {
+    if (indexOffset >= maxOffset) {
+      return;
+    }
+    this.#buffer.set(
+      this.#buffer.subarray(indexOffset, maxOffset),
+      indexOffset + insertSize
+    );
+
+    /**
+     * Buffer slice-shift event: internal-only signal (not part of
+     * {@link imageEventNames}) for a subclass to replicate the same
+     * shift on any of its own buffer-aliased state, for example
+     * MaskImage's contour.
+     *
+     * @event Image#imagesliceshift
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     */
+    this.dispatchEvent(new CustomEvent('imagesliceshift', {
+      detail: {indexOffset, insertSize, maxOffset}
+    }));
+  }
 
   /**
    * Check if another image can be appended to this one.
@@ -1095,13 +1018,6 @@ export class Image extends EventTarget {
     const fullBufferSize = sliceSize * this.#meta.numberOfFiles;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
-
-      if (this.#contour.isInitialized()) {
-        this.#contour.realloc(
-          /** @type {Uint8Array} */ (this.#buffer),
-          this.#geometry.getSize()
-        );
-      }
     }
 
     // slice index
@@ -1117,21 +1033,7 @@ export class Image extends EventTarget {
     const indexOffset = fullSliceIndex * sliceSize;
     const maxOffset = totalSlices * sliceSize;
     // move content if needed
-    if (indexOffset < maxOffset) {
-      this.#buffer.set(
-        this.#buffer.subarray(indexOffset, maxOffset),
-        indexOffset + sliceSize
-      );
-
-      if (this.#contour.isInitialized()) {
-        const contourSliceSize = size.getDimSize(2) * 3;
-        const contourIndexOffset = fullSliceIndex * contourSliceSize;
-        const contourMaxOffset = totalSlices * contourSliceSize;
-        this.#contour.shiftSlice(
-          contourIndexOffset, contourSliceSize, contourMaxOffset
-        );
-      }
-    }
+    this.#shiftSlice(indexOffset, sliceSize, maxOffset);
     // add new slice content
     this.#buffer.set(rhs.getBuffer(), indexOffset);
 
@@ -1262,13 +1164,6 @@ export class Image extends EventTarget {
     const fullBufferSize = volumeSize * this.#meta.numberOfFiles;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
-
-      if (this.#contour.isInitialized()) {
-        this.#contour.realloc(
-          /** @type {Uint8Array} */ (this.#buffer),
-          this.#geometry.getSize()
-        );
-      }
     }
 
     // linear index of this volume's first slice
@@ -1278,24 +1173,7 @@ export class Image extends EventTarget {
     const insertSize = numberOfNewSlices * sliceSize;
     const maxOffset = totalSlices * sliceSize;
     // move content if needed
-    if (indexOffset < maxOffset) {
-      this.#buffer.set(
-        this.#buffer.subarray(indexOffset, maxOffset),
-        indexOffset + insertSize
-      );
-
-      if (this.#contour.isInitialized()) {
-        const contourSliceSize = size.getDimSize(2) * 3;
-        const contourIndexOffset =
-          numberOfSlicesBeforeTime * contourSliceSize;
-        const contourMaxOffset = totalSlices * contourSliceSize;
-        this.#contour.shiftSlice(
-          contourIndexOffset,
-          contourSliceSize * numberOfNewSlices,
-          contourMaxOffset
-        );
-      }
-    }
+    this.#shiftSlice(indexOffset, insertSize, maxOffset);
     // add new volume content (rhs buffer is one contiguous block)
     this.#buffer.set(rhs.getBuffer(), indexOffset);
 
@@ -1379,13 +1257,6 @@ export class Image extends EventTarget {
     const fullBufferSize = frameSize * this.#meta.numberOfFiles;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
-
-      if (this.#contour.isInitialized()) {
-        this.#contour.realloc(
-          /** @type {Uint8Array} */ (this.#buffer),
-          this.#geometry.getSize()
-        );
-      }
     }
     // check index
     if (frameIndex >= this.#meta.numberOfFiles) {
@@ -1455,174 +1326,6 @@ export class Image extends EventTarget {
       this.#histogram = res.histogram;
     }
     return this.#histogram;
-  }
-
-  // ****************************************
-  // image data modifiers... carefull...
-  // ****************************************
-
-  /**
-   * Set the inner buffer values at given offsets.
-   *
-   * @param {number[]} offsets List of offsets where to set the data.
-   * @param {number|RGB} value The value to set at the given offsets.
-   * @fires Image#imagecontentchange
-   */
-  setAtOffsets(offsets, value) {
-    // value to array
-    let bufferValue;
-    if (typeof value === 'number') {
-      if (this.#numberOfComponents !== 1) {
-        throw new Error(
-          'Number of components is not 1 for setting single value.');
-      }
-      bufferValue = [value];
-    } else if (typeof value.r !== 'undefined' &&
-      typeof value.g !== 'undefined' &&
-      typeof value.b !== 'undefined') {
-      if (this.#numberOfComponents !== 3) {
-        throw new Error(
-          'Number of components is not 3 for setting RGB value.');
-      }
-      bufferValue = [value.r, value.g, value.b];
-    }
-
-    let offset;
-    for (let i = 0, leni = offsets.length; i < leni; ++i) {
-      offset = offsets[i];
-      if (this.#numberOfComponents === 1) {
-        const previousValue = this.#buffer[offset];
-        this.#buffer[offset] = bufferValue[0];
-        this.#segmentCollection?.updateAtOffset(
-          offset, previousValue, bufferValue[0]);
-      } else {
-        for (let j = 0; j < this.#numberOfComponents; ++j) {
-          this.#buffer[offset + j] = bufferValue[j];
-        }
-      }
-    }
-    // fire imagecontentchange
-    this.dispatchEvent(new CustomEvent('imagecontentchange'));
-  }
-
-  /**
-   * Set the inner buffer values at given offsets, each to its own value.
-   * Used when a single uniform value cannot be used across all offsets,
-   * for example restoring the segment still present at a voxel that used
-   * to be hidden by an overlapping, now deleted, segment.
-   *
-   * @param {number[]} offsets List of offsets where to set the data.
-   * @param {number[]} values Per-offset values, same length as offsets.
-   * @fires Image#imagecontentchange
-   */
-  setAtOffsetsWithValues(offsets, values) {
-    for (let i = 0; i < offsets.length; ++i) {
-      const offset = offsets[i];
-      const value = values[i];
-      const previousValue = this.#buffer[offset];
-      this.#buffer[offset] = value;
-      this.#contour.resetAroundOffset(offset);
-      this.#segmentCollection?.updateAtOffset(offset, previousValue, value);
-    }
-    // fire imagecontentchange
-    this.dispatchEvent(new CustomEvent('imagecontentchange'));
-  }
-
-
-  /**
-   * Set the inner buffer values at given offsets.
-   *
-   * @param {number[][]} offsetsLists List of offset lists where
-   *   to set the data.
-   * @param {number} value The value to set at the given offsets.
-   * @returns {Array} A list of objects representing the original values before
-   *  replacing them.
-   * @fires Image#imagecontentchange
-   */
-  setAtOffsetsAndGetOriginals(offsetsLists, value) {
-    const originalValuesLists = [];
-
-    // update and store
-    for (let j = 0; j < offsetsLists.length; ++j) {
-      const offsets = offsetsLists[j];
-      // first value
-      let offset = offsets[0];
-      let previousValue = this.#buffer[offset];
-      // original value storage
-      const originalValues = [];
-      originalValues.push({
-        index: 0,
-        value: previousValue
-      });
-      for (let i = 0; i < offsets.length; ++i) {
-        offset = offsets[i];
-        const currentValue = this.#buffer[offset];
-        // check if new value
-        if (previousValue !== currentValue) {
-          // store new value
-          originalValues.push({
-            index: i,
-            value: currentValue
-          });
-          previousValue = currentValue;
-        }
-        // write update value
-        this.#buffer[offset] = value;
-        this.#contour.resetAroundOffset(offset);
-        this.#segmentCollection?.updateAtOffset(offset, currentValue, value);
-      }
-      originalValuesLists.push(originalValues);
-    }
-    // fire imagecontentchange
-    this.dispatchEvent(new CustomEvent('imagecontentchange'));
-    return originalValuesLists;
-  }
-
-  /**
-   * Set the inner buffer values at given offsets.
-   *
-   * @param {number[][]} offsetsLists List of offset lists
-   *   where to set the data.
-   * @param {number|Array} value The value to set at the given offsets.
-   * @fires Image#imagecontentchange
-   */
-  setAtOffsetsWithIterator(offsetsLists, value) {
-    const isValueArray = Array.isArray(value);
-
-    for (let j = 0; j < offsetsLists.length; ++j) {
-      const offsets = offsetsLists[j];
-      let iterator;
-      if (isValueArray) {
-        // input value is a list of iterators
-        // created by setAtOffsetsAndGetOriginals
-        iterator = valueRange(
-          value[j], offsets.length);
-      } else {
-        // input value is a simple color
-        iterator = valueRange(
-          [{index: 0, value}], offsets.length);
-      }
-
-      // set values
-      let ival = iterator.next();
-      while (!ival.done) {
-        const offset = offsets[ival.index];
-        const previousValue = this.#buffer[offset];
-        this.#buffer[offset] = ival.value;
-        this.#contour.resetAroundOffset(offset);
-        this.#segmentCollection?.updateAtOffset(
-          offset, previousValue, ival.value);
-        ival = iterator.next();
-      }
-    }
-    /**
-     * Image content change event.
-     *
-     * @event Image#imagecontentchange
-     * @type {CustomEvent}
-     * @property {object} detail The event detail.
-     */
-    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
@@ -2031,167 +1734,6 @@ export class Image extends EventTarget {
       );
     }
     return newImage;
-  }
-
-  /**
-   * Initialize the contour buffer.
-   * Should be called on every segmentation image, or any image where
-   * contour rendering needs to be supported.
-   */
-  initializeContour() {
-    this.#contour.initialize(
-      /** @type {Uint8Array} */ (this.#buffer),
-      this.#geometry.getSize()
-    );
-  }
-
-  /**
-   * Get the image contour. Should only be available
-   * for segmentation images, but can be initialized
-   * for any Uint8Array image.
-   *
-   * @returns {ImageContour} The image contour.
-   */
-  getContour() {
-    return this.#contour;
-  }
-
-  /**
-   * Post-process labels after labeling thread is done.
-   *
-   * @param {any} labels The labels to update.
-   * @fires Image#labelschanged
-   */
-  #postProcessLabels(labels) {
-    const spacing = this.#geometry.getSpacing();
-    const lengthUnit = this.getMeta().lengthUnit;
-    let pixelVolume = 1;
-    let volumeUnit = 'unit.pixel';
-    if (lengthUnit === 'unit.mm') {
-      pixelVolume =
-        spacing.get(0) *
-        spacing.get(1) *
-        spacing.get(2) *
-        ML_PER_MM;
-      volumeUnit = 'unit.ml';
-    }
-
-    for (const label of labels) {
-      // add centroid point
-      label.centroid = this.#geometry.indexToWorld(
-        new Index(label.centroidIndex));
-      // add volume
-      label.volume = {
-        value: label.count * pixelVolume,
-        unit: volumeUnit
-      };
-      // add unit to values
-      let majorDiameter;
-      let minorDiameter;
-      if (typeof label.diameters !== 'undefined') {
-        if (typeof label.diameters.major !== 'undefined') {
-          majorDiameter = label.diameters.major.diameter;
-        }
-        if (typeof label.diameters.minor !== 'undefined') {
-          minorDiameter = label.diameters.minor.diameter;
-        }
-      }
-      label.diameters = {
-        major: {
-          diameter: {
-            value: majorDiameter,
-            unit: lengthUnit
-          }
-        },
-        minor: {
-          diameter: {
-            value: minorDiameter,
-            unit: lengthUnit
-          }
-        }
-      };
-      label.height = {
-        value: label.height,
-        unit: lengthUnit
-      };
-    }
-    // sort by volume then by id
-    /** @type {Label[]} */
-    const labelsSorted =
-      labels.sort((v1, v2) => {
-        return v2.volume.value - v1.volume.value;
-      }).sort((v1, v2) => {
-        return v1.id - v2.id;
-      });
-
-    this.dispatchEvent(new CustomEvent('labelschanged', {
-      detail: {
-        labels: /** @type {Label[]} */ (labelsSorted)
-      }
-    }));
-  }
-
-  /**
-   * Label segments with overlap.
-   * The merged labelmap uses first-wins at overlap positions, so voxels
-   * shared by two segments are attributed only to the first segment.
-   * Run the filter once per segment on a clean per-segment buffer so
-   * every segment gets its correct voxels counted.
-   */
-  #labelOverlapSegments() {
-    const imageSize = this.#geometry.getSize();
-    const nx = imageSize.get(0);
-    const ny = imageSize.get(1);
-    const segments = [];
-    for (const [segNumber, sliceMap] of this.#segmentCollection.getAll()) {
-      const sliceIndices = [...sliceMap.keys()];
-      const minSlice = Math.min(...sliceIndices);
-      const size = new Size([nx, ny, Math.max(...sliceIndices) - minSlice + 1]);
-      const slices = [];
-      for (const [sliceIndex, sliceBuf] of sliceMap) {
-        slices.push({
-          sliceIndex: sliceIndex - minSlice,
-          data: new Uint8Array(sliceBuf)
-        });
-      }
-      segments.push({segNumber, size, slices, minSlice});
-    }
-
-    this.#labelingThread.runOverlap(segments, this.#geometry);
-  }
-
-  /**
-   * Recalculate labels.
-   *
-   * @fires Image#labelingstart
-   * @fires Image#labelschanged
-   */
-  recalculateLabels() {
-    this.dispatchEvent(new CustomEvent('labelingstart'));
-
-    // create thread if not done yet
-    if (this.#labelingThread === null) {
-      this.#labelingThread = new LabelingThread();
-
-      this.#labelingThread.ondone = (event) => {
-        this.#postProcessLabels(event.data.labels);
-        //TODO: This is temporary until a proper method of displaying
-        // diameters is implmented.
-        // ------
-        if (event.data.buffer) {
-          this.#buffer = event.data.buffer;
-          this.dispatchEvent(new CustomEvent('imagecontentchange'));
-        }
-        // ------
-      };
-    }
-
-    const collection = this.#segmentCollection;
-    if (collection?.getHasOverlap() && collection.getAll().size > 0) {
-      this.#labelOverlapSegments();
-    } else {
-      this.#labelingThread.run(this.#buffer, this.#geometry);
-    }
   }
 
   /**

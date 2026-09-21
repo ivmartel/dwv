@@ -7,13 +7,17 @@ import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGetAll} from '../../src/dicom/dataElement.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {MaskFactory, mergeMaskImages} from '../../src/image/maskFactory.js';
-import {Image} from '../../src/image/image.js';
+import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
+
+/**
+ * @import {Image} from '../../src/image/image.js';
+ */
 
 import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 
@@ -62,7 +66,7 @@ function buildRefImage() {
  * Build a mask Image matching test-img-00 geometry.
  *
  * @param {string} configName The config name.
- * @returns {Image} The reference image.
+ * @returns {MaskImage} The reference image.
  */
 function buildMaskImage(configName) {
   const config = syntheticData.find(c => c.name === configName);
@@ -332,7 +336,7 @@ describe('MaskFactory', () => {
  * @param {string} label The segment label.
  * @param {number} pixelStart First pixel index to mark as foreground.
  * @param {number} pixelCount Number of contiguous foreground pixels.
- * @returns {Image} The mask image.
+ * @returns {MaskImage} The mask image.
  */
 function buildSingleSegmentMask(segNumber, label, pixelStart, pixelCount) {
   const config = syntheticData.find(c => c.name === 'test-img-00');
@@ -350,8 +354,8 @@ function buildSingleSegmentMask(segNumber, label, pixelStart, pixelCount) {
   const collection = new SegmentCollection(geometry);
   collection.addFrame(segNumber, sliceBuf, 0, 0, sliceSize, segNumber);
   const labelMap = collection.getLabelMap();
-  const image = new Image(geometry, labelMap, [`uid-${segNumber}`]);
-  image.setSegmentCollection(collection);
+  const image = new MaskImage(geometry, labelMap, [`uid-${segNumber}`],
+    collection);
   const segment = {number: segNumber, label};
   image.setMeta({
     Modality: 'SEG',
@@ -475,8 +479,7 @@ describe('mergeMaskImages', () => {
         new Size([tags.Columns, tags.Rows, 1]),
         new Spacing([1, 1, 1])
       );
-      const brushMask = new Image(brushGeometry, brushBuf, ['uid-brush']);
-      brushMask.setupSegmentCollection();
+      const brushMask = new MaskImage(brushGeometry, brushBuf, ['uid-brush']);
       brushMask.setMeta({Modality: 'SEG', custom: {}});
       const mask1 = buildSingleSegmentMask(1, 'Seg1', 0, 16);
       const merged = mergeMaskImages(mask1, brushMask);
@@ -501,8 +504,7 @@ describe('mergeMaskImages', () => {
         new Size([tags.Columns, tags.Rows, 1]),
         new Spacing([1, 1, 1])
       );
-      const brushMask = new Image(brushGeometry, brushBuf, ['uid-brush']);
-      brushMask.setupSegmentCollection();
+      const brushMask = new MaskImage(brushGeometry, brushBuf, ['uid-brush']);
       brushMask.setMeta({Modality: 'SEG', custom: {}});
       const mask2 = buildSingleSegmentMask(2, 'Seg2', 100, 16);
       const merged = mergeMaskImages(brushMask, mask2);
@@ -528,9 +530,9 @@ describe('mergeMaskImages', () => {
       const sliceBuf1 = new Uint8Array(sliceSize);
       sliceBuf1[0] = 1;
       collection1.addFrame(1, sliceBuf1, 0, 1, sliceSize, 1);
-      const mask1 = new Image(
-        geometry1, collection1.getLabelMap(), ['uid-1a', 'uid-1b', 'uid-1c']);
-      mask1.setSegmentCollection(collection1);
+      const mask1 = new MaskImage(
+        geometry1, collection1.getLabelMap(), ['uid-1a', 'uid-1b', 'uid-1c'],
+        collection1);
       mask1.setMeta({
         Modality: 'SEG',
         custom: {segments: [{number: 1, label: 'Seg1'}]}
@@ -548,9 +550,8 @@ describe('mergeMaskImages', () => {
       const sliceBuf2 = new Uint8Array(sliceSize);
       sliceBuf2[100] = 1;
       collection2.addFrame(2, sliceBuf2, 0, 0, sliceSize, 2);
-      const mask2 = new Image(
-        geometry2, collection2.getLabelMap(), ['uid-2']);
-      mask2.setSegmentCollection(collection2);
+      const mask2 = new MaskImage(
+        geometry2, collection2.getLabelMap(), ['uid-2'], collection2);
       mask2.setMeta({
         Modality: 'SEG',
         custom: {segments: [{number: 2, label: 'Seg2'}]}
@@ -586,9 +587,8 @@ describe('mergeMaskImages', () => {
     const sliceBuf1 = new Uint8Array(sliceSize);
     sliceBuf1[0] = 1;
     collection1.addFrame(1, sliceBuf1, 0, 0, sliceSize, 1);
-    const mask1 = new Image(
-      geometry1, collection1.getLabelMap(), ['uid-1']);
-    mask1.setSegmentCollection(collection1);
+    const mask1 = new MaskImage(
+      geometry1, collection1.getLabelMap(), ['uid-1'], collection1);
     mask1.setMeta({
       Modality: 'SEG',
       custom: {segments: [{number: 1, label: 'Seg1'}]}
@@ -610,9 +610,9 @@ describe('mergeMaskImages', () => {
     const sliceBuf2c = new Uint8Array(sliceSize);
     sliceBuf2c[150] = 1;
     collection2.addFrame(2, sliceBuf2c, 0, 2, sliceSize, 2);
-    const mask2 = new Image(
-      geometry2, collection2.getLabelMap(), ['uid-2a', 'uid-2b', 'uid-2c']);
-    mask2.setSegmentCollection(collection2);
+    const mask2 = new MaskImage(
+      geometry2, collection2.getLabelMap(), ['uid-2a', 'uid-2b', 'uid-2c'],
+      collection2);
     mask2.setMeta({
       Modality: 'SEG',
       custom: {segments: [{number: 2, label: 'Seg2'}]}
@@ -649,9 +649,9 @@ describe('mergeMaskImages', () => {
       const narrowSliceBuf = new Uint8Array(sliceSize);
       narrowSliceBuf[0] = 1;
       narrowCollection.addFrame(1, narrowSliceBuf, 0, 0, sliceSize, 1);
-      const narrowMask = new Image(
-        narrowGeometry, narrowCollection.getLabelMap(), ['uid-narrow']);
-      narrowMask.setSegmentCollection(narrowCollection);
+      const narrowMask = new MaskImage(
+        narrowGeometry, narrowCollection.getLabelMap(), ['uid-narrow'],
+        narrowCollection);
       narrowMask.setMeta({
         Modality: 'SEG',
         custom: {segments: [{number: 1, label: 'Seg1'}]}
@@ -669,10 +669,9 @@ describe('mergeMaskImages', () => {
         sliceBuf[50] = 1;
         wideCollection.addFrame(2, sliceBuf, 0, k, sliceSize, 2);
       }
-      const wideMask = new Image(
+      const wideMask = new MaskImage(
         wideGeometry, wideCollection.getLabelMap(),
-        ['uid-wide-a', 'uid-wide-b', 'uid-wide-c']);
-      wideMask.setSegmentCollection(wideCollection);
+        ['uid-wide-a', 'uid-wide-b', 'uid-wide-c'], wideCollection);
       wideMask.setMeta({
         Modality: 'SEG',
         custom: {segments: [{number: 2, label: 'Seg2'}]}

@@ -3,7 +3,7 @@ import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
-import {Image} from '../../src/image/image.js';
+import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 import {DeleteSegmentCommand} from '../../src/command/deleteSegmentCommand.js';
@@ -19,7 +19,7 @@ describe('DeleteSegmentCommand', () => {
    * addFrame, buffer aliased to the built label map), with segment 1
    * covering offsets 0-1 and segment 2 covering offsets 1-2 (overlap at 1).
    *
-   * @returns {{image: Image, collection: SegmentCollection,
+   * @returns {{image: MaskImage, collection: SegmentCollection,
    *   seg1: MaskSegment, seg2: MaskSegment}} The test fixture.
    */
   function makeOverlappingMask() {
@@ -29,8 +29,8 @@ describe('DeleteSegmentCommand', () => {
     collection.addFrame(1, new Uint8Array([1, 1, 0]), 0, 0, 3, 1);
     collection.addFrame(2, new Uint8Array([0, 1, 1]), 0, 0, 3, 2);
 
-    const image = new Image(geom, collection.getLabelMap(), ['0']);
-    image.setSegmentCollection(collection);
+    const image = new MaskImage(geom, collection.getLabelMap(), ['0'],
+      collection);
 
     const seg1 = new MaskSegment(1, 'seg-1', 'MANUAL');
     seg1.displayValue = 1;

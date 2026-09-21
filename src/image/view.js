@@ -17,6 +17,7 @@ import {
 import {generateImageDataRgb} from './viewRgb.js';
 import {generateImageDataYbrFull} from './viewYbrFull.js';
 import {ViewFactory} from './viewFactory.js';
+import {MaskImage} from './maskImage.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {getSliceIterator} from '../image/iterator.js';
 
@@ -230,8 +231,10 @@ export class View extends EventTarget {
       // ideally getContourDistance would be passed in by an
       // iterator, but that would require a large change to a
       // lot of components for this one edge case.
+      // (this function is only ever installed as the active alpha
+      // function when isMask() is true, so #image is a MaskImage here)
       const contourDistance =
-        this.#image.getContour().getDistance(
+        /** @type {MaskImage} */ (this.#image).getContour().getDistance(
           index,
           this.getOrientation()
         );
@@ -320,7 +323,7 @@ export class View extends EventTarget {
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return this.#image.isMask();
+    return this.#image instanceof MaskImage;
   }
 
   /**
@@ -1080,7 +1083,7 @@ export class View extends EventTarget {
         break;
 
       case 'PALETTE COLOR':
-        if (image.getHasOverlap()) {
+        if (image instanceof MaskImage && image.getHasOverlap()) {
           generateImageDataPaletteColorBlend(
             data,
             iterator,

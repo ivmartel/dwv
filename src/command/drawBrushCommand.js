@@ -1,12 +1,12 @@
 import {Command} from './undoStack.js';
 
 /**
- * @import {Image} from '../image/image.js';
+ * @import {MaskImage} from '../image/maskImage.js';
  */
 
 export class DrawBrushCommandProperties {
   /**
-   * @type {Image}
+   * @type {MaskImage}
    */
   mask;
   /**

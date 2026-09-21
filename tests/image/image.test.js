@@ -8,9 +8,7 @@ import {Spacing} from '../../src/image/spacing.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 import {Image} from '../../src/image/image.js';
-import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
-import {Matrix33} from '../../src/math/matrix.js';
 import {WindowLevel, equalWl} from '../../src/image/windowLevel.js';
 import {WindowPreset} from '../../src/image/windowPreset.js';
 
@@ -668,7 +666,7 @@ describe('image', () => {
    *
    * @function module:tests/image~hasvaluesGetoffsets
    */
-  test('hasValues getOffsets', () => {
+  test('hasValues', () => {
     const size0 = 3;
     const imgSize0 = new Size([size0, size0, 1]);
     const imgSpacing0 = new Spacing([1, 1, 1]);
@@ -682,8 +680,6 @@ describe('image', () => {
     for (let i1 = 2 * size0; i1 < size0 * size0; ++i1) {
       buffer0[i1] = 1;
     }
-    const theoOffset0 = [1, 2, 3, 4, 5];
-    const theoOffset1 = [0, 6, 7, 8];
 
     // create the image
     const image0 = new Image(imgGeometry0, buffer0);
@@ -720,55 +716,6 @@ describe('image', () => {
     assert.ok(
       arrayEquals(image0.hasValues([2, 1, 0]), [false, true, true]),
       'Image has values 2,1,0'
-    );
-
-    // test offsets list
-    const off00 = image0.getOffsets(0);
-    const off01 = image0.getOffsets(1);
-    assert.ok(arrayEquals(off00, theoOffset0), 'Image offsets 0');
-    assert.ok(arrayEquals(off01, theoOffset1), 'Image offsets 1');
-  });
-
-  /**
-   * Tests for {@link Image} initializeContour and getContour.
-   *
-   * @function module:tests/image~imageContour
-   */
-  test('Image contour', () => {
-    const imgOrigins = new Point3D(0, 0, 0);
-    const imgSpacing = new Spacing([1, 1, 1]);
-    const imgSize0 = new Size([3, 3, 1]);
-    const imgGeometry0 =
-      new Geometry(imgOrigins, imgSize0, imgSpacing);
-    const imgBuffer0 = new Uint8Array(9).fill(1);
-
-    const image0 = new Image(imgGeometry0, imgBuffer0);
-
-    assert.notOk(
-      image0.getContour().isInitialized(),
-      'Contour not initialized before initializeContour'
-    );
-
-    image0.initializeContour();
-
-    assert.ok(
-      image0.getContour().isInitialized(),
-      'Contour initialized after initializeContour'
-    );
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const o00 = [
-      1, 0, 0,
-      0, 1, 0,
-      0, 0, 1,
-    ];
-    /* eslint-enable @stylistic/js/array-element-newline */
-    const orientation00 = new Matrix33(o00);
-
-    assert.equal(
-      typeof image0.getContour().getDistance(4, orientation00),
-      'number',
-      'getDistance returns a number'
     );
   });
 
@@ -830,71 +777,5 @@ describe('image', () => {
     assert.equal(image1.getMeta().Modality, modality1,
       'Clone image modality #1');
   });
-
-  test(
-    'segment collection label map follows the buffer after a realloc',
-    () => {
-      // single-slice mask, mirrors Brush#createMask + setupSegmentCollection
-      const size1 = new Size([2, 2, 1]);
-      const spacing = new Spacing([1, 1, 1]);
-      const geom0 = new Geometry([new Point3D(0, 0, 0)], size1, spacing);
-      const image = new Image(geom0, new Uint8Array(4), ['0']);
-      image.setMeta({PixelRepresentation: 0, numberOfFiles: 2});
-      image.setupSegmentCollection();
-
-      // paint segment 1 on slice 0
-      image.setAtOffsetsAndGetOriginals([[0]], 1);
-
-      // append a second slice: triggers Image#realloc since the buffer
-      // must grow from 4 to 8 elements
-      const geom1 = new Geometry([new Point3D(0, 0, 1)], size1, spacing);
-      const slice = new Image(geom1, new Uint8Array(4), ['1']);
-      slice.setMeta({PixelRepresentation: 0, numberOfFiles: 2});
-      image.appendSlice(slice);
-
-      // paint segment 1 on the newly appended slice 1
-      image.setAtOffsetsAndGetOriginals([[4]], 1);
-
-      const collection = image.getSegmentCollection();
-      assert.equal(
-        collection.getLabelMap(), image.getBuffer(),
-        'label map still aliases the (reallocated) image buffer'
-      );
-      assert.equal(
-        collection.getLabelMap()[4], 1,
-        'edit made on the appended slice is visible in the label map'
-      );
-    }
-  );
-
-  test(
-    'setAtOffsets keeps the segment collection in sync (e.g. ' +
-    'DeleteSegmentCommand / ChangeSegmentColourCommand)',
-    () => {
-      // mimic a mask loaded via MaskFactory: per-segment data in
-      // #segments, buffer aliased to the built label map
-      const size1 = new Size([3, 1, 1]);
-      const spacing = new Spacing([1, 1, 1]);
-      const geom = new Geometry([new Point3D(0, 0, 0)], size1, spacing);
-      const collection = new SegmentCollection(geom);
-      const pixelBuffer = new Uint8Array([1, 1, 0]);
-      collection.addFrame(1, pixelBuffer, 0, 0, 3, 1);
-
-      const image = new Image(geom, collection.getLabelMap(), ['0']);
-      image.setSegmentCollection(collection);
-
-      // simulate ChangeSegmentColourCommand renumbering segment 1 to 3
-      image.setAtOffsets([0, 1], 3);
-
-      const oldBuffers = collection.getSegmentBuffers([{number: 1}]);
-      assert.ok(
-        oldBuffers[0][0].every(v => v === 0),
-        'old segment number no longer carries these pixels'
-      );
-      const newBuffers = collection.getSegmentBuffers([{number: 3}]);
-      assert.equal(newBuffers[2][0][0], 1, 'pixel tracked under new number');
-      assert.equal(newBuffers[2][0][1], 1, 'pixel tracked under new number');
-    }
-  );
 
 });

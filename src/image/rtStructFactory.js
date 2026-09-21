@@ -13,7 +13,7 @@ import {
   mergeTagValues
 } from '../dicom/simpleTagValues.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
-import {Image} from './image.js';
+import {MaskImage} from './maskImage.js';
 import {ColourMap} from './luts.js';
 import {SegmentCollection} from './segmentCollection.js';
 import {RGB} from '../utils/colour.js';
@@ -22,6 +22,7 @@ import {Index} from '../math/index.js';
 import {logger} from '../utils/logger.js';
 
 /**
+ * @import {Image} from './image.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
  */
@@ -475,7 +476,7 @@ export class RtStructFactory {
   }
 
   /**
-   * Get a mask {@link Image} from RTSTRUCT DICOM elements.
+   * Get a {@link MaskImage} from RTSTRUCT DICOM elements.
    *
    * Contours are rasterized into a Uint8Array whose voxel values are
    * segment numbers (0 = background, 1..N = ROI index).
@@ -484,7 +485,7 @@ export class RtStructFactory {
    *
    * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @param {Image} refImage The reference image (CT/MR) that was loaded first.
-   * @returns {Image} The mask image.
+   * @returns {MaskImage} The mask image.
    * @throws {Error} If the reference image geometry cannot be used.
    */
   create(dataElements, refImage) {
@@ -578,8 +579,8 @@ export class RtStructFactory {
     }
 
     // create mask image from the merged label map
-    const image = new Image(geo, collection.getLabelMap(), uids);
-    image.setSegmentCollection(collection);
+    const image = new MaskImage(
+      geo, collection.getLabelMap(), uids, collection);
     image.setPhotometricInterpretation('PALETTE COLOR');
     image.setPaletteColourMap(new ColourMap(redLut, greenLut, blueLut));
 
@@ -610,13 +611,13 @@ export class RtStructFactory {
   }
 
   /**
-   * Convert a mask {@link Image} into DICOM RT Structure Set elements.
+   * Convert a {@link MaskImage} into DICOM RT Structure Set elements.
    *
    * Traces each segment's pixel regions per slice using Moore neighborhood
    * contour tracing, simplifies with Ramer-Douglas-Peucker, then maps the
    * 2D pixel coordinates back to 3D patient-space coordinates.
    *
-   * @param {Image} image The mask image.
+   * @param {MaskImage} image The mask image.
    * @param {MaskSegment[]} [segments] The mask segments; if omitted, taken
    *   from image meta.
    * @param {Image} [sourceImage] Source image (provides StudyInstanceUID).

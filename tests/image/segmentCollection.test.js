@@ -405,6 +405,63 @@ describe('SegmentCollection', () => {
   );
 
   // -------------------------------------------------------------------------
+  // shiftSlices — re-indexing after a slice insertion
+  // -------------------------------------------------------------------------
+
+  test(
+    'shiftSlices moves entries at or after the threshold, leaves earlier ' +
+    'ones alone',
+    () => {
+      // 4-slice geometry; segment 1 on slices 0 and 2, segment 2 on slice 3
+      const geom = makeGeometry(3, 1, 4);
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, makePixelBuffer(3, [0]), 0, 0, 3, 1);
+      collection.addFrame(1, makePixelBuffer(3, [1]), 0, 2, 3, 1);
+      collection.addFrame(2, makePixelBuffer(3, [2]), 0, 3, 3, 2);
+
+      // a slice was inserted before index 2 (e.g. at the new index 2)
+      collection.shiftSlices(2, 1);
+
+      const seg1Slices = [...collection.getAll().get(1).keys()].sort();
+      const seg2Slices = [...collection.getAll().get(2).keys()].sort();
+      assert.deepEqual(
+        seg1Slices, [0, 3], 'slice 0 untouched, slice 2 shifted to 3'
+      );
+      assert.deepEqual(seg2Slices, [4], 'slice 3 shifted to 4');
+    }
+  );
+
+  test('shiftSlices is a no-op for a brush-created mask (no #segments)',
+    () => {
+      const geom = makeGeometry(3, 1, 2);
+      const collection = new SegmentCollection(geom);
+      collection.setLabelMap(new Uint8Array([1, 0, 0, 0, 0, 2]));
+
+      // should not throw, and getAll() stays empty
+      collection.shiftSlices(0, 1);
+      assert.equal(collection.getAll().size, 0);
+    }
+  );
+
+  test(
+    'shiftSlices invalidates the cached union contour',
+    () => {
+      const geom = makeGeometry(3, 1, 2);
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, makePixelBuffer(3, [0]), 0, 0, 3, 1);
+
+      const size = geom.getSize();
+      const before = collection.getOrBuildUnionContour(undefined, size);
+      collection.shiftSlices(0, 1);
+      const after = collection.getOrBuildUnionContour(undefined, size);
+
+      assert.notEqual(
+        before, after, 'union contour rebuilt after a slice shift'
+      );
+    }
+  );
+
+  // -------------------------------------------------------------------------
   // getOrBuildUnionContour — caching
   // -------------------------------------------------------------------------
 

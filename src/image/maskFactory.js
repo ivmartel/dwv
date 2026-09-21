@@ -31,7 +31,7 @@ import {
 } from '../dicom/dicomFunctionalGroup.js';
 import {getFramesGeometry} from '../dicom/dicomGeometry.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
-import {Image} from '../image/image.js';
+import {MaskImage} from '../image/maskImage.js';
 import {SegmentCollection} from './segmentCollection.js';
 import {Point, point3DFromArray} from '../math/point.js';
 import {
@@ -43,6 +43,7 @@ import {ColourMap} from './luts.js';
 import {DataElement} from '../dicom/dataElement.js';
 
 /**
+ * @import {Image} from '../image/image.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
  * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
  */
@@ -269,13 +270,13 @@ export class MaskFactory {
   }
 
   /**
-   * Get an {@link Image} object from the read DICOM file.
+   * Get a {@link MaskImage} object from the read DICOM file.
    *
    * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @param {Uint8Array} pixelBuffer The pixel buffer.
    * @param {Image} [refImage] Reference image, code will use its
    *   origins if present (best) or try to calculate them.
-   * @returns {Image} A new Image.
+   * @returns {MaskImage} A new mask image.
    * @throws {Error} Error for missing or wrong data.
    */
   create(dataElements, pixelBuffer, refImage) {
@@ -413,8 +414,8 @@ export class MaskFactory {
     }
 
     // create image from the merged label map
-    const image = new Image(geometry, collection.getLabelMap(), uids);
-    image.setSegmentCollection(collection);
+    const image = new MaskImage(
+      geometry, collection.getLabelMap(), uids, collection);
 
     if (hasDisplayRGBValue) {
       image.setPhotometricInterpretation('PALETTE COLOR');
@@ -456,7 +457,7 @@ export class MaskFactory {
   /**
    * Convert a mask image into a DICOM segmentation object.
    *
-   * @param {Image} image The mask image.
+   * @param {MaskImage} image The mask image.
    * @param {MaskSegment[]} segments The mask segments.
    * @param {Image} sourceImage The source image.
    * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
@@ -634,9 +635,9 @@ export class MaskFactory {
  * The returned image can be saved with the standard
  * `new MaskFactory().toDicom(merged, undefined, sourceImage)` workflow.
  *
- * @param {Image} mask1 The first mask (provides meta).
- * @param {Image} mask2 The second mask to merge into mask1.
- * @returns {Image} The new merged mask image.
+ * @param {MaskImage} mask1 The first mask (provides meta).
+ * @param {MaskImage} mask2 The second mask to merge into mask1.
+ * @returns {MaskImage} The new merged mask image.
  */
 export function mergeMaskImages(mask1, mask2) {
   const geometry1 = mask1.getGeometry();
@@ -779,9 +780,8 @@ export function mergeMaskImages(mask1, mask2) {
   }
 
   const uids = baseOrigins.map((_, i) => i.toString());
-  const mergedImage = new Image(
-    baseGeometry, mergedCollection.getLabelMap(), uids);
-  mergedImage.setSegmentCollection(mergedCollection);
+  const mergedImage = new MaskImage(
+    baseGeometry, mergedCollection.getLabelMap(), uids, mergedCollection);
 
   // set palette colour map if possible
   if (hasRGB1 || hasRGB2) {
@@ -814,4 +814,19 @@ export function mergeMaskImages(mask1, mask2) {
   mergedImage.setMeta(mergedMeta);
 
   return mergedImage;
+}
+
+/**
+ * Create a mask Image from DICOM elements.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {MaskImage} The mask Image object.
+ */
+export function createMaskImage(elements) {
+  const factory = new MaskFactory();
+  return factory.create(
+    elements,
+    /** @type {Uint8Array} */
+    elements['7FE00010'].value[0]
+  );
 }

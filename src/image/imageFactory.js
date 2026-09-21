@@ -521,3 +521,18 @@ export class ImageFactory {
   }
 
 }
+
+/**
+ * Create an Image from DICOM elements.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {Image} The Image object.
+ */
+export function createImage(elements) {
+  const factory = new ImageFactory();
+  return factory.create(
+    elements,
+    elements['7FE00010'].value[0],
+    1
+  );
+}

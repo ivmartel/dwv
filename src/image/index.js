@@ -6,11 +6,9 @@ import {
   CADReport,
   AnnotationGroupFactory
 } from './annotationGroupFactory.js';
-import {
-  Image,
-  createImage,
-  createMaskImage
-} from './image.js';
+import {Image} from './image.js';
+import {MaskImage} from './maskImage.js';
+import {createImage} from './imageFactory.js';
 import {ImageContour} from './imageContour.js';
 import {
   View,
@@ -30,6 +28,7 @@ import {
 } from './windowLevel.js';
 import {
   MaskFactory,
+  createMaskImage,
   getDefaultDicomSegJson,
   mergeMaskImages
 } from './maskFactory.js';
@@ -57,6 +56,7 @@ export {
   Diameters,
   Geometry,
   Image,
+  MaskImage,
   ImageContour,
   Label,
   MaskFactory,

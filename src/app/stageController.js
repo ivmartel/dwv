@@ -1,5 +1,6 @@
 import {viewEventNames} from '../image/view.js';
 import {ViewFactory} from '../image/viewFactory.js';
+import {MaskImage} from '../image/maskImage.js';
 import {
   getMatrixFromName,
   getOrientationStringLPS,
@@ -822,7 +823,7 @@ export class StageController extends EventTarget {
     view.setOrientation(viewOrientation);
 
     // segmentation settings
-    if (view.isMask()) {
+    if (data.image instanceof MaskImage) {
       data.image.initializeContour();
       // possible presets
       if (typeof viewConfig.fillOpacity !== 'undefined') {

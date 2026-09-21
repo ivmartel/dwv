@@ -1,4 +1,5 @@
 import {logger} from '../../utils/logger.js';
+import {MaskImage} from '../../image/maskImage.js';
 import {ViewLayer} from '../../gui/viewLayer.js';
 import {ERROR_MESSAGES} from './brushPaintMessages.js';
 import {BrushMode, BrushMaskPaint} from './brushMaskPaint.js';
@@ -204,7 +205,9 @@ export class BrushDragBehavior extends DragBehavior {
 
   /**
    * @param {LayerGroup} layerGroup The layer group.
-   * @returns {boolean} True if series is blacklisted.
+   * @returns {boolean} True if the active layer's mask has overlapping
+   *   segments; always false if the active layer is not a mask yet
+   *   (for example before the first brush stroke creates one).
    */
   #hasOverlap(layerGroup) {
     if (typeof layerGroup === 'undefined') {
@@ -217,7 +220,7 @@ export class BrushDragBehavior extends DragBehavior {
     const dataId = viewLayer.getDataId();
     const dataCtrl = this.#app.getDataController();
     const data = dataCtrl.get(dataId);
-    return data.image.getHasOverlap();
+    return data.image instanceof MaskImage && data.image.getHasOverlap();
   }
 
   #setEraserModeForRightButton() {

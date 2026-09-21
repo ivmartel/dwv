@@ -2,7 +2,7 @@ import {MaskSegmentHelper} from '../image/maskSegmentHelper.js';
 import {Command} from './undoStack.js';
 
 /**
- * @import {Image} from '../image/image.js';
+ * @import {MaskImage} from '../image/maskImage.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
  */
 
@@ -14,7 +14,7 @@ export class DeleteSegmentCommand extends Command {
   /**
    * The associated mask.
    *
-   * @type {Image}
+   * @type {MaskImage}
    */
   #mask;
 
@@ -40,7 +40,7 @@ export class DeleteSegmentCommand extends Command {
   #offsets;
 
   /**
-   * @param {Image} mask The mask image.
+   * @param {MaskImage} mask The mask image.
    * @param {MaskSegment} segment The segment to remove.
    * @param {boolean} [silent] Whether to send a creation event or not.
    */

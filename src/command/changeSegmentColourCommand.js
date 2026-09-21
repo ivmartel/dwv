@@ -1,7 +1,7 @@
 import {Command} from './undoStack.js';
 
 /**
- * @import {Image} from '../image/image.js';
+ * @import {MaskImage} from '../image/maskImage.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
  * @import {RGB} from '../utils/colour.js';
  */
@@ -14,7 +14,7 @@ export class ChangeSegmentColourCommand extends Command {
   /**
    * The associated mask.
    *
-   * @type {Image}
+   * @type {MaskImage}
    */
   #mask;
 
@@ -54,7 +54,7 @@ export class ChangeSegmentColourCommand extends Command {
   #offsets;
 
   /**
-   * @param {Image} mask The mask image.
+   * @param {MaskImage} mask The mask image.
    * @param {MaskSegment} segment The segment to modify.
    * @param {RGB|number} newColour The new segment colour.
    * @param {boolean} [silent] Whether to send a creation event or not.
