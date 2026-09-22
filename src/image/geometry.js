@@ -765,6 +765,18 @@ export class Geometry {
   /**
    * Convert world coordinates into an index.
    *
+   * Always returns an index, even for a point outside the geometry:
+   * this does not itself mean the point is in bounds, use
+   * isIndexInBounds/isInBounds for that. In-plane (row/column), an
+   * out-of-bounds point extrapolates freely (eg -5 or size+12). On the
+   * scroll axis, a point close to a real per-slice origin snaps to it;
+   * further away, it is pinned to just past the first/last known
+   * origin (ie the origins array length, or -1) rather than left to
+   * drift arbitrarily far via linear extrapolation - except when there
+   * are few or no real origins to compare against (eg a root geometry
+   * with only its first slice known), where it still falls back to
+   * that unclamped extrapolation.
+   *
    * @param {Point} point The point to convert.
    * @returns {Index} The corresponding index.
    */
