@@ -43,6 +43,32 @@ function getComparePoint3D(orientation) {
 }
 
 /**
+ * Get the closest of a list of origins to an input point, and the
+ * signed residual between the point and that origin, projected onto
+ * the slice-stacking direction (the orientation's 3rd column, ie its
+ * normal). A positive residual means the point is 'ahead of' (in the
+ * codirectional sense) the closest origin along that direction, a
+ * negative (or zero) residual means it is 'at or behind' it.
+ *
+ * @param {Point3D} point3D The point to locate.
+ * @param {Point3D[]} origins The origins to search.
+ * @param {Matrix33} orientation The geometry orientation.
+ * @returns {{index: number, normalResidual: number}} The closest
+ *   origin's index in the input list and the normal-projected
+ *   residual to it.
+ */
+function getClosestOriginResidual(point3D, origins, orientation) {
+  const index = point3D.getClosest(origins);
+  const normal = new Vector3D(
+    orientation.get(0, 2),
+    orientation.get(1, 2),
+    orientation.get(2, 2)
+  );
+  const normalResidual = point3D.minus(origins[index]).dotProduct(normal);
+  return {index, normalResidual};
+}
+
+/**
  * 2D/3D Geometry class.
  */
 export class Geometry {
@@ -333,7 +359,7 @@ export class Geometry {
   }
 
   /**
-   * Get the slice position of a point in the current slice layout.
+   * Get the slice position of an origin in the current slice layout.
    * Slice indices increase with decreasing origins (high index -> low origin),
    * this simplified the handling of reconstruction since it means
    * the displayed data is in the same 'direction' as the extracted data.
@@ -341,38 +367,44 @@ export class Geometry {
    * This implies that the index to world and reverse method do some flipping
    * magic...
    *
-   * @param {Point3D} point The point to evaluate.
+   * Limitation: the codirectional (before/after) refinement below is a
+   * strict sign check on the normal-projected residual, with no
+   * tolerance - unlike worldToIndex's magnitude-based half-spacing
+   * gate. That is safe for this method's one real caller
+   * (Image#appendSlice, which only ever compares exact, already-known
+   * slice origins - a clean, large residual, never close to zero),
+   * but this method should not be used for an arbitrary point with a
+   * large in-plane offset from its closest origin (eg a click
+   * position): float noise in that offset, amplified by a
+   * lower-precision orientation (eg gantry-tilt direction cosines
+   * with few decimal digits), can flip the sign of a residual that
+   * should be exactly zero. Use worldToIndex (or a plain
+   * Point3D#getClosest) instead for that case.
+   *
+   * @param {Point3D} origin The origin to locate.
    * @param {number} [time] Optional time index.
    * @returns {number} The slice index.
    */
-  getSliceIndex(point, time) {
-    // cannot use this.worldToIndex(point).getK() since
-    // we cannot guaranty consecutive slices...
+  getSliceIndex(origin, time) {
+    // cannot use this.worldToIndex(origin).getK() directly: unlike
+    // this method, it can fall back to an out-of-range extrapolated
+    // index, which is not a valid insertion point here...
 
     let localOrigins = this.#origins;
     if (typeof time !== 'undefined') {
       localOrigins = this.#timeOrigins[time];
     }
 
-    // find the closest origin
-    const closestOriginIndex = point.getClosest(localOrigins);
-    const closestOrigin = localOrigins[closestOriginIndex];
+    // find the closest origin and how far past (or before) it the
+    // input origin is, along the slice-stacking direction
+    const closest = getClosestOriginResidual(
+      origin, localOrigins, this.#orientation);
 
-    // direction between the input point and the closest origin
-    const pointDir = point.minus(closestOrigin);
-
-    // use third orientation matrix column as plane normal vector
-    const normal = new Vector3D(
-      this.#orientation.get(0, 2),
-      this.#orientation.get(1, 2),
-      this.#orientation.get(2, 2)
-    );
-
-    // codirectional vectors: above slice index
-    // oposite vectors: below slice index
-    const isCodirectional = normal.isCodirectional(pointDir);
-    const sliceIndex = isCodirectional
-      ? closestOriginIndex + 1 : closestOriginIndex;
+    // positive residual: origin is past the closest origin, so it
+    // belongs to the next slice index; zero or negative: it belongs
+    // to (or is before) the closest origin's own index
+    const sliceIndex = closest.normalResidual > 0
+      ? closest.index + 1 : closest.index;
 
     return sliceIndex;
   }
@@ -739,7 +771,6 @@ export class Geometry {
   worldToIndex(point) {
     // compensate for origin
     // (origin is not oriented, compensate before orientation)
-    // TODO: use slice origin...
     const origin = this.getOrigin();
     const point3D = new Point3D(
       point.get(0) - origin.getX(),
@@ -751,7 +782,7 @@ export class Geometry {
       this.getOrientation().getInverse().multiplyPoint3D(point3D);
     // keep >3d values
     const values = point.getValues();
-    // apply spacing and floor
+    // apply spacing and floor for the in-plane (row/column) axes
     // (precisionRound to avoid float number inaccuracies)
     const spacing = this.getSpacing();
     values[0] = Math.floor(precisionRound(
@@ -762,10 +793,30 @@ export class Geometry {
       orientedPoint3D.getY() / spacing.get(1),
       REAL_WORLD_EXPONENT
     ));
-    values[2] = Math.floor(precisionRound(
+    // scroll axis: prefer the nearest true per-slice origin over linear
+    // extrapolation from origin[0] when the position is actually close
+    // to one (within half a slice spacing, projected along the normal)
+    // - robust to per-slice origin drift/divergence regardless of
+    // slice count, unlike the naive arithmetic below on its own.
+    // Falls back to that arithmetic result when no real origin is
+    // that close, which correctly preserves both "genuinely out of
+    // bounds" and "this geometry only has some of its origins
+    // populated so far, extrapolate the rest" (eg a multi-frame DICOM
+    // root geometry with no per-frame position data, see
+    // dicomGeometry.js#getRootGeometry).
+    const naiveZ = Math.floor(precisionRound(
       orientedPoint3D.getZ() / spacing.get(2),
       REAL_WORLD_EXPONENT
     ));
+    values[2] = naiveZ;
+    const origins = this.getOrigins();
+    if (origins.length > 0) {
+      const closest = getClosestOriginResidual(
+        point.get3D(), origins, this.getOrientation());
+      if (Math.abs(closest.normalResidual) < spacing.get(2) / 2) {
+        values[2] = closest.index;
+      }
+    }
     // return index
     return new Index(values);
   }
