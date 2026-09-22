@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, beforeEach, afterEach} from 'vitest';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
@@ -7,12 +7,25 @@ import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 import {DeleteSegmentCommand} from '../../src/command/deleteSegmentCommand.js';
+import {logger} from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'command/deleteSegmentCommand.js' file.
  */
 
 describe('DeleteSegmentCommand', () => {
+
+  // building an overlapping mask logs a warning: spy on it so it
+  // does not pollute the test output, while keeping it assertable.
+  let warnSpy;
+
+  beforeEach(() => {
+    warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
 
   /**
    * Build a 3x1x1 mask, loaded-mask style (SegmentCollection filled via
@@ -40,6 +53,16 @@ describe('DeleteSegmentCommand', () => {
 
     return {image, collection, seg1, seg2};
   }
+
+  test('makeOverlappingMask logs a warning about the overlap', () => {
+    makeOverlappingMask();
+
+    assert.equal(warnSpy.mock.calls.length, 1);
+    assert.equal(
+      warnSpy.mock.calls[0][0],
+      'SegmentCollection: detected overlapping segments'
+    );
+  });
 
   test('execute removes a non-overlapping segment', () => {
     const {image, seg1} = makeOverlappingMask();
