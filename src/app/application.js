@@ -1,7 +1,6 @@
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {Style} from '../gui/style.js';
-import {State} from '../io/state.js';
 import {logger} from '../utils/logger.js';
 import {getUriQuery, decodeQuery} from '../utils/uri.js';
 import {ToolboxController} from './toolboxController.js';
@@ -28,7 +27,6 @@ import {
 } from '../tools/toolOptions.js';
 import {binderList} from '../gui/binders.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
-import {konvaToAnnotation} from '../gui/drawLayer.js';
 import {DicomData} from './dataController.js';
 import {
   StageController,
@@ -942,7 +940,7 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -954,7 +952,7 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {number} detail.loaded The loaded percentage.
@@ -968,7 +966,7 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {object} detail.data The loaded meta data.
@@ -983,7 +981,7 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -996,7 +994,7 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -1008,7 +1006,7 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {object} detail.error The error.
@@ -1022,7 +1020,7 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: an url as a string.
    * @property {object} detail.target The event target.
    */
@@ -1034,13 +1032,13 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image or state.
+   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
 
   /**
-   * Load a list of files. Can be image files or a state file.
+   * Load a list of image files.
    *
    * @param {File[]} files The list of files to load.
    * @returns {string} The data ID, '-1' if problem.
@@ -1063,7 +1061,7 @@ export class App extends EventTarget {
   };
 
   /**
-   * Load a list of URLs. Can be image files or a state file.
+   * Load a list of image URLs.
    *
    * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The options object, can contain:
@@ -1566,57 +1564,6 @@ export class App extends EventTarget {
     viewLayer.draw();
   }
 
-  /**
-   * Set the drawings of the active layer group.
-   *
-   * @deprecated Since v0.34, please switch to DICOM SR annotations.
-   * @param {Array} drawings An array of drawings.
-   * @param {Array} drawingsDetails An array of drawings details.
-   * @param {string} dataId The converted data id.
-   */
-  setDrawings(drawings, drawingsDetails, dataId) {
-    logger.debug(
-      'App.setDrawings: deprecated since v0.34, ' +
-      'please switch to DICOM SR annotations.');
-    const layerGroup = this.#stageController.getActiveLayerGroup();
-    const viewLayer = layerGroup.getBaseViewLayer();
-    const refDataId = viewLayer.getDataId();
-    const refData = this.#dataController.get(refDataId);
-    const viewController = viewLayer.getViewController();
-
-    // convert konva to annotation
-    // (assume current image is ref image)
-    const annotations = konvaToAnnotation(
-      drawings, drawingsDetails, refData.image);
-    // create data
-    const data = this.createAnnotationData(refDataId);
-    // add annotations to data
-    for (const annotation of annotations) {
-      annotation.setViewController(viewController);
-      data.annotationGroup.add(annotation);
-    }
-    // add to data controller
-    this.#dataController.add(dataId, data);
-    // render
-    this.#stageController.render(dataId);
-  }
-
-  /**
-   * Apply a JSON state to this app.
-   *
-   * @deprecated Since v0.34, please switch to DICOM SR
-   *   for annotations.
-   * @param {string} jsonState The state of the app as a JSON string.
-   * @param {string} dataId The state data id.
-   */
-  applyJsonState(jsonState, dataId) {
-    logger.debug(
-      'App.applyJsonState: deprecated since v0.34, ' +
-      'please switch to DICOM SR for annotations.');
-    const state = new State(dataId);
-    state.apply(this, state.fromJSON(jsonState));
-  }
-
   // Handler Methods -----------------------------------------------------------
 
   /**
@@ -2035,8 +1982,6 @@ export class App extends EventTarget {
         }));
         return;
       }
-    } else if (event.detail.loadtype === 'state') {
-      this.applyJsonState(event.detail.data, event.detail.dataid);
     }
 
     // propagate (before display)

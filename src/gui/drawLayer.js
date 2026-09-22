@@ -9,20 +9,9 @@ import {AddAnnotationCommand} from '../command/drawCommands.js';
 import {
   isNodeWithId,
   isPositionNode,
-  isNodeNameShape,
   isNodeNameLabel
 } from '../tools/shapes/drawBounds.js';
-import {Index} from '../math/index.js';
 import {Style} from '../gui/style.js';
-import {Line} from '../math/line.js';
-import {Rectangle} from '../math/rectangle.js';
-import {ROI} from '../math/roi.js';
-import {Protractor} from '../math/protractor.js';
-import {Ellipse} from '../math/ellipse.js';
-import {Circle} from '../math/circle.js';
-import {Point2D} from '../math/point.js';
-import {BidimensionalLine} from '../math/bidimensionalLine.js';
-import {Annotation} from '../image/annotation.js';
 
 // external
 import Konva from 'konva';
@@ -31,8 +20,10 @@ import Konva from 'konva';
  * @import {Point, Point3D} from '../math/point.js';
  * @import {Vector3D} from '../math/vector.js';
  * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ * @import {Index} from '../math/index.js';
  * @import {Image} from '../image/image.js';
  * @import {PlaneHelper} from '../image/planeHelper.js';
+ * @import {Annotation} from '../image/annotation.js';
  * @import {AnnotationGroup} from '../image/annotationGroup.js';
  * @import {DrawShapeHandler} from '../tools/shapes/drawShapeHandler.js';
  */
@@ -1324,162 +1315,4 @@ export class DrawDetails {
    * @type {DrawMeta}
    */
   meta;
-}
-
-/**
- * Convert a posGroup id (for ex '#2-0') into index values.
- *
- * @param {string} id The posGroup id.
- * @returns {number[]} The index values.
- */
-function posGroupIdToArray(id) {
-  const res = [0, 0, 0];
-
-  const splitHashes = id.split('#');
-  for (const splitHash of splitHashes) {
-    const split = splitHash.split('-');
-    res[split[0]] = split[1];
-  }
-
-  return res;
-}
-
-/**
- * Convert a KonvaLayer object to a list of annotations.
- *
- * @param {Array} drawings An array of drawings stored
- *   with 'KonvaLayer().toObject()'.
- * @param {DrawDetails[]} drawingsDetails An array of drawings details.
- * @param {Image} refImage The reference image.
- * @returns {Annotation[]} The associated list of annotations.
- */
-export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
-  const annotations = [];
-
-  // regular Konva deserialize
-  const stateLayer = Konva.Node.create(drawings);
-
-  // get all position groups
-  const statePosGroups = stateLayer.getChildren(isPositionNode);
-
-  for (let i = 0, leni = statePosGroups.length; i < leni; ++i) {
-    const statePosGroup = statePosGroups[i];
-    const statePosKids = statePosGroup.getChildren();
-    for (let j = 0, lenj = statePosKids.length; j < lenj; ++j) {
-      const annotation = new Annotation();
-      // use posGroup id as origin
-      const posGroupIndex = new Index(posGroupIdToArray(statePosGroup.id()));
-      // find ref SOP UID
-      // WARN: getImageUid returns first UID is the index is not found...
-      annotation.referencedSopInstanceUID = refImage.getImageUid(posGroupIndex);
-
-      // shape group (use first one since it will be removed from
-      // the group when we change it)
-      const stateGroup = statePosKids[0];
-      // annotation id
-      annotation.trackingId = stateGroup.id();
-      annotation.trackingUid = stateGroup.id();
-
-      // shape
-      const shape = stateGroup.getChildren(isNodeNameShape)[0];
-      // annotation colour
-      annotation.colour = shape.stroke();
-
-      if (stateGroup.name() === 'line-group') {
-        const points = shape.points();
-        annotation.mathShape = new Point2D(points[0], points[1]);
-        annotation.referencePoints = [
-          new Point2D(points[2], points[3])
-        ];
-      } else if (stateGroup.name() === 'ruler-group') {
-        const points = shape.points();
-        annotation.mathShape = new Line(
-          new Point2D(points[0], points[1]),
-          new Point2D(points[2], points[3])
-        );
-      } else if (stateGroup.name() === 'rectangle-group') {
-        annotation.mathShape = new Rectangle(
-          new Point2D(shape.x(), shape.y()),
-          new Point2D(shape.x() + shape.width(), shape.y() + shape.height())
-        );
-      } else if (stateGroup.name() === 'roi-group') {
-        const points = shape.points();
-        const pointsArray = [];
-        for (let p = 0; p < points.length; p = p + 2) {
-          pointsArray.push(new Point2D(points[p], points[p + 1]));
-        }
-        annotation.mathShape = new ROI(pointsArray);
-      } else if (stateGroup.name() === 'freeHand-group') {
-        logger.warn('Converting freehand into ROI shape');
-        const points = shape.points();
-        const pointsArray = [];
-        for (let p = 0; p < points.length; p = p + 2) {
-          pointsArray.push(new Point2D(points[p], points[p + 1]));
-        }
-        annotation.mathShape = new ROI(pointsArray);
-      } else if (stateGroup.name() === 'protractor-group') {
-        const points = shape.points();
-        annotation.mathShape = new Protractor([
-          new Point2D(points[0], points[1]),
-          new Point2D(points[2], points[3]),
-          new Point2D(points[4], points[5])
-        ]);
-      } else if (stateGroup.name() === 'ellipse-group') {
-        const absPosition = shape.absolutePosition();
-        annotation.mathShape = new Ellipse(
-          new Point2D(absPosition.x, absPosition.y),
-          shape.radiusX(),
-          shape.radiusY()
-        );
-      } else if (stateGroup.name() === 'circle-group') {
-        const absPosition = shape.absolutePosition();
-        annotation.mathShape = new Circle(
-          new Point2D(absPosition.x, absPosition.y),
-          shape.radius()
-        );
-      } else if (stateGroup.name() === 'bidimensional-group') {
-        const points = shape.points();
-        const bidim = new BidimensionalLine(
-          new Point2D(points[0], points[1]),
-          new Point2D(points[2], points[3])
-        );
-
-        const details = drawingsDetails && drawingsDetails[stateGroup.id()]
-          ? drawingsDetails[stateGroup.id()]
-          : undefined;
-        const quant = details && details.meta && details.meta.quantification
-          ? details.meta.quantification
-          : {};
-
-        if (
-          typeof BidimensionalLine.restorePropertiesFromQuantification ===
-          'function'
-        ) {
-          BidimensionalLine.restorePropertiesFromQuantification(
-            annotation,
-            bidim,
-            quant
-          );
-        } else {
-          if (typeof quant.shortAxisLength === 'number') {
-            bidim.shortAxisLength = quant.shortAxisLength;
-          }
-          if (typeof quant.shortAxisT === 'number') {
-            bidim.shortAxisT = quant.shortAxisT;
-          }
-          annotation.mathShape = bidim;
-        }
-      }
-      // details
-      if (drawingsDetails) {
-        const details = drawingsDetails[stateGroup.id()];
-        annotation.textExpr = details.meta.textExpr;
-        annotation.quantification = details.meta.quantification;
-      }
-
-      annotations.push(annotation);
-    }
-  }
-
-  return annotations;
 }

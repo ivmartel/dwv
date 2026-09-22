@@ -46,23 +46,17 @@ export class LoadController extends EventTarget {
   }
 
   /**
-   * Load a list of files. Can be image files or a state file.
+   * Load a list of image files.
    *
    * @param {File[]} files The list of files to load.
    * @param {string} dataId The data Id.
    */
   loadFiles(files, dataId) {
-    // has been checked for emptiness.
-    const ext = files[0].name.split('.').pop().toLowerCase();
-    if (ext === 'json') {
-      this.#loadStateFile(files[0], dataId);
-    } else {
-      this.#loadImageFiles(files, dataId);
-    }
+    this.#loadImageFiles(files, dataId);
   }
 
   /**
-   * Load a list of URLs. Can be image files or a state file.
+   * Load a list of image URLs.
    *
    * @param {string[]} urls The list of urls to load.
    * @param {string} dataId The data Id.
@@ -70,15 +64,8 @@ export class LoadController extends EventTarget {
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
-
   loadURLs(urls, dataId, options) {
-    // has been checked for emptiness.
-    const ext = urls[0].split('.').pop().toLowerCase();
-    if (ext === 'json') {
-      this.#loadStateUrl(urls[0], dataId, options);
-    } else {
-      this.#loadImageUrls(urls, dataId, options);
-    }
+    this.#loadImageUrls(urls, dataId, options);
   }
 
   /**
@@ -150,41 +137,11 @@ export class LoadController extends EventTarget {
   }
 
   /**
-   * Load a State file.
-   *
-   * @param {File} file The state file to load.
-   * @param {string} dataId The data Id.
-   */
-  #loadStateFile(file, dataId) {
-    // create IO
-    const fileIO = new FilesLoader();
-    // load data
-    this.#loadData([file], fileIO, 'state', dataId);
-  }
-
-
-  /**
-   * Load a State url.
-   *
-   * @param {string} url The state url to load.
-   * @param {string} [dataId] The data Id.
-   * @param {object} [options] The load options:
-   * - requestHeaders: an array of {name, value} to use as request headers.
-   * - withCredentials: credentials flag to pass to the request.
-   */
-  #loadStateUrl(url, dataId, options) {
-    // create IO
-    const urlIO = new UrlsLoader();
-    // load data
-    this.#loadData([url], urlIO, 'state', dataId, options);
-  }
-
-  /**
    * Load a list of data.
    *
    * @param {string[]|File[]|Array} data Array of data to load.
    * @param {object} loader The data loader.
-   * @param {string} loadType The data load type: 'image' or 'state'.
+   * @param {string} loadType The data load type: 'image'.
    * @param {string} dataId The data id.
    * @param {object} [options] Options passed to the final loader.
    */
