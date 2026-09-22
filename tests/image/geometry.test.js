@@ -356,6 +356,88 @@ describe('image', () => {
   });
 
   /**
+   * Regression test for a real DICOM SEG-on-reference-series scenario
+   * (mask geometry covers only a few slices out of a larger, tilted
+   * reference series): {@link Geometry#worldToIndex} must not duplicate
+   * the mask's last real slice onto the reference slice just past it.
+   * The queried position isn't a stored origin, it's reconstructed via
+   * the reference geometry's own indexToWorld (origin + spacing*index),
+   * same as App/ViewController do when syncing a scroll position across
+   * layers of different geometries - that reconstruction carries a few
+   * 1e-6 mm of float drift for a tilted (multi-matrix-multiply)
+   * orientation, which used to land just under the exact slice
+   * boundary and get floored down one slice too far, right back into
+   * the mask's valid range.
+   *
+   * @function module:tests/image~geometryWorldToIndexNoBoundaryDuplicate
+   */
+  test('Geometry worldToIndex does not duplicate the mask\'s last ' +
+    'slice at the reference slice just past it', () => {
+    const cosines = [1.0, -0.0, 0.0, -0.0, 0.98687, 0.16151];
+    const orientation = getOrientationFromCosines(cosines);
+
+    // real ImagePositionPatient values from a tilted-gantry CT series,
+    // in ascending-index order along the orientation's normal (ie the
+    // order Image#appendSlice's getSliceIndex insertion would produce -
+    // required here since, unlike the corner-position test above, this
+    // test reconstructs positions via indexToWorld's index*spacing
+    // arithmetic, which only lines up with the origins array when the
+    // array is in that arithmetic's own direction)
+    const ipp = [
+      [-87.4287872314, -67.9226989746, -57.8825378418],
+      [-87.4287872314, -68.4072418213, -54.9219245911],
+      [-87.4287872314, -68.8917846680, -51.9613113403],
+      [-87.4287872314, -69.3763275146, -49.0006980896],
+      [-87.4287872314, -69.8608703613, -46.0400848389],
+      [-87.4287872314, -70.3454055786, -43.0794754028],
+      [-87.4287872314, -70.8299484253, -40.1188621521],
+      [-87.4287872314, -71.3144912720, -37.1582527161],
+      [-87.4287872314, -71.7990264893, -34.1976394653],
+      [-87.4287872314, -72.2835693359, -31.2370319366],
+      [-87.4287872314, -72.7681121826, -28.2764186859]
+    ];
+    const origins = ipp.map((v) => new Point3D(v[0], v[1], v[2]));
+
+    const size = new Size([512, 512, 1]);
+    const spacing = new Spacing([0.1758, 0.1758, 3]);
+
+    // full reference series geometry, as DataController builds it
+    const refGeometry = new Geometry(
+      [origins[0]], size, spacing, orientation);
+    for (let m = 1; m < origins.length; ++m) {
+      refGeometry.appendOrigin(origins[m], m);
+    }
+
+    // a mask covering only 3 of the reference's slices (#3, #4, #5),
+    // as MaskFactory#create builds a SEG loaded on top of this series
+    const maskOrigins = [origins[3], origins[4], origins[5]];
+    const maskGeometry = new Geometry(
+      [maskOrigins[0]], size, spacing, orientation);
+    for (let m = 1; m < maskOrigins.length; ++m) {
+      maskGeometry.appendOrigin(maskOrigins[m], m);
+    }
+
+    // the shared scroll position, reconstructed via the reference
+    // geometry's own indexToWorld - not the stored origin Point3D
+    // directly - to reproduce the same float drift the app carries
+    // between layers of different geometries
+    for (let refIndex = 0; refIndex < origins.length; ++refIndex) {
+      const worldPos = refGeometry.indexToWorld(new Index([0, 0, refIndex]));
+      const maskIndex = maskGeometry.worldToIndex(worldPos).get(2);
+      if (refIndex >= 3 && refIndex <= 5) {
+        assert.equal(
+          maskIndex, refIndex - 3,
+          `ref slice #${refIndex} resolves to its matching mask slice`);
+      } else {
+        assert.ok(
+          maskIndex < 0 || maskIndex >= maskOrigins.length,
+          `ref slice #${refIndex} (outside the mask's range) must not ` +
+          `resolve into the mask's valid slice indices, got ${maskIndex}`);
+      }
+    }
+  });
+
+  /**
    * Tests for {@link Geometry#getSliceIndex}.
    *
    * @function module:tests/image~geometryGetSliceIndex

@@ -815,6 +815,18 @@ export class Geometry {
         point.get3D(), origins, this.getOrientation());
       if (Math.abs(closest.normalResidual) < spacing.get(2) / 2) {
         values[2] = closest.index;
+      } else if (closest.index === origins.length - 1 &&
+        closest.normalResidual > 0 && values[2] < origins.length) {
+        // unambiguously past the last real origin (the residual is a
+        // full slice spacing or more, so its sign is not float-noise
+        // sensitive the way a near-zero one would be): naiveZ must not
+        // be allowed to land back inside the origins we actually have
+        // data for, regardless of any drift in its own arithmetic
+        values[2] = origins.length;
+      } else if (closest.index === 0 &&
+        closest.normalResidual < 0 && values[2] >= 0) {
+        // symmetric guard for the near side, before the first origin
+        values[2] = -1;
       }
     }
     // return index
