@@ -106,9 +106,13 @@ export class ToolboxController {
    *
    * @param {string} eventType The event type, for example
    *   mousedown, touchstart...
-   * @returns {EventListener} The event handler.
+   * @returns {EventListener|undefined} The event handler, undefined
+   *   if no tool is selected.
    */
   getSelectedToolEventHandler(eventType) {
+    if (!this.getSelectedTool()) {
+      return undefined;
+    }
     return this.getSelectedTool()[eventType];
   }
 
