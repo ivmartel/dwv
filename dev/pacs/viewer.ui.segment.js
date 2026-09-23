@@ -806,9 +806,10 @@ export class SegmentationUI {
    *
    * @param {MaskSegment} segment The segment.
    * @param {number} segmentationIndex The segmentation index.
+   * @param {boolean} [selectSegment] Optional flag to select segment.
    * @returns {HTMLLiElement} THe HTML element.
    */
-  #getSegmentHtml(segment, segmentationIndex) {
+  #getSegmentHtml(segment, segmentationIndex, selectSegment = false) {
     const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
 
     // segment select
@@ -819,7 +820,7 @@ export class SegmentationUI {
     selectInput.title = segmentId;
     selectInput.onchange = this.#onSegmentSelect;
 
-    if (segment.number === 1) {
+    if (segment.number === 1 || selectSegment) {
       selectInput.checked = true;
       this.#appSelectSegment(segment.number, _segmentations[segmentationIndex]);
     }
@@ -962,7 +963,9 @@ export class SegmentationUI {
     // add item to list
     const listDivId = `${getSegmentationHtmlId(segmentationIndex)}-list`;
     const listDiv = this.#rootDoc.getElementById(listDivId);
-    listDiv.appendChild(this.#getSegmentHtml(newSegment, segmentationIndex));
+    listDiv.appendChild(
+      this.#getSegmentHtml(newSegment, segmentationIndex, true)
+    );
   };
 
   /**
