@@ -141,7 +141,7 @@ export class DrawController {
    * @param {Function} exeCallback The undo stack callback.
    */
   removeAllAnnotationsWithCommand(exeCallback) {
-    for (const annotation of this.#annotationGroup.getList()) {
+    for (const annotation of [...this.#annotationGroup.getList()]) {
       this.removeAnnotationWithCommand(annotation.trackingUid, exeCallback);
     }
   }
