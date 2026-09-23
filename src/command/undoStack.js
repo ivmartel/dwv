@@ -82,7 +82,6 @@ export class UndoStack extends EventTarget {
     ++this.#curCmdIndex;
     /**
      * Add command to undo stack event.
-     * `event.target.getCurrentCommand()` will return the added command.
      *
      * @event UndoStack#undoadd
      * @type {Event}
@@ -133,7 +132,6 @@ export class UndoStack extends EventTarget {
     if (this.#curCmdIndex > 0) {
       /**
        * Command undo event.
-       * `event.target.getCurrentCommand()` will return the undone command.
        *
        * @event UndoStack#undo
        * @type {Event}
@@ -159,7 +157,6 @@ export class UndoStack extends EventTarget {
       ++this.#curCmdIndex;
       /**
        * Command redo event.
-       * `event.target.getCurrentCommand()` will return the re-done command.
        *
        * @event UndoStack#redo
        * @type {Event}
