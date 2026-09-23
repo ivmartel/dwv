@@ -8,6 +8,10 @@ import {WheelTick} from './behaviors/wheelTick.js';
 // Avoid mouse events. To use with browser mobile simulation.
 const TOUCH_EVENTS_DEBUG = false;
 
+// Max display-pixel distance from the down point still considered a tap
+// (mouse/finger jitter tolerance), not a move.
+const MOVE_TOLERANCE = 5;
+
 /**
  * `MouseEvent#button` values (left through fifth / forward).
  *
@@ -135,11 +139,12 @@ export class LayerGroupPointer extends EventTarget {
   #downed = false;
 
   /**
-   * True after a mouse or touch move, reset at mousedown or touchstart.
+   * Pointer position at mousedown or touchstart, used to measure
+   * {@link MOVE_TOLERANCE}.
    *
-   * @type {boolean}
+   * @type {Point2D|undefined}
    */
-  #moved = false;
+  #downPoint;
 
   /**
    * @param {LayerGroupPointerOptions} options Constructor options.
@@ -190,6 +195,20 @@ export class LayerGroupPointer extends EventTarget {
       point: getMousePoint(event),
       layerGroup
     };
+  }
+
+  /**
+   * Live check of a pointer position against {@link #downPoint}: false
+   * (tap jitter, not a move) while within {@link MOVE_TOLERANCE}.
+   *
+   * @param {Point2D} point Pointer position to check, typically at
+   *   mouseup/touchend.
+   * @returns {boolean} True when the point is more than
+   *   {@link MOVE_TOLERANCE} display pixels away from the down point.
+   */
+  #isMoved(point) {
+    return typeof this.#downPoint === 'undefined' ||
+      this.#downPoint.getDistance(point) > MOVE_TOLERANCE;
   }
 
   /**
@@ -281,7 +300,7 @@ export class LayerGroupPointer extends EventTarget {
    */
   cancel() {
     this.#downed = false;
-    this.#moved = false;
+    this.#downPoint = undefined;
     this.#clearLongTouchTimer();
 
     // reset drag
@@ -313,11 +332,12 @@ export class LayerGroupPointer extends EventTarget {
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.reset();
     }
-    this.#moved = false;
-    // set flag
-    this.#downed = true;
-
+    // context
     const {point, layerGroup} = this.#getMouseLayerContext(event);
+    // set flags
+    this.#downed = true;
+    this.#downPoint = point;
+
     if (!this.#tapBehavior?.isActive() &&
       this.#dragBehavior?.canStart(point, layerGroup)) {
       this.#dragBehavior.onStart(point, layerGroup, {
@@ -335,10 +355,9 @@ export class LayerGroupPointer extends EventTarget {
     if (TOUCH_EVENTS_DEBUG) {
       return;
     }
-    // set flag
-    this.#moved = true;
-
+    // context
     const {point, layerGroup} = this.#getMouseLayerContext(event);
+
     if (this.#downed) {
       // remove hover for down+move
       this.#hoverBehavior?.onEnd();
@@ -365,9 +384,12 @@ export class LayerGroupPointer extends EventTarget {
     if (TOUCH_EVENTS_DEBUG) {
       return;
     }
+    // context
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+    const moved = this.#isMoved(point);
 
     if (this.#dragBehavior?.isActive()) {
-      if (this.#moved) {
+      if (moved) {
         // up+move -> end drag
         this.#dragBehavior.onEnd();
       } else {
@@ -377,10 +399,9 @@ export class LayerGroupPointer extends EventTarget {
     }
 
     if (this.#tapBehavior &&
-      (this.#tapBehavior.isActive() || (this.#downed && !this.#moved))) {
+      (this.#tapBehavior.isActive() || (this.#downed && !moved))) {
       // active tap -> sticky tap
       // down + no move -> discrete tap
-      const {point, layerGroup} = this.#getMouseLayerContext(event);
       this.#tapBehavior.onTap(point, layerGroup);
     }
 
@@ -408,7 +429,7 @@ export class LayerGroupPointer extends EventTarget {
     this.#hoverBehavior?.onEnd();
     // reset flags
     this.#downed = false;
-    this.#moved = false;
+    this.#downPoint = undefined;
   };
 
   /**
@@ -419,12 +440,13 @@ export class LayerGroupPointer extends EventTarget {
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.reset();
     }
-    this.#moved = false;
     this.#clearLongTouchTimer();
-    // set flag
-    this.#downed = true;
-
+    // get touch points
     const touchPoints = getTouchPoints(event);
+    // set flags
+    this.#downed = true;
+    this.#downPoint = touchPoints[0];
+
     if (touchPoints.length === 1) {
       // one touch drag
       const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
@@ -452,8 +474,6 @@ export class LayerGroupPointer extends EventTarget {
   touchmove = (event) => {
     // reset
     this.#clearLongTouchTimer();
-    // set flag
-    this.#moved = true;
 
     // context
     const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
@@ -487,8 +507,12 @@ export class LayerGroupPointer extends EventTarget {
       return;
     }
 
+    // context
+    const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
+    const moved = this.#isMoved(point);
+
     if (this.#dragBehavior?.isActive()) {
-      if (this.#moved) {
+      if (moved) {
         // up+move -> end drag
         this.#dragBehavior.onEnd();
       } else {
@@ -498,10 +522,9 @@ export class LayerGroupPointer extends EventTarget {
     }
 
     if (this.#tapBehavior &&
-      (this.#tapBehavior.isActive() || (this.#downed && !this.#moved))) {
+      (this.#tapBehavior.isActive() || (this.#downed && !moved))) {
       // active tap -> sticky tap
       // down + no move -> discrete tap
-      const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
       this.#tapBehavior.onTap(point, layerGroup);
     }
 

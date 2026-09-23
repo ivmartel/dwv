@@ -504,11 +504,11 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(onHoverUpdate.mock.calls.length, 1);
 
     pointer.mousedown(mouseEvent('mousedown', canvas, 1, 1));
-    pointer.mousemove(mouseEvent('mousemove', canvas, 2, 2));
+    pointer.mousemove(mouseEvent('mousemove', canvas, 20, 20));
     assert.equal(onHoverUpdate.mock.calls.length, 1);
     assert.equal(onHoverEnd.mock.calls.length, 1);
 
-    pointer.mouseup(mouseEvent('mouseup', canvas, 2, 2));
+    pointer.mouseup(mouseEvent('mouseup', canvas, 20, 20));
 
     pointer.mousedown(mouseEvent('mousedown', canvas, 0, 0));
     pointer.mouseup(mouseEvent('mouseup', canvas, 0, 0));
@@ -659,7 +659,35 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(drag.isActive(), false);
   });
 
-  test('mouseup does not tap after mousemove', () => {
+  test('mouseup does not tap after mousemove past tolerance', () => {
+    const {canvas, groupDivId} = setupLayerCanvas();
+    const onTap = vi.fn();
+    const pointer = new LayerGroupPointer({
+      stageController: {
+        getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)
+      },
+      dragBehavior: new DragBehavior(),
+      tapBehavior: {
+        onTap,
+        isActive() {
+          return false;
+        },
+        onUpdate() {
+          // no-op
+        },
+        reset() {
+          // no-op
+        }
+      }
+    });
+
+    pointer.mousedown(mouseEvent('mousedown', canvas, 0, 0));
+    pointer.mousemove(mouseEvent('mousemove', canvas, 20, 20));
+    pointer.mouseup(mouseEvent('mouseup', canvas, 20, 20));
+    assert.equal(onTap.mock.calls.length, 0);
+  });
+
+  test('mouseup still taps after a small mousemove within tolerance', () => {
     const {canvas, groupDivId} = setupLayerCanvas();
     const onTap = vi.fn();
     const pointer = new LayerGroupPointer({
@@ -684,7 +712,36 @@ describe('tools/layerGroupPointer', () => {
     pointer.mousedown(mouseEvent('mousedown', canvas, 0, 0));
     pointer.mousemove(mouseEvent('mousemove', canvas, 1, 1));
     pointer.mouseup(mouseEvent('mouseup', canvas, 1, 1));
-    assert.equal(onTap.mock.calls.length, 0);
+    assert.equal(onTap.mock.calls.length, 1);
+  });
+
+  test('mouseup taps on a live tolerance check: a move far from the down ' +
+    'point that returns within tolerance still taps', () => {
+    const {canvas, groupDivId} = setupLayerCanvas();
+    const onTap = vi.fn();
+    const pointer = new LayerGroupPointer({
+      stageController: {
+        getLayerGroupByDivId: (id) => (id === groupDivId ? {} : undefined)
+      },
+      dragBehavior: new DragBehavior(),
+      tapBehavior: {
+        onTap,
+        isActive() {
+          return false;
+        },
+        onUpdate() {
+          // no-op
+        },
+        reset() {
+          // no-op
+        }
+      }
+    });
+
+    pointer.mousedown(mouseEvent('mousedown', canvas, 0, 0));
+    pointer.mousemove(mouseEvent('mousemove', canvas, 20, 20));
+    pointer.mouseup(mouseEvent('mouseup', canvas, 1, 1));
+    assert.equal(onTap.mock.calls.length, 1);
   });
 
   test('mouseup invokes tap when tap is active even after mousemove', () => {
