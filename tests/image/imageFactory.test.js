@@ -8,6 +8,16 @@ import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
 
+// config and transfer syntax pairs to run the creation suites against
+// (the first suite runs against all configs)
+const creationCases = [
+  {
+    name: syntheticData[0].name,
+    syntax: '1.2.840.10008.1.2.1',
+    config: syntheticData[0]
+  }
+];
+
 /**
  * Tests for the 'image/imageFactory.js' file.
  */
@@ -137,78 +147,80 @@ describe('ImageFactory', () => {
   // build a 3D volume from multiple single-slice DICOM elements, the way
   // the app assembles a series: one Image per slice via ImageFactory,
   // combined with appendSlice.
-  describe('3D creation from generateDicomElements', () => {
-    const config = syntheticData[0];
-    const numberOfSlices = 4;
+  describe.each(creationCases)(
+    '3D creation from generateDicomElements - $name $syntax',
+    (testCase) => {
+      const config = testCase.config;
+      const numberOfSlices = 4;
 
-    let image;
-    let sliceElementsList;
+      let image;
+      let sliceElementsList;
 
-    beforeAll(() => {
-      const tagsCopy = structuredClone(config.tags);
-      tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-      const genOptions = {
-        pixelGeneratorName: 'string',
-        numberOfSlices
-      };
-      sliceElementsList = generateDataElements(tagsCopy, genOptions);
+      beforeAll(() => {
+        const tagsCopy = structuredClone(config.tags);
+        tagsCopy.TransferSyntaxUID = testCase.syntax;
+        const genOptions = {
+          pixelGeneratorName: 'string',
+          numberOfSlices
+        };
+        sliceElementsList = generateDataElements(tagsCopy, genOptions);
 
-      const factory = new ImageFactory();
-      for (const sliceElements of sliceElementsList) {
-        const pixelBuffer = sliceElements['7FE00010'].value;
-        const sliceImage = factory.create(
-          sliceElements, pixelBuffer, numberOfSlices);
-        if (typeof image === 'undefined') {
-          image = sliceImage;
-        } else {
-          image.appendSlice(sliceImage);
+        const factory = new ImageFactory();
+        for (const sliceElements of sliceElementsList) {
+          const pixelBuffer = sliceElements['7FE00010'].value;
+          const sliceImage = factory.create(
+            sliceElements, pixelBuffer, numberOfSlices);
+          if (typeof image === 'undefined') {
+            image = sliceImage;
+          } else {
+            image.appendSlice(sliceImage);
+          }
         }
-      }
-    });
+      });
 
-    test('geometry has one slice per generated element set', () => {
-      assert.equal(
-        image.getGeometry().getSize().get(2), numberOfSlices,
-        'slice count matches numberOfSlices'
-      );
-    });
-
-    test('slice origins are ordered along z with expected spacing', () => {
-      const origins = image.getGeometry().getOrigins();
-      assert.equal(origins.length, numberOfSlices, 'one origin per slice');
-      for (let i = 0; i < numberOfSlices; ++i) {
-        assert.equal(origins[i].getZ(), i, `slice ${i} z position`);
-      }
-    });
-
-    test('pixel buffer content of each slice is preserved', () => {
-      const sliceSize = config.tags.Rows * config.tags.Columns;
-      const fullBuffer = image.getBuffer();
-      for (let i = 0; i < numberOfSlices; ++i) {
-        const sliceBuffer = sliceElementsList[i]['7FE00010'].value;
+      test('geometry has one slice per generated element set', () => {
         assert.equal(
-          fullBuffer[i * sliceSize], sliceBuffer[0],
-          `slice ${i} first pixel matches`
+          image.getGeometry().getSize().get(2), numberOfSlices,
+          'slice count matches numberOfSlices'
         );
-        assert.equal(
-          fullBuffer[i * sliceSize + sliceSize - 1],
-          sliceBuffer[sliceSize - 1],
-          `slice ${i} last pixel matches`
-        );
-      }
-    });
+      });
 
-    test('each slice SOPInstanceUID is included as an image UID', () => {
-      for (let i = 0; i < numberOfSlices; ++i) {
-        const uid = sliceElementsList[i]['00080018'].value[0];
-        assert.ok(
-          image.includesImageUid(uid),
-          `slice ${i} SOPInstanceUID included`
-        );
-      }
-    });
+      test('slice origins are ordered along z with expected spacing', () => {
+        const origins = image.getGeometry().getOrigins();
+        assert.equal(origins.length, numberOfSlices, 'one origin per slice');
+        for (let i = 0; i < numberOfSlices; ++i) {
+          assert.equal(origins[i].getZ(), i, `slice ${i} z position`);
+        }
+      });
 
-  });
+      test('pixel buffer content of each slice is preserved', () => {
+        const sliceSize = config.tags.Rows * config.tags.Columns;
+        const fullBuffer = image.getBuffer();
+        for (let i = 0; i < numberOfSlices; ++i) {
+          const sliceBuffer = sliceElementsList[i]['7FE00010'].value;
+          assert.equal(
+            fullBuffer[i * sliceSize], sliceBuffer[0],
+            `slice ${i} first pixel matches`
+          );
+          assert.equal(
+            fullBuffer[i * sliceSize + sliceSize - 1],
+            sliceBuffer[sliceSize - 1],
+            `slice ${i} last pixel matches`
+          );
+        }
+      });
+
+      test('each slice SOPInstanceUID is included as an image UID', () => {
+        for (let i = 0; i < numberOfSlices; ++i) {
+          const uid = sliceElementsList[i]['00080018'].value[0];
+          assert.ok(
+            image.includesImageUid(uid),
+            `slice ${i} SOPInstanceUID included`
+          );
+        }
+      });
+
+    });
 
   // build an image from a single multiframe DICOM file (NumberOfFrames
   // tag, one SOPInstanceUID, all frame pixel data in one buffer). With
@@ -216,76 +228,78 @@ describe('ImageFactory', () => {
   // the frames share the file's single spatial position and are stacked
   // along the time dimension instead of z, unlike the spatially-stacked
   // volume built via appendSlice above.
-  describe('multiframe creation from generateDataElements', () => {
-    const config = syntheticData[0];
-    const tags = config.tags;
-    const numberOfFrames = 3;
+  describe.each(creationCases)(
+    'multiframe creation from generateDataElements - $name $syntax',
+    (testCase) => {
+      const config = testCase.config;
+      const tags = config.tags;
+      const numberOfFrames = 3;
 
-    let image;
-    let buffer;
+      let image;
+      let buffer;
 
-    beforeAll(() => {
-      const tagsCopy = structuredClone(config.tags);
-      tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-      tagsCopy.NumberOfFrames = numberOfFrames;
-      const genOptions = {pixelGeneratorName: 'string'};
-      const elements = generateDataElements(tagsCopy, genOptions)[0];
-      buffer = elements['7FE00010'].value;
+      beforeAll(() => {
+        const tagsCopy = structuredClone(config.tags);
+        tagsCopy.TransferSyntaxUID = testCase.syntax;
+        tagsCopy.NumberOfFrames = numberOfFrames;
+        const genOptions = {pixelGeneratorName: 'string'};
+        const elements = generateDataElements(tagsCopy, genOptions)[0];
+        buffer = elements['7FE00010'].value;
 
-      const factory = new ImageFactory();
-      factory.checkElements(elements);
-      image = factory.create(elements, buffer, 1);
-    });
+        const factory = new ImageFactory();
+        factory.checkElements(elements);
+        image = factory.create(elements, buffer, 1);
+      });
 
-    test('geometry keeps a single spatial slice with frames as time', () => {
-      const size = image.getGeometry().getSize();
-      assert.equal(size.get(2), 1, 'single spatial slice');
-      assert.equal(size.length(), 4, 'geometry gains a time dimension');
-      assert.equal(
-        size.get(3), numberOfFrames, 'frame count matches NumberOfFrames');
-    });
-
-    test('meta numberOfFiles stays 1 for a single multiframe file', () => {
-      assert.equal(image.getMeta().numberOfFiles, 1, 'numberOfFiles');
-    });
-
-    test('pixel buffer holds all frames with distinct per-frame content',
-      () => {
-        const sliceSize = tags.Rows * tags.Columns;
+      test('geometry keeps a single spatial slice with frames as time', () => {
+        const size = image.getGeometry().getSize();
+        assert.equal(size.get(2), 1, 'single spatial slice');
+        assert.equal(size.length(), 4, 'geometry gains a time dimension');
         assert.equal(
-          buffer.length, sliceSize * numberOfFrames,
-          'buffer holds all frames'
-        );
-        const imageBuffer = image.getBuffer();
-        const frames = [];
-        for (let f = 0; f < numberOfFrames; ++f) {
-          const start = f * sliceSize;
-          const end = start + sliceSize;
-          frames.push(Array.from(buffer.slice(start, end)));
-          assert.deepEqual(
-            Array.from(imageBuffer.slice(start, end)),
-            frames[f],
-            `frame ${f} pixel data is preserved`
+          size.get(3), numberOfFrames, 'frame count matches NumberOfFrames');
+      });
+
+      test('meta numberOfFiles stays 1 for a single multiframe file', () => {
+        assert.equal(image.getMeta().numberOfFiles, 1, 'numberOfFiles');
+      });
+
+      test('pixel buffer holds all frames with distinct per-frame content',
+        () => {
+          const sliceSize = tags.Rows * tags.Columns;
+          assert.equal(
+            buffer.length, sliceSize * numberOfFrames,
+            'buffer holds all frames'
+          );
+          const imageBuffer = image.getBuffer();
+          const frames = [];
+          for (let f = 0; f < numberOfFrames; ++f) {
+            const start = f * sliceSize;
+            const end = start + sliceSize;
+            frames.push(Array.from(buffer.slice(start, end)));
+            assert.deepEqual(
+              Array.from(imageBuffer.slice(start, end)),
+              frames[f],
+              `frame ${f} pixel data is preserved`
+            );
+          }
+          // sanity check the generated data actually varies per frame,
+          // otherwise the preservation check above would be vacuous
+          // (e.g. a generator that only fills frame 0, leaving the rest
+          // zeroed, would still pass it)
+          assert.notDeepEqual(
+            frames[0], frames[1], 'frame 0 and frame 1 are not identical'
           );
         }
-        // sanity check the generated data actually varies per frame,
-        // otherwise the preservation check above would be vacuous
-        // (e.g. a generator that only fills frame 0, leaving the rest
-        // zeroed, would still pass it)
-        assert.notDeepEqual(
-          frames[0], frames[1], 'frame 0 and frame 1 are not identical'
-        );
-      }
-    );
-
-    test('SOPInstanceUID used as frame UID', () => {
-      assert.ok(
-        image.includesImageUid(tags.SOPInstanceUID),
-        'SOPInstanceUID is in image UIDs'
       );
-    });
 
-  });
+      test('SOPInstanceUID used as frame UID', () => {
+        assert.ok(
+          image.includesImageUid(tags.SOPInstanceUID),
+          'SOPInstanceUID is in image UIDs'
+        );
+      });
+
+    });
 
   // build an image from a single multiframe DICOM file that also carries
   // per-frame spatial position (frames3D genOption: Shared/PerFrame
@@ -295,9 +309,11 @@ describe('ImageFactory', () => {
   // above, the per-frame ImagePositionPatient lets ImageFactory build a
   // genuine spatial z-stack (getFramesGeometry) from a single file,
   // instead of falling back to a time dimension.
-  describe('multiframe multi-slice creation from generateDataElements',
-    () => {
-      const config = syntheticData[0];
+  describe.each(creationCases)(
+    'multiframe multi-slice creation from generateDataElements' +
+    ' - $name $syntax',
+    (testCase) => {
+      const config = testCase.config;
       const tags = config.tags;
       const numberOfFrames = 5;
 
@@ -306,7 +322,7 @@ describe('ImageFactory', () => {
 
       beforeAll(() => {
         const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+        tagsCopy.TransferSyntaxUID = testCase.syntax;
         tagsCopy.NumberOfFrames = numberOfFrames;
         const genOptions = {
           pixelGeneratorName: 'string',
@@ -385,10 +401,11 @@ describe('ImageFactory', () => {
   // with appendVolume rather than appendSlice, since each one is a
   // whole volume (more than one slice) representing a new time point,
   // not a single 2D slice.
-  describe(
-    'multiple single-frame multi-slice creation from generateDataElements',
-    () => {
-      const config = syntheticData[0];
+  describe.each(creationCases)(
+    'multiple single-frame multi-slice creation from generateDataElements' +
+    ' - $name $syntax',
+    (testCase) => {
+      const config = testCase.config;
       const tags = config.tags;
       const numberOfSlices = 3;
       const numberOfFrames = 5;
@@ -398,7 +415,7 @@ describe('ImageFactory', () => {
 
       beforeAll(() => {
         const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+        tagsCopy.TransferSyntaxUID = testCase.syntax;
         tagsCopy.NumberOfFrames = numberOfFrames;
         const genOptions = {
           pixelGeneratorName: 'string',
@@ -508,9 +525,11 @@ describe('ImageFactory', () => {
   // for the "3D creation" case; but since the files share one origin
   // and each carries its own tag-derived time, appendSlice grows a
   // time dimension instead of stacking along z.
-  describe('multiple single-frame creation from generateDataElements',
-    () => {
-      const config = syntheticData[0];
+  describe.each(creationCases)(
+    'multiple single-frame creation from generateDataElements' +
+    ' - $name $syntax',
+    (testCase) => {
+      const config = testCase.config;
       const tags = config.tags;
       const numberOfFrames = 3;
 
@@ -519,7 +538,7 @@ describe('ImageFactory', () => {
 
       beforeAll(() => {
         const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+        tagsCopy.TransferSyntaxUID = testCase.syntax;
         const genOptions = {
           pixelGeneratorName: 'string',
           numberOfFrames
