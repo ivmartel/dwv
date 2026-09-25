@@ -194,10 +194,10 @@ export class DicomBufferToData {
       typeof rows !== 'undefined') {
       pixelMeta.sliceSize = columns * rows;
     } else {
-      if (typeof columns !== 'undefined') {
+      if (typeof columns === 'undefined') {
         pixelMeta.missing.push('columns');
       }
-      if (typeof rows !== 'undefined') {
+      if (typeof rows === 'undefined') {
         pixelMeta.missing.push('rows');
       }
     }
