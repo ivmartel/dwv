@@ -4,7 +4,12 @@ import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
-import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
+import {
+  dataStructures,
+  getStructureElementsList,
+  getStructureNumberOfFiles,
+  singleSliceStructure
+} from '../../dev/dicom/dataStructures.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
 
@@ -43,10 +48,8 @@ describe('ImageFactory', () => {
     let buffer;
 
     beforeAll(() => {
-      const tagsCopy = structuredClone(config.tags);
-      tagsCopy.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-      const genOptions = {pixelGeneratorName: 'string'};
-      const elements = generateDataElements(tagsCopy, genOptions)[0];
+      const elements = getStructureElementsList(
+        config, '1.2.840.10008.1.2.1', singleSliceStructure)[0];
       buffer = elements['7FE00010'].value;
 
       const factory = new ImageFactory();
@@ -144,487 +147,127 @@ describe('ImageFactory', () => {
 
   });
 
-  // build a 3D volume from multiple single-slice DICOM elements, the way
-  // the app assembles a series: one Image per slice via ImageFactory,
-  // combined with appendSlice.
-  describe.each(creationCases)(
-    '3D creation from generateDicomElements - $name $syntax',
-    (testCase) => {
-      const config = testCase.config;
-      const numberOfSlices = 4;
+  // expected geometry per data structure: number of slices (z) and
+  // number of time points (undefined if no time dimension)
+  const structureExpectations = {
+    // frames without per-frame position: stacked along time
+    multiframe: {z: 1, time: 3},
+    // frames with per-frame position (frames3D): a genuine z-stack
+    // from a single file
+    multiframeMultiSlice: {z: 5},
+    // one file per slice, combined with appendSlice along z
+    multipleSingleSlice: {z: 5},
+    // files sharing one position but with a different
+    // TemporalPositionIdentifier: appendSlice grows a time dimension
+    multipleSingleFrame: {z: 1, time: 3},
+    // one z-stack file per time point, combined with appendVolume
+    multipleSingleFrameMultiSlice: {z: 5, time: 3}
+  };
 
-      let image;
-      let sliceElementsList;
+  const structureCases = [];
+  for (const testCase of creationCases) {
+    for (const [key, structure] of Object.entries(dataStructures)) {
+      structureCases.push({
+        label: `${structure.name} - ${testCase.name} ${testCase.syntax}`,
+        testCase,
+        structure,
+        expected: structureExpectations[key]
+      });
+    }
+  }
 
-      beforeAll(() => {
-        const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = testCase.syntax;
-        const genOptions = {
-          pixelGeneratorName: 'string',
-          numberOfSlices
-        };
-        sliceElementsList = generateDataElements(tagsCopy, genOptions);
+  // build an image from the files of a data structure, the way the app
+  // assembles a series (see DataController): one Image per file via
+  // ImageFactory, combined with appendVolume if the file image has more
+  // than one slice, appendSlice otherwise.
+  describe.each(structureCases)('$label', ({testCase, structure, expected}) => {
+    const tags = testCase.config.tags;
 
-        const factory = new ImageFactory();
-        for (const sliceElements of sliceElementsList) {
-          const pixelBuffer = sliceElements['7FE00010'].value;
-          const sliceImage = factory.create(
-            sliceElements, pixelBuffer, numberOfSlices);
-          if (typeof image === 'undefined') {
-            image = sliceImage;
-          } else {
-            image.appendSlice(sliceImage);
-          }
+    let image;
+    let fileElementsList;
+
+    beforeAll(() => {
+      fileElementsList = getStructureElementsList(
+        testCase.config, testCase.syntax, structure);
+      const numberOfFiles = fileElementsList.length;
+
+      const factory = new ImageFactory();
+      for (const elements of fileElementsList) {
+        factory.checkElements(elements);
+        const fileImage = factory.create(
+          elements, elements['7FE00010'].value, numberOfFiles);
+        if (typeof image === 'undefined') {
+          image = fileImage;
+        } else if (fileImage.getGeometry().getSize().get(2) > 1) {
+          image.appendVolume(fileImage);
+        } else {
+          image.appendSlice(fileImage);
         }
-      });
-
-      test('geometry has one slice per generated element set', () => {
-        assert.equal(
-          image.getGeometry().getSize().get(2), numberOfSlices,
-          'slice count matches numberOfSlices'
-        );
-      });
-
-      test('slice origins are ordered along z with expected spacing', () => {
-        const origins = image.getGeometry().getOrigins();
-        assert.equal(origins.length, numberOfSlices, 'one origin per slice');
-        for (let i = 0; i < numberOfSlices; ++i) {
-          assert.equal(origins[i].getZ(), i, `slice ${i} z position`);
-        }
-      });
-
-      test('pixel buffer content of each slice is preserved', () => {
-        const sliceSize = config.tags.Rows * config.tags.Columns;
-        const fullBuffer = image.getBuffer();
-        for (let i = 0; i < numberOfSlices; ++i) {
-          const sliceBuffer = sliceElementsList[i]['7FE00010'].value;
-          assert.equal(
-            fullBuffer[i * sliceSize], sliceBuffer[0],
-            `slice ${i} first pixel matches`
-          );
-          assert.equal(
-            fullBuffer[i * sliceSize + sliceSize - 1],
-            sliceBuffer[sliceSize - 1],
-            `slice ${i} last pixel matches`
-          );
-        }
-      });
-
-      test('each slice SOPInstanceUID is included as an image UID', () => {
-        for (let i = 0; i < numberOfSlices; ++i) {
-          const uid = sliceElementsList[i]['00080018'].value[0];
-          assert.ok(
-            image.includesImageUid(uid),
-            `slice ${i} SOPInstanceUID included`
-          );
-        }
-      });
-
+      }
     });
 
-  // build an image from a single multiframe DICOM file (NumberOfFrames
-  // tag, one SOPInstanceUID, all frame pixel data in one buffer). With
-  // no per-frame position info (no PerFrameFunctionalGroupsSequence),
-  // the frames share the file's single spatial position and are stacked
-  // along the time dimension instead of z, unlike the spatially-stacked
-  // volume built via appendSlice above.
-  describe.each(creationCases)(
-    'multiframe creation from generateDataElements - $name $syntax',
-    (testCase) => {
-      const config = testCase.config;
-      const tags = config.tags;
-      const numberOfFrames = 3;
-
-      let image;
-      let buffer;
-
-      beforeAll(() => {
-        const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = testCase.syntax;
-        tagsCopy.NumberOfFrames = numberOfFrames;
-        const genOptions = {pixelGeneratorName: 'string'};
-        const elements = generateDataElements(tagsCopy, genOptions)[0];
-        buffer = elements['7FE00010'].value;
-
-        const factory = new ImageFactory();
-        factory.checkElements(elements);
-        image = factory.create(elements, buffer, 1);
-      });
-
-      test('geometry keeps a single spatial slice with frames as time', () => {
-        const size = image.getGeometry().getSize();
-        assert.equal(size.get(2), 1, 'single spatial slice');
-        assert.equal(size.length(), 4, 'geometry gains a time dimension');
-        assert.equal(
-          size.get(3), numberOfFrames, 'frame count matches NumberOfFrames');
-      });
-
-      test('meta numberOfFiles stays 1 for a single multiframe file', () => {
-        assert.equal(image.getMeta().numberOfFiles, 1, 'numberOfFiles');
-      });
-
-      test('pixel buffer holds all frames with distinct per-frame content',
-        () => {
-          const sliceSize = tags.Rows * tags.Columns;
-          assert.equal(
-            buffer.length, sliceSize * numberOfFrames,
-            'buffer holds all frames'
-          );
-          const imageBuffer = image.getBuffer();
-          const frames = [];
-          for (let f = 0; f < numberOfFrames; ++f) {
-            const start = f * sliceSize;
-            const end = start + sliceSize;
-            frames.push(Array.from(buffer.slice(start, end)));
-            assert.deepEqual(
-              Array.from(imageBuffer.slice(start, end)),
-              frames[f],
-              `frame ${f} pixel data is preserved`
-            );
-          }
-          // sanity check the generated data actually varies per frame,
-          // otherwise the preservation check above would be vacuous
-          // (e.g. a generator that only fills frame 0, leaving the rest
-          // zeroed, would still pass it)
-          assert.notDeepEqual(
-            frames[0], frames[1], 'frame 0 and frame 1 are not identical'
-          );
-        }
-      );
-
-      test('SOPInstanceUID used as frame UID', () => {
-        assert.ok(
-          image.includesImageUid(tags.SOPInstanceUID),
-          'SOPInstanceUID is in image UIDs'
-        );
-      });
-
+    test('generates the structure number of files', () => {
+      assert.equal(
+        fileElementsList.length, getStructureNumberOfFiles(structure),
+        'number of files');
     });
 
-  // build an image from a single multiframe DICOM file that also carries
-  // per-frame spatial position (frames3D genOption: Shared/PerFrame
-  // FunctionalGroupsSequence with a PlanePositionSequence per frame), as
-  // created by dev/dicom/pages/synthetic-data.js's
-  // getSingleMultiFrameMultiSliceLink. Unlike the plain multiframe case
-  // above, the per-frame ImagePositionPatient lets ImageFactory build a
-  // genuine spatial z-stack (getFramesGeometry) from a single file,
-  // instead of falling back to a time dimension.
-  describe.each(creationCases)(
-    'multiframe multi-slice creation from generateDataElements' +
-    ' - $name $syntax',
-    (testCase) => {
-      const config = testCase.config;
-      const tags = config.tags;
-      const numberOfFrames = 5;
+    test('geometry size', () => {
+      const size = image.getGeometry().getSize();
+      assert.equal(size.get(0), tags.Columns, 'columns');
+      assert.equal(size.get(1), tags.Rows, 'rows');
+      assert.equal(size.get(2), expected.z, 'z size');
+      if (typeof expected.time === 'undefined') {
+        assert.equal(size.length(), 3, 'no time dimension');
+      } else {
+        assert.equal(size.length(), 4, 'time dimension');
+        assert.equal(size.get(3), expected.time, 'time size');
+      }
+    });
 
-      let image;
-      let buffer;
-
-      beforeAll(() => {
-        const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = testCase.syntax;
-        tagsCopy.NumberOfFrames = numberOfFrames;
-        const genOptions = {
-          pixelGeneratorName: 'string',
-          frames3D: true
-        };
-        const elements = generateDataElements(tagsCopy, genOptions)[0];
-        buffer = elements['7FE00010'].value;
-
-        const factory = new ImageFactory();
-        factory.checkElements(elements);
-        image = factory.create(elements, buffer, 1);
-      });
-
-      test('geometry is a genuine z-stack, not a time dimension', () => {
-        const size = image.getGeometry().getSize();
-        assert.equal(size.length(), 3, 'no extra time dimension');
-        assert.equal(
-          size.get(2), numberOfFrames, 'slice count matches NumberOfFrames');
-      });
-
-      test('frame origins are ordered along z with expected spacing', () => {
-        const origins = image.getGeometry().getOrigins();
-        assert.equal(origins.length, numberOfFrames, 'one origin per frame');
-        for (let i = 0; i < numberOfFrames; ++i) {
-          assert.equal(origins[i].getZ(), i, `frame ${i} z position`);
-        }
-      });
-
-      test('meta numberOfFiles stays 1 for a single multiframe file', () => {
-        assert.equal(image.getMeta().numberOfFiles, 1, 'numberOfFiles');
-      });
-
-      test('pixel buffer holds all frames with distinct per-frame content',
-        () => {
-          const sliceSize = tags.Rows * tags.Columns;
-          assert.equal(
-            buffer.length, sliceSize * numberOfFrames,
-            'buffer holds all frames'
-          );
-          const imageBuffer = image.getBuffer();
-          const frames = [];
-          for (let f = 0; f < numberOfFrames; ++f) {
-            const start = f * sliceSize;
-            const end = start + sliceSize;
-            frames.push(Array.from(buffer.slice(start, end)));
-            assert.deepEqual(
-              Array.from(imageBuffer.slice(start, end)),
-              frames[f],
-              `frame ${f} pixel data is preserved`
-            );
-          }
-          // sanity check the generated data actually varies per frame,
-          // otherwise the preservation check above would be vacuous
-          assert.notDeepEqual(
-            frames[0], frames[1], 'frame 0 and frame 1 are not identical'
-          );
-        }
-      );
-
-      test('SOPInstanceUID used as frame UID', () => {
-        assert.ok(
-          image.includesImageUid(tags.SOPInstanceUID),
-          'SOPInstanceUID is in image UIDs'
-        );
-      });
-
-    }
-  );
-
-  // build a 4D volume from multiple files, each file itself a spatial
-  // multiframe 3D volume (frames3D) representing one time point, as
-  // created by dev/dicom/pages/synthetic-data.js's
-  // getMultipleSingleFrameMultiSliceLink. Each file is turned into its
-  // own z-stack Image via ImageFactory (as in the "multiframe
-  // multi-slice" case above), then the per-file volumes are combined
-  // with appendVolume rather than appendSlice, since each one is a
-  // whole volume (more than one slice) representing a new time point,
-  // not a single 2D slice.
-  describe.each(creationCases)(
-    'multiple single-frame multi-slice creation from generateDataElements' +
-    ' - $name $syntax',
-    (testCase) => {
-      const config = testCase.config;
-      const tags = config.tags;
-      const numberOfSlices = 3;
-      const numberOfFrames = 5;
-
-      let image;
-      let fileElementsList;
-
-      beforeAll(() => {
-        const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = testCase.syntax;
-        tagsCopy.NumberOfFrames = numberOfFrames;
-        const genOptions = {
-          pixelGeneratorName: 'string',
-          frames3D: true,
-          numberOfSlices
-        };
-        fileElementsList = generateDataElements(tagsCopy, genOptions);
-
-        const factory = new ImageFactory();
-        for (const elements of fileElementsList) {
-          const pixelBuffer = elements['7FE00010'].value;
-          const fileImage = factory.create(
-            elements, pixelBuffer, numberOfSlices);
-          if (typeof image === 'undefined') {
-            image = fileImage;
-          } else {
-            image.appendVolume(fileImage);
-          }
-        }
-      });
-
-      test('generates one multiframe file per slice position', () => {
-        assert.equal(
-          fileElementsList.length, numberOfSlices,
-          'one file per slice position'
-        );
-      });
-
-      test('geometry is 4D: spatial frames by z, files by time', () => {
-        const size = image.getGeometry().getSize();
-        assert.equal(size.length(), 4, 'geometry gains a time dimension');
-        assert.equal(
-          size.get(2), numberOfFrames,
-          'z size matches per-file frame count');
-        assert.equal(
-          size.get(3), numberOfSlices, 'time size matches file count');
-      });
-
-      test('frame origins are ordered along z with expected spacing', () => {
-        const origins = image.getGeometry().getOrigins();
-        assert.equal(origins.length, numberOfFrames, 'one origin per frame');
-        for (let i = 0; i < numberOfFrames; ++i) {
-          assert.equal(origins[i].getZ(), i, `frame ${i} z position`);
-        }
-      });
-
-      test('meta numberOfFiles matches the number of combined files', () => {
-        assert.equal(
-          image.getMeta().numberOfFiles, numberOfSlices, 'numberOfFiles');
-      });
-
-      test(
-        'pixel buffer holds every file and frame with distinct content',
-        () => {
-          const sliceSize = tags.Rows * tags.Columns;
-          const fullBuffer = image.getBuffer();
-          assert.equal(
-            fullBuffer.length, sliceSize * numberOfFrames * numberOfSlices,
-            'buffer holds every file and frame'
-          );
-
-          const frames = [];
-          for (let fileIndex = 0; fileIndex < numberOfSlices; ++fileIndex) {
-            const fileBuffer = fileElementsList[fileIndex]['7FE00010'].value;
-            for (let f = 0; f < numberOfFrames; ++f) {
-              const start = (fileIndex * numberOfFrames + f) * sliceSize;
-              const end = start + sliceSize;
-              const frame = Array.from(fullBuffer.slice(start, end));
-              assert.deepEqual(
-                frame,
-                Array.from(fileBuffer.slice(f * sliceSize, f * sliceSize +
-                sliceSize)),
-                `file ${fileIndex} frame ${f} pixel data is preserved`
-              );
-              frames.push(frame);
-            }
-          }
-          // sanity check the generated data actually varies, both across
-          // frames within a file (z) and across files at the same frame
-          // index (time), otherwise the preservation check above would
-          // be vacuous
-          assert.notDeepEqual(
-            frames[0], frames[1], 'frame 0 and frame 1 of file 0 differ');
-          assert.notDeepEqual(
-            frames[0], frames[numberOfFrames],
-            'frame 0 of file 0 and frame 0 of file 1 differ');
-        }
-      );
-
-      test('each file SOPInstanceUID is included as an image UID', () => {
-        for (const elements of fileElementsList) {
-          const uid = elements['00080018'].value[0];
-          assert.ok(image.includesImageUid(uid), `${uid} included`);
-        }
-      });
-
-    }
-  );
-
-  // build a 4D volume from multiple single-frame files that all share
-  // the same spatial position but differ by TemporalPositionIdentifier
-  // (a "cine" style series stored as separate single-frame instances),
-  // as created by dev/dicom/pages/synthetic-data.js's
-  // getMultipleSingleFrameLink. Each per-file Image has a single slice
-  // (no NumberOfFrames, no frames3D), so unlike the two cases above the
-  // files are combined with a plain Image#appendSlice loop, exactly as
-  // for the "3D creation" case; but since the files share one origin
-  // and each carries its own tag-derived time, appendSlice grows a
-  // time dimension instead of stacking along z.
-  describe.each(creationCases)(
-    'multiple single-frame creation from generateDataElements' +
-    ' - $name $syntax',
-    (testCase) => {
-      const config = testCase.config;
-      const tags = config.tags;
-      const numberOfFrames = 3;
-
-      let image;
-      let fileElementsList;
-
-      beforeAll(() => {
-        const tagsCopy = structuredClone(config.tags);
-        tagsCopy.TransferSyntaxUID = testCase.syntax;
-        const genOptions = {
-          pixelGeneratorName: 'string',
-          numberOfFrames
-        };
-        fileElementsList = generateDataElements(tagsCopy, genOptions);
-
-        const factory = new ImageFactory();
-        for (const elements of fileElementsList) {
-          const pixelBuffer = elements['7FE00010'].value;
-          const fileImage = factory.create(
-            elements, pixelBuffer, numberOfFrames);
-          if (typeof image === 'undefined') {
-            image = fileImage;
-          } else {
-            image.appendSlice(fileImage);
-          }
-        }
-      });
-
-      test('generates one single-frame file per temporal position', () => {
-        assert.equal(
-          fileElementsList.length, numberOfFrames,
-          'one file per temporal position'
-        );
-      });
-
-      test('geometry keeps a single spatial slice, gains a time dimension',
-        () => {
-          const size = image.getGeometry().getSize();
-          assert.equal(size.length(), 4, 'geometry gains a time dimension');
-          assert.equal(size.get(2), 1, 'single spatial slice');
-          assert.equal(
-            size.get(3), numberOfFrames, 'time size matches file count');
-        }
-      );
-
-      test('all files share the same spatial origin', () => {
-        const origins = image.getGeometry().getOrigins();
-        assert.equal(origins.length, 1, 'single shared origin');
+    test('origins are ordered along z with expected spacing', () => {
+      const origins = image.getGeometry().getOrigins();
+      assert.equal(origins.length, expected.z, 'one origin per slice');
+      for (let i = 0; i < expected.z; ++i) {
         assert.deepEqual(
-          origins[0].getValues(), [0, 0, 0], 'origin at (0,0,0)');
-      });
+          origins[i].getValues(), [0, 0, i], `slice ${i} origin`);
+      }
+    });
 
-      test('meta numberOfFiles matches the number of combined files', () => {
-        assert.equal(
-          image.getMeta().numberOfFiles, numberOfFrames, 'numberOfFiles');
-      });
+    test('meta numberOfFiles matches the number of files', () => {
+      assert.equal(
+        image.getMeta().numberOfFiles, fileElementsList.length,
+        'numberOfFiles');
+    });
 
-      test('pixel buffer holds every file with distinct content', () => {
-        const sliceSize = tags.Rows * tags.Columns;
-        const fullBuffer = image.getBuffer();
-        assert.equal(
-          fullBuffer.length, sliceSize * numberOfFrames,
-          'buffer holds every file'
-        );
+    test('pixel buffer holds every file with distinct content', () => {
+      const fileBuffers = fileElementsList.map(
+        (elements) => Array.from(elements['7FE00010'].value));
+      assert.deepEqual(
+        Array.from(image.getBuffer()), fileBuffers.flat(),
+        'buffer is the concatenation of the file buffers');
 
-        const frames = [];
-        for (let f = 0; f < numberOfFrames; ++f) {
-          const fileBuffer = fileElementsList[f]['7FE00010'].value;
-          const start = f * sliceSize;
-          const end = start + sliceSize;
-          const frame = Array.from(fullBuffer.slice(start, end));
-          assert.deepEqual(
-            frame, Array.from(fileBuffer),
-            `file ${f} pixel data is preserved`
-          );
-          frames.push(frame);
-        }
-        // sanity check the generated data actually varies per file,
-        // otherwise the preservation check above would be vacuous
+      // sanity check the generated data actually varies, along z or
+      // time, otherwise the check above would not detect a mix-up
+      const sliceSize = tags.Rows * tags.Columns;
+      const buffer = image.getBuffer();
+      const getSlice = (index) => Array.from(
+        buffer.slice(index * sliceSize, (index + 1) * sliceSize));
+      assert.notDeepEqual(getSlice(0), getSlice(1), 'slices 0 and 1 differ');
+      if (expected.z > 1 && typeof expected.time !== 'undefined') {
         assert.notDeepEqual(
-          frames[0], frames[1], 'file 0 and file 1 content differ'
-        );
-      });
+          getSlice(0), getSlice(expected.z),
+          'slice 0 of time 0 and 1 differ');
+      }
+    });
 
-      test('SOPInstanceUID is included as an image UID', () => {
-        // note: getMultipleSingleFrameLink's files only vary by
-        // TemporalPositionIdentifier, not SOPInstanceUID, so all files
-        // share the same uid here
-        assert.ok(
-          image.includesImageUid(tags.SOPInstanceUID),
-          'SOPInstanceUID is in image UIDs'
-        );
-      });
+    test('each file SOPInstanceUID is included as an image UID', () => {
+      for (const elements of fileElementsList) {
+        const uid = elements['00080018'].value[0];
+        assert.ok(image.includesImageUid(uid), `${uid} included`);
+      }
+    });
 
-    }
-  );
+  });
 
 });

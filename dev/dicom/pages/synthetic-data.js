@@ -1,10 +1,13 @@
-import {addTagsToDictionary} from '../../../src/dicom/dictionary.js';
 import {
-  generateDataElements,
-  generateSliceBuffers,
   isMultiSliceModality,
   zipBuffers
 } from '../dicomGenerator.js';
+import {
+  dataStructures,
+  getStructureBuffers,
+  getStructureNumberOfFiles,
+  singleSliceStructure
+} from '../dataStructures.js';
 
 /**
  * Setup.
@@ -20,47 +23,6 @@ function setup() {
 }
 
 /**
- * Create DICOM buffers from (JSON) tags.
- *
- * @param {object} config The data configuration.
- * @param {number} [numberOfSlices] The number of slices.
- * @param {number} [numberOfFrames] The number of frames.
- * @returns {ArrayBuffer[]} The list of buffers.
- */
-function getBuffersFromTags(config, numberOfSlices = 1, numberOfFrames = 1) {
-  // add private tags to dict if present
-  let useUnVrForPrivateSq = false;
-  if (typeof config.privateDictionary !== 'undefined') {
-    const keys = Object.keys(config.privateDictionary);
-    for (let i = 0; i < keys.length; ++i) {
-      const group = keys[i];
-      const tags = config.privateDictionary[group];
-      addTagsToDictionary(group, tags);
-    }
-    if (typeof config.useUnVrForPrivateSq !== 'undefined') {
-      useUnVrForPrivateSq = config.useUnVrForPrivateSq;
-    }
-  }
-
-  // generate data elements
-  const genOptions = {
-    pixelGeneratorName: 'string',
-    segmentSquares: config.segmentSquares,
-    frames3D: config.frames3D
-  };
-  if (numberOfSlices !== 1) {
-    genOptions.numberOfSlices = numberOfSlices;
-  }
-  if (numberOfFrames !== 1) {
-    genOptions.numberOfFrames = numberOfFrames;
-  }
-  const dataElementsList = generateDataElements(config.tags, genOptions);
-  // generate buffers
-  const writerOptions = {useUnVrForPrivateSq};
-  return generateSliceBuffers(dataElementsList, writerOptions);
-}
-
-/**
  * Get a single-slice link (dcm file).
  *
  * @param {object} config The data configuration.
@@ -69,7 +31,8 @@ function getBuffersFromTags(config, numberOfSlices = 1, numberOfFrames = 1) {
 function getSingleSliceLink(config) {
   const link = document.createElement('a');
   try {
-    const buffer = getBuffersFromTags(config)[0];
+    const buffer = getStructureBuffers(
+      config, config.tags.TransferSyntaxUID, singleSliceStructure)[0];
     const blob = new Blob([buffer], {type: 'application/dicom'});
     link.href = URL.createObjectURL(blob);
   } catch (error) {
@@ -83,132 +46,38 @@ function getSingleSliceLink(config) {
 }
 
 /**
- * Get a multi-frame link (dcm file).
- *
- * @param {object} config0 The data configuration.
- * @returns {HTMLLinkElement} The link.
- */
-function getMultiFrameLink(config0) {
-  const config = structuredClone(config0);
-  const link = document.createElement('a');
-  try {
-    config.tags.NumberOfFrames = 3;
-    const buffer = getBuffersFromTags(config)[0];
-    const blob = new Blob([buffer], {type: 'application/dicom'});
-    link.href = URL.createObjectURL(blob);
-  } catch (error) {
-    console.log('data:', config.name);
-    console.error(error);
-  }
-  const fileName = `dwv-generated-${config.name}-mf.dcm`;
-  link.download = fileName;
-  link.appendChild(document.createTextNode('mf.dcm'));
-  return link;
-}
-
-/**
- * Get a single-frame multi-slice link (dcm file).
- *
- * @param {object} config0 The data configuration.
- * @returns {HTMLLinkElement} The link.
- */
-function getSingleFrameMultiSliceLink(config0) {
-  const config = structuredClone(config0);
-  const link = document.createElement('a');
-  try {
-    config.frames3D = true;
-    config.tags.NumberOfFrames = 5;
-    const buffer = getBuffersFromTags(config)[0];
-    const blob = new Blob([buffer], {type: 'application/dicom'});
-    link.href = URL.createObjectURL(blob);
-  } catch (error) {
-    console.log('data:', config.name);
-    console.error(error);
-  }
-  const fileName = `dwv-generated-${config.name}-sfms.dcm`;
-  link.download = fileName;
-  link.appendChild(document.createTextNode('sfms.dcm'));
-  return link;
-}
-
-/**
- * Get a multiple single-slice link (zip file).
+ * Get a data structure link: dcm file for single file structures,
+ * zip file otherwise.
  *
  * @param {object} config The data configuration.
+ * @param {object} structure The data structure,
+ *   see {@link dataStructures}.
  * @returns {HTMLLinkElement} The link.
  */
-function getMultipleSingleSliceLink(config) {
+function getStructureLink(config, structure) {
   const link = document.createElement('a');
-  const fileName = `dwv-generated-${config.name}-mss.zip`;
-
-  const zipCallback = function (zipBlob) {
-    link.download = fileName;
-    link.href = URL.createObjectURL(zipBlob);
-  };
+  const isZip = getStructureNumberOfFiles(structure) !== 1;
+  const linkText = `${structure.short}.${isZip ? 'zip' : 'dcm'}`;
+  const fileName = `dwv-generated-${config.name}-${linkText}`;
 
   try {
-    const buffers = getBuffersFromTags(config, 5);
-    zipBuffers(buffers, zipCallback);
+    const buffers = getStructureBuffers(
+      config, config.tags.TransferSyntaxUID, structure);
+    if (isZip) {
+      zipBuffers(buffers, function (zipBlob) {
+        link.download = fileName;
+        link.href = URL.createObjectURL(zipBlob);
+      });
+    } else {
+      const blob = new Blob([buffers[0]], {type: 'application/dicom'});
+      link.download = fileName;
+      link.href = URL.createObjectURL(blob);
+    }
   } catch (error) {
     console.log('data:', config.name);
     console.error(error);
   }
-  link.appendChild(document.createTextNode('mss.zip'));
-  return link;
-}
-
-/**
- * Get a multiple single-frame link (zip file).
- *
- * @param {object} config The data configuration.
- * @returns {HTMLLinkElement} The link.
- */
-function getMultipleSingleFrameLink(config) {
-  const link = document.createElement('a');
-  const fileName = `dwv-generated-${config.name}-msf.zip`;
-
-  const zipCallback = function (zipBlob) {
-    link.download = fileName;
-    link.href = URL.createObjectURL(zipBlob);
-  };
-
-  try {
-    const buffers = getBuffersFromTags(config, 1, 3);
-    zipBuffers(buffers, zipCallback);
-  } catch (error) {
-    console.log('data:', config.name);
-    console.error(error);
-  }
-  link.appendChild(document.createTextNode('msf.zip'));
-  return link;
-}
-
-/**
- * Get a multiple single-frame multi-slice link (zip file).
- *
- * @param {object} config0 The data configuration.
- * @returns {HTMLLinkElement} The link.
- */
-function getMultipleSingleFrameMultiSliceLink(config0) {
-  const config = structuredClone(config0);
-  const link = document.createElement('a');
-  const fileName = `dwv-generated-${config.name}-msfms.zip`;
-
-  const zipCallback = function (zipBlob) {
-    link.download = fileName;
-    link.href = URL.createObjectURL(zipBlob);
-  };
-
-  try {
-    config.frames3D = true;
-    config.tags.NumberOfFrames = 5;
-    const buffers = getBuffersFromTags(config, 3);
-    zipBuffers(buffers, zipCallback);
-  } catch (error) {
-    console.log('data:', config.name);
-    console.error(error);
-  }
-  link.appendChild(document.createTextNode('msfms.zip'));
+  link.appendChild(document.createTextNode(linkText));
   return link;
 }
 
@@ -227,16 +96,10 @@ function getConfigsHtmlList(configs) {
       `${config.name}: ${config.tags.SeriesDescription}: `));
     li.append(getSingleSliceLink(config));
     if (isMultiSliceModality(config.tags.Modality)) {
-      li.appendChild(document.createTextNode(', '));
-      li.append(getMultiFrameLink(config));
-      li.appendChild(document.createTextNode(', '));
-      li.append(getSingleFrameMultiSliceLink(config));
-      li.appendChild(document.createTextNode(', '));
-      li.append(getMultipleSingleSliceLink(config));
-      li.appendChild(document.createTextNode(', '));
-      li.append(getMultipleSingleFrameLink(config));
-      li.appendChild(document.createTextNode(', '));
-      li.append(getMultipleSingleFrameMultiSliceLink(config));
+      for (const structure of Object.values(dataStructures)) {
+        li.appendChild(document.createTextNode(', '));
+        li.append(getStructureLink(config, structure));
+      }
     }
     // append to list
     ul.append(li);
@@ -286,7 +149,8 @@ function getFileConfigsHtmlList(fileNames) {
  * for a given data group, then create their html list.
  *
  * @param {object} configs Synthetic data configuration.
- * @param {object} dataGroup The data group (name, short, syntax).
+ * @param {object} dataGroup The data group (name, short, syntax,
+ *   optional filter).
  * @returns {HTMLUListElement} The html list element.
  */
 function renderDataGroup(configs, dataGroup) {
@@ -299,7 +163,12 @@ function renderDataGroup(configs, dataGroup) {
     // set transfer syntax
     config.tags.TransferSyntaxUID = dataGroup.syntax;
   }
-  return getConfigsHtmlList(groupConfigs);
+  // optional group filter
+  let finalConfigs = groupConfigs;
+  if (typeof dataGroup.filter !== 'undefined') {
+    finalConfigs = groupConfigs.filter(dataGroup.filter);
+  }
+  return getConfigsHtmlList(finalConfigs);
 }
 
 /**
@@ -321,6 +190,17 @@ function displayConfigs(configs) {
       name: 'Synthetic data Explicit VR Big Endian (SEBE)',
       short: 'sebe',
       syntax: '1.2.840.10008.1.2.2'
+    },
+    {
+      name: 'Synthetic data RLE Lossless (SRLE)',
+      short: 'srle',
+      syntax: '1.2.840.10008.1.2.5',
+      // RLE encoder only supports 8 and 16 bits allocated
+      filter(config) {
+        return isMultiSliceModality(config.tags.Modality) && (
+          config.tags.BitsAllocated === 8 ||
+          config.tags.BitsAllocated === 16);
+      }
     }
   ];
 
