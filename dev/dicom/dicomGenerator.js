@@ -11,6 +11,7 @@ import {
 import {
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
+import {transferSyntaxKeywords} from '../../src/dicom/dictionary.js';
 
 import {
   BinaryPixGenerator
@@ -32,6 +33,7 @@ import {
 import {
   StringPixGenerator
 } from './stringPixGenerator.js';
+import {encodeRleFrame} from './rleEncoder.js';
 
 import JSZip from 'jszip';
 
@@ -235,6 +237,24 @@ export function generatePixelDataFromJSONTags(
     genOptions.sliceNumber,
     genOptions.frameNumber
   );
+
+  // RLE: encapsulated pixel data, one fragment per frame
+  if (tags.TransferSyntaxUID === transferSyntaxKeywords.RLELossless) {
+    const frameLength = sliceLength * samplesPerPixel;
+    const fragments = [];
+    for (let f = 0; f < numberOfFrames; ++f) {
+      const frame = pixels.subarray(f * frameLength, (f + 1) * frameLength);
+      fragments.push(encodeRleFrame(frame, bitsAllocated,
+        samplesPerPixel, tags.PlanarConfiguration));
+    }
+    return {
+      tag: getPixelDataTag(),
+      vr: 'OB',
+      vl: 0,
+      value: fragments,
+      undefinedLength: true
+    };
+  }
 
   // create and return the DICOM element
   let vr = 'OW';
