@@ -77,6 +77,15 @@ export class DicomBufferToData {
   #decompressedSizes = [];
 
   /**
+   * List of number of decoded items: items can be decoded in any order
+   * (decoding is done in parallel), so the item number cannot be used
+   * to know if an item is the first or last one to be decoded.
+   *
+   * @type {number[]}
+   */
+  #numberOfDecodedItems = [];
+
+  /**
    * Local buffer storage.
    *
    * @type {TypedArray[]}
@@ -151,11 +160,6 @@ export class DicomBufferToData {
     // pixelDecoder.ondecodestart: nothing to do
     this.#pixelDecoder.ondecodeditem = (event) => {
       this.#onDecodedItem(event);
-      // send onload and onloadend when all items have been decoded
-      if (event.itemNumber + 1 === event.numberOfItems) {
-        this.onload(event);
-        this.onloadend(event);
-      }
     };
     // pixelDecoder.ondecoded: nothing to do
     // pixelDecoder.ondecodeend: nothing to do
@@ -273,10 +277,13 @@ export class DicomBufferToData {
     const dataIndex = event.index;
     const origin = event.indexOrigin;
 
+    ++this.#numberOfDecodedItems[dataIndex];
+    const numberOfDecodedItems = this.#numberOfDecodedItems[dataIndex];
+
     // send progress
     this.onprogress({
       lengthComputable: true,
-      loaded: event.itemNumber + 1,
+      loaded: numberOfDecodedItems,
       total: event.numberOfItems,
       index: event.index,
       source: origin
@@ -327,9 +334,16 @@ export class DicomBufferToData {
       this.#finalBufferStore[dataIndex] = decodedData;
     }
 
-    // create data for the first item
-    if (event.itemNumber === 0) {
+    // create data for the first decoded item (the buffer
+    // is filled in place by the following ones)
+    if (numberOfDecodedItems === 1) {
       this.#generateData(dataIndex, origin);
+    }
+
+    // send onload and onloadend when all items have been decoded
+    if (numberOfDecodedItems === event.numberOfItems) {
+      this.onload(event);
+      this.onloadend(event);
     }
   }
 
@@ -388,6 +402,9 @@ export class DicomBufferToData {
         if (typeof this.#pixelDecoder === 'undefined') {
           this.#setupPixelDecoder(algoName);
         }
+        // reset decoding state (in case of index reuse)
+        this.#numberOfDecodedItems[dataIndex] = 0;
+        this.#decompressedSizes[dataIndex] = undefined;
         // decode and generate data (asynchronous)
         this.#decodeAndGenerateData(dataIndex, origin, rawBuffer);
       } else {
