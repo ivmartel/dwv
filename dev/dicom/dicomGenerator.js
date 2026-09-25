@@ -57,6 +57,10 @@ import JSZip from 'jszip';
  *   {minI, maxI, minJ, maxJ}.
  * @property {string} modality The DICOM modality to generate pixel
  *   data for, defaults to the tags' Modality.
+ * @property {boolean} frames3D Add per-frame positions (frames
+ *   as spatial slices).
+ * @property {number[]} framePositionOrder With frames3D, the slice
+ *   position of each frame, defaults to the frame number.
  */
 
 /**
@@ -387,7 +391,9 @@ function generateSingleFileDataElements(tags0, genOptions) {
         },
         PlanePositionSequence: {
           value: [{
-            ImagePositionPatient: getIpp(k)
+            ImagePositionPatient: getIpp(
+              typeof genOptions.framePositionOrder !== 'undefined'
+                ? genOptions.framePositionOrder[k] : k)
           }]
         }
       });

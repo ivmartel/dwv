@@ -8,7 +8,8 @@ import {
   dataStructures,
   getStructureElementsList,
   getStructureNumberOfFiles,
-  singleSliceStructure
+  singleSliceStructure,
+  unsortedMultiframeMultiSliceStructure
 } from '../../dev/dicom/dataStructures.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
@@ -266,6 +267,71 @@ describe('ImageFactory', () => {
         const uid = elements['00080018'].value[0];
         assert.ok(image.includesImageUid(uid), `${uid} included`);
       }
+    });
+
+  });
+
+  // frames with positions not in spatial order
+  describe('unsorted frames', () => {
+    const config = syntheticData[0];
+    const tags = config.tags;
+    const structure = unsortedMultiframeMultiSliceStructure;
+    const order = structure.genOptions.framePositionOrder;
+
+    let elements;
+    let buffer;
+    let sortedBuffer;
+
+    beforeAll(() => {
+      elements = getStructureElementsList(
+        config, '1.2.840.10008.1.2.1', structure)[0];
+      buffer = elements['7FE00010'].value;
+      // frames moved to their spatial slot
+      const frameSize = buffer.length / order.length;
+      sortedBuffer = buffer.slice();
+      for (let f = 0; f < order.length; ++f) {
+        sortedBuffer.set(
+          buffer.subarray(f * frameSize, (f + 1) * frameSize),
+          order[f] * frameSize);
+      }
+    });
+
+    test('origins are sorted', () => {
+      const image = new ImageFactory().create(elements, buffer, 1);
+      const origins = image.getGeometry().getOrigins();
+      assert.equal(origins.length, order.length, 'one origin per frame');
+      for (let i = 0; i < order.length; ++i) {
+        assert.deepEqual(
+          origins[i].getValues(), [0, 0, i], `slice ${i} origin`);
+      }
+    });
+
+    test('buffer is remapped to spatial order', () => {
+      const image = new ImageFactory().create(elements, buffer, 1);
+      assert.notStrictEqual(image.getBuffer(), buffer, 'buffer copy');
+      assert.deepEqual(
+        Array.from(image.getBuffer()), Array.from(sortedBuffer),
+        'sorted buffer');
+    });
+
+    test('sorted buffer is used as is', () => {
+      const image = new ImageFactory().create(
+        elements, sortedBuffer, 1, undefined, true);
+      assert.strictEqual(image.getBuffer(), sortedBuffer, 'same buffer');
+    });
+
+    test('initial index on the first decoded frame slice', () => {
+      const firstDecodedFrame = 1;
+      const image = new ImageFactory().create(
+        elements, sortedBuffer, 1, firstDecodedFrame, true);
+      assert.deepEqual(
+        image.getInitialIndex().getValues(),
+        [
+          Math.floor(tags.Columns / 2),
+          Math.floor(tags.Rows / 2),
+          order[firstDecodedFrame]
+        ],
+        'initial index');
     });
 
   });

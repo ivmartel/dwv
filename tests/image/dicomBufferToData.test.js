@@ -67,7 +67,8 @@ import {
   dataStructures,
   getStructureBuffers,
   getStructureElementsList,
-  singleSliceStructure
+  singleSliceStructure,
+  unsortedMultiframeMultiSliceStructure
 } from '../../dev/dicom/dataStructures.js';
 
 import syntheticImgData from '/tests/data/synthetic-img.json';
@@ -508,6 +509,47 @@ describe('image', () => {
           getReferencePixels(config, structure),
           'decoded buffer matches generated pixels'
         );
+      });
+
+      test('unsorted frames: stored in spatial order', () => {
+        const unsorted = unsortedMultiframeMultiSliceStructure;
+        const order = unsorted.genOptions.framePositionOrder;
+        const events = convertDeferred(
+          [getBuffer(config, Syntax.RLELossless, unsorted)],
+          (a, b) => b.itemNumber - a.itemNumber
+        );
+
+        assert.equal(
+          eventsOfType(events, 'onerror').length, 0, 'no error');
+        const data = eventsOfType(events, 'onloaditem')[0].data;
+        assert.ok(data.isBufferSorted, 'buffer is sorted');
+        assert.equal(
+          data.firstDecodedFrame, unsorted.numberOfFrames - 1,
+          'first decoded frame');
+
+        // reference frames, moved to their spatial slot
+        const reference = getReferencePixels(config, unsorted);
+        const frameSize = reference.length / order.length;
+        const expected = new Array(reference.length);
+        for (let f = 0; f < order.length; ++f) {
+          for (let i = 0; i < frameSize; ++i) {
+            expected[order[f] * frameSize + i] = reference[f * frameSize + i];
+          }
+        }
+        // buffer is filled after the first item (shared reference)
+        assert.deepEqual(
+          Array.from(data.buffer), expected,
+          'decoded buffer in spatial order'
+        );
+      });
+
+      test('frames without position: not sorted', () => {
+        const events = convertDeferred(
+          [getBuffer(config, Syntax.RLELossless, structure)],
+          (a, b) => b.itemNumber - a.itemNumber
+        );
+        const data = eventsOfType(events, 'onloaditem')[0].data;
+        assert.isUndefined(data.isBufferSorted, 'no sorted flag');
       });
 
       test('interleaved data indices', () => {

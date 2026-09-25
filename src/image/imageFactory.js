@@ -4,11 +4,6 @@ import {WindowPreset} from './windowPreset.js';
 import {Image} from './image.js';
 import {Index} from '../math/index.js';
 import {ColourMap} from './luts.js';
-import {
-  point3DFromArray,
-  includesPoint3D,
-  getEqualPoint3DFunction
-} from '../math/point.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
@@ -21,13 +16,10 @@ import {
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 import {
   getRootGeometry,
-  getFramesGeometry
+  getSortedFramesGeometry
 } from '../dicom/dicomGeometry.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {logger} from '../utils/logger.js';
-import {
-  getPerFrameFunctionalGroups
-} from '../dicom/dicomFunctionalGroup.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
@@ -316,10 +308,14 @@ export class ImageFactory {
    * @param {number} numberOfFiles The input number of files.
    * @param {number} [firstDecodedFrame] The number of the first decoded
    *   frame, when the pixel buffer is only partially filled.
+   * @param {boolean} [isBufferSorted] True if the pixel buffer frames
+   *   are already in spatial (sorted) order, defaults to false.
    * @returns {Image} A new Image.
    * @throws {Error} Error for missing or wrong data.
    */
-  create(dataElements, pixelBuffer, numberOfFiles, firstDecodedFrame) {
+  create(
+    dataElements, pixelBuffer, numberOfFiles,
+    firstDecodedFrame, isBufferSorted) {
     // safe get shortcuts
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
@@ -335,58 +331,30 @@ export class ImageFactory {
     // frame (encoding order) to slice index, if frames
     // are sorted by the functional groups geometry
     let frameSliceIndices;
-    // possible geometry from frame functional groups
-    const funcGroups =
-      getPerFrameFunctionalGroups(dataElements);
-    if (typeof funcGroups !== 'undefined') {
-      // check unique origins
-      const frameOrigins = [];
-      let uniqueOrigins = true;
-      for (const funcGroup of funcGroups) {
-        const frameOrigin = point3DFromArray(funcGroup.imagePosPat);
-        if (!includesPoint3D(frameOrigins, frameOrigin)) {
-          frameOrigins.push(frameOrigin);
-        } else {
-          uniqueOrigins = false;
-          break;
-        }
-      }
-      // use functional group for geometry if unique pos pats,
-      // revert to root geometry if not.
-      if (uniqueOrigins) {
-        logger.debug('Using frame infos for geometry');
-        geometry = getFramesGeometry(dataElements, funcGroups);
-        geometry.sortOrigins();
+    // possible geometry from frame functional groups,
+    // revert to root geometry if not possible
+    const sortedFrames = getSortedFramesGeometry(dataElements);
+    if (typeof sortedFrames !== 'undefined') {
+      logger.debug('Using frame infos for geometry');
+      geometry = sortedFrames.geometry;
+      frameSliceIndices = sortedFrames.frameSliceIndices;
 
-        // pixelBuffer is in per-frame (encoding) order, which can
-        // differ from the spatial order sortOrigins just applied to
-        // the geometry; work out where each frame now lands and only
-        // reorder the buffer if that order actually changed.
-        const sortedOrigins = geometry.getOrigins();
-        const sliceIndices = frameOrigins.map(function (frameOrigin) {
-          const sliceIndex = sortedOrigins.findIndex(
-            getEqualPoint3DFunction(frameOrigin));
-          if (sliceIndex === -1) {
-            throw new Error('Cannot find frame origin in sorted origins');
-          }
-          return sliceIndex;
-        });
-        frameSliceIndices = sliceIndices;
-        const needsRemap = sliceIndices.some(function (sliceIndex, f) {
+      // reorder the buffer if not sorted and the order actually changed
+      const needsRemap = !isBufferSorted &&
+        frameSliceIndices.some(function (sliceIndex, f) {
           return sliceIndex !== f;
         });
-        if (needsRemap) {
-          const size2D = getImage2DSize(dataElements);
-          const sliceSize = size2D[0] * size2D[1] * samplesPerPixel;
-          const sortedBuffer = pixelBuffer.slice();
-          for (let f = 0; f < funcGroups.length; ++f) {
-            sortedBuffer.set(
-              pixelBuffer.subarray(f * sliceSize, (f + 1) * sliceSize),
-              sliceIndices[f] * sliceSize
-            );
-          }
-          pixelBuffer = sortedBuffer;
+      if (needsRemap) {
+        const size2D = getImage2DSize(dataElements);
+        const sliceSize = size2D[0] * size2D[1] * samplesPerPixel;
+        const sortedBuffer = pixelBuffer.slice();
+        for (let f = 0; f < frameSliceIndices.length; ++f) {
+          sortedBuffer.set(
+            pixelBuffer.subarray(f * sliceSize, (f + 1) * sliceSize),
+            frameSliceIndices[f] * sliceSize
+          );
         }
+        pixelBuffer = sortedBuffer;
       }
     }
     // try root geometry

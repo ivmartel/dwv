@@ -13,6 +13,16 @@ export const singleSliceStructure = {
 };
 
 /**
+ * Single file, frames with positions not in spatial order: the
+ * frames need to be sorted to get the spatial slices.
+ */
+export const unsortedMultiframeMultiSliceStructure = {
+  name: 'unsorted multiframe multi-slice',
+  numberOfFrames: 5,
+  genOptions: {frames3D: true, framePositionOrder: [2, 0, 4, 1, 3]}
+};
+
+/**
  * Multi-file or multi-frame data structures: the ways an image can be
  * stored in one or more DICOM files.
  *

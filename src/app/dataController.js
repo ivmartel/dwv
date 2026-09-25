@@ -120,6 +120,14 @@ export class DicomData {
   firstDecodedFrame;
 
   /**
+   * True if the buffer frames are already in spatial (sorted) order,
+   * set by the decoder for frames with a per-frame geometry.
+   *
+   * @type {boolean|undefined}
+   */
+  isBufferSorted;
+
+  /**
    * List of data creation warning.
    *
    * @type {string[]}
@@ -690,7 +698,8 @@ export class DataController extends EventTarget {
             data.meta,
             data.buffer,
             data.numberOfFiles,
-            data.firstDecodedFrame
+            data.firstDecodedFrame,
+            data.isBufferSorted
           );
         }
       }

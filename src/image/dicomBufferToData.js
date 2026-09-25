@@ -5,6 +5,7 @@ import {
   getSyntaxDecompressionName
 } from '../dicom/dicomParser.js';
 import {getAnyPixelDataElement} from '../dicom/dicomTag.js';
+import {getSortedFramesGeometry} from '../dicom/dicomGeometry.js';
 import {PixelBufferDecoder} from './decoder.js';
 import {DicomData} from '../app/dataController.js';
 
@@ -86,6 +87,14 @@ export class DicomBufferToData {
   #numberOfDecodedItems = [];
 
   /**
+   * List of frame to slice indices: decoded frames are stored in
+   * spatial order when the frames geometry is sorted.
+   *
+   * @type {Array<number[]|undefined>}
+   */
+  #frameSliceIndices = [];
+
+  /**
    * Local buffer storage.
    *
    * @type {TypedArray[]}
@@ -116,6 +125,9 @@ export class DicomBufferToData {
     }
     data.numberOfFiles = this.#options.numberOfFiles;
     data.firstDecodedFrame = firstDecodedFrame;
+    if (typeof this.#frameSliceIndices[index] !== 'undefined') {
+      data.isBufferSorted = true;
+    }
 
     // call onloaditem
     this.onloaditem({
@@ -258,6 +270,22 @@ export class DicomBufferToData {
 
     const numberOfItems = pixelBuffer.length;
 
+    // frame to slice indices to store decoded frames in spatial order
+    if (numberOfItems > 1) {
+      let sortedFrames;
+      try {
+        sortedFrames = getSortedFramesGeometry(
+          this.#dicomParserStore[dataIndex].getDicomElements());
+      } catch (error) {
+        // error will be reported at image creation
+        logger.debug(`Cannot get sorted frames geometry: ${error}`);
+      }
+      if (typeof sortedFrames !== 'undefined' &&
+        sortedFrames.frameSliceIndices.length === numberOfItems) {
+        this.#frameSliceIndices[dataIndex] = sortedFrames.frameSliceIndices;
+      }
+    }
+
     // launch decode
     for (let i = 0; i < numberOfItems; ++i) {
       this.#pixelDecoder.decode(pixelBuffer[i], pixelMeta,
@@ -330,9 +358,14 @@ export class DicomBufferToData {
         logger.warn(`Unsupported varying decompressed data size: ${
           decodedData.length } != ${this.#decompressedSizes[dataIndex]}`);
       }
-      // set buffer item data
+      // set buffer item data (in spatial order if possible)
+      let slot = event.itemNumber;
+      const frameSliceIndices = this.#frameSliceIndices[dataIndex];
+      if (typeof frameSliceIndices !== 'undefined') {
+        slot = frameSliceIndices[event.itemNumber];
+      }
       this.#finalBufferStore[dataIndex].set(
-        decodedData, this.#decompressedSizes[dataIndex] * event.itemNumber);
+        decodedData, this.#decompressedSizes[dataIndex] * slot);
     } else {
       this.#finalBufferStore[dataIndex] = decodedData;
     }
@@ -412,6 +445,7 @@ export class DicomBufferToData {
         // reset decoding state (in case of index reuse)
         this.#numberOfDecodedItems[dataIndex] = 0;
         this.#decompressedSizes[dataIndex] = undefined;
+        this.#frameSliceIndices[dataIndex] = undefined;
         // decode and generate data (asynchronous)
         this.#decodeAndGenerateData(dataIndex, origin, rawBuffer);
       } else {
