@@ -112,6 +112,14 @@ export class DicomData {
   numberOfFiles;
 
   /**
+   * Number of the first decoded frame, set when the buffer
+   * is only partially filled at creation (parallel frame decoding).
+   *
+   * @type {number|undefined}
+   */
+  firstDecodedFrame;
+
+  /**
    * List of data creation warning.
    *
    * @type {string[]}
@@ -681,7 +689,8 @@ export class DataController extends EventTarget {
           data.image = factory.create(
             data.meta,
             data.buffer,
-            data.numberOfFiles
+            data.numberOfFiles,
+            data.firstDecodedFrame
           );
         }
       }

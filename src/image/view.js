@@ -288,9 +288,9 @@ export class View extends EventTarget {
       }
     }
 
-    // default to middle index
+    // default to the image initial index
     if (typeof this.getCurrentPosition() === 'undefined') {
-      this.setCurrentIndex(this.#getMiddleIndex(), true);
+      this.setCurrentIndex(image.getInitialIndex(), true);
     }
 
     // reset alpha function
@@ -425,23 +425,6 @@ export class View extends EventTarget {
     this.dispatchEvent(new CustomEvent('maskviewchange', {
       detail: {value: [this.#fillOpacity, this.#contourThickness]}
     }));
-  }
-
-  /**
-   * Get the middle index of the current image.
-   *
-   * @returns {Index} The middle index.
-   */
-  #getMiddleIndex() {
-    const geometry = this.#image.getGeometry();
-    const size = geometry.getSize();
-    const values = new Array(size.length());
-    values.fill(0);
-    // middle
-    values[0] = Math.floor(size.get(0) / 2);
-    values[1] = Math.floor(size.get(1) / 2);
-    values[2] = Math.floor(size.get(2) / 2);
-    return size.normaliseIndex(new Index(values));
   }
 
   /**

@@ -104,8 +104,10 @@ export class DicomBufferToData {
    *
    * @param {number} index The data index.
    * @param {string} origin The data origin.
+   * @param {number} [firstDecodedFrame] The number of the first
+   *   decoded frame, if the buffer is only partially filled.
    */
-  #generateData(index, origin) {
+  #generateData(index, origin, firstDecodedFrame) {
     const dataElements = this.#dicomParserStore[index].getDicomElements();
     // create data
     const data = new DicomData(dataElements);
@@ -113,6 +115,7 @@ export class DicomBufferToData {
       data.buffer = this.#finalBufferStore[index];
     }
     data.numberOfFiles = this.#options.numberOfFiles;
+    data.firstDecodedFrame = firstDecodedFrame;
 
     // call onloaditem
     this.onloaditem({
@@ -337,7 +340,11 @@ export class DicomBufferToData {
     // create data for the first decoded item (the buffer
     // is filled in place by the following ones)
     if (numberOfDecodedItems === 1) {
-      this.#generateData(dataIndex, origin);
+      let firstDecodedFrame;
+      if (event.numberOfItems !== 1) {
+        firstDecodedFrame = event.itemNumber;
+      }
+      this.#generateData(dataIndex, origin, firstDecodedFrame);
     }
 
     // send onload and onloadend when all items have been decoded

@@ -2,6 +2,7 @@ import {RescaleSlopeAndIntercept} from './rsi.js';
 import {WindowLevel} from './windowLevel.js';
 import {WindowPreset} from './windowPreset.js';
 import {Image} from './image.js';
+import {Index} from '../math/index.js';
 import {ColourMap} from './luts.js';
 import {
   point3DFromArray,
@@ -313,10 +314,12 @@ export class ImageFactory {
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
    * @param {number} numberOfFiles The input number of files.
+   * @param {number} [firstDecodedFrame] The number of the first decoded
+   *   frame, when the pixel buffer is only partially filled.
    * @returns {Image} A new Image.
    * @throws {Error} Error for missing or wrong data.
    */
-  create(dataElements, pixelBuffer, numberOfFiles) {
+  create(dataElements, pixelBuffer, numberOfFiles, firstDecodedFrame) {
     // safe get shortcuts
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
@@ -329,6 +332,9 @@ export class ImageFactory {
     }
 
     let geometry;
+    // frame (encoding order) to slice index, if frames
+    // are sorted by the functional groups geometry
+    let frameSliceIndices;
     // possible geometry from frame functional groups
     const funcGroups =
       getPerFrameFunctionalGroups(dataElements);
@@ -365,6 +371,7 @@ export class ImageFactory {
           }
           return sliceIndex;
         });
+        frameSliceIndices = sliceIndices;
         const needsRemap = sliceIndices.some(function (sliceIndex, f) {
           return sliceIndex !== f;
         });
@@ -409,6 +416,23 @@ export class ImageFactory {
 
     // image
     const image = new Image(geometry, pixelBuffer, [sopInstanceUid]);
+
+    // initial index: middle of the image, on a frame with data
+    // in case of a partially filled buffer
+    const size = geometry.getSize();
+    const values = new Array(size.length()).fill(0);
+    values[0] = Math.floor(size.get(0) / 2);
+    values[1] = Math.floor(size.get(1) / 2);
+    if (typeof firstDecodedFrame === 'undefined') {
+      values[2] = Math.floor(size.get(2) / 2);
+    } else if (typeof frameSliceIndices !== 'undefined') {
+      // frames along the third dimension
+      values[2] = frameSliceIndices[firstDecodedFrame];
+    } else if (values.length > 3) {
+      // frames along the fourth dimension
+      values[3] = firstDecodedFrame;
+    }
+    image.setInitialIndex(new Index(values));
 
     // PhotometricInterpretation
     const photo = getPhotometricInterpretation(dataElements);

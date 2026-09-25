@@ -272,6 +272,14 @@ export class Image extends EventTarget {
   #complete = false;
 
   /**
+   * Initial index, used as default position by views.
+   * If undefined, the middle of the image is used.
+   *
+   * @type {Index|undefined}
+   */
+  #initialIndex;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -310,6 +318,35 @@ export class Image extends EventTarget {
    */
   getComplete() {
     return this.#complete;
+  }
+
+  /**
+   * Set the initial index, used as default position by views.
+   * Should point to a slice/frame with data.
+   *
+   * @param {Index} index The index.
+   */
+  setInitialIndex(index) {
+    this.#initialIndex = index;
+  }
+
+  /**
+   * Get the initial index, used as default position by views.
+   * Defaults to the middle of the image (first frame for 4D)
+   * if not set.
+   *
+   * @returns {Index} The index.
+   */
+  getInitialIndex() {
+    if (typeof this.#initialIndex !== 'undefined') {
+      return this.#initialIndex;
+    }
+    const size = this.#geometry.getSize();
+    const values = new Array(size.length()).fill(0);
+    for (let i = 0; i < Math.min(3, values.length); ++i) {
+      values[i] = Math.floor(size.get(i) / 2);
+    }
+    return new Index(values);
   }
 
   /**
@@ -774,6 +811,9 @@ export class Image extends EventTarget {
     copy.setPlanarConfiguration(this.getPlanarConfiguration());
     copy.setPaletteColourMap(structuredClone(this.#paletteColourMap));
     copy.setMeta(structuredClone(this.getMeta()));
+    if (typeof this.#initialIndex !== 'undefined') {
+      copy.setInitialIndex(this.#initialIndex);
+    }
     // return
     return copy;
   }
