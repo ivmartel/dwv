@@ -28,7 +28,8 @@ import {
  * Related DICOM tag keys.
  */
 const TagKeys = {
-  Modality: '00080060'
+  Modality: '00080060',
+  SOPInstanceUID: '00080018'
 };
 
 /**
@@ -112,12 +113,13 @@ export class DicomData {
   numberOfFiles;
 
   /**
-   * Number of the first decoded frame, set when the buffer
-   * is only partially filled at creation (parallel frame decoding).
+   * Frame number, set when the buffer only contains one frame
+   * of a multi-frame data: frames are sent one by one and assembled
+   * by the image (see Image.appendSlice).
    *
    * @type {number|undefined}
    */
-  firstDecodedFrame;
+  frameNumber;
 
   /**
    * List of data creation warning.
@@ -185,14 +187,32 @@ export class DicomData {
     // if there was, then the image must be created when
     // the load finishes via a DicomSliceDataList.buildImage
     if (!this.#hasDuplicateOrigin) {
+      // frames of an already appended file share its meta:
+      // only merge the meta of new files
+      let isNewFile = true;
+      if (typeof data.frameNumber !== 'undefined' &&
+        typeof this.image !== 'undefined') {
+        const sopInstanceUid = safeGet(data.meta, TagKeys.SOPInstanceUID);
+        isNewFile = !this.image.includesImageUid(sopInstanceUid);
+      }
+
       // append image to current image
       if (typeof this.image !== 'undefined' &&
         typeof data.image !== 'undefined'
       ) {
         this.#appendImage(data.image);
+        // frames are not stored for a later rebuild
+        // (see DataController.add)
+        if (this.#hasDuplicateOrigin &&
+          typeof data.frameNumber !== 'undefined') {
+          logger.error('Cannot append frame with duplicate origin, ' +
+            'following data will be ignored');
+        }
       }
 
-      this.#mergeMeta(data.meta);
+      if (isNewFile) {
+        this.#mergeMeta(data.meta);
+      }
     }
   }
 
@@ -203,15 +223,6 @@ export class DicomData {
    */
   #appendImage(image) {
     const geom1 = image.getGeometry();
-
-    // a multi-slice image is a whole new time point (for example one
-    // complete multi-frame 3D dataset per time point): repeated Z
-    // origins across such images are expected, not a duplicate-origin
-    // conflict, so go straight to appendImage.
-    if (geom1.getSize().get(2) > 1) {
-      this.image.appendVolume(image);
-      return;
-    }
 
     // check if append is possible
     const geom0 = this.image.getGeometry();
@@ -690,7 +701,7 @@ export class DataController extends EventTarget {
             data.meta,
             data.buffer,
             data.numberOfFiles,
-            data.firstDecodedFrame
+            data.frameNumber
           );
         }
       }
@@ -744,9 +755,11 @@ export class DataController extends EventTarget {
       // create content
       this.#setDataContent(data);
       // store data for possible processing at complete time
-      // (see markDataAsComplete)
+      // (see markDataAsComplete), not for frames: the slice list
+      // expects one data per file
       if (typeof data.numberOfFiles !== 'undefined' &&
-        data.numberOfFiles > 1) {
+        data.numberOfFiles > 1 &&
+        typeof data.frameNumber === 'undefined') {
         this.#tmpSliceList[dataId] = new DicomSliceDataList();
         // add first data as clone since this data
         // is the base for future appends with no
@@ -882,7 +895,8 @@ export class DataController extends EventTarget {
 
     // store data for possible processing at complete time
     // (see markDataAsComplete)
-    if (typeof this.#tmpSliceList[dataId] !== 'undefined') {
+    if (typeof this.#tmpSliceList[dataId] !== 'undefined' &&
+      typeof data.frameNumber === 'undefined') {
       this.#tmpSliceList[dataId].add(data);
     }
 

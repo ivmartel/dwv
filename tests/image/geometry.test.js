@@ -158,56 +158,6 @@ describe('image', () => {
   });
 
   /**
-   * Tests for {@link Geometry#appendVolume}.
-   *
-   * @function module:tests/image~geometryAppendVolume
-   */
-  test('Geometry appendVolume', () => {
-    const size = new Size([3, 3, 1]);
-    const spacing = new Spacing([1, 1, 1]);
-    const origin0 = new Point3D(0, 0, 0);
-    const origin1 = new Point3D(0, 0, 1);
-    const geometry = new Geometry([origin0], size, spacing);
-    geometry.appendOrigin(origin1, 1);
-    // seed time 0 for the base volume, as Image#appendImage would
-    geometry.setInitialTime(0);
-
-    const volOrigins = [new Point3D(0, 0, 0), new Point3D(0, 0, 1)];
-
-    // mismatched slice count throws
-    assert.throws(
-      () => geometry.appendVolume([new Point3D(0, 0, 0)], 1),
-      /different number of slices/);
-
-    // append time 2 first (out of temporal order arrival)
-    geometry.appendVolume(volOrigins, 2);
-    assert.equal(geometry.getSize().get(3), 2, 'time dimension is 2');
-    assert.equal(
-      geometry.getCurrentTotalNumberOfSlices(), 4, 'total slices is 4');
-    assert.equal(
-      geometry.getCurrentNumberOfSlicesBeforeTime(2), 2,
-      'only time 0 counted before time 2 so far');
-
-    // now append time 1: it must sort between time 0 and time 2
-    geometry.appendVolume(volOrigins, 1);
-    assert.equal(geometry.getSize().get(3), 3, 'time dimension is 3');
-    assert.equal(
-      geometry.getCurrentTotalNumberOfSlices(), 6, 'total slices is 6');
-    assert.equal(
-      geometry.getCurrentNumberOfSlicesBeforeTime(1), 2,
-      'only time 0 counted before time 1');
-    assert.equal(
-      geometry.getCurrentNumberOfSlicesBeforeTime(2), 4,
-      'time 0 and time 1 counted before time 2, even though time 2 ' +
-      'was appended first');
-
-    // duplicate time throws
-    assert.throws(
-      () => geometry.appendVolume(volOrigins, 1),
-      /already exists/);
-  });
-
-  /**
    * Test that {@link Geometry#worldToIndex} resolves the correct
    * slice for an irregularly spaced grid, instead of naively
    * extrapolating from origin #0 with a single rounded spacing value
@@ -501,17 +451,14 @@ describe('image', () => {
     const origin0 = new Point3D(0, 0, 0);
     const origin1 = new Point3D(0, 0, 1);
     const geometry = new Geometry([origin0], size, spacing);
-    // 2 slices for time 0, as Image#appendImage would build it
+    // 2 slices for time 0, as Image#appendSlice would build it
     geometry.appendOrigin(origin1, 1);
     geometry.setInitialTime(0);
 
     // second time point has a different (irregular) slice layout,
     // but the same slice count as time 0
-    const time1Origins = [
-      new Point3D(0, 0, 0),
-      new Point3D(0, 0, 4)
-    ];
-    geometry.appendVolume(time1Origins, 1);
+    geometry.appendFrame(new Point3D(0, 0, 0), 1);
+    geometry.appendOrigin(new Point3D(0, 0, 4), 1, 1);
 
     assert.equal(
       geometry.getSliceIndex(new Point3D(0, 0, 4), 1), 1,

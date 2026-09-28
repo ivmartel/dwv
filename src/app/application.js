@@ -1973,6 +1973,9 @@ export class App extends EventTarget {
             error
           }
         }));
+        // stop the load: following items would fail the same way
+        // (for example all frames of a multi-frame data)
+        this.abortLoad(event.detail.dataid);
         this.dispatchEvent(new CustomEvent('loadend', {
           detail: {
             dataid: event.detail.dataid,

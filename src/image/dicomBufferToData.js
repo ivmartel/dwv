@@ -23,6 +23,8 @@ import {DicomData} from '../app/dataController.js';
  */
 const TagKeys = {
   TransferSyntaxUID: '00020010',
+  Modality: '00080060',
+  NumberOfFrames: '00280008',
   SamplesPerPixel: '00280002',
   PlanarConfiguration: '00280006',
   Rows: '00280010',
@@ -70,13 +72,6 @@ export class DicomBufferToData {
   #dicomParserStore = [];
 
   /**
-   * List of decompressed data sizes.
-   *
-   * @type {number[]}
-   */
-  #decompressedSizes = [];
-
-  /**
    * List of number of decoded items: items can be decoded in any order
    * (decoding is done in parallel), so the item number cannot be used
    * to know if an item is the first or last one to be decoded.
@@ -86,11 +81,12 @@ export class DicomBufferToData {
   #numberOfDecodedItems = [];
 
   /**
-   * Local buffer storage.
+   * List of full buffers for data that is not split into frames
+   * (see #isFrameSplit), filled as items are decoded.
    *
    * @type {TypedArray[]}
    */
-  #finalBufferStore = [];
+  #fullBufferStore = [];
 
   /**
    * Abort flag.
@@ -104,24 +100,38 @@ export class DicomBufferToData {
    *
    * @param {number} index The data index.
    * @param {string} origin The data origin.
-   * @param {number} [firstDecodedFrame] The number of the first
-   *   decoded frame, if the buffer is only partially filled.
+   * @param {TypedArray} [buffer] The pixel buffer.
+   * @param {number} [frameNumber] The frame number if the buffer
+   *   only contains one frame of a multi-frame data.
    */
-  #generateData(index, origin, firstDecodedFrame) {
+  #generateData(index, origin, buffer, frameNumber) {
     const dataElements = this.#dicomParserStore[index].getDicomElements();
     // create data
     const data = new DicomData(dataElements);
-    if (typeof this.#finalBufferStore[index] !== 'undefined') {
-      data.buffer = this.#finalBufferStore[index];
-    }
+    data.buffer = buffer;
     data.numberOfFiles = this.#options.numberOfFiles;
-    data.firstDecodedFrame = firstDecodedFrame;
+    data.frameNumber = frameNumber;
 
     // call onloaditem
     this.onloaditem({
       data,
       source: origin
     });
+  }
+
+  /**
+   * Check if the data should be split into frames: multi-frame
+   * data (apart from DICOM SEG, whose mask is created from the
+   * full buffer) is sent frame by frame and assembled by the image.
+   *
+   * @param {number} index The data index.
+   * @param {number} numberOfFrames The number of frames.
+   * @returns {boolean} True if the data is split into frames.
+   */
+  #isFrameSplit(index, numberOfFrames) {
+    const dataElements = this.#dicomParserStore[index].getDicomElements();
+    return numberOfFrames > 1 &&
+      safeGet(dataElements, TagKeys.Modality) !== 'SEG';
   }
 
   /**
@@ -277,6 +287,11 @@ export class DicomBufferToData {
    * @param {object} event The decoded item event.
    */
   #onDecodedItem(event) {
+    // ignore items decoded before the abort
+    if (this.#aborted) {
+      return;
+    }
+
     const dataIndex = event.index;
     const origin = event.indexOrigin;
 
@@ -292,16 +307,18 @@ export class DicomBufferToData {
       source: origin
     });
 
-    // store decoded data
     const decodedData = event.data[0];
-    if (event.numberOfItems !== 1) {
-      // allocate buffer if not done yet
-      if (typeof this.#decompressedSizes[dataIndex] === 'undefined') {
-        this.#decompressedSizes[dataIndex] = decodedData.length;
-        const fullSize = event.numberOfItems *
-          this.#decompressedSizes[dataIndex];
+    if (this.#isFrameSplit(dataIndex, event.numberOfItems)) {
+      // send the frame
+      this.#generateData(dataIndex, origin, decodedData, event.itemNumber);
+    } else if (event.numberOfItems === 1) {
+      this.#generateData(dataIndex, origin, decodedData);
+    } else {
+      // full buffer: allocate at first decoded item
+      if (typeof this.#fullBufferStore[dataIndex] === 'undefined') {
+        const fullSize = event.numberOfItems * decodedData.length;
         try {
-          this.#finalBufferStore[dataIndex] =
+          this.#fullBufferStore[dataIndex] =
             new decodedData.constructor(fullSize);
         } catch (error) {
           if (error instanceof RangeError) {
@@ -325,26 +342,15 @@ export class DicomBufferToData {
           return;
         }
       }
-      // hoping for all items to have the same size...
-      if (decodedData.length !== this.#decompressedSizes[dataIndex]) {
-        logger.warn(`Unsupported varying decompressed data size: ${
-          decodedData.length } != ${this.#decompressedSizes[dataIndex]}`);
+      // set item data (hoping for all items to have the same size...)
+      this.#fullBufferStore[dataIndex].set(
+        decodedData, decodedData.length * event.itemNumber);
+      // send the data once complete
+      if (numberOfDecodedItems === event.numberOfItems) {
+        this.#generateData(
+          dataIndex, origin, this.#fullBufferStore[dataIndex]);
+        this.#fullBufferStore[dataIndex] = undefined;
       }
-      // set buffer item data
-      this.#finalBufferStore[dataIndex].set(
-        decodedData, this.#decompressedSizes[dataIndex] * event.itemNumber);
-    } else {
-      this.#finalBufferStore[dataIndex] = decodedData;
-    }
-
-    // create data for the first decoded item (the buffer
-    // is filled in place by the following ones)
-    if (numberOfDecodedItems === 1) {
-      let firstDecodedFrame;
-      if (event.numberOfItems !== 1) {
-        firstDecodedFrame = event.itemNumber;
-      }
-      this.#generateData(dataIndex, origin, firstDecodedFrame);
     }
 
     // send onload and onloadend when all items have been decoded
@@ -411,14 +417,27 @@ export class DicomBufferToData {
         }
         // reset decoding state (in case of index reuse)
         this.#numberOfDecodedItems[dataIndex] = 0;
-        this.#decompressedSizes[dataIndex] = undefined;
+        this.#fullBufferStore[dataIndex] = undefined;
         // decode and generate data (asynchronous)
         this.#decodeAndGenerateData(dataIndex, origin, rawBuffer);
       } else {
-        // store buffer
-        this.#finalBufferStore[dataIndex] = rawBuffer[0];
-        // generate data
-        this.#generateData(dataIndex, origin);
+        const pixelBuffer = rawBuffer[0];
+        let numberOfFrames = parseInt(
+          safeGet(elements, TagKeys.NumberOfFrames), 10);
+        if (isNaN(numberOfFrames)) {
+          numberOfFrames = 1;
+        }
+        if (this.#isFrameSplit(dataIndex, numberOfFrames)) {
+          // send one data per frame (buffer views),
+          // stop if aborted by an item handler
+          const frameSize = pixelBuffer.length / numberOfFrames;
+          for (let f = 0; f < numberOfFrames && !this.#aborted; ++f) {
+            this.#generateData(dataIndex, origin,
+              pixelBuffer.subarray(f * frameSize, (f + 1) * frameSize), f);
+          }
+        } else {
+          this.#generateData(dataIndex, origin, pixelBuffer);
+        }
         this.#sendFinalEvents(dataIndex, origin);
       }
     } else {

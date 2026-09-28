@@ -17,7 +17,8 @@ import {getOrientationFromCosines} from '../math/orientation.js';
 import {
   Point3D,
   point3DFromArray,
-  includesPoint3D
+  includesPoint3D,
+  getEqualPoint3DFunction
 } from '../math/point.js';
 import {Index} from '../math/index.js';
 import {
@@ -26,6 +27,7 @@ import {
 } from '../math/number.js';
 import {arraySortEquals} from '../utils/array.js';
 import {logger} from '../utils/logger.js';
+import {getPerFrameFunctionalGroups} from './dicomFunctionalGroup.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
@@ -352,13 +354,62 @@ export function getFramesGeometry(
     geometry.appendOrigin(origins[m], m);
   }
 
-  // stamp a tag-derived time (for example TemporalPositionIndex), so a
-  // whole multi-frame file can later be appended as one timepoint
-  // (see Image.appendVolume)
+  // stamp a tag-derived time (for example TemporalPositionIndex), so
+  // the frames of a multi-frame file are appended to their timepoint
+  // (see ImageFactory getFrameGeometry)
   const time = getVolumeIdTagValue(dataElements);
   if (typeof time !== 'undefined') {
     geometry.setInitialTime(time);
   }
 
   return geometry;
+}
+
+/**
+ * Get the spatially sorted geometry from the per-frame functional groups,
+ *   along with the sorted slice index of each frame.
+ *
+ * @param {DataElements} dataElements The DICOM data elements.
+ * @returns {{geometry: Geometry, frameSliceIndices: number[]}|undefined}
+ *   The sorted geometry and the list of slice indices indexed by frame
+ *   (encoding order) number, undefined if there are no per-frame
+ *   functional groups or if their origins are not unique.
+ * @throws {Error} Error for missing or wrong data.
+ */
+export function getSortedFramesGeometry(dataElements) {
+  const funcGroups = getPerFrameFunctionalGroups(dataElements);
+  if (typeof funcGroups === 'undefined') {
+    return;
+  }
+
+  // check unique origins
+  const frameOrigins = [];
+  for (const funcGroup of funcGroups) {
+    const frameOrigin = point3DFromArray(funcGroup.imagePosPat);
+    if (includesPoint3D(frameOrigins, frameOrigin)) {
+      return;
+    }
+    frameOrigins.push(frameOrigin);
+  }
+
+  const geometry = getFramesGeometry(dataElements, funcGroups);
+  geometry.sortOrigins();
+
+  // frames are in per-frame (encoding) order, which can
+  // differ from the spatial order sortOrigins just applied
+  // to the geometry: work out where each frame now lands
+  const sortedOrigins = geometry.getOrigins();
+  const frameSliceIndices = frameOrigins.map(function (frameOrigin) {
+    const sliceIndex = sortedOrigins.findIndex(
+      getEqualPoint3DFunction(frameOrigin));
+    if (sliceIndex === -1) {
+      throw new Error('Cannot find frame origin in sorted origins');
+    }
+    return sliceIndex;
+  });
+
+  return {
+    geometry,
+    frameSliceIndices
+  };
 }

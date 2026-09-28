@@ -1,9 +1,19 @@
 import {describe, test, assert} from 'vitest';
-import {getFramesGeometry} from '../../src/dicom/dicomGeometry.js';
+import {
+  getFramesGeometry,
+  getSortedFramesGeometry
+} from '../../src/dicom/dicomGeometry.js';
 import {
   getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 import {Point3D} from '../../src/math/point.js';
+import {
+  getStructureElementsList,
+  singleSliceStructure,
+  unsortedMultiframeMultiSliceStructure
+} from '../../dev/dicom/dataStructures.js';
+
+import syntheticData from '/tests/data/synthetic-img.json';
 
 /**
  * Tests for the 'dicom/dicomGeometry.js' file.
@@ -123,5 +133,38 @@ describe('getFramesGeometry', () => {
       );
     }
   );
+
+});
+
+describe('getSortedFramesGeometry', () => {
+  const config = syntheticData[0];
+  const syntax = '1.2.840.10008.1.2.1';
+
+  test('undefined without per-frame functional groups', () => {
+    const elements = getStructureElementsList(
+      config, syntax, singleSliceStructure)[0];
+    assert.isUndefined(getSortedFramesGeometry(elements));
+  });
+
+  test('undefined with duplicate origins', () => {
+    const structure = structuredClone(unsortedMultiframeMultiSliceStructure);
+    structure.genOptions.framePositionOrder = [0, 0, 1, 2, 3];
+    const elements = getStructureElementsList(config, syntax, structure)[0];
+    assert.isUndefined(getSortedFramesGeometry(elements));
+  });
+
+  test('sorted geometry and frame slice indices', () => {
+    const structure = unsortedMultiframeMultiSliceStructure;
+    const order = structure.genOptions.framePositionOrder;
+    const elements = getStructureElementsList(config, syntax, structure)[0];
+    const res = getSortedFramesGeometry(elements);
+    assert.isDefined(res);
+    assert.deepEqual(res.frameSliceIndices, order, 'frame slice indices');
+    const origins = res.geometry.getOrigins();
+    for (let i = 0; i < order.length; ++i) {
+      assert.deepEqual(
+        origins[i].getValues(), [0, 0, i], `slice ${i} origin`);
+    }
+  });
 
 });

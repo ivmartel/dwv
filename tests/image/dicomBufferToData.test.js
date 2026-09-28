@@ -61,13 +61,16 @@ vi.mock('../../src/utils/thread.js', async (importOriginal) => {
 });
 
 import {DicomBufferToData} from '../../src/image/dicomBufferToData.js';
+import {DataController} from '../../src/app/dataController.js';
+import {ImageFactory} from '../../src/image/imageFactory.js';
 import {logger} from '../../src/utils/logger.js';
 import {generateSliceBuffers} from '../../dev/dicom/dicomGenerator.js';
 import {
   dataStructures,
   getStructureBuffers,
   getStructureElementsList,
-  singleSliceStructure
+  singleSliceStructure,
+  unsortedMultiframeMultiSliceStructure
 } from '../../dev/dicom/dataStructures.js';
 
 import syntheticImgData from '/tests/data/synthetic-img.json';
@@ -159,6 +162,123 @@ function getRecordingConverter(options) {
 function eventsOfType(events, type) {
   return events.filter((item) => item.type === type).map(
     (item) => item.event);
+}
+
+/**
+ * Get the reference (uncompressed) frames of a file, in encoding order.
+ *
+ * @param {object} elements The file data elements.
+ * @param {number} numberOfFrames The number of frames.
+ * @returns {number[][]} The frames pixel values.
+ */
+function getReferenceFrames(elements, numberOfFrames) {
+  const pixels = Array.from(elements['7FE00010'].value);
+  const frameSize = pixels.length / numberOfFrames;
+  const frames = [];
+  for (let f = 0; f < numberOfFrames; ++f) {
+    frames.push(pixels.slice(f * frameSize, (f + 1) * frameSize));
+  }
+  return frames;
+}
+
+/**
+ * Get the number of frames per file of a data structure.
+ *
+ * @param {object} structure The data structure.
+ * @returns {number} The number of frames.
+ */
+function getFramesPerFile(structure) {
+  return typeof structure.numberOfFrames !== 'undefined'
+    ? structure.numberOfFrames : 1;
+}
+
+/**
+ * Convert buffers with deferred decoding, then run the decoding
+ * tasks in the given order (uncompressed data is not deferred).
+ *
+ * @param {ArrayBuffer[]} buffers The buffers, one per data index.
+ * @param {Function} sortTasks The pending tasks sort function.
+ * @param {object} [options] Optional converter options.
+ * @param {Function} [setup] Optional converter setup function,
+ *   called with the recording converter before conversion.
+ * @returns {object[]} The recorded events.
+ */
+function convertDeferred(buffers, sortTasks, options, setup) {
+  const {converter, events} = getRecordingConverter(options);
+  if (typeof setup !== 'undefined') {
+    setup(converter);
+  }
+  poolState.deferred = true;
+  poolState.pendingTasks = [];
+  try {
+    for (let i = 0; i < buffers.length; ++i) {
+      converter.convert(buffers[i], `origin${i}`, i);
+    }
+  } finally {
+    poolState.deferred = false;
+  }
+  const tasks = poolState.pendingTasks.slice().sort(sortTasks);
+  poolState.pendingTasks = [];
+  for (const task of tasks) {
+    task.run();
+  }
+  return events;
+}
+
+/**
+ * Get a converter setup function that adds or appends the loaded
+ * data to a data controller, as the app does.
+ *
+ * @param {DataController} dataController The data controller.
+ * @returns {Function} The setup function.
+ */
+function getDataControllerSetup(dataController) {
+  return (converter) => {
+    const record = converter.onloaditem;
+    converter.onloaditem = (event) => {
+      record(event);
+      if (typeof dataController.get('0') === 'undefined') {
+        dataController.add('0', event.data);
+      } else {
+        dataController.update('0', event.data);
+      }
+    };
+  };
+}
+
+/**
+ * Build the reference image of a data structure from its uncompressed
+ * files, without converter nor data controller: one image per frame
+ * appended in encoding order.
+ *
+ * @param {object} config The data configuration.
+ * @param {object} structure The data structure.
+ * @returns {object} The reference image.
+ */
+function getReferenceImage(config, structure) {
+  const elementsList = getStructureElementsList(
+    config, Syntax.ExplicitVRLittleEndian, structure);
+  const numberOfFrames = getFramesPerFile(structure);
+  const factory = new ImageFactory();
+  let image;
+  for (const elements of elementsList) {
+    factory.checkElements(elements);
+    const frames = getReferenceFrames(elements, numberOfFrames);
+    const TypedArray = elements['7FE00010'].value.constructor;
+    for (let f = 0; f < numberOfFrames; ++f) {
+      const frameImage = factory.create(
+        elements,
+        new TypedArray(frames[f]),
+        elementsList.length,
+        numberOfFrames === 1 ? undefined : f);
+      if (typeof image === 'undefined') {
+        image = frameImage;
+      } else {
+        image.appendSlice(frameImage);
+      }
+    }
+  }
+  return image;
 }
 
 // ---------------------------------------------------------------------------
@@ -256,6 +376,36 @@ describe('image', () => {
         events.map((item) => item.type), ['onabort'], 'abort event');
     });
 
+    // the app aborts the load when a frame cannot be added (for example
+    // an unsupported geometry): the following frames should not be sent
+    // (the mock pool abort does not cancel the pending tasks, as a
+    // real worker can have finished before the abort)
+    describe.each([
+      {name: 'uncompressed', syntax: Syntax.ExplicitVRLittleEndian},
+      {name: 'RLE', syntax: Syntax.RLELossless}
+    ])('multi frame: abort at first loaded item, $name', ({syntax}) => {
+
+      test('no more item nor load', () => {
+        const events = convertDeferred(
+          [getBuffer(config, syntax, dataStructures.multiframe)],
+          (a, b) => a.itemNumber - b.itemNumber,
+          undefined,
+          (converter) => {
+            const record = converter.onloaditem;
+            converter.onloaditem = (event) => {
+              record(event);
+              converter.abort();
+            };
+          }
+        );
+        assert.equal(
+          eventsOfType(events, 'onloaditem').length, 1, 'one loaditem');
+        assert.equal(eventsOfType(events, 'onabort').length, 1, 'one abort');
+        assert.equal(eventsOfType(events, 'onload').length, 0, 'no load');
+      });
+
+    });
+
     // decoding itself is tested in tests/decoders/dwv/rle.test.js,
     // test the converter with a monochrome and a RGB image: the latter
     // being the only one that needs the planar configuration
@@ -287,7 +437,7 @@ describe('image', () => {
         );
       });
 
-      test('multi frame: decoded buffer', () => {
+      test('multi frame: one data per frame', () => {
         const structure = dataStructures.multiframe;
         const numberOfFrames = structure.numberOfFrames;
         const {converter, events} = getRecordingConverter();
@@ -295,7 +445,7 @@ describe('image', () => {
           getBuffer(imgConfig, Syntax.RLELossless, structure),
           'origin0', 0);
 
-        // one progress per frame
+        // one progress and data per frame
         const progress = eventsOfType(events, 'onprogress');
         assert.equal(progress.length, numberOfFrames, 'progress count');
         for (let i = 0; i < numberOfFrames; ++i) {
@@ -303,118 +453,161 @@ describe('image', () => {
           assert.equal(
             progress[i].total, numberOfFrames, `progress ${i} total`);
         }
-        // data generated once, load sent once
-        assert.equal(
-          eventsOfType(events, 'onloaditem').length, 1, 'one loaditem');
+        const items = eventsOfType(events, 'onloaditem');
+        assert.equal(items.length, numberOfFrames, 'one loaditem per frame');
+        // load sent once
         assert.equal(eventsOfType(events, 'onload').length, 1, 'one load');
         assert.equal(
           eventsOfType(events, 'onloadend').length, 1, 'one loadend');
         assert.equal(
           eventsOfType(events, 'onerror').length, 0, 'no error');
 
-        // buffer is filled after the first item (shared reference)
-        const data = eventsOfType(events, 'onloaditem')[0].data;
-        assert.deepEqual(
-          Array.from(data.buffer),
-          getReferencePixels(imgConfig, structure),
-          'decoded buffer matches generated pixels'
-        );
+        const refFrames = getReferenceFrames(
+          getStructureElementsList(
+            imgConfig, Syntax.ExplicitVRLittleEndian, structure)[0],
+          numberOfFrames);
+        for (let i = 0; i < numberOfFrames; ++i) {
+          const data = items[i].data;
+          assert.equal(data.frameNumber, i, `item ${i} frame number`);
+          assert.deepEqual(
+            Array.from(data.buffer), refFrames[i],
+            `item ${i} buffer matches generated frame`);
+        }
       });
 
     });
 
     // same data structures as the ImageFactory creation tests, each
     // file converted in turn by the same converter (as DicomDataLoader)
-    describe.each(Object.values(dataStructures))(
-      'RLE structure: $name', (structure) => {
+    describe.each([
+      {name: 'uncompressed', syntax: Syntax.ExplicitVRLittleEndian},
+      {name: 'RLE', syntax: Syntax.RLELossless}
+    ])('$name', ({syntax}) => {
 
-        const framesPerFile = typeof structure.numberOfFrames !== 'undefined'
-          ? structure.numberOfFrames : 1;
+      describe.each(Object.values(dataStructures))(
+        'structure: $name', (structure) => {
 
-        let refElementsList;
+          const framesPerFile = getFramesPerFile(structure);
+
+          let refElementsList;
+          let events;
+
+          beforeAll(() => {
+            refElementsList = getStructureElementsList(
+              config, Syntax.ExplicitVRLittleEndian, structure);
+            const buffers = getStructureBuffers(config, syntax, structure);
+
+            const recording = getRecordingConverter(
+              {numberOfFiles: buffers.length});
+            events = recording.events;
+            for (let i = 0; i < buffers.length; ++i) {
+              recording.converter.convert(buffers[i], `origin${i}`, i);
+            }
+          });
+
+          test('one load per file, one data per frame, no error', () => {
+            const numberOfFiles = refElementsList.length;
+            assert.equal(
+              eventsOfType(events, 'onloadstart').length, numberOfFiles,
+              'one loadstart per file');
+            assert.equal(
+              eventsOfType(events, 'onloaditem').length,
+              numberOfFiles * framesPerFile,
+              'one loaditem per frame');
+            assert.equal(
+              eventsOfType(events, 'onload').length, numberOfFiles,
+              'one load per file');
+            assert.equal(
+              eventsOfType(events, 'onloadend').length, numberOfFiles,
+              'one loadend per file');
+            assert.equal(
+              eventsOfType(events, 'onerror').length, 0, 'no error');
+          });
+
+          test('each data has its file meta and frame buffer', () => {
+            const items = eventsOfType(events, 'onloaditem');
+            for (let i = 0; i < items.length; ++i) {
+              const fileIndex = Math.floor(i / framesPerFile);
+              const frameIndex = i % framesPerFile;
+              const refElements = refElementsList[fileIndex];
+              const data = items[i].data;
+              assert.equal(
+                items[i].source, `origin${fileIndex}`, `item ${i} source`);
+              assert.equal(
+                data.numberOfFiles, refElementsList.length,
+                `item ${i} numberOfFiles`);
+              assert.equal(
+                data.meta['00080018'].value[0],
+                refElements['00080018'].value[0],
+                `item ${i} SOPInstanceUID`);
+              if (framesPerFile === 1) {
+                assert.isUndefined(data.frameNumber, `item ${i} frame number`);
+              } else {
+                assert.equal(
+                  data.frameNumber, frameIndex, `item ${i} frame number`);
+              }
+              assert.deepEqual(
+                Array.from(data.buffer),
+                getReferenceFrames(refElements, framesPerFile)[frameIndex],
+                `item ${i} buffer matches generated frame`);
+            }
+          });
+
+        });
+
+      // assembled image: frames decoded in reverse order (across files),
+      // data added as it arrives (as the app does), the result
+      // should be the same as the one built from the full files
+      describe.each([
+        ...Object.values(dataStructures),
+        unsortedMultiframeMultiSliceStructure
+      ])('assembled structure: $name', (structure) => {
+
+        let image;
+        let refImage;
         let events;
 
         beforeAll(() => {
-          refElementsList = getStructureElementsList(
-            config, Syntax.ExplicitVRLittleEndian, structure);
-          const buffers = getStructureBuffers(
-            config, Syntax.RLELossless, structure);
-
-          const recording = getRecordingConverter(
-            {numberOfFiles: buffers.length});
-          events = recording.events;
-          for (let i = 0; i < buffers.length; ++i) {
-            recording.converter.convert(buffers[i], `origin${i}`, i);
-          }
+          const buffers = getStructureBuffers(config, syntax, structure);
+          const dataController = new DataController();
+          events = convertDeferred(
+            buffers,
+            (a, b) => (b.itemNumber - a.itemNumber) || (b.index - a.index),
+            {numberOfFiles: buffers.length},
+            getDataControllerSetup(dataController)
+          );
+          dataController.markDataAsComplete('0');
+          image = dataController.get('0').image;
+          refImage = getReferenceImage(config, structure);
         });
 
-        test('one load per file, no error', () => {
-          const numberOfFiles = refElementsList.length;
-          assert.equal(
-            eventsOfType(events, 'onloadstart').length, numberOfFiles,
-            'one loadstart per file');
-          assert.equal(
-            eventsOfType(events, 'onloaditem').length, numberOfFiles,
-            'one loaditem per file');
-          assert.equal(
-            eventsOfType(events, 'onload').length, numberOfFiles,
-            'one load per file');
-          assert.equal(
-            eventsOfType(events, 'onloadend').length, numberOfFiles,
-            'one loadend per file');
+        test('no error', () => {
           assert.equal(
             eventsOfType(events, 'onerror').length, 0, 'no error');
         });
 
-        test('one progress per frame', () => {
-          const progress = eventsOfType(events, 'onprogress');
-          assert.equal(
-            progress.length, refElementsList.length * framesPerFile,
-            'progress count');
-          for (let i = 0; i < progress.length; ++i) {
-            const fileIndex = Math.floor(i / framesPerFile);
-            const frameIndex = i % framesPerFile;
-            assert.equal(progress[i].index, fileIndex, `progress ${i} index`);
-            assert.equal(
-              progress[i].loaded, frameIndex + 1, `progress ${i} loaded`);
-            assert.equal(
-              progress[i].total, framesPerFile, `progress ${i} total`);
-          }
+        test('same size and origins', () => {
+          assert.deepEqual(
+            image.getGeometry().getSize().getValues(),
+            refImage.getGeometry().getSize().getValues(),
+            'size');
+          assert.deepEqual(
+            image.getGeometry().getOrigins().map((item) => item.getValues()),
+            refImage.getGeometry().getOrigins().map(
+              (item) => item.getValues()),
+            'origins');
         });
 
-        test('each file data has its own meta and decoded buffer', () => {
-          const items = eventsOfType(events, 'onloaditem');
-          for (let i = 0; i < items.length; ++i) {
-            const refElements = refElementsList[i];
-            const data = items[i].data;
-            assert.equal(items[i].source, `origin${i}`, `file ${i} source`);
-            assert.equal(
-              data.numberOfFiles, refElementsList.length,
-              `file ${i} numberOfFiles`);
-            assert.equal(
-              data.meta['00080018'].value[0],
-              refElements['00080018'].value[0],
-              `file ${i} SOPInstanceUID`);
-            assert.equal(
-              data.meta['00200013'].value[0],
-              refElements['00200013'].value[0],
-              `file ${i} InstanceNumber`);
-            assert.deepEqual(
-              Array.from(data.buffer),
-              Array.from(refElements['7FE00010'].value),
-              `file ${i} decoded buffer matches generated pixels`);
-          }
-          // sanity check the generated data actually varies per file,
-          // otherwise a mix-up between data indices would go unnoticed
-          if (items.length > 1) {
-            assert.notDeepEqual(
-              Array.from(items[0].data.buffer),
-              Array.from(items[1].data.buffer),
-              'file 0 and file 1 buffers differ');
-          }
+        test('same buffer', () => {
+          assert.deepEqual(
+            Array.from(image.getBuffer()),
+            Array.from(refImage.getBuffer()),
+            'buffer');
         });
 
       });
+
+    });
 
     test('RLE: several data indices on one converter', () => {
       const {converter, events} = getRecordingConverter();
@@ -428,19 +621,24 @@ describe('image', () => {
         getBuffer(config1, Syntax.RLELossless, structure1), 'origin1', 1);
 
       const items = eventsOfType(events, 'onloaditem');
-      assert.equal(items.length, 2, 'one loaditem per data');
-      assert.equal(items[0].source, 'origin0', 'first source');
-      assert.equal(items[1].source, 'origin1', 'second source');
-      assert.deepEqual(
-        Array.from(items[0].data.buffer),
-        getReferencePixels(config, structure0),
-        'first buffer'
-      );
-      assert.deepEqual(
-        Array.from(items[1].data.buffer),
-        getReferencePixels(config1, structure1),
-        'second buffer'
-      );
+      assert.equal(
+        items.length,
+        structure0.numberOfFrames + structure1.numberOfFrames,
+        'one loaditem per frame');
+      const cases = [
+        {origin: 'origin0', imgConfig: config, structure: structure0},
+        {origin: 'origin1', imgConfig: config1, structure: structure1}
+      ];
+      for (const {origin, imgConfig, structure} of cases) {
+        const refFrames = getReferenceFrames(
+          getStructureElementsList(
+            imgConfig, Syntax.ExplicitVRLittleEndian, structure)[0],
+          structure.numberOfFrames);
+        const frames = items.filter((item) => item.source === origin);
+        assert.deepEqual(
+          frames.map((item) => Array.from(item.data.buffer)), refFrames,
+          `${origin} frames`);
+      }
     });
 
     describe('RLE: items decoded in any order', () => {
@@ -448,34 +646,7 @@ describe('image', () => {
       const structure = dataStructures.multiframe;
       const numberOfFrames = structure.numberOfFrames;
 
-      /**
-       * Convert buffers with deferred decoding, then run the decoding
-       * tasks in the given order.
-       *
-       * @param {ArrayBuffer[]} buffers The buffers, one per data index.
-       * @param {Function} sortTasks The pending tasks sort function.
-       * @returns {object[]} The recorded events.
-       */
-      function convertDeferred(buffers, sortTasks) {
-        const {converter, events} = getRecordingConverter();
-        poolState.deferred = true;
-        poolState.pendingTasks = [];
-        try {
-          for (let i = 0; i < buffers.length; ++i) {
-            converter.convert(buffers[i], `origin${i}`, i);
-          }
-        } finally {
-          poolState.deferred = false;
-        }
-        const tasks = poolState.pendingTasks.slice().sort(sortTasks);
-        poolState.pendingTasks = [];
-        for (const task of tasks) {
-          task.run();
-        }
-        return events;
-      }
-
-      test('reverse order: data once, load after the last item', () => {
+      test('reverse order: data per frame, load after the last item', () => {
         const events = convertDeferred(
           [getBuffer(config, Syntax.RLELossless, structure)],
           (a, b) => b.itemNumber - a.itemNumber
@@ -488,7 +659,9 @@ describe('image', () => {
             'onprogress',
             'onloaditem',
             'onprogress',
+            'onloaditem',
             'onprogress',
+            'onloaditem',
             'onload',
             'onloadend'
           ],
@@ -501,13 +674,19 @@ describe('image', () => {
         assert.equal(
           progress[0].total, numberOfFrames, 'progress total');
 
-        // buffer is filled after the first item (shared reference)
-        const data = eventsOfType(events, 'onloaditem')[0].data;
+        const items = eventsOfType(events, 'onloaditem');
         assert.deepEqual(
-          Array.from(data.buffer),
-          getReferencePixels(config, structure),
-          'decoded buffer matches generated pixels'
-        );
+          items.map((item) => item.data.frameNumber), [2, 1, 0],
+          'frame numbers in decoding order');
+        const refFrames = getReferenceFrames(
+          getStructureElementsList(
+            config, Syntax.ExplicitVRLittleEndian, structure)[0],
+          numberOfFrames);
+        for (const item of items) {
+          assert.deepEqual(
+            Array.from(item.data.buffer), refFrames[item.data.frameNumber],
+            `frame ${item.data.frameNumber} buffer`);
+        }
       });
 
       test('interleaved data indices', () => {
@@ -522,7 +701,7 @@ describe('image', () => {
         );
 
         const items = eventsOfType(events, 'onloaditem');
-        assert.equal(items.length, 2, 'one loaditem per data');
+        assert.equal(items.length, 2 * numberOfFrames, 'one item per frame');
         assert.equal(eventsOfType(events, 'onload').length, 2, 'two loads');
         assert.equal(
           eventsOfType(events, 'onloadend').length, 2, 'two loadends');
@@ -536,20 +715,22 @@ describe('image', () => {
           assert.ok(
             lastProgress < load, `index ${index} load after its items`);
         }
-        const byOrigin = {};
-        for (const item of items) {
-          byOrigin[item.source] = item.data;
+        const cases = [
+          {origin: 'origin0', imgConfig: config},
+          {origin: 'origin1', imgConfig: config1}
+        ];
+        for (const {origin, imgConfig} of cases) {
+          const refFrames = getReferenceFrames(
+            getStructureElementsList(
+              imgConfig, Syntax.ExplicitVRLittleEndian, structure)[0],
+            numberOfFrames);
+          for (const item of items.filter((it) => it.source === origin)) {
+            assert.deepEqual(
+              Array.from(item.data.buffer),
+              refFrames[item.data.frameNumber],
+              `${origin} frame ${item.data.frameNumber} buffer`);
+          }
         }
-        assert.deepEqual(
-          Array.from(byOrigin.origin0.buffer),
-          getReferencePixels(config, structure),
-          'first data buffer'
-        );
-        assert.deepEqual(
-          Array.from(byOrigin.origin1.buffer),
-          getReferencePixels(config1, structure),
-          'second data buffer'
-        );
       });
 
     });

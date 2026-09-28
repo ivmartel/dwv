@@ -4,7 +4,6 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Image} from '../../src/image/image.js';
-import {Index} from '../../src/math/index.js';
 import {View} from '../../src/image/view.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
@@ -388,16 +387,10 @@ describe('image', () => {
     const imgSize0 = new Size([4, 4, 1, 5]);
     const imgGeometry0 = new Geometry([imgOrigin], imgSize0, imgSpacing);
     const buffer0 = new Uint8Array(imgSize0.getTotalSize());
-    // no initial index: middle index
-    const image00 = new Image(imgGeometry0, buffer0);
-    const view00 = new View(image00);
-    assert.deepEqual(view00.getCurrentIndex().getValues(), [2, 2, 0, 0],
-      '4D default index');
-    // initial index: use it
-    const image01 = new Image(imgGeometry0, buffer0);
-    image01.setInitialIndex(new Index([2, 2, 0, 3]));
-    const view01 = new View(image01);
-    assert.deepEqual(view01.getCurrentIndex().getValues(), [2, 2, 0, 3],
+    // middle index, first frame
+    const image0 = new Image(imgGeometry0, buffer0);
+    const view0 = new View(image0);
+    assert.deepEqual(view0.getCurrentIndex().getValues(), [2, 2, 0, 0],
       '4D initial index');
 
     // 3D (frames along third dimension)
@@ -408,16 +401,10 @@ describe('image', () => {
     }
     const imgGeometry1 = new Geometry(origins, imgSize1, imgSpacing);
     const buffer1 = new Uint8Array(imgSize1.getTotalSize());
-    // no initial index: middle index
-    const image10 = new Image(imgGeometry1, buffer1);
-    const view10 = new View(image10);
-    assert.deepEqual(view10.getCurrentIndex().getValues(), [2, 2, 2],
-      '3D default index');
-    // initial index: use it
-    const image11 = new Image(imgGeometry1, buffer1);
-    image11.setInitialIndex(new Index([2, 2, 4]));
-    const view11 = new View(image11);
-    assert.deepEqual(view11.getCurrentIndex().getValues(), [2, 2, 4],
+    // middle index
+    const image1 = new Image(imgGeometry1, buffer1);
+    const view1 = new View(image1);
+    assert.deepEqual(view1.getCurrentIndex().getValues(), [2, 2, 2],
       '3D initial index');
   });
 

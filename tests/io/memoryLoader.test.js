@@ -24,9 +24,14 @@ describe('io', () => {
    * @param {Array} data The data to load as a string array.
    * @param {number} nData The theoretical number of data.
    * @param {number} nDataOk The theoretical number of data with no error.
+   * @param {number} [nItems] The theoretical number of load items,
+   *   defaults to nDataOk (multi-frame data sends one item per frame).
    * @returns {Promise} The load promise.
    */
-  async function checkLoad(id, data, nData, nDataOk) {
+  async function checkLoad(id, data, nData, nDataOk, nItems) {
+    if (typeof nItems === 'undefined') {
+      nItems = nDataOk;
+    }
 
     return new Promise((resolve) => {
 
@@ -70,7 +75,7 @@ describe('io', () => {
           assert.ok(progressDates.length > 0,
             `${prefix}Received at least one progress.`);
         }
-        assert.equal(loadItemDates.length, nDataOk,
+        assert.equal(loadItemDates.length, nItems,
           `${prefix}Received loaditem.`);
         const nLoad = nDataError === 0 ? 1 : 0;
         assert.equal(loadDates.length, nLoad,
@@ -232,7 +237,9 @@ describe('io', () => {
       ];
       const nData0 = data0.length;
       const nDataOk0 = nData0;
-      await checkLoad('0', data0, nData0, nDataOk0);
+      // one item per frame
+      const nItems0 = 16;
+      await checkLoad('0', data0, nData0, nDataOk0, nItems0);
 
       // #1: encoded multi frame
       // TODO seems to cause problems to phantomjs...
