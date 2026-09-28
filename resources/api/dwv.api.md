@@ -82,8 +82,6 @@ export class App extends EventTarget {
     // @deprecated
     addToUndoStack: (cmd: Command) => void;
     // @deprecated
-    applyJsonState(jsonState: string, dataId: string): void;
-    // @deprecated
     canScroll(): boolean;
     // @deprecated
     canWindowLevel(): boolean;
@@ -178,8 +176,6 @@ export class App extends EventTarget {
     // @deprecated
     setDataViewConfigs(configs: Record<string, ViewConfig[]>): void;
     // @deprecated
-    setDrawings(drawings: any[], drawingsDetails: any[], dataId: string): void;
-    // @deprecated
     setImage(dataId: string, img: Image_2): void;
     // @deprecated
     setImageSmoothing(flag: boolean): void;
@@ -238,7 +234,7 @@ export class CADReport {
 
 // @public
 export class ChangeSegmentColourCommand extends Command {
-    constructor(mask: Image_2, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
+    constructor(mask: MaskImage, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
     isValid(): boolean;
     onExecute(_event: object): void;
     onUndo(_event: object): void;
@@ -271,15 +267,6 @@ export class Command {
     getName(): string;
     undo(): void;
 }
-
-// @public
-export function createImage(elements: Record<string, DataElement>): Image_2;
-
-// @public
-export function createMaskImage(elements: Record<string, DataElement>): Image_2;
-
-// @public
-export function createView(elements: Record<string, DataElement>, image: Image_2): View;
 
 // @public (undocumented)
 export namespace custom {
@@ -346,11 +333,20 @@ export const defaultToolOptions: Record<string, Record<string, any>>;
 
 // @public
 export class DeleteSegmentCommand extends Command {
-    constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
+    constructor(mask: MaskImage, segment: MaskSegment, silent?: boolean);
     isValid(): boolean;
     onExecute(_event: object): void;
     onUndo(_event: object): void;
 }
+
+// @public
+export function demoCreateImage(elements: Record<string, DataElement>): Image_2;
+
+// @public
+export function demoCreateMaskImage(elements: Record<string, DataElement>): MaskImage;
+
+// @public
+export function demoCreateView(elements: Record<string, DataElement>, image: Image_2): View;
 
 // @public
 export class Diameter {
@@ -382,6 +378,7 @@ export class DicomData {
     annotationGroup: AnnotationGroup | undefined;
     appendData(data: DicomData): void;
     buffer: any | undefined;
+    frameNumber: number | undefined;
     getComplete(): boolean | undefined;
     hasDuplicateOrigin(): boolean;
     image: Image_2 | undefined;
@@ -436,7 +433,7 @@ export class DrawBrushCommand extends Command {
 export class DrawBrushCommandProperties {
     dataId: string;
     isSilent: boolean;
-    mask: Image_2;
+    mask: MaskImage;
     mode: string;
     offsetsLists: number[][];
     originalValuesLists: any[];
@@ -543,10 +540,8 @@ export class Geometry {
     constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     appendFrame(origin: Point3D, time: number): void;
     appendOrigin(origin: Point3D, index: number, time?: number): void;
-    appendVolume(origins: Point3D[], time: number): void;
     canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
     canAppendSlice(rhs: Geometry): BooleanResult;
-    canAppendVolume(rhs: Geometry): BooleanResult;
     clone(): Geometry;
     equals(rhs: Geometry): boolean;
     getCurrentNumberOfSlicesBeforeTime(time: number): number | undefined;
@@ -558,7 +553,7 @@ export class Geometry {
     getRange(): Point[];
     getRealSpacing(): Spacing;
     getSize(viewOrientation?: Matrix33): Size;
-    getSliceIndex(point: Point3D, time?: number): number;
+    getSliceIndex(origin: Point3D, time?: number): number;
     getSpacing(viewOrientation?: Matrix33): Spacing;
     hasSlicesAtTime(time: number): boolean;
     includesOrigin(point3D: Point3D, tol?: number): boolean;
@@ -676,12 +671,10 @@ class Image_2 extends EventTarget {
     appendFrame(time: number, origin: Point3D): void;
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
     appendSlice(rhs: Image_2): void;
-    appendVolume(rhs: Image_2): void;
     calculateDataRange(): object;
     calculateHistogram(): object;
     calculateRescaledDataRange(): object;
     canAppendSlice(rhs: Image_2): BooleanResult;
-    canAppendVolume(rhs: Image_2): BooleanResult;
     canQuantify(): boolean;
     canScroll(viewOrientation: Matrix33): boolean;
     // @deprecated
@@ -693,16 +686,15 @@ class Image_2 extends EventTarget {
     convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
     getComplete(): boolean;
-    getContour(): ImageContour;
     getDataRange(): NumberRange;
     getGeometry(): Geometry;
+    // @deprecated
     getHasOverlap(): boolean;
     getHistogram(): any[];
     getImageUid(index?: Index): string;
-    getMaskReferencedSeriesUID(): string | undefined;
+    getInitialIndex(): Index;
     getMeta(): Record<string, any>;
     getNumberOfComponents(): number;
-    getOffsets(value: number | RGB): number[];
     getOriginForImageUid(uid: string): Point3D | undefined;
     getPaletteColourMap(): ColourMap;
     getPhotometricInterpretation(): string;
@@ -713,32 +705,26 @@ class Image_2 extends EventTarget {
     getRescaledValueAtOffset(offset: number): number;
     getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     getSecondaryOffset(index: Index): number;
-    getSegmentCollection(): SegmentCollection | undefined;
     getValue(i: number, j: number, k: number, f?: number): number;
     getValueAtIndex(index: Index): number;
     getValueAtOffset(offset: number): number;
     hasValues(values: any[]): boolean[];
     includesImageUid(uid: string): boolean;
-    initializeContour(): void;
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
+    // @deprecated
     isMask(): boolean;
     isMonochrome(): boolean;
     isResampled(): boolean;
-    recalculateLabels(): void;
+    replaceBuffer(newBuffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
     resample(orientation: Matrix33, interpolated?: boolean | undefined, centerOfRotation?: Point | undefined): void;
     revert(): void;
-    setAtOffsets(offsets: number[], value: number | RGB): void;
-    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
-    setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
     setComplete(flag: boolean): void;
     setMeta(rhs: Record<string, any>): void;
     setPaletteColourMap(map: ColourMap): void;
     setPhotometricInterpretation(interp: string): void;
     setPlanarConfiguration(config: number): void;
     setRescaleSlopeAndIntercept(inRsi: RescaleSlopeAndIntercept, offset?: number): void;
-    setSegmentCollection(collection: SegmentCollection): void;
-    setupSegmentCollection(): void;
     transform(operator: Function): Image_2;
     updatePaletteColourMap(index: number, colour: RGB): void;
 }
@@ -903,9 +889,25 @@ export const luts: Record<string, ColourMap>;
 // @public
 export class MaskFactory {
     checkElements(_dicomElements: Record<string, DataElement>): string | undefined;
-    create(dataElements: Record<string, DataElement>, pixelBuffer: Uint8Array, refImage?: Image_2): Image_2;
+    create(dataElements: Record<string, DataElement>, pixelBuffer: Uint8Array, refImage?: Image_2): MaskImage;
     getWarning(): string | undefined;
-    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
+    toDicom(image: MaskImage, segments: MaskSegment[], sourceImage: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
+}
+
+// @public
+export class MaskImage extends Image_2 {
+    constructor(geometry: Geometry, buffer: Uint8Array, imageUids?: string[], segmentCollection?: SegmentCollection);
+    clone(): MaskImage;
+    getContour(): ImageContour;
+    getMaskReferencedSeriesUID(): string | undefined;
+    getOffsets(value: number | RGB): number[];
+    getSegmentCollection(): SegmentCollection;
+    initializeContour(): void;
+    recalculateLabels(): void;
+    setAtOffsets(offsets: number[], value: number | RGB): void;
+    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
+    setAtOffsetsWithValues(offsets: number[], values: number[]): void;
 }
 
 // @public
@@ -927,7 +929,7 @@ export class MaskSegment {
 
 // @public
 export class MaskSegmentHelper {
-    constructor(mask: Image_2);
+    constructor(mask: MaskImage);
     addSegment(segment: MaskSegment): void;
     findOverlap(rhs: MaskSegmentHelper): Record<number, {
         label: string;
@@ -938,7 +940,7 @@ export class MaskSegmentHelper {
         }>;
         count: number;
     }>;
-    getMask(): Image_2;
+    getMask(): MaskImage;
     getNumberOfSegments(): number;
     getSegment(segmentNumber: number): MaskSegment | undefined;
     hasSegment(segmentNumber: number): boolean;
@@ -978,7 +980,7 @@ export class Matrix33 {
 }
 
 // @public
-export function mergeMaskImages(mask1: Image_2, mask2: Image_2): Image_2;
+export function mergeMaskImages(mask1: MaskImage, mask2: MaskImage): MaskImage;
 
 // @public
 export function mergeTagValues(list1: SimpleTagValues, list2: SimpleTagValues): void;
@@ -1202,9 +1204,9 @@ export class RTROIContour {
 // @public
 export class RtStructFactory {
     checkElements(_dataElements: Record<string, DataElement>): string | undefined;
-    create(dataElements: Record<string, DataElement>, refImage: Image_2): Image_2;
+    create(dataElements: Record<string, DataElement>, refImage: Image_2): MaskImage;
     getWarning(): string | undefined;
-    toDicom(image: Image_2, segments?: MaskSegment[], sourceImage?: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
+    toDicom(image: MaskImage, segments?: MaskSegment[], sourceImage?: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
 }
 
 // @public
@@ -1235,12 +1237,16 @@ export class ScrollWheelBehavior extends WheelBehavior {
 export class SegmentCollection {
     constructor(geometry: Geometry);
     addFrame(segNumber: number, pixelBuffer: Uint8Array, frameOffset: number, sliceIndex: number, sliceSize: number, value: number): void;
+    clone(): SegmentCollection;
     getAll(): Map<number, Map<number, Uint8Array>>;
     getHasOverlap(): boolean;
     getLabelMap(): Uint8Array;
     getOrBuildUnionContour(segmentViewHelper: MaskSegmentViewHelper | undefined, imageSize: Size): ImageContour;
+    getOtherValueAtOffset(offset: number, excludeSegmentNumber: number): number;
     getSegmentBuffers(segments: MaskSegment[]): Record<string, Record<number, Uint8Array>>;
     setLabelMap(buffer: Uint8Array): void;
+    shiftSlices(sliceIndexThreshold: number, numberOfSlices: number): void;
+    updateAtOffset(offset: number, previousValue: number, newValue: number): void;
 }
 
 // @public
@@ -1369,7 +1375,7 @@ export class ToolboxController {
     bindLayerGroup(layerGroup: LayerGroup, layer: ViewLayer | DrawLayer): void;
     enableShortcuts(flag: boolean): void;
     getSelectedTool(): object;
-    getSelectedToolEventHandler(eventType: string): EventListener;
+    getSelectedToolEventHandler(eventType: string): EventListener | undefined;
     getToolList(): any[];
     hasTool(name: string): boolean;
     init(): void;
