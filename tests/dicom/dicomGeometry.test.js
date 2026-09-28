@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi} from 'vitest';
 import {
   getFramesGeometry,
   getSortedFramesGeometry
@@ -7,6 +7,7 @@ import {
   getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 import {Point3D} from '../../src/math/point.js';
+import {logger} from '../../src/utils/logger.js';
 import {
   getStructureElementsList,
   singleSliceStructure,
@@ -133,6 +134,31 @@ describe('getFramesGeometry', () => {
       );
     }
   );
+
+  test('geometric spacing computed on sorted frame origins', () => {
+    // only 2D pixel spacing: slice spacing is computed from origins
+    const elements = getElementsFromSimpleTagValues({
+      Rows: 4,
+      Columns: 4,
+      SharedFunctionalGroupsSequence: {
+        value: [
+          {
+            PlaneOrientationSequence: {
+              value: [{ImageOrientationPatient: [1, 0, 0, 0, 1, 0]}]
+            },
+            PixelMeasuresSequence: {
+              value: [{PixelSpacing: [1, 1]}]
+            }
+          }
+        ]
+      }
+    });
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const geometry = getFramesGeometry(elements, makeFrames([2, 0, 4, 1, 3]));
+    warnSpy.mockRestore();
+    assert.equal(geometry.getSpacing().get(2), 1, 'slice spacing');
+    assert.equal(warnSpy.mock.calls.length, 0, 'no varying spacing warning');
+  });
 
 });
 

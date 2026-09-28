@@ -33,7 +33,7 @@ export const DIRECTION_EPSILON = 1e-6;
  * @param {Matrix33} orientation The orientation matrix.
  * @returns {comparePointFn} The point compare function.
  */
-function getComparePoint3D(orientation) {
+export function getComparePoint3D(orientation) {
   const invOrientation = orientation.getInverse();
   return function (point1, point2) {
     const p1 = invOrientation.multiplyPoint3D(point1);

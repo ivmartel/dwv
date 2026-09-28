@@ -1,9 +1,13 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, afterEach} from 'vitest';
 import {Point3D, Point} from '../../src/math/point.js';
 import {Index} from '../../src/math/index.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
-import {Geometry} from '../../src/image/geometry.js';
+import {
+  Geometry,
+  getSliceGeometrySpacing
+} from '../../src/image/geometry.js';
+import {logger} from '../../src/utils/logger.js';
 import {Matrix33, getIdentityMat33} from '../../src/math/matrix.js';
 import {getOrientationFromCosines} from '../../src/math/orientation.js';
 
@@ -530,6 +534,47 @@ describe('image', () => {
         projectOnNormal(sorted[i]) > projectOnNormal(sorted[i - 1]),
         `origin #${i} is further along the normal than #${i - 1}`);
     }
+  });
+
+});
+
+describe('getSliceGeometrySpacing', () => {
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /**
+   * @param {number[]} zValues The origins Z coordinates.
+   * @returns {Point3D[]} The origins.
+   */
+  function makeOrigins(zValues) {
+    return zValues.map(z => new Point3D(0, 0, z));
+  }
+
+  test('undefined for less than two origins', () => {
+    assert.isUndefined(getSliceGeometrySpacing([]));
+    assert.isUndefined(getSliceGeometrySpacing(makeOrigins([0])));
+  });
+
+  test('throws for zero slice spacing', () => {
+    assert.throws(() => {
+      getSliceGeometrySpacing(makeOrigins([0, 1, 1]));
+    }, /Zero slice spacing/);
+  });
+
+  test('constant spacing, no warning', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    assert.equal(getSliceGeometrySpacing(makeOrigins([0, 2, 4, 6])), 2);
+    assert.equal(warnSpy.mock.calls.length, 0, 'no warning');
+  });
+
+  test('varying spacing: rounded mean and warning', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    // spacings: 1, 2, 4 -> mean 2.3333...
+    assert.equal(getSliceGeometrySpacing(makeOrigins([0, 1, 3, 7])), 2.3333);
+    assert.equal(warnSpy.mock.calls.length, 1, 'one warning');
+    assert.match(warnSpy.mock.calls[0][0], /^Varying slice spacing/);
   });
 
 });

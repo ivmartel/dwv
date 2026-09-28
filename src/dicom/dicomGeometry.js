@@ -2,7 +2,8 @@ import {Size} from '../image/size.js';
 import {Spacing} from '../image/spacing.js';
 import {
   Geometry,
-  getSliceGeometrySpacing
+  getSliceGeometrySpacing,
+  getComparePoint3D
 } from '../image/geometry.js';
 import {safeGet, safeGetAll} from './dataElement.js';
 import {
@@ -325,7 +326,10 @@ export function getFramesGeometry(
   if (typeof completeOrigins === 'undefined' ||
     completeOrigins === false) {
     origins = frameOrigins;
-    const geoSpacing = getSliceGeometrySpacing(origins);
+    // frames can be in any order: compute spacing on sorted origins
+    const sortedOrigins = origins.slice().sort(
+      getComparePoint3D(orientationMatrix));
+    const geoSpacing = getSliceGeometrySpacing(sortedOrigins);
     if (spacing.length() === 2) {
       spacing = new Spacing([spacing.get(0), spacing.get(1), geoSpacing]);
     } else if (spacing.get(2) !== geoSpacing) {
