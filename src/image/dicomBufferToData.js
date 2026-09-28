@@ -287,6 +287,11 @@ export class DicomBufferToData {
    * @param {object} event The decoded item event.
    */
   #onDecodedItem(event) {
+    // ignore items decoded before the abort
+    if (this.#aborted) {
+      return;
+    }
+
     const dataIndex = event.index;
     const origin = event.indexOrigin;
 
@@ -423,9 +428,10 @@ export class DicomBufferToData {
           numberOfFrames = 1;
         }
         if (this.#isFrameSplit(dataIndex, numberOfFrames)) {
-          // send one data per frame (buffer views)
+          // send one data per frame (buffer views),
+          // stop if aborted by an item handler
           const frameSize = pixelBuffer.length / numberOfFrames;
-          for (let f = 0; f < numberOfFrames; ++f) {
+          for (let f = 0; f < numberOfFrames && !this.#aborted; ++f) {
             this.#generateData(dataIndex, origin,
               pixelBuffer.subarray(f * frameSize, (f + 1) * frameSize), f);
           }

@@ -376,6 +376,36 @@ describe('image', () => {
         events.map((item) => item.type), ['onabort'], 'abort event');
     });
 
+    // the app aborts the load when a frame cannot be added (for example
+    // an unsupported geometry): the following frames should not be sent
+    // (the mock pool abort does not cancel the pending tasks, as a
+    // real worker can have finished before the abort)
+    describe.each([
+      {name: 'uncompressed', syntax: Syntax.ExplicitVRLittleEndian},
+      {name: 'RLE', syntax: Syntax.RLELossless}
+    ])('multi frame: abort at first loaded item, $name', ({syntax}) => {
+
+      test('no more item nor load', () => {
+        const events = convertDeferred(
+          [getBuffer(config, syntax, dataStructures.multiframe)],
+          (a, b) => a.itemNumber - b.itemNumber,
+          undefined,
+          (converter) => {
+            const record = converter.onloaditem;
+            converter.onloaditem = (event) => {
+              record(event);
+              converter.abort();
+            };
+          }
+        );
+        assert.equal(
+          eventsOfType(events, 'onloaditem').length, 1, 'one loaditem');
+        assert.equal(eventsOfType(events, 'onabort').length, 1, 'one abort');
+        assert.equal(eventsOfType(events, 'onload').length, 0, 'no load');
+      });
+
+    });
+
     // decoding itself is tested in tests/decoders/dwv/rle.test.js,
     // test the converter with a monochrome and a RGB image: the latter
     // being the only one that needs the planar configuration
