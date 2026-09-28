@@ -2,7 +2,8 @@ import {RescaleSlopeAndIntercept} from './rsi.js';
 import {WindowLevel} from './windowLevel.js';
 import {WindowPreset} from './windowPreset.js';
 import {Image} from './image.js';
-import {Index} from '../math/index.js';
+import {Size} from './size.js';
+import {Geometry} from './geometry.js';
 import {ColourMap} from './luts.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
@@ -39,6 +40,7 @@ const TagKeys = {
   Modality: '00080060',
   SamplesPerPixel: '00280002',
   PlanarConfiguration: '00280006',
+  NumberOfFrames: '00280008',
   RescaleSlope: '00281053',
   RescaleIntercept: '00281052',
   VOILUTFunction: '00281056',
@@ -234,6 +236,62 @@ function getWindowPresets(dataElements, intensityFactor) {
 }
 
 /**
+ * Sorted frames geometry cache: frames of a multi-frame data share
+ * the same data elements, avoid calculating it for each frame.
+ *
+ * @type {WeakMap<DataElements, object>}
+ */
+const sortedFramesCache = new WeakMap();
+
+/**
+ * Get the geometry of one frame of a multi-frame data.
+ *
+ * Frames with unique per-frame positions are spatial slices: the frame
+ * geometry has the frame position and the data time (if any). Other
+ * frames are time frames: the frame geometry has the root position
+ * and the frame number as time. Once all frames are appended
+ * (see Image.appendSlice), the image has the same layout as the one
+ * created from the full buffer.
+ *
+ * @param {DataElements} dataElements The DICOM tags.
+ * @param {number} frameNumber The frame number.
+ * @returns {Geometry} The frame geometry.
+ */
+function getFrameGeometry(dataElements, frameNumber) {
+  if (!sortedFramesCache.has(dataElements)) {
+    sortedFramesCache.set(
+      dataElements, getSortedFramesGeometry(dataElements));
+  }
+  const sortedFrames = sortedFramesCache.get(dataElements);
+
+  const size2D = getImage2DSize(dataElements);
+  const size = new Size([size2D[0], size2D[1], 1]);
+
+  let res;
+  if (typeof sortedFrames !== 'undefined') {
+    const geometry = sortedFrames.geometry;
+    const sliceIndex = sortedFrames.frameSliceIndices[frameNumber];
+    res = new Geometry(
+      [geometry.getOrigins()[sliceIndex]],
+      size,
+      geometry.getSpacing(),
+      geometry.getOrientation(),
+      geometry.getInitialTime()
+    );
+  } else {
+    const geometry = getRootGeometry(dataElements);
+    res = new Geometry(
+      [geometry.getOrigin()],
+      size,
+      geometry.getSpacing(),
+      geometry.getOrientation(),
+      frameNumber
+    );
+  }
+  return res;
+}
+
+/**
  * {@link Image} factory.
  */
 export class ImageFactory {
@@ -306,16 +364,13 @@ export class ImageFactory {
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
    * @param {number} numberOfFiles The input number of files.
-   * @param {number} [firstDecodedFrame] The number of the first decoded
-   *   frame, when the pixel buffer is only partially filled.
-   * @param {boolean} [isBufferSorted] True if the pixel buffer frames
-   *   are already in spatial (sorted) order, defaults to false.
+   * @param {number} [frameNumber] The frame number if the pixel buffer
+   *   only contains one frame of a multi-frame data: the image is
+   *   then one frame, the other ones are to be appended to it.
    * @returns {Image} A new Image.
    * @throws {Error} Error for missing or wrong data.
    */
-  create(
-    dataElements, pixelBuffer, numberOfFiles,
-    firstDecodedFrame, isBufferSorted) {
+  create(dataElements, pixelBuffer, numberOfFiles, frameNumber) {
     // safe get shortcuts
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
@@ -327,38 +382,12 @@ export class ImageFactory {
       samplesPerPixel = 1;
     }
 
+    // geometry: frames of multi-frame data are created one by one
+    // and assembled by the image (see Image.appendSlice)
     let geometry;
-    // frame (encoding order) to slice index, if frames
-    // are sorted by the functional groups geometry
-    let frameSliceIndices;
-    // possible geometry from frame functional groups,
-    // revert to root geometry if not possible
-    const sortedFrames = getSortedFramesGeometry(dataElements);
-    if (typeof sortedFrames !== 'undefined') {
-      logger.debug('Using frame infos for geometry');
-      geometry = sortedFrames.geometry;
-      frameSliceIndices = sortedFrames.frameSliceIndices;
-
-      // reorder the buffer if not sorted and the order actually changed
-      const needsRemap = !isBufferSorted &&
-        frameSliceIndices.some(function (sliceIndex, f) {
-          return sliceIndex !== f;
-        });
-      if (needsRemap) {
-        const size2D = getImage2DSize(dataElements);
-        const sliceSize = size2D[0] * size2D[1] * samplesPerPixel;
-        const sortedBuffer = pixelBuffer.slice();
-        for (let f = 0; f < frameSliceIndices.length; ++f) {
-          sortedBuffer.set(
-            pixelBuffer.subarray(f * sliceSize, (f + 1) * sliceSize),
-            frameSliceIndices[f] * sliceSize
-          );
-        }
-        pixelBuffer = sortedBuffer;
-      }
-    }
-    // try root geometry
-    if (typeof geometry === 'undefined') {
+    if (typeof frameNumber !== 'undefined') {
+      geometry = getFrameGeometry(dataElements, frameNumber);
+    } else {
       geometry = getRootGeometry(dataElements);
     }
 
@@ -384,23 +413,6 @@ export class ImageFactory {
 
     // image
     const image = new Image(geometry, pixelBuffer, [sopInstanceUid]);
-
-    // initial index: middle of the image, on a frame with data
-    // in case of a partially filled buffer
-    const size = geometry.getSize();
-    const values = new Array(size.length()).fill(0);
-    values[0] = Math.floor(size.get(0) / 2);
-    values[1] = Math.floor(size.get(1) / 2);
-    if (typeof firstDecodedFrame === 'undefined') {
-      values[2] = Math.floor(size.get(2) / 2);
-    } else if (typeof frameSliceIndices !== 'undefined') {
-      // frames along the third dimension
-      values[2] = frameSliceIndices[firstDecodedFrame];
-    } else if (values.length > 3) {
-      // frames along the fourth dimension
-      values[3] = firstDecodedFrame;
-    }
-    image.setInitialIndex(new Index(values));
 
     // PhotometricInterpretation
     const photo = getPhotometricInterpretation(dataElements);
@@ -456,9 +468,16 @@ export class ImageFactory {
     }
 
     // meta information
+    // (number of files is used to allocate the full buffer
+    // when appending slices, for frames: the total number of frames)
     const meta = {
       numberOfFiles
     };
+    if (typeof frameNumber !== 'undefined') {
+      const numberOfFrames = parseInt(
+        safeGetLocal(TagKeys.NumberOfFrames), 10);
+      meta.numberOfFiles *= numberOfFrames;
+    }
 
     // defaults
     meta.TransferSyntaxUID = safeGetLocal(TagKeys.TransferSyntaxUID);

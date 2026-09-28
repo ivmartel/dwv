@@ -260,7 +260,7 @@ export class SegmentCollection {
 
   /**
    * Re-index the per-segment, per-slice buffers after a slice insertion
-   * (from Image#appendSlice/appendVolume) that shifted existing slice
+   * (from Image#appendSlice) that shifted existing slice
    * content to make room for new slices. Unlike the shared label map
    * (which aliases the image buffer, so the raw byte-level shift already
    * covers it for free), `#segments` is keyed by slice index rather than

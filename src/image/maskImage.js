@@ -73,7 +73,7 @@ export class MaskImage extends Image {
       }
     });
 
-    // replicate a buffer slice shift (from appendSlice/appendVolume) onto
+    // replicate a buffer slice shift (from appendSlice) onto
     // the segment collection's per-slice indexing and the contour buffer
     this.addEventListener('imagesliceshift', (event) => {
       const {indexOffset, insertSize, maxOffset} =

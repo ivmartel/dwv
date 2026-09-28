@@ -199,7 +199,10 @@ export class InfoData extends EventTarget {
       if (typeof data['00080018'] !== 'undefined') {
         // SOP instance UID
         dataUid = data['00080018'].value[0];
-        this.#infoData[dataUid] = createInfoData(data, this.#infoConfigs);
+        // frames of a multi-frame data share the same meta
+        if (typeof this.#infoData[dataUid] === 'undefined') {
+          this.#infoData[dataUid] = createInfoData(data, this.#infoConfigs);
+        }
       } else {
         logger.warn('Missing DICOM SOP instance UID for info data indexing');
       }

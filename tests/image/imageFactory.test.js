@@ -28,6 +28,43 @@ const creationCases = [
  * Tests for the 'image/imageFactory.js' file.
  */
 
+/**
+ * Create the image of a file frame by frame, the way loaded data is
+ * (see DicomBufferToData and DataController): one image per frame,
+ * appended to the first one. Single frame data is created at once.
+ *
+ * @param {ImageFactory} factory The image factory.
+ * @param {object} elements The file data elements.
+ * @param {number} numberOfFiles The number of files.
+ * @param {number} numberOfFrames The number of frames of the file.
+ * @param {object} [image] Optional image to append the frames to.
+ * @returns {object} The image.
+ */
+function createFramesImage(
+  factory, elements, numberOfFiles, numberOfFrames, image) {
+  const buffer = elements['7FE00010'].value;
+  const frameSize = buffer.length / numberOfFrames;
+  for (let f = 0; f < numberOfFrames; ++f) {
+    let frameImage;
+    if (numberOfFrames === 1) {
+      frameImage = factory.create(elements, buffer, numberOfFiles);
+    } else {
+      frameImage = factory.create(
+        elements,
+        buffer.subarray(f * frameSize, (f + 1) * frameSize),
+        numberOfFiles,
+        f
+      );
+    }
+    if (typeof image === 'undefined') {
+      image = frameImage;
+    } else {
+      image.appendSlice(frameImage);
+    }
+  }
+  return image;
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -161,7 +198,7 @@ describe('ImageFactory', () => {
     // files sharing one position but with a different
     // TemporalPositionIdentifier: appendSlice grows a time dimension
     multipleSingleFrame: {z: 1, time: 3},
-    // one z-stack file per time point, combined with appendVolume
+    // one z-stack file per time point, frames combined with appendSlice
     multipleSingleFrameMultiSlice: {z: 5, time: 3}
   };
 
@@ -178,9 +215,9 @@ describe('ImageFactory', () => {
   }
 
   // build an image from the files of a data structure, the way the app
-  // assembles a series (see DataController): one Image per file via
-  // ImageFactory, combined with appendVolume if the file image has more
-  // than one slice, appendSlice otherwise.
+  // assembles a series (see DataController): one Image per frame via
+  // ImageFactory (multi-frame data is loaded frame by frame), combined
+  // with appendSlice.
   describe.each(structureCases)('$label', ({testCase, structure, expected}) => {
     const tags = testCase.config.tags;
 
@@ -193,17 +230,12 @@ describe('ImageFactory', () => {
       const numberOfFiles = fileElementsList.length;
 
       const factory = new ImageFactory();
+      const numberOfFrames = typeof structure.numberOfFrames !== 'undefined'
+        ? structure.numberOfFrames : 1;
       for (const elements of fileElementsList) {
         factory.checkElements(elements);
-        const fileImage = factory.create(
-          elements, elements['7FE00010'].value, numberOfFiles);
-        if (typeof image === 'undefined') {
-          image = fileImage;
-        } else if (fileImage.getGeometry().getSize().get(2) > 1) {
-          image.appendVolume(fileImage);
-        } else {
-          image.appendSlice(fileImage);
-        }
+        image = createFramesImage(
+          factory, elements, numberOfFiles, numberOfFrames, image);
       }
     });
 
@@ -235,9 +267,12 @@ describe('ImageFactory', () => {
       }
     });
 
-    test('meta numberOfFiles matches the number of files', () => {
+    test('meta numberOfFiles is the total number of frames', () => {
+      const numberOfFrames = typeof structure.numberOfFrames !== 'undefined'
+        ? structure.numberOfFrames : 1;
       assert.equal(
-        image.getMeta().numberOfFiles, fileElementsList.length,
+        image.getMeta().numberOfFiles,
+        fileElementsList.length * numberOfFrames,
         'numberOfFiles');
     });
 
@@ -271,6 +306,34 @@ describe('ImageFactory', () => {
 
   });
 
+  // frames without positions: time frames
+  describe('time frames', () => {
+    const config = syntheticData[0];
+    const tags = config.tags;
+    const structure = dataStructures.multiframe;
+
+    test('frame image: one slice with the frame number as time', () => {
+      const elements = getStructureElementsList(
+        config, '1.2.840.10008.1.2.1', structure)[0];
+      const buffer = elements['7FE00010'].value;
+      const numberOfFrames = structure.numberOfFrames;
+      const frameSize = buffer.length / numberOfFrames;
+      for (let f = 0; f < numberOfFrames; ++f) {
+        const image = new ImageFactory().create(
+          elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 2, f);
+        const geometry = image.getGeometry();
+        assert.deepEqual(
+          geometry.getSize().getValues(), [tags.Columns, tags.Rows, 1],
+          `frame ${f} size`);
+        assert.equal(geometry.getInitialTime(), f, `frame ${f} time`);
+        assert.equal(
+          image.getMeta().numberOfFiles, 2 * numberOfFrames,
+          `frame ${f} numberOfFiles is the total number of frames`);
+      }
+    });
+
+  });
+
   // frames with positions not in spatial order
   describe('unsorted frames', () => {
     const config = syntheticData[0];
@@ -296,8 +359,9 @@ describe('ImageFactory', () => {
       }
     });
 
-    test('origins are sorted', () => {
-      const image = new ImageFactory().create(elements, buffer, 1);
+    test('frames image: origins are sorted', () => {
+      const image = createFramesImage(
+        new ImageFactory(), elements, 1, order.length);
       const origins = image.getGeometry().getOrigins();
       assert.equal(origins.length, order.length, 'one origin per frame');
       for (let i = 0; i < order.length; ++i) {
@@ -306,32 +370,30 @@ describe('ImageFactory', () => {
       }
     });
 
-    test('buffer is remapped to spatial order', () => {
-      const image = new ImageFactory().create(elements, buffer, 1);
-      assert.notStrictEqual(image.getBuffer(), buffer, 'buffer copy');
+    test('frames image: buffer in spatial order', () => {
+      const image = createFramesImage(
+        new ImageFactory(), elements, 1, order.length);
       assert.deepEqual(
         Array.from(image.getBuffer()), Array.from(sortedBuffer),
         'sorted buffer');
     });
 
-    test('sorted buffer is used as is', () => {
-      const image = new ImageFactory().create(
-        elements, sortedBuffer, 1, undefined, true);
-      assert.strictEqual(image.getBuffer(), sortedBuffer, 'same buffer');
-    });
-
-    test('initial index on the first decoded frame slice', () => {
-      const firstDecodedFrame = 1;
-      const image = new ImageFactory().create(
-        elements, sortedBuffer, 1, firstDecodedFrame, true);
-      assert.deepEqual(
-        image.getInitialIndex().getValues(),
-        [
-          Math.floor(tags.Columns / 2),
-          Math.floor(tags.Rows / 2),
-          order[firstDecodedFrame]
-        ],
-        'initial index');
+    test('frame image: one slice at the frame position', () => {
+      const frameSize = buffer.length / order.length;
+      for (let f = 0; f < order.length; ++f) {
+        const image = new ImageFactory().create(
+          elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 1, f);
+        const geometry = image.getGeometry();
+        assert.deepEqual(
+          geometry.getSize().getValues(), [tags.Columns, tags.Rows, 1],
+          `frame ${f} size`);
+        assert.deepEqual(
+          geometry.getOrigin().getValues(), [0, 0, order[f]],
+          `frame ${f} origin`);
+        assert.equal(
+          image.getMeta().numberOfFiles, order.length,
+          `frame ${f} numberOfFiles is the total number of frames`);
+      }
     });
 
   });
