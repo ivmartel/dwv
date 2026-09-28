@@ -49,13 +49,15 @@ export const viewEventNames = [
 ];
 
 /**
- * Create a View from DICOM elements and image.
+ * Demo View creation from DICOM elements and image.
+ *
+ * Warning: not to be used in production code.
  *
  * @param {Record<string, DataElement>} elements The DICOM elements.
  * @param {Image} image The associated image.
  * @returns {View} The View object.
  */
-export function createView(elements, image) {
+export function demoCreateView(elements, image) {
   const factory = new ViewFactory();
   return factory.create(elements, image);
 }
@@ -67,16 +69,16 @@ export function createView(elements, image) {
  * (either directly or with helper methods).
  *
  * @example
- * import {DicomParser, createImage, createView} from '//esm.sh/dwv';
+ * import {DicomParser, demoCreateImage, demoCreateView} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
  *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = demoCreateImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = createView(dicomParser.getDicomElements(), image);
+ *   const view = demoCreateView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;

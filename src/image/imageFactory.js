@@ -547,12 +547,16 @@ export class ImageFactory {
 }
 
 /**
- * Create an Image from DICOM elements.
+ * Demo Image creation from DICOM elements: takes
+ * elements and first element of the pixel buffer
+ * to create an image.
+ *
+ * Warning: not to be used in production code.
  *
  * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The Image object.
  */
-export function createImage(elements) {
+export function demoCreateImage(elements) {
   const factory = new ImageFactory();
   return factory.create(
     elements,

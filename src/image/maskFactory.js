@@ -817,12 +817,16 @@ export function mergeMaskImages(mask1, mask2) {
 }
 
 /**
- * Create a mask Image from DICOM elements.
+ * Demo mask Image creation from DICOM elements: takes
+ * elements and first element of the pixel buffer
+ * to create an image.
+ *
+ * Warning: not to be used in production code.
  *
  * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {MaskImage} The mask Image object.
  */
-export function createMaskImage(elements) {
+export function demoCreateMaskImage(elements) {
   const factory = new MaskFactory();
   return factory.create(
     elements,
