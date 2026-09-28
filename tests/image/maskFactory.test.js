@@ -122,6 +122,24 @@ describe('MaskFactory', () => {
     );
   });
 
+  test('create: throws for incomplete per-frame functional groups', () => {
+    const config = syntheticData.find(c => c.name === 'test-seg-00');
+    const tags = structuredClone(config.tags);
+    tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+    const genOptions = {segmentSquares: config.segmentSquares};
+    const elements = generateDataElements(tags, genOptions)[0];
+    // remove the FrameContentSequence of the first per-frame item
+    const perFrameSq = safeGetAll(elements, '52009230');
+    delete perFrameSq[0]['00209111'];
+    const buffer = elements['7FE00010'].value;
+    const factory = new MaskFactory();
+    assert.throws(
+      () => factory.create(elements, buffer, buildRefImage()),
+      Error,
+      'Incomplete per frame functional groups'
+    );
+  });
+
   test('create: non-overlapping squares pixel values in label map', () => {
     const image = buildMaskImage('test-seg-00');
 

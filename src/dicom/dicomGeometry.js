@@ -385,6 +385,12 @@ export function getSortedFramesGeometry(dataElements) {
   if (typeof funcGroups === 'undefined') {
     return;
   }
+  // a group can be undefined if its required sequences are missing
+  if (funcGroups.some(funcGroup => typeof funcGroup === 'undefined')) {
+    logger.warn('Incomplete per-frame functional groups, ' +
+      'not using them for geometry');
+    return;
+  }
 
   // check unique origins
   const frameOrigins = [];

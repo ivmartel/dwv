@@ -355,6 +355,10 @@ export class MaskFactory {
     if (typeof funcGroups === 'undefined') {
       throw new Error('Missing or empty per frame functional sequence');
     }
+    // a group can be undefined if its required sequences are missing
+    if (funcGroups.some(funcGroup => typeof funcGroup === 'undefined')) {
+      throw new Error('Incomplete per frame functional groups');
+    }
 
     // geometry
     let refOrigins;

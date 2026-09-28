@@ -179,6 +179,17 @@ describe('getSortedFramesGeometry', () => {
     assert.isUndefined(getSortedFramesGeometry(elements));
   });
 
+  test('undefined with incomplete per-frame functional groups', () => {
+    const warnSpy = vi.spyOn(logger, 'warn');
+    // per-frame item without FrameContentSequence nor PlanePositionSequence
+    const elements = {
+      52009230: {value: [{}, {}]}
+    };
+    assert.isUndefined(getSortedFramesGeometry(elements));
+    assert.equal(warnSpy.mock.calls.length, 1, 'incomplete groups warning');
+    warnSpy.mockRestore();
+  });
+
   test('sorted geometry and frame slice indices', () => {
     const structure = unsortedMultiframeMultiSliceStructure;
     const order = structure.genOptions.framePositionOrder;
