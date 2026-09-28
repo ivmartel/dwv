@@ -360,9 +360,29 @@ describe('SegmentCollection', () => {
 
       const segs = [makeSeg(1), makeSeg(2)];
       const roiBuffers = collection.getSegmentBuffers(segs);
-      assert.equal(roiBuffers[0][0][0], 0, 'seg 1 no longer has offset 0');
+      assert.isUndefined(roiBuffers[0], 'seg 1 no longer has any pixel');
       assert.equal(roiBuffers[1][0][0], 1, 'seg 2 now has offset 0');
       assert.equal(roiBuffers[1][0][2], 1, 'seg 2 keeps its original pixel');
+    }
+  );
+
+  test(
+    'getSegmentBuffers (MaskFactory path) skips slices emptied by edits',
+    () => {
+      // seg 1 covers offset 0 on slice 0 and offset 1 on slice 1
+      const geom = makeGeometry(3, 1, 2);
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, makePixelBuffer(3, [0]), 0, 0, 3, 1);
+      collection.addFrame(1, makePixelBuffer(3, [1]), 0, 1, 3, 1);
+
+      // erase the only pixel of slice 0
+      collection.updateAtOffset(0, 1, 0);
+
+      const segs = [makeSeg(1)];
+      const roiBuffers = collection.getSegmentBuffers(segs);
+      assert.deepEqual(
+        Object.keys(roiBuffers[0]), ['1'], 'only slice 1 is returned');
+      assert.equal(roiBuffers[0][1][1], 1, 'slice 1 pixel present');
     }
   );
 

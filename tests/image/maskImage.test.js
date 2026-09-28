@@ -116,8 +116,8 @@ describe('MaskImage', () => {
       mask.setAtOffsets([0, 1], 3);
 
       const oldBuffers = collection.getSegmentBuffers([{number: 1}]);
-      assert.ok(
-        oldBuffers[0][0].every(v => v === 0),
+      assert.isUndefined(
+        oldBuffers[0],
         'old segment number no longer carries these pixels'
       );
       const newBuffers = collection.getSegmentBuffers([{number: 3}]);

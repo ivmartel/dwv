@@ -397,14 +397,21 @@ export class SegmentCollection {
         continue;
       }
       for (const [sliceIndex, sliceBuf] of sliceMap) {
-        if (roiBuffers[segmentIndex] === undefined) {
-          roiBuffers[segmentIndex] = {};
-        }
         const binarySlice = new Uint8Array(sliceBuf.length);
+        let isEmpty = true;
         for (let l = 0; l < sliceBuf.length; ++l) {
           if (sliceBuf[l] !== 0) {
             binarySlice[l] = 1;
+            isEmpty = false;
           }
+        }
+        // skip slices emptied by edits (for example brush erase),
+        // consistent with the label map path
+        if (isEmpty) {
+          continue;
+        }
+        if (roiBuffers[segmentIndex] === undefined) {
+          roiBuffers[segmentIndex] = {};
         }
         roiBuffers[segmentIndex][sliceIndex] = binarySlice;
       }
