@@ -68,14 +68,14 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
  * - planar configuration (default RGBRGB...).
  *
  * @example
- * import {DicomParser, createImage} from '//esm.sh/dwv';
+ * import {DicomParser, demoCreateImage} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
  *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = demoCreateImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size

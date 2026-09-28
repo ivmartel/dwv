@@ -8,11 +8,11 @@ import {
 } from './annotationGroupFactory.js';
 import {Image} from './image.js';
 import {MaskImage} from './maskImage.js';
-import {createImage} from './imageFactory.js';
+import {demoCreateImage} from './imageFactory.js';
 import {ImageContour} from './imageContour.js';
 import {
   View,
-  createView
+  demoCreateView
 } from './view.js';
 import {Geometry} from './geometry.js';
 import {Size} from './size.js';
@@ -28,7 +28,7 @@ import {
 } from './windowLevel.js';
 import {
   MaskFactory,
-  createMaskImage,
+  demoCreateMaskImage,
   getDefaultDicomSegJson,
   mergeMaskImages
 } from './maskFactory.js';
@@ -74,9 +74,9 @@ export {
   WindowLevel,
   WindowPreset,
   luts,
-  createImage,
-  createMaskImage,
-  createView,
+  demoCreateImage,
+  demoCreateMaskImage,
+  demoCreateView,
   equalWl,
   getDefaultDicomSegJson,
   getDefaultDicomRTStructJson,
