@@ -362,7 +362,9 @@ export class DicomWriter {
 
   /**
    * Flag to remove private tags (odd group number), including
-   * the ones in sequence items. Default to false.
+   * the ones in sequence items. Default to false. Overrides
+   * writing rules, if set to true a private tag is removed
+   * even if a rule says copy or replace for it.
    *
    * @type {boolean}
    */
