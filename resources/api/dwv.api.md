@@ -415,6 +415,7 @@ export class DicomWriter {
     getBuffer(dataElements: Record<string, DataElement>): ArrayBuffer;
     getElementToWrite(element: DataElement): DataElement | null;
     setFixUnknownVR(flag: boolean): void;
+    setRemovePrivateTags(flag: boolean): void;
     setRules(rules: Record<string, WriterRule>, addMissingTags?: boolean): void;
     setUseUnVrForPrivateSq(flag: boolean): void;
     useSpecialTextEncoder(): void;
