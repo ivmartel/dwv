@@ -536,6 +536,40 @@ describe('image', () => {
     }
   });
 
+  /**
+   * Test that {@link Geometry#canAppendSlice} tolerates orientation
+   * rounding differences between slices of the same series.
+   *
+   * @function module:tests/image~geometryCanAppendSlice
+   */
+  test('Geometry canAppendSlice orientation tolerance', () => {
+    const size = new Size([64, 64, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    // real ImageOrientationPatient values (5 decimals DS) of
+    // consecutive slices of the same series
+    const orientation0 = getOrientationFromCosines(
+      [1.0, -0.0, 0.0, -0.0, 0.99996, 0.00928]);
+    const orientation1 = getOrientationFromCosines(
+      [1.0, -0.0, 0.0, -0.0, 0.99996, 0.00929]);
+    const geometry0 = new Geometry(
+      [new Point3D(-105.5271530151, -77.7085952759, 65.0604629517)],
+      size, spacing, orientation0);
+    const geometry1 = new Geometry(
+      [new Point3D(-105.5271530151, -77.6807403564, 62.0605888367)],
+      size, spacing, orientation1);
+    assert.ok(geometry0.canAppendSlice(geometry1).success,
+      'can append slice with rounded orientation');
+
+    // really different orientation
+    const orientation2 = getOrientationFromCosines(
+      [1.0, 0.0, 0.0, 0.0, 0.98687, 0.16151]);
+    const geometry2 = new Geometry(
+      [new Point3D(-105.5271530151, -77.6807403564, 62.0605888367)],
+      size, spacing, orientation2);
+    assert.notOk(geometry0.canAppendSlice(geometry2).success,
+      'cannot append slice with different orientation');
+  });
+
 });
 
 describe('getSliceGeometrySpacing', () => {

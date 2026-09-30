@@ -17,6 +17,11 @@ import {Matrix33} from '../math/matrix.js';
 
 // direction epsilon, for example when comparing orientations
 export const DIRECTION_EPSILON = 1e-6;
+// slice direction epsilon, when comparing orientations of slices
+// of the same series: Image Orientation (Patient) is a DS
+// that can be written with only 5 decimals, leading to rounding
+// differences of 1e-5 between slices
+export const SLICE_DIRECTION_EPSILON = 1e-4;
 
 /**
  * @callback comparePointFn
@@ -441,7 +446,7 @@ export class Geometry {
     }
     // check orientation
     if (!this.getOrientation().isSimilar(
-      rhs.getOrientation(), DIRECTION_EPSILON)) {
+      rhs.getOrientation(), SLICE_DIRECTION_EPSILON)) {
       return {
         success: false,
         message: 'Cannot append a slice with different orientation'
