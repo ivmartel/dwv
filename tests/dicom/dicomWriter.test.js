@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {describe, test, assert, vi} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
+import {DataElement} from '../../src/dicom/dataElement.js';
 import {
   DicomWriter,
   getUID
@@ -201,6 +202,75 @@ describe('dicom', () => {
       assert.notOk(rawTags['00104000'], 'patientsComments #1');
     }
   );
+
+  /**
+   * Tests for {@link DicomWriter} private tags removal.
+   *
+   * @function module:tests/dicom~writeRemovePrivateTags
+   */
+  test('Write remove private tags', () => {
+    /**
+     * Get a LO data element.
+     *
+     * @param {string} value The element value.
+     * @returns {DataElement} The data element.
+     */
+    const getLoElement = function (value) {
+      const element = new DataElement('LO');
+      element.value = [value];
+      return element;
+    };
+    /**
+     * Get the parsed elements of the test file with added private tags.
+     *
+     * @returns {Record<string, DataElement>} The data elements.
+     */
+    const getElements = function () {
+      const parser = new DicomParser();
+      parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+      const elements = parser.getDicomElements();
+      // top level private tags
+      elements['00090010'] = getLoElement('DWV_TEST');
+      elements['00091001'] = getLoElement('private-top');
+      // private tags in ReferencedImageSequence item
+      const item = elements['00081140'].value[0];
+      item['00110010'] = getLoElement('DWV_TEST');
+      item['00111001'] = getLoElement('private-seq');
+      return elements;
+    };
+    /**
+     * Write and re-parse elements.
+     *
+     * @param {DicomWriter} writer The writer.
+     * @returns {Record<string, DataElement>} The parsed elements.
+     */
+    const writeAndParse = function (writer) {
+      const parser = new DicomParser();
+      parser.parse(writer.getBuffer(getElements()));
+      return parser.getDicomElements();
+    };
+
+    // default: private tags are kept
+    let tags = writeAndParse(new DicomWriter());
+    assert.equal(tags['00091001'].value[0], 'private-top', 'top #0');
+    assert.equal(tags['00081140'].value[0]['00111001'].value[0],
+      'private-seq', 'seq #0');
+
+    // remove private tags
+    const writer = new DicomWriter();
+    writer.setRemovePrivateTags(true);
+    tags = writeAndParse(writer);
+    assert.notOk(tags['00090010'], 'top creator #1');
+    assert.notOk(tags['00091001'], 'top #1');
+    const item = tags['00081140'].value[0];
+    assert.notOk(item['00110010'], 'seq creator #1');
+    assert.notOk(item['00111001'], 'seq #1');
+    // public tags are kept
+    assert.equal(item['00081155'].value[0],
+      '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
+      'seq public #1');
+    assert.equal(tags['00100010'].value[0], 'dwv^PatientName', 'public #1');
+  });
 
   /**
    * Tests for {@link DicomWriter} anomnymisation and add tags.

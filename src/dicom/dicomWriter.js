@@ -361,6 +361,14 @@ export class DicomWriter {
   #fixUnknownVR = true;
 
   /**
+   * Flag to remove private tags (odd group number), including
+   * the ones in sequence items. Default to false.
+   *
+   * @type {boolean}
+   */
+  #removePrivateTags = false;
+
+  /**
    * Default rules: just copy.
    *
    * @type {Record<string, WriterRule>}
@@ -413,6 +421,17 @@ export class DicomWriter {
    */
   setFixUnknownVR(flag) {
     this.#fixUnknownVR = flag;
+  }
+
+  /**
+   * Set the remove private tags flag. If true, private tags
+   * (odd group number) are not written, including the ones
+   * in sequence items. Takes precedence over the writing rules.
+   *
+   * @param {boolean} flag True to remove private tags.
+   */
+  setRemovePrivateTags(flag) {
+    this.#removePrivateTags = flag;
   }
 
   /**
@@ -909,6 +928,10 @@ export class DicomWriter {
     for (const key of keys) {
       const originalElement = dataElements[key];
       originalElement.tag = getTagFromKey(key);
+      // skip private tags if requested
+      if (this.#removePrivateTags && originalElement.tag.isPrivate()) {
+        continue;
+      }
       element = this.getElementToWrite(originalElement);
       if (element !== null &&
         !fmiglTag.equals(element.tag) &&
@@ -1115,6 +1138,10 @@ export class DicomWriter {
             subElement.tag = getTagFromKey(itemKey);
 
             if (isItemTag(subElement.tag)) {
+              continue;
+            }
+            // skip private tags if requested
+            if (this.#removePrivateTags && subElement.tag.isPrivate()) {
               continue;
             }
             // set item value
