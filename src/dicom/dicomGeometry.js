@@ -32,7 +32,6 @@ import {getPerFrameFunctionalGroups} from './dicomFunctionalGroup.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
- * @import {Matrix33} from '../math/matrix.js';
  * @import {DicomFunctionalGroup} from './dicomFunctionalGroup.js';
  */
 
