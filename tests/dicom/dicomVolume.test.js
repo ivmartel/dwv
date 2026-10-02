@@ -31,6 +31,7 @@ const TagKeys = {
   TemporalPositionIdentifier: '00200100',
   TemporalPositionIndex: '00209128',
   PerFrameFunctionalGroupsSequence: '52009230',
+  MRDiffusionSequence: '00189117',
   FrameContentSequence: '00209111',
   EchoTime: '00180081',
   TriggerTime: '00181060',
@@ -61,6 +62,27 @@ function makeMultiFrameElements(temporalPositionIndex, numberOfFrames) {
     perFrameGroups.push(perFrameGroupItem);
   }
   return {
+    [TagKeys.PerFrameFunctionalGroupsSequence]:
+      makeDataElement('SQ', perFrameGroups)
+  };
+}
+
+/**
+ * Create DICOM elements for an enhanced MR multi-frame file with
+ * per-frame diffusion b-values.
+ *
+ * @param {number[]} bValues The per-frame b-values.
+ * @returns {Record<string, DataElement>} The DICOM elements.
+ */
+function makeEnhancedMRElements(bValues) {
+  const perFrameGroups = bValues.map(bValue => ({
+    [TagKeys.MRDiffusionSequence]: makeDataElement('SQ', [{
+      [TagKeys.DiffusionBValue]: makeDataElement('FD', [bValue])
+    }])
+  }));
+  return {
+    [TagKeys.SOPClassUID]: makeDataElement(
+      'UI', ['1.2.840.10008.5.1.4.1.1.4.1']),
     [TagKeys.PerFrameFunctionalGroupsSequence]:
       makeDataElement('SQ', perFrameGroups)
   };
@@ -225,6 +247,19 @@ describe('dicom', () => {
         }])
       };
       assert.equal(getter(elements), 2);
+    });
+
+    test('DiffusionBValue getter with per-frame enhanced MR value', () => {
+      const getter = getCandidate('DiffusionBValue');
+      const elements = makeEnhancedMRElements([500, 500]);
+      assert.equal(getter(elements), 500);
+    });
+
+    test('DiffusionBValue getter with varying per-frame value', () => {
+      const getter = getCandidate('DiffusionBValue');
+      // multiple b-values in one file: not a single volume
+      const elements = makeEnhancedMRElements([0, 500, 1000]);
+      assert.equal(getter(elements), undefined);
     });
 
     test('DiffusionBValue getter with non numeric value', () => {

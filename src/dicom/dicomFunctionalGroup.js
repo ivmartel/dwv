@@ -428,3 +428,35 @@ export function getDicomFunctionalGroupItem(funcGroup) {
 
   return item;
 }
+
+/**
+ * Get a value that is constant across the frames of a multi-frame file.
+ * Frames without the value are ignored.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @param {Function} valueGetter The per frame functional group value getter.
+ * @param {string} name The value name, used for logging.
+ * @returns {any|undefined} The value, or undefined if absent or if it
+ *   varies across frames: the file then does not represent a single
+ *   volume and the value cannot be used as a volume id.
+ */
+export function getConstantPerFrameValue(elements, valueGetter, name) {
+  let res;
+  const perFrameGroupSeq =
+    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+  if (typeof perFrameGroupSeq === 'undefined') {
+    return undefined;
+  }
+  for (const group of perFrameGroupSeq) {
+    const value = valueGetter(group);
+    if (typeof value !== 'undefined') {
+      if (typeof res === 'undefined') {
+        res = value;
+      } else if (res !== value) {
+        logger.debug(`Unhandled varying ${name}`);
+        return undefined;
+      }
+    }
+  }
+  return res;
+}

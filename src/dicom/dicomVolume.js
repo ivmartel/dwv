@@ -8,6 +8,7 @@ import {
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
 import {cleanString} from './dicomParser.js';
+import {getConstantPerFrameValue} from './dicomFunctionalGroup.js';
 import {logger} from '../utils/logger.js';
 
 /**
@@ -25,7 +26,6 @@ const TagKeys = {
   DimensionIndexSequence: '00209222',
   DimensionIndexPointer: '00209165',
   SharedFunctionalGroupsSequence: '52009229',
-  PerFrameFunctionalGroupsSequence: '52009230',
   MRDiffusionSequence: '00189117',
   DiffusionBValue: '00189087',
   DiffusionBValueAT: '(0018,9087)',
@@ -102,17 +102,8 @@ function getStandardDiffusionBValueFromEMR(elements) {
   }
   // from Per Frame Functional Groups Sequence
   if (typeof res === 'undefined') {
-    const perFrameGroupSeq =
-      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
-    if (typeof perFrameGroupSeq !== 'undefined') {
-      // TODO: go to specific frame number?
-      for (const group of perFrameGroupSeq) {
-        res = getDiffusionBValueFromFunctionalSeq(group);
-        if (typeof res !== 'undefined') {
-          break;
-        }
-      }
-    }
+    res = getConstantPerFrameValue(
+      elements, getDiffusionBValueFromFunctionalSeq, 'DiffusionBValue');
   }
   return res;
 }
@@ -213,10 +204,15 @@ function getDiffusionBValueFromFrameContent(elements) {
   }
   // get from per frame functional group
   if (gotBValuePointer) {
-    const perFrameGroupSeq =
-      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
-    if (typeof perFrameGroupSeq !== 'undefined') {
-      const group = perFrameGroupSeq[0];
+    /**
+     * Get the b-value dimension index value of a frame.
+     *
+     * @param {Record<string, DataElement>} group The per frame
+     *   functional group.
+     * @returns {string|undefined} The value, if present.
+     */
+    const valueGetter = function (group) {
+      let value;
       const frameContentSeq = safeGetAll(group, TagKeys.FrameContentSequence);
       if (typeof frameContentSeq !== 'undefined') {
         // should be only one
@@ -225,10 +221,13 @@ function getDiffusionBValueFromFrameContent(elements) {
         if (typeof dimValues !== 'undefined' &&
           dimValues.length === 4) {
           // does not follow order set in DimensionIndexSequence...
-          res = dimValues[2];
+          value = dimValues[2];
         }
       }
-    }
+      return value;
+    };
+    res = getConstantPerFrameValue(
+      elements, valueGetter, 'DimensionIndexValues b-value');
   }
 
   return res;
@@ -345,33 +344,25 @@ function getMRVolumeIdTagValue(elements) {
  * @returns {number|undefined} The value, if present.
  */
 function getTemporalPositionIndex(elements) {
-  let res;
-
-  const perFrameGroupSeq =
-    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
-  if (typeof perFrameGroupSeq === 'undefined') {
-    return undefined;
-  }
-  for (const group of perFrameGroupSeq) {
+  /**
+   * Get the temporal position index of a frame.
+   *
+   * @param {Record<string, DataElement>} group The per frame
+   *   functional group.
+   * @returns {number|undefined} The value, if present.
+   */
+  const valueGetter = function (group) {
+    let res;
     const frameContentSeq = safeGetAll(group, TagKeys.FrameContentSequence);
-    if (typeof frameContentSeq === 'undefined') {
-      continue;
+    if (typeof frameContentSeq !== 'undefined') {
+      res = parseNumber(
+        safeGet(frameContentSeq[0], TagKeys.TemporalPositionIndex),
+        value => parseInt(value, 10));
     }
-    const index = parseNumber(
-      safeGet(frameContentSeq[0], TagKeys.TemporalPositionIndex),
-      value => parseInt(value, 10));
-    if (typeof index !== 'undefined') {
-      if (typeof res === 'undefined') {
-        res = index;
-      } else if (res !== index) {
-        // varying temporal position within one file: this file does not
-        // represent a single temporal position, candidate is not usable
-        logger.debug('Unhandled varying TemporalPositionIndex');
-        return undefined;
-      }
-    }
-  }
-  return res;
+    return res;
+  };
+  return getConstantPerFrameValue(
+    elements, valueGetter, 'TemporalPositionIndex');
 }
 
 /**
