@@ -163,7 +163,7 @@ function getNonStandardDiffusionBValueFromMR(elements) {
     }
     // keep first valid result
     if (typeof value !== 'undefined' &&
-      !isNaN(parseInt(value, 10))) {
+      !isNaN(parseFloat(value))) {
       res = value;
       break;
     }
@@ -307,8 +307,8 @@ function getDiffusionBValue(elements) {
     }
   }
 
-  // cast to int
-  return parseNumber(res, value => parseInt(value, 10));
+  // cast to number (FD/DS b-values can be fractional)
+  return parseNumber(res, parseFloat);
 }
 
 /**

@@ -262,6 +262,27 @@ describe('dicom', () => {
       assert.equal(getter(elements), undefined);
     });
 
+    test('DiffusionBValue getter keeps fractional value', () => {
+      const getter = getCandidate('DiffusionBValue');
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        [TagKeys.DiffusionBValue]: makeDataElement('FD', [50.5])
+      };
+      assert.equal(getter(elements), 50.5);
+    });
+
+    test('DiffusionBValue getter with small exponent value', () => {
+      const getter = getCandidate('DiffusionBValue');
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        // parseInt would give 1
+        [TagKeys.DiffusionBValue]: makeDataElement('FD', [1e-7])
+      };
+      assert.equal(getter(elements), 1e-7);
+    });
+
     test('DiffusionBValue getter with non numeric value', () => {
       const getter = getCandidate('DiffusionBValue');
       const elements = {
