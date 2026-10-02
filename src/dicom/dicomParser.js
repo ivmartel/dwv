@@ -190,12 +190,8 @@ export function hasDicomPrefix(buffer) {
   return prefixArray.reduce(stringReducer, '') === 'DICM';
 }
 
-// Zero-width space (u200B)
-// @ts-expect-error -- fromCharCode expects a number, not a string
-const ZWS = String.fromCharCode('u200B');
-
 /**
- * Clean string: remove zero-width space ending and trim.
+ * Clean string: remove null characters (padding) and trim.
  * Warning: no tests are done on the input, will fail if
  *   null or undefined or not string.
  * Exported for tests only.
@@ -204,16 +200,8 @@ const ZWS = String.fromCharCode('u200B');
  * @returns {string} The cleaned string.
  */
 export function cleanString(inputStr) {
-  let res = inputStr;
-  // get rid of ending zero-width space
-  const lastIndex = inputStr.length - 1;
-  if (inputStr[lastIndex] === ZWS) {
-    res = inputStr.substring(0, lastIndex);
-  }
-  // trim spaces
-  res = res.trim();
-  // return
-  return res;
+  // remove null characters (UI padding) and trim spaces
+  return inputStr.replace(/\0/g, '').trim();
 }
 
 /**

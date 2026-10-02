@@ -351,28 +351,28 @@ describe('dicom', () => {
       cleanString();
     },
     TypeError,
-    'Cannot read properties of undefined (reading \'length\')',
+    'Cannot read properties of undefined (reading \'replace\')',
     'cleanstring undefined throws.');
     // null
     assert.throws(function () {
       cleanString(null);
     },
     TypeError,
-    'Cannot read properties of null (reading \'length\')',
+    'Cannot read properties of null (reading \'replace\')',
     'cleanstring null throws.');
     // number
     assert.throws(function () {
       cleanString(3);
     },
     TypeError,
-    'res.trim is not a function',
+    'inputStr.replace is not a function',
     'cleanstring number throws.');
     // empty
     assert.equal(cleanString(''), '', 'Clean empty');
     // short
     assert.equal(cleanString('a'), 'a', 'Clean short');
     // special
-    const special = String.fromCharCode('u200B');
+    const special = '\0';
     assert.equal(cleanString(special), '', 'Clean just special');
     // regular
     let str = ' El cielo azul ';
@@ -383,11 +383,21 @@ describe('dicom', () => {
     refStr = 'El cielo azul';
     assert.equal(
       cleanString(str), refStr, 'Clean regular with special');
-    // regular with special and ending space (not trimmed)
+    // regular with special and ending space
     str = ` El cielo azul ${special}`;
     refStr = 'El cielo azul';
     assert.equal(
       cleanString(str), refStr, 'Clean regular with special 2');
+    // regular with special before ending space
+    str = ` El cielo azul${special} `;
+    refStr = 'El cielo azul';
+    assert.equal(
+      cleanString(str), refStr, 'Clean regular with special 3');
+    // regular with multiple specials
+    str = `El cielo${special} azul${special}${special}`;
+    refStr = 'El cielo azul';
+    assert.equal(
+      cleanString(str), refStr, 'Clean regular with multiple specials');
   });
 
   /**
