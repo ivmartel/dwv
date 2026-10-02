@@ -189,6 +189,7 @@ function getNonStandardDiffusionBValueFromMR(elements) {
 /**
  * Get the b-value from the frame content sequence if
  * the dimension index sequence has a pointer to the b-value.
+ * Hard coded logic based on real cases...
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
@@ -221,7 +222,8 @@ function getDiffusionBValueFromFrameContent(elements) {
         // should be only one
         const dimValues =
           safeGetAll(frameContentSeq[0], TagKeys.DimensionIndexValues);
-        if (typeof dimValues !== 'undefined') {
+        if (typeof dimValues !== 'undefined' &&
+          dimValues.length === 4) {
           // does not follow order set in DimensionIndexSequence...
           res = dimValues[2];
         }
