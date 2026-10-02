@@ -261,9 +261,7 @@ function getDiffusionBValue(elements) {
     res = getNonStandardDiffusionBValueFromMR(elements);
     // if not found, check standard EMR tag
     if (typeof res === 'undefined') {
-      if (typeof res === 'undefined') {
-        res = getStandardDiffusionBValueFromEMR(elements);
-      }
+      res = getStandardDiffusionBValueFromEMR(elements);
     }
   }
 
