@@ -194,7 +194,6 @@ export function hasDicomPrefix(buffer) {
  * Clean string: remove null characters (padding) and trim.
  * Warning: no tests are done on the input, will fail if
  *   null or undefined or not string.
- * Exported for tests only.
  *
  * @param {string} inputStr The string to clean.
  * @returns {string} The cleaned string.

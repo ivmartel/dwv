@@ -4,6 +4,14 @@ import {
   getVolumeIdTagValue
 } from '../../src/dicom/dicomVolume.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
+import {DicomParser} from '../../src/dicom/dicomParser.js';
+import {transferSyntaxKeywords} from '../../src/dicom/dictionary.js';
+import {
+  getStructureBuffers,
+  singleSliceStructure
+} from '../../dev/dicom/dataStructures.js';
+
+import syntheticData from '/tests/data/synthetic-img.json';
 
 /**
  * Tests for the 'dicom/dicomVolume.js' file.
@@ -15,7 +23,10 @@ import {DataElement} from '../../src/dicom/dataElement.js';
 const TagKeys = {
   SOPClassUID: '00080016',
   AcquisitionTime: '00080032',
+  Manufacturer: '00080070',
   DiffusionBValue: '00189087',
+  SiemensBValue: '0019100C',
+  GEBValue: '00431039',
   TemporalPositionIdentifier: '00200100',
   TemporalPositionIndex: '00209128',
   PerFrameFunctionalGroupsSequence: '52009230',
@@ -213,6 +224,81 @@ describe('dicom', () => {
         [TagKeys.DiffusionBValue]: makeDataElement('FD', [800])
       };
       assert.equal(getVolumeIdTagValue(elements), 800);
+    });
+
+    test('uses explicit VR private b-value', () => {
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        [TagKeys.Manufacturer]: makeDataElement('LO', ['SIEMENS']),
+        [TagKeys.SiemensBValue]: makeDataElement('IS', ['1000'])
+      };
+      assert.equal(getVolumeIdTagValue(elements), 1000);
+    });
+
+    test('decodes implicit VR (UN) private b-value', () => {
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        [TagKeys.Manufacturer]: makeDataElement('LO', ['SIEMENS']),
+        // '1500'
+        [TagKeys.SiemensBValue]: makeDataElement(
+          'UN', new Uint8Array([0x31, 0x35, 0x30, 0x30]))
+      };
+      assert.equal(getVolumeIdTagValue(elements), 1500);
+    });
+
+    test('decodes multi-valued padded UN private b-value', () => {
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        [TagKeys.Manufacturer]: makeDataElement('LO', ['GE MEDICAL SYSTEMS']),
+        // '500\8 '
+        [TagKeys.GEBValue]: makeDataElement(
+          'UN', new Uint8Array([0x35, 0x30, 0x30, 0x5C, 0x38, 0x20]))
+      };
+      assert.equal(getVolumeIdTagValue(elements), 500);
+    });
+
+    test('falls back to standard b-value on invalid private one', () => {
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        [TagKeys.Manufacturer]: makeDataElement('LO', ['SIEMENS']),
+        [TagKeys.SiemensBValue]: makeDataElement(
+          'UN', new Uint8Array([0x00, 0x00])),
+        [TagKeys.DiffusionBValue]: makeDataElement('FD', [800])
+      };
+      assert.equal(getVolumeIdTagValue(elements), 800);
+    });
+
+    test('reads padded UN private b-value from generated data', () => {
+      // private tag declared as UN to simulate a reader without the
+      // vendor dictionary (else the parser fixes the VR)
+      const config = structuredClone(syntheticData[0]);
+      config.tags.Manufacturer = 'SIEMENS';
+      // '500\0'
+      config.tags.SiemensBValue = [0x35, 0x30, 0x30, 0x00];
+      config.privateDictionary = {
+        '0019': {
+          '100C': ['UN', '1', 'SiemensBValue']
+        }
+      };
+      const syntaxes = [
+        transferSyntaxKeywords.ImplicitVRLittleEndian,
+        transferSyntaxKeywords.ExplicitVRLittleEndian
+      ];
+      for (const syntax of syntaxes) {
+        const buffer = getStructureBuffers(
+          config, syntax, singleSliceStructure)[0];
+        const parser = new DicomParser();
+        parser.parse(buffer);
+        const elements = parser.getDicomElements();
+        assert.equal(elements[TagKeys.SiemensBValue].vr, 'UN',
+          `UN vr for ${syntax}`);
+        assert.equal(getVolumeIdTagValue(elements), 500,
+          `b-value for ${syntax}`);
+      }
     });
 
     test('returns undefined with no usable tag', () => {

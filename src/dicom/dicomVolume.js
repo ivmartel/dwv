@@ -7,6 +7,7 @@ import {
   NormalisedManufacturers,
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
+import {cleanString} from './dicomParser.js';
 import {logger} from '../utils/logger.js';
 
 /**
@@ -117,6 +118,27 @@ function getStandardDiffusionBValueFromEMR(elements) {
 }
 
 /**
+ * Get the first value of a private tag. Private tags read from
+ * implicit VR data are not in the dictionary and are parsed as 'UN',
+ * their value is then the raw bytes: decode them as an ASCII string.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @param {string} key The tag key.
+ * @returns {string|undefined} The value, if present.
+ */
+function getPrivateTagValue(elements, key) {
+  const element = elements[key];
+  if (typeof element !== 'undefined' &&
+    element.vr === 'UN' &&
+    typeof element.value !== 'undefined') {
+    const str = cleanString(String.fromCharCode(...element.value));
+    // first of multiple values
+    return str.length !== 0 ? str.split('\\')[0] : undefined;
+  }
+  return safeGet(elements, key);
+}
+
+/**
  * Get the diffusion b-value from MR from non standard
  *   and/or private DICOM tags.
  *
@@ -142,11 +164,11 @@ function getNonStandardDiffusionBValueFromMR(elements) {
     if (typeof rule.uidPrefix !== 'undefined' &&
       typeof sopInstanceUID !== 'undefined' &&
       sopInstanceUID.startsWith(rule.uidPrefix)) {
-      value = safeGet(elements, rule.key);
+      value = getPrivateTagValue(elements, rule.key);
     } else if (typeof rule.manufacturer !== 'undefined' &&
       typeof manufacturer !== 'undefined' &&
       rule.manufacturer === manufacturer) {
-      value = safeGet(elements, rule.key);
+      value = getPrivateTagValue(elements, rule.key);
     }
     // keep first valid result
     if (typeof value !== 'undefined' &&
