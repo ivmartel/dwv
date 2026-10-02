@@ -127,33 +127,32 @@ function getNonStandardDiffusionBValueFromMR(elements) {
   let res;
 
   // manufacturers private tag
-  if (typeof res === 'undefined') {
-    const manufacturer = getNormalisedManufacturer(elements);
-    const sopInstanceUID = safeGet(elements, TagKeys.SOPInstanceUID);
+  const manufacturer = getNormalisedManufacturer(elements);
+  const sopInstanceUID = safeGet(elements, TagKeys.SOPInstanceUID);
 
-    let rules;
-    if (typeof custom.privateBValueRules !== 'undefined') {
-      rules = custom.privateBValueRules;
-    } else {
-      rules = LocalBValueRules;
+  let rules;
+  if (typeof custom.privateBValueRules !== 'undefined') {
+    rules = custom.privateBValueRules;
+  } else {
+    rules = LocalBValueRules;
+  }
+
+  for (const rule of rules) {
+    let value;
+    if (typeof rule.uidPrefix !== 'undefined' &&
+      typeof sopInstanceUID !== 'undefined' &&
+      sopInstanceUID.startsWith(rule.uidPrefix)) {
+      value = safeGet(elements, rule.key);
+    } else if (typeof rule.manufacturer !== 'undefined' &&
+      typeof manufacturer !== 'undefined' &&
+      rule.manufacturer === manufacturer) {
+      value = safeGet(elements, rule.key);
     }
-
-    for (const rule of rules) {
-      if (typeof rule.uidPrefix !== 'undefined' &&
-        typeof sopInstanceUID !== 'undefined' &&
-        sopInstanceUID.startsWith(rule.uidPrefix)) {
-        res = safeGet(elements, rule.key);
-      } else if (typeof rule.manufacturer !== 'undefined' &&
-        typeof manufacturer !== 'undefined' &&
-        rule.manufacturer === manufacturer) {
-        res = safeGet(elements, rule.key);
-      }
-      // break at first valid result
-      if (typeof res !== 'undefined' &&
-        !isNaN(parseInt(res, 10))) {
-        // TODO just break or exit function?
-        break;
-      }
+    // keep first valid result
+    if (typeof value !== 'undefined' &&
+      !isNaN(parseInt(value, 10))) {
+      res = value;
+      break;
     }
   }
 
