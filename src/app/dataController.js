@@ -416,7 +416,8 @@ export class DicomSliceDataList {
           // too many indices
           return;
         }
-        volIndexValues.sort();
+        // sort as numbers
+        volIndexValues.sort((a, b) => a - b);
       }
       // add indices to volume indices
       for (const index of item.indices) {
