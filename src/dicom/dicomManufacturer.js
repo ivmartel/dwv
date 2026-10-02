@@ -18,7 +18,7 @@ export const NormalisedManufacturers = {
   GE: 'ge',
   SIEMENS: 'siemens',
   PHILIPS: 'philips',
-  HITASHI: 'hitashi'
+  HITACHI: 'hitachi'
 };
 
 /**
@@ -51,6 +51,9 @@ export function getNormalisedManufacturer(elements) {
     } else if (manufacturer.startsWith('Philips')) {
       // 'Philips Healthcare', 'Philips Medical Systems'
       res = NormalisedManufacturers.PHILIPS;
+    } else if (manufacturer.toUpperCase().startsWith('HITACHI')) {
+      // 'Hitachi Medical Corporation', 'HITACHI'
+      res = NormalisedManufacturers.HITACHI;
     } else {
       res = manufacturer.toLowerCase();
     }

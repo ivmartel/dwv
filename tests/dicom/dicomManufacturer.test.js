@@ -214,6 +214,29 @@ describe('dicom', () => {
     });
 
     /**
+     * Tests for {@link getNormalisedManufacturer} for Hitachi.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturerHitachi
+     */
+    test('Hitachi', () => {
+      const de0 = new DataElement('LO');
+      de0.value = ['Hitachi Medical Corporation'];
+      const elements0 = {
+        [TagKeys.Manufacturer]: de0
+      };
+      const result0 = getNormalisedManufacturer(elements0);
+      assert.equal(result0, NormalisedManufacturers.HITACHI);
+
+      const de1 = new DataElement('LO');
+      de1.value = ['HITACHI'];
+      const elements1 = {
+        [TagKeys.Manufacturer]: de1
+      };
+      const result1 = getNormalisedManufacturer(elements1);
+      assert.equal(result1, NormalisedManufacturers.HITACHI);
+    });
+
+    /**
      * Tests for {@link getNormalisedManufacturer} for unknown.
      *
      * @function module:tests/dicom~getnormalisedmanufacturerUnknown

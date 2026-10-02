@@ -27,6 +27,7 @@ const TagKeys = {
   DiffusionBValue: '00189087',
   SiemensBValue: '0019100C',
   GEBValue: '00431039',
+  HitachiBValue: '00291030',
   TemporalPositionIdentifier: '00200100',
   TemporalPositionIndex: '00209128',
   PerFrameFunctionalGroupsSequence: '52009230',
@@ -258,6 +259,17 @@ describe('dicom', () => {
           'UN', new Uint8Array([0x35, 0x30, 0x30, 0x5C, 0x38, 0x20]))
       };
       assert.equal(getVolumeIdTagValue(elements), 500);
+    });
+
+    test('uses Hitachi private b-value', () => {
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        [TagKeys.Manufacturer]: makeDataElement(
+          'LO', ['Hitachi Medical Corporation']),
+        [TagKeys.HitachiBValue]: makeDataElement('DS', ['1000'])
+      };
+      assert.equal(getVolumeIdTagValue(elements), 1000);
     });
 
     test('falls back to standard b-value on invalid private one', () => {

@@ -54,7 +54,7 @@ const LocalBValueRules = [
     key: '00431039'
   },
   {
-    manufacturer: NormalisedManufacturers.HITASHI,
+    manufacturer: NormalisedManufacturers.HITACHI,
     key: '00291030'
   }
 ];
