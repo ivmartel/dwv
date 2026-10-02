@@ -126,6 +126,22 @@ describe('dicom', () => {
       assert.equal(getter({}), undefined);
     });
 
+    test('EchoTime getter with non numeric value', () => {
+      const getter = getCandidate('EchoTime');
+      const elements = {
+        [TagKeys.EchoTime]: makeDataElement('DS', ['abc'])
+      };
+      assert.equal(getter(elements), undefined);
+    });
+
+    test('TemporalPositionIdentifier getter with non numeric value', () => {
+      const getter = getCandidate('TemporalPositionIdentifier');
+      const elements = {
+        [TagKeys.TemporalPositionIdentifier]: makeDataElement('IS', ['abc'])
+      };
+      assert.equal(getter(elements), undefined);
+    });
+
     test('TriggerTime getter', () => {
       const getter = getCandidate('TriggerTime');
       const elements = {
@@ -190,6 +206,33 @@ describe('dicom', () => {
         [TagKeys.FrameContentSequence]: makeDataElement('SQ', [{
           [TagKeys.TemporalPositionIndex]: makeDataElement('US', ['3'])
         }])
+      };
+      assert.equal(getter(elements), undefined);
+    });
+
+    test('TemporalPositionIndex getter with non numeric value', () => {
+      const getter = getCandidate('TemporalPositionIndex');
+      const elements = makeMultiFrameElements('abc');
+      assert.equal(getter(elements), undefined);
+    });
+
+    test('TemporalPositionIndex getter ignores non numeric frame', () => {
+      const getter = getCandidate('TemporalPositionIndex');
+      const elements = makeMultiFrameElements(2);
+      elements[TagKeys.PerFrameFunctionalGroupsSequence].value[1] = {
+        [TagKeys.FrameContentSequence]: makeDataElement('SQ', [{
+          [TagKeys.TemporalPositionIndex]: makeDataElement('US', ['abc'])
+        }])
+      };
+      assert.equal(getter(elements), 2);
+    });
+
+    test('DiffusionBValue getter with non numeric value', () => {
+      const getter = getCandidate('DiffusionBValue');
+      const elements = {
+        [TagKeys.SOPClassUID]: makeDataElement(
+          'UI', ['1.2.840.10008.5.1.4.1.1.4']),
+        [TagKeys.DiffusionBValue]: makeDataElement('FD', ['abc'])
       };
       assert.equal(getter(elements), undefined);
     });

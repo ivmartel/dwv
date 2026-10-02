@@ -255,6 +255,25 @@ function getNonStandardDiffusionBValueFromEMR(elements) {
 }
 
 /**
+ * Parse a tag value to a number.
+ *
+ * @param {any} value The value to parse.
+ * @param {Function} parse The string to number parser to use.
+ * @returns {number|undefined} The number, or undefined if the value
+ *   is absent or not a number.
+ */
+function parseNumber(value, parse) {
+  let res;
+  if (typeof value !== 'undefined') {
+    const number = parse(value);
+    if (!isNaN(number)) {
+      res = number;
+    }
+  }
+  return res;
+}
+
+/**
  * Get the diffusion b-value.
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
@@ -288,11 +307,7 @@ function getDiffusionBValue(elements) {
   }
 
   // cast to int
-  if (typeof res !== 'undefined') {
-    res = parseInt(res, 10);
-  }
-
-  return res;
+  return parseNumber(res, value => parseInt(value, 10));
 }
 
 /**
@@ -340,9 +355,10 @@ function getTemporalPositionIndex(elements) {
     if (typeof frameContentSeq === 'undefined') {
       continue;
     }
-    const tpi = safeGet(frameContentSeq[0], TagKeys.TemporalPositionIndex);
-    if (typeof tpi !== 'undefined') {
-      const index = parseInt(tpi, 10);
+    const index = parseNumber(
+      safeGet(frameContentSeq[0], TagKeys.TemporalPositionIndex),
+      value => parseInt(value, 10));
+    if (typeof index !== 'undefined') {
       if (typeof res === 'undefined') {
         res = index;
       } else if (res !== index) {
@@ -361,16 +377,12 @@ function getTemporalPositionIndex(elements) {
  *
  * @param {string} key The tag key.
  * @param {Function} parse The string to number parser to use.
- * @returns {Function} The getter, returns undefined if the tag is absent.
+ * @returns {Function} The getter, returns undefined if the tag is absent
+ *   or not a number.
  */
 function makeNumericTagGetter(key, parse) {
   return function (elements) {
-    let res;
-    const value = safeGet(elements, key);
-    if (typeof value !== 'undefined') {
-      res = parse(value);
-    }
-    return res;
+    return parseNumber(safeGet(elements, key), parse);
   };
 }
 
