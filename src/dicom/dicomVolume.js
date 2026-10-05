@@ -314,7 +314,7 @@ function getDiffusionBValue(elements) {
 }
 
 /**
- * Get the tag time value for MR images.
+ * Get the volume id for MR images (can be time, b-value...).
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {number|undefined} The value, if present.
@@ -330,10 +330,7 @@ function getMRVolumeIdTagValue(elements) {
     sopClassUID === SOPClassUIDs.LegacyConvertedEnhancedMRImageStorage
   ) {
     // diffusion b-value
-    const bvalue = getDiffusionBValue(elements);
-    if (typeof bvalue !== 'undefined') {
-      res = bvalue;
-    }
+    res = getDiffusionBValue(elements);
   }
 
   return res;
@@ -411,10 +408,7 @@ export function getVolumeIdTagValue(elements) {
     }
     // MR (and enhanced MR) volume id
     if (typeof res === 'undefined') {
-      const volumeId = getMRVolumeIdTagValue(elements);
-      if (typeof volumeId !== 'undefined') {
-        res = volumeId;
-      }
+      res = getMRVolumeIdTagValue(elements);
     }
   }
 
