@@ -81,8 +81,6 @@ describe('dicom', () => {
     assert.deepEqual(tm31, tmTheo31, 'test time #31');
   });
 
-  });
-
   /**
    * Tests for {@link getDate}.
    *
