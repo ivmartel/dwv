@@ -34,6 +34,10 @@ describe('dicom', () => {
     const da11 = getDateObj({value: ['20230131']});
     const daTheo11 = {year: 2023, monthIndex: 0, day: 31};
     assert.deepEqual(da11, daTheo11, 'test date #11');
+
+    // non-standard ACR-NEMA
+    const da20 = getDateObj({value: ['2023.01.31']});
+    assert.deepEqual(da20, daTheo11, 'test date #20');
   });
 
   /**
@@ -59,8 +63,24 @@ describe('dicom', () => {
     assert.deepEqual(tm12, tmTheo12, 'test time #12');
 
     const tm13 = getTimeObj({value: ['193610.012345']});
-    const tmTheo13 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 12};
+    const tmTheo13 = {
+      hours: 19, minutes: 36, seconds: 10, milliseconds: 12.345
+    };
     assert.deepEqual(tm13, tmTheo13, 'test time #13');
+
+    // non-standard ACR-NEMA
+    const tm20 = getTimeObj({value: ['19:36:10.012345']});
+    assert.deepEqual(tm20, tmTheo13, 'test time #20');
+
+    // partial fractional seconds
+    const tm30 = getTimeObj({value: ['193610.5']});
+    const tmTheo30 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 500};
+    assert.deepEqual(tm30, tmTheo30, 'test time #30');
+    const tm31 = getTimeObj({value: ['193610.0001']});
+    const tmTheo31 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 0.1};
+    assert.deepEqual(tm31, tmTheo31, 'test time #31');
+  });
+
   });
 
   /**
@@ -154,14 +174,14 @@ describe('dicom', () => {
     const dt16 = getDateTimeObj({value: ['20230501193610.012345']});
     const dtTheo16 = {
       date: {year: 2023, monthIndex: 4, day: 1},
-      time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12}
+      time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12.345}
     };
     assert.deepEqual(dt16, dtTheo16, 'test time #16');
 
     const dt17 = getDateTimeObj({value: ['20230501193610.012345&0200']});
     const dtTheo17 = {
       date: {year: 2023, monthIndex: 4, day: 1},
-      time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12}
+      time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12.345}
     };
     assert.deepEqual(dt17, dtTheo17, 'test time #17');
   });
