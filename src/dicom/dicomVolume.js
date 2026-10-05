@@ -65,8 +65,8 @@ const LocalBValueRules = [
 const SOPClassUIDs = {
   MR: '1.2.840.10008.5.1.4.1.1.4',
   EnhancedMR: '1.2.840.10008.5.1.4.1.1.4.1',
-  MRSpectroscopy: '1.2.840.10008.5.1.4.1.1.4.2',
-  EnhancedMRColorImage: '1.2.840.10008.5.1.4.1.1.4.3'
+  EnhancedMRColorImage: '1.2.840.10008.5.1.4.1.1.4.3',
+  LegacyConvertedEnhancedMRImageStorage: '1.2.840.10008.5.1.4.1.1.4.4'
 };
 
 /**
@@ -286,8 +286,8 @@ function getDiffusionBValue(elements) {
   const sopClassUID = safeGet(elements, TagKeys.SOPClassUID);
 
   if (sopClassUID === SOPClassUIDs.EnhancedMR ||
-    sopClassUID === SOPClassUIDs.MRSpectroscopy ||
-    sopClassUID === SOPClassUIDs.EnhancedMRColorImage
+    sopClassUID === SOPClassUIDs.EnhancedMRColorImage ||
+    sopClassUID === SOPClassUIDs.LegacyConvertedEnhancedMRImageStorage
   ) {
     // standard tag
     res = getStandardDiffusionBValueFromEMR(elements);
@@ -324,8 +324,8 @@ function getMRVolumeIdTagValue(elements) {
   const sopClassUID = safeGet(elements, TagKeys.SOPClassUID);
   if (sopClassUID === SOPClassUIDs.MR ||
     sopClassUID === SOPClassUIDs.EnhancedMR ||
-    sopClassUID === SOPClassUIDs.MRSpectroscopy ||
-    sopClassUID === SOPClassUIDs.EnhancedMRColorImage
+    sopClassUID === SOPClassUIDs.EnhancedMRColorImage ||
+    sopClassUID === SOPClassUIDs.LegacyConvertedEnhancedMRImageStorage
   ) {
     // diffusion b-value
     const bvalue = getDiffusionBValue(elements);
