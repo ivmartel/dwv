@@ -191,19 +191,11 @@ function getPhilipsDiffusionBValueFromEMR(elements) {
   let res;
 
   // check if the dim pointer is for b-value
-  let gotBValuePointer = false;
   const indexSeq = safeGetAll(elements, TagKeys.DimensionIndexSequence);
-  if (typeof indexSeq !== 'undefined') {
-    for (const dimIndex of indexSeq) {
-      const pointer = safeGet(dimIndex, TagKeys.DimensionIndexPointer);
-      if (typeof pointer !== 'undefined' &&
-        pointer === TagKeys.DiffusionBValueAT
-      ) {
-        gotBValuePointer = true;
-        break;
-      }
-    }
-  }
+  const gotBValuePointer = typeof indexSeq !== 'undefined' &&
+    indexSeq.some(dimIndex =>
+      safeGet(dimIndex, TagKeys.DimensionIndexPointer) ===
+      TagKeys.DiffusionBValueAT);
   // get from per frame functional group
   if (gotBValuePointer) {
     /**
