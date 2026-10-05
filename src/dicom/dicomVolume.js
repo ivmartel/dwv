@@ -185,7 +185,7 @@ function getNonStandardDiffusionBValueFromMR(elements) {
  * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
-function getDiffusionBValueFromFrameContent(elements) {
+function getPhilipsDiffusionBValueFromEMR(elements) {
   let res;
 
   // check if the dim pointer is for b-value
@@ -249,7 +249,7 @@ function getNonStandardDiffusionBValueFromEMR(elements) {
   // philips can use frame content
   if (typeof manufacturer !== 'undefined' &&
     manufacturer === NormalisedManufacturers.PHILIPS) {
-    res = getDiffusionBValueFromFrameContent(elements);
+    res = getPhilipsDiffusionBValueFromEMR(elements);
   }
 
   return res;
