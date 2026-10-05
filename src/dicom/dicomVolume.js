@@ -8,6 +8,7 @@ import {
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
 import {cleanString} from './dicomParser.js';
+import {getDateObj, getTimeInSeconds} from './dicomDate.js';
 import {getConstantPerFrameValue} from './dicomFunctionalGroup.js';
 import {logger} from '../utils/logger.js';
 
@@ -22,6 +23,7 @@ const TagKeys = {
   SOPClassUID: '00080016',
   SOPInstanceUID: '00080018',
   Manufacturer: '00080070',
+  AcquisitionDate: '00080022',
   AcquisitionTime: '00080032',
   DimensionIndexSequence: '00209222',
   DimensionIndexPointer: '00209165',
@@ -420,6 +422,30 @@ export function getVolumeIdTagValue(elements) {
 }
 
 /**
+ * Get the acquisition time as a number of seconds. If the acquisition
+ * date is available, it is included so that acquisitions spanning
+ * midnight are correctly ordered.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {number|undefined} The value, if present.
+ */
+function getAcquisitionTime(elements) {
+  if (typeof safeGet(elements, TagKeys.AcquisitionTime) === 'undefined') {
+    return undefined;
+  }
+  let res = getTimeInSeconds(elements[TagKeys.AcquisitionTime]);
+  if (typeof res !== 'undefined' &&
+    typeof safeGet(elements, TagKeys.AcquisitionDate) !== 'undefined') {
+    const date = getDateObj(elements[TagKeys.AcquisitionDate]);
+    const dateMs = Date.UTC(date.year, date.monthIndex, date.day);
+    if (!isNaN(dateMs)) {
+      res += dateMs / 1000;
+    }
+  }
+  return res;
+}
+
+/**
  * Ordered list of candidate post load volume id getters. Since the tag
  * that actually discriminates volumes is not known until the full data
  * is loaded, `DicomSliceDataList` tries these in order and keeps the
@@ -456,6 +482,6 @@ export const postLoadVolumeIdCandidates = [
   },
   {
     name: 'AcquisitionTime',
-    getter: makeNumericTagGetter(TagKeys.AcquisitionTime, parseFloat)
+    getter: getAcquisitionTime
   }
 ];

@@ -22,6 +22,7 @@ import syntheticData from '/tests/data/synthetic-img.json';
  */
 const TagKeys = {
   SOPClassUID: '00080016',
+  AcquisitionDate: '00080022',
   AcquisitionTime: '00080032',
   Manufacturer: '00080070',
   DiffusionBValue: '00189087',
@@ -185,7 +186,22 @@ describe('dicom', () => {
       const elements = {
         [TagKeys.AcquisitionTime]: makeDataElement('TM', ['101112'])
       };
-      assert.equal(getter(elements), 101112);
+      // seconds since midnight
+      assert.equal(getter(elements), 10 * 3600 + 11 * 60 + 12);
+    });
+
+    test('AcquisitionTime getter orders across midnight', () => {
+      const getter = getCandidate('AcquisitionTime');
+      const before = getter({
+        [TagKeys.AcquisitionDate]: makeDataElement('DA', ['20260101']),
+        [TagKeys.AcquisitionTime]: makeDataElement('TM', ['235959'])
+      });
+      const after = getter({
+        [TagKeys.AcquisitionDate]: makeDataElement('DA', ['20260102']),
+        [TagKeys.AcquisitionTime]: makeDataElement('TM', ['000001'])
+      });
+      assert.isBelow(before, after);
+      assert.equal(after - before, 2);
     });
 
     test('DiffusionBValue getter uses root level tag for MR', () => {
