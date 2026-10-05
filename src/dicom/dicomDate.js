@@ -96,6 +96,26 @@ export function getTimeObj(element) {
 }
 
 /**
+ * Get the number of seconds since midnight from a DICOM element
+ *   with vr=TM.
+ *
+ * @param {DataElement} element The DICOM element with time information.
+ * @returns {number|undefined} The number of seconds, or undefined if
+ *   the element is absent or not a valid time.
+ */
+export function getTimeInSeconds(element) {
+  const timeObj = getTimeObj(element);
+  if (typeof timeObj === 'undefined') {
+    return undefined;
+  }
+  const res = timeObj.hours * 3600 +
+    timeObj.minutes * 60 +
+    timeObj.seconds +
+    timeObj.milliseconds / 1000;
+  return isNaN(res) ? undefined : res;
+}
+
+/**
  * Get a javascript Date object from objects with date information.
  *
  * @param {DateObj} dateObj The date object.

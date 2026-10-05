@@ -2,6 +2,7 @@ import {describe, test, assert} from 'vitest';
 import {
   getDateObj,
   getTimeObj,
+  getTimeInSeconds,
   getDate,
   getDateTimeObj,
   dateToDateObj,
@@ -79,6 +80,31 @@ describe('dicom', () => {
     const tm31 = getTimeObj({value: ['193610.0001']});
     const tmTheo31 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 0.1};
     assert.deepEqual(tm31, tmTheo31, 'test time #31');
+  });
+
+  /**
+   * Tests for {@link getTimeInSeconds}.
+   *
+   * @function module:tests/dicom~gettimeinseconds
+   */
+  test('getTimeInSeconds', () => {
+    assert.isUndefined(getTimeInSeconds(undefined), 'test time #00');
+    assert.isUndefined(getTimeInSeconds({value: ['abc']}), 'test time #01');
+
+    assert.equal(getTimeInSeconds({value: ['19']}), 19 * 3600,
+      'test time #10');
+    assert.equal(getTimeInSeconds({value: ['1936']}), 19 * 3600 + 36 * 60,
+      'test time #11');
+    assert.equal(getTimeInSeconds({value: ['193610']}),
+      19 * 3600 + 36 * 60 + 10, 'test time #12');
+    assert.equal(getTimeInSeconds({value: ['193610.5']}),
+      19 * 3600 + 36 * 60 + 10.5, 'test time #13');
+    // non-standard ACR-NEMA
+    assert.equal(getTimeInSeconds({value: ['19:36:10.5']}),
+      19 * 3600 + 36 * 60 + 10.5, 'test time #20');
+    // microsecond precision
+    assert.closeTo(getTimeInSeconds({value: ['193610.000001']}),
+      19 * 3600 + 36 * 60 + 10.000001, 1e-9, 'test time #30');
   });
 
   /**
