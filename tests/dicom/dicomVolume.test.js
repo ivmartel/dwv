@@ -1,8 +1,10 @@
 import {describe, test, assert} from 'vitest';
 import {
-  postLoadVolumeIdCandidates,
-  getVolumeIdTagValue
+  volumeIdCandidates,
+  getVolumeIdTagValue,
+  getVolumeIndices
 } from '../../src/dicom/dicomVolume.js';
+import {custom} from '../../src/app/custom.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {transferSyntaxKeywords} from '../../src/dicom/dictionary.js';
@@ -109,17 +111,17 @@ function makeDataElement(vr, value) {
  * @returns {Function} The getter.
  */
 function getCandidate(name) {
-  const candidate = postLoadVolumeIdCandidates.find(
+  const candidate = volumeIdCandidates.find(
     item => item.name === name);
   return candidate.getter;
 }
 
 describe('dicom', () => {
 
-  describe('postLoadVolumeIdCandidates', () => {
+  describe('volumeIdCandidates', () => {
 
     test('has AcquisitionTime last', () => {
-      const names = postLoadVolumeIdCandidates.map(item => item.name);
+      const names = volumeIdCandidates.map(item => item.name);
       assert.equal(names[names.length - 1], 'AcquisitionTime');
     });
 
@@ -430,6 +432,107 @@ describe('dicom', () => {
 
     test('returns undefined with no usable tag', () => {
       assert.equal(getVolumeIdTagValue({}), undefined);
+    });
+
+  });
+
+  describe('getVolumeIdTagValue pre load candidates', () => {
+
+    test('flags the explicit candidates', () => {
+      const names = volumeIdCandidates
+        .filter(item => item.preLoad === true)
+        .map(item => item.name);
+      assert.deepEqual(names, [
+        'TemporalPositionIdentifier',
+        'TemporalPositionIndex',
+        'DiffusionBValue'
+      ]);
+    });
+
+    test('ignores non pre load candidates', () => {
+      const elements = {
+        [TagKeys.EchoTime]: makeDataElement('DS', ['90'])
+      };
+      assert.isUndefined(getVolumeIdTagValue(elements));
+    });
+
+    test('uses custom pre load candidates', () => {
+      const elements = {
+        [TagKeys.EchoTime]: makeDataElement('DS', ['90']),
+        [TagKeys.TemporalPositionIdentifier]: makeDataElement('IS', ['3'])
+      };
+      custom.volumeIdCandidates = [
+        {
+          name: 'EchoTime',
+          getter: getCandidate('EchoTime'),
+          preLoad: true
+        },
+        {
+          name: 'TemporalPositionIdentifier',
+          getter: getCandidate('TemporalPositionIdentifier')
+        }
+      ];
+      try {
+        assert.equal(getVolumeIdTagValue(elements), 90);
+      } finally {
+        custom.volumeIdCandidates = undefined;
+      }
+    });
+
+  });
+
+  describe('getVolumeIndices', () => {
+
+    test('volume-major items', () => {
+      assert.deepEqual(
+        getVolumeIndices([1, 1, 2, 2], [0, 1, 0, 1], 2),
+        [0, 0, 1, 1]);
+    });
+
+    test('slice-major items', () => {
+      assert.deepEqual(
+        getVolumeIndices([1, 2, 1, 2], [0, 0, 1, 1], 2),
+        [0, 1, 0, 1]);
+    });
+
+    test('scrambled items', () => {
+      assert.deepEqual(
+        getVolumeIndices([2, 1, 1, 2], [1, 0, 1, 0], 2),
+        [1, 0, 0, 1]);
+    });
+
+    test('sorts values as numbers', () => {
+      assert.deepEqual(
+        getVolumeIndices([1000, 50, 0], [0, 0, 0], 1),
+        [2, 1, 0]);
+    });
+
+    test('accepts fractional values', () => {
+      assert.deepEqual(
+        getVolumeIndices([0.5, 1.5, 0.5, 1.5], [0, 0, 1, 1], 2),
+        [0, 1, 0, 1]);
+    });
+
+    test('undefined for invalid groupings', () => {
+      // length mismatch
+      assert.isUndefined(getVolumeIndices([1, 2], [0, 0, 1], 2));
+      // missing value
+      assert.isUndefined(
+        getVolumeIndices([1, undefined, 2, 2], [0, 1, 0, 1], 2));
+      // non number value
+      assert.isUndefined(
+        getVolumeIndices(['1', '1', '2', '2'], [0, 1, 0, 1], 2));
+      assert.isUndefined(
+        getVolumeIndices([1, NaN, 2, 2], [0, 1, 0, 1], 2));
+      // single value
+      assert.isUndefined(
+        getVolumeIndices([1, 1, 1, 1], [0, 1, 0, 1], 2));
+      // volumes x slices !== items
+      assert.isUndefined(
+        getVolumeIndices([1, 1, 2, 3], [0, 1, 0, 1], 2));
+      // duplicate (slice, volume) pair
+      assert.isUndefined(
+        getVolumeIndices([1, 1, 2, 2], [0, 0, 1, 1], 2));
     });
 
   });

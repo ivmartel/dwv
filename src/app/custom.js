@@ -60,14 +60,16 @@ export const custom = {
   getPostLoadVolumeIdTagValue: undefined,
 
   /**
-   * Ordered list of candidate post load volume id getters, tried in
-   * order until one produces a valid per-volume grouping. Overrides
-   * the default list from `dicomVolume.js`. Ignored if
-   * `getPostLoadVolumeIdTagValue` is set.
+   * Ordered list of candidate volume id getters, tried in order until
+   * one produces a valid per-volume grouping of the files of a series.
+   * Candidates flagged with
+   * `preLoad` are also used while loading (see `getVolumeIdTagValue`).
+   * Overrides the default list from `dicomVolume.js`. Ignored for
+   * grouping if `getPostLoadVolumeIdTagValue` is set.
    *
-   * @type {{name: string, getter: Function}[]}
+   * @type {{name: string, getter: Function, preLoad?: boolean}[]}
    */
-  postLoadVolumeIdCandidates: undefined,
+  volumeIdCandidates: undefined,
 
   /**
    * Get the pixel data unit from a list of dicom tags.

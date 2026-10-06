@@ -9,9 +9,8 @@ import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet} from '../dicom/dataElement.js';
 import {
   getVolumeIdTagValue,
-  postLoadVolumeIdCandidates
+  guessVolumeIndices
 } from '../dicom/dicomVolume.js';
-import {custom} from './custom.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 import {
   getReferencedSeriesUID,
@@ -302,8 +301,8 @@ export class DicomSliceDataList {
     }
 
     // guess the volume id tag and get indices per volumes
-    const {volsIndices, volumeIndexGetter} = this.#guessVolumesIndices(
-      originList, numberOfSlicesPerVolumes);
+    const {volsIndices, volumeIndexGetter} =
+      this.#guessVolumesIndices(originList);
 
     if (typeof volsIndices === 'undefined') {
       throw new Error('Cannot create image for multi-volume');
@@ -339,113 +338,45 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Guess the post load volume id getter and derive the indices per
-   * volume from it. If `custom.getPostLoadVolumeIdTagValue` is
-   * registered, it is used as-is (no guessing). Otherwise, since the
-   * tag that discriminates volumes is only knowable once the whole
-   * data is loaded, candidate getters are tried in order and the
-   * first one that produces a valid, consistent per-volume grouping
-   * is kept.
+   * Guess the volume id getter and derive the indices per volume
+   * from it (see dicomVolume guessVolumeIndices).
    *
    * @param {object[]} originList The list of origins and their
    *   occurences, as returned by #getOriginList.
-   * @param {number} numberOfSlicesPerVolumes The number of
-   *   expected slices per volumes.
    * @returns {{volsIndices: number[][]|undefined,
    *   volumeIndexGetter: Function|undefined}} The indices per volume
    *   and the getter that produced them, both undefined if no
    *   candidate worked.
    */
-  #guessVolumesIndices(originList, numberOfSlicesPerVolumes) {
-    if (typeof custom.getPostLoadVolumeIdTagValue !== 'undefined') {
-      const volumeIndexGetter = custom.getPostLoadVolumeIdTagValue;
+  #guessVolumesIndices(originList) {
+    // slice index of each data
+    const sliceIndices = [];
+    for (let i = 0; i < originList.length; ++i) {
+      for (const index of originList[i].indices) {
+        sliceIndices[index] = i;
+      }
+    }
+    const guess = guessVolumeIndices(
+      this.#list.map(data => data.meta), sliceIndices, originList.length);
+    if (typeof guess === 'undefined') {
       return {
-        volsIndices: this.#getVolumesIndices(
-          originList, numberOfSlicesPerVolumes, volumeIndexGetter),
-        volumeIndexGetter
+        volsIndices: undefined,
+        volumeIndexGetter: undefined
       };
     }
 
-    const candidates = typeof custom.postLoadVolumeIdCandidates !== 'undefined'
-      ? custom.postLoadVolumeIdCandidates
-      : postLoadVolumeIdCandidates;
-    for (const candidate of candidates) {
-      const volsIndices = this.#getVolumesIndices(
-        originList, numberOfSlicesPerVolumes, candidate.getter);
-      if (typeof volsIndices !== 'undefined') {
-        logger.debug(
-          `Using '${candidate.name}' as temporal position identifier`);
-        return {volsIndices, volumeIndexGetter: candidate.getter};
-      }
-    }
-
-    return {
-      volsIndices: undefined,
-      volumeIndexGetter: undefined
-    };
-  }
-
-  /**
-   * Get the list of indices per volume.
-   *
-   * @param {object[]} originList The list of origins and their
-   *   occurences, as returned by #getOriginList.
-   * @param {number} numberOfSlicesPerVolumes The number of
-   *   expected slices per volumes.
-   * @param {Function} volumeIndexGetter A function to get the volume index from
-   *   meta data.
-   * @returns {number[][]|undefined} List of indices per volume or
-   *   undefined if something went wrong.
-   */
-  #getVolumesIndices(originList, numberOfSlicesPerVolumes, volumeIndexGetter) {
-    const volumesIndices = [];
-    const volIndexValues = [];
+    // data indices per volume, in origin list order
+    const volsIndices = [];
     for (const item of originList) {
-      // build volume index list
-      if (volIndexValues.length === 0) {
-        for (const index of item.indices) {
-          const relData = this.#list[index];
-          const volumeIndex = volumeIndexGetter(relData.meta);
-          if (volIndexValues.includes(volumeIndex)) {
-            // duplicate volume index
-            return;
-          }
-          volIndexValues.push(volumeIndex);
-        }
-        if (volIndexValues.length !== numberOfSlicesPerVolumes) {
-          // too many indices
-          return;
-        }
-        // sort as numbers
-        volIndexValues.sort((a, b) => a - b);
-      }
-      // add indices to volume indices
       for (const index of item.indices) {
-        const relData = this.#list[index];
-        const volumeIndex = volumeIndexGetter(relData.meta);
-        const volIndex = volIndexValues.indexOf(volumeIndex);
-        if (volIndex === -1) {
-          // unknown index
-          return;
+        const volIndex = guess.volumeIndices[index];
+        if (typeof volsIndices[volIndex] === 'undefined') {
+          volsIndices[volIndex] = [];
         }
-        // add data index to volume indices
-        if (typeof volumesIndices[volIndex] === 'undefined') {
-          volumesIndices[volIndex] = [];
-        }
-        volumesIndices[volIndex].push(index);
+        volsIndices[volIndex].push(index);
       }
     }
-
-    // check same size
-    const numberOfSlices = originList.length;
-    for (const list of volumesIndices) {
-      if (list.length !== numberOfSlices) {
-        // wrong number of slices
-        return;
-      }
-    }
-
-    return volumesIndices;
+    return {volsIndices, volumeIndexGetter: guess.getter};
   }
 
   /**
