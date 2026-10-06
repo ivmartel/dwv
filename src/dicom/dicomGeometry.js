@@ -18,8 +18,7 @@ import {getOrientationFromCosines} from '../math/orientation.js';
 import {
   Point3D,
   point3DFromArray,
-  includesPoint3D,
-  getEqualPoint3DFunction
+  includesPoint3D
 } from '../math/point.js';
 import {Index} from '../math/index.js';
 import {
@@ -369,14 +368,14 @@ export function getFramesGeometry(
 }
 
 /**
- * Get the spatially sorted geometry from the per-frame functional groups,
- *   along with the sorted slice index of each frame.
+ * Get the geometry of each frame from the per-frame functional groups:
+ *   a one slice geometry with the frame position and the data time
+ *   (if any).
  *
  * @param {DataElements} dataElements The DICOM data elements.
- * @returns {{geometry: Geometry, frameSliceIndices: number[]}|undefined}
- *   The sorted geometry and the list of slice indices indexed by frame
- *   (encoding order) number, undefined if there are no per-frame
- *   functional groups or if their origins are not unique.
+ * @returns {Geometry[]|undefined} The list of geometries indexed by
+ *   frame (encoding order) number. Undefined if there are no per-frame
+ *   functional groups or if their positions are not unique.
  * @throws {Error} Error for missing or wrong data.
  */
 export function getSortedFramesGeometry(dataElements) {
@@ -401,24 +400,20 @@ export function getSortedFramesGeometry(dataElements) {
     frameOrigins.push(frameOrigin);
   }
 
+  // common geometry (spacing, orientation, time)
   const geometry = getFramesGeometry(dataElements, funcGroups);
-  geometry.sortOrigins();
+  const geoSize = geometry.getSize();
+  const frameSize = new Size([geoSize.get(0), geoSize.get(1), 1]);
 
-  // frames are in per-frame (encoding) order, which can
-  // differ from the spatial order sortOrigins just applied
-  // to the geometry: work out where each frame now lands
-  const sortedOrigins = geometry.getOrigins();
-  const frameSliceIndices = frameOrigins.map(function (frameOrigin) {
-    const sliceIndex = sortedOrigins.findIndex(
-      getEqualPoint3DFunction(frameOrigin));
-    if (sliceIndex === -1) {
-      throw new Error('Cannot find frame origin in sorted origins');
-    }
-    return sliceIndex;
-  });
-
-  return {
-    geometry,
-    frameSliceIndices
-  };
+  const res = [];
+  for (let i = 0; i < frameOrigins.length; ++i) {
+    res.push(new Geometry(
+      [frameOrigins[i]],
+      frameSize,
+      geometry.getSpacing(),
+      geometry.getOrientation(),
+      geometry.getInitialTime()
+    ));
+  }
+  return res;
 }

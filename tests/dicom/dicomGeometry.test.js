@@ -190,17 +190,19 @@ describe('getSortedFramesGeometry', () => {
     warnSpy.mockRestore();
   });
 
-  test('sorted geometry and frame slice indices', () => {
+  test('frame geometries', () => {
     const structure = unsortedMultiframeMultiSliceStructure;
     const order = structure.genOptions.framePositionOrder;
     const elements = getStructureElementsList(config, syntax, structure)[0];
     const res = getSortedFramesGeometry(elements);
     assert.isDefined(res);
-    assert.deepEqual(res.frameSliceIndices, order, 'frame slice indices');
-    const origins = res.geometry.getOrigins();
-    for (let i = 0; i < order.length; ++i) {
+    assert.equal(res.length, order.length, 'one geometry per frame');
+    for (let f = 0; f < res.length; ++f) {
       assert.deepEqual(
-        origins[i].getValues(), [0, 0, i], `slice ${i} origin`);
+        res[f].getOrigins().map(origin => origin.getValues()),
+        [[0, 0, order[f]]], `frame ${f} origin`);
+      assert.equal(res[f].getSize().get(2), 1, `frame ${f} one slice`);
+      assert.equal(res[f].getSpacing().get(2), 1, `frame ${f} slice spacing`);
     }
   });
 

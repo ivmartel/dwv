@@ -236,18 +236,18 @@ function getWindowPresets(dataElements, intensityFactor) {
 }
 
 /**
- * Sorted frames geometry cache: frames of a multi-frame data share
+ * Frames geometry cache: frames of a multi-frame data share
  * the same data elements, avoid calculating it for each frame.
  *
- * @type {WeakMap<DataElements, object>}
+ * @type {WeakMap<DataElements, Geometry[]|undefined>}
  */
-const sortedFramesCache = new WeakMap();
+const framesGeometryCache = new WeakMap();
 
 /**
  * Get the geometry of one frame of a multi-frame data.
  *
- * Frames with unique per-frame positions are spatial slices: the frame
- * geometry has the frame position and the data time (if any). Other
+ * Frames with per-frame positions get their geometry from
+ * getSortedFramesGeometry: the frame position and the data time. Other
  * frames are time frames: the frame geometry has the root position
  * and the frame number as time. Once all frames are appended
  * (see Image.appendSlice), the image has the same layout as the one
@@ -258,31 +258,22 @@ const sortedFramesCache = new WeakMap();
  * @returns {Geometry} The frame geometry.
  */
 function getFrameGeometry(dataElements, frameNumber) {
-  if (!sortedFramesCache.has(dataElements)) {
-    sortedFramesCache.set(
+  if (!framesGeometryCache.has(dataElements)) {
+    framesGeometryCache.set(
       dataElements, getSortedFramesGeometry(dataElements));
   }
-  const sortedFrames = sortedFramesCache.get(dataElements);
-
-  const size2D = getImage2DSize(dataElements);
-  const size = new Size([size2D[0], size2D[1], 1]);
+  const framesGeometry = framesGeometryCache.get(dataElements);
 
   let res;
-  if (typeof sortedFrames !== 'undefined') {
-    const geometry = sortedFrames.geometry;
-    const sliceIndex = sortedFrames.frameSliceIndices[frameNumber];
-    res = new Geometry(
-      [geometry.getOrigins()[sliceIndex]],
-      size,
-      geometry.getSpacing(),
-      geometry.getOrientation(),
-      geometry.getInitialTime()
-    );
+  if (typeof framesGeometry !== 'undefined') {
+    // clone: the geometry of the first frame is modified by appends
+    res = framesGeometry[frameNumber].clone();
   } else {
     const geometry = getRootGeometry(dataElements);
+    const size2D = getImage2DSize(dataElements);
     res = new Geometry(
       [geometry.getOrigin()],
-      size,
+      new Size([size2D[0], size2D[1], 1]),
       geometry.getSpacing(),
       geometry.getOrientation(),
       frameNumber
