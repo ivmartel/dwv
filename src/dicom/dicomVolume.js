@@ -386,6 +386,25 @@ const getTemporalPositionIdentifier = makeNumericTagGetter(
   TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10));
 
 /**
+ * List of already logged deprecation messages.
+ *
+ * @type {string[]}
+ */
+const loggedDeprecations = [];
+
+/**
+ * Log a deprecation warning, only once per message.
+ *
+ * @param {string} message The deprecation message.
+ */
+function warnDeprecatedOnce(message) {
+  if (!loggedDeprecations.includes(message)) {
+    loggedDeprecations.push(message);
+    logger.warn(message);
+  }
+}
+
+/**
  * Get the volume id from a list of tags, used while loading (before
  * the full data is known): the first defined value of the volume id
  * candidates flagged with `preLoad` (see volumeIdCandidates).
@@ -395,6 +414,10 @@ const getTemporalPositionIdentifier = makeNumericTagGetter(
  */
 export function getVolumeIdTagValue(elements) {
   if (typeof custom.getVolumeIdTagValue !== 'undefined') {
+    warnDeprecatedOnce(
+      'custom.getVolumeIdTagValue: deprecated since v0.37,' +
+      ' please use custom.volumeIdCandidates with a preLoad candidate.'
+    );
     return custom.getVolumeIdTagValue(elements);
   }
   for (const candidate of getVolumeIdCandidates()) {
@@ -545,8 +568,8 @@ export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
  * Guess the volume index of items (files) that share slice
  * positions: volume id candidates are tried in order, the first one
  * that produces a valid grouping is kept (see getVolumeIndices).
- * If `custom.getPostLoadVolumeIdTagValue` is defined, it is used as
- * the only candidate.
+ * If the deprecated `custom.getPostLoadVolumeIdTagValue` is defined,
+ * it is used as the only candidate.
  *
  * @param {Record<string, DataElement>[]} elementsList The DICOM tags
  *   of each item.
@@ -560,6 +583,10 @@ export function guessVolumeIndices(
   elementsList, sliceIndices, numberOfSlices) {
   let candidates;
   if (typeof custom.getPostLoadVolumeIdTagValue !== 'undefined') {
+    warnDeprecatedOnce(
+      'custom.getPostLoadVolumeIdTagValue: deprecated since v0.37,' +
+      ' please use custom.volumeIdCandidates.'
+    );
     candidates = [{
       name: 'custom',
       getter: custom.getPostLoadVolumeIdTagValue

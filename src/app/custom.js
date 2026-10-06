@@ -48,6 +48,10 @@ export const custom = {
    *
    * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {number|undefined} The id value if available.
+   * @deprecated Since v0.37, please use volumeIdCandidates with
+   *   a `preLoad` candidate, for example:
+   *   `[{name: 'custom', getter: fn, preLoad: true},
+   *   ...volumeIdCandidates]`.
    */
   getVolumeIdTagValue: undefined,
 
@@ -56,6 +60,8 @@ export const custom = {
    *
    * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {number|undefined} The id value if available.
+   * @deprecated Since v0.37, please use volumeIdCandidates, for example:
+   *   `[{name: 'custom', getter: fn}, ...volumeIdCandidates]`.
    */
   getPostLoadVolumeIdTagValue: undefined,
 
@@ -63,9 +69,10 @@ export const custom = {
    * Ordered list of candidate volume id getters, tried in order until
    * one produces a valid per-volume grouping of the files of a series.
    * Candidates flagged with
-   * `preLoad` are also used while loading (see `getVolumeIdTagValue`).
-   * Overrides the default list from `dicomVolume.js`. Ignored for
-   * grouping if `getPostLoadVolumeIdTagValue` is set.
+   * `preLoad` are also used while loading: they must not vary between
+   * the slices of a single volume. Overrides the default list from
+   * `dicomVolume.js` (exported as `volumeIdCandidates`), which can
+   * be used to extend it.
    *
    * @type {{name: string, getter: Function, preLoad?: boolean}[]}
    */

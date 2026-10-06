@@ -1,10 +1,11 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi} from 'vitest';
 import {
   volumeIdCandidates,
   getVolumeIdTagValue,
   getVolumeIndices
 } from '../../src/dicom/dicomVolume.js';
 import {custom} from '../../src/app/custom.js';
+import {logger} from '../../src/utils/logger.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {transferSyntaxKeywords} from '../../src/dicom/dictionary.js';
@@ -454,6 +455,19 @@ describe('dicom', () => {
         [TagKeys.EchoTime]: makeDataElement('DS', ['90'])
       };
       assert.isUndefined(getVolumeIdTagValue(elements));
+    });
+
+    test('uses deprecated custom getter with a warning', () => {
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+      custom.getVolumeIdTagValue = () => 7;
+      try {
+        assert.equal(getVolumeIdTagValue({}), 7);
+        assert.equal(getVolumeIdTagValue({}), 7);
+        assert.equal(warnSpy.mock.calls.length, 1, 'warn once');
+      } finally {
+        custom.getVolumeIdTagValue = undefined;
+        warnSpy.mockRestore();
+      }
     });
 
     test('uses custom pre load candidates', () => {

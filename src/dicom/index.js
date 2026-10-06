@@ -46,6 +46,7 @@ import {
   getManufacturer,
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
+import {volumeIdCandidates} from './dicomVolume.js';
 
 // also export typedefs
 export * from './simpleTagValues.js';
@@ -81,4 +82,5 @@ export {
   getManufacturer,
   getNormalisedManufacturer,
   hasDicomPrefix,
+  volumeIdCandidates,
 };

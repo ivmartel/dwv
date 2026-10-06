@@ -177,15 +177,24 @@ function viewerSetup() {
   //   }
   // };
 
-  // // example private logic for volume id value retrieval
-  // custom.getVolumeIdTagValue = function (elements) {
-  //   let value;
-  //   const element = elements['ABCD0123'];
-  //   if (typeof element !== 'undefined') {
-  //     value = parseInt(element.value[0], 10);
-  //   }
-  //   return value;
-  // };
+  // // example private logic for volume id value retrieval:
+  // // tried first, before the default candidates
+  // // (import {volumeIdCandidates} from '../../src/dicom/dicomVolume.js')
+  // custom.volumeIdCandidates = [
+  //   {
+  //     name: 'ABCD0123',
+  //     getter: function (elements) {
+  //       let value;
+  //       const element = elements['ABCD0123'];
+  //       if (typeof element !== 'undefined') {
+  //         value = parseInt(element.value[0], 10);
+  //       }
+  //       return value;
+  //     },
+  //     preLoad: true
+  //   },
+  //   ...volumeIdCandidates
+  // ];
 
   // // example private logic for pixel unit value retrieval
   // custom.getTagPixelUnit = function (/*elements*/) {
