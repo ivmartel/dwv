@@ -247,7 +247,8 @@ const framesGeometryCache = new WeakMap();
  * Get the geometry of one frame of a multi-frame data.
  *
  * Frames with per-frame positions get their geometry from
- * getSortedFramesGeometry: the frame position and the data time. Other
+ * getSortedFramesGeometry: the frame position and the data time,
+ * or the volume index as time if frames share positions. Other
  * frames are time frames: the frame geometry has the root position
  * and the frame number as time. Once all frames are appended
  * (see Image.appendSlice), the image has the same layout as the one

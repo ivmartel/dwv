@@ -15,11 +15,50 @@ export const singleSliceStructure = {
 /**
  * Single file, frames with positions not in spatial order: the
  * frames need to be sorted to get the spatial slices.
+ *
+ * Test only: not part of {@link dataStructures}, so not listed
+ * in the synthetic data page.
  */
 export const unsortedMultiframeMultiSliceStructure = {
   name: 'unsorted multiframe multi-slice',
   numberOfFrames: 5,
   genOptions: {frames3D: true, framePositionOrder: [2, 0, 4, 1, 3]}
+};
+
+/**
+ * Single file, several volumes: frames share positions and have
+ * a different TemporalPositionIndex per volume. Frames are not in
+ * spatial nor temporal order.
+ *
+ * Test only: not part of {@link dataStructures}, so not listed
+ * in the synthetic data page.
+ */
+export const multiframeMultiVolumeStructure = {
+  name: 'unsorted multiframe multi-volume',
+  numberOfFrames: 4,
+  genOptions: {
+    frames3D: true,
+    framePositionOrder: [1, 0, 0, 1],
+    frameTemporalPositions: [2, 2, 1, 1]
+  }
+};
+
+/**
+ * Single file, several volumes: frames share positions and have
+ * a different diffusion b-value per volume (constant
+ * TemporalPositionIndex). Frames are not in spatial nor b-value order.
+ *
+ * Test only: not part of {@link dataStructures}, so not listed
+ * in the synthetic data page.
+ */
+export const multiframeMultiVolumeBValueStructure = {
+  name: 'multiframe multi-volume b-value',
+  numberOfFrames: 4,
+  genOptions: {
+    frames3D: true,
+    framePositionOrder: [1, 0, 0, 1],
+    frameBValues: [1000, 1000, 50, 50]
+  }
 };
 
 /**
@@ -49,6 +88,18 @@ export const dataStructures = {
     short: 'sfms',
     numberOfFrames: 5,
     genOptions: {frames3D: true}
+  },
+  // one file, frames with position and temporal position: several
+  // volumes (frames in volume then spatial order)
+  multiframeMultiVolume: {
+    name: 'multiframe multi-volume',
+    short: 'mfmv',
+    numberOfFrames: 10,
+    genOptions: {
+      frames3D: true,
+      framePositionOrder: [0, 1, 2, 3, 4, 0, 1, 2, 3, 4],
+      frameTemporalPositions: [1, 1, 1, 1, 1, 2, 2, 2, 2, 2]
+    }
   },
   // spatial slices, one file per slice
   multipleSingleSlice: {

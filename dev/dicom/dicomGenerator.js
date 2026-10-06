@@ -61,6 +61,10 @@ import JSZip from 'jszip';
  *   as spatial slices).
  * @property {number[]} framePositionOrder With frames3D, the slice
  *   position of each frame, defaults to the frame number.
+ * @property {number[]} frameTemporalPositions With frames3D, the
+ *   TemporalPositionIndex of each frame, defaults to the time index.
+ * @property {number[]} frameBValues With frames3D, the diffusion
+ *   b-value of each frame (in a MRDiffusionSequence), defaults to none.
  */
 
 /**
@@ -70,6 +74,17 @@ import JSZip from 'jszip';
  * @property {Object} writerRules The writer rules.
  * @property {boolean} addMissingTags Writer add missing flag.
  */
+
+/**
+ * Get the rank of each value in the sorted list of distinct values.
+ *
+ * @param {number[]} values The values.
+ * @returns {number[]} The ranks.
+ */
+function getRanks(values) {
+  const sorted = [...new Set(values)].sort((a, b) => a - b);
+  return values.map(value => sorted.indexOf(value));
+}
 
 // List of pixel generators
 export const _pixelGenerators = {
@@ -216,6 +231,13 @@ export function generatePixelDataFromJSONTags(
   }
   const GeneratorClass =
     _pixelGenerators[genOptions.pixelGeneratorName].generator;
+  // frames3D: frame volume index from the per frame volume ids
+  let frameVolumes;
+  if (typeof genOptions.frameTemporalPositions !== 'undefined') {
+    frameVolumes = getRanks(genOptions.frameTemporalPositions);
+  } else if (typeof genOptions.frameBValues !== 'undefined') {
+    frameVolumes = getRanks(genOptions.frameBValues);
+  }
   const generator = new GeneratorClass({
     numberOfColumns,
     numberOfRows,
@@ -227,7 +249,9 @@ export function generatePixelDataFromJSONTags(
     imageOrientationPatient: tags.ImageOrientationPatient,
     segmentSquares: genOptions.segmentSquares,
     modality: genOptions.modality,
-    frames3D: genOptions.frames3D
+    frames3D: genOptions.frames3D,
+    framePositions: genOptions.framePositionOrder,
+    frameVolumes
   });
   if (typeof generator.setImages !== 'undefined' &&
     typeof genOptions.images !== 'undefined') {
@@ -382,11 +406,13 @@ function generateSingleFileDataElements(tags0, genOptions) {
 
     const perFrameValues = [];
     for (let k = 0; k < tags.NumberOfFrames; ++k) {
-      perFrameValues.push({
+      const perFrameValue = {
         FrameContentSequence: {
           value: [{
             DimensionIndexValues: [1, k, 1],
-            TemporalPositionIndex: genOptions.timeIndex
+            TemporalPositionIndex:
+              typeof genOptions.frameTemporalPositions !== 'undefined'
+                ? genOptions.frameTemporalPositions[k] : genOptions.timeIndex
           }]
         },
         PlanePositionSequence: {
@@ -396,7 +422,15 @@ function generateSingleFileDataElements(tags0, genOptions) {
                 ? genOptions.framePositionOrder[k] : k)
           }]
         }
-      });
+      };
+      if (typeof genOptions.frameBValues !== 'undefined') {
+        perFrameValue.MRDiffusionSequence = {
+          value: [{
+            DiffusionBValue: genOptions.frameBValues[k]
+          }]
+        };
+      }
+      perFrameValues.push(perFrameValue);
     }
     tags.PerFrameFunctionalGroupsSequence = {
       value: perFrameValues

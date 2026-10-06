@@ -460,7 +460,9 @@ function getAcquisitionTime(elements) {
  * actually discriminates volumes is not known until the full data
  * is loaded, `guessVolumeIndices` tries these in order and keeps the
  * first one that produces a valid, consistent per-volume grouping.
- * It is used for the files of a series (see `DicomSliceDataList`).
+ * It is used for the files of a series (see `DicomSliceDataList`)
+ * and for the frames of a multi-frame file (see
+ * `getSortedFramesGeometry`).
  * Most explicit/reliable discriminators come first, AcquisitionTime
  * (the historical default) comes last.
  * Candidates flagged with `preLoad` are also used while loading
@@ -517,7 +519,7 @@ function getVolumeIdCandidates() {
 }
 
 /**
- * Get the volume index of each item (file) from its volume
+ * Get the volume index of each item (file or frame) from its volume
  * id value. The grouping is valid if all items have a numeric value,
  * there are at least two distinct values and each (slice, volume)
  * pair is unique with a total of slices times volumes items: every
@@ -565,7 +567,7 @@ export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
 }
 
 /**
- * Guess the volume index of items (files) that share slice
+ * Guess the volume index of items (files or frames) that share slice
  * positions: volume id candidates are tried in order, the first one
  * that produces a valid grouping is kept (see getVolumeIndices).
  * If the deprecated `custom.getPostLoadVolumeIdTagValue` is defined,

@@ -7,11 +7,11 @@ import {
   getDcmDicomCode
 } from './dicomCode.js';
 import {
+  DataElement,
   safeGetAll
 } from './dataElement.js';
 
 /**
- * @import {DataElement} from './dataElement.js';
  * @import {Spacing} from '../image/spacing.js';
  * @import {SimpleTagValues} from './simpleTagValues.js';
  */
@@ -459,4 +459,25 @@ export function getConstantPerFrameValue(elements, valueGetter, name) {
     }
   }
   return res;
+}
+
+/**
+ * Get the DICOM tags of one frame of a multi-frame file: the root tags
+ * with a per frame functional groups sequence that only contains the
+ * frame item. Getters written for the root tags (for example using
+ * getConstantPerFrameValue) then return the frame value.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @param {number} frameNumber The frame number.
+ * @returns {Record<string, DataElement>} The frame DICOM tags.
+ */
+export function getFrameElements(elements, frameNumber) {
+  const perFrameGroupSeq =
+    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+  const frameGroupSeq = new DataElement('SQ');
+  frameGroupSeq.value = [perFrameGroupSeq[frameNumber]];
+  return {
+    ...elements,
+    [TagKeys.PerFrameFunctionalGroupsSequence]: frameGroupSeq
+  };
 }

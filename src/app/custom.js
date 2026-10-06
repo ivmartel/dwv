@@ -67,8 +67,8 @@ export const custom = {
 
   /**
    * Ordered list of candidate volume id getters, tried in order until
-   * one produces a valid per-volume grouping of the files of a series.
-   * Candidates flagged with
+   * one produces a valid per-volume grouping of the files of a series
+   * or of the frames of a multi-frame file. Candidates flagged with
    * `preLoad` are also used while loading: they must not vary between
    * the slices of a single volume. Overrides the default list from
    * `dicomVolume.js` (exported as `volumeIdCandidates`), which can

@@ -13,12 +13,16 @@ import {
   getOrientationMatrix,
   getSpacingFromMeasure
 } from './dicomImage.js';
-import {getVolumeIdTagValue} from './dicomVolume.js';
+import {
+  getVolumeIdTagValue,
+  guessVolumeIndices
+} from './dicomVolume.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
 import {
   Point3D,
   point3DFromArray,
-  includesPoint3D
+  includesPoint3D,
+  getEqualPoint3DFunction
 } from '../math/point.js';
 import {Index} from '../math/index.js';
 import {
@@ -27,7 +31,10 @@ import {
 } from '../math/number.js';
 import {arraySortEquals} from '../utils/array.js';
 import {logger} from '../utils/logger.js';
-import {getPerFrameFunctionalGroups} from './dicomFunctionalGroup.js';
+import {
+  getPerFrameFunctionalGroups,
+  getFrameElements
+} from './dicomFunctionalGroup.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
@@ -369,13 +376,17 @@ export function getFramesGeometry(
 
 /**
  * Get the geometry of each frame from the per-frame functional groups:
- *   a one slice geometry with the frame position and the data time
- *   (if any).
+ *   a one slice geometry with the frame position and the frame time.
+ *   The frame time is the data time (if any) if the frame positions
+ *   are unique. If frames share positions (several volumes in one
+ *   file), the frame time is the frame volume index, derived from
+ *   volume ids (see dicomVolume guessVolumeIndices).
  *
  * @param {DataElements} dataElements The DICOM data elements.
  * @returns {Geometry[]|undefined} The list of geometries indexed by
  *   frame (encoding order) number. Undefined if there are no per-frame
- *   functional groups or if their positions are not unique.
+ *   functional groups or if their positions are not unique and cannot
+ *   be grouped into volumes.
  * @throws {Error} Error for missing or wrong data.
  */
 export function getSortedFramesGeometry(dataElements) {
@@ -390,14 +401,37 @@ export function getSortedFramesGeometry(dataElements) {
     return;
   }
 
-  // check unique origins
+  // frame origins and index in the list of unique origins
   const frameOrigins = [];
+  const uniqueOrigins = [];
+  const frameUniqueIndices = [];
   for (const funcGroup of funcGroups) {
     const frameOrigin = point3DFromArray(funcGroup.imagePosPat);
-    if (includesPoint3D(frameOrigins, frameOrigin)) {
-      return;
+    let uniqueIndex = uniqueOrigins.findIndex(
+      getEqualPoint3DFunction(frameOrigin));
+    if (uniqueIndex === -1) {
+      uniqueIndex = uniqueOrigins.length;
+      uniqueOrigins.push(frameOrigin);
     }
     frameOrigins.push(frameOrigin);
+    frameUniqueIndices.push(uniqueIndex);
+  }
+
+  // duplicate origins: group frames into volumes
+  let frameTimes;
+  if (uniqueOrigins.length !== frameOrigins.length) {
+    const frameElementsList = [];
+    for (let i = 0; i < frameOrigins.length; ++i) {
+      frameElementsList.push(getFrameElements(dataElements, i));
+    }
+    const guess = guessVolumeIndices(
+      frameElementsList, frameUniqueIndices, uniqueOrigins.length);
+    if (typeof guess === 'undefined') {
+      logger.warn('Duplicate frame origins without volume ids, ' +
+        'not using them for geometry');
+      return;
+    }
+    frameTimes = guess.volumeIndices;
   }
 
   // common geometry (spacing, orientation, time)
@@ -412,7 +446,8 @@ export function getSortedFramesGeometry(dataElements) {
       frameSize,
       geometry.getSpacing(),
       geometry.getOrientation(),
-      geometry.getInitialTime()
+      typeof frameTimes !== 'undefined'
+        ? frameTimes[i] : geometry.getInitialTime()
     ));
   }
   return res;

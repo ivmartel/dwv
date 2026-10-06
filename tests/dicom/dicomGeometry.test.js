@@ -11,7 +11,9 @@ import {logger} from '../../src/utils/logger.js';
 import {
   getStructureElementsList,
   singleSliceStructure,
-  unsortedMultiframeMultiSliceStructure
+  unsortedMultiframeMultiSliceStructure,
+  multiframeMultiVolumeStructure,
+  multiframeMultiVolumeBValueStructure
 } from '../../dev/dicom/dataStructures.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
@@ -172,22 +174,50 @@ describe('getSortedFramesGeometry', () => {
     assert.isUndefined(getSortedFramesGeometry(elements));
   });
 
-  test('undefined with duplicate origins', () => {
+  test('undefined with duplicate origins without volume ids', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
     const structure = structuredClone(unsortedMultiframeMultiSliceStructure);
     structure.genOptions.framePositionOrder = [0, 0, 1, 2, 3];
     const elements = getStructureElementsList(config, syntax, structure)[0];
     assert.isUndefined(getSortedFramesGeometry(elements));
+    assert.equal(warnSpy.mock.calls.length, 1, 'duplicate origins warning');
+    warnSpy.mockRestore();
   });
 
-  test('undefined with incomplete per-frame functional groups', () => {
-    const warnSpy = vi.spyOn(logger, 'warn');
-    // per-frame item without FrameContentSequence nor PlanePositionSequence
-    const elements = {
-      52009230: {value: [{}, {}]}
-    };
+  test('undefined with duplicate origins and inconsistent volume ids', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const structure = structuredClone(multiframeMultiVolumeStructure);
+    // one volume has a duplicate slice
+    structure.genOptions.framePositionOrder = [1, 0, 0, 0];
+    const elements = getStructureElementsList(config, syntax, structure)[0];
     assert.isUndefined(getSortedFramesGeometry(elements));
-    assert.equal(warnSpy.mock.calls.length, 1, 'incomplete groups warning');
     warnSpy.mockRestore();
+  });
+
+  test('multi-volume frame geometries', () => {
+    for (const structure of [
+      multiframeMultiVolumeStructure,
+      multiframeMultiVolumeBValueStructure
+    ]) {
+      const positions = structure.genOptions.framePositionOrder;
+      // volume 0 is the lowest TemporalPositionIndex or b-value
+      const volumes = [1, 1, 0, 0];
+      const elements = getStructureElementsList(config, syntax, structure)[0];
+      const res = getSortedFramesGeometry(elements);
+      assert.isDefined(res, structure.name);
+      assert.equal(
+        res.length, structure.numberOfFrames,
+        `${structure.name} one geometry per frame`);
+      for (let f = 0; f < res.length; ++f) {
+        assert.deepEqual(
+          res[f].getOrigins().map(origin => origin.getValues()),
+          [[0, 0, positions[f]]],
+          `${structure.name} frame ${f} origin`);
+        assert.equal(
+          res[f].getInitialTime(), volumes[f],
+          `${structure.name} frame ${f} time`);
+      }
+    }
   });
 
   test('frame geometries', () => {

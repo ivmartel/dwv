@@ -1,4 +1,4 @@
-import {describe, beforeAll, test, assert} from 'vitest';
+import {describe, beforeAll, test, assert, vi} from 'vitest';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
@@ -9,8 +9,11 @@ import {
   getStructureElementsList,
   getStructureNumberOfFiles,
   singleSliceStructure,
-  unsortedMultiframeMultiSliceStructure
+  unsortedMultiframeMultiSliceStructure,
+  multiframeMultiVolumeStructure,
+  multiframeMultiVolumeBValueStructure
 } from '../../dev/dicom/dataStructures.js';
+import {logger} from '../../src/utils/logger.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
 
@@ -193,6 +196,9 @@ describe('ImageFactory', () => {
     // frames with per-frame position (frames3D): a genuine z-stack
     // from a single file
     multiframeMultiSlice: {z: 5},
+    // frames with per-frame position and temporal position: several
+    // volumes from a single file
+    multiframeMultiVolume: {z: 5, time: 2},
     // one file per slice, combined with appendSlice along z
     multipleSingleSlice: {z: 5},
     // files sharing one position but with a different
@@ -396,6 +402,114 @@ describe('ImageFactory', () => {
       }
     });
 
+  });
+
+  // several volumes in one file: frames share positions
+  describe.each([
+    multiframeMultiVolumeStructure,
+    multiframeMultiVolumeBValueStructure
+  ])('multi-volume frames: $name', (structure) => {
+    const config = syntheticData[0];
+    const tags = config.tags;
+    const positions = structure.genOptions.framePositionOrder;
+    // volume 0 is the lowest TemporalPositionIndex or b-value
+    const volumes = [1, 1, 0, 0];
+    const numberOfFrames = structure.numberOfFrames;
+    const numberOfSlices = 2;
+
+    let elements;
+    let buffer;
+    let frameSize;
+    let expectedBuffer;
+
+    beforeAll(() => {
+      elements = getStructureElementsList(
+        config, '1.2.840.10008.1.2.1', structure)[0];
+      buffer = elements['7FE00010'].value;
+      frameSize = buffer.length / numberOfFrames;
+      // frames moved to their (volume, slice) slot
+      expectedBuffer = buffer.slice();
+      for (let f = 0; f < numberOfFrames; ++f) {
+        expectedBuffer.set(
+          buffer.subarray(f * frameSize, (f + 1) * frameSize),
+          (volumes[f] * numberOfSlices + positions[f]) * frameSize);
+      }
+    });
+
+    test('frame image: frame position and volume index as time', () => {
+      for (let f = 0; f < numberOfFrames; ++f) {
+        const image = new ImageFactory().create(
+          elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 1, f);
+        const geometry = image.getGeometry();
+        assert.deepEqual(
+          geometry.getSize().getValues(), [tags.Columns, tags.Rows, 1],
+          `frame ${f} size`);
+        assert.deepEqual(
+          geometry.getOrigin().getValues(), [0, 0, positions[f]],
+          `frame ${f} origin`);
+        assert.equal(geometry.getInitialTime(), volumes[f], `frame ${f} time`);
+        assert.equal(
+          image.getMeta().numberOfFiles, numberOfFrames,
+          `frame ${f} numberOfFiles is the total number of frames`);
+      }
+    });
+
+    test('frames image: slices and volumes', () => {
+      const image = createFramesImage(
+        new ImageFactory(), elements, 1, numberOfFrames);
+      const geometry = image.getGeometry();
+      assert.deepEqual(
+        geometry.getSize().getValues(),
+        [tags.Columns, tags.Rows, numberOfSlices, 2],
+        'size');
+      const origins = geometry.getOrigins();
+      assert.equal(origins.length, numberOfSlices, 'one origin per slice');
+      for (let i = 0; i < numberOfSlices; ++i) {
+        assert.deepEqual(
+          origins[i].getValues(), [0, 0, i], `slice ${i} origin`);
+      }
+      assert.deepEqual(
+        Array.from(image.getBuffer()), Array.from(expectedBuffer),
+        'buffer in volume then spatial order');
+    });
+
+    test('frames image: append order does not matter', () => {
+      const factory = new ImageFactory();
+      let image;
+      for (let f = numberOfFrames - 1; f >= 0; --f) {
+        const frameImage = factory.create(
+          elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 1, f);
+        if (typeof image === 'undefined') {
+          image = frameImage;
+        } else {
+          image.appendSlice(frameImage);
+        }
+      }
+      assert.deepEqual(
+        Array.from(image.getBuffer()), Array.from(expectedBuffer),
+        'buffer in volume then spatial order');
+    });
+
+  });
+
+  // duplicate positions without per-frame volume ids: time frames
+  test('duplicate frame positions without volume ids', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const config = syntheticData[0];
+    const structure = structuredClone(multiframeMultiVolumeStructure);
+    delete structure.genOptions.frameTemporalPositions;
+    const elements = getStructureElementsList(
+      config, '1.2.840.10008.1.2.1', structure)[0];
+    const buffer = elements['7FE00010'].value;
+    const numberOfFrames = structure.numberOfFrames;
+    const frameSize = buffer.length / numberOfFrames;
+    for (let f = 0; f < numberOfFrames; ++f) {
+      const image = new ImageFactory().create(
+        elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 1, f);
+      assert.equal(
+        image.getGeometry().getInitialTime(), f, `frame ${f} time`);
+    }
+    warnSpy.mockRestore();
   });
 
 });

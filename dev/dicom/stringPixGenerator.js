@@ -45,6 +45,8 @@ export class StringPixGenerator {
   #numberOfFrames;
 
   #frames3D = false;
+  #framePositions;
+  #frameVolumes;
 
   #shape = 'brain';
   #pixels;
@@ -68,6 +70,8 @@ export class StringPixGenerator {
     if (typeof options.frames3D !== 'undefined') {
       this.#frames3D = options.frames3D;
     }
+    this.#framePositions = options.framePositions;
+    this.#frameVolumes = options.frameVolumes;
 
     this.#isRGB = options.photometricInterpretation === 'RGB';
 
@@ -110,7 +114,13 @@ export class StringPixGenerator {
             for (let s = 0; s < this.#numberOfSamples; ++s) {
               let values;
               if (this.#frames3D) {
-                values = getFunc(i, j, frameNum, sliceNumber);
+                // frames are slices: content from the frame position
+                // and volume (default to the file number)
+                const position = typeof this.#framePositions !== 'undefined'
+                  ? this.#framePositions[frameNum] : frameNum;
+                const volume = typeof this.#frameVolumes !== 'undefined'
+                  ? this.#frameVolumes[frameNum] : sliceNumber;
+                values = getFunc(i, j, position, volume);
               } else {
                 values = getFunc(i, j, sliceNumber, frameNum);
               }

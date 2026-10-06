@@ -2,8 +2,10 @@ import {describe, test, assert, vi} from 'vitest';
 import {
   volumeIdCandidates,
   getVolumeIdTagValue,
-  getVolumeIndices
+  getVolumeIndices,
+  guessVolumeIndices
 } from '../../src/dicom/dicomVolume.js';
+import {getFrameElements} from '../../src/dicom/dicomFunctionalGroup.js';
 import {custom} from '../../src/app/custom.js';
 import {logger} from '../../src/utils/logger.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
@@ -37,6 +39,9 @@ const TagKeys = {
   PerFrameFunctionalGroupsSequence: '52009230',
   MRDiffusionSequence: '00189117',
   FrameContentSequence: '00209111',
+  DimensionIndexSequence: '00209222',
+  DimensionIndexPointer: '00209165',
+  DimensionIndexValues: '00209157',
   EchoTime: '00180081',
   TriggerTime: '00181060',
   InversionTime: '00180082'
@@ -87,6 +92,48 @@ function makeEnhancedMRElements(bValues) {
   return {
     [TagKeys.SOPClassUID]: makeDataElement(
       'UI', ['1.2.840.10008.5.1.4.1.1.4.1']),
+    [TagKeys.PerFrameFunctionalGroupsSequence]:
+      makeDataElement('SQ', perFrameGroups)
+  };
+}
+
+/**
+ * Create DICOM elements for a multi-frame file with per-frame
+ * TemporalPositionIndex and/or diffusion b-values.
+ *
+ * @param {object} frameValues The per-frame values: optional
+ *   `temporalPositions`, `bValues` and `dimensionIndexValues` arrays.
+ * @param {Record<string, DataElement>} [extraElements] Optional
+ *   root elements.
+ * @returns {Record<string, DataElement>} The DICOM elements.
+ */
+function makePerFrameElements(frameValues, extraElements) {
+  const lists = Object.values(frameValues);
+  const numberOfFrames = lists[0].length;
+  const perFrameGroups = [];
+  for (let i = 0; i < numberOfFrames; ++i) {
+    const group = {};
+    const frameContentItem = {};
+    if (typeof frameValues.temporalPositions !== 'undefined') {
+      frameContentItem[TagKeys.TemporalPositionIndex] =
+        makeDataElement('US', [frameValues.temporalPositions[i]]);
+    }
+    if (typeof frameValues.dimensionIndexValues !== 'undefined') {
+      frameContentItem[TagKeys.DimensionIndexValues] =
+        makeDataElement('UL', frameValues.dimensionIndexValues[i]);
+    }
+    group[TagKeys.FrameContentSequence] =
+      makeDataElement('SQ', [frameContentItem]);
+    if (typeof frameValues.bValues !== 'undefined') {
+      group[TagKeys.MRDiffusionSequence] = makeDataElement('SQ', [{
+        [TagKeys.DiffusionBValue]:
+          makeDataElement('FD', [frameValues.bValues[i]])
+      }]);
+    }
+    perFrameGroups.push(group);
+  }
+  return {
+    ...extraElements,
     [TagKeys.PerFrameFunctionalGroupsSequence]:
       makeDataElement('SQ', perFrameGroups)
   };
@@ -547,6 +594,128 @@ describe('dicom', () => {
       // duplicate (slice, volume) pair
       assert.isUndefined(
         getVolumeIndices([1, 1, 2, 2], [0, 0, 1, 1], 2));
+    });
+
+  });
+
+  describe('guessVolumeIndices on frames', () => {
+
+    const enhancedMRElements = {
+      [TagKeys.SOPClassUID]: makeDataElement(
+        'UI', ['1.2.840.10008.5.1.4.1.1.4.1'])
+    };
+
+    /**
+     * Get the per frame DICOM tags of a multi-frame file.
+     *
+     * @param {Record<string, DataElement>} elements The DICOM tags.
+     * @returns {Record<string, DataElement>[]} The frames DICOM tags.
+     */
+    function getFramesElements(elements) {
+      const numberOfFrames =
+        elements[TagKeys.PerFrameFunctionalGroupsSequence].value.length;
+      const res = [];
+      for (let i = 0; i < numberOfFrames; ++i) {
+        res.push(getFrameElements(elements, i));
+      }
+      return res;
+    }
+
+    test('uses varying TemporalPositionIndex first', () => {
+      const elements = makePerFrameElements({
+        temporalPositions: [2, 2, 1, 1],
+        bValues: [0, 1000, 0, 1000]
+      }, enhancedMRElements);
+      const res = guessVolumeIndices(
+        getFramesElements(elements), [0, 1, 0, 1], 2);
+      assert.deepEqual(res.volumeIndices, [1, 1, 0, 0]);
+      assert.equal(res.getter, getCandidate('TemporalPositionIndex'));
+    });
+
+    test('falls back to b-value with constant TemporalPositionIndex', () => {
+      const elements = makePerFrameElements({
+        temporalPositions: [1, 1, 1, 1],
+        bValues: [1000, 1000, 50, 50]
+      }, enhancedMRElements);
+      const res = guessVolumeIndices(
+        getFramesElements(elements), [0, 1, 0, 1], 2);
+      assert.deepEqual(res.volumeIndices, [1, 1, 0, 0]);
+      assert.equal(res.getter, getCandidate('DiffusionBValue'));
+    });
+
+    test('uses Philips dimension index b-value', () => {
+      const dimensionIndexValues = [
+        [1, 1, 1, 1], [1, 2, 1, 1], [1, 1, 2, 1], [1, 2, 2, 1]
+      ];
+      const philipsElements = {
+        ...enhancedMRElements,
+        [TagKeys.Manufacturer]:
+          makeDataElement('LO', ['Philips Medical Systems']),
+        [TagKeys.DimensionIndexSequence]: makeDataElement('SQ', [{
+          [TagKeys.DimensionIndexPointer]:
+            makeDataElement('AT', ['(0018,9087)'])
+        }])
+      };
+      const elements = makePerFrameElements(
+        {dimensionIndexValues}, philipsElements);
+      const res = guessVolumeIndices(
+        getFramesElements(elements), [0, 1, 0, 1], 2);
+      assert.deepEqual(res.volumeIndices, [0, 0, 1, 1]);
+
+      // not without the Philips manufacturer
+      const otherElements = makePerFrameElements({dimensionIndexValues}, {
+        ...philipsElements,
+        [TagKeys.Manufacturer]: makeDataElement('LO', ['SIEMENS'])
+      });
+      assert.isUndefined(guessVolumeIndices(
+        getFramesElements(otherElements), [0, 1, 0, 1], 2));
+
+      // not without the b-value pointer
+      const noPointerElements = makePerFrameElements({dimensionIndexValues}, {
+        ...enhancedMRElements,
+        [TagKeys.Manufacturer]: philipsElements[TagKeys.Manufacturer]
+      });
+      assert.isUndefined(guessVolumeIndices(
+        getFramesElements(noPointerElements), [0, 1, 0, 1], 2));
+    });
+
+    test('undefined without a valid candidate', () => {
+      const elements = makePerFrameElements({
+        temporalPositions: [1, 1, 1, 1]
+      }, enhancedMRElements);
+      assert.isUndefined(guessVolumeIndices(
+        getFramesElements(elements), [0, 1, 0, 1], 2));
+    });
+
+    test('uses custom candidates', () => {
+      const elements = makePerFrameElements({
+        temporalPositions: [2, 2, 1, 1]
+      });
+      const framesElements = getFramesElements(elements);
+      const values = [5, 6, 5, 6];
+      const getter = frameElements => values[
+        framesElements.indexOf(frameElements)];
+      custom.volumeIdCandidates = [{name: 'Custom', getter}];
+      try {
+        const res = guessVolumeIndices(framesElements, [0, 0, 1, 1], 2);
+        assert.deepEqual(res.volumeIndices, [0, 1, 0, 1]);
+        assert.equal(res.getter, getter);
+      } finally {
+        custom.volumeIdCandidates = undefined;
+      }
+    });
+
+    test('uses custom post load getter only', () => {
+      const elements = makePerFrameElements({
+        temporalPositions: [2, 2, 1, 1]
+      });
+      custom.getPostLoadVolumeIdTagValue = () => 1;
+      try {
+        assert.isUndefined(guessVolumeIndices(
+          getFramesElements(elements), [0, 1, 0, 1], 2));
+      } finally {
+        custom.getPostLoadVolumeIdTagValue = undefined;
+      }
     });
 
   });
