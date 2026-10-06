@@ -46,8 +46,21 @@ import JSZip from 'jszip';
  * @typedef {Object} GenerateOptions
  * @property {string} pixelGeneratorName The name of
  *   the pixel generator to use, defaults to gradSquare.
- * @property {number} numberOfSlices The result number of slices,
- *   default to 1.
+ * @property {number} numberOfSlices The number of files per time
+ *   point, default to 1. Without frames3D, one file per spatial slice
+ *   (ImagePositionPatient from the slice index). With frames3D, each
+ *   file holds a full volume and the slice index is used as the
+ *   frames TemporalPositionIndex (unless frameTemporalPositions
+ *   is set).
+ * @property {number} numberOfFrames The number of time points
+ *   (generation outer loop), default to 1. The total number of
+ *   generated files is numberOfFrames * numberOfSlices, ordered
+ *   time point first then slice. Without frames3D and if greater
+ *   than 1, each file gets the time point index (0-based) as
+ *   TemporalPositionIdentifier. With frames3D, it only repeats the
+ *   files, no time information is added. Not to be confused with
+ *   the NumberOfFrames tag (number of frames per file, taken
+ *   from the input tags).
  * @property {number} sliceNumber The slice number,
  *   default to 0.
  * @property {Array} images The images to pass to file
@@ -446,12 +459,17 @@ function generateSingleFileDataElements(tags0, genOptions) {
     }
   }
 
-  if (typeof genOptions.numberOfSlices !== 'undefined' &&
-    genOptions.numberOfSlices > 1) {
-    tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${genOptions.sliceNumber}`;
+  // instance index: time point first then slice
+  // (same order as generateDataElements)
+  const numberOfSlices = genOptions.numberOfSlices ?? 1;
+  const numberOfFrames = genOptions.numberOfFrames ?? 1;
+  const frameNumber = genOptions.frameNumber ?? 0;
+  const instanceIndex = frameNumber * numberOfSlices + genOptions.sliceNumber;
+  if (numberOfSlices * numberOfFrames > 1) {
+    tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${instanceIndex}`;
   }
   // instance number
-  tags.InstanceNumber = genOptions.sliceNumber.toString();
+  tags.InstanceNumber = instanceIndex.toString();
 
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromSimpleTagValues(tags);
