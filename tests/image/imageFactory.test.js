@@ -10,8 +10,8 @@ import {
   getStructureNumberOfFiles,
   singleSliceStructure,
   unsortedMultiframeMultiSliceStructure,
-  multiframeMultiVolumeStructure,
-  multiframeMultiVolumeBValueStructure
+  unsortedMultiframeMultiVolumeStructure,
+  unsortedMultiframeMultiVolumeBValueStructure
 } from '../../dev/dicom/dataStructures.js';
 import {logger} from '../../src/utils/logger.js';
 
@@ -205,7 +205,7 @@ describe('ImageFactory', () => {
     // TemporalPositionIdentifier: appendSlice grows a time dimension
     multipleSingleFrame: {z: 1, time: 3},
     // one z-stack file per time point, frames combined with appendSlice
-    multipleSingleFrameMultiSlice: {z: 5, time: 3}
+    multipleMultiframeMultiSlice: {z: 5, time: 3}
   };
 
   const structureCases = [];
@@ -406,8 +406,8 @@ describe('ImageFactory', () => {
 
   // several volumes in one file: frames share positions
   describe.each([
-    multiframeMultiVolumeStructure,
-    multiframeMultiVolumeBValueStructure
+    unsortedMultiframeMultiVolumeStructure,
+    unsortedMultiframeMultiVolumeBValueStructure
   ])('multi-volume frames: $name', (structure) => {
     const config = syntheticData[0];
     const tags = config.tags;
@@ -496,7 +496,7 @@ describe('ImageFactory', () => {
   test('duplicate frame positions without volume ids', () => {
     const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
     const config = syntheticData[0];
-    const structure = structuredClone(multiframeMultiVolumeStructure);
+    const structure = structuredClone(unsortedMultiframeMultiVolumeStructure);
     delete structure.genOptions.frameTemporalPositions;
     const elements = getStructureElementsList(
       config, '1.2.840.10008.1.2.1', structure)[0];

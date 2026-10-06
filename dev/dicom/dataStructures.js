@@ -33,7 +33,7 @@ export const unsortedMultiframeMultiSliceStructure = {
  * Test only: not part of {@link dataStructures}, so not listed
  * in the synthetic data page.
  */
-export const multiframeMultiVolumeStructure = {
+export const unsortedMultiframeMultiVolumeStructure = {
   name: 'unsorted multiframe multi-volume',
   numberOfFrames: 4,
   genOptions: {
@@ -51,8 +51,8 @@ export const multiframeMultiVolumeStructure = {
  * Test only: not part of {@link dataStructures}, so not listed
  * in the synthetic data page.
  */
-export const multiframeMultiVolumeBValueStructure = {
-  name: 'multiframe multi-volume b-value',
+export const unsortedMultiframeMultiVolumeBValueStructure = {
+  name: 'unsorted multiframe multi-volume b-value',
   numberOfFrames: 4,
   genOptions: {
     frames3D: true,
@@ -85,7 +85,7 @@ export const dataStructures = {
   // one file, frames with position: spatial slices
   multiframeMultiSlice: {
     name: 'multiframe multi-slice',
-    short: 'sfms',
+    short: 'mfms',
     numberOfFrames: 5,
     genOptions: {frames3D: true}
   },
@@ -114,9 +114,9 @@ export const dataStructures = {
     genOptions: {numberOfFrames: 3}
   },
   // one multiframe multi-slice file per time point
-  multipleSingleFrameMultiSlice: {
-    name: 'multiple single-frame multi-slice',
-    short: 'msfms',
+  multipleMultiframeMultiSlice: {
+    name: 'multiple multiframe multi-slice',
+    short: 'mmfms',
     numberOfFrames: 5,
     genOptions: {frames3D: true, numberOfSlices: 3}
   }

@@ -12,8 +12,8 @@ import {
   getStructureElementsList,
   singleSliceStructure,
   unsortedMultiframeMultiSliceStructure,
-  multiframeMultiVolumeStructure,
-  multiframeMultiVolumeBValueStructure
+  unsortedMultiframeMultiVolumeStructure,
+  unsortedMultiframeMultiVolumeBValueStructure
 } from '../../dev/dicom/dataStructures.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
@@ -186,7 +186,7 @@ describe('getSortedFramesGeometry', () => {
 
   test('undefined with duplicate origins and inconsistent volume ids', () => {
     const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
-    const structure = structuredClone(multiframeMultiVolumeStructure);
+    const structure = structuredClone(unsortedMultiframeMultiVolumeStructure);
     // one volume has a duplicate slice
     structure.genOptions.framePositionOrder = [1, 0, 0, 0];
     const elements = getStructureElementsList(config, syntax, structure)[0];
@@ -196,8 +196,8 @@ describe('getSortedFramesGeometry', () => {
 
   test('multi-volume frame geometries', () => {
     for (const structure of [
-      multiframeMultiVolumeStructure,
-      multiframeMultiVolumeBValueStructure
+      unsortedMultiframeMultiVolumeStructure,
+      unsortedMultiframeMultiVolumeBValueStructure
     ]) {
       const positions = structure.genOptions.framePositionOrder;
       // volume 0 is the lowest TemporalPositionIndex or b-value
