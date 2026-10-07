@@ -21,7 +21,6 @@ typically convert the binary retrieved data into a local class, for example an [
 The current specialised loaders are:
 
 - [DicomDataLoader](../dicomdataloader/): for DICOM data
-- [JSONTextLoader](../jsontextloader/): for JSON data
 - [RawImageLoader](../rawimageloader/): for image formats supported by the browser
 - [RawVideoLoader](../rawvideoloader/): for video formats supported by the browser
 - [ZipLoader](../ziploader/): for data compressed in a ZIP file

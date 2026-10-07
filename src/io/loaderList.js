@@ -1,5 +1,4 @@
 import {DicomDataLoader} from './dicomDataLoader.js';
-import {JSONTextLoader} from './jsonTextLoader.js';
 import {MultipartLoader} from './multipartLoader.js';
 import {RawImageLoader} from './rawImageLoader.js';
 import {RawVideoLoader} from './rawVideoLoader.js';
@@ -26,7 +25,6 @@ export function getLoaderList() {
   if (_loaderList === null) {
     _loaderList = [
       DicomDataLoader,
-      JSONTextLoader,
       MultipartLoader,
       RawImageLoader,
       RawVideoLoader,
