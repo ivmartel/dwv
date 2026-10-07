@@ -11,7 +11,8 @@
  */
 
 /**
- * Per-volume histogram (for example from {@link MaskImage#getHistogramBySegment}).
+ * Per-volume histogram (for example from
+ * {@link MaskImage#getHistogramBySegment}).
  *
  * @typedef {object} VolumeHistogram
  * @property {number} volume Volume index.
