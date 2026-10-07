@@ -424,4 +424,53 @@ describe('MaskImage', () => {
     }
   );
 
+  test(
+    'getHistogramBySegment throws when orientations differ',
+    () => {
+      const size = new Size([2, 1, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const origins = [new Point3D(0, 0, 0)];
+      const maskGeom = new Geometry(origins, size, spacing);
+      const imageOrientation = new Matrix33([1, 0, 0, 0, 0, -1, 0, 1, 0]);
+      const imageGeom = new Geometry(
+        origins, size, spacing, imageOrientation);
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /orientations differ/
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment throws when origins differ',
+    () => {
+      const size = new Size([2, 1, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 0)], size, spacing);
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 5)], size, spacing);
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /origins differ/
+      );
+    }
+  );
+
 });

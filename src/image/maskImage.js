@@ -1,4 +1,5 @@
 import {Index} from '../math/index.js';
+import {REAL_WORLD_EPSILON} from '../math/number.js';
 import {Size} from './size.js';
 import {valueRange} from './iterator.js';
 import {LabelingThread} from './labelingThread.js';
@@ -554,9 +555,10 @@ export class MaskImage extends Image {
       return [];
     }
 
-    const imageSize = image.getGeometry().getSize();
-    const maskSize = this.getGeometry().getSize();
-    this.#assertCompatibleHistogramSizes(maskSize, imageSize);
+    const imageGeometry = image.getGeometry();
+    const maskGeometry = this.getGeometry();
+    this.#assertCompatibleHistogramGeometry(maskGeometry, imageGeometry);
+    const imageSize = imageGeometry.getSize();
 
     const segmentValue = typeof segment.displayValue !== 'undefined'
       ? segment.displayValue
@@ -640,17 +642,38 @@ export class MaskImage extends Image {
   }
 
   /**
-   * Ensure mask and image spatial sizes (dims 0-2) are compatible.
-   * Segmentations are 3D; dim 3 of a 4D reference image is ignored here.
+   * Ensure mask and image share spatial size (dims 0-2), origins and
+   * orientation. Segmentations are 3D; dim 3 of a 4D reference image
+   * is ignored here.
    *
-   * @param {Size} maskSize The mask size.
-   * @param {Size} imageSize The reference image size.
+   * @param {Geometry} maskGeometry The mask geometry.
+   * @param {Geometry} imageGeometry The reference image geometry.
    */
-  #assertCompatibleHistogramSizes(maskSize, imageSize) {
+  #assertCompatibleHistogramGeometry(maskGeometry, imageGeometry) {
+    const maskSize = maskGeometry.getSize();
+    const imageSize = imageGeometry.getSize();
     for (let i = 0; i < 3; ++i) {
       if (maskSize.get(i) !== imageSize.get(i)) {
         throw new Error(
           'getHistogramBySegment: mask and image spatial sizes differ.');
+      }
+    }
+    if (!maskGeometry.getOrientation().isSimilar(
+      imageGeometry.getOrientation(), REAL_WORLD_EPSILON)) {
+      throw new Error(
+        'getHistogramBySegment: mask and image orientations differ.');
+    }
+    const maskOrigins = maskGeometry.getOrigins();
+    const imageOrigins = imageGeometry.getOrigins();
+    if (maskOrigins.length !== imageOrigins.length) {
+      throw new Error(
+        'getHistogramBySegment: mask and image origins differ.');
+    }
+    for (let i = 0; i < maskOrigins.length; ++i) {
+      if (!maskOrigins[i].isSimilar(
+        imageOrigins[i], REAL_WORLD_EPSILON)) {
+        throw new Error(
+          'getHistogramBySegment: mask and image origins differ.');
       }
     }
   }
