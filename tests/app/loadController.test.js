@@ -214,7 +214,7 @@ describe('app', () => {
       ]);
       for (const event of events) {
         assert.equal(event.detail.dataid, 'id0', `${event.type} dataid`);
-        assert.equal(event.detail.loadtype, 'image', `${event.type} loadtype`);
+        assert.isUndefined(event.detail.loadtype, `${event.type} loadtype`);
       }
       // original event content is kept
       assert.equal(events[0].detail.source, 'src');
@@ -228,9 +228,8 @@ describe('app', () => {
       const controller = new LoadController();
       const events = recordEvents(controller);
       controller.loadFiles([], 'id0');
-      lastLoader().onload({dataid: 'other', loadtype: 'other'});
+      lastLoader().onload({dataid: 'other'});
       assert.equal(events[0].detail.dataid, 'id0');
-      assert.equal(events[0].detail.loadtype, 'image');
     });
 
     test('no timeout callback if loader does not support it', () => {
@@ -295,11 +294,9 @@ describe('app', () => {
 
       assert.deepEqual(events.map((e) => e.type), ['error', 'loadend']);
       assert.equal(events[0].detail.dataid, 'id0');
-      assert.equal(events[0].detail.loadtype, 'image');
       assert.instanceOf(events[0].detail.error, Error);
       assert.equal(events[0].detail.error.message, 'load failed');
       assert.equal(events[1].detail.dataid, 'id0');
-      assert.equal(events[1].detail.loadtype, 'image');
       assert.deepEqual(controller.getLoadingDataIds(), []);
     });
 

@@ -79,7 +79,7 @@ export class LoadController extends EventTarget {
     // create IO
     const memoryIO = new MemoryLoader();
     // load data
-    this.#loadData(data, memoryIO, 'image', dataId);
+    this.#loadData(data, memoryIO, dataId);
   }
 
   /**
@@ -116,7 +116,7 @@ export class LoadController extends EventTarget {
     const fileIO = new FilesLoader();
     fileIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    this.#loadData(files, fileIO, 'image', dataId);
+    this.#loadData(files, fileIO, dataId);
   }
 
   /**
@@ -133,7 +133,7 @@ export class LoadController extends EventTarget {
     const urlIO = new UrlsLoader();
     urlIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    this.#loadData(urls, urlIO, 'image', dataId, options);
+    this.#loadData(urls, urlIO, dataId, options);
   }
 
   /**
@@ -141,14 +141,12 @@ export class LoadController extends EventTarget {
    *
    * @param {string[]|File[]|Array} data Array of data to load.
    * @param {object} loader The data loader.
-   * @param {string} loadType The data load type: 'image'.
    * @param {string} dataId The data id.
    * @param {object} [options] Options passed to the final loader.
    */
-  #loadData(data, loader, loadType, dataId, options) {
+  #loadData(data, loader, dataId, options) {
     const eventInfo = {
-      dataid: dataId,
-      loadtype: loadType
+      dataid: dataId
     };
 
     // set callbacks
@@ -164,8 +162,7 @@ export class LoadController extends EventTarget {
     loader.onprogress = this.#getFireEvent('loadprogress', eventInfo);
     loader.onloaditem = (event) => {
       const eventInfoItem = {
-        dataid: dataId,
-        loadtype: loadType
+        dataid: dataId
       };
       if (typeof this.#currentLoaders[dataId] !== 'undefined') {
         eventInfoItem.isfirstitem = this.#currentLoaders[dataId].isFirstItem;
@@ -197,14 +194,12 @@ export class LoadController extends EventTarget {
       this.dispatchEvent(new CustomEvent('error', {
         detail: {
           dataid: dataId,
-          loadtype: loadType,
           error
         }
       }));
       this.dispatchEvent(new CustomEvent('loadend', {
         detail: {
-          dataid: dataId,
-          loadtype: loadType,
+          dataid: dataId
         }
       }));
     }

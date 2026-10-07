@@ -313,7 +313,7 @@ function viewerSetup() {
   });
   _app.addEventListener('load', function (event) {
     // log meta data
-    logMetaData(event.detail.dataid, event.detail.loadtype);
+    logMetaData(event.detail.dataid);
     // render if not done yet
     if (!viewOnFirstLoadItem) {
       _app.getStageController().render(event.detail.dataid);
@@ -494,9 +494,8 @@ function viewerSetup() {
  * Log meta data.
  *
  * @param {string} dataId The data ID.
- * @param {string} loadType The load type.
  */
-function logMetaData(dataId, loadType) {
+function logMetaData(dataId) {
   // meta data
   const dataCtrl = _app.getDataController();
   const meta = dataCtrl.get(dataId).meta;
@@ -510,8 +509,7 @@ function logMetaData(dataId, loadType) {
 
   // get modality
   let modality;
-  if (loadType === 'image' &&
-    typeof meta['00080060'] !== 'undefined') {
+  if (typeof meta['00080060'] !== 'undefined') {
     modality = meta['00080060'].value[0];
   }
   // log DICOM SEG

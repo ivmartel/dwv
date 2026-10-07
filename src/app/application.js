@@ -940,7 +940,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -952,7 +951,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {number} detail.loaded The loaded percentage.
@@ -966,7 +964,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {object} detail.data The loaded meta data.
@@ -981,7 +978,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -994,7 +990,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -1006,7 +1001,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {object} detail.error The error.
@@ -1020,7 +1014,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: an url as a string.
    * @property {object} detail.target The event target.
    */
@@ -1032,7 +1025,6 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.dataid The data id.
-   * @property {string} detail.loadtype The load type: image.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -1951,40 +1943,33 @@ export class App extends EventTarget {
     if (typeof event.detail.data === 'undefined') {
       logger.error('Missing loaditem event data.');
     }
-    if (typeof event.detail.loadtype === 'undefined') {
-      logger.error('Missing loaditem event load type.');
-    }
 
     const isFirstLoadItem = event.detail.isfirstitem;
 
-    if (event.detail.loadtype === 'image') {
-      try {
-        if (isFirstLoadItem) {
-          this.#dataController.add(event.detail.dataid, event.detail.data);
-        } else {
-          this.#dataController.update(event.detail.dataid, event.detail.data);
-        }
-      } catch (error) {
-        this.dispatchEvent(new CustomEvent('error', {
-          detail: {
-            dataid: event.detail.dataid,
-            loadtype: event.detail.loadtype,
-            source: event.detail.source,
-            error
-          }
-        }));
-        // stop the load: following items would fail the same way
-        // (for example all frames of a multi-frame data)
-        this.abortLoad(event.detail.dataid);
-        this.dispatchEvent(new CustomEvent('loadend', {
-          detail: {
-            dataid: event.detail.dataid,
-            loadtype: event.detail.loadtype,
-            source: event.detail.source
-          }
-        }));
-        return;
+    try {
+      if (isFirstLoadItem) {
+        this.#dataController.add(event.detail.dataid, event.detail.data);
+      } else {
+        this.#dataController.update(event.detail.dataid, event.detail.data);
       }
+    } catch (error) {
+      this.dispatchEvent(new CustomEvent('error', {
+        detail: {
+          dataid: event.detail.dataid,
+          source: event.detail.source,
+          error
+        }
+      }));
+      // stop the load: following items would fail the same way
+      // (for example all frames of a multi-frame data)
+      this.abortLoad(event.detail.dataid);
+      this.dispatchEvent(new CustomEvent('loadend', {
+        detail: {
+          dataid: event.detail.dataid,
+          source: event.detail.source
+        }
+      }));
+      return;
     }
 
     // propagate (before display)
@@ -1997,9 +1982,8 @@ export class App extends EventTarget {
     }
 
     // render if first and flag allows
-    if (event.detail.loadtype === 'image' &&
-      this.#stageController.getViewConfigs(event.detail.dataid).length !== 0 &&
-      isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
+    if (isFirstLoadItem && this.#options.viewOnFirstLoadItem &&
+      this.#stageController.getViewConfigs(event.detail.dataid).length !== 0) {
       this.#stageController.render(event.detail.dataid);
     }
   };
