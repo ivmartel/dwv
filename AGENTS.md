@@ -11,7 +11,7 @@ annotation, filters). Not certified for diagnostic use. Licensed GPL-3.0.
 
 Package manager is `yarn` (yarn v4, `packageManager` pinned in package.json).
 `corepack enable` is enough to get the right yarn version; npm also works for
-all scripts. Node >= 14 required (CI uses Node 24). Module type is `"module"`
+all scripts. Node >= 14 required (CI uses Node 26). Module type is `"module"`
 (ESM throughout `src/`).
 
 ## Commands
@@ -39,6 +39,32 @@ all scripts. Node >= 14 required (CI uses Node 24). Module type is `"module"`
 Tests live in `tests/<area>/*.test.js` mirroring `src/<area>/`, using vitest
 with `environment: 'node'` (jsdom pulled in as needed) and DICOM/zip/DICOMDIR
 fixtures under `tests/data`.
+
+### What CI checks
+
+`.github/workflows/nodejs-ci.yml` runs on every push, pull request and
+merge-group, on Node 26 with yarn through corepack. A change passes when
+these steps all succeed, in this order:
+
+1. `yarn install --immutable` — `yarn.lock` must already match
+   `package.json`; commit the lockfile with any dependency change.
+2. `yarn lint` — no eslint errors. The jsdoc plugin's recommended rules
+   (missing jsdoc, params, returns...) are only warnings and don't fail
+   the step (there is no `--max-warnings`); the errors are the base
+   `eslint.config.js` rules plus `jsdoc/tag-lines` (one blank line before
+   the tags) and `jsdoc/require-description-complete-sentence`. Keep
+   warnings at zero anyway.
+3. `yarn test-ci` — all vitest tests pass and coverage stays at or above
+   50% for statements, branches, functions and lines (`vitest.config.js`).
+4. `yarn build` — the webpack bundle, the `tsc` type generation (so the
+   jsdoc types must type-check) and api-extractor must all succeed. The
+   `api` step runs with `--local`: an API change rewrites
+   `resources/api/dwv.api.md` instead of failing, and that file is only
+   committed at release time.
+
+On pushes to `develop` or `master` CI also runs `yarn build-demo` and
+publishes the demo to `gh-pages` (`demo/trunk` or `demo/stable`). To
+reproduce CI locally, run `yarn lint && yarn test-ci && yarn build`.
 
 ## Requirements traceability
 
@@ -92,14 +118,15 @@ recommended API.
 
 - `LoadController` — picks `FilesLoader`/`UrlsLoader`/`MemoryLoader` based on
   input type, re-dispatches their load events tagged with `{dataid,
-  loadtype}`. `loadtype` is `'image'` or `'state'` (legacy `.json` app state).
+  isfirstitem}` (`isfirstitem` on `loaditem` only). The former `loadtype`
+  field was removed in v0.37 along with legacy `.json` state loading.
 - `DataController` — owns `#dataList: Record<dataId, DicomData>`. Its
   `#setDataContent` inspects Modality/pixel-data presence to route parsed
   data to `ImageFactory`, `MaskFactory` (Modality `SEG`), `AnnotationGroupFactory`
   (Modality `SR`), or `RtStructFactory` (Modality `RTSTRUCT`, rasterizes
   contours against an already-loaded reference series). Also handles
   multi-volume/4D data via `DicomSliceDataList`, buffering same-origin slices
-  until load completes.
+  until load completes (see *Multi-volume / 4D data* below).
 - `StageController` — owns the single `Stage` (all `LayerGroup`s/layers).
   Creates `View`s via `ViewFactory` at render time (one `View` per
   layer/layer-group, even for a shared `Image`), builds `ViewLayer`/`DrawLayer`s,
@@ -118,7 +145,7 @@ recommended API.
 1. **IO loaders** (`src/io/`): `LoaderBase` (extends `LoadHandlers`, the
    on*-callback contract) is implemented by `DicomDataLoader`, `ZipLoader`,
    `MultipartLoader` (WADO-RS multipart/related), `RawImageLoader`/
-   `RawVideoLoader` (non-DICOM), `JSONTextLoader` (legacy state files). Loader
+   `RawVideoLoader` (non-DICOM). Loader
    capability is queried via `canLoadFile`/`canLoadUrl`/`canLoadMemory`
    (extension/media-type based). `getLoaderList()` (`loaderList.js`) is a
    lazily-built singleton list to avoid a circular-import (`MultipartLoader`
@@ -135,7 +162,12 @@ recommended API.
    tables, producing `Record<tagKey, DataElement>`.
    `getSyntaxDecompressionName(syntax)` maps the transfer syntax to one of
    `'jpeg2000'` / `'jpeg-baseline'` / `'jpeg-lossless'` / `'rle'` (or
-   undefined if uncompressed).
+   undefined if uncompressed). Private tags (not in the dictionary) read
+   from implicit VR data come out as VR `UN` with raw byte values; callers
+   decode them as needed (e.g. `getPrivateTagValue` in `dicomVolume.js`).
+   `DicomWriter` (`dicomWriter.js`) writes data back
+   using per-tag writing rules; `setRemovePrivateTags(true)` drops all
+   odd-group tags (including inside sequences) and overrides the rules.
 3. **Pixel decompression** (`src/image/decoder.js`, `src/decoders/`): when a
    decompression algo is needed, `DicomBufferToData` (`src/image/
    dicomBufferToData.js`, called by `DicomDataLoader`) builds a
@@ -154,7 +186,16 @@ recommended API.
    `MaskImage` (a segmentation-specific subclass of `Image`, see below) from
    DICOM SEG; `AnnotationGroupFactory` parses DICOM SR into an
    `AnnotationGroup` of `Annotation`s; `RtStructFactory` rasterizes RTSTRUCT
-   contours into a `MaskImage`.
+   contours into a `MaskImage`. The exported `demoCreateImage`/
+   `demoCreateMaskImage`/`demoCreateView` helpers (formerly `create*`) are
+   single-file shortcuts for demos only, not the app path.
+   Images are built progressively: the first load item creates the `Image`,
+   later items (slices, or frames of a multi-frame file) are added via
+   `appendSlice`/`appendFrameBuffer` into a buffer preallocated from
+   `meta.sliceCapacity` (load items × frames per item). Don't confuse it with
+   `numberOfItems` (loader option and `DicomData` property: how many
+   files/urls/buffers/multipart parts are in the load); `ImageFactory.create()`
+   is where the latter becomes the former.
 5. **View construction and rendering** (`src/image/view*.js`,
    `src/gui/`, at render time via `StageController`): `ViewFactory` wraps an
    `Image` in a `View` (orientation/position, `WindowLut`, colour map, window
@@ -211,22 +252,40 @@ Two parallel models, both stored alongside regular pixel data on `DicomData`:
   vector/graphic `Annotation` objects grouped in an `AnnotationGroup`,
   rendered by `DrawLayer` (Konva).
 
-### Legacy state persistence
+### Multi-volume / 4D data (`src/dicom/dicomVolume.js`)
 
-`src/io/state.js` (`State` class) is explicitly `@deprecated since v0.34` in
-favor of DICOM SR annotations — it's the old JSON app-state serializer
-(window/level, zoom, pan, legacy Konva "drawings"). `App.setDrawings()`
-(also deprecated) converts old Konva drawings into the current
-`AnnotationGroup` model via `konvaToAnnotation` in `src/gui/drawLayer.js`.
-Prefer the `Annotation`/`AnnotationGroup`/DICOM SR path for any new work.
+The tag that discriminates volumes is not known until all data is loaded, so
+`guessVolumeIndices` tries an ordered list of volume-id getters
+(`defaultVolumeIdCandidates`: TemporalPositionIdentifier,
+TemporalPositionIndex, DiffusionBValue (incl. private b-value tags via
+`defaultPrivateBValueRules`, VR `UN` values decoded as ASCII), …,
+AcquisitionTime last) and keeps the first
+that yields a valid, consistent per-volume grouping. Candidates flagged
+`preLoad` are also used while loading (`getVolumeIdTagValue`) and must not
+vary within a volume. The same logic serves both a series of files
+(`DicomSliceDataList` in `dataController.js`) and the frames of a single
+multi-frame file (`getSortedFramesGeometry` in `dicomGeometry.js`, used by
+`ImageFactory`).
+
+### Legacy state persistence (removed)
+
+The JSON app-state (`src/io/state.js`, `JSONTextLoader`,
+`App.applyJsonState()`, `App.setDrawings()`, `konvaToAnnotation`) was
+removed in v0.37; `.json` inputs are no longer loadable. Use the
+`Annotation`/`AnnotationGroup`/DICOM SR path.
 
 ### Extensibility
 
 `src/app/custom.js` exports a single mutable `custom` object (window/level
 presets per modality, shape label texts, private b-value rules, volume-id
-and pixel-unit getters, ROI dialog override) meant to be overridden by
+candidates, pixel-unit getter, ROI dialog override) meant to be overridden by
 embedding applications — check it before adding new hardcoded
-modality-specific behavior.
+modality-specific behavior. `custom.volumeIdCandidates` and
+`custom.privateBValueRules` replace the defaults; extend the exported
+`defaultVolumeIdCandidates`/`defaultPrivateBValueRules` (from `dicom/index.js`,
+typedefs in `volumeTypes.js`) rather than rewriting them.
+`custom.getVolumeIdTagValue`/`getPostLoadVolumeIdTagValue` are deprecated
+since v0.37.
 
 ### Cross-cutting utilities (`src/utils/`)
 

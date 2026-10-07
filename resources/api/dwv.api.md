@@ -275,7 +275,7 @@ export namespace custom {
     let // (undocumented)
     labelTexts: Record<string, Record<string, string>>;
     let // (undocumented)
-    privateBValueRules: object[];
+    privateBValueRules: PrivateBValueRule[];
     let // (undocumented)
     openRoiDialog: any;
     let // (undocumented)
@@ -283,10 +283,7 @@ export namespace custom {
     let // (undocumented)
     getPostLoadVolumeIdTagValue: any;
     let // (undocumented)
-    postLoadVolumeIdCandidates: {
-        name: string;
-        getter: Function;
-    }[];
+    volumeIdCandidates: VolumeIdCandidate[];
     let // (undocumented)
     getTagPixelUnit: any;
 }
@@ -326,10 +323,16 @@ export class DataElement {
 }
 
 // @public
+export const defaultPrivateBValueRules: PrivateBValueRule[];
+
+// @public
 export const defaultToolList: Record<string, any>;
 
 // @public
 export const defaultToolOptions: Record<string, Record<string, any>>;
+
+// @public
+export const defaultVolumeIdCandidates: VolumeIdCandidate[];
 
 // @public
 export class DeleteSegmentCommand extends Command {
@@ -383,7 +386,7 @@ export class DicomData {
     hasDuplicateOrigin(): boolean;
     image: Image_2 | undefined;
     meta: Record<string, DataElement>;
-    numberOfFiles: number;
+    numberOfItems: number;
     setComplete(flag: boolean): void;
     warn: string[];
 }
@@ -995,7 +998,7 @@ export namespace NormalisedManufacturers {
     let // (undocumented)
     PHILIPS: string;
     let // (undocumented)
-    HITASHI: string;
+    HITACHI: string;
 }
 
 // @public
@@ -1116,6 +1119,13 @@ export class PositionHelper {
 
 // @public
 export function precisionRound(number: number, precision: number): number;
+
+// @public
+export type PrivateBValueRule = {
+    manufacturer?: string;
+    uidPrefix?: string;
+    key: string;
+};
 
 // @public
 export class Protractor {
@@ -1605,6 +1615,13 @@ export class ViewLayer {
     unbindImage(): void;
     unbindInteraction(): void;
 }
+
+// @public
+export type VolumeIdCandidate = {
+    name: string;
+    getter: Function;
+    preLoad?: boolean;
+};
 
 // @public
 export class WheelBehavior {
