@@ -523,6 +523,7 @@ export class DataController extends EventTarget {
    */
   reset() {
     this.#dataList = {};
+    this.#tmpSliceList = {};
   }
 
   /**
@@ -770,6 +771,7 @@ export class DataController extends EventTarget {
       }
       // remove data from list
       delete this.#dataList[dataId];
+      delete this.#tmpSliceList[dataId];
       /**
        * Data remove event.
        *
@@ -891,11 +893,11 @@ export class DataController extends EventTarget {
       this.setImage(dataId, finalData.image);
       // set meta
       data.meta = finalData.meta;
-      // reset tmp var
-      delete this.#tmpSliceList[dataId];
       // mark image as changed
       res.imageHasChanged = true;
     }
+    // release the slice list (also when not used)
+    delete this.#tmpSliceList[dataId];
 
     // mark image as complete
     data.setComplete(true);
