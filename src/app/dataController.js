@@ -325,7 +325,12 @@ export class DicomSliceDataList {
       // intentionaly limited to first items,
       // merged object is too big and slow when it contains
       // all the info
-      const sliceMeta = this.#list[indices[0]].meta;
+      // frames share their file meta: use the frame tags so that
+      // the volume index getter returns the frame value
+      const firstData = this.#list[indices[0]];
+      const sliceMeta = typeof firstData.frameNumber !== 'undefined'
+        ? getFrameElements(firstData.meta, firstData.frameNumber)
+        : firstData.meta;
       if (typeof meta === 'undefined') {
         meta = sliceMeta;
       } else {

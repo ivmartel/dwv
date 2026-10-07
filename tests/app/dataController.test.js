@@ -184,6 +184,64 @@ describe('app', () => {
   });
 
   /**
+   * Tests for {@link DataController} with multi-frame files that
+   * each contain multiple volumes.
+   *
+   * @function module:tests/app~datacontrollerMultiFrameMultiVolumePerFile
+   */
+  test('DataController builds multi-frame files with multiple volumes',
+    () => {
+      // 2 files, each one with 2 volumes of 2 frames at the same
+      // positions: the first item of 2 volumes comes from the same
+      // file, the meta merge has to use the frame b-value
+      const filesBValues = [[0, 0, 800, 800], [50, 50, 1000, 1000]];
+      const numberOfFrames = 4;
+      const filesElements = filesBValues.map((bValues, index) => {
+        const config = structuredClone(syntheticData[0]);
+        config.tags.SOPInstanceUID += `.${index}`;
+        const elements = getStructureElementsList(
+          config, '1.2.840.10008.1.2.1', {
+            numberOfFrames,
+            genOptions: {
+              frames3D: true,
+              framePositionOrder: [0, 1, 0, 1],
+              frameBValues: bValues
+            }
+          })[0];
+        // distinct instance numbers (meta merge id)
+        elements['00200013'].value = [String(index + 1)];
+        return elements;
+      });
+
+      // send frames as DicomBufferToData does
+      const dc0 = new DataController();
+      const dataId = '0';
+      for (const elements of filesElements) {
+        const buffer = elements['7FE00010'].value;
+        const frameSize = buffer.length / numberOfFrames;
+        for (let f = 0; f < numberOfFrames; ++f) {
+          const data = new DicomData(elements);
+          data.buffer = buffer.subarray(f * frameSize, (f + 1) * frameSize);
+          data.numberOfFiles = filesElements.length;
+          data.frameNumber = f;
+          if (typeof dc0.get(dataId) === 'undefined') {
+            dc0.add(dataId, data);
+          } else {
+            dc0.update(dataId, data);
+          }
+        }
+      }
+      assert.ok(dc0.get(dataId).hasDuplicateOrigin(), 'has duplicate origin');
+
+      const res0 = dc0.markDataAsComplete(dataId);
+      assert.ok(res0.imageHasChanged, 'image has changed');
+
+      const size = dc0.get(dataId).image.getGeometry().getSize();
+      assert.equal(size.get(2), 2, 'number of slices');
+      assert.equal(size.get(3), 4, 'number of volumes');
+    });
+
+  /**
    * Tests for {@link DicomSliceDataList#buildData}.
    *
    * @function module:tests/app~dicomSliceDataListBuildData
