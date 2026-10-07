@@ -94,7 +94,7 @@ export class DicomData {
    */
   image;
   /**
-   * Annotattion group extracted from meta data.
+   * Annotation group extracted from meta data.
    *
    * @type {AnnotationGroup|undefined}
    */
@@ -322,7 +322,7 @@ export class DicomSliceDataList {
     for (let i = 0; i < volsIndices.length; ++i) {
       const indices = volsIndices[i];
       // meta
-      // intentionaly limited to first items,
+      // intentionally limited to first items,
       // merged object is too big and slow when it contains
       // all the info
       // frames share their file meta: use the frame tags so that
@@ -422,7 +422,7 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Get the list of origins and thein occurences in a list
+   * Get the list of origins and their occurences in a list
    *   of {pos, indices, count}.
    *
    * @returns {object[]} A list of origins and
@@ -479,7 +479,7 @@ export class DataController extends EventTarget {
   #tmpSliceList = {};
 
   /**
-   * List of DICOM data.
+   * List of stashed DICOM data.
    *
    * @type {Record<string, DicomData>}
    */
@@ -524,6 +524,7 @@ export class DataController extends EventTarget {
   reset() {
     this.#dataList = {};
     this.#tmpSliceList = {};
+    this.#dataListStashed = {};
   }
 
   /**
@@ -857,7 +858,7 @@ export class DataController extends EventTarget {
     }
 
     /**
-     * Data udpate event.
+     * Data update event.
      *
      * @event DataController#dataupdate
      * @type {CustomEvent}
