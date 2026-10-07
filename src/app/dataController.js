@@ -1,5 +1,5 @@
 import {mergeObjects} from '../utils/operator.js';
-import {logger} from '../utils/logger.js';
+import {getFrameElements} from '../dicom/dicomFunctionalGroup.js';
 import {MaskFactory} from '../image/maskFactory.js';
 import {ImageFactory} from '../image/imageFactory.js';
 import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
@@ -200,13 +200,6 @@ export class DicomData {
         typeof data.image !== 'undefined'
       ) {
         this.#appendImage(data.image);
-        // frames are not stored for a later rebuild
-        // (see DataController.add)
-        if (this.#hasDuplicateOrigin &&
-          typeof data.frameNumber !== 'undefined') {
-          logger.error('Cannot append frame with duplicate origin, ' +
-            'following data will be ignored');
-        }
       }
 
       if (isNewFile) {
@@ -267,6 +260,7 @@ export class DicomSliceDataList {
   addClone(data) {
     const clone = new DicomData(structuredClone(data.meta));
     clone.image = data.image.clone();
+    clone.frameNumber = data.frameNumber;
     this.add(clone);
   }
 
@@ -280,7 +274,8 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Build a data from the stored slice data.
+   * Build a data from the stored slice data. The items can be
+   * single frame files or frames of multi-frame files.
    *
    * @returns {{image, meta}} The result data.
    */
@@ -356,8 +351,14 @@ export class DicomSliceDataList {
         sliceIndices[index] = i;
       }
     }
+    // frames share their file meta: use the frame tags so that
+    // per-frame getters return the frame value
+    const elementsList = this.#list.map(data =>
+      typeof data.frameNumber !== 'undefined'
+        ? getFrameElements(data.meta, data.frameNumber)
+        : data.meta);
     const guess = guessVolumeIndices(
-      this.#list.map(data => data.meta), sliceIndices, originList.length);
+      elementsList, sliceIndices, originList.length);
     if (typeof guess === 'undefined') {
       return {
         volsIndices: undefined,
@@ -686,12 +687,10 @@ export class DataController extends EventTarget {
       typeof data.annotationGroup === 'undefined') {
       // create content
       this.#setDataContent(data);
-      // store data for possible processing at complete time
-      // (see markDataAsComplete), not for frames: the slice list
-      // expects one data per file
+      // store data (slice or frame) for possible processing
+      // at complete time (see markDataAsComplete)
       if (typeof data.numberOfFiles !== 'undefined' &&
-        data.numberOfFiles > 1 &&
-        typeof data.frameNumber === 'undefined') {
+        data.numberOfFiles > 1) {
         this.#tmpSliceList[dataId] = new DicomSliceDataList();
         // add first data as clone since this data
         // is the base for future appends with no
@@ -827,8 +826,7 @@ export class DataController extends EventTarget {
 
     // store data for possible processing at complete time
     // (see markDataAsComplete)
-    if (typeof this.#tmpSliceList[dataId] !== 'undefined' &&
-      typeof data.frameNumber === 'undefined') {
+    if (typeof this.#tmpSliceList[dataId] !== 'undefined') {
       this.#tmpSliceList[dataId].add(data);
     }
 

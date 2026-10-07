@@ -11,6 +11,9 @@ import {Spacing} from '../../src/image/spacing.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
 import {custom} from '../../src/app/custom.js';
+import {getStructureElementsList} from '../../dev/dicom/dataStructures.js';
+
+import syntheticData from '/tests/data/synthetic-img.json';
 
 /**
  * Tests for the 'app/dataController.js' file.
@@ -116,6 +119,68 @@ describe('app', () => {
     // reset
     dc0.reset();
     assert.deepEqual(dc0.getDataIds(), [], 'dataIds after reset');
+  });
+
+  /**
+   * Tests for {@link DataController} with multi-frame multi-volume
+   * files.
+   *
+   * @function module:tests/app~datacontrollerMultiFrameMultiVolume
+   */
+  test('DataController builds multi-frame files with shared origins', () => {
+    // 3 files, each one volume of 2 frames at the same positions with
+    // a constant TemporalPositionIndex (so the pre-load time is the same
+    // for all files) and one b-value per file (the post-load volume id)
+    const bValues = [800, 0, 50];
+    const numberOfFrames = 2;
+    const filesElements = bValues.map((bValue, index) => {
+      const config = structuredClone(syntheticData[0]);
+      config.tags.SOPInstanceUID += `.${index}`;
+      const elements = getStructureElementsList(config, '1.2.840.10008.1.2.1', {
+        numberOfFrames,
+        genOptions: {
+          frames3D: true,
+          framePositionOrder: [0, 1],
+          frameTemporalPositions: [1, 1],
+          frameBValues: [bValue, bValue]
+        }
+      })[0];
+      // distinct instance numbers (meta merge id)
+      elements['00200013'].value = [String(index + 1)];
+      return elements;
+    });
+
+    // send frames as DicomBufferToData does
+    const dc0 = new DataController();
+    const dataId = '0';
+    for (const elements of filesElements) {
+      const buffer = elements['7FE00010'].value;
+      const frameSize = buffer.length / numberOfFrames;
+      for (let f = 0; f < numberOfFrames; ++f) {
+        const data = new DicomData(elements);
+        data.buffer = buffer.subarray(f * frameSize, (f + 1) * frameSize);
+        data.numberOfFiles = filesElements.length;
+        data.frameNumber = f;
+        if (typeof dc0.get(dataId) === 'undefined') {
+          dc0.add(dataId, data);
+        } else {
+          dc0.update(dataId, data);
+        }
+      }
+    }
+    assert.ok(dc0.get(dataId).hasDuplicateOrigin(), 'has duplicate origin');
+
+    const res0 = dc0.markDataAsComplete(dataId);
+    assert.ok(res0.imageHasChanged, 'image has changed');
+
+    const image = dc0.get(dataId).image;
+    const geometry = image.getGeometry();
+    const size = geometry.getSize();
+    assert.equal(size.get(2), numberOfFrames, 'number of slices');
+    assert.equal(size.get(3), bValues.length, 'number of volumes');
+    // volumes in b-value order: first one is the b=0 file
+    const firstUid = filesElements[1]['00080018'].value[0];
+    assert.equal(image.getImageUid(), firstUid, 'first volume is b=0');
   });
 
   /**
