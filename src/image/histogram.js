@@ -11,7 +11,7 @@
  */
 
 /**
- * Per-volume histogram (e.g. from {@link MaskImage#getHistogramBySegment}).
+ * Per-volume histogram (for example from {@link MaskImage#getHistogramBySegment}).
  *
  * @typedef {object} VolumeHistogram
  * @property {number} volume Volume index.
@@ -116,8 +116,8 @@ function buildIntervalsFromThresholds(min, maxExclusive, thresholds, names) {
  * volume's histogram. Interval names are provided separately and must have
  * length `thresholds.length + 1`.
  *
- * @param {VolumeHistogram[]} volumeHistograms Per-volume histograms (e.g.
- *   output of {@link MaskImage#getHistogramBySegment}).
+ * @param {VolumeHistogram[]} volumeHistograms Per-volume histograms (for
+ *   example the output of {@link MaskImage#getHistogramBySegment}).
  * @param {number[]} thresholds Interior intensity cut points in ascending
  *   order (e.g. `[1, 5]`).
  * @param {string[]} names Names for the resulting intervals
