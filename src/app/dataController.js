@@ -429,32 +429,28 @@ export class DicomSliceDataList {
    *   their number of occurences.
    */
   #getOriginList() {
-    // equal callback
-    const getEqualPosCallback = function (pos) {
-      return function (element) {
-        return element.pos.equals(pos);
-      };
-    };
-
-    const res = [];
+    // origins by key: Point3D.equals is an exact comparison so
+    // equal origins have the same string, the map keeps the
+    // insertion order
+    const originMap = new Map();
     for (let i = 0; i < this.#list.length; ++i) {
       const relData = this.#list[i];
       const origin = relData.image.getGeometry().getOrigin();
-      const findCallback = getEqualPosCallback(origin);
-      const found = res.find(findCallback);
-      if (typeof found === 'undefined') {
-        res.push({
+      const key = origin.toString();
+      let item = originMap.get(key);
+      if (typeof item === 'undefined') {
+        item = {
           pos: origin,
-          indices: [i],
-          count: 1
-        });
-      } else {
-        ++found.count;
-        found.indices.push(i);
+          indices: [],
+          count: 0
+        };
+        originMap.set(key, item);
       }
+      ++item.count;
+      item.indices.push(i);
     }
 
-    return res;
+    return [...originMap.values()];
   }
 }
 
