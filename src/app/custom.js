@@ -1,5 +1,9 @@
 /**
  * @import {WindowLevel} from '../image/windowLevel.js';
+ * @import {
+ *   PrivateBValueRule,
+ *   VolumeIdCandidate
+ * } from '../dicom/volumeTypes.js';
  */
 
 /**
@@ -33,7 +37,7 @@ export const custom = {
    * from `dicomVolume.js` (exported as `defaultPrivateBValueRules`),
    * which can be used to extend it.
    *
-   * @type {{manufacturer?: string, uidPrefix?: string, key: string}[]}
+   * @type {PrivateBValueRule[]}
    */
   privateBValueRules: undefined,
 
@@ -76,7 +80,7 @@ export const custom = {
    * `dicomVolume.js` (exported as `defaultVolumeIdCandidates`), which can
    * be used to extend it.
    *
-   * @type {{name: string, getter: Function, preLoad?: boolean}[]}
+   * @type {VolumeIdCandidate[]}
    */
   volumeIdCandidates: undefined,
 

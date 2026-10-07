@@ -53,6 +53,7 @@ import {
 
 // also export typedefs
 export * from './simpleTagValues.js';
+export * from './volumeTypes.js';
 
 export {
   DataElement,

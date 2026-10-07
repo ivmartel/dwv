@@ -276,7 +276,7 @@ export class Point3D {
  * Get an array find callback for an equal input point.
  *
  * @param {Point3D} point The point to compare to.
- * @returns {(element: Point3D) => boolean} A function that compares,
+ * @returns {function(Point3D): boolean} A function that compares,
  *   using `equals`, its input point to the one given as input to
  *   this function.
  */

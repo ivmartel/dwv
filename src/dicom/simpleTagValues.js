@@ -36,8 +36,8 @@ import {logger} from '../utils/logger.js';
  *
  * @param {Record<string, DataElement>} dataElements The meta data
  *   index by tag keys.
- * @returns {(accumulator: SimpleTagValues, currentValue: string) =>
- *   SimpleTagValues} An array reducer callbackFn.
+ * @returns {function(SimpleTagValues, string): SimpleTagValues} An array
+ *   reducer callbackFn (accumulator, currentValue).
  */
 function getDataElementsReducer(dataElements) {
   return function (accumulator, currentValue) {

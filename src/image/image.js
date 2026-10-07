@@ -123,11 +123,8 @@ export class Image extends EventTarget {
    * used by {@link Image#clone} to build the copy via the concrete
    * (possibly subclassed) constructor.
    *
-   * @typedef {new (
-   *   geometry: Geometry,
-   *   buffer: TypedArray,
-   *   imageUids?: string[]
-   * ) => Image} ImageConstructor
+   * @typedef {function(new:Image, Geometry, TypedArray, Array<string>=)}
+   *   ImageConstructor
    */
 
   /**

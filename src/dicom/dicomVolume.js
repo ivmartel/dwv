@@ -14,6 +14,10 @@ import {logger} from '../utils/logger.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {
+ *   PrivateBValueRule,
+ *   VolumeIdCandidate
+ * } from './volumeTypes.js';
  */
 
 /**
@@ -55,7 +59,7 @@ const SOPClassUIDs = {
  * Rules are either `{manufacturer, key}` or `{uidPrefix, key}`.
  * Can be used to extend `custom.privateBValueRules`.
  *
- * @type {{manufacturer?: string, uidPrefix?: string, key: string}[]}
+ * @type {PrivateBValueRule[]}
  */
 export const defaultPrivateBValueRules = [
   {
@@ -86,7 +90,7 @@ export const defaultPrivateBValueRules = [
  * (see `getVolumeIdTagValue`): they must not vary between the
  * slices of a single volume.
  *
- * @type {{name: string, getter: Function, preLoad?: boolean}[]}
+ * @type {VolumeIdCandidate[]}
  */
 export const defaultVolumeIdCandidates = [
   {
@@ -502,7 +506,7 @@ function getAcquisitionTime(elements) {
  * Get the list of volume id candidates: the custom one if defined,
  * the default one otherwise.
  *
- * @returns {{name: string, getter: Function, preLoad?: boolean}[]}
+ * @returns {VolumeIdCandidate[]}
  *   The candidates.
  */
 function getVolumeIdCandidates() {
@@ -566,7 +570,7 @@ export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
  * If the deprecated `custom.getPostLoadVolumeIdTagValue` is defined,
  * it is used as the only candidate.
  *
- * @param {Record<string, DataElement>[]} elementsList The DICOM tags
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM tags
  *   of each item.
  * @param {number[]} sliceIndices The slice index of each item.
  * @param {number} numberOfSlices The number of distinct slices.

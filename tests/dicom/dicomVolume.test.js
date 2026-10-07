@@ -609,7 +609,7 @@ describe('dicom', () => {
      * Get the per frame DICOM tags of a multi-frame file.
      *
      * @param {Record<string, DataElement>} elements The DICOM tags.
-     * @returns {Record<string, DataElement>[]} The frames DICOM tags.
+     * @returns {Array<Record<string, DataElement>>} The frames DICOM tags.
      */
     function getFramesElements(elements) {
       const numberOfFrames =
