@@ -41,12 +41,23 @@ const TagKeys = {
 };
 
 /**
- * Private b-value tag rules. Tested in order.
- * Rules are either `{manufacturer, key}` or `{uidPrefix, key}`.
- *
- * @type {object[]}
+ * Related SOP class UIDs.
  */
-const LocalBValueRules = [
+const SOPClassUIDs = {
+  MR: '1.2.840.10008.5.1.4.1.1.4',
+  EnhancedMR: '1.2.840.10008.5.1.4.1.1.4.1',
+  EnhancedMRColorImage: '1.2.840.10008.5.1.4.1.1.4.3',
+  LegacyConvertedEnhancedMRImageStorage: '1.2.840.10008.5.1.4.1.1.4.4'
+};
+
+/**
+ * Default private b-value tag rules. Tested in order.
+ * Rules are either `{manufacturer, key}` or `{uidPrefix, key}`.
+ * Can be used to extend `custom.privateBValueRules`.
+ *
+ * @type {{manufacturer?: string, uidPrefix?: string, key: string}[]}
+ */
+export const defaultPrivateBValueRules = [
   {
     manufacturer: NormalisedManufacturers.SIEMENS,
     key: '0019100C'
@@ -62,14 +73,55 @@ const LocalBValueRules = [
 ];
 
 /**
- * Related SOP class UIDs.
+ * Ordered list of candidate volume id getters. Since the tag that
+ * actually discriminates volumes is not known until the full data
+ * is loaded, `guessVolumeIndices` tries these in order and keeps the
+ * first one that produces a valid, consistent per-volume grouping.
+ * It is used for the files of a series (see `DicomSliceDataList`)
+ * and for the frames of a multi-frame file (see
+ * `getSortedFramesGeometry`).
+ * Most explicit/reliable discriminators come first, AcquisitionTime
+ * (the historical default) comes last.
+ * Candidates flagged with `preLoad` are also used while loading
+ * (see `getVolumeIdTagValue`): they must not vary between the
+ * slices of a single volume.
+ *
+ * @type {{name: string, getter: Function, preLoad?: boolean}[]}
  */
-const SOPClassUIDs = {
-  MR: '1.2.840.10008.5.1.4.1.1.4',
-  EnhancedMR: '1.2.840.10008.5.1.4.1.1.4.1',
-  EnhancedMRColorImage: '1.2.840.10008.5.1.4.1.1.4.3',
-  LegacyConvertedEnhancedMRImageStorage: '1.2.840.10008.5.1.4.1.1.4.4'
-};
+export const defaultVolumeIdCandidates = [
+  {
+    name: 'TemporalPositionIdentifier',
+    getter: makeNumericTagGetter(
+      TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10)),
+    preLoad: true
+  },
+  {
+    name: 'TemporalPositionIndex',
+    getter: getTemporalPositionIndex,
+    preLoad: true
+  },
+  {
+    name: 'DiffusionBValue',
+    getter: getMRVolumeIdTagValue,
+    preLoad: true
+  },
+  {
+    name: 'EchoTime',
+    getter: makeNumericTagGetter(TagKeys.EchoTime, parseFloat)
+  },
+  {
+    name: 'TriggerTime',
+    getter: makeNumericTagGetter(TagKeys.TriggerTime, parseFloat)
+  },
+  {
+    name: 'InversionTime',
+    getter: makeNumericTagGetter(TagKeys.InversionTime, parseFloat)
+  },
+  {
+    name: 'AcquisitionTime',
+    getter: getAcquisitionTime
+  }
+];
 
 /**
  * Get the diffusion b-value from a functional DICOM sequence.
@@ -149,7 +201,7 @@ function getNonStandardDiffusionBValueFromMR(elements) {
   if (typeof custom.privateBValueRules !== 'undefined') {
     rules = custom.privateBValueRules;
   } else {
-    rules = LocalBValueRules;
+    rules = defaultPrivateBValueRules;
   }
 
   for (const rule of rules) {
@@ -377,15 +429,6 @@ function makeNumericTagGetter(key, parse) {
 }
 
 /**
- * Get the TemporalPositionIdentifier tag value.
- *
- * @param {Record<string, DataElement>} elements The DICOM tags.
- * @returns {number|undefined} The value, if present.
- */
-const getTemporalPositionIdentifier = makeNumericTagGetter(
-  TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10));
-
-/**
  * List of already logged deprecation messages.
  *
  * @type {string[]}
@@ -407,7 +450,7 @@ function warnDeprecatedOnce(message) {
 /**
  * Get the volume id from a list of tags, used while loading (before
  * the full data is known): the first defined value of the volume id
- * candidates flagged with `preLoad` (see volumeIdCandidates).
+ * candidates flagged with `preLoad` (see defaultVolumeIdCandidates).
  *
  * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number|undefined} The id value if available.
@@ -456,56 +499,6 @@ function getAcquisitionTime(elements) {
 }
 
 /**
- * Ordered list of candidate volume id getters. Since the tag that
- * actually discriminates volumes is not known until the full data
- * is loaded, `guessVolumeIndices` tries these in order and keeps the
- * first one that produces a valid, consistent per-volume grouping.
- * It is used for the files of a series (see `DicomSliceDataList`)
- * and for the frames of a multi-frame file (see
- * `getSortedFramesGeometry`).
- * Most explicit/reliable discriminators come first, AcquisitionTime
- * (the historical default) comes last.
- * Candidates flagged with `preLoad` are also used while loading
- * (see `getVolumeIdTagValue`): they must not vary between the
- * slices of a single volume.
- *
- * @type {{name: string, getter: Function, preLoad?: boolean}[]}
- */
-export const volumeIdCandidates = [
-  {
-    name: 'TemporalPositionIdentifier',
-    getter: getTemporalPositionIdentifier,
-    preLoad: true
-  },
-  {
-    name: 'TemporalPositionIndex',
-    getter: getTemporalPositionIndex,
-    preLoad: true
-  },
-  {
-    name: 'DiffusionBValue',
-    getter: getMRVolumeIdTagValue,
-    preLoad: true
-  },
-  {
-    name: 'EchoTime',
-    getter: makeNumericTagGetter(TagKeys.EchoTime, parseFloat)
-  },
-  {
-    name: 'TriggerTime',
-    getter: makeNumericTagGetter(TagKeys.TriggerTime, parseFloat)
-  },
-  {
-    name: 'InversionTime',
-    getter: makeNumericTagGetter(TagKeys.InversionTime, parseFloat)
-  },
-  {
-    name: 'AcquisitionTime',
-    getter: getAcquisitionTime
-  }
-];
-
-/**
  * Get the list of volume id candidates: the custom one if defined,
  * the default one otherwise.
  *
@@ -515,7 +508,7 @@ export const volumeIdCandidates = [
 function getVolumeIdCandidates() {
   return typeof custom.volumeIdCandidates !== 'undefined'
     ? custom.volumeIdCandidates
-    : volumeIdCandidates;
+    : defaultVolumeIdCandidates;
 }
 
 /**

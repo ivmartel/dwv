@@ -1,6 +1,6 @@
 import {describe, test, assert, vi} from 'vitest';
 import {
-  volumeIdCandidates,
+  defaultVolumeIdCandidates,
   getVolumeIdTagValue,
   getVolumeIndices,
   guessVolumeIndices
@@ -159,17 +159,17 @@ function makeDataElement(vr, value) {
  * @returns {Function} The getter.
  */
 function getCandidate(name) {
-  const candidate = volumeIdCandidates.find(
+  const candidate = defaultVolumeIdCandidates.find(
     item => item.name === name);
   return candidate.getter;
 }
 
 describe('dicom', () => {
 
-  describe('volumeIdCandidates', () => {
+  describe('defaultVolumeIdCandidates', () => {
 
     test('has AcquisitionTime last', () => {
-      const names = volumeIdCandidates.map(item => item.name);
+      const names = defaultVolumeIdCandidates.map(item => item.name);
       assert.equal(names[names.length - 1], 'AcquisitionTime');
     });
 
@@ -487,7 +487,7 @@ describe('dicom', () => {
   describe('getVolumeIdTagValue pre load candidates', () => {
 
     test('flags the explicit candidates', () => {
-      const names = volumeIdCandidates
+      const names = defaultVolumeIdCandidates
         .filter(item => item.preLoad === true)
         .map(item => item.name);
       assert.deepEqual(names, [

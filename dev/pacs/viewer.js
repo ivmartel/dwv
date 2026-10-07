@@ -179,7 +179,8 @@ function viewerSetup() {
 
   // // example private logic for volume id value retrieval:
   // // tried first, before the default candidates
-  // // (import {volumeIdCandidates} from '../../src/dicom/dicomVolume.js')
+  // // (import {defaultVolumeIdCandidates}
+  // //   from '../../src/dicom/dicomVolume.js')
   // custom.volumeIdCandidates = [
   //   {
   //     name: 'ABCD0123',
@@ -193,7 +194,7 @@ function viewerSetup() {
   //     },
   //     preLoad: true
   //   },
-  //   ...volumeIdCandidates
+  //   ...defaultVolumeIdCandidates
   // ];
 
   // // example private logic for pixel unit value retrieval
