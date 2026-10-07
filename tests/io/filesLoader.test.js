@@ -181,7 +181,7 @@ describe('io', () => {
     assert.equal(MockFileReader.instances[0].mode, 'text');
     assert.equal(MockFileReader.instances[1].mode, 'text');
     assert.equal(MockIoLoader.instances.length, 1);
-    assert.equal(MockIoLoader.instances[0].options.numberOfFiles, 2);
+    assert.equal(MockIoLoader.instances[0].options.numberOfItems, 2);
     assert.equal(
       MockIoLoader.instances[0].options.defaultCharacterSet,
       'ISO_IR 100'

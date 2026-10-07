@@ -452,12 +452,12 @@ export class Image extends EventTarget {
    */
   canScroll(viewOrientation) {
     const size = this.getGeometry().getSize();
-    // also check the numberOfFiles in case we are in the middle of a load
-    let nFiles = 1;
-    if (typeof this.#meta.numberOfFiles !== 'undefined') {
-      nFiles = this.#meta.numberOfFiles;
+    // also check the slice capacity in case we are in the middle of a load
+    let sliceCapacity = 1;
+    if (typeof this.#meta.sliceCapacity !== 'undefined') {
+      sliceCapacity = this.#meta.sliceCapacity;
     }
-    return size.canScroll(viewOrientation) || nFiles !== 1;
+    return size.canScroll(viewOrientation) || sliceCapacity !== 1;
   }
 
   /**
@@ -922,7 +922,7 @@ export class Image extends EventTarget {
     for (const key in this.#meta) {
       if (
         key === 'windowPresets' ||
-        key === 'numberOfFiles' ||
+        key === 'sliceCapacity' ||
         key === 'custom'
       ) {
         continue;
@@ -998,10 +998,10 @@ export class Image extends EventTarget {
     const sliceSize = this.#numberOfComponents * size.getDimSize(2);
 
     // create full buffer if not done yet
-    if (typeof this.#meta.numberOfFiles === 'undefined') {
-      throw new Error('Missing number of files for buffer manipulation.');
+    if (typeof this.#meta.sliceCapacity === 'undefined') {
+      throw new Error('Missing slice capacity for buffer manipulation.');
     }
-    const fullBufferSize = sliceSize * this.#meta.numberOfFiles;
+    const fullBufferSize = sliceSize * this.#meta.sliceCapacity;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
     }
@@ -1095,17 +1095,17 @@ export class Image extends EventTarget {
     // create full buffer if not done yet
     const size = this.#geometry.getSize();
     const frameSize = this.#numberOfComponents * size.getDimSize(2);
-    if (typeof this.#meta.numberOfFiles === 'undefined') {
-      throw new Error('Missing number of files for frame buffer manipulation.');
+    if (typeof this.#meta.sliceCapacity === 'undefined') {
+      throw new Error('Missing slice capacity for frame buffer manipulation.');
     }
-    const fullBufferSize = frameSize * this.#meta.numberOfFiles;
+    const fullBufferSize = frameSize * this.#meta.sliceCapacity;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
     }
     // check index
-    if (frameIndex >= this.#meta.numberOfFiles) {
+    if (frameIndex >= this.#meta.sliceCapacity) {
       logger.warn(`Ignoring frame at index ${ frameIndex
-      } (size: ${this.#meta.numberOfFiles})`);
+      } (size: ${this.#meta.sliceCapacity})`);
       return;
     }
     // append

@@ -456,7 +456,7 @@ export class BrushMaskPaint extends EventTarget {
     }
     const tags = this.#mask.getMeta();
     for (const element of originsToAdd) {
-      tags.numberOfFiles += 1;
+      tags.sliceCapacity += 1;
       this.#mask.appendSlice(
         this.#createMaskImage(maskGeometry, element, sliceMeta));
     }
@@ -493,7 +493,7 @@ export class BrushMaskPaint extends EventTarget {
     firstSliceMeta.DimensionIndexSequence = dimension.indices;
     // local
     firstSliceMeta.PixelRepresentation = 0;
-    firstSliceMeta.numberOfFiles = 1;
+    firstSliceMeta.sliceCapacity = 1;
 
     const tags = sourceImage.getMeta();
 

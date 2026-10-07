@@ -109,7 +109,7 @@ export class DicomBufferToData {
     // create data
     const data = new DicomData(dataElements);
     data.buffer = buffer;
-    data.numberOfFiles = this.#options.numberOfFiles;
+    data.numberOfItems = this.#options.numberOfItems;
     data.frameNumber = frameNumber;
 
     // call onloaditem

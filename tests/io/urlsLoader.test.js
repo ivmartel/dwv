@@ -198,7 +198,7 @@ describe('io', () => {
     assert.equal(MockXMLHttpRequest.sentUrls.length, 2);
     assert.deepEqual(MockXMLHttpRequest.sentUrls, urls);
     assert.equal(MockIoLoader.instances.length, 1);
-    assert.equal(MockIoLoader.instances[0].options.numberOfFiles, 2);
+    assert.equal(MockIoLoader.instances[0].options.numberOfItems, 2);
     assert.equal(
       MockIoLoader.instances[0].options.defaultCharacterSet,
       'ISO_IR 100'

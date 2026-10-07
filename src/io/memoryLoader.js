@@ -166,7 +166,7 @@ export class MemoryLoader extends LoadHandlers {
         foundLoader = true;
         // load options
         loader.setOptions({
-          numberOfFiles: data.length,
+          numberOfItems: data.length,
           defaultCharacterSet: this.getDefaultCharacterSet()
         });
         // set loader callbacks

@@ -355,14 +355,14 @@ export class ImageFactory {
    * @param {Uint8Array | Int8Array |
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
-   * @param {number} numberOfFiles The input number of files.
+   * @param {number} numberOfItems The number of load items.
    * @param {number} [frameNumber] The frame number if the pixel buffer
    *   only contains one frame of a multi-frame data: the image is
    *   then one frame, the other ones are to be appended to it.
    * @returns {Image} A new Image.
    * @throws {Error} Error for missing or wrong data.
    */
-  create(dataElements, pixelBuffer, numberOfFiles, frameNumber) {
+  create(dataElements, pixelBuffer, numberOfItems, frameNumber) {
     // safe get shortcuts
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
@@ -460,15 +460,15 @@ export class ImageFactory {
     }
 
     // meta information
-    // (number of files is used to allocate the full buffer
+    // (slice capacity is used to allocate the full buffer
     // when appending slices, for frames: the total number of frames)
     const meta = {
-      numberOfFiles
+      sliceCapacity: numberOfItems
     };
     if (typeof frameNumber !== 'undefined') {
       const numberOfFrames = parseInt(
         safeGetLocal(TagKeys.NumberOfFrames), 10);
-      meta.numberOfFiles *= numberOfFrames;
+      meta.sliceCapacity *= numberOfFrames;
     }
 
     // defaults

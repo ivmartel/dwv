@@ -57,7 +57,7 @@ function makeSliceData(z, uid, meta) {
   const geometry = new Geometry([origin], size, spacing);
   const buffer = new Int16Array(size.getTotalSize());
   const image = new Image(geometry, buffer, [uid]);
-  image.setMeta({numberOfFiles: 4});
+  image.setMeta({sliceCapacity: 4});
 
   const data = new DicomData({
     ...meta,
@@ -159,7 +159,7 @@ describe('app', () => {
       for (let f = 0; f < numberOfFrames; ++f) {
         const data = new DicomData(elements);
         data.buffer = buffer.subarray(f * frameSize, (f + 1) * frameSize);
-        data.numberOfFiles = filesElements.length;
+        data.numberOfItems = filesElements.length;
         data.frameNumber = f;
         if (typeof dc0.get(dataId) === 'undefined') {
           dc0.add(dataId, data);
@@ -222,7 +222,7 @@ describe('app', () => {
         for (let f = 0; f < numberOfFrames; ++f) {
           const data = new DicomData(elements);
           data.buffer = buffer.subarray(f * frameSize, (f + 1) * frameSize);
-          data.numberOfFiles = filesElements.length;
+          data.numberOfItems = filesElements.length;
           data.frameNumber = f;
           if (typeof dc0.get(dataId) === 'undefined') {
             dc0.add(dataId, data);

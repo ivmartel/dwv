@@ -10,13 +10,13 @@ import {LoaderBase} from './loaderBase.js';
  * Accumulates parsed parts from every `load()` call (one per URL) and
  * hands them all to a single {@link MemoryLoader} once the last expected
  * URL has arrived. This lets N multipart URLs – each containing M DICOM
- * slices – be assembled correctly with `numberOfFiles = N × M`.
+ * slices – be assembled correctly with `numberOfItems = N × M`.
  */
 export class MultipartLoader extends LoaderBase {
 
   /**
    * Total number of `load()` calls expected (= number of URLs in the
-   * batch, taken from `options.numberOfFiles` on the first call).
+   * batch, taken from `options.numberOfItems` on the first call).
    *
    * @type {number}
    */
@@ -46,7 +46,7 @@ export class MultipartLoader extends LoaderBase {
   load(buffer, origin, index) {
     // initialise on the first call of a new batch
     if (this.#receivedCalls === 0) {
-      this.#expectedCalls = this.getOptions().numberOfFiles ?? 1;
+      this.#expectedCalls = this.getOptions().numberOfItems ?? 1;
       this.#allParts = [];
       this.setLoading(true);
       this.onloadstart({

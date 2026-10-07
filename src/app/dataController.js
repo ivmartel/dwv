@@ -108,11 +108,12 @@ export class DicomData {
   buffer;
 
   /**
-   * Number of files/urls associated to the data.
+   * Number of load items (files, urls, buffers...) associated
+   * to the data.
    *
    * @type {number}
    */
-  numberOfFiles;
+  numberOfItems;
 
   /**
    * Frame number, set when the buffer only contains one frame
@@ -649,7 +650,7 @@ export class DataController extends EventTarget {
           data.image = factory.create(
             data.meta,
             data.buffer,
-            data.numberOfFiles,
+            data.numberOfItems,
             data.frameNumber
           );
         }
@@ -705,8 +706,8 @@ export class DataController extends EventTarget {
       this.#setDataContent(data);
       // store data (slice or frame) for possible processing
       // at complete time (see markDataAsComplete)
-      if (typeof data.numberOfFiles !== 'undefined' &&
-        data.numberOfFiles > 1) {
+      if (typeof data.numberOfItems !== 'undefined' &&
+        data.numberOfItems > 1) {
         this.#tmpSliceList[dataId] = new DicomSliceDataList();
         // add first data as clone since this data
         // is the base for future appends with no

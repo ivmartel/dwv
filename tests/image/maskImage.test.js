@@ -69,7 +69,7 @@ describe('MaskImage', () => {
       const spacing = new Spacing([1, 1, 1]);
       const geom0 = new Geometry([new Point3D(0, 0, 0)], size1, spacing);
       const mask = new MaskImage(geom0, new Uint8Array(4), ['0']);
-      mask.setMeta({PixelRepresentation: 0, numberOfFiles: 2});
+      mask.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
 
       // paint segment 1 on slice 0
       mask.setAtOffsetsAndGetOriginals([[0]], 1);
@@ -78,7 +78,7 @@ describe('MaskImage', () => {
       // must grow from 4 to 8 elements
       const geom1 = new Geometry([new Point3D(0, 0, 1)], size1, spacing);
       const slice = new Image(geom1, new Uint8Array(4), ['1']);
-      slice.setMeta({PixelRepresentation: 0, numberOfFiles: 2});
+      slice.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
       mask.appendSlice(slice);
 
       // paint segment 1 on the newly appended slice 1
@@ -223,13 +223,13 @@ describe('MaskImage', () => {
     () => {
       const size = 2;
       const spacing = new Spacing([1, 1, 1]);
-      // 2 initial slices (z=0, z=1), room reserved for 3 via numberOfFiles
+      // 2 initial slices (z=0, z=1), room reserved for 3 via sliceCapacity
       const geometry = new Geometry(
         [new Point3D(0, 0, 0)], new Size([size, size, 1]), spacing);
       geometry.appendOrigin(new Point3D(0, 0, 1), 1);
       const buffer = new Uint8Array(size * size * 2).fill(1);
       const mask = new MaskImage(geometry, buffer, ['0', '1']);
-      mask.setMeta({PixelRepresentation: 0, numberOfFiles: 3});
+      mask.setMeta({PixelRepresentation: 0, sliceCapacity: 3});
       mask.initializeContour();
 
       const shiftSliceSpy = vi.spyOn(mask.getContour(), 'shiftSlice');
@@ -239,7 +239,7 @@ describe('MaskImage', () => {
         [new Point3D(0, 0, -1)], new Size([size, size, 1]), spacing);
       const slice = new Image(
         sliceGeometry, new Uint8Array(size * size).fill(2), ['2']);
-      slice.setMeta({PixelRepresentation: 0, numberOfFiles: 3});
+      slice.setMeta({PixelRepresentation: 0, sliceCapacity: 3});
       mask.appendSlice(slice);
 
       // image-space shift: indexOffset=0, insertSize=sliceSize(4),
@@ -270,7 +270,7 @@ describe('MaskImage', () => {
         1, new Uint8Array([1, 1, 1, 1]), 0, 0, size * size, 1);
       const mask = new MaskImage(
         geometry, collection.getLabelMap(), ['1'], collection);
-      mask.setMeta({PixelRepresentation: 0, numberOfFiles: 2});
+      mask.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
 
       // append the other slice, z=0, which sorts *before* the existing
       // one and so shifts the existing segment's buffer content
@@ -278,7 +278,7 @@ describe('MaskImage', () => {
         [new Point3D(0, 0, 0)], new Size([size, size, 1]), spacing);
       const slice = new Image(sliceGeometry, new Uint8Array(size * size),
         ['0']);
-      slice.setMeta({PixelRepresentation: 0, numberOfFiles: 2});
+      slice.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
       mask.appendSlice(slice);
 
       // brush-paint a new segment 2 onto the newly appended slice (z=0,

@@ -250,7 +250,7 @@ describe('io', () => {
 
     test('load with 2 URLs: accumulates parts, fires MemoryLoader once', () => {
       const loader = new MultipartLoader();
-      loader.setOptions({numberOfFiles: 2});
+      loader.setOptions({numberOfItems: 2});
 
       parseMultipart
         .mockReturnValueOnce([{data: 'part-a'}])

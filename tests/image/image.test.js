@@ -225,7 +225,7 @@ describe('image', () => {
       [imgOrigin], imgSizeMinusOne, imgSpacing);
     imgGeometry0.appendOrigin(new Point3D(0, 0, 1), 1);
     const image0 = new Image(imgGeometry0, buffer, ['0']);
-    image0.setMeta({numberOfFiles: 3});
+    image0.setMeta({sliceCapacity: 3});
     // append null
     assert.throws(function () {
       image0.appendSlice(null);
@@ -237,7 +237,7 @@ describe('image', () => {
     const sliceGeometry = new Geometry(
       [sliceOrigin], sliceSize, imgSpacing);
     const slice0 = new Image(sliceGeometry, sliceBuffer, ['1']);
-    slice0.setMeta({numberOfFiles: 3});
+    slice0.setMeta({sliceCapacity: 3});
     // append slice before
     image0.appendSlice(slice0);
     // test its values
@@ -261,12 +261,12 @@ describe('image', () => {
       [imgOrigin], imgSizeMinusOne, imgSpacing);
     imgGeometry1.appendOrigin(new Point3D(0, 0, 1), 1);
     const image1 = new Image(imgGeometry1, buffer, ['0']);
-    image1.setMeta({numberOfFiles: 3});
+    image1.setMeta({sliceCapacity: 3});
     const sliceOrigin1 = new Point3D(0, 0, 2);
     const sliceGeometry1 = new Geometry(
       [sliceOrigin1], sliceSize, imgSpacing);
     const slice1 = new Image(sliceGeometry1, sliceBuffer, ['1']);
-    slice1.setMeta({numberOfFiles: 3});
+    slice1.setMeta({sliceCapacity: 3});
     // append slice before
     image1.appendSlice(slice1);
     // test its values
@@ -290,12 +290,12 @@ describe('image', () => {
       [imgOrigin], imgSizeMinusOne, imgSpacing);
     imgGeometry2.appendOrigin(new Point3D(0, 0, 1), 1);
     const image2 = new Image(imgGeometry2, buffer, ['0']);
-    image2.setMeta({numberOfFiles: 3});
+    image2.setMeta({sliceCapacity: 3});
     const sliceOrigin2 = new Point3D(0, 0, 0.4);
     const sliceGeometry2 = new Geometry(
       [sliceOrigin2], sliceSize, imgSpacing);
     const slice2 = new Image(sliceGeometry2, sliceBuffer, ['1']);
-    slice2.setMeta({numberOfFiles: 3});
+    slice2.setMeta({sliceCapacity: 3});
     // append slice before
     image2.appendSlice(slice2);
     // test its values
@@ -345,7 +345,7 @@ describe('image', () => {
       const buffer = new Int16Array(size * size);
       const image = new Image(geometry, buffer, [`${z}`]);
       image.setMeta({
-        numberOfFiles,
+        sliceCapacity: numberOfFiles,
         windowPresets: {
           Default: new WindowPreset('Default', [wl])
         }

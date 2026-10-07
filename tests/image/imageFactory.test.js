@@ -148,7 +148,7 @@ describe('ImageFactory', () => {
       assert.equal(meta.SeriesInstanceUID, tags.SeriesInstanceUID,
         'SeriesInstanceUID');
       assert.equal(meta.PatientID, tags.PatientID, 'PatientID');
-      assert.equal(meta.numberOfFiles, 1, 'numberOfFiles');
+      assert.equal(meta.sliceCapacity, 1, 'sliceCapacity');
     });
 
     test('create: length unit is mm when PixelSpacing is present', () => {
@@ -273,13 +273,13 @@ describe('ImageFactory', () => {
       }
     });
 
-    test('meta numberOfFiles is the total number of frames', () => {
+    test('meta sliceCapacity is the total number of frames', () => {
       const numberOfFrames = typeof structure.numberOfFrames !== 'undefined'
         ? structure.numberOfFrames : 1;
       assert.equal(
-        image.getMeta().numberOfFiles,
+        image.getMeta().sliceCapacity,
         fileElementsList.length * numberOfFrames,
-        'numberOfFiles');
+        'sliceCapacity');
     });
 
     test('pixel buffer holds every file with distinct content', () => {
@@ -333,8 +333,8 @@ describe('ImageFactory', () => {
           `frame ${f} size`);
         assert.equal(geometry.getInitialTime(), f, `frame ${f} time`);
         assert.equal(
-          image.getMeta().numberOfFiles, 2 * numberOfFrames,
-          `frame ${f} numberOfFiles is the total number of frames`);
+          image.getMeta().sliceCapacity, 2 * numberOfFrames,
+          `frame ${f} sliceCapacity is the total number of frames`);
       }
     });
 
@@ -397,8 +397,8 @@ describe('ImageFactory', () => {
           geometry.getOrigin().getValues(), [0, 0, order[f]],
           `frame ${f} origin`);
         assert.equal(
-          image.getMeta().numberOfFiles, order.length,
-          `frame ${f} numberOfFiles is the total number of frames`);
+          image.getMeta().sliceCapacity, order.length,
+          `frame ${f} sliceCapacity is the total number of frames`);
       }
     });
 
@@ -449,8 +449,8 @@ describe('ImageFactory', () => {
           `frame ${f} origin`);
         assert.equal(geometry.getInitialTime(), volumes[f], `frame ${f} time`);
         assert.equal(
-          image.getMeta().numberOfFiles, numberOfFrames,
-          `frame ${f} numberOfFiles is the total number of frames`);
+          image.getMeta().sliceCapacity, numberOfFrames,
+          `frame ${f} sliceCapacity is the total number of frames`);
       }
     });
 

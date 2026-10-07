@@ -12,7 +12,7 @@ import {LoadHandlers} from './loadHandlers.js';
 export class LoaderBase extends LoadHandlers {
 
   /**
-   * Loader options: {numberOfFiles, defaultCharacterSet}.
+   * Loader options: {numberOfItems, defaultCharacterSet}.
    *
    * @type {object}
    */

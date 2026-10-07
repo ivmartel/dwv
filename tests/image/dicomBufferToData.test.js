@@ -133,7 +133,7 @@ function getReferencePixels(config, structure = singleSliceStructure) {
 function getRecordingConverter(options) {
   const converter = new DicomBufferToData();
   converter.setOptions(
-    typeof options !== 'undefined' ? options : {numberOfFiles: 1});
+    typeof options !== 'undefined' ? options : {numberOfItems: 1});
   const events = [];
   const types = [
     'onloadstart',
@@ -313,12 +313,12 @@ describe('image', () => {
 
       test('data meta and buffer', () => {
         const {converter, events} = getRecordingConverter(
-          {numberOfFiles: 3});
+          {numberOfItems: 3});
         converter.convert(getBuffer(config, syntax), 'origin0', 0);
         const item = eventsOfType(events, 'onloaditem')[0];
         assert.equal(item.source, 'origin0', 'loaditem source');
         const data = item.data;
-        assert.equal(data.numberOfFiles, 3, 'numberOfFiles from options');
+        assert.equal(data.numberOfItems, 3, 'numberOfItems from options');
         assert.equal(
           data.meta['00080060'].value[0], config.tags.Modality, 'Modality');
         assert.equal(
@@ -498,7 +498,7 @@ describe('image', () => {
             const buffers = getStructureBuffers(config, syntax, structure);
 
             const recording = getRecordingConverter(
-              {numberOfFiles: buffers.length});
+              {numberOfItems: buffers.length});
             events = recording.events;
             for (let i = 0; i < buffers.length; ++i) {
               recording.converter.convert(buffers[i], `origin${i}`, i);
@@ -534,8 +534,8 @@ describe('image', () => {
               assert.equal(
                 items[i].source, `origin${fileIndex}`, `item ${i} source`);
               assert.equal(
-                data.numberOfFiles, refElementsList.length,
-                `item ${i} numberOfFiles`);
+                data.numberOfItems, refElementsList.length,
+                `item ${i} numberOfItems`);
               assert.equal(
                 data.meta['00080018'].value[0],
                 refElements['00080018'].value[0],
@@ -573,7 +573,7 @@ describe('image', () => {
           events = convertDeferred(
             buffers,
             (a, b) => (b.itemNumber - a.itemNumber) || (b.index - a.index),
-            {numberOfFiles: buffers.length},
+            {numberOfItems: buffers.length},
             getDataControllerSetup(dataController)
           );
           dataController.markDataAsComplete('0');

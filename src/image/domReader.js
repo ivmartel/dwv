@@ -68,7 +68,7 @@ function getDefaultImage(
   const meta = {};
   meta.BitsStored = 8;
   if (typeof numberOfFrames !== 'undefined') {
-    meta.numberOfFiles = numberOfFrames;
+    meta.sliceCapacity = numberOfFrames;
   }
   image.setMeta(meta);
   // return
