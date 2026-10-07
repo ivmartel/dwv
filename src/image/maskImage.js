@@ -5,11 +5,14 @@ import {LabelingThread} from './labelingThread.js';
 import {SegmentCollection} from './segmentCollection.js';
 import {ImageContour} from './imageContour.js';
 import {Image} from './image.js';
+import {logger} from '../utils/logger.js';
+import {MaskSegmentHelper} from './maskSegmentHelper.js';
 
 /**
  * @import {Geometry} from './geometry.js';
  * @import {RGB} from '../utils/colour.js';
  * @import {Label} from './label.js';
+ * @import {MaskSegment} from '../dicom/dicomSegment.js';
  */
 
 const ML_PER_MM = 0.001; // ml/mm^3
@@ -527,6 +530,129 @@ export class MaskImage extends Image {
       /** @type {Uint8Array} */ (copy.getBuffer()));
     copy.#segmentCollection = clonedCollection;
     return copy;
+  }
+
+  /**
+   * Get per-volume histograms of reference-image intensities for one segment.
+   *
+   * For each volume of `image`, counts how often each rescaled intensity
+   * appears in voxels belonging to the given segment of this mask.
+   * Segmentations are 3D: the same mask is applied to every volume.
+   * Histogram arrays are dense from the min to max intensity found in
+   * that volume (`histogram[value] === 0` means that intensity is absent).
+   *
+   * @param {Image} image The reference image (intensities).
+   * @param {string} segmentId Segment tracking UID, or segment number as
+   *   string.
+   * @returns {{volume: number, histogram: number[]}[]} One entry per volume.
+   */
+  getHistogramBySegment(image, segmentId) {
+    const segment = this.#findSegmentById(segmentId);
+    if (typeof segment === 'undefined') {
+      logger.warn(
+        `getHistogramBySegment: unknown segment id: ${segmentId}`);
+      return [];
+    }
+
+    const imageSize = image.getGeometry().getSize();
+    const maskSize = this.getGeometry().getSize();
+    this.#assertCompatibleHistogramSizes(maskSize, imageSize);
+
+    const segmentValue = typeof segment.displayValue !== 'undefined'
+      ? segment.displayValue
+      : segment.number;
+
+    const numberOfVolumes = imageSize.length() === 4
+      ? imageSize.get(3)
+      : 1;
+    const volumeSize = imageSize.length() === 4
+      ? imageSize.getDimSize(3)
+      : imageSize.getTotalSize();
+
+    const maskBuffer = this.getBuffer();
+    const result = [];
+
+    for (let v = 0; v < numberOfVolumes; ++v) {
+      const start = v * volumeSize;
+      const end = start + volumeSize;
+      /** @type {number[]} */
+      const counts = [];
+      let rmin;
+      let rmax;
+
+      for (let offset = start; offset < end; ++offset) {
+        // mask is always 3D spatial: reuse it for each volume
+        const maskOffset = offset - start;
+        if (maskBuffer[maskOffset] !== segmentValue) {
+          continue;
+        }
+        const value = image.getRescaledValueAtOffset(offset);
+        counts[value] = (counts[value] || 0) + 1;
+        if (typeof rmin === 'undefined' || value < rmin) {
+          rmin = value;
+        }
+        if (typeof rmax === 'undefined' || value > rmax) {
+          rmax = value;
+        }
+      }
+
+      /** @type {number[]} */
+      const histogram = [];
+      if (typeof rmin !== 'undefined') {
+        for (let b = rmin; b <= rmax; ++b) {
+          histogram[b] = counts[b] || 0;
+        }
+      }
+
+      result.push({volume: v, histogram});
+    }
+
+    return result;
+  }
+
+  /**
+   * Find a segment by tracking UID or by number as string.
+   *
+   * @param {string} segmentId The segment id.
+   * @returns {MaskSegment|undefined} The segment, or undefined if not found.
+   */
+  #findSegmentById(segmentId) {
+    const helper = new MaskSegmentHelper(this);
+    const segments = this.getMeta()?.custom?.segments ?? [];
+
+    for (const segment of segments) {
+      if (segment.trackingUid === segmentId) {
+        return segment;
+      }
+    }
+    for (const segment of segments) {
+      if (String(segment.number) === segmentId) {
+        return segment;
+      }
+    }
+    // also allow lookup when segments are only known via the helper
+    // (e.g. freshly added) using the same number-as-string rule
+    const asNumber = Number(segmentId);
+    if (!Number.isNaN(asNumber) && helper.hasSegment(asNumber)) {
+      return helper.getSegment(asNumber);
+    }
+    return undefined;
+  }
+
+  /**
+   * Ensure mask and image spatial sizes (dims 0-2) are compatible.
+   * Segmentations are 3D; dim 3 of a 4D reference image is ignored here.
+   *
+   * @param {Size} maskSize The mask size.
+   * @param {Size} imageSize The reference image size.
+   */
+  #assertCompatibleHistogramSizes(maskSize, imageSize) {
+    for (let i = 0; i < 3; ++i) {
+      if (maskSize.get(i) !== imageSize.get(i)) {
+        throw new Error(
+          'getHistogramBySegment: mask and image spatial sizes differ.');
+      }
+    }
   }
 
 } // MaskImage class
