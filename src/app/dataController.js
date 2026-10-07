@@ -11,7 +11,10 @@ import {
   getVolumeIdTagValue,
   guessVolumeIndices
 } from '../dicom/dicomVolume.js';
-import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
+import {
+  getAllPixelDataTagKeys,
+  hasAnyPixelDataElement
+} from '../dicom/dicomTag.js';
 import {
   getReferencedSeriesUID,
   getReferencedSeriesUIDFromRTStruct
@@ -253,12 +256,22 @@ export class DicomSliceDataList {
   #list = [];
 
   /**
-   * Add a clone of the input data to the local list.
+   * Add a clone of the input data to the local list. The pixel
+   * data is not cloned: the image is already created and the meta
+   * of frames includes the pixel data of the full file.
    *
    * @param {DicomData} data The data to clone and add.
    */
   addClone(data) {
-    const clone = new DicomData(structuredClone(data.meta));
+    const pixelDataKeys = getAllPixelDataTagKeys();
+    /** @type {Record<string, DataElement>} */
+    const meta = {};
+    for (const key of Object.keys(data.meta)) {
+      if (!pixelDataKeys.includes(key)) {
+        meta[key] = data.meta[key];
+      }
+    }
+    const clone = new DicomData(structuredClone(meta));
     clone.image = data.image.clone();
     clone.frameNumber = data.frameNumber;
     this.add(clone);

@@ -258,7 +258,7 @@ export function getPixelDataTag() {
  *
  * @returns {string[]} The key list.
  */
-function getAllPixelDataTagKeys() {
+export function getAllPixelDataTagKeys() {
   return ['7FE00010', '7FE00009', '7FE00008'];
 }
 
