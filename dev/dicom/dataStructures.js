@@ -86,6 +86,8 @@ export const unsortedMultiframeMultiVolumeBValueStructure = {
  */
 export const dataStructures = {
   // one file, frames without position: time
+  // (not valid DICOM: the MR Image IOD is single frame and has no
+  // Multi-frame module)
   multiframe: {
     name: 'multiframe',
     short: 'mf',
