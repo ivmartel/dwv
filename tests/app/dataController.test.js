@@ -136,6 +136,8 @@ describe('app', () => {
     const filesElements = bValues.map((bValue, index) => {
       const config = structuredClone(syntheticData[0]);
       config.tags.SOPInstanceUID += `.${index}`;
+      config.tags.MediaStorageSOPInstanceUID =
+        config.tags.SOPInstanceUID;
       const elements = getStructureElementsList(config, '1.2.840.10008.1.2.1', {
         numberOfFrames,
         genOptions: {
@@ -199,6 +201,8 @@ describe('app', () => {
       const filesElements = filesBValues.map((bValues, index) => {
         const config = structuredClone(syntheticData[0]);
         config.tags.SOPInstanceUID += `.${index}`;
+        config.tags.MediaStorageSOPInstanceUID =
+          config.tags.SOPInstanceUID;
         const elements = getStructureElementsList(
           config, '1.2.840.10008.1.2.1', {
             numberOfFrames,

@@ -467,6 +467,9 @@ function generateSingleFileDataElements(tags0, genOptions) {
   const instanceIndex = frameNumber * numberOfSlices + genOptions.sliceNumber;
   if (numberOfSlices * numberOfFrames > 1) {
     tags.SOPInstanceUID = `${tags.SOPInstanceUID}.${instanceIndex}`;
+    if (typeof tags.MediaStorageSOPInstanceUID !== 'undefined') {
+      tags.MediaStorageSOPInstanceUID = tags.SOPInstanceUID;
+    }
   }
   // instance number
   tags.InstanceNumber = instanceIndex.toString();
