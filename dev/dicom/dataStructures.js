@@ -5,6 +5,16 @@ import {
 } from './dicomGenerator.js';
 
 /**
+ * MR Image Storage SOP class UID.
+ */
+const MRImageStorage = '1.2.840.10008.5.1.4.1.1.4';
+
+/**
+ * Enhanced MR Image Storage SOP class UID.
+ */
+const EnhancedMRImageStorage = '1.2.840.10008.5.1.4.1.1.4.1';
+
+/**
  * Single file, single frame data structure.
  */
 export const singleSliceStructure = {
@@ -153,6 +163,13 @@ export function getStructureNumberOfFiles(structure) {
 export function getStructureElementsList(config, syntax, structure) {
   const tags = structuredClone(config.tags);
   tags.TransferSyntaxUID = syntax;
+  // per-frame functional groups are not part of the MR Image IOD:
+  // use the Enhanced MR Image one
+  if (structure.genOptions.frames3D &&
+    tags.SOPClassUID === MRImageStorage) {
+    tags.SOPClassUID = EnhancedMRImageStorage;
+    tags.MediaStorageSOPClassUID = EnhancedMRImageStorage;
+  }
   if (typeof structure.numberOfFrames !== 'undefined') {
     tags.NumberOfFrames = structure.numberOfFrames;
   }
