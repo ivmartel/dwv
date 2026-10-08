@@ -385,6 +385,26 @@ describe('image', () => {
   );
 
   /**
+   * Tests that {@link Annotation#init} sets a 1-based frame number
+   * from the position time index.
+   *
+   * @function module:tests/image~annotationInitFrameNumber
+   */
+  test('Annotation init sets a 1-based referencedFrameNumber', () => {
+    for (const timeIndex of [0, 2]) {
+      const ann = new Annotation();
+      const vc = new MockViewController({uid: 'sop-001'});
+      vc.getCurrentPosition = () => ({
+        length: () => 4,
+        get: (i) => (i === 3 ? timeIndex : 0)
+      });
+      ann.init(vc);
+      assert.equal(ann.referencedFrameNumber, timeIndex + 1,
+        `frame number for time index ${timeIndex}`);
+    }
+  });
+
+  /**
    * Tests that a second {@link Annotation#init} call is a no-op.
    *
    * @function module:tests/image~annotationInitTwice

@@ -124,6 +124,14 @@ export class AnnotationGroupFactory {
   #warning;
 
   /**
+   * Flag to know if the referenced frame numbers of the
+   * input data are 0-based.
+   *
+   * @type {boolean}
+   */
+  #isZeroBasedFrameNumber = false;
+
+  /**
    * Get a warning string if elements are not as expected.
    * Created by checkElements.
    *
@@ -161,6 +169,24 @@ export class AnnotationGroupFactory {
     return isDwv034 &&
       typeof contentTemplate === 'undefined' &&
       rootConcept === DcmCodes.MeasurementGroup.value;
+  }
+
+  /**
+   * Check if input elements were written by a dwv version that used
+   * 0-based referenced frame numbers (up to v0.37.0-beta.17).
+   *
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
+   * @returns {boolean} True if the frame numbers are 0-based.
+   */
+  #hasZeroBasedFrameNumber(dataElements) {
+    const classUID =
+      safeGet(dataElements, TagKeys.ImplementationClassUID);
+    let dwvVersion;
+    if (typeof classUID !== 'undefined') {
+      dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    }
+    return typeof dwvVersion !== 'undefined' &&
+      isVersionInBounds(dwvVersion, '0.34.0', '0.37.0-beta.17');
   }
 
   /**
@@ -261,8 +287,12 @@ export class AnnotationGroupFactory {
       annotation.referencedSopInstanceUID =
         content.value.referencedSOPSequence.referencedSOPInstanceUID;
       if (typeof content.value.referencedFrameNumber !== 'undefined') {
-        annotation.referencedFrameNumber =
-          parseInt(content.value.referencedFrameNumber, 10);
+        let frameNumber = parseInt(content.value.referencedFrameNumber, 10);
+        // backwards compatibility: 0-based frame number
+        if (this.#isZeroBasedFrameNumber) {
+          frameNumber += 1;
+        }
+        annotation.referencedFrameNumber = frameNumber;
       }
     }
   }
@@ -1073,6 +1103,8 @@ export class AnnotationGroupFactory {
    * @throws {Error} Error for missing or wrong data.
    */
   create(dataElements) {
+    this.#isZeroBasedFrameNumber =
+      this.#hasZeroBasedFrameNumber(dataElements);
     const srContent = getSRContent(dataElements);
 
     let annotationGroup;
@@ -1115,6 +1147,8 @@ export class AnnotationGroupFactory {
    * @returns {CADReport|undefined} A new CAD report.
    */
   createCADReport(dataElements) {
+    this.#isZeroBasedFrameNumber =
+      this.#hasZeroBasedFrameNumber(dataElements);
     const srContent = getSRContent(dataElements);
 
     // get the summary

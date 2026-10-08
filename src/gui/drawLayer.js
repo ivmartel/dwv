@@ -676,7 +676,12 @@ export class DrawLayer {
     }
     let posId;
     if (typeof points !== 'undefined') {
-      posId = this.#getPositionId(points, annotation.referencedFrameNumber);
+      // 1-based frame number to 0-based time index
+      let timeIndex;
+      if (typeof annotation.referencedFrameNumber !== 'undefined') {
+        timeIndex = annotation.referencedFrameNumber - 1;
+      }
+      posId = this.#getPositionId(points, timeIndex);
     }
     return posId;
   }
@@ -685,10 +690,10 @@ export class DrawLayer {
    * Get a string id from input plane points.
    *
    * @param {Point3D[]} points A list of points that defined a plane.
-   * @param {number} [frameNumber] Optional frame number.
+   * @param {number} [timeIndex] Optional time index.
    * @returns {string} The string id.
    */
-  #getPositionId(points, frameNumber) {
+  #getPositionId(points, timeIndex) {
     let res = '';
     for (const point of points) {
       if (res.length !== 0) {
@@ -701,8 +706,8 @@ export class DrawLayer {
       ];
       res += toStringId(posValues);
     }
-    if (typeof frameNumber !== 'undefined') {
-      res += `-${frameNumber}`;
+    if (typeof timeIndex !== 'undefined') {
+      res += `-${timeIndex}`;
     }
     return res;
   }
@@ -1094,11 +1099,11 @@ export class DrawLayer {
       // use plane points
       points = planePoints;
     }
-    let frameNumber;
+    let timeIndex;
     if (position.length() > 3) {
-      frameNumber = position.get(3);
+      timeIndex = position.get(3);
     }
-    const posGroupId = this.#getPositionId(points, frameNumber);
+    const posGroupId = this.#getPositionId(points, timeIndex);
 
     this.#activateDrawLayer(posGroupId);
     // TODO: add check

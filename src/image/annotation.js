@@ -48,7 +48,9 @@ export class Annotation {
   referencedSopClassUID;
 
   /**
-   * Referenced frame number.
+   * Referenced frame number, 1-based as the DICOM
+   * Referenced Frame Number: frame number 1 is
+   * the first frame (time index 0).
    *
    * @type {number|undefined}
    */
@@ -214,7 +216,7 @@ export class Annotation {
     this.referencedSopInstanceUID = viewController.getCurrentImageUid();
     this.referencedSopClassUID = viewController.getSopClassUid();
     if (currentPosition.length() > 3) {
-      this.referencedFrameNumber = currentPosition.get(3);
+      this.referencedFrameNumber = currentPosition.get(3) + 1;
     }
     // set plane origin (not saved with file)
     this.planeOrigin =
@@ -303,7 +305,7 @@ export class Annotation {
       }
       const values = [origin.getX(), origin.getY(), origin.getZ()];
       if (typeof this.referencedFrameNumber !== 'undefined') {
-        values.push(this.referencedFrameNumber);
+        values.push(this.referencedFrameNumber - 1);
       }
       const originPoint = new Point(values);
       res = this.#viewController.getIndexFromPosition(originPoint);
@@ -331,7 +333,7 @@ export class Annotation {
       // add frame number if defined
       if (typeof this.referencedFrameNumber !== 'undefined') {
         const values = res.getValues();
-        values[3] = this.referencedFrameNumber;
+        values[3] = this.referencedFrameNumber - 1;
         res = new Point(values);
       }
     }

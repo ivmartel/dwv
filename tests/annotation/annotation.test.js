@@ -577,6 +577,63 @@ describe('annotation', () => {
   });
 
   /**
+   * Tests for the referenced frame number of an {@link Annotation}:
+   * 1-based, 0-based for data written by dwv up to v0.37.0-beta.17.
+   *
+   * @function module:tests/annotation~readReferencedFrameNumber
+   */
+  test('Read referenced frame number', () => {
+    /**
+     * Add a referenced frame number to the image references.
+     *
+     * @param {object} elements The data elements.
+     * @param {string} frameNumber The frame number.
+     */
+    function addFrameNumber(elements, frameNumber) {
+      for (const element of Object.values(elements)) {
+        if (element.vr === 'SQ') {
+          for (const item of element.value) {
+            if (typeof item['00081199'] !== 'undefined') {
+              item['00081160'] = {vr: 'IS', value: [frameNumber]};
+            }
+            addFrameNumber(item, frameNumber);
+          }
+        }
+      }
+    }
+
+    const dwvUidPrefix = '1.2.826.0.1.3680043.9.7278.1';
+    const cases = [
+      // fixture class uid: dwv v0.35.0-beta.21
+      {name: 'old dwv', classUid: undefined, frameNumber: '2'},
+      {
+        name: 'last 0-based dwv',
+        classUid: `${dwvUidPrefix}.0.37.0.99.17`,
+        frameNumber: '2'
+      },
+      {
+        name: 'new dwv',
+        classUid: `${dwvUidPrefix}.0.37.0.99.18`,
+        frameNumber: '3'
+      },
+      {name: 'non dwv', classUid: '1.2.3.4', frameNumber: '3'}
+    ];
+    for (const testCase of cases) {
+      const dicomParser = new DicomParser();
+      dicomParser.parse(b64urlToArrayBuffer(tid1500v0Ruler));
+      const tags = dicomParser.getDicomElements();
+      if (typeof testCase.classUid !== 'undefined') {
+        tags['00020012'].value = [testCase.classUid];
+      }
+      addFrameNumber(tags, testCase.frameNumber);
+      const group = new AnnotationGroupFactory().create(tags);
+      for (const annotation of group.getList()) {
+        assert.equal(annotation.referencedFrameNumber, 3, testCase.name);
+      }
+    }
+  });
+
+  /**
    * Tests for {@link Annotation} from tid1500 v0 containing a
    * BidimensionalLine.
    *
