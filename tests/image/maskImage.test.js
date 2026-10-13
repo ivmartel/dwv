@@ -403,6 +403,35 @@ describe('MaskImage', () => {
   );
 
   test(
+    'getHistogramBySegment maps mask slices to image slices by origin',
+    () => {
+      // mask: one slice at z=1
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 1)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      // image: two slices at z=0 and z=1
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+        new Size([2, 1, 2]),
+        new Spacing([1, 1, 1]));
+      const image = new Image(
+        imageGeom, new Uint8Array([10, 11, 20, 21]), ['0']);
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.equal(result.length, 1, 'one volume');
+      assert.equal(result[0].histogram[20], 1);
+      assert.isUndefined(result[0].histogram[10]);
+      assert.isUndefined(result[0].histogram[21]);
+    }
+  );
+
+  test(
     'getHistogramBySegment throws when spatial sizes differ',
     () => {
       const maskGeom = new Geometry(
@@ -419,7 +448,7 @@ describe('MaskImage', () => {
 
       assert.throws(
         () => mask.getHistogramBySegment(image, '1'),
-        /spatial sizes differ/
+        /geometries are not compatible/
       );
     }
   );
@@ -444,7 +473,7 @@ describe('MaskImage', () => {
 
       assert.throws(
         () => mask.getHistogramBySegment(image, '1'),
-        /orientations differ/
+        /geometries are not compatible/
       );
     }
   );
@@ -468,7 +497,7 @@ describe('MaskImage', () => {
 
       assert.throws(
         () => mask.getHistogramBySegment(image, '1'),
-        /origins differ/
+        /geometries are not compatible/
       );
     }
   );

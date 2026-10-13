@@ -556,9 +556,19 @@ export class MaskImage extends Image {
     }
 
     const imageGeometry = image.getGeometry();
-    const maskGeometry = this.getGeometry();
-    this.#assertCompatibleHistogramGeometry(maskGeometry, imageGeometry);
+    if (!this.#isCompatibleGeometry(imageGeometry)) {
+      throw new Error(
+        'getHistogramBySegment: mask and image geometries are not compatible.');
+    }
     const imageSize = imageGeometry.getSize();
+
+    // image slice index of each mask slice
+    const imageOrigins = imageGeometry.getOrigins();
+    const sliceIndices = this.getGeometry().getOrigins().map(
+      (maskOrigin) => imageOrigins.findIndex(
+        (imageOrigin) => maskOrigin.isSimilar(imageOrigin, REAL_WORLD_EPSILON)
+      )
+    );
 
     const segmentValue = typeof segment.displayValue !== 'undefined'
       ? segment.displayValue
@@ -567,34 +577,34 @@ export class MaskImage extends Image {
     const numberOfVolumes = imageSize.length() === 4
       ? imageSize.get(3)
       : 1;
-    const volumeSize = imageSize.length() === 4
-      ? imageSize.getDimSize(3)
-      : imageSize.getTotalSize();
+    const volumeSize = imageSize.getDimSize(3);
+    const sliceSize = imageSize.getDimSize(2);
 
     const maskBuffer = this.getBuffer();
     const result = [];
 
     for (let v = 0; v < numberOfVolumes; ++v) {
-      const start = v * volumeSize;
-      const end = start + volumeSize;
       /** @type {number[]} */
       const counts = [];
       let rmin;
       let rmax;
 
-      for (let offset = start; offset < end; ++offset) {
-        // mask is always 3D spatial: reuse it for each volume
-        const maskOffset = offset - start;
-        if (maskBuffer[maskOffset] !== segmentValue) {
-          continue;
-        }
-        const value = image.getRescaledValueAtOffset(offset);
-        counts[value] = (counts[value] || 0) + 1;
-        if (typeof rmin === 'undefined' || value < rmin) {
-          rmin = value;
-        }
-        if (typeof rmax === 'undefined' || value > rmax) {
-          rmax = value;
+      // mask is always 3D spatial: reuse it for each volume
+      for (let k = 0; k < sliceIndices.length; ++k) {
+        const maskStart = k * sliceSize;
+        const imageStart = v * volumeSize + sliceIndices[k] * sliceSize;
+        for (let i = 0; i < sliceSize; ++i) {
+          if (maskBuffer[maskStart + i] !== segmentValue) {
+            continue;
+          }
+          const value = image.getRescaledValueAtOffset(imageStart + i);
+          counts[value] = (counts[value] || 0) + 1;
+          if (typeof rmin === 'undefined' || value < rmin) {
+            rmin = value;
+          }
+          if (typeof rmax === 'undefined' || value > rmax) {
+            rmax = value;
+          }
         }
       }
 
@@ -642,40 +652,33 @@ export class MaskImage extends Image {
   }
 
   /**
-   * Ensure mask and image share spatial size (dims 0-2), origins and
-   * orientation. Segmentations are 3D; dim 3 of a 4D reference image
-   * is ignored here.
+   * Check if this mask and the image share slice size (dims 0-1) and
+   * orientation, and that each mask origin is one of the image origins.
+   * The mask can have fewer slices than the image. Segmentations are
+   * 3D; dim 3 of a 4D reference image is ignored here.
    *
-   * @param {Geometry} maskGeometry The mask geometry.
    * @param {Geometry} imageGeometry The reference image geometry.
+   * @returns {boolean} True if the geometries are compatible.
    */
-  #assertCompatibleHistogramGeometry(maskGeometry, imageGeometry) {
+  #isCompatibleGeometry(imageGeometry) {
+    const maskGeometry = this.getGeometry();
     const maskSize = maskGeometry.getSize();
     const imageSize = imageGeometry.getSize();
-    for (let i = 0; i < 3; ++i) {
+    for (let i = 0; i < 2; ++i) {
       if (maskSize.get(i) !== imageSize.get(i)) {
-        throw new Error(
-          'getHistogramBySegment: mask and image spatial sizes differ.');
+        return false;
       }
     }
     if (!maskGeometry.getOrientation().isSimilar(
       imageGeometry.getOrientation(), REAL_WORLD_EPSILON)) {
-      throw new Error(
-        'getHistogramBySegment: mask and image orientations differ.');
+      return false;
     }
-    const maskOrigins = maskGeometry.getOrigins();
     const imageOrigins = imageGeometry.getOrigins();
-    if (maskOrigins.length !== imageOrigins.length) {
-      throw new Error(
-        'getHistogramBySegment: mask and image origins differ.');
-    }
-    for (let i = 0; i < maskOrigins.length; ++i) {
-      if (!maskOrigins[i].isSimilar(
-        imageOrigins[i], REAL_WORLD_EPSILON)) {
-        throw new Error(
-          'getHistogramBySegment: mask and image origins differ.');
-      }
-    }
+    return maskGeometry.getOrigins().every(
+      (maskOrigin) => imageOrigins.some(
+        (imageOrigin) => maskOrigin.isSimilar(imageOrigin, REAL_WORLD_EPSILON)
+      )
+    );
   }
 
 } // MaskImage class
