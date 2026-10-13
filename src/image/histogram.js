@@ -1,3 +1,5 @@
+import {Statistics} from '../math/stats.js';
+
 /**
  * Histogram utilities.
  */
@@ -185,4 +187,85 @@ export class Histogram {
     return percentages;
   }
 
+  /**
+   * Get the statistics of the rescaled values: minimum, maximum, mean,
+   * standard deviation, median, 25th and 75th percentiles.
+   * Gives the same results as `getStats` (`math/stats.js`) on the full
+   * list of values.
+   *
+   * @returns {Statistics|undefined} The statistics, undefined if empty.
+   */
+  getStats() {
+    const entries = this.getEntries();
+    if (entries.length === 0) {
+      return undefined;
+    }
+
+    let total = 0;
+    let sum = 0;
+    let sumSqr = 0;
+    for (const entry of entries) {
+      total += entry.count;
+      sum += entry.value * entry.count;
+      sumSqr += entry.value * entry.value * entry.count;
+    }
+    const mean = sum / total;
+    // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+    let variance = sumSqr / total - mean * mean;
+    if (variance < 0) {
+      variance = 0;
+    }
+
+    const stats = new Statistics(
+      entries[0].value,
+      entries[entries.length - 1].value,
+      mean,
+      Math.sqrt(variance)
+    );
+    stats.median = getEntriesPercentile(entries, total, 0.5);
+    stats.p25 = getEntriesPercentile(entries, total, 0.25);
+    stats.p75 = getEntriesPercentile(entries, total, 0.75);
+    return stats;
+  }
+
 } // class Histogram
+
+/**
+ * Get the value at a given index of the sorted list of values
+ * that the entries describe.
+ *
+ * @param {HistogramEntry[]} entries The sorted entries.
+ * @param {number} index The index in the sorted list of values.
+ * @returns {number} The value.
+ */
+function getEntriesValueAt(entries, index) {
+  let cumulated = 0;
+  for (const entry of entries) {
+    cumulated += entry.count;
+    if (index < cumulated) {
+      return entry.value;
+    }
+  }
+  return entries[entries.length - 1].value;
+}
+
+/**
+ * Get the percentile of the values that the entries describe. Uses
+ * linear interpolation between values like `getPercentile` in
+ * `math/stats.js`.
+ *
+ * @param {HistogramEntry[]} entries The sorted entries.
+ * @param {number} total The total count.
+ * @param {number} ratio The percentile ratio [0-1].
+ * @returns {number} The percentile.
+ */
+function getEntriesPercentile(entries, total, ratio) {
+  const i = (total - 1) * ratio;
+  const i0 = Math.floor(i);
+  const v0 = getEntriesValueAt(entries, i0);
+  if (i === i0) {
+    return v0;
+  }
+  const v1 = getEntriesValueAt(entries, i0 + 1);
+  return v0 + (v1 - v0) * (i - i0);
+}

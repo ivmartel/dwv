@@ -1,6 +1,7 @@
 import {describe, test, assert} from 'vitest';
 import {Histogram} from '../../src/image/histogram.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
+import {getStats} from '../../src/math/stats.js';
 
 /**
  * Tests for the 'image/histogram.js' file.
@@ -133,6 +134,51 @@ describe('histogram', () => {
 
     assert.deepEqual(histogram.getIntervalPercentages([10]), [50, 50]);
     assert.deepEqual(histogram.getIntervalPercentages([]), [100]);
+  });
+
+  test('Histogram getStats matches getStats on values', () => {
+    const counts = {'-3': 2, 0: 1, 4: 3, 7: 1, 10: 2};
+    const rsi = new RescaleSlopeAndIntercept(0.5, 1);
+    const histogram = buildHistogram(counts, rsi);
+    // the full list of rescaled values
+    const values = [];
+    for (const [raw, count] of Object.entries(counts)) {
+      for (let i = 0; i < count; ++i) {
+        values.push(rsi.apply(Number(raw)));
+      }
+    }
+    const theo = getStats(values, ['median', 'p25', 'p75']);
+
+    const stats = histogram.getStats();
+    assert.equal(stats.min, theo.min, 'min');
+    assert.equal(stats.max, theo.max, 'max');
+    assert.closeTo(stats.mean, theo.mean, 1e-12, 'mean');
+    assert.closeTo(stats.stdDev, theo.stdDev, 1e-12, 'stdDev');
+    assert.equal(stats.median, theo.median, 'median');
+    assert.equal(stats.p25, theo.p25, 'p25');
+    assert.equal(stats.p75, theo.p75, 'p75');
+  });
+
+  test('Histogram getStats interpolates median', () => {
+    // values 1, 2, 3, 4 → median 2.5
+    const histogram = buildHistogram({1: 1, 2: 1, 3: 1, 4: 1});
+
+    const stats = histogram.getStats();
+    assert.equal(stats.median, 2.5, 'median');
+    assert.equal(stats.mean, 2.5, 'mean');
+    assert.equal(stats.p25, 1.75, 'p25');
+    assert.equal(stats.p75, 3.25, 'p75');
+  });
+
+  test('Histogram getStats single value and empty', () => {
+    const stats = buildHistogram({5: 3}).getStats();
+    assert.equal(stats.min, 5);
+    assert.equal(stats.max, 5);
+    assert.equal(stats.mean, 5);
+    assert.equal(stats.stdDev, 0);
+    assert.equal(stats.median, 5);
+
+    assert.isUndefined(new Histogram().getStats());
   });
 
 });
