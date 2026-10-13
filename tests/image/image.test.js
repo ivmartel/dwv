@@ -163,20 +163,37 @@ describe('image', () => {
     const image0 = new Image(imgGeometry0, buffer0);
 
     // histogram
-    const histogram = image0.getHistogram();
-    assert.equal(histogram.length, size0 * size0, 'histogram size');
+    const entries = image0.getHistogram().getEntries();
+    assert.equal(entries.length, size0 * size0, 'histogram size');
     let histoContentTest = true;
     for (let j = 0; j < size0 * size0; ++j) {
-      if (histogram[j][0] !== j) {
+      if (entries[j].value !== j) {
         histoContentTest = false;
         break;
       }
-      if (histogram[j][1] !== 1) {
+      if (entries[j].count !== 1) {
         histoContentTest = false;
         break;
       }
     }
     assert.equal(histoContentTest, true, 'histogram content');
+    assert.deepEqual(
+      image0.getDataRange(), {min: 0, max: 15}, 'data range');
+
+    // image with rsi
+    const imgGeometry1 = new Geometry(
+      [imgOrigin0], new Size([2, 2, 1]), imgSpacing0);
+    const image1 = new Image(imgGeometry1, [-2, -1, 0, 1]);
+    image1.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(0.5, 10));
+    assert.deepEqual(image1.getHistogram().getEntries(), [
+      {value: 9, count: 1},
+      {value: 9.5, count: 1},
+      {value: 10, count: 1},
+      {value: 10.5, count: 1}
+    ], 'rescaled histogram content');
+    assert.deepEqual(
+      image1.getRescaledDataRange(), {min: 9, max: 10.5},
+      'rescaled data range');
   });
 
   /**

@@ -1,153 +1,137 @@
 import {describe, test, assert} from 'vitest';
-import {getHistogramIntervalPercentages} from '../../src/image/histogram.js';
+import {Histogram} from '../../src/image/histogram.js';
+import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 
 /**
  * Tests for the 'image/histogram.js' file.
  */
 
+const idRsi = new RescaleSlopeAndIntercept(1, 0);
+
 /**
- * Build a dense histogram array from intensity -> count pairs.
+ * Build a histogram from intensity -> count pairs.
  *
  * @param {Record<number, number>} counts Map of intensity to count.
- * @returns {number[]} Histogram array.
+ * @param {RescaleSlopeAndIntercept} [rsi] Optional RSI, defaults to id.
+ * @returns {Histogram} The histogram.
  */
-function buildHistogram(counts) {
-  const histogram = [];
-  const values = Object.keys(counts).map(Number);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  for (let b = min; b <= max; ++b) {
-    histogram[b] = counts[b] || 0;
+function buildHistogram(counts, rsi) {
+  const histogram = new Histogram();
+  const rawCounts = histogram.getRawCounts(rsi ?? idRsi);
+  for (const [value, count] of Object.entries(counts)) {
+    if (count !== 0) {
+      rawCounts.set(Number(value), count);
+    }
   }
   return histogram;
 }
 
 describe('histogram', () => {
 
-  test('getHistogramIntervalPercentages for one volume', () => {
-    // intensities: 0×25, 1×40, 5×20, 10×15 → total 100
-    // thresholds [1, 5] → [0,1), [1,5), [5,11)
-    const volumeHistograms = [{
-      volume: 0,
-      histogram: buildHistogram({0: 25, 1: 40, 5: 20, 10: 15})
-    }];
-    const thresholds = [1, 5];
-    const names = ['intervalo1', 'intervalo2', 'intervalo3'];
+  test('Histogram keeps negative values', () => {
+    const histogram = buildHistogram({'-1000': 3, 0: 1, 40: 2});
 
-    const result = getHistogramIntervalPercentages(
-      volumeHistograms, thresholds, names);
-
-    assert.equal(result.length, 1);
-    assert.equal(result[0].volume, 0);
-    assert.equal(result[0].intervals[0].name, 'intervalo1');
-    assert.equal(result[0].intervals[0].percentage, 25);
-    assert.equal(result[0].intervals[1].name, 'intervalo2');
-    assert.equal(result[0].intervals[1].percentage, 40);
-    assert.equal(result[0].intervals[2].name, 'intervalo3');
-    assert.equal(result[0].intervals[2].percentage, 35);
+    assert.deepEqual(histogram.getEntries(), [
+      {value: -1000, count: 3},
+      {value: 0, count: 1},
+      {value: 40, count: 2}
+    ]);
+    assert.equal(histogram.getTotal(), 6);
+    assert.deepEqual(histogram.getRescaledRange(), {min: -1000, max: 40});
+    assert.deepEqual(histogram.getRange(), {min: -1000, max: 40});
   });
 
-  test(
-    'getHistogramIntervalPercentages keeps volumes independent',
-    () => {
-      const volumeHistograms = [
-        {
-          volume: 0,
-          histogram: buildHistogram({0: 10})
-        },
-        {
-          volume: 1,
-          histogram: buildHistogram({5: 4, 10: 6})
-        }
-      ];
-      const thresholds = [1, 5];
-      const names = ['low', 'mid', 'high'];
+  test('Histogram rescales non integer values', () => {
+    const rsi = new RescaleSlopeAndIntercept(0.5, -1024);
+    const histogram = buildHistogram({1: 2, 2: 1, 3: 4}, rsi);
 
-      const result = getHistogramIntervalPercentages(
-        volumeHistograms, thresholds, names);
+    assert.deepEqual(histogram.getEntries(), [
+      {value: -1023.5, count: 2},
+      {value: -1023, count: 1},
+      {value: -1022.5, count: 4}
+    ]);
+    assert.deepEqual(histogram.getRange(), {min: 1, max: 3});
+    assert.deepEqual(
+      histogram.getRescaledRange(), {min: -1023.5, max: -1022.5});
+  });
 
-      assert.equal(result.length, 2);
-      assert.equal(result[0].volume, 0);
-      // vol0 range [0,1): only low gets mass
-      assert.equal(result[0].intervals[0].percentage, 100);
-      assert.equal(result[0].intervals[1].percentage, 0);
-      assert.equal(result[0].intervals[2].percentage, 0);
-      assert.equal(result[1].volume, 1);
-      // vol1 range [5,11): only high gets mass
-      assert.equal(result[1].intervals[0].percentage, 0);
-      assert.equal(result[1].intervals[1].percentage, 0);
-      assert.equal(result[1].intervals[2].percentage, 100);
-    }
-  );
+  test('Histogram merges equal values from different RSI', () => {
+    const histogram = new Histogram();
+    // 10 * 1 + 0 = 10, 5 * 2 + 0 = 10, 2 * 2 + 0 = 4
+    histogram.add(10, new RescaleSlopeAndIntercept(1, 0));
+    histogram.add(5, new RescaleSlopeAndIntercept(2, 0));
+    histogram.add(5, new RescaleSlopeAndIntercept(2, 0));
+    histogram.add(2, new RescaleSlopeAndIntercept(2, 0));
 
-  test(
-    'getHistogramIntervalPercentages returns 0 when total is 0',
-    () => {
-      const volumeHistograms = [{volume: 0, histogram: []}];
-      const thresholds = [1, 5];
-      const names = ['a', 'b', 'c'];
+    assert.deepEqual(histogram.getEntries(), [
+      {value: 4, count: 1},
+      {value: 10, count: 3}
+    ]);
+    assert.equal(histogram.getTotal(), 4);
+  });
 
-      const result = getHistogramIntervalPercentages(
-        volumeHistograms, thresholds, names);
+  test('Histogram sorts entries with negative slope', () => {
+    const rsi = new RescaleSlopeAndIntercept(-1, 0);
+    const histogram = buildHistogram({1: 1, 2: 2, 3: 3}, rsi);
 
-      assert.equal(result[0].intervals.length, 3);
-      assert.equal(result[0].intervals[0].percentage, 0);
-      assert.equal(result[0].intervals[1].percentage, 0);
-      assert.equal(result[0].intervals[2].percentage, 0);
-    }
-  );
+    assert.deepEqual(
+      histogram.getEntries().map((entry) => entry.value), [-3, -2, -1]);
+    assert.deepEqual(histogram.getRescaledRange(), {min: -3, max: -1});
+  });
 
-  test(
-    'getHistogramIntervalPercentages uses semi-open bounds [min, max)',
-    () => {
-      // value 5 sits on the cut: belongs to [5, max), not [min, 5)
-      const volumeHistograms = [{
-        volume: 0,
-        histogram: buildHistogram({1: 0, 5: 10})
-      }];
-      const thresholds = [5];
-      const names = ['before', 'atAndAfter'];
+  test('Histogram empty', () => {
+    const histogram = new Histogram();
 
-      const result = getHistogramIntervalPercentages(
-        volumeHistograms, thresholds, names);
+    assert.deepEqual(histogram.getEntries(), []);
+    assert.equal(histogram.getTotal(), 0);
+    assert.isUndefined(histogram.getRescaledRange());
+    assert.isUndefined(histogram.getRange());
+  });
 
-      assert.equal(result[0].intervals[0].percentage, 0);
-      assert.equal(result[0].intervals[1].percentage, 100);
-    }
-  );
+  test('Histogram getCountInRange', () => {
+    const histogram = buildHistogram({'-5': 1, 0: 2, 5: 3, 10: 4});
 
-  test(
-    'getHistogramIntervalPercentages covers full histogram range',
-    () => {
-      // with auto min/max, all mass is assigned → percentages sum to 100
-      const volumeHistograms = [{
-        volume: 0,
-        histogram: buildHistogram({2: 50, 100: 50})
-      }];
-      const thresholds = [10];
-      const names = ['low', 'high'];
+    assert.equal(histogram.getCountInRange(0, 10), 5, '[0, 10)');
+    assert.equal(histogram.getCountInRange(undefined, 5), 3, '[-inf, 5)');
+    assert.equal(histogram.getCountInRange(5), 7, '[5, +inf]');
+    assert.equal(histogram.getCountInRange(), 10, 'unbounded');
+  });
 
-      const result = getHistogramIntervalPercentages(
-        volumeHistograms, thresholds, names);
+  test('Histogram getIntervalPercentages', () => {
+    // intensities: 0×25, 1×40, 5×20, 10×15 → total 100
+    // thresholds [1, 5] → [0, 1), [1, 5), [5, 10]
+    const histogram = buildHistogram({0: 25, 1: 40, 5: 20, 10: 15});
 
-      assert.equal(result[0].intervals[0].percentage, 50);
-      assert.equal(result[0].intervals[1].percentage, 50);
-    }
-  );
+    assert.deepEqual(histogram.getIntervalPercentages([1, 5]), [25, 40, 35]);
+  });
 
-  test(
-    'getHistogramIntervalPercentages throws if names length is wrong',
-    () => {
-      const volumeHistograms = [{
-        volume: 0,
-        histogram: buildHistogram({0: 1})
-      }];
-      assert.throws(
-        () => getHistogramIntervalPercentages(
-          volumeHistograms, [1, 5], ['only-one']),
-        /names length must be/
-      );
-    }
-  );
+  test('Histogram getIntervalPercentages with non integer values', () => {
+    // values 0.5, 1, 1.5, 2 with counts 1, 1, 1, 1
+    const rsi = new RescaleSlopeAndIntercept(0.5, 0);
+    const histogram = buildHistogram({1: 1, 2: 1, 3: 1, 4: 1}, rsi);
+
+    assert.deepEqual(histogram.getIntervalPercentages([1.5]), [50, 50]);
+  });
+
+  test('Histogram getIntervalPercentages returns 0 when empty', () => {
+    const histogram = new Histogram();
+
+    assert.deepEqual(histogram.getIntervalPercentages([1, 5]), [0, 0, 0]);
+  });
+
+  test('Histogram getIntervalPercentages uses semi-open bounds', () => {
+    // value 5 sits on the cut: belongs to [5, max], not [min, 5)
+    const histogram = buildHistogram({5: 10});
+
+    assert.deepEqual(histogram.getIntervalPercentages([5]), [0, 100]);
+  });
+
+  test('Histogram getIntervalPercentages covers full range', () => {
+    // all mass is assigned → percentages sum to 100
+    const histogram = buildHistogram({2: 50, 100: 50});
+
+    assert.deepEqual(histogram.getIntervalPercentages([10]), [50, 50]);
+    assert.deepEqual(histogram.getIntervalPercentages([]), [100]);
+  });
 
 });

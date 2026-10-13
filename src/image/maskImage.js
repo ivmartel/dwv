@@ -8,6 +8,7 @@ import {ImageContour} from './imageContour.js';
 import {Image} from './image.js';
 import {logger} from '../utils/logger.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
+import {Histogram} from './histogram.js';
 
 /**
  * @import {Geometry} from './geometry.js';
@@ -536,16 +537,17 @@ export class MaskImage extends Image {
   /**
    * Get per-volume histograms of reference-image intensities for one segment.
    *
-   * For each volume of `image`, counts how often each rescaled intensity
+   * For each volume of `image`, counts how often each intensity
    * appears in voxels belonging to the given segment of this mask.
    * Segmentations are 3D: the same mask is applied to every volume.
-   * Histogram arrays are dense from the min to max intensity found in
-   * that volume (`histogram[value] === 0` means that intensity is absent).
+   * Raw values are counted per rescale slope and intercept and rescaled
+   * when read from the {@link Histogram}.
    *
    * @param {Image} image The reference image (intensities).
    * @param {string} segmentId Segment tracking UID, or segment number as
    *   string.
-   * @returns {{volume: number, histogram: number[]}[]} One entry per volume.
+   * @returns {{volume: number, histogram: Histogram}[]} One entry per
+   *   volume.
    */
   getHistogramBySegment(image, segmentId) {
     const segment = this.#findSegmentById(segmentId);
@@ -584,35 +586,25 @@ export class MaskImage extends Image {
     const result = [];
 
     for (let v = 0; v < numberOfVolumes; ++v) {
-      /** @type {number[]} */
-      const counts = [];
-      let rmin;
-      let rmax;
+      const histogram = new Histogram();
 
       // mask is always 3D spatial: reuse it for each volume
       for (let k = 0; k < sliceIndices.length; ++k) {
         const maskStart = k * sliceSize;
         const imageStart = v * volumeSize + sliceIndices[k] * sliceSize;
+
+        // rsi of this image slice (index ignored for constant rsi)
+        const rsi = image.getRescaleSlopeAndIntercept(
+          imageSize.offsetToIndex(imageStart));
+        // one lookup per slice, not per voxel
+        const counts = histogram.getRawCounts(rsi);
+
         for (let i = 0; i < sliceSize; ++i) {
           if (maskBuffer[maskStart + i] !== segmentValue) {
             continue;
           }
-          const value = image.getRescaledValueAtOffset(imageStart + i);
-          counts[value] = (counts[value] || 0) + 1;
-          if (typeof rmin === 'undefined' || value < rmin) {
-            rmin = value;
-          }
-          if (typeof rmax === 'undefined' || value > rmax) {
-            rmax = value;
-          }
-        }
-      }
-
-      /** @type {number[]} */
-      const histogram = [];
-      if (typeof rmin !== 'undefined') {
-        for (let b = rmin; b <= rmax; ++b) {
-          histogram[b] = counts[b] || 0;
+          const value = image.getValueAtOffset(imageStart + i);
+          counts.set(value, (counts.get(value) ?? 0) + 1);
         }
       }
 

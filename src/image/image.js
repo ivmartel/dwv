@@ -8,6 +8,7 @@ import {isMonochrome} from '../dicom/dicomImage.js';
 import {ResamplingThread} from './resamplingThread.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
+import {Histogram} from './histogram.js';
 
 /**
  * @import {Geometry} from './geometry.js';
@@ -250,7 +251,7 @@ export class Image extends EventTarget {
   /**
    * Histogram.
    *
-   * @type {Array}
+   * @type {Histogram|null}
    */
   #histogram = null;
 
@@ -1160,14 +1161,13 @@ export class Image extends EventTarget {
   /**
    * Get the histogram.
    *
-   * @returns {Array} The histogram.
+   * @returns {Histogram} The histogram.
    */
   getHistogram() {
     if (!this.#histogram) {
-      const res = this.calculateHistogram();
-      this.#dataRange = res.dataRange;
-      this.#rescaledDataRange = res.rescaledDataRange;
-      this.#histogram = res.histogram;
+      this.#histogram = this.#calculateHistogram();
+      this.#dataRange = this.#histogram.getRange();
+      this.#rescaledDataRange = this.#histogram.getRescaledRange();
     }
     return this.#histogram;
   }
@@ -1337,48 +1337,23 @@ export class Image extends EventTarget {
   /**
    * Calculate the histogram of the image.
    *
-   * @returns {object} The histogram, data range and rescaled data range.
+   * @returns {Histogram} The histogram.
    */
-  calculateHistogram() {
+  #calculateHistogram() {
     const size = this.getGeometry().getSize();
-    const histo = [];
-    let min = this.getValueAtOffset(0);
-    let max = min;
-    let value;
-    let rmin = this.getRescaledValueAtOffset(0);
-    let rmax = rmin;
-    let rvalue;
-    for (let i = 0, leni = size.getTotalSize(); i < leni; ++i) {
-      value = this.getValueAtOffset(i);
-      if (value > max) {
-        max = value;
+    const sliceSize = size.getDimSize(2);
+    const histogram = new Histogram();
+    for (let start = 0, leni = size.getTotalSize();
+      start < leni; start += sliceSize) {
+      // rsi of this slice (index ignored for constant rsi)
+      const counts = histogram.getRawCounts(
+        this.getRescaleSlopeAndIntercept(size.offsetToIndex(start)));
+      for (let i = start; i < start + sliceSize; ++i) {
+        const value = this.getValueAtOffset(i);
+        counts.set(value, (counts.get(value) ?? 0) + 1);
       }
-      if (value < min) {
-        min = value;
-      }
-      rvalue = this.getRescaledValueAtOffset(i);
-      if (rvalue > rmax) {
-        rmax = rvalue;
-      }
-      if (rvalue < rmin) {
-        rmin = rvalue;
-      }
-      histo[rvalue] = (histo[rvalue] || 0) + 1;
     }
-    // set data range
-    const dataRange = {min, max};
-    const rescaledDataRange = {min: rmin, max: rmax};
-    // generate data for plotting
-    const histogram = [];
-    for (let b = rmin; b <= rmax; ++b) {
-      histogram.push([b, (histo[b] || 0)]);
-    }
-    // return
-    return {
-      dataRange,
-      rescaledDataRange,
-      histogram
-    };
+    return histogram;
   }
 
   /**

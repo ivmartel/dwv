@@ -3,163 +3,187 @@
  */
 
 /**
- * Percentage of a histogram that falls in one interval.
- *
- * @typedef {object} HistogramIntervalPercentage
- * @property {string} name Interval name.
- * @property {number} percentage Percentage of total counts in [0, 100].
+ * @import {RescaleSlopeAndIntercept} from './rsi.js';
+ * @import {NumberRange} from '../math/number.js';
  */
 
 /**
- * Per-volume histogram (for example from
- * {@link MaskImage#getHistogramBySegment}).
+ * Histogram entry.
  *
- * @typedef {object} VolumeHistogram
- * @property {number} volume Volume index.
- * @property {number[]} histogram Sparse/dense counts indexed by intensity.
+ * @typedef {object} HistogramEntry
+ * @property {number} value The rescaled value.
+ * @property {number} count The number of occurrences.
  */
 
 /**
- * Per-volume interval percentages.
+ * Histogram of image values.
  *
- * @typedef {object} VolumeHistogramIntervalPercentages
- * @property {number} volume Volume index.
- * @property {HistogramIntervalPercentage[]} intervals Percentages in
- *   input order.
+ * Raw (stored) values are counted per rescale slope and intercept (RSI):
+ * values sharing an RSI share one count map. Values are rescaled when
+ * read. An image with a constant RSI only has one group.
  */
+export class Histogram {
 
-/**
- * Sum counts for intensities in the semi-open range [min, max).
- *
- * @param {number[]} histogram Intensity-indexed counts.
- * @param {number} min Inclusive lower bound.
- * @param {number} max Exclusive upper bound.
- * @returns {number} Sum of counts in the range.
- */
-function sumCountsInRange(histogram, min, max) {
-  let sum = 0;
-  for (let v = min; v < max; ++v) {
-    sum += histogram[v] || 0;
+  /**
+   * Raw value counts per RSI.
+   *
+   * @type {{rsi: RescaleSlopeAndIntercept, counts: Map<number, number>}[]}
+   */
+  #groups = [];
+
+  /**
+   * Get the raw value counts for an RSI, creating them if needed.
+   *
+   * @param {RescaleSlopeAndIntercept} rsi The RSI of the raw values.
+   * @returns {Map<number, number>} The raw value to count map.
+   */
+  getRawCounts(rsi) {
+    let group = this.#groups.find((item) => item.rsi.equals(rsi));
+    if (typeof group === 'undefined') {
+      group = {rsi, counts: new Map()};
+      this.#groups.push(group);
+    }
+    return group.counts;
   }
-  return sum;
-}
 
-/**
- * Sum all counts in a histogram.
- *
- * @param {number[]} histogram Intensity-indexed counts.
- * @returns {number} Total count.
- */
-function sumHistogramCounts(histogram) {
-  let total = 0;
-  for (let i = 0; i < histogram.length; ++i) {
-    total += histogram[i] || 0;
+  /**
+   * Add one raw value.
+   *
+   * @param {number} rawValue The raw value.
+   * @param {RescaleSlopeAndIntercept} rsi The RSI of the raw value.
+   */
+  add(rawValue, rsi) {
+    const counts = this.getRawCounts(rsi);
+    counts.set(rawValue, (counts.get(rawValue) ?? 0) + 1);
   }
-  return total;
-}
 
-/**
- * Get the inclusive min intensity and exclusive max intensity present in a
- * histogram (indices that are defined, including explicit zeros).
- *
- * @param {number[]} histogram Intensity-indexed counts.
- * @returns {{min: number, maxExclusive: number}|undefined} Range, or
- *   undefined if the histogram has no defined bins.
- */
-function getHistogramIntensityRange(histogram) {
-  let min;
-  let max;
-  for (let i = 0; i < histogram.length; ++i) {
-    if (typeof histogram[i] !== 'undefined') {
-      if (typeof min === 'undefined') {
-        min = i;
+  /**
+   * Get the total number of counted values.
+   *
+   * @returns {number} The total count.
+   */
+  getTotal() {
+    let total = 0;
+    for (const group of this.#groups) {
+      for (const count of group.counts.values()) {
+        total += count;
       }
-      max = i;
     }
-  }
-  if (typeof min === 'undefined') {
-    return undefined;
-  }
-  return {min, maxExclusive: max + 1};
-}
-
-/**
- * Build semi-open intervals [min, t0), [t0, t1), ..., [tLast, max) from
- * interior thresholds and the histogram intensity range.
- *
- * @param {number} min Inclusive histogram minimum intensity.
- * @param {number} maxExclusive Exclusive histogram maximum intensity.
- * @param {number[]} thresholds Interior cut points (ascending).
- * @param {string[]} names One name per resulting interval
- *   (`thresholds.length + 1`).
- * @returns {{name: string, min: number, max: number}[]} Named ranges.
- */
-function buildIntervalsFromThresholds(min, maxExclusive, thresholds, names) {
-  const bounds = [min, ...thresholds, maxExclusive];
-  const intervals = [];
-  for (let i = 0; i < names.length; ++i) {
-    intervals.push({
-      name: names[i],
-      min: bounds[i],
-      max: bounds[i + 1]
-    });
-  }
-  return intervals;
-}
-
-/**
- * Compute, per volume, the percentage of histogram counts that fall in each
- * intensity interval.
- *
- * The caller only passes interior cut points (e.g. `[1, 5]`). For each volume
- * the code builds semi-open intervals covering the histogram range:
- * `[min, 1)`, `[1, 5)`, `[5, max)` where `min` / `max` come from that
- * volume's histogram. Interval names are provided separately and must have
- * length `thresholds.length + 1`.
- *
- * @param {VolumeHistogram[]} volumeHistograms Per-volume histograms (for
- *   example the output of {@link MaskImage#getHistogramBySegment}).
- * @param {number[]} thresholds Interior intensity cut points in ascending
- *   order (e.g. `[1, 5]`).
- * @param {string[]} names Names for the resulting intervals
- *   (`thresholds.length + 1` entries).
- * @returns {VolumeHistogramIntervalPercentages[]} One entry per volume, with
- *   interval percentages in the same order as `names`.
- */
-export function getHistogramIntervalPercentages(
-  volumeHistograms, thresholds, names) {
-  if (names.length !== thresholds.length + 1) {
-    throw new Error(
-      'getHistogramIntervalPercentages: names length must be ' +
-      'thresholds.length + 1.');
+    return total;
   }
 
-  return volumeHistograms.map((volumeHistogram) => {
-    const {volume, histogram} = volumeHistogram;
-    const total = sumHistogramCounts(histogram);
-
-    if (total === 0) {
-      return {
-        volume,
-        intervals: names.map((name) => ({name, percentage: 0}))
-      };
+  /**
+   * Get the histogram entries: rescaled values (equal values from
+   * different RSI merged) sorted in ascending order.
+   *
+   * @returns {HistogramEntry[]} The entries.
+   */
+  getEntries() {
+    /** @type {Map<number, number>} */
+    const merged = new Map();
+    for (const group of this.#groups) {
+      for (const [rawValue, count] of group.counts) {
+        const value = group.rsi.apply(rawValue);
+        merged.set(value, (merged.get(value) ?? 0) + count);
+      }
     }
+    return Array.from(merged, ([value, count]) => ({value, count}))
+      .sort((a, b) => a.value - b.value);
+  }
 
-    const range = getHistogramIntensityRange(histogram);
-    const built = buildIntervalsFromThresholds(
-      range.min, range.maxExclusive, thresholds, names);
+  /**
+   * Get the value range (raw values).
+   *
+   * @returns {NumberRange|undefined} The range, undefined if empty.
+   */
+  getRange() {
+    let min;
+    let max;
+    for (const group of this.#groups) {
+      for (const rawValue of group.counts.keys()) {
+        if (typeof min === 'undefined' || rawValue < min) {
+          min = rawValue;
+        }
+        if (typeof max === 'undefined' || rawValue > max) {
+          max = rawValue;
+        }
+      }
+    }
+    if (typeof min === 'undefined') {
+      return undefined;
+    }
+    return {min, max};
+  }
 
-    const intervalResults = built.map((interval) => {
-      const count = sumCountsInRange(histogram, interval.min, interval.max);
-      return {
-        name: interval.name,
-        percentage: (count * 100) / total
-      };
-    });
+  /**
+   * Get the rescaled value range.
+   *
+   * @returns {NumberRange|undefined} The range, undefined if empty.
+   */
+  getRescaledRange() {
+    let min;
+    let max;
+    for (const group of this.#groups) {
+      for (const rawValue of group.counts.keys()) {
+        const value = group.rsi.apply(rawValue);
+        if (typeof min === 'undefined' || value < min) {
+          min = value;
+        }
+        if (typeof max === 'undefined' || value > max) {
+          max = value;
+        }
+      }
+    }
+    if (typeof min === 'undefined') {
+      return undefined;
+    }
+    return {min, max};
+  }
 
-    return {
-      volume,
-      intervals: intervalResults
-    };
-  });
-}
+  /**
+   * Get the number of values with a rescaled value in [min, max).
+   *
+   * @param {number} [min] Inclusive lower bound, unbounded if undefined.
+   * @param {number} [max] Exclusive upper bound, unbounded if undefined.
+   * @returns {number} The count.
+   */
+  getCountInRange(min, max) {
+    let sum = 0;
+    for (const group of this.#groups) {
+      for (const [rawValue, count] of group.counts) {
+        const value = group.rsi.apply(rawValue);
+        if ((typeof min === 'undefined' || value >= min) &&
+          (typeof max === 'undefined' || value < max)) {
+          sum += count;
+        }
+      }
+    }
+    return sum;
+  }
+
+  /**
+   * Get the percentage of counts that fall in each interval defined by
+   * interior thresholds.
+   *
+   * For thresholds `[1, 5]`, the intervals are `[min, 1)`, `[1, 5)` and
+   * `[5, max]`, where `min` / `max` are the histogram rescaled range.
+   *
+   * @param {number[]} thresholds Interior rescaled cut points in ascending
+   *   order.
+   * @returns {number[]} The percentages in [0, 100], one per interval
+   *   (`thresholds.length + 1` entries), all 0 for an empty histogram.
+   */
+  getIntervalPercentages(thresholds) {
+    const total = this.getTotal();
+    // open first and last intervals
+    const bounds = [undefined, ...thresholds, undefined];
+    const percentages = [];
+    for (let i = 0; i < bounds.length - 1; ++i) {
+      percentages.push(total === 0
+        ? 0
+        : (this.getCountInRange(bounds[i], bounds[i + 1]) * 100) / total);
+    }
+    return percentages;
+  }
+
+} // class Histogram

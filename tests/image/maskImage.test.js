@@ -8,6 +8,22 @@ import {Image} from '../../src/image/image.js';
 import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {MaskSegment} from '../../src/dicom/dicomSegment.js';
+import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
+
+/**
+ * @import {Histogram} from '../../src/image/histogram.js';
+ */
+
+/**
+ * Get the count of a rescaled value in a histogram.
+ *
+ * @param {Histogram} histogram The histogram.
+ * @param {number} value The rescaled value.
+ * @returns {number|undefined} The count, undefined if absent.
+ */
+function countOf(histogram, value) {
+  return histogram.getEntries().find((entry) => entry.value === value)?.count;
+}
 
 /**
  * Tests for the 'image/maskImage.js' file.
@@ -318,12 +334,10 @@ describe('MaskImage', () => {
 
       assert.equal(result.length, 1, 'one volume for 3D');
       assert.equal(result[0].volume, 0);
-      assert.equal(result[0].histogram[10], 2, 'value 10 twice');
-      assert.equal(result[0].histogram[20], 1, 'value 20 once');
-      // holes between min and max are filled with zeros
-      assert.equal(result[0].histogram[15], 0, 'absent intensity is 0');
+      assert.equal(countOf(result[0].histogram, 10), 2, 'value 10 twice');
+      assert.equal(countOf(result[0].histogram, 20), 1, 'value 20 once');
       assert.isUndefined(
-        result[0].histogram[99], 'outside-segment voxel ignored');
+        countOf(result[0].histogram, 99), 'outside-segment voxel ignored');
     }
   );
 
@@ -345,9 +359,8 @@ describe('MaskImage', () => {
         image, '1.2.3.segment-uid');
 
       assert.equal(result.length, 1);
-      assert.equal(result[0].histogram[5], 1);
-      assert.equal(result[0].histogram[6], 0, 'gap filled with zero');
-      assert.equal(result[0].histogram[7], 1);
+      assert.equal(countOf(result[0].histogram, 5), 1);
+      assert.equal(countOf(result[0].histogram, 7), 1);
     }
   );
 
@@ -394,11 +407,11 @@ describe('MaskImage', () => {
 
       assert.equal(result.length, 2, 'two volumes');
       assert.equal(result[0].volume, 0);
-      assert.equal(result[0].histogram[10], 1);
-      assert.isUndefined(result[0].histogram[11]);
+      assert.equal(countOf(result[0].histogram, 10), 1);
+      assert.isUndefined(countOf(result[0].histogram, 11));
       assert.equal(result[1].volume, 1);
-      assert.equal(result[1].histogram[20], 1);
-      assert.isUndefined(result[1].histogram[21]);
+      assert.equal(countOf(result[1].histogram, 20), 1);
+      assert.isUndefined(countOf(result[1].histogram, 21));
     }
   );
 
@@ -425,9 +438,63 @@ describe('MaskImage', () => {
       const result = mask.getHistogramBySegment(image, '1');
 
       assert.equal(result.length, 1, 'one volume');
-      assert.equal(result[0].histogram[20], 1);
-      assert.isUndefined(result[0].histogram[10]);
-      assert.isUndefined(result[0].histogram[21]);
+      assert.equal(countOf(result[0].histogram, 20), 1);
+      assert.isUndefined(countOf(result[0].histogram, 10));
+      assert.isUndefined(countOf(result[0].histogram, 21));
+    }
+  );
+
+  test(
+    'getHistogramBySegment rescales with a constant RSI',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      const image = new Image(
+        geom, new Uint8Array([1, 2, 3]), ['0']);
+      image.setRescaleSlopeAndIntercept(
+        new RescaleSlopeAndIntercept(0.5, -1024));
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.deepEqual(result[0].histogram.getEntries(), [
+        {value: -1023.5, count: 1},
+        {value: -1023, count: 1}
+      ]);
+    }
+  );
+
+  test(
+    'getHistogramBySegment rescales each slice with its own RSI',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+        new Size([2, 1, 2]),
+        new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 0, 1, 0]), ['0', '1']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      // slice 0: id rsi, slice 1: slope 2
+      const image = new Image(
+        geom, new Uint8Array([10, 11, 10, 11]), ['0', '1']);
+      image.setRescaleSlopeAndIntercept(
+        new RescaleSlopeAndIntercept(2, 0), 1);
+      assert.isFalse(image.isConstantRSI(), 'non constant rsi');
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.deepEqual(result[0].histogram.getEntries(), [
+        {value: 10, count: 1},
+        {value: 20, count: 1}
+      ]);
     }
   );
 

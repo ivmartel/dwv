@@ -45,7 +45,7 @@ import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
 import {SegmentCollection} from './segmentCollection.js';
 import {Diameter, Diameters, Label} from './label.js';
 import {WindowPreset} from './windowPreset.js';
-import {getHistogramIntervalPercentages} from './histogram.js';
+import {Histogram} from './histogram.js';
 
 export {
   Annotation,
@@ -56,6 +56,7 @@ export {
   Diameter,
   Diameters,
   Geometry,
+  Histogram,
   Image,
   MaskImage,
   ImageContour,
@@ -81,7 +82,6 @@ export {
   equalWl,
   getDefaultDicomSegJson,
   getDefaultDicomRTStructJson,
-  getHistogramIntervalPercentages,
   mergeMaskImages,
   bufferToPolygons,
   simplifyPolygon,
