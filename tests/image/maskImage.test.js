@@ -7,6 +7,7 @@ import {Matrix33} from '../../src/math/matrix.js';
 import {Image} from '../../src/image/image.js';
 import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
+import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 
 /**
  * Tests for the 'image/maskImage.js' file.
@@ -295,6 +296,179 @@ describe('MaskImage', () => {
       assert.deepEqual(
         Object.keys(roiBuffers[1]), ['0'],
         'segment 2 stays on the slice it was painted on (0)'
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment returns one volume histogram for 3D data',
+    () => {
+      // mask: segment 1 on first 3 voxels; image intensities beside it
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([4, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 1, 1, 0]), ['0']);
+      const segment = new MaskSegment(1, 'seg-1', 'MANUAL');
+      mask.setMeta({custom: {segments: [segment]}});
+
+      const image = new Image(
+        geom, new Uint8Array([10, 10, 20, 99]), ['0']);
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.equal(result.length, 1, 'one volume for 3D');
+      assert.equal(result[0].volume, 0);
+      assert.equal(result[0].histogram[10], 2, 'value 10 twice');
+      assert.equal(result[0].histogram[20], 1, 'value 20 once');
+      // holes between min and max are filled with zeros
+      assert.equal(result[0].histogram[15], 0, 'absent intensity is 0');
+      assert.isUndefined(
+        result[0].histogram[99], 'outside-segment voxel ignored');
+    }
+  );
+
+  test(
+    'getHistogramBySegment resolves segment by trackingUid',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([2, 2, 0]), ['0']);
+      const segment = new MaskSegment(2, 'seg-2', 'MANUAL');
+      segment.trackingUid = '1.2.3.segment-uid';
+      mask.setMeta({custom: {segments: [segment]}});
+
+      const image = new Image(
+        geom, new Uint8Array([5, 7, 0]), ['0']);
+
+      const result = mask.getHistogramBySegment(
+        image, '1.2.3.segment-uid');
+
+      assert.equal(result.length, 1);
+      assert.equal(result[0].histogram[5], 1);
+      assert.equal(result[0].histogram[6], 0, 'gap filled with zero');
+      assert.equal(result[0].histogram[7], 1);
+    }
+  );
+
+  test(
+    'getHistogramBySegment returns empty array for unknown segment',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(geom, new Uint8Array([3, 4]), ['0']);
+
+      const result = mask.getHistogramBySegment(image, 'missing');
+
+      assert.deepEqual(result, []);
+    }
+  );
+
+  test(
+    'getHistogramBySegment returns a histogram per 4D volume ' +
+    'using a 3D mask',
+    () => {
+      // 3D mask reused on each volume of a 4D image
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 0)],
+        new Size([2, 1, 1, 2]),
+        new Spacing([1, 1, 1, 1]));
+      // vol0 intensities [10, 11], vol1 [20, 21]
+      const image = new Image(
+        imageGeom, new Uint8Array([10, 11, 20, 21]), ['0', '1']);
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.equal(result.length, 2, 'two volumes');
+      assert.equal(result[0].volume, 0);
+      assert.equal(result[0].histogram[10], 1);
+      assert.isUndefined(result[0].histogram[11]);
+      assert.equal(result[1].volume, 1);
+      assert.equal(result[1].histogram[20], 1);
+      assert.isUndefined(result[1].histogram[21]);
+    }
+  );
+
+  test(
+    'getHistogramBySegment throws when spatial sizes differ',
+    () => {
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2, 3]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /spatial sizes differ/
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment throws when orientations differ',
+    () => {
+      const size = new Size([2, 1, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const origins = [new Point3D(0, 0, 0)];
+      const maskGeom = new Geometry(origins, size, spacing);
+      const imageOrientation = new Matrix33([1, 0, 0, 0, 0, -1, 0, 1, 0]);
+      const imageGeom = new Geometry(
+        origins, size, spacing, imageOrientation);
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /orientations differ/
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment throws when origins differ',
+    () => {
+      const size = new Size([2, 1, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 0)], size, spacing);
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 5)], size, spacing);
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /origins differ/
       );
     }
   );
