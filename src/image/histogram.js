@@ -147,7 +147,7 @@ export class Histogram {
    * @param {number} [max] Exclusive upper bound, unbounded if undefined.
    * @returns {number} The count.
    */
-  getCountInRange(min, max) {
+  getCountInRescaledRange(min, max) {
     let sum = 0;
     for (const group of this.#groups) {
       for (const [rawValue, count] of group.counts) {
@@ -179,9 +179,8 @@ export class Histogram {
     const bounds = [undefined, ...thresholds, undefined];
     const percentages = [];
     for (let i = 0; i < bounds.length - 1; ++i) {
-      percentages.push(total === 0
-        ? 0
-        : (this.getCountInRange(bounds[i], bounds[i + 1]) * 100) / total);
+      const count = this.getCountInRescaledRange(bounds[i], bounds[i + 1]);
+      percentages.push(total === 0 ? 0 : (count * 100) / total);
     }
     return percentages;
   }

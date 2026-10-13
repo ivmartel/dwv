@@ -88,13 +88,14 @@ describe('histogram', () => {
     assert.isUndefined(histogram.getRange());
   });
 
-  test('Histogram getCountInRange', () => {
+  test('Histogram getCountInRescaledRange', () => {
     const histogram = buildHistogram({'-5': 1, 0: 2, 5: 3, 10: 4});
 
-    assert.equal(histogram.getCountInRange(0, 10), 5, '[0, 10)');
-    assert.equal(histogram.getCountInRange(undefined, 5), 3, '[-inf, 5)');
-    assert.equal(histogram.getCountInRange(5), 7, '[5, +inf]');
-    assert.equal(histogram.getCountInRange(), 10, 'unbounded');
+    assert.equal(histogram.getCountInRescaledRange(0, 10), 5, '[0, 10)');
+    assert.equal(
+      histogram.getCountInRescaledRange(undefined, 5), 3, '[-inf, 5)');
+    assert.equal(histogram.getCountInRescaledRange(5), 7, '[5, +inf]');
+    assert.equal(histogram.getCountInRescaledRange(), 10, 'unbounded');
   });
 
   test('Histogram getIntervalPercentages', () => {
