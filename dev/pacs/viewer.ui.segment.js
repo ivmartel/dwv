@@ -34,6 +34,7 @@ import {
  * @import {App} from '../../src/app/application.js';
  * @import {MaskSegment} from '../../src/dicom/dicomSegment.js';
  * @import {RGB} from '../../src/utils/colour.js';
+ * @import {Statistics} from '../../src/math/stats.js';
  */
 
 /**
@@ -858,6 +859,14 @@ export class SegmentationUI {
         }
         ++i;
       }
+      const statsList = this.#getHistogramStats(segment2, segmentation);
+      for (const item of statsList) {
+        const stats = item.stats;
+        qStr += `- volume #${item.volume}: ` +
+          `min ${stats.min.toPrecision(4)}, ` +
+          `mean ${stats.mean.toPrecision(4)}, ` +
+          `max ${stats.max.toPrecision(4)}\n`;
+      }
       alert(qStr);
     };
 
@@ -1102,6 +1111,51 @@ export class SegmentationUI {
       URL.revokeObjectURL(element.href);
     }
   };
+
+  /**
+   * Get the per volume histogram statistics of the reference image
+   * values inside a segment.
+   *
+   * @param {MaskSegment} segment The segment.
+   * @param {Segmentation} segmentation The segmentation.
+   * @returns {{volume: number, stats: Statistics}[]} The statistics,
+   *   empty if the reference image is not available.
+   */
+  #getHistogramStats(segment, segmentation) {
+    const dataCtrl = this.#app.getDataController();
+    const maskData = dataCtrl.get(segmentation.dataId);
+    if (typeof maskData === 'undefined') {
+      return [];
+    }
+    const maskImage = maskData.image;
+    const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
+    if (typeof refSeriesUID === 'undefined') {
+      return [];
+    }
+    const refDataId = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
+    if (typeof refDataId === 'undefined') {
+      return [];
+    }
+    const refImage = dataCtrl.get(refDataId).image;
+
+    let volumeHistograms;
+    try {
+      volumeHistograms = maskImage.getHistogramBySegment(
+        refImage, segment.number.toString());
+    } catch (error) {
+      console.warn('Cannot calculate segment histogram:', error.message);
+      return [];
+    }
+
+    const res = [];
+    for (const item of volumeHistograms) {
+      const stats = item.histogram.getStats();
+      if (typeof stats !== 'undefined') {
+        res.push({volume: item.volume, stats});
+      }
+    }
+    return res;
+  }
 
   /**
    * Get labels info.
