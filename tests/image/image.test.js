@@ -759,7 +759,7 @@ describe('image', () => {
 
   /**
    * Tests for {@link Image#getOriginForImageUid} on a non time series
-   *   multivolume image (e.g. diffusion b-values, the default): only the
+   *   multivolume image, such as diffusion b-values (the default): only the
    *   initial time point origins are found.
    *
    * @function module:tests/image~getOriginForImageUidNonTime
