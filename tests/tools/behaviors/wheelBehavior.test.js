@@ -62,11 +62,12 @@ describe('tools/behaviors', () => {
       assert.equal(posHelper.decrementPositionAlongScroll.mock.calls.length, 1);
     });
 
-    test('onWheelTick increments dimension 3 when up=true and moreThanOne(3)',
+    test('onWheelTick increments dimension 3 when up=true (time series)',
       () => {
         const layerGroup = makeMockLayerGroup();
         layerGroup.canScroll.mockReturnValue(false);
         layerGroup.moreThanOne.mockReturnValue(true);
+        layerGroup.canScrollTimepoints.mockReturnValue(true);
         const posHelper = layerGroup.getPositionHelper();
 
         behavior.onWheelTick(true, layerGroup);
@@ -77,11 +78,12 @@ describe('tools/behaviors', () => {
       }
     );
 
-    test('onWheelTick decrements dimension 3 when up=false and moreThanOne(3)',
+    test('onWheelTick decrements dimension 3 when up=false (time series)',
       () => {
         const layerGroup = makeMockLayerGroup();
         layerGroup.canScroll.mockReturnValue(false);
         layerGroup.moreThanOne.mockReturnValue(true);
+        layerGroup.canScrollTimepoints.mockReturnValue(true);
         const posHelper = layerGroup.getPositionHelper();
 
         behavior.onWheelTick(false, layerGroup);
@@ -89,6 +91,22 @@ describe('tools/behaviors', () => {
         assert.equal(posHelper.decrementPosition.mock.calls.length, 1);
         const arg = posHelper.decrementPosition.mock.calls[0][0];
         assert.equal(arg, 3);
+      }
+    );
+
+    test('onWheelTick does not move dimension 3 of a non time series',
+      () => {
+        // for example diffusion b-values: multivolume but not a time series
+        const layerGroup = makeMockLayerGroup();
+        layerGroup.canScroll.mockReturnValue(false);
+        layerGroup.moreThanOne.mockReturnValue(true);
+        const posHelper = layerGroup.getPositionHelper();
+
+        behavior.onWheelTick(true, layerGroup);
+        behavior.onWheelTick(false, layerGroup);
+
+        assert.equal(posHelper.incrementPosition.mock.calls.length, 0);
+        assert.equal(posHelper.decrementPosition.mock.calls.length, 0);
       }
     );
   });

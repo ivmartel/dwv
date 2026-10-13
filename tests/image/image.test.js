@@ -694,4 +694,116 @@ describe('image', () => {
       'Clone image modality #1');
   });
 
+  /**
+   * Timepoints of the two time points image.
+   */
+  const timepoints = {
+    tag: 'TemporalPositionIdentifier',
+    syncTable: [
+      {timepointIndex: 0, tagValue: 0},
+      {timepointIndex: 1, tagValue: 1}
+    ]
+  };
+
+  /**
+   * Create a 2 slices x 2 time points image (one uid per slice,
+   *   uid 't{time}z{z}') by appending single slices.
+   *
+   * @returns {Image} The image.
+   */
+  function makeTwoTimePointImage() {
+    const spacing = new Spacing([1, 1, 1]);
+
+    /**
+     * Create a single slice image.
+     *
+     * @param {number} z The slice z origin.
+     * @param {number} time The time point.
+     * @returns {Image} The slice image.
+     */
+    function makeSlice(z, time) {
+      const geometry = new Geometry(
+        [new Point3D(0, 0, z)], new Size([2, 2, 1]), spacing,
+        undefined, time);
+      const image = new Image(geometry, new Int16Array(4), [`t${time}z${z}`]);
+      image.setMeta({sliceCapacity: 4});
+      return image;
+    }
+
+    const image = makeSlice(0, 0);
+    image.appendSlice(makeSlice(1, 0));
+    image.appendSlice(makeSlice(0, 1));
+    image.appendSlice(makeSlice(1, 1));
+    return image;
+  }
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} on a time series:
+   *   origins of every time point are found.
+   *
+   * @function module:tests/image~getOriginForImageUidTime
+   */
+  test('getOriginForImageUid time series', () => {
+    const image = makeTwoTimePointImage();
+    image.setTimepoints(timepoints);
+    assert.ok(image.isTimeSeries(), 'time series');
+    assert.ok(image.getOriginForImageUid('t0z1').equals(new Point3D(0, 0, 1)),
+      'time0 slice1 origin');
+    assert.ok(image.getOriginForImageUid('t1z0').equals(new Point3D(0, 0, 0)),
+      'time1 slice0 origin');
+    assert.ok(image.getOriginForImageUid('t1z1').equals(new Point3D(0, 0, 1)),
+      'time1 slice1 origin');
+    assert.equal(image.getOriginForImageUid('unknown'), undefined,
+      'unknown uid');
+  });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} on a non time series
+   *   multivolume image (e.g. diffusion b-values, the default): only the
+   *   initial time point origins are found.
+   *
+   * @function module:tests/image~getOriginForImageUidNonTime
+   */
+  test('getOriginForImageUid non time series', () => {
+    const image = makeTwoTimePointImage();
+    assert.notOk(image.isTimeSeries(), 'not time series by default');
+    for (const flag of [false, true, false]) {
+      image.setTimepoints(flag ? timepoints : undefined);
+      assert.ok(
+        image.getOriginForImageUid('t0z1').equals(new Point3D(0, 0, 1)),
+        `initial time point origin (${flag})`);
+      assert.equal(typeof image.getOriginForImageUid('t1z1') !== 'undefined',
+        flag, `origin for other time points only if time series (${flag})`);
+    }
+  });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} on a single volume.
+   *
+   * @function module:tests/image~getOriginForImageUid3D
+   */
+  test('getOriginForImageUid single volume', () => {
+    const origin = new Point3D(1, 2, 3);
+    const geometry = new Geometry(
+      [origin], new Size([2, 2, 1]), new Spacing([1, 1, 1]));
+    const image = new Image(geometry, new Int16Array(4), ['uid0']);
+    assert.notOk(image.isTimeSeries(), 'not time series');
+    assert.ok(image.getOriginForImageUid('uid0').equals(origin), 'origin');
+  });
+
+  /**
+   * Tests for {@link Image#clone} keeping the time series flag.
+   *
+   * @function module:tests/image~cloneTimeSeries
+   */
+  test('clone keeps the time series flag and origins', () => {
+    const image = makeTwoTimePointImage();
+    image.setTimepoints(timepoints);
+    const copy = image.clone();
+    assert.ok(copy.isTimeSeries(), 'time series');
+    assert.deepEqual(copy.getTimepoints(), timepoints, 'timepoints');
+    assert.ok(copy.getOriginForImageUid('t1z1').equals(new Point3D(0, 0, 1)),
+      'time1 slice1 origin');
+  });
+
 });

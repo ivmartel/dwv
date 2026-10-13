@@ -8,9 +8,11 @@ import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet} from '../dicom/dataElement.js';
 import {
+  getTimepoints,
   getVolumeIdTagValue,
   guessVolumeIndices
 } from '../dicom/dicomVolume.js';
+import {getFramesTimepoints} from '../dicom/dicomGeometry.js';
 import {
   getAllPixelDataTagKeys,
   hasAnyPixelDataElement
@@ -24,6 +26,7 @@ import {
  * @import {Image} from '../image/image.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {AnnotationGroup} from '../image/annotationGroup.js';
+ * @import {Timepoints} from '../dicom/volumeTypes.js';
  */
 
 /**
@@ -33,6 +36,11 @@ const TagKeys = {
   Modality: '00080060',
   SOPInstanceUID: '00080018'
 };
+
+/**
+ * Index of the time dimension of an image size.
+ */
+const TIME_DIM_INDEX = 3;
 
 /**
  * List of data event names.
@@ -288,10 +296,20 @@ export class DicomSliceDataList {
   }
 
   /**
+   * Find the timepoints of the stored data.
+   *
+   * @returns {Timepoints|undefined} The timepoints, undefined if the
+   *   data is not a time series.
+   */
+  guessTimepoints() {
+    return this.#guessVolumesIndices(this.#getOriginList()).timepoints;
+  }
+
+  /**
    * Build a data from the stored slice data. The items can be
    * single frame files or frames of multi-frame files.
    *
-   * @returns {{image, meta}} The result data.
+   * @returns {{image, meta, timepoints}} The result data.
    */
   buildData() {
     const originList = this.#getOriginList();
@@ -310,7 +328,7 @@ export class DicomSliceDataList {
     }
 
     // guess the volume id tag and get indices per volumes
-    const {volsIndices, volumeIndexGetter} =
+    const {volsIndices, volumeIndexGetter, timepoints} =
       this.#guessVolumesIndices(originList);
 
     if (typeof volsIndices === 'undefined') {
@@ -348,7 +366,7 @@ export class DicomSliceDataList {
         }
       }
     }
-    return {image, meta};
+    return {image, meta, timepoints};
   }
 
   /**
@@ -358,8 +376,9 @@ export class DicomSliceDataList {
    * @param {object[]} originList The list of origins and their
    *   occurences, as returned by #getOriginList.
    * @returns {{volsIndices: number[][]|undefined,
-   *   volumeIndexGetter: Function|undefined}} The indices per volume
-   *   and the getter that produced them, both undefined if no
+   *   volumeIndexGetter: Function|undefined,
+   *   timepoints: Timepoints|undefined}} The indices per volume, the
+   *   getter that produced them and the timepoints, all undefined if no
    *   candidate worked.
    */
   #guessVolumesIndices(originList) {
@@ -381,7 +400,8 @@ export class DicomSliceDataList {
     if (typeof guess === 'undefined') {
       return {
         volsIndices: undefined,
-        volumeIndexGetter: undefined
+        volumeIndexGetter: undefined,
+        timepoints: undefined
       };
     }
 
@@ -396,7 +416,11 @@ export class DicomSliceDataList {
         volsIndices[volIndex].push(index);
       }
     }
-    return {volsIndices, volumeIndexGetter: guess.getter};
+    return {
+      volsIndices,
+      volumeIndexGetter: guess.getter,
+      timepoints: getTimepoints(guess, elementsList)
+    };
   }
 
   /**
@@ -869,6 +893,7 @@ export class DataController extends EventTarget {
 
   /**
    * Mark a data a complete (fully loaded).
+   * Sets the image timepoints if the data is a multivolume time series.
    *
    * @param {string} dataId The data id.
    * @returns {{imageHasChanged}} An object with an imageHasChanged property.
@@ -880,6 +905,7 @@ export class DataController extends EventTarget {
     }
 
     const res = {imageHasChanged: false};
+    let timepoints;
 
     // data with duplicate origin case: build image
     // from final slice list
@@ -891,9 +917,21 @@ export class DataController extends EventTarget {
       this.setImage(dataId, finalData.image);
       // set meta
       data.meta = finalData.meta;
+      timepoints = finalData.timepoints;
       // mark image as changed
       res.imageHasChanged = true;
     }
+
+    const size = data.image?.getGeometry().getSize();
+    if (typeof size !== 'undefined' && size.moreThanOne(TIME_DIM_INDEX)) {
+      if (!res.imageHasChanged) {
+        timepoints = typeof this.#tmpSliceList[dataId] !== 'undefined'
+          ? this.#tmpSliceList[dataId].guessTimepoints()
+          : getFramesTimepoints(data.meta);
+      }
+      data.image.setTimepoints(timepoints);
+    }
+
     // release the slice list (also when not used)
     delete this.#tmpSliceList[dataId];
 
@@ -901,6 +939,28 @@ export class DataController extends EventTarget {
     data.setComplete(true);
 
     return res;
+  }
+
+  /**
+   * Get the name of the tag that separates the timepoints of a data.
+   *
+   * @param {string} dataId The data id.
+   * @returns {string|undefined} The tag name, undefined if the data is
+   *   not a time series.
+   */
+  getTimepointTag(dataId) {
+    return this.#dataList[dataId]?.image?.getTimepoints()?.tag;
+  }
+
+  /**
+   * Get the timepoint sync table of a data.
+   *
+   * @param {string} dataId The data id.
+   * @returns {Array<{timepointIndex: number, tagValue: number}>|undefined}
+   *   The table, undefined if the data is not a time series.
+   */
+  getTimepointSyncTable(dataId) {
+    return this.#dataList[dataId]?.image?.getTimepoints()?.syncTable;
   }
 
   /**

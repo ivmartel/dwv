@@ -105,9 +105,110 @@ export class MaskViewBinder {
 }
 
 /**
+ * Number of spatial dimensions of a position.
+ */
+const NUMBER_OF_SPATIAL_DIMS = 3;
+
+/**
+ * Check if a view controller can scroll along its scroll dimension.
+ *
+ * @param {object} vc The view controller.
+ * @returns {boolean} True if the image has more than one slice along
+ *   the scroll dimension.
+ */
+function canScrollSlices(vc) {
+  const size = vc.getImageSize();
+  return typeof size !== 'undefined' &&
+    size.moreThanOne(vc.getScrollDimIndex());
+}
+
+/**
+ * Check if a position change only modified non spatial dimensions.
+ *
+ * @param {number[]} [diffDims] The modified dimensions.
+ * @returns {boolean} True if only non spatial dimensions changed.
+ */
+function isVolumeOnlyMove(diffDims) {
+  return Array.isArray(diffDims) &&
+    diffDims.length !== 0 &&
+    diffDims.every((dim) => dim >= NUMBER_OF_SPATIAL_DIMS);
+}
+
+/**
+ * Check if a position change did not modify any dimension.
+ *
+ * @param {number[]} [diffDims] The modified dimensions.
+ * @returns {boolean} True if no dimension changed.
+ */
+function isUnchangedPosition(diffDims) {
+  return Array.isArray(diffDims) && diffDims.length === 0;
+}
+
+/**
+ * Get the target timepoint index that has the same timepoint tag value
+ * as the source timepoint. Both data must be time series with the same
+ * timepoint tag.
+ *
+ * @param {Function|undefined} getTimepointSyncTable The timepoint sync
+ *   table getter.
+ * @param {Function|undefined} getTimepointTag The timepoint tag getter.
+ * @param {string} sourceDataId The source data id.
+ * @param {string} targetDataId The target data id.
+ * @param {number} sourceTimepoint The source timepoint index.
+ * @returns {number|undefined} The target timepoint index, undefined if
+ *   there is no match.
+ */
+function getMatchingTimepoint(
+  getTimepointSyncTable, getTimepointTag,
+  sourceDataId, targetDataId, sourceTimepoint) {
+  if (typeof getTimepointSyncTable !== 'function' ||
+    typeof getTimepointTag !== 'function') {
+    return undefined;
+  }
+  const sourceTag = getTimepointTag(sourceDataId);
+  const targetTag = getTimepointTag(targetDataId);
+  if (typeof sourceTag === 'undefined' || sourceTag !== targetTag) {
+    return undefined;
+  }
+  const sourceTagValue = getTimepointSyncTable(sourceDataId)?.find(
+    (entry) => entry.timepointIndex === sourceTimepoint)?.tagValue;
+  if (typeof sourceTagValue === 'undefined') {
+    return undefined;
+  }
+  const targetSyncTable = getTimepointSyncTable(targetDataId);
+  return targetSyncTable?.find(
+    (entry) => entry.tagValue === sourceTagValue)?.timepointIndex;
+}
+
+/**
  * Position binder.
  */
 export class PositionBinder {
+  /**
+   * The timepoint sync table getter.
+   *
+   * @type {Function|undefined}
+   */
+  #getTimepointSyncTable;
+
+  /**
+   * The timepoint tag getter.
+   *
+   * @type {Function|undefined}
+   */
+  #getTimepointTag;
+
+  /**
+   * @param {Function} [getTimepointSyncTable] The timepoint sync table
+   *   getter, takes a data id as input.
+   * @param {Function} [getTimepointTag] The timepoint tag getter, takes
+   *   a data id as input.
+   */
+  constructor(getTimepointSyncTable, getTimepointTag) {
+    this.#getTimepointSyncTable = getTimepointSyncTable;
+    this.#getTimepointTag = getTimepointTag;
+  }
+
   /**
    * Get the associated event.
    *
@@ -122,11 +223,17 @@ export class PositionBinder {
    * @param {LayerGroup} layerGroup The input lqyer group.
    * @returns {EventListener} The event handler.
    */
-  getCallback = function (layerGroup) {
+  getCallback = (layerGroup) => {
+    const getTimepointSyncTable = this.#getTimepointSyncTable;
+    const getTimepointTag = this.#getTimepointTag;
     return function (/** @type {CustomEvent} */ event) {
       const dataid = event.detail?.dataid;
       const value = event.detail?.value;
-      const pointValues = value[1];
+      if (!Array.isArray(value?.[1]) ||
+        isUnchangedPosition(event.detail?.diffDims)) {
+        return;
+      }
+      const pointValues = [...value[1]];
       const vls = layerGroup.getViewLayersByDataId(dataid);
       let vl;
       let sameData = false;
@@ -137,15 +244,25 @@ export class PositionBinder {
       } else {
         vl = layerGroup.getBaseViewLayer();
       }
+      if (typeof vl === 'undefined') {
+        return;
+      }
       const vc = vl.getViewController();
       // bind 3D for all
       // bind 4D if same data, otherwise use 3D and keep current
       const currentPos = vc.getCurrentPosition();
+      if (!canScrollSlices(vc) || isVolumeOnlyMove(event.detail?.diffDims)) {
+        for (let i = 0; i < NUMBER_OF_SPATIAL_DIMS; ++i) {
+          pointValues[i] = currentPos.get(i);
+        }
+      }
       const currentDims = currentPos.length();
       const inputDims = pointValues.length;
       if (!sameData &&
         inputDims > 3 && currentDims > 3) {
-        pointValues[3] = currentPos.get(3);
+        pointValues[3] = getMatchingTimepoint(
+          getTimepointSyncTable, getTimepointTag,
+          dataid, vl.getDataId(), pointValues[3]) ?? currentPos.get(3);
       }
       vc.setCurrentPosition(new Point(pointValues));
     };

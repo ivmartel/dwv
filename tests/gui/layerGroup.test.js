@@ -10,10 +10,120 @@ import {
   getScaledOffset,
 } from '../../src/gui/layerGroup.js';
 import * as loggerModule from '../../src/utils/logger.js';
+import {PositionBinder} from '../../src/gui/binders.js';
+import {Point} from '../../src/math/point.js';
+import {Size} from '../../src/image/size.js';
 
 /**
  * Tests for the 'gui/layerGroup.js' file.
  */
+
+/**
+ * Timepoint tag of the time series used in the tests.
+ */
+const TPI = 'TemporalPositionIdentifier';
+
+/**
+ * Timepoint sync tables per data id: same tag values in a different
+ * timepoint order, so that a match changes the timepoint index.
+ */
+const syncTables = {
+  source: [
+    {timepointIndex: 0, tagValue: 1},
+    {timepointIndex: 1, tagValue: 2}
+  ],
+  target: [
+    {timepointIndex: 0, tagValue: 2},
+    {timepointIndex: 1, tagValue: 1}
+  ]
+};
+
+/**
+ * Get the timepoint sync table of a data.
+ *
+ * @param {string} dataId The data id.
+ * @returns {Array|undefined} The table.
+ */
+function getTimepointSyncTable(dataId) {
+  return syncTables[dataId];
+}
+
+/**
+ * Create a timepoint tag getter.
+ *
+ * @param {object} tags The timepoint tag per data id.
+ * @returns {Function} The getter.
+ */
+function makeGetTimepointTag(tags) {
+  return function (dataId) {
+    return tags[dataId];
+  };
+}
+
+/**
+ * Create a target layer group mock at slice 5 and timepoint 0.
+ *
+ * @param {object} [options] The target options.
+ * @param {boolean} [options.sameData] True if the target shows the
+ *   source data.
+ * @param {number} [options.numberOfSlices] The number of slices along
+ *   the scroll dimension, defaults to 10.
+ * @returns {{layerGroup: object, getPosition: Function}} The layer group
+ *   mock and a getter for the position set on it.
+ */
+function makeTargetLayerGroup(options = {}) {
+  const sameData = options.sameData === true;
+  const numberOfSlices = options.numberOfSlices ?? 10;
+  let position;
+  const viewController = {
+    getCurrentPosition: () => new Point([0, 0, 5, 0]),
+    getImageSize: () => new Size([2, 2, numberOfSlices, 2]),
+    getScrollDimIndex: () => 2,
+    setCurrentPosition: (point) => {
+      position = point;
+    }
+  };
+  const viewLayer = {
+    getDataId: () => (sameData ? 'source' : 'target'),
+    getViewController: () => viewController
+  };
+  const layerGroup = {
+    getViewLayersByDataId: () => (sameData ? [viewLayer] : []),
+    getBaseViewLayer: () => viewLayer
+  };
+  return {
+    layerGroup,
+    getPosition: () => position
+  };
+}
+
+/**
+ * Send a source position change to a target layer group.
+ *
+ * @param {PositionBinder} binder The binder.
+ * @param {object} [move] The source move.
+ * @param {number} [move.slice] The source slice, defaults to 0.
+ * @param {number} [move.timepoint] The source timepoint, defaults to 0.
+ * @param {number[]} [move.diffDims] The modified dimensions, defaults
+ *   to [3].
+ * @param {object} [targetOptions] The target options, see
+ *   makeTargetLayerGroup.
+ * @returns {Point|undefined} The target position.
+ */
+function moveSource(binder, move = {}, targetOptions = {}) {
+  const slice = move.slice ?? 0;
+  const timepoint = move.timepoint ?? 0;
+  const target = makeTargetLayerGroup(targetOptions);
+  const callback = binder.getCallback(target.layerGroup);
+  callback(new CustomEvent('positionchange', {
+    detail: {
+      dataid: 'source',
+      value: [[0, 0, slice, timepoint], [0, 0, slice, timepoint]],
+      diffDims: 'diffDims' in move ? move.diffDims : [3]
+    }
+  }));
+  return target.getPosition();
+}
 
 describe('gui', () => {
 
@@ -587,6 +697,125 @@ describe('gui', () => {
     assert.equal(warnSpy.mock.calls[0][0], 'No layer to show crosshair');
     lg.setShowCrosshair(false);
     assert.equal(lg.getShowCrosshair(), false);
+  });
+
+  /**
+   * Tests for {@link LayerGroup#canScrollTimepoints}.
+   *
+   * @function module:tests/gui~canScrollTimepoints
+   */
+  test('LayerGroup canScrollTimepoints asks its view layers', () => {
+    const element = document.createElement('div');
+    element.id = 'layerGroupTimepoints';
+    const lg = new LayerGroup(element);
+    assert.notOk(lg.canScrollTimepoints(), 'no view layer');
+
+    let canScroll = false;
+    vi.spyOn(lg, 'someViewLayer').mockImplementation(
+      callbackFn => callbackFn({
+        getViewController: () => ({canScrollTimepoints: () => canScroll})
+      }));
+    assert.notOk(lg.canScrollTimepoints(), 'non time series layer');
+    canScroll = true;
+    assert.ok(lg.canScrollTimepoints(), 'time series layer');
+  });
+
+  describe('PositionBinder', () => {
+
+    test('matches the timepoints of time series with the same tag', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({source: TPI, target: TPI}));
+      // source timepoint 0 has the tag value 1: target timepoint 1
+      assert.equal(moveSource(binder).get(3), 1);
+    });
+
+    test('keeps the target timepoint if it is not a time series', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({source: TPI}));
+      assert.equal(moveSource(binder).get(3), 0);
+    });
+
+    test('keeps the target timepoint for a different tag', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable,
+        makeGetTimepointTag({source: TPI, target: 'TemporalPositionIndex'}));
+      assert.equal(moveSource(binder).get(3), 0);
+    });
+
+    test('keeps the target timepoint without getters', () => {
+      assert.equal(moveSource(new PositionBinder()).get(3), 0);
+    });
+
+    test('keeps the target timepoint without sync table', () => {
+      const binder = new PositionBinder(
+        () => undefined, makeGetTimepointTag({source: TPI, target: TPI}));
+      assert.equal(moveSource(binder).get(3), 0);
+    });
+
+    test('keeps the target timepoint for an unknown source timepoint',
+      () => {
+        const binder = new PositionBinder(
+          getTimepointSyncTable,
+          makeGetTimepointTag({source: TPI, target: TPI}));
+        assert.equal(moveSource(binder, {timepoint: 5}).get(3), 0);
+      });
+
+    test('uses the source timepoint for the same data', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({}));
+      const position = moveSource(binder, {timepoint: 1}, {sameData: true});
+      assert.equal(position.get(3), 1);
+    });
+
+    test('keeps the target slice for a timepoint only move', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({source: TPI, target: TPI}));
+      const position = moveSource(binder, {slice: 0, diffDims: [3]});
+      assert.equal(position.get(2), 5, 'slice');
+      assert.equal(position.get(3), 1, 'timepoint');
+    });
+
+    test('keeps the position of a single slice target', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({source: TPI, target: TPI}));
+      const position = moveSource(
+        binder, {slice: 8, diffDims: [2]}, {numberOfSlices: 1});
+      assert.equal(position.get(2), 5);
+    });
+
+    test('binds the slice of a multi-slice target', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({source: TPI, target: TPI}));
+      assert.equal(moveSource(binder, {slice: 8, diffDims: [2]}).get(2), 8);
+      assert.equal(
+        moveSource(binder, {slice: 8, diffDims: undefined}).get(2), 8,
+        'unknown modified dimensions');
+    });
+
+    test('does not move the target for an unchanged source position', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({source: TPI, target: TPI}));
+      assert.isUndefined(moveSource(binder, {slice: 8, diffDims: []}));
+    });
+
+    test('does nothing without target layer or position', () => {
+      const binder = new PositionBinder(
+        getTimepointSyncTable, makeGetTimepointTag({source: TPI, target: TPI}));
+      const loadingCallback = binder.getCallback({
+        getViewLayersByDataId: () => [],
+        getBaseViewLayer: () => undefined
+      });
+      assert.doesNotThrow(() => loadingCallback(new CustomEvent(
+        'positionchange',
+        {detail: {dataid: 'source', value: [[0, 0, 0, 0], [0, 0, 0, 0]]}}
+      )), 'no target layer');
+
+      const target = makeTargetLayerGroup();
+      binder.getCallback(target.layerGroup)(new CustomEvent(
+        'positionchange', {detail: {dataid: 'source'}}));
+      assert.isUndefined(target.getPosition(), 'no position');
+    });
+
   });
 
 });

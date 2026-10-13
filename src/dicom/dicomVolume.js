@@ -16,6 +16,7 @@ import {logger} from '../utils/logger.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {
  *   PrivateBValueRule,
+ *   Timepoints,
  *   VolumeIdCandidate
  * } from './volumeTypes.js';
  */
@@ -89,6 +90,8 @@ export const defaultPrivateBValueRules = [
  * Candidates flagged with `preLoad` are also used while loading
  * (see `getVolumeIdTagValue`): they must not vary between the
  * slices of a single volume.
+ * Candidates flagged with `timepoint` separate the timepoints of a time
+ * series (see `guessTimepoints`).
  *
  * @type {VolumeIdCandidate[]}
  */
@@ -97,12 +100,14 @@ export const defaultVolumeIdCandidates = [
     name: 'TemporalPositionIdentifier',
     getter: makeNumericTagGetter(
       TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10)),
-    preLoad: true
+    preLoad: true,
+    timepoint: true
   },
   {
     name: 'TemporalPositionIndex',
     getter: getTemporalPositionIndex,
-    preLoad: true
+    preLoad: true,
+    timepoint: true
   },
   {
     name: 'DiffusionBValue',
@@ -574,9 +579,11 @@ export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
  *   of each item.
  * @param {number[]} sliceIndices The slice index of each item.
  * @param {number} numberOfSlices The number of distinct slices.
- * @returns {{volumeIndices: number[], getter: Function}|undefined}
- *   The volume index of each item and the volume id getter that
- *   produced them, undefined if no candidate produces a valid grouping.
+ * @returns {{volumeIndices: number[], getter: Function,
+ *   candidate: VolumeIdCandidate}|undefined}
+ *   The volume index of each item, the volume id getter that
+ *   produced them and its candidate, undefined if no candidate
+ *   produces a valid grouping.
  */
 export function guessVolumeIndices(
   elementsList, sliceIndices, numberOfSlices) {
@@ -600,8 +607,55 @@ export function guessVolumeIndices(
       values, sliceIndices, numberOfSlices);
     if (typeof volumeIndices !== 'undefined') {
       logger.debug(`Using '${candidate.name}' as volume id`);
-      return {volumeIndices, getter: candidate.getter};
+      return {volumeIndices, getter: candidate.getter, candidate};
     }
   }
   return undefined;
+}
+
+/**
+ * Get the timepoints of items (files or frames) grouped into volumes:
+ *   the volumes must be separated by a candidate flagged with
+ *   `timepoint`.
+ *
+ * @param {{volumeIndices: number[], getter: Function,
+ *   candidate: VolumeIdCandidate}|undefined} guess The volume grouping,
+ *   as returned by guessVolumeIndices.
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM tags
+ *   of each item.
+ * @returns {Timepoints|undefined} The timepoints, undefined if the
+ *   volumes are not separated by a timepoint tag.
+ */
+export function getTimepoints(guess, elementsList) {
+  if (typeof guess === 'undefined' || !guess.candidate.timepoint) {
+    return undefined;
+  }
+  const syncTable = [];
+  for (let i = 0; i < elementsList.length; ++i) {
+    const timepointIndex = guess.volumeIndices[i];
+    if (typeof syncTable[timepointIndex] === 'undefined') {
+      syncTable[timepointIndex] = {
+        timepointIndex,
+        tagValue: guess.getter(elementsList[i])
+      };
+    }
+  }
+  return {tag: guess.candidate.name, syncTable};
+}
+
+/**
+ * Find the timepoints of items (files or frames) that share slice
+ * positions (see guessVolumeIndices and getTimepoints).
+ *
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM tags
+ *   of each item.
+ * @param {number[]} sliceIndices The slice index of each item.
+ * @param {number} numberOfSlices The number of distinct slices.
+ * @returns {Timepoints|undefined} The timepoints, undefined if the
+ *   volumes are not separated by a timepoint tag.
+ */
+export function guessTimepoints(elementsList, sliceIndices, numberOfSlices) {
+  return getTimepoints(
+    guessVolumeIndices(elementsList, sliceIndices, numberOfSlices),
+    elementsList);
 }

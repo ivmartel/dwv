@@ -1246,6 +1246,17 @@ export class LayerGroup extends EventTarget {
   }
 
   /**
+   * Check if one of the view layers can scroll its timepoints.
+   *
+   * @returns {boolean} True if one view layer can scroll its timepoints.
+   */
+  canScrollTimepoints() {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().canScrollTimepoints();
+    });
+  }
+
+  /**
    * Check if any layer has a valid position.
    *
    * @returns {boolean} True if any layer has a valid position.

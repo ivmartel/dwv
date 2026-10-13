@@ -382,7 +382,7 @@ export class ScrollDragBehavior extends DragBehavior {
       } else {
         positionHelper.incrementPositionAlongScroll();
       }
-    } else if (drag.passesThresholdX() && layerGroup.moreThanOne(3)) {
+    } else if (drag.passesThresholdX() && layerGroup.canScrollTimepoints()) {
       if (drag.delta.x > 0) {
         positionHelper.incrementPosition(3);
       } else {

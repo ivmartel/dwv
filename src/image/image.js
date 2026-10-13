@@ -17,6 +17,7 @@ import {equalWl} from './windowLevel.js';
  * @import {ColourMap} from './luts.js';
  * @import {Point} from '../math/point.js';
  * @import {MaskImage} from './maskImage.js';
+ * @import {Timepoints} from '../dicom/volumeTypes.js';
  */
 
 
@@ -170,6 +171,20 @@ export class Image extends EventTarget {
   #imageUids;
 
   /**
+   * Image origins, indexed as the image UIDs.
+   *
+   * @type {Point3D[]}
+   */
+  #imageOrigins;
+
+  /**
+   * Multivolume time series timepoints.
+   *
+   * @type {Timepoints|undefined}
+   */
+  #timepoints;
+
+  /**
    * Constant rescale slope and intercept (default).
    *
    * @type {RescaleSlopeAndIntercept}
@@ -282,6 +297,8 @@ export class Image extends EventTarget {
     this.#rawGeometry = null;
     this.#rawBuffer = null;
     this.#imageUids = imageUids;
+    const origins = this.#geometry.getOrigins();
+    this.#imageOrigins = Array.isArray(origins) ? origins.slice() : [origins];
     this.#resamplingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
@@ -351,7 +368,38 @@ export class Image extends EventTarget {
   }
 
   /**
+   * Set the timepoints.
+   *
+   * @param {Timepoints|undefined} timepoints The timepoints, undefined
+   *   if the image is not a time series.
+   */
+  setTimepoints(timepoints) {
+    this.#timepoints = timepoints;
+  }
+
+  /**
+   * Get the timepoints.
+   *
+   * @returns {Timepoints|undefined} The timepoints, undefined if the
+   *   image is not a time series.
+   */
+  getTimepoints() {
+    return this.#timepoints;
+  }
+
+  /**
+   * Check if the image is a multivolume time series.
+   *
+   * @returns {boolean} True if the image is a time series.
+   */
+  isTimeSeries() {
+    return typeof this.#timepoints !== 'undefined';
+  }
+
+  /**
    * Get the image origin for a image UID.
+   * For a time series, the origins of all timepoints are searched,
+   *   otherwise only the ones of the initial timepoint.
    *
    * @param {string} uid The UID.
    * @returns {Point3D|undefined} The origin.
@@ -360,7 +408,9 @@ export class Image extends EventTarget {
     let origin;
     const uidIndex = this.#imageUids.indexOf(uid);
     if (uidIndex !== -1) {
-      const origins = this.getGeometry().getOrigins();
+      const origins = this.isTimeSeries()
+        ? this.#imageOrigins
+        : this.getGeometry().getOrigins();
       origin = origins[uidIndex];
     }
     return origin;
@@ -772,6 +822,8 @@ export class Image extends EventTarget {
     const Ctor = /** @type {ImageConstructor} */ (this.constructor);
     const copy = new Ctor(
       this.getGeometry().clone(), clonedBuffer, this.#imageUids);
+    copy.#imageOrigins = this.#imageOrigins.slice();
+    copy.#timepoints = this.#timepoints;
     // copy the RSI(s)
     if (this.isConstantRSI()) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
@@ -1038,6 +1090,9 @@ export class Image extends EventTarget {
 
     // insert sop instance UIDs
     this.#imageUids.splice(fullSliceIndex, 0, rhs.getImageUid());
+
+    this.#imageOrigins.splice(
+      fullSliceIndex, 0, rhs.getGeometry().getOrigin());
 
     // update window presets
     if (typeof this.#meta.windowPresets !== 'undefined') {

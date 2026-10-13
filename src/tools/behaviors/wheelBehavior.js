@@ -57,7 +57,7 @@ export class ScrollWheelBehavior extends WheelBehavior {
       } else {
         positionHelper.decrementPositionAlongScroll();
       }
-    } else if (layerGroup.moreThanOne(3)) {
+    } else if (layerGroup.canScrollTimepoints()) {
       if (up) {
         positionHelper.incrementPosition(3);
       } else {

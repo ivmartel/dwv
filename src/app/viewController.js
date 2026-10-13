@@ -576,6 +576,16 @@ export class ViewController {
   }
 
   /**
+   * Check if the timepoints (fourth dimension) can be scrolled: only
+   * for a multivolume time series.
+   *
+   * @returns {boolean} True if the timepoints can be scrolled.
+   */
+  canScrollTimepoints() {
+    return this.#view.getImage().isTimeSeries();
+  }
+
+  /**
    * Get the image world (mm) 2D size.
    *
    * @returns {Scalar2D} The 2D size as {x,y}.
@@ -770,6 +780,9 @@ export class ViewController {
         recommendedDisplayFrameRate);
       const size = image.getGeometry().getSize();
       const canScroll3D = size.canScroll3D();
+      if (!canScroll3D && !this.canScrollTimepoints()) {
+        return;
+      }
       const helper = this.getPositionHelper();
 
       this.#playerID = window.setInterval(() => {
