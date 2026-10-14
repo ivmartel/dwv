@@ -48,6 +48,13 @@ export class MaskImage extends Image {
   #labelingThread = null;
 
   /**
+   * The labels from the last labeling, sorted by id then volume.
+   *
+   * @type {Label[]|undefined}
+   */
+  #labels;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {Uint8Array} buffer The mask data as a one dimensional buffer:
    *   one byte per voxel, 0 for background, the segment number otherwise.
@@ -446,6 +453,8 @@ export class MaskImage extends Image {
         return v1.id - v2.id;
       });
 
+    this.#labels = labelsSorted;
+
     this.dispatchEvent(new CustomEvent('labelschanged', {
       detail: {
         labels: /** @type {Label[]} */ (labelsSorted)
@@ -481,6 +490,15 @@ export class MaskImage extends Image {
     }
 
     this.#labelingThread.runOverlap(segments, geometry);
+  }
+
+  /**
+   * Get the labels from the last labeling (see {@link recalculateLabels}).
+   *
+   * @returns {Label[]|undefined} The labels, undefined if not calculated.
+   */
+  getLabels() {
+    return this.#labels;
   }
 
   /**
@@ -543,11 +561,18 @@ export class MaskImage extends Image {
    * Raw values are counted per rescale slope and intercept and rescaled
    * when read from the {@link Histogram}.
    *
+   * If labels are available (see {@link getLabels}), each entry also has
+   * `labelHistograms`: one histogram per label of the segment, made of
+   * the segment voxels between the label min and max Z. Since labels
+   * of the same segment that share slices cannot be separated this way,
+   * `labelHistograms` is not provided in that case.
+   *
    * @param {Image} image The reference image (intensities).
    * @param {string} segmentId Segment tracking UID, or segment number as
    *   string.
-   * @returns {{volume: number, histogram: Histogram}[]} One entry per
-   *   volume.
+   * @returns {{volume: number, histogram: Histogram,
+   *   labelHistograms?: {label: Label, histogram: Histogram}[]}[]} One
+   *   entry per volume.
    */
   getHistogramBySegment(image, segmentId) {
     const segment = this.#findSegmentById(segmentId);
@@ -583,13 +608,18 @@ export class MaskImage extends Image {
     const sliceSize = imageSize.getDimSize(2);
 
     const maskBuffer = this.getBuffer();
-    const result = [];
 
-    for (let v = 0; v < numberOfVolumes; ++v) {
-      const histogram = new Histogram();
-
-      // mask is always 3D spatial: reuse it for each volume
-      for (let k = 0; k < sliceIndices.length; ++k) {
+    /**
+     * Add the image values of the segment voxels of a slice range
+     * to a histogram.
+     *
+     * @param {Histogram} histogram The histogram to fill.
+     * @param {number} v The volume index.
+     * @param {number} kMin The first mask slice index.
+     * @param {number} kMax The last mask slice index (inclusive).
+     */
+    const fillHistogram = (histogram, v, kMin, kMax) => {
+      for (let k = kMin; k <= kMax; ++k) {
         const maskStart = k * sliceSize;
         const imageStart = v * volumeSize + sliceIndices[k] * sliceSize;
 
@@ -607,11 +637,59 @@ export class MaskImage extends Image {
           counts.set(value, (counts.get(value) ?? 0) + 1);
         }
       }
+    };
 
-      result.push({volume: v, histogram});
+    // labels of this segment, if calculated
+    let segmentLabels = this.#labels?.filter(
+      (label) => label.id === segmentValue);
+    // a label histogram uses all the segment voxels of the label slices:
+    // only possible if labels do not share slices
+    if (typeof segmentLabels !== 'undefined' &&
+      this.#haveSharedSlices(segmentLabels)) {
+      logger.debug(
+        'getHistogramBySegment: labels share slices, ' +
+        'no label histograms.');
+      segmentLabels = undefined;
+    }
+
+    const result = [];
+    for (let v = 0; v < numberOfVolumes; ++v) {
+      // mask is always 3D spatial: reuse it for each volume
+      const histogram = new Histogram();
+      fillHistogram(histogram, v, 0, sliceIndices.length - 1);
+
+      /**
+       * @type {{volume: number, histogram: Histogram,
+       *   labelHistograms?: {label: Label, histogram: Histogram}[]}}
+       */
+      const item = {volume: v, histogram};
+      if (typeof segmentLabels !== 'undefined') {
+        item.labelHistograms = segmentLabels.map((label) => {
+          const labelHistogram = new Histogram();
+          fillHistogram(labelHistogram, v, label.minZ, label.maxZ);
+          return {label, histogram: labelHistogram};
+        });
+      }
+      result.push(item);
     }
 
     return result;
+  }
+
+  /**
+   * Check if some labels share slices (overlapping min/max Z ranges).
+   *
+   * @param {Label[]} labels The labels.
+   * @returns {boolean} True if at least two labels share a slice.
+   */
+  #haveSharedSlices(labels) {
+    const sorted = labels.slice().sort((a, b) => a.minZ - b.minZ);
+    for (let i = 1; i < sorted.length; ++i) {
+      if (sorted[i].minZ <= sorted[i - 1].maxZ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

@@ -10,6 +10,22 @@ import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 
+// run the labeling synchronously, without web workers
+vi.mock('../../src/image/labelingThread.js', async (importOriginal) => {
+  const original = await importOriginal();
+  const {LabelingFilter} = await import('../../src/image/labelingFilter.js');
+  class LabelingThread {
+    ondone(_event) {}
+    run(buffer, geometry) {
+      const filter = new LabelingFilter();
+      this.ondone({
+        data: filter.run(original.generateWorkerMessage(buffer, geometry))
+      });
+    }
+  }
+  return {...original, LabelingThread};
+});
+
 /**
  * @import {Histogram} from '../../src/image/histogram.js';
  */
@@ -566,6 +582,82 @@ describe('MaskImage', () => {
         () => mask.getHistogramBySegment(image, '1'),
         /geometries are not compatible/
       );
+    }
+  );
+
+  test('getLabels is undefined before labeling', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+    const mask = new MaskImage(geom, new Uint8Array([1, 0]), ['0']);
+
+    assert.isUndefined(mask.getLabels());
+  });
+
+  test(
+    'getHistogramBySegment adds a histogram per label after labeling',
+    () => {
+      // 4 slices: segment 1 on slice 0 and on slices 2-3 (two labels)
+      const origins = [0, 1, 2, 3].map((z) => new Point3D(0, 0, z));
+      const geom = new Geometry(
+        origins, new Size([2, 1, 4]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom,
+        new Uint8Array([1, 0, 0, 0, 1, 0, 1, 1]),
+        ['0', '1', '2', '3']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        geom,
+        new Uint8Array([10, 99, 99, 99, 20, 99, 30, 40]),
+        ['0', '1', '2', '3']);
+
+      // no labels yet
+      const before = mask.getHistogramBySegment(image, '1');
+      assert.isUndefined(before[0].labelHistograms, 'no label histograms');
+
+      mask.recalculateLabels();
+      const labels = mask.getLabels();
+      assert.equal(labels.length, 2, 'two labels');
+
+      const result = mask.getHistogramBySegment(image, '1');
+      assert.equal(result.length, 1, 'one volume');
+      assert.equal(result[0].histogram.getTotal(), 4, 'segment total');
+
+      const labelHistograms = result[0].labelHistograms;
+      assert.equal(labelHistograms.length, 2, 'one histogram per label');
+      const values = labelHistograms.map(
+        (item) => item.histogram.getEntries().map((entry) => entry.value));
+      values.sort((a, b) => a[0] - b[0]);
+      assert.deepEqual(values, [[10], [20, 30, 40]], 'label values');
+      for (const item of labelHistograms) {
+        assert.isTrue(labels.includes(item.label), 'label reference');
+      }
+    }
+  );
+
+  test(
+    'getHistogramBySegment has no label histograms if labels share slices',
+    () => {
+      // 2 slices: segment 1 on voxels 0 and 2 of each slice,
+      // two labels (columns) that share both slices
+      const origins = [0, 1].map((z) => new Point3D(0, 0, z));
+      const geom = new Geometry(
+        origins, new Size([3, 1, 2]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 0, 1, 1, 0, 1]), ['0', '1']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        geom, new Uint8Array([10, 99, 20, 30, 99, 40]), ['0', '1']);
+
+      mask.recalculateLabels();
+      assert.equal(mask.getLabels().length, 2, 'two labels');
+
+      const result = mask.getHistogramBySegment(image, '1');
+      assert.equal(result[0].histogram.getTotal(), 4, 'segment total');
+      assert.isUndefined(result[0].labelHistograms, 'no label histograms');
     }
   );
 
