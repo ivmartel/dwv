@@ -12,7 +12,7 @@ function viewerSetup() {
   const service = new ViewerService();
   service.registerListeners();
 
-  // viewer UI (after app listeners: relies on rendered data at load)
+  // viewer UI (load events come from the service, after its handling)
   const viewerUI = new ViewerUI(service);
   viewerUI.setup();
   viewerUI.registerListeners();

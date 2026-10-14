@@ -278,27 +278,6 @@ export class ViewerUI {
   #dataTable;
 
   /**
-   * Number of data to load.
-   *
-   * @type {number}
-   */
-  #numberOfDataToLoad = 0;
-
-  /**
-   * Number of data that finished loading.
-   *
-   * @type {number}
-   */
-  #numberOfLoadendData = 0;
-
-  /**
-   * Load progress per data id.
-   *
-   * @type {number[]}
-   */
-  #dataLoadProgress = [];
-
-  /**
    * @param {ViewerService} service The associated viewer service.
    */
   constructor(service) {
@@ -366,48 +345,15 @@ export class ViewerUI {
    * Bind app to ui.
    */
   registerListeners() {
-    this.#service.addEventListener('loadstart', (event) => {
-      // update load counters
-      if (this.#numberOfDataToLoad === this.#numberOfLoadendData) {
-        this.#numberOfDataToLoad = 0;
-        this.#numberOfLoadendData = 0;
-        // reset progress array
-        this.#dataLoadProgress.length = 0;
-      }
-      ++this.#numberOfDataToLoad;
-      // remove post-load listeners
-      const dataCtrl = this.#service.getDataController();
-      if (dataCtrl.getDataIds().length !== 0) {
-        this.#removePostLoadListeners();
-      }
-      // add new data view config for new data
-      this.#addNewDataViewConfig(event.detail.dataid);
-    });
-    this.#service.addEventListener('loadprogress', (event) => {
-      if (event.detail.total > 0) {
-        this.#dataLoadProgress[event.detail.dataid] =
-          Math.ceil((event.detail.loaded / event.detail.total) * 100);
-        const sumReducer = function (sum, value) {
-          return sum + value;
-        };
-        const progressElement = document.getElementById('loadprogress');
-        progressElement.value =
-          this.#dataLoadProgress.reduce(sumReducer) /
-          this.#numberOfDataToLoad;
-      }
-    });
-    this.#service.addEventListener('loadend', () => {
-      // update load counter
-      ++this.#numberOfLoadendData;
-    });
-    this.#service.addEventListener('load', () => {
-      // update sliders with new data info
-      // (has to be after full load)
-      this.#initSliders(this.#getSelectedLayout());
-      // add post-load listeners
-      this.#addPostLoadListeners();
-    });
+    this.#registerLoadListeners();
+    this.#registerOtherListeners();
+  }
 
+  /**
+   * Register the other listeners: UI update at first render,
+   * position change and filter shortcut.
+   */
+  #registerOtherListeners() {
     // update UI at first render of first data
     const onRenderEnd = () => {
       // set app tool
@@ -467,6 +413,33 @@ export class ViewerUI {
           run: true
         });
       }
+    });
+  }
+
+  /**
+   * Register the load listeners: load progress display,
+   * data view config and post-load listeners.
+   */
+  #registerLoadListeners() {
+    this.#service.addEventListener('loadstart', (event) => {
+      // remove post-load listeners
+      const dataCtrl = this.#service.getDataController();
+      if (dataCtrl.getDataIds().length !== 0) {
+        this.#removePostLoadListeners();
+      }
+      // add new data view config for new data
+      this.#addNewDataViewConfig(event.detail.dataid);
+    });
+    this.#service.addEventListener('loadprogress', () => {
+      const progressElement = document.getElementById('loadprogress');
+      progressElement.value = this.#service.getLoadProgress();
+    });
+    this.#service.addEventListener('load', () => {
+      // update sliders with new data info
+      // (has to be after full load)
+      this.#initSliders(this.#getSelectedLayout());
+      // add post-load listeners
+      this.#addPostLoadListeners();
     });
   }
 

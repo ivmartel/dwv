@@ -18,6 +18,15 @@ import {overlayConfig} from './overlays.js';
  * @import {Matrix33} from '../../src/math/matrix.js';
  */
 
+// load event types used by the UI: re-dispatched by the service
+// after its own handling (other load events are directly the app ones)
+const loadEventTypes = [
+  'loadstart',
+  'loadprogress',
+  'loadend',
+  'load'
+];
+
 // view on first load item flag
 const viewOnFirstLoadItem = true;
 
@@ -104,8 +113,10 @@ function setupCustom() {
 /**
  * Viewer service: facade to the dwv App, the viewer UI
  * should not access the App directly.
+ * Load events are re-dispatched by the service after its own handling,
+ * other events are directly the App ones.
  */
-export class ViewerService {
+export class ViewerService extends EventTarget {
 
   /**
    * The associated application.
@@ -115,9 +126,38 @@ export class ViewerService {
   #app;
 
   /**
+   * Number of data to load.
+   *
+   * @type {number}
+   */
+  #numberOfDataToLoad = 0;
+
+  /**
+   * Number of data that finished loading.
+   *
+   * @type {number}
+   */
+  #numberOfLoadendData = 0;
+
+  /**
+   * Load progress per data id.
+   *
+   * @type {number[]}
+   */
+  #dataLoadProgress = [];
+
+  /**
+   * Overall load progress, in percent.
+   *
+   * @type {number}
+   */
+  #loadProgress = 0;
+
+  /**
    * Create the app with the viewer configuration.
    */
   constructor() {
+    super();
     // logger level (optional)
     logger.level = logger.levels.DEBUG;
 
@@ -148,6 +188,36 @@ export class ViewerService {
    * keyboard shortcuts and window resize.
    */
   registerListeners() {
+    this.#registerLoadListeners();
+    this.#registerOtherListeners();
+  }
+
+  /**
+   * Get the overall load progress, averaged over the data
+   * of the current load batch.
+   *
+   * @returns {number} The progress, in percent.
+   */
+  getLoadProgress() {
+    return this.#loadProgress;
+  }
+
+  /**
+   * Re-dispatch an app event as a service event.
+   *
+   * @param {CustomEvent} event The app event.
+   */
+  #redispatch = (event) => {
+    this.dispatchEvent(new CustomEvent(event.type, {detail: event.detail}));
+  };
+
+  /**
+   * Register the load listeners: logging, load counters and progress,
+   * load abort (on error or via keyboard shortcut) and render
+   * if not done at first load item.
+   * The UI used load events are re-dispatched after handling.
+   */
+  #registerLoadListeners() {
     // abort shortcut handler
     const abortShortcut = (event) => {
       if (event.key === 'a') {
@@ -166,13 +236,37 @@ export class ViewerService {
       }
     });
     this.#app.addEventListener('loadstart', (event) => {
+      // log
       console.log('%c----------------', 'color: teal;');
       console.log(
         `load source data:${event.detail.dataid}`, event.detail.source);
       // timer
       console.time(`load-data-${event.detail.dataid}`);
+      // update load counters
+      if (this.#numberOfDataToLoad === this.#numberOfLoadendData) {
+        this.#numberOfDataToLoad = 0;
+        this.#numberOfLoadendData = 0;
+        // reset progress
+        this.#dataLoadProgress.length = 0;
+        this.#loadProgress = 0;
+      }
+      ++this.#numberOfDataToLoad;
       // add abort shortcut
       window.addEventListener('keydown', abortShortcut);
+      this.#redispatch(event);
+    });
+    this.#app.addEventListener('loadprogress', (event) => {
+      if (event.detail.total > 0) {
+        this.#dataLoadProgress[event.detail.dataid] =
+          Math.ceil((event.detail.loaded / event.detail.total) * 100);
+        const sumReducer = function (sum, value) {
+          return sum + value;
+        };
+        this.#loadProgress =
+          this.#dataLoadProgress.reduce(sumReducer) /
+          this.#numberOfDataToLoad;
+      }
+      this.#redispatch(event);
     });
     this.#app.addEventListener('loaditem', (event) => {
       if (typeof event.detail.warn !== 'undefined') {
@@ -180,9 +274,12 @@ export class ViewerService {
       }
     });
     this.#app.addEventListener('loadend', (event) => {
+      // update load counter
+      ++this.#numberOfLoadendData;
       console.timeEnd(`load-data-${event.detail.dataid}`);
       // remove abort shortcut
       window.removeEventListener('keydown', abortShortcut);
+      this.#redispatch(event);
     });
     this.#app.addEventListener('load', (event) => {
       // log meta data
@@ -191,8 +288,16 @@ export class ViewerService {
       if (!viewOnFirstLoadItem) {
         this.#app.getStageController().render(event.detail.dataid);
       }
+      this.#redispatch(event);
     });
+  }
 
+  /**
+   * Register the other listeners: filter, labeling and resampling
+   * logging, warnings, keyboard shortcuts and window resize.
+   */
+  #registerOtherListeners() {
+    // filter
     this.#app.addEventListener('filterrun', (event) => {
       console.log('filterrun', event);
     });
@@ -231,23 +336,32 @@ export class ViewerService {
   // events
 
   /**
-   * Add an app event listener.
+   * Add an event listener: load events are listened to on the service,
+   * other events directly on the app.
    *
    * @param {string} type The event type.
    * @param {Function} callback The event callback.
    */
   addEventListener(type, callback) {
-    this.#app.addEventListener(type, callback);
+    if (loadEventTypes.includes(type)) {
+      super.addEventListener(type, callback);
+    } else {
+      this.#app.addEventListener(type, callback);
+    }
   }
 
   /**
-   * Remove an app event listener.
+   * Remove an event listener.
    *
    * @param {string} type The event type.
    * @param {Function} callback The event callback.
    */
   removeEventListener(type, callback) {
-    this.#app.removeEventListener(type, callback);
+    if (loadEventTypes.includes(type)) {
+      super.removeEventListener(type, callback);
+    } else {
+      this.#app.removeEventListener(type, callback);
+    }
   }
 
   // controllers
