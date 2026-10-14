@@ -2,7 +2,7 @@ import {Orientation} from '../../src/math/orientation.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
 import {luts} from '../../src/image/luts.js';
 
-import {getControlDiv} from './viewer.ui.js';
+import {getControlDiv} from './viewer.utils.js';
 
 /**
  * @import {App} from '../../src/app/application.js';

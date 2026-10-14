@@ -23,7 +23,7 @@ import {
 import {
   getHtmlId,
   getRootFromHtmlId
-} from './viewer.ui.js';
+} from './viewer.utils.js';
 import {
   getButton,
   setButtonPressed,
