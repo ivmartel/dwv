@@ -664,6 +664,21 @@ export function hasDicomPrefix(buffer: ArrayBuffer): boolean;
 // @public
 export function hexToRgb(hexStr: string): RGB;
 
+// @public
+export class Histogram {
+    add(rawValue: number, rsi: RescaleSlopeAndIntercept): void;
+    getCountInRescaledRange(min?: number, max?: number): number;
+    // Warning: (ae-forgotten-export) The symbol "HistogramEntry" needs to be exported by the entry point index.d.ts
+    getEntries(): HistogramEntry[];
+    getIntervalPercentages(thresholds: number[]): number[];
+    getRange(): NumberRange | undefined;
+    getRawCounts(rsi: RescaleSlopeAndIntercept): Map<number, number>;
+    getRescaledRange(): NumberRange | undefined;
+    // Warning: (ae-forgotten-export) The symbol "Statistics" needs to be exported by the entry point index.d.ts
+    getStats(): Statistics | undefined;
+    getTotal(): number;
+}
+
 // @public (undocumented)
 export namespace i18n {
     export function t(key: string): string | undefined;
@@ -676,7 +691,6 @@ class Image_2 extends EventTarget {
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
     appendSlice(rhs: Image_2): void;
     calculateDataRange(): object;
-    calculateHistogram(): object;
     calculateRescaledDataRange(): object;
     canAppendSlice(rhs: Image_2): BooleanResult;
     canQuantify(): boolean;
@@ -694,7 +708,7 @@ class Image_2 extends EventTarget {
     getGeometry(): Geometry;
     // @deprecated
     getHasOverlap(): boolean;
-    getHistogram(): any[];
+    getHistogram(): Histogram;
     getImageUid(index?: Index): string;
     getInitialIndex(): Index;
     getMeta(): Record<string, any>;
@@ -793,6 +807,8 @@ export class Label {
     height: NumberValue;
     id: number;
     largestSliceZ: number;
+    maxZ: number;
+    minZ: number;
     volume: NumberValue;
 }
 
@@ -903,6 +919,15 @@ export class MaskImage extends Image_2 {
     constructor(geometry: Geometry, buffer: Uint8Array, imageUids?: string[], segmentCollection?: SegmentCollection);
     clone(): MaskImage;
     getContour(): ImageContour;
+    getHistogramBySegment(image: Image_2, segmentId: string): {
+        volume: number;
+        histogram: Histogram;
+        labelHistograms?: {
+            label: Label;
+            histogram: Histogram;
+        }[];
+    }[];
+    getLabels(): Label[] | undefined;
     getMaskReferencedSeriesUID(): string | undefined;
     getOffsets(value: number | RGB): number[];
     getSegmentCollection(): SegmentCollection;
