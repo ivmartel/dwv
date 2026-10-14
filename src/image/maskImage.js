@@ -493,7 +493,8 @@ export class MaskImage extends Image {
   }
 
   /**
-   * Get the labels from the last labeling (see {@link recalculateLabels}).
+   * Get the labels from the last labeling (see
+   * {@link MaskImage#recalculateLabels}).
    *
    * @returns {Label[]|undefined} The labels, undefined if not calculated.
    */
@@ -561,8 +562,8 @@ export class MaskImage extends Image {
    * Raw values are counted per rescale slope and intercept and rescaled
    * when read from the {@link Histogram}.
    *
-   * If labels are available (see {@link getLabels}), each entry also has
-   * `labelHistograms`: one histogram per label of the segment, made of
+   * If labels are available (see {@link MaskImage#getLabels}), each entry
+   * also has `labelHistograms`: one histogram per label of the segment, made of
    * the segment voxels between the label min and max Z. Since labels
    * of the same segment that share slices cannot be separated this way,
    * `labelHistograms` is not provided in that case.
