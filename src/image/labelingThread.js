@@ -142,6 +142,8 @@ export class LabelingThread {
         const sliceOffset = minSliceBySegNumber.get(label.id) ?? 0;
         label.centroidIndex[2] += sliceOffset;
         label.largestSliceZ += sliceOffset;
+        label.minZ += sliceOffset;
+        label.maxZ += sliceOffset;
       }
       allLabels.push(...event.data.labels);
     };

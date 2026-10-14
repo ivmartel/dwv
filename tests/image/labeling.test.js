@@ -256,6 +256,16 @@ describe('image', () => {
       'Expected largest slice Z for label diameters'
     );
     assert.equal(
+      labels2[0].minZ,
+      0,
+      'Expected min Z for label diameters'
+    );
+    assert.equal(
+      labels2[0].maxZ,
+      2,
+      'Expected max Z for label diameters'
+    );
+    assert.equal(
       major2.offset1,
       43,
       'Expected major offset 1 for label diameters'

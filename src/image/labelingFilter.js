@@ -364,6 +364,8 @@ export class LabelingFilter {
         centroidIndex: index,
         count: detailledInfo.count,
         largestSliceZ,
+        minZ: detailledInfo.minZ,
+        maxZ: detailledInfo.maxZ,
         height: (detailledInfo.maxZ - detailledInfo.minZ + 1) * spacing[2]
       };
     }

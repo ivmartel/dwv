@@ -109,4 +109,18 @@ export class Label {
    * @type {number}
    */
   largestSliceZ;
+
+  /**
+   * The minimum Z index of the segment.
+   *
+   * @type {number}
+   */
+  minZ;
+
+  /**
+   * The maximum Z index of the segment.
+   *
+   * @type {number}
+   */
+  maxZ;
 }
