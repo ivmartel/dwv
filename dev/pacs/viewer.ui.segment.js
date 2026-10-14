@@ -35,6 +35,7 @@ import {
  * @import {MaskSegment} from '../../src/dicom/dicomSegment.js';
  * @import {RGB} from '../../src/utils/colour.js';
  * @import {Statistics} from '../../src/math/stats.js';
+ * @import {Label} from '../../src/image/label.js';
  */
 
 /**
@@ -845,6 +846,20 @@ export class SegmentationUI {
       const segment2 = getSegment(indices.segmentNumber, segmentation.segments);
       const labelsInfo = this.#getLabelsInfo(segment2, segmentationIndex);
 
+      const statsToString = (stats) => {
+        return `min ${stats.min.toPrecision(4)}, ` +
+          `mean ${stats.mean.toPrecision(4)}, ` +
+          `max ${stats.max.toPrecision(4)}`;
+      };
+      const statsList = this.#getHistogramStats(segment2, segmentation);
+      // only show the volume index for multi volume data
+      const intensityName = (volume) => {
+        return statsList.length > 1 ? `intensity (#${volume})` : 'intensity';
+      };
+      // same label order as labels info
+      const segmentLabels = segmentation.labels.filter(
+        (label) => label.id === segment2.number);
+
       let qStr = 'Quantification:\n';
       let i = 0;
       for (const labelInfo of labelsInfo) {
@@ -857,15 +872,21 @@ export class SegmentationUI {
           }${i18n.t(quant.unit)}`;
           qStr += '\n';
         }
+        // label histogram stats, if available
+        for (const item of statsList) {
+          const labelItem = item.labelStats?.find(
+            (element) => element.label === segmentLabels[i]);
+          if (typeof labelItem !== 'undefined') {
+            qStr += `  - ${intensityName(item.volume)}: ` +
+              `${statsToString(labelItem.stats)}\n`;
+          }
+        }
         ++i;
       }
-      const statsList = this.#getHistogramStats(segment2, segmentation);
+      // global histogram stats
       for (const item of statsList) {
-        const stats = item.stats;
-        qStr += `- volume #${item.volume}: ` +
-          `min ${stats.min.toPrecision(4)}, ` +
-          `mean ${stats.mean.toPrecision(4)}, ` +
-          `max ${stats.max.toPrecision(4)}\n`;
+        qStr += `- ${intensityName(item.volume)}: ` +
+          `${statsToString(item.stats)}\n`;
       }
       alert(qStr);
     };
@@ -1118,8 +1139,10 @@ export class SegmentationUI {
    *
    * @param {MaskSegment} segment The segment.
    * @param {Segmentation} segmentation The segmentation.
-   * @returns {{volume: number, stats: Statistics}[]} The statistics,
-   *   empty if the reference image is not available.
+   * @returns {{volume: number, stats: Statistics,
+   *   labelStats?: {label: Label, stats: Statistics}[]}[]} The statistics,
+   *   with per label statistics if available, empty if the reference
+   *   image is not available.
    */
   #getHistogramStats(segment, segmentation) {
     const dataCtrl = this.#app.getDataController();
@@ -1150,9 +1173,23 @@ export class SegmentationUI {
     const res = [];
     for (const item of volumeHistograms) {
       const stats = item.histogram.getStats();
-      if (typeof stats !== 'undefined') {
-        res.push({volume: item.volume, stats});
+      if (typeof stats === 'undefined') {
+        continue;
       }
+      const resItem = {volume: item.volume, stats};
+      if (typeof item.labelHistograms !== 'undefined') {
+        resItem.labelStats = [];
+        for (const labelItem of item.labelHistograms) {
+          const labelStats = labelItem.histogram.getStats();
+          if (typeof labelStats !== 'undefined') {
+            resItem.labelStats.push({
+              label: labelItem.label,
+              stats: labelStats
+            });
+          }
+        }
+      }
+      res.push(resItem);
     }
     return res;
   }
