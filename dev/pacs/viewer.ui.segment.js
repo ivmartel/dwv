@@ -31,7 +31,7 @@ import {
 } from './viewer.ui.icons.js';
 
 /**
- * @import {App} from '../../src/app/application.js';
+ * @import {ViewerService} from './viewer.service.js';
  * @import {MaskSegment} from '../../src/dicom/dicomSegment.js';
  * @import {RGB} from '../../src/utils/colour.js';
  * @import {Statistics} from '../../src/math/stats.js';
@@ -222,11 +222,11 @@ function splitSegmentHtmlId(segmentId) {
 export class SegmentationUI {
 
   /**
-   * The associated application.
+   * The associated viewer service.
    *
-   * @type {App}
+   * @type {ViewerService}
    */
-  #app;
+  #service;
 
   /**
    * The root document.
@@ -257,12 +257,12 @@ export class SegmentationUI {
   #withMerge = true;
 
   /**
-   * @param {App} app The associated application.
+   * @param {ViewerService} service The associated viewer service.
    * @param {Document} [rootDoc] Optional root document,
    *   defaults to `window.document`.
    */
-  constructor(app, rootDoc) {
-    this.#app = app;
+  constructor(service, rootDoc) {
+    this.#service = service;
     if (typeof rootDoc !== 'undefined') {
       this.#rootDoc = rootDoc;
     }
@@ -272,8 +272,8 @@ export class SegmentationUI {
    * Bind app to ui.
    */
   registerListeners() {
-    this.#app.addEventListener('dataadd', this.#onDataAdd);
-    this.#app.addEventListener('labelschanged', this.#onLabelsChanged);
+    this.#service.addEventListener('dataadd', this.#onDataAdd);
+    this.#service.addEventListener('labelschanged', this.#onLabelsChanged);
   };
 
   /**
@@ -314,7 +314,7 @@ export class SegmentationUI {
    * @param {number} dataId The data id.
    */
   #calculateLabels(dataId) {
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const maskData = dataCtrl.get(dataId);
     if (!maskData) {
       throw new Error(
@@ -375,7 +375,7 @@ export class SegmentationUI {
    */
   #onDataAdd = (event) => {
     const dataId = event.detail.dataid;
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const maskImage = dataCtrl.get(dataId).image;
 
     if (typeof maskImage !== 'undefined' && maskImage.isMask()) {
@@ -524,7 +524,7 @@ export class SegmentationUI {
    */
   #appSelectSegment(segmentNumber, segmentation) {
     segmentation.selectedSegmentNumber = segmentNumber;
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
 
     // add segment if not present
     const data = dataCtrl.get(segmentation.dataId);
@@ -553,7 +553,7 @@ export class SegmentationUI {
       features.createMask = true;
     }
     console.log('set tool features [add]', features);
-    this.#app.setToolFeatures(features);
+    this.#service.setToolFeatures(features);
   }
 
   /**
@@ -571,7 +571,7 @@ export class SegmentationUI {
       features.maskDataId = segmentation.dataId;
     }
     console.log('set tool features [del]', features);
-    this.#app.setToolFeatures(features);
+    this.#service.setToolFeatures(features);
   }
 
   /**
@@ -608,7 +608,7 @@ export class SegmentationUI {
       // update colours
       const newRgbColour = hexToRgb(newHexColour);
       // get segment and mask
-      const dataCtrl = this.#app.getDataController();
+      const dataCtrl = this.#service.getDataController();
       const maskData = dataCtrl.get(segmentation.dataId);
       // change if possible
       if (typeof maskData !== 'undefined') {
@@ -627,7 +627,7 @@ export class SegmentationUI {
         // execute command
         if (chgCmd.isValid()) {
           chgCmd.execute();
-          const undoCtrl = this.#app.getUndoController();
+          const undoCtrl = this.#service.getUndoController();
           undoCtrl.addToUndoStack(chgCmd);
         }
       }
@@ -660,7 +660,7 @@ export class SegmentationUI {
 
     if (typeof label !== 'undefined') {
       const dataId = segmentation.dataId;
-      const stgCtrl = this.#app.getStageController();
+      const stgCtrl = this.#service.getStageController();
       const drawLayers = stgCtrl.getViewLayersByDataId(dataId);
       for (const layer of drawLayers) {
         layer.setCurrentPosition(label.centroid);
@@ -695,7 +695,7 @@ export class SegmentationUI {
       segViewHelper.addToHidden(segment.number);
     }
     // apply hidden
-    const stageCtrl = this.#app.getStageController();
+    const stageCtrl = this.#service.getStageController();
     const vls = stageCtrl.getViewLayersByDataId(segmentation.dataId);
     if (vls.length === 0) {
       console.warn('No layers to show/hide seg');
@@ -737,7 +737,7 @@ export class SegmentationUI {
     const nextItem = listItem.nextSibling;
 
     // get mask
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const data = dataCtrl.get(segmentation.dataId);
     // delete if possible
     if (typeof data !== 'undefined') {
@@ -757,7 +757,7 @@ export class SegmentationUI {
       // execute command
       if (delCmd.isValid()) {
         delCmd.execute();
-        const undoCtrl = this.#app.getUndoController();
+        const undoCtrl = this.#service.getUndoController();
         undoCtrl.addToUndoStack(delCmd);
       }
     } else {
@@ -1013,7 +1013,7 @@ export class SegmentationUI {
     const segmentation = _segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
     // save
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const maskData = dataCtrl.get(dataId);
     if (typeof maskData === 'undefined') {
       throw new Error('Cannot save SEG without mask image');
@@ -1036,7 +1036,7 @@ export class SegmentationUI {
     const segmentation = _segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
     // save
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const maskData = dataCtrl.get(dataId);
     if (typeof maskData === 'undefined') {
       throw new Error('Cannot save RTSS without mask image');
@@ -1054,7 +1054,7 @@ export class SegmentationUI {
     // get format
     const asRtss = target.id.startsWith(prefixes.mergeSaveRtss);
     // merge first two masks
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const maskId0 = _segmentations[0].dataId;
     const maskImage0 = dataCtrl.get(maskId0).image;
     const maskId1 = _segmentations[1].dataId;
@@ -1080,7 +1080,7 @@ export class SegmentationUI {
    * @param {boolean} asRtss Whether to save as RTSS.
    */
   #saveData(maskImage, fileName, asRtss = false) {
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
     if (typeof refSeriesUID === 'undefined') {
       throw new Error('Cannot save without referenced UID');
@@ -1145,7 +1145,7 @@ export class SegmentationUI {
    *   image is not available.
    */
   #getHistogramStats(segment, segmentation) {
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const maskData = dataCtrl.get(segmentation.dataId);
     if (typeof maskData === 'undefined') {
       return [];
@@ -1383,7 +1383,7 @@ export class SegmentationUI {
     overlapButton.onclick = (/*event*/) => {
       const segment0 = overlapSelect0.value;
       const segment1 = overlapSelect1.value;
-      const dataCtrl = this.#app.getDataController();
+      const dataCtrl = this.#service.getDataController();
       const maskImage0 = dataCtrl.get(segment0).image;
       const maskImage1 = dataCtrl.get(segment1).image;
       const segHelper0 = new MaskSegmentHelper(maskImage0);

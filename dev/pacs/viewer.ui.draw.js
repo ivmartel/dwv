@@ -1,7 +1,7 @@
 import {DicomCode} from '../../src/dicom/dicomCode.js';
 
 /**
- * @import {App} from '../../src/app/application.js';
+ * @import {ViewerService} from './viewer.service.js';
  */
 
 /**
@@ -10,11 +10,11 @@ import {DicomCode} from '../../src/dicom/dicomCode.js';
 export class DrawToolUI {
 
   /**
-   * The associated application.
+   * The associated viewer service.
    *
-   * @type {App}
+   * @type {ViewerService}
    */
-  #app;
+  #service;
 
   /**
    * The tool configuration.
@@ -24,11 +24,11 @@ export class DrawToolUI {
   #toolConfig;
 
   /**
-   * @param {App} app The associated application.
+   * @param {ViewerService} service The associated viewer service.
    * @param {object} toolConfig The tool configuration.
    */
-  constructor(app, toolConfig) {
-    this.#app = app;
+  constructor(service, toolConfig) {
+    this.#service = service;
     this.#toolConfig = toolConfig;
   }
 
@@ -99,7 +99,7 @@ export class DrawToolUI {
 
     shapeSelect.onchange = (event) => {
       const element = event.target;
-      this.#app.setToolFeatures({shapeName: element.value});
+      this.#service.setToolFeatures({shapeName: element.value});
     };
 
     const autoColourInput = document.createElement('input');
@@ -118,13 +118,13 @@ export class DrawToolUI {
 
     autoColourInput.onchange = (event) => {
       const element = event.target;
-      this.#app.setToolFeatures({autoShapeColour: element.checked});
+      this.#service.setToolFeatures({autoShapeColour: element.checked});
       colourInput.disabled = element.checked;
     };
 
     colourInput.onchange = (event) => {
       const element = event.target;
-      this.#app.setToolFeatures({shapeColour: element.value});
+      this.#service.setToolFeatures({shapeColour: element.value});
     };
 
     const res = document.createElement('span');

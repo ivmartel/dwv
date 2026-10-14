@@ -1,7 +1,7 @@
 import {getControlDiv} from './viewer.utils.js';
 
 /**
- * @import {App} from '../../src/app/application.js';
+ * @import {ViewerService} from './viewer.service.js';
  */
 
 /**
@@ -10,17 +10,17 @@ import {getControlDiv} from './viewer.utils.js';
 export class BrushToolUI {
 
   /**
-   * The associated application.
+   * The associated viewer service.
    *
-   * @type {App}
+   * @type {ViewerService}
    */
-  #app;
+  #service;
 
   /**
-   * @param {App} app The associated application.
+   * @param {ViewerService} service The associated viewer service.
    */
-  constructor(app, /*toolConfig*/) {
-    this.#app = app;
+  constructor(service, /*toolConfig*/) {
+    this.#service = service;
   }
 
   /**
@@ -28,7 +28,7 @@ export class BrushToolUI {
    */
   registerListeners() {
     // listen to brush size event (via shortcut)
-    this.#app.addEventListener('brushsizechange', this.#onBrushSizeChange);
+    this.#service.addEventListener('brushsizechange', this.#onBrushSizeChange);
   };
 
   /**
@@ -53,12 +53,12 @@ export class BrushToolUI {
 
     // brush size input
     const sizeCallback = (size) => {
-      this.#app.setToolFeatures({brushSize: size});
+      this.#service.setToolFeatures({brushSize: size});
       //this.updateBrushCursorSize(size);
     };
     // set default size
     const defaultCursorSize = 10;
-    this.#app.setToolFeatures({brushSize: defaultCursorSize});
+    this.#service.setToolFeatures({brushSize: defaultCursorSize});
     // append range
     const controlDiv = getControlDiv(
       'brush-size',
@@ -80,7 +80,7 @@ export class BrushToolUI {
         createMask: true
       };
       console.log('set tool features [add-default]', features);
-      this.#app.setToolFeatures(features);
+      this.#service.setToolFeatures(features);
     }
 
     return res;
@@ -107,7 +107,7 @@ export class BrushToolUI {
    * @param {number} _brushSize The new size.
    */
   // #updateBrushCursorSize(_brushSize) {
-  //   const stgCtrl = this.#app.getStageController();
+  //   const stgCtrl = this.#service.getStageController();
   //   const lg = stgCtrl.getActiveLayerGroup();
   //   if (typeof lg === 'undefined') {
   //     throw new Error('No active layer group for brush cursor');

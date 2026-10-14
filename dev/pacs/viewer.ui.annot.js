@@ -15,7 +15,7 @@ import {
 } from './viewer.ui.icons.js';
 
 /**
- * @import {App} from '../../src/app/application.js';
+ * @import {ViewerService} from './viewer.service.js';
  * @import {Annotation} from '../../src/image/annotation.js';
  * @import {AnnotationGroup} from '../../src/image/annotationGroup.js';
  */
@@ -65,11 +65,11 @@ function splitAnnotationDivId(divId) {
 export class AnnotationUI {
 
   /**
-   * The associated application.
+   * The associated viewer service.
    *
-   * @type {App}
+   * @type {ViewerService}
    */
-  #app;
+  #service;
 
   /**
    * The root document.
@@ -79,12 +79,12 @@ export class AnnotationUI {
   #rootDoc = document;
 
   /**
-   * @param {App} app The associated application.
+   * @param {ViewerService} service The associated viewer service.
    * @param {Document} [rootDoc] Optional root document,
    *   defaults to `window.document`.
    */
-  constructor(app, rootDoc) {
-    this.#app = app;
+  constructor(service, rootDoc) {
+    this.#service = service;
     if (typeof rootDoc !== 'undefined') {
       this.#rootDoc = rootDoc;
     }
@@ -94,11 +94,13 @@ export class AnnotationUI {
    * Bind app to ui.
    */
   registerListeners() {
-    this.#app.addEventListener('dataadd', this.#onDataAdd);
-    this.#app.addEventListener('drawlayeradd', this.#onDrawLayerAdd);
-    this.#app.addEventListener('annotationadd', this.#onAnnotationAdd);
-    this.#app.addEventListener('annotationupdate', this.#onAnnotationUpdate);
-    this.#app.addEventListener('annotationremove', this.#onAnnotationRemove);
+    this.#service.addEventListener('dataadd', this.#onDataAdd);
+    this.#service.addEventListener('drawlayeradd', this.#onDrawLayerAdd);
+    this.#service.addEventListener('annotationadd', this.#onAnnotationAdd);
+    this.#service.addEventListener(
+      'annotationupdate', this.#onAnnotationUpdate);
+    this.#service.addEventListener(
+      'annotationremove', this.#onAnnotationRemove);
   };
 
   /**
@@ -145,7 +147,7 @@ export class AnnotationUI {
       document.createTextNode('Add annotation group'));
     addAnnotationGroupButton.onclick = () => {
       const divId = 'layerGroup0';
-      const stgCtrl = this.#app.getStageController();
+      const stgCtrl = this.#service.getStageController();
       const layerGroup = stgCtrl.getLayerGroupByDivId(divId);
       // add annotation group
       const viewLayer = layerGroup.getActiveViewLayer();
@@ -156,9 +158,9 @@ export class AnnotationUI {
         return;
       }
       const refDataId = viewLayer.getDataId();
-      const data = this.#app.createAnnotationData(refDataId);
+      const data = this.#service.createAnnotationData(refDataId);
       // render (will create draw layer)
-      this.#app.addAndRenderAnnotationData(data, divId, refDataId);
+      this.#service.addAndRenderAnnotationData(data, divId, refDataId);
       // item is added to the UI by the 'dataadd' listener
     };
     addItem.appendChild(addAnnotationGroupButton);
@@ -183,8 +185,8 @@ export class AnnotationUI {
    */
   #getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
-    const dataCtrl = this.#app.getDataController();
-    const undoCtrl = this.#app.getUndoController();
+    const dataCtrl = this.#service.getDataController();
+    const undoCtrl = this.#service.getUndoController();
 
     const infoButton = getButton('Info');
     const ibIdPrefix = 'ib-';
@@ -266,7 +268,7 @@ export class AnnotationUI {
       const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
       const drawLayers =
-        this.#app.getStageController().getDrawLayersByDataId(clkDataId);
+        this.#service.getStageController().getDrawLayersByDataId(clkDataId);
       // toggle hidden
       if (isButtonPressed(target)) {
         setButtonPressed(target, false);
@@ -361,7 +363,7 @@ export class AnnotationUI {
       const annotCentroid = clkAnnotation.getCentroid();
       if (typeof annotCentroid !== 'undefined') {
         const drawLayers =
-          this.#app.getStageController().getDrawLayersByDataId(clkDataId);
+          this.#service.getStageController().getDrawLayersByDataId(clkDataId);
         for (const layer of drawLayers) {
           layer.setCurrentPosition(annotCentroid);
         }
@@ -451,7 +453,7 @@ export class AnnotationUI {
     hideLabelsButton.onclick = (event) => {
       const target = event.target;
       const drawLayer =
-        this.#app.getStageController().getDrawLayersByDataId(dataId)[0];
+        this.#service.getStageController().getDrawLayersByDataId(dataId)[0];
       if (typeof drawLayer === 'undefined') {
         console.warn(`Cannot find draw layer with id ${dataId}`);
       }
@@ -510,7 +512,7 @@ export class AnnotationUI {
    */
   #onDataAdd = (event) => {
     const dataId = event.detail.dataid;
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const data = dataCtrl.get(dataId);
     const ag = data.annotationGroup;
     if (typeof ag !== 'undefined') {
@@ -539,7 +541,7 @@ export class AnnotationUI {
    */
   #onDrawLayerAdd = (event) => {
     const dataId = event.detail.dataid;
-    const dataCtrl = this.#app.getDataController();
+    const dataCtrl = this.#service.getDataController();
     const annotationGroup = dataCtrl.get(dataId).annotationGroup;
     // strike through non viewable annotations
     for (const annotation of annotationGroup.getList()) {

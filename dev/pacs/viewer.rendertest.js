@@ -1,11 +1,15 @@
 /**
+ * @import {ViewerService} from './viewer.service.js';
+ */
+
+/**
  * Setup test line.
  *
- * @param {object} app The associated application.
+ * @param {ViewerService} service The associated viewer service.
  */
-export function setupRenderTests(app) {
+export function setupRenderTests(service) {
   const renderTestButton = document.createElement('button');
-  renderTestButton.onclick = getRunRenderTest(app);
+  renderTestButton.onclick = getRunRenderTest(service);
   renderTestButton.appendChild(document.createTextNode('render test'));
 
   const testsDiv = document.getElementById('tests');
@@ -15,13 +19,13 @@ export function setupRenderTests(app) {
 /**
  * Run render tests.
  *
- * @param {object} app The associated application.
+ * @param {ViewerService} service The associated viewer service.
  * @returns {Function} The run render text function.
  */
-function getRunRenderTest(app) {
+function getRunRenderTest(service) {
   return function () {
     const numberOfRun = 20;
-    const stgCtrl = app.getStageController();
+    const stgCtrl = service.getStageController();
     // default to first layer group
     stgCtrl.setActiveLayerGroup(0);
 
@@ -50,14 +54,14 @@ function getRunRenderTest(app) {
       } else {
         console.log('Stats:', getBasicStats(timings));
         // clean up
-        app.removeEventListener('renderstart', onRenderStart);
-        app.removeEventListener('renderend', onRenderEnd);
+        service.removeEventListener('renderstart', onRenderStart);
+        service.removeEventListener('renderend', onRenderEnd);
       }
     };
 
     // setup
-    app.addEventListener('renderstart', onRenderStart);
-    app.addEventListener('renderend', onRenderEnd);
+    service.addEventListener('renderstart', onRenderStart);
+    service.addEventListener('renderend', onRenderEnd);
 
     // start
     runner();
