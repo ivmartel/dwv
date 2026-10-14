@@ -1,5 +1,4 @@
 import {logger} from '../../src/utils/logger.js';
-import {precisionRound} from '../../src/math/number.js';
 import {custom} from '../../src/app/custom.js';
 import {
   AppOptions,
@@ -8,144 +7,18 @@ import {
 import {WindowLevel} from '../../src/image/windowLevel.js';
 import {getAsSimpleTagValues} from '../../src/dicom/simpleTagValues.js';
 import {getSRContent} from '../../src/dicom/dicomSRContent.js';
-import {getDwvVersion} from '../../src/dicom/dicomParser.js';
-import {Point} from '../../src/math/point.js';
-import {Matrix33} from '../../src/math/matrix.js';
 import {getURLsFromKeyValueUri} from '../../src/utils/uri.js';
 
-import {LayoutProtocol} from './viewer.ui.js';
-import {DataTableUI} from './viewer.ui.datatable.js';
+import {ViewerUI} from './viewer.ui.js';
 import {setupRenderTests} from './viewer.rendertest.js';
-import {AnnotationUI} from './viewer.ui.annot.js';
-import {SegmentationUI} from './viewer.ui.segment.js';
-import {DrawToolUI} from './viewer.ui.draw.js';
-import {BrushToolUI} from './viewer.ui.brush.js';
 import {overlayConfig} from './overlays.js';
-
-/**
- * @import {ViewConfig} from '../../src/app/application.js';
- */
-
 
 // global vars
 
 /**
- * @type {App}
- */
-let _app;
-
-let _tools;
-const _toolFeaturesUI = {};
-
-// layout related
-
-/**
- * Select all: returns true.
- *
- * @returns {boolean} True if selected.
- */
-function selectAll(/*id*/) {
-  return true;
-}
-/**
- * Select event ids.
- *
- * @param {string} id The id to check.
- * @returns {boolean} True if selected.
- */
-function selectEven(id) {
-  return parseInt(id, 10) % 2 === 0;
-}
-/**
- * Select odd ids.
- *
- * @param {string} id The id to check.
- * @returns {boolean} True if selected.
- */
-function selectOdd(id) {
-  return parseInt(id, 10) % 2 !== 0;
-}
-/**
- * Select CT modality data.
- *
- * @param {string} id The id to check.
- * @returns {boolean} True if selected.
- */
-// function selectCT(id) {
-//   const dataCtrl = _app.getDataController();
-//   const modality = dataCtrl.get(id).meta['00080060'].value[0];
-//   return modality === 'CT';
-// }
-/**
- * Select PET modality data.
- *
- * @param {string} id The id to check.
- * @returns {boolean} True if selected.
- */
-// function selectPET(id) {
-//   const dataCtrl = _app.getDataController();
-//   const modality = dataCtrl.get(id).meta['00080060'].value[0];
-//   return modality === 'PT';
-// }
-
-// single div
-const layoutConfig0 = {
-  id: '1*1',
-  displaySets: [
-    {
-      divId: 'layerGroup0',
-      dataSelector: selectAll,
-    }
-  ]
-};
-// one line, two columns
-const layoutConfig1 = {
-  id: '1*2',
-  displaySets: [
-    {
-      divId: 'layerGroup0',
-      dataSelector: selectEven,
-    },
-    {
-      divId: 'layerGroup1',
-      dataSelector: selectOdd,
-    }
-  ]
-};
-// MPR
-const layoutConfig2 = {
-  id: 'mpr',
-  displaySets: [
-    {
-      divId: 'layerGroup0',
-      orientation: 'axial',
-      dataSelector: selectAll,
-    },
-    {
-      divId: 'layerGroup1',
-      orientation: 'coronal',
-      dataSelector: selectAll,
-    },
-    {
-      divId: 'layerGroup2',
-      orientation: 'sagittal',
-      dataSelector: selectAll,
-    }
-  ]
-};
-
-/**
- * @type {LayoutProtocol[]}
- */
-const _layouts = [];
-_layouts.push(new LayoutProtocol(layoutConfig0));
-_layouts.push(new LayoutProtocol(layoutConfig1));
-_layouts.push(new LayoutProtocol(layoutConfig2));
-
-let _selectedLayoutIndex = 0;
-
-/**
  * Setup simple dwv app.
+ *
+ * @returns {App} The created app.
  */
 function viewerSetup() {
   // logger level (optional)
@@ -205,14 +78,8 @@ function viewerSetup() {
   // stage options
   const viewOnFirstLoadItem = true;
 
-  // load counters
-  let numberOfDataToLoad = 0;
-  let numberOfLoadendData = 0;
-  const dataLoadProgress = [];
-  let firstRender = true;
-
   // tools
-  _tools = {
+  const tools = {
     Scroll: {},
     WindowLevel: {},
     ZoomAndPan: {},
@@ -237,214 +104,96 @@ function viewerSetup() {
 
   // app config
   const options = new AppOptions();
-  options.tools = _tools;
+  options.tools = tools;
   options.viewOnFirstLoadItem = viewOnFirstLoadItem;
   options.overlayConfig = overlayConfig;
   // app
-  _app = new App();
-  _app.init(options);
+  const app = new App();
+  app.init(options);
 
   // abort shortcut handler
   const abortShortcut = function (event) {
     if (event.key === 'a') {
-      _app.abortAllLoads();
+      app.abortAllLoads();
     }
   };
 
   // bind events
-  _app.addEventListener('error', function (event) {
+  app.addEventListener('error', function (event) {
     console.error('load error', event, event.detail.error);
     const message = event.detail.error.message;
     const isRenderError = typeof message !== 'undefined' &&
       message.startsWith('Render error');
     // abort load
     if (!isRenderError) {
-      _app.abortLoad(event.detail.dataid);
+      app.abortLoad(event.detail.dataid);
     }
   });
-  _app.addEventListener('loadstart', function (event) {
+  app.addEventListener('loadstart', function (event) {
     console.log('%c----------------', 'color: teal;');
     console.log(`load source data:${event.detail.dataid}`, event.detail.source);
     // timer
     console.time(`load-data-${event.detail.dataid}`);
-    // update load counters
-    if (numberOfDataToLoad === numberOfLoadendData) {
-      numberOfDataToLoad = 0;
-      numberOfLoadendData = 0;
-      // reset progress array
-      dataLoadProgress.length = 0;
-    }
-    ++numberOfDataToLoad;
     // add abort shortcut
     window.addEventListener('keydown', abortShortcut);
-    // remove post-load listeners
-    const dataCtrl = _app.getDataController();
-    if (dataCtrl.getDataIds().length !== 0) {
-      removePostLoadListeners();
-    }
   });
-  const sumReducer = function (sum, value) {
-    return sum + value;
-  };
-  _app.addEventListener('loadprogress', function (event) {
-    if (event.detail.total > 0) {
-      dataLoadProgress[event.detail.dataid] =
-        Math.ceil((event.detail.loaded / event.detail.total) * 100);
-      const progressElement = document.getElementById('loadprogress');
-      progressElement.value =
-        dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
-    }
-  });
-  _app.addEventListener('loaditem', function (event) {
+  app.addEventListener('loaditem', function (event) {
     if (typeof event.detail.warn !== 'undefined') {
       console.warn('load-warn', event.detail.warn);
     }
   });
-  _app.addEventListener('loadstart', function (event) {
-    // add new data view config for new data
-    addNewDataViewConfig(event.detail.dataid);
-  });
-  _app.addEventListener('loadend', function (event) {
+  app.addEventListener('loadend', function (event) {
     console.timeEnd(`load-data-${event.detail.dataid}`);
-    // update load counter
-    ++numberOfLoadendData;
     // remove abort shortcut
     window.removeEventListener('keydown', abortShortcut);
   });
-  _app.addEventListener('load', function (event) {
+  app.addEventListener('load', function (event) {
     // log meta data
-    logMetaData(event.detail.dataid);
+    logMetaData(app, event.detail.dataid);
     // render if not done yet
     if (!viewOnFirstLoadItem) {
-      _app.getStageController().render(event.detail.dataid);
+      app.getStageController().render(event.detail.dataid);
     }
-    // update sliders with new data info
-    // (has to be after full load)
-    initSliders(_layouts[_selectedLayoutIndex]);
-    // add post-load listeners
-    addPostLoadListeners();
   });
 
-  // update UI at first render of first data
-  const onRenderEnd = function (/*event*/) {
-    if (firstRender) {
-      // set app tool
-      setAppTool();
-      // enable html
-      const elementIds = [
-        'tools',
-        'changelayout',
-        'resetviews',
-        'changesmoothing',
-        'rotate-x',
-        'rotate-y',
-        'rotate-z',
-        'rotate-match',
-        'rotate-reset'
-      ];
-      for (const elementId of elementIds) {
-        const element = document.getElementById(elementId);
-        if (element) {
-          element.disabled = false;
-        }
-      }
-      // remove handler
-      _app.removeEventListener('renderend', onRenderEnd);
-      firstRender = false;
-    }
-  };
-  // add handler (will be removed at first success)
-  _app.addEventListener('renderend', onRenderEnd);
-
-  _app.addEventListener('positionchange', function (event) {
-    const input = document.getElementById('position');
-    const values = event.detail.value[1];
-    let text = `(index: ${event.detail.value[0]})`;
-    if (event.detail.value.length > 2) {
-      text += ` value: ${event.detail.value[2]}`;
-    }
-    input.value = values.map(getPrecisionRound(2));
-    // index as small text
-    const span = document.getElementById('positionspan');
-    if (span) {
-      span.innerHTML = text;
-    }
-    // update sliders' value
-    updateSliders(_layouts[_selectedLayoutIndex]);
-  });
-
-  _app.addEventListener('filterrun', function (event) {
+  app.addEventListener('filterrun', function (event) {
     console.log('filterrun', event);
   });
-  _app.addEventListener('filterundo', function (event) {
+  app.addEventListener('filterundo', function (event) {
     console.log('filterundo', event);
   });
   // labels
-  _app.addEventListener('labelingstart', function (event) {
+  app.addEventListener('labelingstart', function (event) {
     console.time(`label-data-${event.detail.dataid}`);
   });
-  _app.addEventListener('labelschanged', function (event) {
+  app.addEventListener('labelschanged', function (event) {
     console.timeEnd(`label-data-${event.detail.dataid}`);
   });
   // resampling
-  _app.addEventListener('imageresamplingstart', function (event) {
+  app.addEventListener('imageresamplingstart', function (event) {
     console.time(`resample-data-${event.detail.dataid}`);
   });
-  _app.addEventListener('imageresamplingcomplete', function (event) {
+  app.addEventListener('imageresamplingcomplete', function (event) {
     console.timeEnd(`resample-data-${event.detail.dataid}`);
   });
 
-  _app.addEventListener('warn', function (event) {
+  app.addEventListener('warn', function (event) {
     console.log('warn', event);
   });
 
   // default keyboard shortcuts
   window.addEventListener('keydown', function (event) {
-    _app.defaultOnKeydown(event);
-
-    // filter
-    if (getSelectedToolName() === 'Filter' &&
-      event.altKey && event.key === 'r') {
-      // run the sharpen filter
-      const dataCtrl = _app.getDataController();
-      _app.setToolFeatures({
-        filterName: 'Sharpen',
-        runArgs: {
-          dataId: dataCtrl.getDataIds()[0]
-        },
-        run: true
-      });
-    }
+    app.defaultOnKeydown(event);
   });
   // default on resize
   window.addEventListener('resize', function () {
-    _app.onResize();
+    app.onResize();
   });
 
-  // tool features UI
-  const toolsUI = {
-    Draw: DrawToolUI,
-    Brush: BrushToolUI
-  };
-
-  for (const toolName in _tools) {
-    if (typeof toolsUI[toolName] !== 'undefined') {
-      const toolUI = new toolsUI[toolName](_app, _tools[toolName]);
-      toolUI.registerListeners();
-      _toolFeaturesUI[toolName] = toolUI;
-    }
-  }
-
-  // data model UI
-  const dataModelUI = {
-    annotation: AnnotationUI,
-    segmentation: SegmentationUI
-  };
-
-  for (const dmName in dataModelUI) {
-    const dmUI = new dataModelUI[dmName](_app);
-    dmUI.registerListeners();
-  }
+  // viewer UI (after app listeners: relies on rendered data at load)
+  const viewerUI = new ViewerUI(app, tools);
+  viewerUI.setup();
+  viewerUI.registerListeners();
 
   const uriOptions = {};
   // uriOptions.batchSize = 100;
@@ -486,18 +235,21 @@ function viewerSetup() {
   // optional load from window location
   const urls = getURLsFromKeyValueUri(window.location.href);
   if (typeof urls !== 'undefined') {
-    _app.loadURLs(urls, uriOptions);
+    app.loadURLs(urls, uriOptions);
   }
+
+  return app;
 }
 
 /**
  * Log meta data.
  *
+ * @param {App} app The associated application.
  * @param {string} dataId The data ID.
  */
-function logMetaData(dataId) {
+function logMetaData(app, dataId) {
   // meta data
-  const dataCtrl = _app.getDataController();
+  const dataCtrl = app.getDataController();
   const meta = dataCtrl.get(dataId).meta;
 
   // log tags for data with transfer syntax (dicom)
@@ -522,644 +274,6 @@ function logMetaData(dataId) {
     const srContent = getSRContent(meta);
     console.log(srContent.toString());
   }
-}
-
-/**
- * Init individual slider on layer related event.
- * WARNING: needs to be called with the final geometry.
- *
- * @param {CustomEvent} event The layer event.
- */
-function initSliderOnEvent(event) {
-  initSlider(event.detail.layergroupid);
-}
-
-/**
- * Add post-load event listeners.
- */
-function addPostLoadListeners() {
-  // post-load since sliders need the full geometry
-  _app.addEventListener('viewlayeradd', initSliderOnEvent);
-  _app.addEventListener('drawlayeradd', initSliderOnEvent);
-  _app.addEventListener('layerremove', initSliderOnEvent);
-}
-
-/**
- * Remove post-load event listeners.
- */
-function removePostLoadListeners() {
-  _app.removeEventListener('viewlayeradd', initSliderOnEvent);
-  _app.removeEventListener('drawlayeradd', initSliderOnEvent);
-  _app.removeEventListener('layerremove', initSliderOnEvent);
-}
-
-/**
- * Merge with first app config.
- *
- * @param {Record<string, ViewConfig[]>} dataViewConfigs A list
- *   of data view configs.
- */
-function mergeAppConfig(dataViewConfigs) {
-  const stgCtrl = _app.getStageController();
-  for (const dataId in dataViewConfigs) {
-    const configs = dataViewConfigs[dataId];
-    const appConfigs = stgCtrl.getViewConfigs(dataId);
-    if (appConfigs.length !== 0) {
-      // use first as base
-      for (const config of configs) {
-        mergeConfigs(config, appConfigs[0]);
-      }
-    }
-  }
-}
-
-/**
- * Merge a data config into the first input one.
- * Copies all but the divId and orientation property.
- *
- * @param {ViewConfig} config The config where to merge.
- * @param {ViewConfig} configToMerge The config to merge.
- * @returns {ViewConfig} The updated config.
- */
-function mergeConfigs(config, configToMerge) {
-  for (const key in configToMerge) {
-    if (key !== 'divId' &&
-      key !== 'orientation') {
-      config[key] = configToMerge[key];
-    }
-  }
-  return config;
-}
-
-/**
- * Get the slider for a given layer group.
- *
- * @param {number} layerGroupDivId The div id.
- * @returns {HTMLInputElement} The slider as html range.
- */
-function getSlider(layerGroupDivId) {
-  const range = document.createElement('input');
-  range.type = 'range';
-  range.className = 'vertical-slider';
-  range.id = `${layerGroupDivId}-slider`;
-  range.min = 0;
-  range.max = 0;
-  range.disabled = true;
-  // update app on slider change
-  range.oninput = function () {
-    const stgCtrl = _app.getStageController();
-    const lg = stgCtrl.getLayerGroupByDivId(layerGroupDivId);
-    const ph = lg.getPositionHelper();
-    const pos = ph.getCurrentPositionAtScrollValue(this.value);
-    ph.setCurrentPosition(pos);
-  };
-  return range;
-}
-
-/**
- * Init sliders: show them and set max.
- *
- * @param {LayoutProtocol} layout The current layout.
- */
-function initSliders(layout) {
-  for (const divId of layout.getLayerGroupDivIds()) {
-    initSlider(divId);
-  }
-}
-
-/**
- * Init individual slider.
- * WARNING: needs to be called with the final geometry.
- *
- * @param {string} layerGroupId The id of the layer group.
- */
-function initSlider(layerGroupId) {
-  const slider = document.getElementById(`${layerGroupId}-slider`);
-  if (slider) {
-    // disabled by default
-    slider.disabled = true;
-    // init if possible
-    const stgCtrl = _app.getStageController();
-    const lg = stgCtrl.getLayerGroupByDivId(layerGroupId);
-    if (typeof lg !== 'undefined') {
-      const ph = lg.getPositionHelper();
-      if (typeof ph !== 'undefined') {
-        const max = ph.getMaximumScrollValue();
-        if (max !== 0) {
-          slider.disabled = false;
-          slider.max = max;
-          slider.value = ph.getCurrentPositionScrollValue();
-        }
-      }
-    }
-  }
-}
-
-/**
- * Update sliders: set the slider value to the current scroll index.
- *
- * @param {LayoutProtocol} layout The current layout.
- */
-function updateSliders(layout) {
-  for (const divId of layout.getLayerGroupDivIds()) {
-    const slider = document.getElementById(`${divId}-slider`);
-    if (slider) {
-      const stgCtrl = _app.getStageController();
-      const lg = stgCtrl.getLayerGroupByDivId(divId);
-      if (typeof lg !== 'undefined') {
-        const ph = lg.getPositionHelper();
-        slider.value = ph.getCurrentPositionScrollValue();
-      }
-    }
-  }
-}
-
-/**
- * Append a layer div in the root 'dwv' one.
- *
- * @param {string} id The id of the layer.
- */
-function addLayerGroupDiv(id) {
-  const layerDiv = document.createElement('div');
-  layerDiv.id = id;
-  layerDiv.className = 'layerGroup';
-
-  const root = document.getElementById('dwv');
-  root.appendChild(layerDiv);
-  root.appendChild(getSlider(id));
-}
-
-/**
- * Add Layer Groups divs.
- *
- * @param {LayoutProtocol} layout The current layout.
- */
-function addLayerGroupsDivs(layout) {
-  // clean up
-  const dwvDiv = document.getElementById('dwv');
-  if (dwvDiv) {
-    dwvDiv.innerHTML = '';
-  }
-  // add div
-  for (const divId of layout.getLayerGroupDivIds()) {
-    addLayerGroupDiv(divId);
-  }
-}
-
-/**
- * Add data view config for the input data.
- *
- * @param {string} dataId The data ID.
- */
-function addNewDataViewConfig(dataId) {
-  const configs = _layouts[_selectedLayoutIndex].getViewConfigsByDataId(dataId);
-  for (const config of configs) {
-    _app.getStageController().addDataViewConfig(dataId, config, false);
-  }
-}
-
-/**
- * Setup file line.
- */
-function setupFileLine() {
-  // bind app to input files
-  const fileinput = document.getElementById('fileinput');
-  fileinput.addEventListener('change', function (event) {
-    const files = event.target.files;
-    if (files.length !== 0) {
-      _app.loadFiles(files);
-    } else {
-      throw new Error('No files to load');
-    }
-  });
-}
-
-/**
- * Setup position line.
- */
-function setupPositionLine() {
-  const positionInput = document.getElementById('position');
-  positionInput.addEventListener('change', function (event) {
-    const vls = _app.getStageController().getViewLayersByDataId('0');
-    const vc = vls[0].getViewController();
-    const element = event.target;
-    const values = element.value.split(',');
-    const point = new Point(values.map(parseFloat));
-    vc.setCurrentPosition(point);
-  });
-}
-
-/**
- * Setup layout line.
- *
- * @param {DataTableUI} dataTable The associated data table.
- */
-function setupLayoutLine(dataTable) {
-  const resetViewsButton = document.getElementById('resetviews');
-  resetViewsButton.disabled = true;
-  resetViewsButton.addEventListener('click', function () {
-    _app.getStageController().resetZoomPan();
-  });
-
-  const changeLayoutSelect = document.getElementById('changelayout');
-  changeLayoutSelect.disabled = true;
-  for (const layout of _layouts) {
-    const layoutId = layout.getId();
-    const option = document.createElement('option');
-    option.value = layoutId;
-    if (layoutId === _layouts[_selectedLayoutIndex].getId()) {
-      option.selected = true;
-    }
-    option.appendChild(document.createTextNode(layout.getId()));
-    changeLayoutSelect.appendChild(option);
-  }
-  changeLayoutSelect.addEventListener('change', function (event) {
-    const selectElement = event.target;
-    const layoutId = selectElement.value;
-    const layoutIndex = _layouts.findIndex(
-      (elem) => elem.getId() === layoutId
-    );
-    if (layoutIndex === -1) {
-      throw new Error(`Unknown layout: ${layoutId}`);
-    } else {
-      _selectedLayoutIndex = layoutIndex;
-    }
-    const selectedLayout = _layouts[_selectedLayoutIndex];
-
-    // add layer groups div
-    addLayerGroupsDivs(selectedLayout);
-
-    // get configs
-    const dataCtrl = _app.getDataController();
-    const dataIds = dataCtrl.getDataIds();
-    const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
-
-    // merge app configs for possible extras (like window level)
-    mergeAppConfig(dataViewConfigs);
-
-    // clear data table
-    dataTable.unRegisterViewListeners();
-    dataTable.clearDataTable();
-
-    // update layout for data table
-    dataTable.unRegisterLayerAddListeners();
-    dataTable.registerLayerAddListeners(selectedLayout);
-
-    // set config (deletes previous layers)
-    const stgCtrl = _app.getStageController();
-    stgCtrl.setDataViewConfigs(dataViewConfigs);
-
-    // render data (creates layers)
-    for (let i = 0; i < dataIds.length; ++i) {
-      stgCtrl.render(dataIds[i]);
-    }
-
-    // listen to view changes
-    dataTable.registerViewListeners();
-
-    // need to set tool after config change
-    setAppTool();
-  });
-
-  const smoothingChk = document.getElementById('changesmoothing');
-  smoothingChk.checked = false;
-  smoothingChk.disabled = true;
-  smoothingChk.addEventListener('change', function (event) {
-    const inputElement = event.target;
-    _app.getStageController().setImageSmoothing(inputElement.checked);
-  });
-}
-
-/**
- * Setup rotate line.
- */
-function setupRotateLine() {
-  const dataCtrl = _app.getDataController();
-  const stgCtrl = _app.getStageController();
-
-  const rotateXButton = document.getElementById('rotate-x');
-  rotateXButton.disabled = true;
-  rotateXButton.addEventListener('click', function () {
-    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    const image = dataCtrl.get(dataId).image;
-    const geometry = image.getGeometry();
-
-    const angle = (Math.PI / 180) * 20;
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new Matrix33([
-      1, 0, 0,
-      0, Math.cos(angle), -Math.sin(angle),
-      0, Math.sin(angle), Math.cos(angle)
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-
-    const newOrientation = rotation.multiply(geometry.getOrientation());
-
-    _app.resample(dataId, newOrientation);
-  });
-
-  const rotateYButton = document.getElementById('rotate-y');
-  rotateYButton.disabled = true;
-  rotateYButton.addEventListener('click', function () {
-    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    const image = dataCtrl.get(dataId).image;
-    const geometry = image.getGeometry();
-
-    const angle = (Math.PI / 180) * 20;
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new Matrix33([
-      Math.cos(angle), 0, -Math.sin(angle),
-      0, 1, 0,
-      Math.sin(angle), 0, Math.cos(angle)
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-
-    const newOrientation = rotation.multiply(geometry.getOrientation());
-
-    _app.resample(dataId, newOrientation);
-  });
-
-  const rotateZButton = document.getElementById('rotate-z');
-  rotateZButton.disabled = true;
-  rotateZButton.addEventListener('click', function () {
-    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    const image = dataCtrl.get(dataId).image;
-    const geometry = image.getGeometry();
-
-    const angle = (Math.PI / 180) * 20;
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new Matrix33([
-      Math.cos(angle), -Math.sin(angle), 0,
-      Math.sin(angle), Math.cos(angle), 0,
-      0, 0, 1
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-
-    const newOrientation = rotation.multiply(geometry.getOrientation());
-
-    _app.resample(dataId, newOrientation);
-  });
-
-  const rotateMatchButton = document.getElementById('rotate-match');
-  rotateMatchButton.disabled = true;
-  rotateMatchButton.addEventListener('click', function () {
-    const dataIds = dataCtrl.getDataIds();
-    if (dataIds.length < 2) {
-      console.log('Not enough datas to match geometries');
-    }
-    // log geometries if resample is needed
-    const geometry0 = dataCtrl.get(dataIds[0]).image.getGeometry();
-    const geometry1 = dataCtrl.get(dataIds[1]).image.getGeometry();
-    if (!geometry0.getOrientation().equals(geometry1.getOrientation())) {
-      console.log('Resample match');
-      console.log('geometry0', geometry0.toString());
-      console.log('geometry1', geometry1.toString());
-    }
-    // resample match data 0 and 1
-    _app.resampleMatch(dataIds[0], dataIds[1]);
-  });
-
-  const rotateResetButton = document.getElementById('rotate-reset');
-  rotateResetButton.disabled = true;
-  rotateResetButton.addEventListener('click', function () {
-    const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
-    const vl = lg.getBaseViewLayer();
-    const dataId = vl.getDataId();
-
-    _app.revertResample(dataId);
-  });
-}
-
-/**
- * Setup the binders checkboxes.
- */
-function setupBindersCheckboxes() {
-  const propList = [
-    'WindowLevel',
-    'Position',
-    'Zoom',
-    'Offset',
-    'Opacity',
-    'ColourMap',
-    'MaskView'
-  ];
-  const binders = [];
-  // add all binders at startup
-  for (let b = 0; b < propList.length; ++b) {
-    binders.push(`${propList[b]}Binder`);
-  }
-  _app.setLayerGroupsBinders(binders);
-
-  /**
-   * Add a binder.
-   *
-   * @param {string} propName The name of the property to bind.
-   */
-  function addBinder(propName) {
-    binders.push(`${propName}Binder`);
-    _app.setLayerGroupsBinders(binders);
-  }
-  /**
-   * Remove a binder.
-   *
-   * @param {string} propName The name of the property to bind.
-   */
-  function removeBinder(propName) {
-    const index = binders.indexOf(`${propName}Binder`);
-    if (index !== -1) {
-      binders.splice(index, 1);
-    }
-    _app.setLayerGroupsBinders(binders);
-  }
-  /**
-   * Get the input change handler for a binder.
-   *
-   * @param {string} propName The name of the property to bind.
-   * @returns {object} The handler.
-   */
-  function getOnInputChange(propName) {
-    return function (event) {
-      const inputElement = event.target;
-      if (inputElement.checked) {
-        addBinder(propName);
-      } else {
-        removeBinder(propName);
-      }
-    };
-  }
-
-  const fieldset = document.getElementById('binders');
-
-  // individual binders
-  for (let i = 0; i < propList.length; ++i) {
-    const propName = propList[i];
-
-    const input = document.createElement('input');
-    input.id = `binder-${i}`;
-    input.type = 'checkbox';
-    input.checked = true;
-    input.onchange = getOnInputChange(propName);
-
-    const label = document.createElement('label');
-    label.htmlFor = input.id;
-    label.appendChild(document.createTextNode(propName));
-
-    fieldset.appendChild(input);
-    fieldset.appendChild(label);
-  }
-
-  // check all
-  const allInput = document.createElement('input');
-  allInput.id = 'binder-all';
-  allInput.type = 'checkbox';
-  allInput.checked = true;
-  allInput.onchange = function () {
-    for (let j = 0; j < propList.length; ++j) {
-      document.getElementById(`binder-${j}`).click();
-    }
-  };
-  const allLabel = document.createElement('label');
-  allLabel.htmlFor = allInput.id;
-  allLabel.appendChild(document.createTextNode('all'));
-  fieldset.appendChild(allInput);
-  fieldset.appendChild(allLabel);
-}
-
-/**
- * Setup the tools checkboxes.
- */
-function setupToolsCheckboxes() {
-  const getChangeTool = function (tool) {
-    return function () {
-      setAppTool(tool);
-    };
-  };
-
-  const getKeyCheck = function (char, input) {
-    return function (event) {
-      if (!event.ctrlKey &&
-        !event.altKey &&
-        !event.shiftKey &&
-        event.key === char) {
-        input.click();
-      }
-    };
-  };
-
-  const fieldset = document.getElementById('tools');
-  const keys = Object.keys(_tools);
-  for (let i = 0; i < keys.length; ++i) {
-    const key = keys[i];
-
-    const input = document.createElement('input');
-    input.name = 'tools';
-    input.type = 'radio';
-    input.id = `tool-${i}`;
-    input.title = key;
-    input.onchange = getChangeTool(key);
-
-    // select first one
-    if (i === 0) {
-      input.checked = true;
-    }
-
-    const label = document.createElement('label');
-    label.htmlFor = input.id;
-    label.title = input.title;
-    label.appendChild(document.createTextNode(input.title));
-
-    fieldset.appendChild(input);
-    fieldset.appendChild(label);
-
-    // keyboard shortcut
-    const shortcut = key[0].toLowerCase();
-    window.addEventListener('keydown', getKeyCheck(shortcut, input));
-  }
-
-  // tool options
-  const div = document.createElement('div');
-  div.id = 'toolOptions';
-  fieldset.appendChild(div);
-}
-
-/**
- * Set the app tool.
- *
- * @param {string} [toolName] The tool to set.
- */
-function setAppTool(toolName) {
-  // find the tool name if not provided
-  if (typeof toolName === 'undefined') {
-    const toolsInput = document.getElementsByName('tools');
-    for (let j = 0; j < toolsInput.length; ++j) {
-      const toolInput = toolsInput[j];
-      if (toolInput.checked) {
-        toolName = toolInput.title;
-        break;
-      }
-    }
-    if (typeof toolName === 'undefined') {
-      console.warn('Cannot find tool to set the app with...');
-      return;
-    }
-  }
-
-  // set tool for app
-  _app.setTool(toolName);
-
-  // force window level non strict mode
-  if (toolName === 'WindowLevel') {
-    _app.setToolFeatures({
-      activeViewLayerOnly: false
-    });
-  }
-
-  // clear options html
-  const toolOptionsEl = document.getElementById('toolOptions');
-  if (toolOptionsEl !== null) {
-    toolOptionsEl.innerHTML = '';
-  }
-  // tool features
-  const featuresUI = _toolFeaturesUI[toolName];
-  if (toolOptionsEl !== null &&
-    typeof featuresUI !== 'undefined') {
-    // setup html
-    const featuresHtml = featuresUI.getHtml();
-    if (typeof featuresHtml !== 'undefined') {
-      toolOptionsEl.appendChild(featuresHtml);
-    }
-    // pass value to app
-    const features = featuresUI.getValue();
-    if (typeof features !== 'undefined') {
-      _app.setToolFeatures(features);
-    }
-  }
-}
-
-/**
- * Get the selected tool name.
- *
- * @returns {string|undefined} The tool name.
- */
-function getSelectedToolName() {
-  let res;
-  const element = document.querySelector('input[name="tools"]:checked');
-  if (element) {
-    res = element.title;
-  }
-  return res;
 }
 
 /**
@@ -1198,18 +312,6 @@ function sortByPosPatKey(obj) {
 }
 
 /**
- * Get a rounding function for a specific precision.
- *
- * @param {number} precision The rounding precision.
- * @returns {Function} The rounding function.
- */
-function getPrecisionRound(precision) {
-  return function (x) {
-    return precisionRound(x, precision);
-  };
-}
-
-/**
  * Log the DICCOM seg segments ordered by frame position patients.
  *
  * @param {object} elements The DICOM seg elements.
@@ -1235,48 +337,16 @@ function logFramePosPats(elements) {
   console.log('DICOM SEG Segments', sortByPosPatKey(perPos));
 }
 
-/**
- * Setup about line.
- */
-function setupAbout() {
-  const testsDiv = document.getElementById('about');
-  const link = document.createElement('a');
-  link.href = 'https://github.com/ivmartel/dwv';
-  link.appendChild(document.createTextNode('dwv'));
-  const text = document.createTextNode(
-    ` v${ getDwvVersion()
-    } on ${navigator.userAgent}`);
-
-  testsDiv.appendChild(link);
-  testsDiv.appendChild(text);
-}
-
 // ---------------------------------------------
 
 /**
  * Main setup.
  */
 function setup() {
-  // add layer groups div
-  addLayerGroupsDivs(_layouts[_selectedLayoutIndex]);
-
-  // viewer setup: creates app
-  viewerSetup();
-
-  // data table
-  const dataTable = new DataTableUI(_app);
-  dataTable.registerListeners();
-  dataTable.registerLayerAddListeners(_layouts[_selectedLayoutIndex]);
-
-  // setup
-  setupFileLine();
-  setupPositionLine();
-  setupLayoutLine(dataTable);
-  setupRotateLine();
-  setupBindersCheckboxes();
-  setupToolsCheckboxes();
-  setupRenderTests(_app);
-  setupAbout();
+  // viewer setup: creates app and UI
+  const app = viewerSetup();
+  // render tests
+  setupRenderTests(app);
 }
 
 // launch
