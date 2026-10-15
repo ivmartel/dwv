@@ -238,7 +238,7 @@ export class SegmentationUI {
   #nextColour() {
     // recreate if empty
     if (this.#coloursPick.length === 0) {
-      console.log('Regenerating colours...');
+      logger.debug('Regenerating colours...');
       this.#coloursPick = defaultColours.slice();
     }
     // pick and remove first in list, return a copy
@@ -561,7 +561,7 @@ export class SegmentationUI {
       const segHelper = new MaskSegmentHelper(maskImage);
       // add segment to mask
       if (!segHelper.hasSegment(segmentNumber)) {
-        console.log('Add segment', segmentNumber);
+        logger.debug(`Add segment ${segmentNumber}`);
         segHelper.addSegment(getSegment(
           segmentNumber, segmentation.segments
         ));
@@ -580,7 +580,8 @@ export class SegmentationUI {
     } else {
       features.createMask = true;
     }
-    console.log('set tool features [add]', features);
+    logger.debug(
+      `set tool features [add] ${JSON.stringify(features)}`);
     this.#service.setToolFeatures(features);
   }
 
@@ -602,7 +603,8 @@ export class SegmentationUI {
       // reset the brush mask id: do not erase in another mask
       features.createMask = true;
     }
-    console.log('set tool features [del]', features);
+    logger.debug(
+      `set tool features [del] ${JSON.stringify(features)}`);
     this.#service.setToolFeatures(features);
   }
 
@@ -697,7 +699,7 @@ export class SegmentationUI {
         layer.setCurrentPosition(label.centroid);
       }
     } else {
-      console.log('No label for this segment');
+      logger.warn('No label for this segment');
     }
   };
 
@@ -729,7 +731,7 @@ export class SegmentationUI {
     const stageCtrl = this.#service.getStageController();
     const vls = stageCtrl.getViewLayersByDataId(segmentation.dataId);
     if (vls.length === 0) {
-      console.warn('No layers to show/hide seg');
+      logger.warn('No layers to show/hide seg');
     }
     for (const vl of vls) {
       const vc = vl.getViewController();
@@ -1166,7 +1168,7 @@ export class SegmentationUI {
     try {
       dicomBuffer = writer.getBuffer(dicomElements);
     } catch (error) {
-      logger.error(error);
+      logger.error(error.message);
       alert(error.message);
     }
     if (dicomBuffer !== undefined) {
@@ -1215,7 +1217,8 @@ export class SegmentationUI {
       volumeHistograms = maskImage.getHistogramBySegment(
         refImage, segment.number.toString());
     } catch (error) {
-      console.warn('Cannot calculate segment histogram:', error.message);
+      logger.warn(
+        `Cannot calculate segment histogram: ${error.message}`);
       return [];
     }
 
