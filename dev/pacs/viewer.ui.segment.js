@@ -272,6 +272,10 @@ export class SegmentationUI {
 
     // insert
     const detailsEl = this.#rootDoc.getElementById('layersdetails');
+    if (!detailsEl) {
+      logger.warn('Cannot find layers details element');
+      return;
+    }
     detailsEl.parentElement.insertBefore(line, detailsEl);
   }
 
@@ -331,15 +335,21 @@ export class SegmentationUI {
     const item = this.#getSegmentationHtml(
       segmentation, this.#segmentations.length - 1, selectFirst);
 
+    const segList = this.#rootDoc.getElementById('segmentation-list');
+    if (!segList) {
+      logger.warn('Cannot find segmentation list element');
+      return;
+    }
     // add segmentation item
     const addItem = this.#rootDoc.getElementById('addsegmentationitem');
-    // remove and add after to make it last item
-    addItem.remove();
-
-    // update list
-    const segList = this.#rootDoc.getElementById('segmentation-list');
-    segList.appendChild(item);
-    segList.appendChild(addItem);
+    if (addItem) {
+      // remove and add after to make it last item
+      addItem.remove();
+      segList.appendChild(item);
+      segList.appendChild(addItem);
+    } else {
+      segList.appendChild(item);
+    }
 
     if (this.#withOverlapCheck) {
       this.#addOverlapCheckerSelection(this.#segmentations.length - 1);
@@ -422,11 +432,15 @@ export class SegmentationUI {
       if (this.#withMerge && this.#canMerge()) {
         const mergeSegButton =
           this.#rootDoc.getElementById(`${prefixes.mergeSaveSeg}0`);
-        mergeSegButton.disabled = false;
+        if (mergeSegButton) {
+          mergeSegButton.disabled = false;
+        }
         if (this.#withRtss) {
           const mergeRtssButton =
             this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
-          mergeRtssButton.disabled = false;
+          if (mergeRtssButton) {
+            mergeRtssButton.disabled = false;
+          }
         }
       }
     }
@@ -535,15 +549,19 @@ export class SegmentationUI {
 
     // setup and append
     this.#setupContainerDiv();
-    this.#getContainerDiv().appendChild(segList);
+    const containerDiv = this.#getContainerDiv();
+    if (!containerDiv) {
+      return;
+    }
+    containerDiv.appendChild(segList);
 
     if (this.#withOverlapCheck) {
       const overlapChecker = this.#getSegmentationOverlapHtml();
-      this.#getContainerDiv().appendChild(overlapChecker);
+      containerDiv.appendChild(overlapChecker);
     }
     if (this.#withMerge) {
       const mergeHtml = this.#getSegmentationMergeHtml();
-      this.#getContainerDiv().appendChild(mergeHtml);
+      containerDiv.appendChild(mergeHtml);
     }
   }
 
@@ -944,8 +962,10 @@ export class SegmentationUI {
     item.onclick = () => {
       // remove selected class from other rows
       const mainlist = this.#rootDoc.getElementById('segmentation-list');
-      const items = mainlist.querySelectorAll('.data-item-list-item');
-      items.forEach(item2 => item2.classList.remove('selected'));
+      if (mainlist) {
+        const items = mainlist.querySelectorAll('.data-item-list-item');
+        items.forEach(item2 => item2.classList.remove('selected'));
+      }
       // mark this row as selected
       item.classList.add('selected');
 
@@ -1295,6 +1315,10 @@ export class SegmentationUI {
       this.#rootDoc.getElementById('overlap-checker-select-list-0');
     const overlapSelect1 =
       this.#rootDoc.getElementById('overlap-checker-select-list-1');
+    if (!overlapSelect0 || !overlapSelect1) {
+      logger.warn('Cannot find overlap checker select elements');
+      return;
+    }
 
     // use the segmentation index as value: the data id can be
     // undefined at this point (segmentation without mask yet)

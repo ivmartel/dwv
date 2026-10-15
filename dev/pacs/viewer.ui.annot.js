@@ -113,6 +113,10 @@ export class AnnotationUI {
 
     // insert
     const detailsEl = this.#rootDoc.getElementById('layersdetails');
+    if (!detailsEl) {
+      logger.warn('Cannot find layers details element');
+      return;
+    }
     detailsEl.parentElement.insertBefore(line, detailsEl);
   }
 
@@ -148,7 +152,10 @@ export class AnnotationUI {
 
     // setup and append
     this.#setupContainerDiv();
-    this.#getContainerDiv().appendChild(annotList);
+    const containerDiv = this.#getContainerDiv();
+    if (containerDiv) {
+      containerDiv.appendChild(annotList);
+    }
   }
 
   /**
@@ -371,8 +378,10 @@ export class AnnotationUI {
     item.onclick = () => {
       // remove selected class from other rows
       const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
-      const items = mainlist.querySelectorAll('.data-item-list-item');
-      items.forEach(item2 => item2.classList.remove('selected'));
+      if (mainlist) {
+        const items = mainlist.querySelectorAll('.data-item-list-item');
+        items.forEach(item2 => item2.classList.remove('selected'));
+      }
       // mark this row as selected
       item.classList.add('selected');
 
@@ -559,17 +568,23 @@ export class AnnotationUI {
       if (!this.#rootDoc.getElementById('annotationgroup-list')) {
         this.#setupHtml();
       }
+      const annotList = this.#rootDoc.getElementById('annotationgroup-list');
+      if (!annotList) {
+        logger.warn('Cannot find annotation group list element');
+        return;
+      }
       // annotation group as html
       const item = this.#getAnnotationGroupHtml(ag, dataId);
       // add annotation group item
       const addItem = this.#rootDoc.getElementById('addannotationgroupitem');
-      // remove and add after to make it last item
-      addItem.remove();
-
-      // update list
-      const annotList = this.#rootDoc.getElementById('annotationgroup-list');
-      annotList.appendChild(item);
-      annotList.appendChild(addItem);
+      if (addItem) {
+        // remove and add after to make it last item
+        addItem.remove();
+        annotList.appendChild(item);
+        annotList.appendChild(addItem);
+      } else {
+        annotList.appendChild(item);
+      }
     }
   };
 
@@ -623,7 +638,9 @@ export class AnnotationUI {
     // add item to list
     const listDivId = `${getAnnotationGroupDivId(dataId)}-list`;
     const listDiv = this.#rootDoc.getElementById(listDivId);
-    listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
+    if (listDiv) {
+      listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
+    }
   };
 
   /**
@@ -642,7 +659,9 @@ export class AnnotationUI {
       if (keys.includes('colour')) {
         const inputColour = this.#rootDoc.getElementById(
           `cb-${annotationDivId}`);
-        inputColour.value = annotation.colour;
+        if (inputColour) {
+          inputColour.value = annotation.colour;
+        }
       }
     }
   };
@@ -658,7 +677,9 @@ export class AnnotationUI {
     // remove annotation from list
     const annotationDivId = getAnnotationDivId(annotation, dataId);
     const item = this.#rootDoc.getElementById(annotationDivId);
-    item.remove();
+    if (item) {
+      item.remove();
+    }
   };
 
 }; // AnnotationUI
