@@ -694,8 +694,8 @@ export class SegmentationUI {
     if (typeof label !== 'undefined') {
       const dataId = segmentation.dataId;
       const stgCtrl = this.#service.getStageController();
-      const drawLayers = stgCtrl.getViewLayersByDataId(dataId);
-      for (const layer of drawLayers) {
+      const layers = stgCtrl.getViewLayersByDataId(dataId);
+      for (const layer of layers) {
         layer.setCurrentPosition(label.centroid);
       }
     } else {
@@ -1405,7 +1405,7 @@ export class SegmentationUI {
   }
 
   /**
-   * Get the HTML for the segmentation overlap chacker.
+   * Get the HTML for the segmentation overlap checker.
    *
    * @returns {HTMLLIElement} The HTML element.
    */
