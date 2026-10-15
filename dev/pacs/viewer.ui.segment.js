@@ -662,12 +662,11 @@ export class SegmentationUI {
           const undoCtrl = this.#service.getUndoController();
           undoCtrl.addToUndoStack(chgCmd);
         }
+      } else {
+        // no mask yet: only update segment, its colour will be
+        // passed to the mask palette when the segment is added to it
+        segment.displayRGBValue = newRgbColour;
       }
-
-      // update segment
-      segment.displayRGBValue = newRgbColour;
-      // pass updated color to brush
-      this.#appSelectSegment(indices.segmentNumber, segmentation);
     }
   };
 
