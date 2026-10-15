@@ -854,7 +854,7 @@ export class SegmentationUI {
       const statsList = this.#getHistogramStats(segment2, segmentation);
       // only show the volume index for multi volume data
       const intensityName = (volume) => {
-        return statsList.length > 1 ? `intensity (#${volume})` : 'intensity';
+        return statsList.length > 1 ? `pixels (#${volume})` : 'pixels';
       };
       // same label order as labels info
       const segmentLabels = segmentation.labels.filter(
@@ -862,12 +862,16 @@ export class SegmentationUI {
 
       let qStr = 'Quantification:\n';
       let i = 0;
+      const nLabels = labelsInfo.length;
+      const tab = nLabels > 1 ? '  ' : '';
       for (const labelInfo of labelsInfo) {
-        qStr += `- label #${i}\n`;
+        if (nLabels > 1) {
+          qStr += `- label #${i}\n`;
+        }
         const keys = Object.keys(labelInfo);
         for (const key of keys) {
           const quant = labelInfo[key];
-          qStr += `  - ${key}: ${
+          qStr += `${tab}- ${key}: ${
             quant.value.toPrecision(4)
           }${i18n.t(quant.unit)}`;
           qStr += '\n';
@@ -877,16 +881,19 @@ export class SegmentationUI {
           const labelItem = item.labelStats?.find(
             (element) => element.label === segmentLabels[i]);
           if (typeof labelItem !== 'undefined') {
-            qStr += `  - ${intensityName(item.volume)}: ` +
+            qStr += `${tab}- ${intensityName(item.volume)}: ` +
               `${statsToString(labelItem.stats)}\n`;
           }
         }
         ++i;
       }
       // global histogram stats
-      for (const item of statsList) {
-        qStr += `- ${intensityName(item.volume)}: ` +
-          `${statsToString(item.stats)}\n`;
+      if (nLabels > 1) {
+        qStr += '\n';
+        for (const item of statsList) {
+          qStr += `- all ${intensityName(item.volume)}: ` +
+            `${statsToString(item.stats)}\n`;
+        }
       }
       alert(qStr);
     };
