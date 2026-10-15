@@ -998,7 +998,6 @@ export class Matrix33 {
     getThirdColMajorDirection(): number;
     getValues(): number[];
     isSimilar(rhs: Matrix33, tol?: number): boolean;
-    isSimilarProgressive(rhs: Matrix33, tol?: number): boolean;
     multiply(rhs: Matrix33): Matrix33;
     multiplyArray3D(array3D: number[]): number[];
     multiplyIndex3D(index3D: Index): Index;
