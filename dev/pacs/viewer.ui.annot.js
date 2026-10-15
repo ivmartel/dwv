@@ -7,6 +7,7 @@ import {
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
 import {i18n} from '../../src/utils/i18n.js';
+import {logger} from '../../src/utils/logger.js';
 import {
   getIconElement,
   getButton,
@@ -158,7 +159,7 @@ export class AnnotationUI {
     // add annotation group
     const viewLayer = layerGroup.getActiveViewLayer();
     if (typeof viewLayer === 'undefined') {
-      console.warn(
+      logger.warn(
         'No active view layer, please select one in the data table'
       );
       return;
@@ -273,7 +274,7 @@ export class AnnotationUI {
         layer.setCurrentPosition(annotCentroid);
       }
     } else {
-      console.log('No centroid for annotation');
+      logger.warn('No centroid for annotation');
     }
   }
 
@@ -421,7 +422,7 @@ export class AnnotationUI {
     try {
       dicomBuffer = writer.getBuffer(dicomElements);
     } catch (error) {
-      console.error(error);
+      logger.error(error.message);
       alert(error.message);
     }
     const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
@@ -445,7 +446,7 @@ export class AnnotationUI {
     const drawLayer = this.#dwvService.getStageController()
       .getDrawLayersByDataId(dataId)[0];
     if (typeof drawLayer === 'undefined') {
-      console.warn(`Cannot find draw layer with id ${dataId}`);
+      logger.warn(`Cannot find draw layer with id ${dataId}`);
       return;
     }
     // toggle hide
