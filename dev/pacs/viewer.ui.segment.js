@@ -884,7 +884,7 @@ export class SegmentationUI {
     item.appendChild(actionsDiv);
 
     // click on li to go to segment
-    item.addEventListener('click', () => {
+    item.onclick = () => {
       // remove selected class from other rows
       const mainlist = this.#rootDoc.getElementById('segmentation-list');
       const items = mainlist.querySelectorAll('.data-item-list-item');
@@ -893,7 +893,7 @@ export class SegmentationUI {
       item.classList.add('selected');
 
       this.#gotoSegment(segment, segmentation);
-    });
+    };
 
     return item;
   }

@@ -369,7 +369,7 @@ export class AnnotationUI {
     item.title = 'Go to annotation';
 
     // click on li to go to annotation
-    item.addEventListener('click', () => {
+    item.onclick = () => {
       // remove selected class from other rows
       const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
       const items = mainlist.querySelectorAll('.data-item-list-item');
@@ -378,7 +378,7 @@ export class AnnotationUI {
       item.classList.add('selected');
 
       this.#gotoAnnotation(annotationGroup, annotationId, dataId);
-    });
+    };
 
     return item;
   }
