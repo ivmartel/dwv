@@ -600,10 +600,14 @@ export class SegmentationUI {
     // app features
     const features = {
       brushMode: 'del',
-      maskDataId: undefined
+      maskDataId: undefined,
+      createMask: false
     };
     if (typeof segmentation.dataId !== 'undefined') {
       features.maskDataId = segmentation.dataId;
+    } else {
+      // reset the brush mask id: do not erase in another mask
+      features.createMask = true;
     }
     console.log('set tool features [del]', features);
     this.#service.setToolFeatures(features);
