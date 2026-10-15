@@ -452,13 +452,6 @@ export class SegmentationUI {
     segList.id = 'segmentation-list';
     segList.className = 'data-list';
 
-    // loop on segmentations
-    for (let i = 0; i < this.#segmentations.length; ++i) {
-      const segmentationItem =
-        this.#getSegmentationHtml(this.#segmentations[i], i);
-      segList.appendChild(segmentationItem);
-    }
-
     // extra item for add segmentation button
     const addItem = document.createElement('li');
     addItem.id = 'addsegmentationitem';
@@ -1004,7 +997,7 @@ export class SegmentationUI {
       maskImage.getMeta().custom.segments,
       sourceData.image,
       {
-        MediaStorageSOPInstanceUID: '1.2.3.4.5.6',
+        MediaStorageSOPInstanceUID: '1.2.3.4.5.6.1000',
         SeriesInstanceUID: '1.2.3.4.5.6',
         SeriesNumber: '1',
         SOPInstanceUID: '1.2.3.4.5.6.1000',
