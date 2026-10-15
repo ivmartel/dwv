@@ -5,7 +5,8 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {
   Geometry,
-  getSliceGeometrySpacing
+  getSliceGeometrySpacing,
+  mergeGeometries
 } from '../../src/image/geometry.js';
 import {logger} from '../../src/utils/logger.js';
 import {Matrix33, getIdentityMat33} from '../../src/math/matrix.js';
@@ -609,6 +610,39 @@ describe('getSliceGeometrySpacing', () => {
     assert.equal(getSliceGeometrySpacing(makeOrigins([0, 1, 3, 7])), 2.3333);
     assert.equal(warnSpy.mock.calls.length, 1, 'one warning');
     assert.match(warnSpy.mock.calls[0][0], /^Varying slice spacing/);
+  });
+
+});
+
+describe('mergeGeometries', () => {
+
+  const size = new Size([2, 2, 1]);
+  const spacing = new Spacing([1, 1, 1]);
+
+  test('rounded orientation', () => {
+    // Image Orientation (Patient) written with 5 decimals:
+    // rounding differences of 1e-5
+    const geometry0 = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing,
+      getOrientationFromCosines([0.99999, 0, 0.00367, 0, 1, 0]));
+    const geometry1 = new Geometry(
+      [new Point3D(0, 0, 1)], size, spacing,
+      getOrientationFromCosines([0.99999, 0, 0.00366, 0, 1, 0]));
+    const merged = mergeGeometries(geometry0, geometry1);
+    assert.equal(merged.getSize().get(2), 2,
+      'merge geometries with rounded orientation');
+  });
+
+  test('different orientation', () => {
+    const geometry0 = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing,
+      getIdentityMat33());
+    const geometry1 = new Geometry(
+      [new Point3D(0, 0, 1)], size, spacing,
+      getOrientationFromCosines([1, 0, 0, 0, 0.98687, 0.16151]));
+    assert.throws(() => {
+      mergeGeometries(geometry0, geometry1);
+    }, /different orientation/);
   });
 
 });
