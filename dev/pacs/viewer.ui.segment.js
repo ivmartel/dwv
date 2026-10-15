@@ -1301,7 +1301,7 @@ export class SegmentationUI {
       const maskData1 = dataCtrl.get(segmentation1?.dataId);
       if (typeof maskData0 === 'undefined' ||
         typeof maskData1 === 'undefined') {
-        overlapResult.innerHTML = 'Cannot check overlap: missing mask data.';
+        overlapResult.textContent = 'Cannot check overlap: missing mask data.';
         return;
       }
       const maskImage0 = maskData0.image;
@@ -1310,32 +1310,22 @@ export class SegmentationUI {
       const segHelper1 = new MaskSegmentHelper(maskImage1);
       const overlap = segHelper0.findOverlap(segHelper1);
 
-      overlapResult.innerHTML = ''; // clear old results
+      overlapResult.replaceChildren(); // clear old results
       const overlapList = document.createElement('ul');
       for (
         const [/*segmentNumber0*/, segmentOverlap] of
         Object.entries(overlap)
       ) {
         // title (segment that these overlaps are for)
+        // (use textContent: labels come from loaded data)
         const segmentLi = document.createElement('li');
-        segmentLi.innerHTML = `${ segmentOverlap.label
-        } (${segmentOverlap.count} voxels): `;
-
-        // list of overlaps
-        let first = true;
-        for (
-          const [/*segmentNumber1*/, count] of
-          Object.entries(segmentOverlap.overlap)
-        ) {
-          if (first) {
-            first = false;
-          } else {
-            segmentLi.innerHTML += ', ';
-          }
-          segmentLi.innerHTML += `${count.label} (${
+        const overlapStrings = Object.values(segmentOverlap.overlap).map(
+          (count) => `${count.label} (${
             count.count } voxels, ${
-            (count.percentage).toPrecision(4) }%)`;
-        }
+            (count.percentage).toPrecision(4) }%)`
+        );
+        segmentLi.textContent = `${ segmentOverlap.label
+        } (${segmentOverlap.count} voxels): ${overlapStrings.join(', ')}`;
 
         overlapList.appendChild(segmentLi);
       }
