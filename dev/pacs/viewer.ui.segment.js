@@ -835,7 +835,7 @@ export class SegmentationUI {
    */
   #getSelectSegmentCheckedId() {
     let id;
-    const selectInputs = document.querySelectorAll(
+    const selectInputs = this.#rootDoc.querySelectorAll(
       'input[type=\'radio\'][name=\'select-segment\']'
     );
     for (const input of selectInputs) {
