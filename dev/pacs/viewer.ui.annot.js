@@ -485,7 +485,7 @@ export class AnnotationUI {
     // hide button
     const hideLabelsButton = getButton('Label');
     setButtonPressed(hideLabelsButton, false);
-    hideLabelsButton.id = 'b-hidelabels';
+    hideLabelsButton.id = `hidelabelsb-${getAnnotationGroupDivId(dataId)}`;
     hideLabelsButton.title = 'Show/hide annotation labels';
     hideLabelsButton.onclick = () => {
       this.#toggleLabelsVisibility(hideLabelsButton, dataId);
