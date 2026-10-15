@@ -1,5 +1,4 @@
 import {logger} from '../utils/logger.js';
-import {BooleanResult} from '../utils/result.js';
 
 // Number.EPSILON is difference between 1 and the smallest
 // floating point number greater than 1
@@ -61,56 +60,6 @@ export function isSimilar(a, b, tol) {
     tol = Number.EPSILON;
   }
   return Math.abs(a - b) < tol;
-}
-
-/**
- * Check if two numbers are similar.
- * Progressively tries larger tolerances up to tol*tolNum.
- *
- * @param {number} a The first number.
- * @param {number} b The second number.
- * @param {number} [tol] Optional comparison tolerance,
- *   defaults to Number.EPSILON.
- * @param {number} [tolNum] Optional tolerated tolerance number,
- *   default to 1, returns true with a message
- *   if tol < Math.abs(a-b) < tolNum*tol.
- * @returns {BooleanResult} True if the value is below tolNum*tol,
- *   false otherwise.
- */
-export function isSimilarProgressive(a, b, tol, tolNum) {
-  // abs is done in isBellowTolerance
-  return isBellowTolerance((a - b), tol, tolNum);
-}
-
-/**
- * Check if a value is below a given tolerance.
- * Progressively tries larger tolerances up to tol*tolNum.
- *
- * @param {number} value The value to test.
- * @param {number} [tol] Optional tolerance,
- *   defaults to Number.EPSILON.
- * @param {number} [tolNum] Optional tolerated tolerance number,
- *   default to 1, returns true with a message
- *   if tol < value < tolNum*tol.
- * @returns {BooleanResult} True if the value is below tolNum*tol,
- *   false otherwise.
- */
-export function isBellowTolerance(value, tol, tolNum) {
-  if (typeof tol === 'undefined') {
-    tol = Number.EPSILON;
-  }
-  if (typeof tolNum === 'undefined') {
-    tolNum = 1;
-  }
-  // how many tols away
-  const multiple = Math.abs(value) / tol;
-
-  const res = multiple < tolNum;
-  const br = new BooleanResult(res);
-  if (!res) {
-    br.message = `${precisionRound(multiple, 2)}`;
-  }
-  return br;
 }
 
 /**
