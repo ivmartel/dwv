@@ -347,11 +347,13 @@ export class SegmentationUI {
    * Add a segment HTML to the main HTML.
    *
    * @param {Segmentation} segmentation The segmentation.
+   * @param {boolean} [selectFirst] Optional flag to select the first
+   *   segment (and pass it to the brush).
    */
-  #addSegmentationHtml(segmentation) {
+  #addSegmentationHtml(segmentation, selectFirst = false) {
     // segmentation as html
-    const item =
-      this.#getSegmentationHtml(segmentation, _segmentations.length - 1);
+    const item = this.#getSegmentationHtml(
+      segmentation, _segmentations.length - 1, selectFirst);
 
     // add segmentation item
     const addItem = this.#rootDoc.getElementById('addsegmentationitem');
@@ -403,12 +405,17 @@ export class SegmentationUI {
           };
           // add to list
           _segmentations.push(segmentation);
-          // add to html
-          this.#addSegmentationHtml(segmentation);
+          // add to html, select segment to pass the mask id to the brush
+          this.#addSegmentationHtml(segmentation, true);
         } else {
-          const indices = splitSegmentHtmlId(
-            getRootFromHtmlId(prefixes.select, selectSegmentCheckedId));
-          const segmentation = _segmentations[indices.segmentationIndex];
+          const segmentation = _segmentations[
+            this.#getSegmentationIndexFromSelectId(selectSegmentCheckedId)
+          ];
+          if (typeof segmentation === 'undefined') {
+            throw new Error(
+              `No segmentation for selected input: ${selectSegmentCheckedId}`
+            );
+          }
           // segmentation created with add segmentation
           if (typeof segmentation.dataId === 'undefined') {
             segmentation.dataId = dataId;
@@ -450,7 +457,7 @@ export class SegmentationUI {
         }
       }
 
-      if (this.#withMerge && _segmentations.length > 1) {
+      if (this.#withMerge && this.#canMerge()) {
         const mergeSegButton =
           this.#rootDoc.getElementById(`${prefixes.mergeSaveSeg}0`);
         mergeSegButton.disabled = false;
@@ -462,6 +469,34 @@ export class SegmentationUI {
       }
     }
   };
+
+  /**
+   * Check if the first two segmentations can be merged:
+   * they both need mask data.
+   *
+   * @returns {boolean} True if mergeable.
+   */
+  #canMerge() {
+    return _segmentations.length > 1 &&
+      typeof _segmentations[0].dataId !== 'undefined' &&
+      typeof _segmentations[1].dataId !== 'undefined';
+  }
+
+  /**
+   * Get the segmentation index from a select input id, being
+   * a segment or an eraser select.
+   *
+   * @param {string} selectId The select input id.
+   * @returns {number} The segmentation index.
+   */
+  #getSegmentationIndexFromSelectId(selectId) {
+    if (selectId.startsWith(prefixes.selectEraser)) {
+      return splitSegmentationHtmlId(
+        getRootFromHtmlId(prefixes.selectEraser, selectId));
+    }
+    return splitSegmentHtmlId(
+      getRootFromHtmlId(prefixes.select, selectId)).segmentationIndex;
+  }
 
   /**
    * Setup the html for the segmentation list.
@@ -495,8 +530,8 @@ export class SegmentationUI {
       };
       // add to list
       _segmentations.push(segmentation);
-      // add to html
-      this.#addSegmentationHtml(segmentation);
+      // add to html, select segment to start drawing
+      this.#addSegmentationHtml(segmentation, true);
     };
     addItem.appendChild(addSegmentationButton);
     segList.appendChild(addItem);
@@ -829,7 +864,7 @@ export class SegmentationUI {
     selectInput.title = segmentId;
     selectInput.onchange = this.#onSegmentSelect;
 
-    if (segment.number === 1 || selectSegment) {
+    if (selectSegment) {
       selectInput.checked = true;
       this.#appSelectSegment(segment.number, _segmentations[segmentationIndex]);
     }
@@ -997,8 +1032,10 @@ export class SegmentationUI {
     const segmentation = _segmentations[segmentationIndex];
     const segments = segmentation.segments;
 
-    // create new segment
-    const newSegment = getNewSegment(segments.length + 1);
+    // create new segment: numbers are not necessarily contiguous
+    const maxNumber = segments.reduce(
+      (max, segment) => Math.max(max, segment.number), 0);
+    const newSegment = getNewSegment(maxNumber + 1);
     // add to list
     segments.push(newSegment);
     // update flag
@@ -1067,6 +1104,9 @@ export class SegmentationUI {
     const target = event.target;
     // get format
     const asRtss = target.id.startsWith(prefixes.mergeSaveRtss);
+    if (!this.#canMerge()) {
+      throw new Error('Cannot merge segmentations without mask data');
+    }
     // merge first two masks
     const dataCtrl = this.#service.getDataController();
     const maskId0 = _segmentations[0].dataId;
@@ -1247,9 +1287,11 @@ export class SegmentationUI {
    *
    * @param {Segmentation} segmentation The segmentation.
    * @param {number} segmentationIndex The segmentation index.
+   * @param {boolean} [selectFirst] Optional flag to select the first
+   *   segment.
    * @returns {HTMLLIElement} The HTML element.
    */
-  #getSegmentationHtml(segmentation, segmentationIndex) {
+  #getSegmentationHtml(segmentation, segmentationIndex, selectFirst = false) {
     const segmentationName = getSegmentationHtmlId(segmentationIndex);
 
     // name
@@ -1289,8 +1331,9 @@ export class SegmentationUI {
     const listDiv = document.createElement('ul');
     listDiv.id = `${segmentationName}-list`;
     listDiv.className = 'data-item-list';
-    for (const segment of segmentation.segments) {
-      listDiv.appendChild(this.#getSegmentHtml(segment, segmentationIndex));
+    for (let i = 0; i < segmentation.segments.length; ++i) {
+      listDiv.appendChild(this.#getSegmentHtml(
+        segmentation.segments[i], segmentationIndex, selectFirst && i === 0));
     }
 
     // data-item-header
