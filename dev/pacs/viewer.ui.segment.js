@@ -49,13 +49,12 @@ import {
  * @property {MaskSegmentViewHelper} viewHelper A view helper.
  */
 
-// global vars
 /**
  * List of possible colours.
  *
  * @type {RGB[]}
  */
-const _colours = [
+const defaultColours = [
   {r: 255, g: 0, b: 0},
   {r: 0, g: 255, b: 0},
   {r: 0, g: 0, b: 255},
@@ -78,18 +77,6 @@ const _colours = [
   {r: 255, g: 255, b: 64},
   {r: 64, g: 64, b: 64},
 ];
-/**
- * Colour array to pick from.
- *
- * @type {RGB[]}
- */
-let _coloursPick = _colours.slice();
-/**
- * List of segmentations.
- *
- * @type {Segmentation[]}
- */
-const _segmentations = [];
 
 /**
  * Get a segment from a segment list.
@@ -102,46 +89,6 @@ function getSegment(segmentNumber, segments) {
   return segments.find(function (item) {
     return item.number === segmentNumber;
   });
-}
-
-/**
- * Get the next available colour from the colour list.
- *
- * @returns {RGB} The colour as {r,g,b}.
- */
-function nextColour() {
-  // recreate if empty
-  if (_coloursPick.length === 0) {
-    console.log('Regenerating colours...');
-    _coloursPick = _colours.slice();
-  }
-  // pick first in list
-  const colour = _coloursPick[0];
-  // remove picked
-  _coloursPick.splice(0, 1);
-  // return first
-  return colour;
-}
-
-/**
- * Get a new segment.
- *
- * @param {number} number The segment number.
- * @returns {MaskSegment} The new segment.
- */
-function getNewSegment(number) {
-  return {
-    number,
-    algorithmType: 'MANUAL',
-    algorithmName: undefined,
-    label: `s${number}`,
-    displayRGBValue: nextColour(),
-    displayValue: undefined,
-    propertyCategoryCode: getSegmentationCode(),
-    propertyTypeCode: getSegmentationCode(),
-    trackingId: undefined,
-    trackingUid: undefined
-  };
 }
 
 /**
@@ -257,6 +204,20 @@ export class SegmentationUI {
   #withMerge = true;
 
   /**
+   * Colour array to pick from.
+   *
+   * @type {RGB[]}
+   */
+  #coloursPick = defaultColours.slice();
+
+  /**
+   * List of segmentations.
+   *
+   * @type {Segmentation[]}
+   */
+  #segmentations = [];
+
+  /**
    * @param {ViewerService} service The associated viewer service.
    * @param {Document} [rootDoc] Optional root document,
    *   defaults to `window.document`.
@@ -266,6 +227,42 @@ export class SegmentationUI {
     if (typeof rootDoc !== 'undefined') {
       this.#rootDoc = rootDoc;
     }
+  }
+
+  /**
+   * Get the next available colour from the colour list.
+   *
+   * @returns {RGB} The colour as {r,g,b}.
+   */
+  #nextColour() {
+    // recreate if empty
+    if (this.#coloursPick.length === 0) {
+      console.log('Regenerating colours...');
+      this.#coloursPick = defaultColours.slice();
+    }
+    // pick and remove first in list, return a copy
+    return {...this.#coloursPick.shift()};
+  }
+
+  /**
+   * Get a new segment.
+   *
+   * @param {number} number The segment number.
+   * @returns {MaskSegment} The new segment.
+   */
+  #getNewSegment(number) {
+    return {
+      number,
+      algorithmType: 'MANUAL',
+      algorithmName: undefined,
+      label: `s${number}`,
+      displayRGBValue: this.#nextColour(),
+      displayValue: undefined,
+      propertyCategoryCode: getSegmentationCode(),
+      propertyTypeCode: getSegmentationCode(),
+      trackingId: undefined,
+      trackingUid: undefined
+    };
   }
 
   /**
@@ -332,7 +329,7 @@ export class SegmentationUI {
    */
   #onLabelsChanged = (event) => {
     const segmentation =
-      _segmentations.find(
+      this.#segmentations.find(
         (seg) => {
           return seg.dataId === event.detail.dataid;
         }
@@ -353,7 +350,7 @@ export class SegmentationUI {
   #addSegmentationHtml(segmentation, selectFirst = false) {
     // segmentation as html
     const item = this.#getSegmentationHtml(
-      segmentation, _segmentations.length - 1, selectFirst);
+      segmentation, this.#segmentations.length - 1, selectFirst);
 
     // add segmentation item
     const addItem = this.#rootDoc.getElementById('addsegmentationitem');
@@ -366,7 +363,7 @@ export class SegmentationUI {
     segList.appendChild(addItem);
 
     if (this.#withOverlapCheck) {
-      this.#addOverlapCheckerSelection(_segmentations.length - 1);
+      this.#addOverlapCheckerSelection(this.#segmentations.length - 1);
     }
   }
 
@@ -393,7 +390,7 @@ export class SegmentationUI {
         if (typeof selectSegmentCheckedId === 'undefined') {
           // default segment created at first brush
           const segmentNumber = 1;
-          const segment = getNewSegment(segmentNumber);
+          const segment = this.#getNewSegment(segmentNumber);
           // default segmentation
           const segmentation = {
             dataId,
@@ -404,11 +401,11 @@ export class SegmentationUI {
             viewHelper: new MaskSegmentViewHelper()
           };
           // add to list
-          _segmentations.push(segmentation);
+          this.#segmentations.push(segmentation);
           // add to html, select segment to pass the mask id to the brush
           this.#addSegmentationHtml(segmentation, true);
         } else {
-          const segmentation = _segmentations[
+          const segmentation = this.#segmentations[
             this.#getSegmentationIndexFromSelectId(selectSegmentCheckedId)
           ];
           if (typeof segmentation === 'undefined') {
@@ -438,7 +435,7 @@ export class SegmentationUI {
             viewHelper: new MaskSegmentViewHelper()
           };
           // add to list
-          _segmentations.push(segmentation);
+          this.#segmentations.push(segmentation);
           // calculate labels
           this.#calculateLabels(dataId);
           // add to html
@@ -446,12 +443,12 @@ export class SegmentationUI {
 
           // remove colour from colour pick
           for (const segment of imgMeta.custom.segments) {
-            const index = _coloursPick.findIndex((item) =>
+            const index = this.#coloursPick.findIndex((item) =>
               item.r === segment.displayRGBValue.r &&
               item.g === segment.displayRGBValue.g &&
               item.b === segment.displayRGBValue.b);
             if (index !== -1) {
-              _coloursPick.splice(index, 1);
+              this.#coloursPick.splice(index, 1);
             }
           }
         }
@@ -477,9 +474,9 @@ export class SegmentationUI {
    * @returns {boolean} True if mergeable.
    */
   #canMerge() {
-    return _segmentations.length > 1 &&
-      typeof _segmentations[0].dataId !== 'undefined' &&
-      typeof _segmentations[1].dataId !== 'undefined';
+    return this.#segmentations.length > 1 &&
+      typeof this.#segmentations[0].dataId !== 'undefined' &&
+      typeof this.#segmentations[1].dataId !== 'undefined';
   }
 
   /**
@@ -508,8 +505,9 @@ export class SegmentationUI {
     segList.className = 'data-list';
 
     // loop on segmentations
-    for (let i = 0; i < _segmentations.length; ++i) {
-      const segmentationItem = this.#getSegmentationHtml(_segmentations[i], i);
+    for (let i = 0; i < this.#segmentations.length; ++i) {
+      const segmentationItem =
+        this.#getSegmentationHtml(this.#segmentations[i], i);
       segList.appendChild(segmentationItem);
     }
 
@@ -525,11 +523,11 @@ export class SegmentationUI {
         dataId: undefined,
         labels: [],
         hasNewSegments: true,
-        segments: [getNewSegment(1)],
+        segments: [this.#getNewSegment(1)],
         viewHelper: new MaskSegmentViewHelper()
       };
       // add to list
-      _segmentations.push(segmentation);
+      this.#segmentations.push(segmentation);
       // add to html, select segment to start drawing
       this.#addSegmentationHtml(segmentation, true);
     };
@@ -623,7 +621,7 @@ export class SegmentationUI {
     // get segment
     const indices = splitSegmentHtmlId(
       getRootFromHtmlId(prefixes.select, target.id));
-    const segmentation = _segmentations[indices.segmentationIndex];
+    const segmentation = this.#segmentations[indices.segmentationIndex];
     // select it
     this.#appSelectSegment(indices.segmentNumber, segmentation);
   };
@@ -639,7 +637,7 @@ export class SegmentationUI {
     // get segment
     const indices = splitSegmentHtmlId(
       getRootFromHtmlId(prefixes.colour, target.id));
-    const segmentation = _segmentations[indices.segmentationIndex];
+    const segmentation = this.#segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
     const segmentHexColour = rgbToHex(segment.displayRGBValue);
 
@@ -688,7 +686,7 @@ export class SegmentationUI {
     // get segment
     const indices = splitSegmentHtmlId(
       getRootFromHtmlId(prefixes.li, target.id));
-    const segmentation = _segmentations[indices.segmentationIndex];
+    const segmentation = this.#segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
 
     // Find the first label for this segment
@@ -722,7 +720,7 @@ export class SegmentationUI {
     // get segment
     const indices = splitSegmentHtmlId(
       getRootFromHtmlId(prefixes.view, target.id));
-    const segmentation = _segmentations[indices.segmentationIndex];
+    const segmentation = this.#segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
     // toggle hidden
     const segViewHelper = segmentation.viewHelper;
@@ -758,7 +756,7 @@ export class SegmentationUI {
     // get segment
     const indices = splitSegmentHtmlId(
       getRootFromHtmlId(prefixes.delete, target.id));
-    const segmentation = _segmentations[indices.segmentationIndex];
+    const segmentation = this.#segmentations[indices.segmentationIndex];
     const segmentId = getSegmentHtmlId(
       indices.segmentNumber, indices.segmentationIndex);
 
@@ -870,7 +868,8 @@ export class SegmentationUI {
 
     if (selectSegment) {
       selectInput.checked = true;
-      this.#appSelectSegment(segment.number, _segmentations[segmentationIndex]);
+      this.#appSelectSegment(
+        segment.number, this.#segmentations[segmentationIndex]);
     }
 
     const selectLabel = document.createElement('label');
@@ -888,7 +887,7 @@ export class SegmentationUI {
       // get segment
       const indices = splitSegmentHtmlId(
         getRootFromHtmlId(prefixes.info, target.id));
-      const segmentation = _segmentations[indices.segmentationIndex];
+      const segmentation = this.#segmentations[indices.segmentationIndex];
       const segment2 = getSegment(indices.segmentNumber, segmentation.segments);
       const labelsInfo = this.#getLabelsInfo(segment2, segmentationIndex);
 
@@ -1018,7 +1017,7 @@ export class SegmentationUI {
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
       getRootFromHtmlId(prefixes.selectEraser, target.id));
-    const segmentation = _segmentations[segmentationIndex];
+    const segmentation = this.#segmentations[segmentationIndex];
     // select eraser
     this.#appSelectEraser(segmentation);
   };
@@ -1033,13 +1032,13 @@ export class SegmentationUI {
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
       getRootFromHtmlId(prefixes.addSegment, target.id));
-    const segmentation = _segmentations[segmentationIndex];
+    const segmentation = this.#segmentations[segmentationIndex];
     const segments = segmentation.segments;
 
     // create new segment: numbers are not necessarily contiguous
     const maxNumber = segments.reduce(
       (max, segment) => Math.max(max, segment.number), 0);
-    const newSegment = getNewSegment(maxNumber + 1);
+    const newSegment = this.#getNewSegment(maxNumber + 1);
     // add to list
     segments.push(newSegment);
     // update flag
@@ -1065,7 +1064,7 @@ export class SegmentationUI {
       getRootFromHtmlId(prefixes.saveSeg, target.id));
     const segmentationName = getSegmentationHtmlId(segmentationIndex);
     const fileName = `${segmentationName}-seg`;
-    const segmentation = _segmentations[segmentationIndex];
+    const segmentation = this.#segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
     // save
     const dataCtrl = this.#service.getDataController();
@@ -1088,7 +1087,7 @@ export class SegmentationUI {
       getRootFromHtmlId(prefixes.saveRtss, target.id));
     const segmentationName = getSegmentationHtmlId(segmentationIndex);
     const fileName = `${segmentationName}-rtss`;
-    const segmentation = _segmentations[segmentationIndex];
+    const segmentation = this.#segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
     // save
     const dataCtrl = this.#service.getDataController();
@@ -1113,9 +1112,9 @@ export class SegmentationUI {
     }
     // merge first two masks
     const dataCtrl = this.#service.getDataController();
-    const maskId0 = _segmentations[0].dataId;
+    const maskId0 = this.#segmentations[0].dataId;
     const maskImage0 = dataCtrl.get(maskId0).image;
-    const maskId1 = _segmentations[1].dataId;
+    const maskId1 = this.#segmentations[1].dataId;
     const maskImage1 = dataCtrl.get(maskId1).image;
 
     const mergedImage = mergeMaskImages(maskImage0, maskImage1);
@@ -1261,7 +1260,7 @@ export class SegmentationUI {
    */
   #getLabelsInfo(segment, segmentationIndex) {
     // get the labels info strings
-    const segmentation = _segmentations[segmentationIndex];
+    const segmentation = this.#segmentations[segmentationIndex];
     const labelsInfo = [];
     for (const label of segmentation.labels) {
       if (label.id === segment.number) {
@@ -1444,9 +1443,9 @@ export class SegmentationUI {
 
     overlapButton.onclick = (/*event*/) => {
       const segmentation0 =
-        _segmentations[parseInt(overlapSelect0.value, 10)];
+        this.#segmentations[parseInt(overlapSelect0.value, 10)];
       const segmentation1 =
-        _segmentations[parseInt(overlapSelect1.value, 10)];
+        this.#segmentations[parseInt(overlapSelect1.value, 10)];
       const dataCtrl = this.#service.getDataController();
       const maskData0 = dataCtrl.get(segmentation0?.dataId);
       const maskData1 = dataCtrl.get(segmentation1?.dataId);
