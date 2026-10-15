@@ -201,7 +201,7 @@ export class AnnotationUI {
       const target = event.target;
       // get annotation
       const indices =
-        splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
+        splitAnnotationDivId(target.id.substring(ibIdPrefix.length));
       const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
       const annotationGroup = dataCtrl.get(clkDataId).annotationGroup;
@@ -270,19 +270,13 @@ export class AnnotationUI {
         splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
       const clkDataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const drawLayers =
-        this.#dwvService.getStageController().getDrawLayersByDataId(clkDataId);
-      // toggle hidden
-      if (isButtonPressed(target)) {
-        setButtonPressed(target, false);
-        for (const layer of drawLayers) {
-          layer.setAnnotationVisibility(annotationId, true);
-        }
-      } else {
-        setButtonPressed(target, true);
-        for (const layer of drawLayers) {
-          layer.setAnnotationVisibility(annotationId, false);
-        }
+      const drawLayers = this.#dwvService.getStageController()
+        .getDrawLayersByDataId(clkDataId);
+      // toggle view
+      const isPressed = isButtonPressed(target);
+      setButtonPressed(target, !isPressed);
+      for (const layer of drawLayers) {
+        layer.setAnnotationVisibility(annotationId, isPressed);
       }
     };
 
@@ -399,16 +393,10 @@ export class AnnotationUI {
     lockButton.onclick = function (event) {
       const target = event.target;
       // toggle hidden
-      if (isButtonPressed(target)) {
-        setButtonPressed(target, false);
-        if (typeof annotationGroup !== 'undefined') {
-          annotationGroup.setEditable(true);
-        }
-      } else {
-        setButtonPressed(target, true);
-        if (typeof annotationGroup !== 'undefined') {
-          annotationGroup.setEditable(false);
-        }
+      const isPressed = isButtonPressed(target);
+      setButtonPressed(target, !isPressed);
+      if (typeof annotationGroup !== 'undefined') {
+        annotationGroup.setEditable(isPressed);
       }
     };
 
@@ -459,14 +447,12 @@ export class AnnotationUI {
         .getDrawLayersByDataId(dataId)[0];
       if (typeof drawLayer === 'undefined') {
         console.warn(`Cannot find draw layer with id ${dataId}`);
+        return;
       }
-      if (isButtonPressed(target)) {
-        setButtonPressed(target, false);
-        drawLayer.setLabelsVisibility(true);
-      } else {
-        setButtonPressed(target, true);
-        drawLayer.setLabelsVisibility(false);
-      }
+      // toggle hide
+      const isPressed = isButtonPressed(target);
+      setButtonPressed(target, !isPressed);
+      drawLayer.setLabelsVisibility(isPressed);
     };
 
     // actions
