@@ -705,6 +705,12 @@ export class SegmentationUI {
       // update labels
       this.#calculateLabels(segmentation.dataId);
     } else {
+      // no mask yet: remove from the segmentation segments so that
+      // it is not added to the mask when it gets created
+      const index = segmentation.segments.indexOf(segment);
+      if (index !== -1) {
+        segmentation.segments.splice(index, 1);
+      }
       listItem.remove();
     }
 
