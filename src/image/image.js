@@ -1,7 +1,6 @@
 import {Index} from '../math/index.js';
 import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
-import {arrayContains} from '../utils/array.js';
 import {getTypedArray} from '../dicom/dicomParser.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
@@ -164,11 +163,12 @@ export class Image extends EventTarget {
   #rawBuffer;
 
   /**
-   * Image UIDs.
+   * Per-slice data: the image UID and origin of each image
+   *   slice, indexed by slice number.
    *
-   * @type {string[]}
+   * @type {{uid: string, origin: Point3D}[]}
    */
-  #imageUids;
+  #imageSlices;
 
   /**
    * Constant rescale slope and intercept (default).
@@ -282,7 +282,11 @@ export class Image extends EventTarget {
     this.#resamplingJobId = '0';
     this.#rawGeometry = null;
     this.#rawBuffer = null;
-    this.#imageUids = imageUids;
+    const origins = this.#geometry.getOrigins();
+    this.#imageSlices = origins.map((origin, index) => ({
+      uid: typeof imageUids !== 'undefined' ? imageUids[index] : undefined,
+      origin
+    }));
     this.#resamplingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
@@ -344,9 +348,9 @@ export class Image extends EventTarget {
    * @returns {string} The UID.
    */
   getImageUid(index) {
-    let uid = this.#imageUids[0];
-    if (this.#imageUids.length !== 1 && typeof index !== 'undefined') {
-      uid = this.#imageUids[this.getSecondaryOffset(index)];
+    let uid = this.#imageSlices[0].uid;
+    if (this.#imageSlices.length !== 1 && typeof index !== 'undefined') {
+      uid = this.#imageSlices[this.getSecondaryOffset(index)].uid;
     }
     return uid;
   }
@@ -359,10 +363,9 @@ export class Image extends EventTarget {
    */
   getOriginForImageUid(uid) {
     let origin;
-    const uidIndex = this.#imageUids.indexOf(uid);
-    if (uidIndex !== -1) {
-      const origins = this.getGeometry().getOrigins();
-      origin = origins[uidIndex];
+    const slice = this.#imageSlices.find((item) => item.uid === uid);
+    if (typeof slice !== 'undefined') {
+      origin = slice.origin;
     }
     return origin;
   }
@@ -374,7 +377,7 @@ export class Image extends EventTarget {
    * @returns {boolean} True if present.
    */
   includesImageUid(uid) {
-    return this.#imageUids.includes(uid);
+    return this.#imageSlices.some((item) => item.uid === uid);
   }
 
   /**
@@ -384,7 +387,7 @@ export class Image extends EventTarget {
    * @returns {boolean} True if all uids are in this image uids.
    */
   containsImageUids(uids) {
-    return arrayContains(this.#imageUids, uids);
+    return uids.length > 0 && uids.every((uid) => this.includesImageUid(uid));
   }
 
   /**
@@ -772,7 +775,14 @@ export class Image extends EventTarget {
     // the mask-specific state)
     const Ctor = /** @type {ImageConstructor} */ (this.constructor);
     const copy = new Ctor(
-      this.getGeometry().clone(), clonedBuffer, this.#imageUids);
+      this.getGeometry().clone(), clonedBuffer,
+      this.#imageSlices.map((item) => item.uid));
+    // copy as new objects so that appending a slice to the clone
+    // cannot splice into (and corrupt) this image's own slice data
+    copy.#imageSlices = this.#imageSlices.map((item) => ({
+      uid: item.uid,
+      origin: item.origin
+    }));
     // copy the RSI(s)
     if (this.isConstantRSI()) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
@@ -1035,10 +1045,14 @@ export class Image extends EventTarget {
       rhs.getRescaleSlopeAndIntercept(), fullSliceIndex);
 
     // current number of images
-    const numberOfImages = this.#imageUids.length;
+    const numberOfImages = this.#imageSlices.length;
 
-    // insert sop instance UIDs
-    this.#imageUids.splice(fullSliceIndex, 0, rhs.getImageUid());
+    // insert the sop instance UID and origin as a single entry so that
+    // one splice cannot desynchronise them from each other
+    this.#imageSlices.splice(fullSliceIndex, 0, {
+      uid: rhs.getImageUid(),
+      origin: rhs.getGeometry().getOrigin()
+    });
 
     // update window presets
     if (typeof this.#meta.windowPresets !== 'undefined') {

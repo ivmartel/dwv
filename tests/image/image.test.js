@@ -1,5 +1,6 @@
 import {describe, test, assert} from 'vitest';
 import {Point3D} from '../../src/math/point.js';
+import {Matrix33} from '../../src/math/matrix.js';
 import {Index} from '../../src/math/index.js';
 import {getStats} from '../../src/math/stats.js';
 import {arrayEquals} from '../../src/utils/array.js';
@@ -709,6 +710,387 @@ describe('image', () => {
     assert.equal(image0.getMeta().Modality, modality0, 'Image modality #1');
     assert.equal(image1.getMeta().Modality, modality1,
       'Clone image modality #1');
+  });
+
+  /**
+   * Create a 2 slices x 2 time points image (one uid per slice,
+   *   uid 't{time}z{z}') by appending single slices.
+   *
+   * @returns {Image} The image.
+   */
+  function makeTwoTimePointImage() {
+    const spacing = new Spacing([1, 1, 1]);
+
+    /**
+     * Create a single slice image.
+     *
+     * @param {number} z The slice z origin.
+     * @param {number} time The time point.
+     * @returns {Image} The slice image.
+     */
+    function makeSlice(z, time) {
+      const geometry = new Geometry(
+        [new Point3D(0, 0, z)], new Size([2, 2, 1]), spacing,
+        undefined, time);
+      const image = new Image(geometry, new Int16Array(4), [`t${time}z${z}`]);
+      image.setMeta({sliceCapacity: 4});
+      return image;
+    }
+
+    const image = makeSlice(0, 0);
+    image.appendSlice(makeSlice(1, 0));
+    image.appendSlice(makeSlice(0, 1));
+    image.appendSlice(makeSlice(1, 1));
+    return image;
+  }
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} on a multivolume image:
+   *   origins of every volume are found.
+   *
+   * @function module:tests/image~getOriginForImageUidMultivolume
+   */
+  test('getOriginForImageUid multivolume', () => {
+    const image = makeTwoTimePointImage();
+    assert.ok(image.getOriginForImageUid('t0z1').equals(new Point3D(0, 0, 1)),
+      'time0 slice1 origin');
+    assert.ok(image.getOriginForImageUid('t1z0').equals(new Point3D(0, 0, 0)),
+      'time1 slice0 origin');
+    assert.ok(image.getOriginForImageUid('t1z1').equals(new Point3D(0, 0, 1)),
+      'time1 slice1 origin');
+    assert.equal(image.getOriginForImageUid('unknown'), undefined,
+      'unknown uid');
+  });
+
+  /**
+   * Tests for {@link Image#containsImageUids}.
+   *
+   * @function module:tests/image~containsImageUids
+   */
+  test('containsImageUids', () => {
+    const image = makeTwoTimePointImage();
+    assert.ok(image.containsImageUids(['t0z0', 't1z1']),
+      'contains a subset of its own uids');
+    assert.ok(image.containsImageUids(['t0z0', 't0z1', 't1z0', 't1z1']),
+      'contains all of its own uids');
+    assert.notOk(image.containsImageUids(['t0z0', 'unknown']),
+      'does not contain an unknown uid');
+    assert.notOk(image.containsImageUids([]),
+      'empty uid list is not contained');
+  });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} after an out-of-order
+   *   (mid-array) {@link Image#appendSlice}, within a single time point.
+   *
+   * @function module:tests/image~getOriginForImageUidOutOfOrderAppend
+   */
+  test('getOriginForImageUid after out-of-order append', () => {
+    const spacing = new Spacing([1, 1, 1]);
+
+    /**
+     * Create a single slice image.
+     *
+     * @param {number} z The slice z origin.
+     * @param {string} uid The slice uid.
+     * @returns {Image} The slice image.
+     */
+    function makeSlice(z, uid) {
+      const geometry = new Geometry(
+        [new Point3D(0, 0, z)], new Size([2, 2, 1]), spacing);
+      const image = new Image(geometry, new Int16Array(4), [uid]);
+      image.setMeta({sliceCapacity: 3});
+      return image;
+    }
+
+    // append z=0 then z=2, then insert z=1 in the middle of the array
+    const image = makeSlice(0, 'z0');
+    image.appendSlice(makeSlice(2, 'z2'));
+    image.appendSlice(makeSlice(1, 'z1'));
+
+    assert.ok(image.getOriginForImageUid('z0').equals(new Point3D(0, 0, 0)),
+      'slice0 origin');
+    assert.ok(image.getOriginForImageUid('z1').equals(new Point3D(0, 0, 1)),
+      'slice1 origin');
+    assert.ok(image.getOriginForImageUid('z2').equals(new Point3D(0, 0, 2)),
+      'slice2 origin');
+  });
+
+  /**
+   * Create a single slice image with a given z origin and time point.
+   *
+   * @param {Spacing} spacing The slice spacing.
+   * @param {number} z The slice z origin.
+   * @param {number} time The time point.
+   * @returns {Image} The slice image.
+   */
+  function makeTimeSlice(spacing, z, time) {
+    const geometry = new Geometry(
+      [new Point3D(0, 0, z)], new Size([2, 2, 1]), spacing,
+      undefined, time);
+    const image = new Image(geometry, new Int16Array(4), [`t${time}z${z}`]);
+    image.setMeta({sliceCapacity: 5});
+    return image;
+  }
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} after appending
+   *   slices in reverse order, across time points.
+   *
+   * @function module:tests/image~getOriginForImageUidReverseOrderAppend
+   */
+  test('getOriginForImageUid after reverse-order append across time points',
+    () => {
+      const spacing = new Spacing([1, 1, 1]);
+
+      // build the last time point and slice first, then work backwards
+      const image = makeTimeSlice(spacing, 1, 1);
+      image.appendSlice(makeTimeSlice(spacing, 0, 1));
+      image.appendSlice(makeTimeSlice(spacing, 1, 0));
+      image.appendSlice(makeTimeSlice(spacing, 0, 0));
+
+      assert.ok(image.getOriginForImageUid('t0z0').equals(new Point3D(0, 0, 0)),
+        'time0 slice0 origin');
+      assert.ok(image.getOriginForImageUid('t0z1').equals(new Point3D(0, 0, 1)),
+        'time0 slice1 origin');
+      assert.ok(image.getOriginForImageUid('t1z0').equals(new Point3D(0, 0, 0)),
+        'time1 slice0 origin');
+      assert.ok(image.getOriginForImageUid('t1z1').equals(new Point3D(0, 0, 1)),
+        'time1 slice1 origin');
+    });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} after appending
+   *   slices interleaved between time points, instead of finishing
+   *   one time point before starting the next.
+   *
+   * @function module:tests/image~getOriginForImageUidVolumeInterleavedAppend
+   */
+  test('getOriginForImageUid after volume-interleaved append', () => {
+    const spacing = new Spacing([1, 1, 1]);
+
+    // alternate between time points while building, instead of
+    // completing time0 before starting time1
+    const image = makeTimeSlice(spacing, 0, 0);
+    image.appendSlice(makeTimeSlice(spacing, 0, 1));
+    image.appendSlice(makeTimeSlice(spacing, 1, 0));
+    image.appendSlice(makeTimeSlice(spacing, 1, 1));
+
+    assert.ok(image.getOriginForImageUid('t0z0').equals(new Point3D(0, 0, 0)),
+      'time0 slice0 origin');
+    assert.ok(image.getOriginForImageUid('t0z1').equals(new Point3D(0, 0, 1)),
+      'time0 slice1 origin');
+    assert.ok(image.getOriginForImageUid('t1z0').equals(new Point3D(0, 0, 0)),
+      'time1 slice0 origin');
+    assert.ok(image.getOriginForImageUid('t1z1').equals(new Point3D(0, 0, 1)),
+      'time1 slice1 origin');
+  });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} after a mid-array
+   *   insert within one time point, while another time point already
+   *   has slices of its own.
+   *
+   * @function module:tests/image~getOriginForImageUidMultivolumeMidInsert
+   */
+  test('getOriginForImageUid after mid-array insert with another ' +
+    'time point already present', () => {
+    const spacing = new Spacing([1, 1, 1]);
+
+    // time0 gets a gap at z=1, time1 is built in between, then the
+    // gap in time0 is filled last
+    const image = makeTimeSlice(spacing, 0, 0);
+    image.appendSlice(makeTimeSlice(spacing, 2, 0));
+    image.appendSlice(makeTimeSlice(spacing, 0, 1));
+    image.appendSlice(makeTimeSlice(spacing, 1, 0));
+
+    assert.ok(image.getOriginForImageUid('t0z0').equals(new Point3D(0, 0, 0)),
+      'time0 slice0 origin');
+    assert.ok(image.getOriginForImageUid('t0z1').equals(new Point3D(0, 0, 1)),
+      'time0 slice1 origin');
+    assert.ok(image.getOriginForImageUid('t0z2').equals(new Point3D(0, 0, 2)),
+      'time0 slice2 origin');
+    assert.ok(image.getOriginForImageUid('t1z0').equals(new Point3D(0, 0, 0)),
+      'time1 slice0 origin unaffected by the later time0 insert');
+  });
+
+  /**
+   * Tests for {@link Image#clone} and {@link Image#appendSlice}:
+   *   appending an out-of-order slice to a multivolume clone does not
+   *   affect the original.
+   *
+   * @function module:tests/image~cloneThenAppendOutOfOrderMultivolumeSlice
+   */
+  test('clone then append out-of-order slice to a multivolume clone ' +
+    'does not affect original', () => {
+    const image = makeTwoTimePointImage();
+    const copy = image.clone();
+    copy.setMeta({sliceCapacity: 5});
+    copy.appendSlice(makeTimeSlice(new Spacing([1, 1, 1]), 2, 0));
+
+    // the clone gained the new slice, at its own origin
+    assert.ok(copy.getOriginForImageUid('t0z2').equals(new Point3D(0, 0, 2)),
+      'clone has the new slice origin');
+    // the clone's other existing data is still correct
+    assert.ok(copy.getOriginForImageUid('t1z1').equals(new Point3D(0, 0, 1)),
+      'clone time1 slice1 origin unaffected');
+
+    // the original must not have been affected by the clone's append
+    assert.notOk(image.includesImageUid('t0z2'),
+      'original does not include the new uid');
+    assert.ok(image.getOriginForImageUid('t0z1').equals(new Point3D(0, 0, 1)),
+      'original time0 slice1 origin unaffected');
+  });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} after
+   *   {@link Image#appendSlice}, when the constructor was given fewer
+   *   uids than the geometry has origins.
+   *
+   * @function module:tests/image~getOriginForImageUidConstructorMismatch
+   */
+  test('getOriginForImageUid stays correct after appendSlice when the ' +
+    'constructor was given fewer uids than the geometry has origins',
+  () => {
+    // geometry has 2 slices (z=0, z=1), but only 1 uid is passed in
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+      new Size([2, 2, 2]), new Spacing([1, 1, 1]));
+    const image = new Image(geometry, new Int16Array(8), ['uidZ0']);
+    image.setMeta({sliceCapacity: 3});
+
+    // append a 3rd slice at z=2
+    const sliceGeometry = new Geometry(
+      [new Point3D(0, 0, 2)], new Size([2, 2, 1]), new Spacing([1, 1, 1]));
+    const slice = new Image(sliceGeometry, new Int16Array(4), ['uidZ2']);
+    image.appendSlice(slice);
+
+    // the newly appended slice must get its own origin, not the
+    // origin of the existing slice that has no uid
+    assert.ok(image.getOriginForImageUid('uidZ2').equals(new Point3D(0, 0, 2)),
+      'new slice origin is its own, not drifted from another slice');
+    // the slice present since construction keeps its own origin too
+    assert.ok(image.getOriginForImageUid('uidZ0').equals(new Point3D(0, 0, 0)),
+      'first slice origin unaffected');
+  });
+
+  /**
+   * Tests for {@link Image#clone} and {@link Image#appendSlice}:
+   *   appending a slice to a clone does not affect the original.
+   *
+   * @function module:tests/image~cloneThenAppendSlice
+   */
+  test('clone then append slice does not affect original', () => {
+    const spacing = new Spacing([1, 1, 1]);
+
+    /**
+     * Create a single slice image.
+     *
+     * @param {number} z The slice z origin.
+     * @param {string} uid The slice uid.
+     * @returns {Image} The slice image.
+     */
+    function makeSlice(z, uid) {
+      const geometry = new Geometry(
+        [new Point3D(0, 0, z)], new Size([2, 2, 1]), spacing);
+      const image = new Image(geometry, new Int16Array(4), [uid]);
+      image.setMeta({sliceCapacity: 2});
+      return image;
+    }
+
+    const image = makeSlice(0, 'z0');
+    const copy = image.clone();
+    copy.appendSlice(makeSlice(1, 'z1'));
+
+    // the clone gained the new slice
+    assert.ok(copy.getOriginForImageUid('z1').equals(new Point3D(0, 0, 1)),
+      'clone has the new slice origin');
+    assert.ok(copy.includesImageUid('z1'), 'clone includes the new uid');
+
+    // the original image must not have been affected by the clone's
+    // appendSlice, i.e. the uid/origin pairs are not shared by reference
+    assert.notOk(image.includesImageUid('z1'),
+      'original does not include the new uid');
+    assert.equal(image.getOriginForImageUid('z1'), undefined,
+      'original has no origin for the new uid');
+    assert.ok(image.getOriginForImageUid('z0').equals(new Point3D(0, 0, 0)),
+      'original slice0 origin is unchanged');
+  });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} on a single volume.
+   *
+   * @function module:tests/image~getOriginForImageUid3D
+   */
+  test('getOriginForImageUid single volume', () => {
+    const origin = new Point3D(1, 2, 3);
+    const geometry = new Geometry(
+      [origin], new Size([2, 2, 1]), new Spacing([1, 1, 1]));
+    const image = new Image(geometry, new Int16Array(4), ['uid0']);
+    assert.ok(image.getOriginForImageUid('uid0').equals(origin), 'origin');
+  });
+
+  /**
+   * Tests for {@link Image#clone} keeping the image origins.
+   *
+   * @function module:tests/image~cloneOrigins
+   */
+  test('clone keeps the image origins', () => {
+    const image = makeTwoTimePointImage();
+    const copy = image.clone();
+    assert.ok(copy.getOriginForImageUid('t1z1').equals(new Point3D(0, 0, 1)),
+      'time1 slice1 origin');
+  });
+
+  /**
+   * Tests for {@link Image#getOriginForImageUid} after
+   *   {@link Image#resample} and {@link Image#revert}.
+   *
+   * @function module:tests/image~getOriginForImageUidResampleRevert
+   */
+  test('getOriginForImageUid is unaffected by resample and revert', () => {
+    // resample() hands off work to a web worker; stub it out so the
+    // synchronous part of resample (the geometry swap) can be tested
+    // without spawning a real worker
+    const originalWorker = globalThis.Worker;
+    globalThis.Worker = class {
+      postMessage() {}
+      terminate() {}
+    };
+
+    try {
+      const origin = new Point3D(1, 2, 3);
+      const geometry = new Geometry(
+        [origin], new Size([2, 2, 1]), new Spacing([1, 1, 1]));
+      const image = new Image(geometry, new Int16Array(4), ['uid0']);
+
+      assert.ok(image.getOriginForImageUid('uid0').equals(origin),
+        'origin before resample');
+
+      // resample to a 90° rotated orientation: this replaces the
+      // image geometry (and its origins), the uid/origin snapshot
+      // is not recomputed from it and must stay the same
+      /* eslint-disable @stylistic/js/array-element-newline */
+      const rotated = new Matrix33([
+        1, 0, 0,
+        0, 0, -1,
+        0, 1, 0
+      ]);
+      /* eslint-enable @stylistic/js/array-element-newline */
+      image.resample(rotated);
+
+      assert.ok(image.isResampled(), 'image is resampled');
+      assert.ok(image.getOriginForImageUid('uid0').equals(origin),
+        'origin unchanged after resample');
+
+      image.revert();
+
+      assert.notOk(image.isResampled(), 'image is reverted');
+      assert.ok(image.getOriginForImageUid('uid0').equals(origin),
+        'origin unchanged after revert');
+    } finally {
+      globalThis.Worker = originalWorker;
+    }
   });
 
 });
