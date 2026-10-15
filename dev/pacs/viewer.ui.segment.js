@@ -248,6 +248,7 @@ export class SegmentationUI {
    */
   registerListeners() {
     this.#service.addEventListener('dataadd', this.#onDataAdd);
+    this.#service.addEventListener('dataremove', this.#onDataRemove);
     this.#service.addEventListener('labelschanged', this.#onLabelsChanged);
   };
 
@@ -426,6 +427,63 @@ export class SegmentationUI {
           const mergeRtssButton =
             this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
           mergeRtssButton.disabled = false;
+        }
+      }
+    }
+  };
+
+  /**
+   * Handle a dataremove event.
+   *
+   * @param {CustomEvent} event The dataremove event.
+   */
+  #onDataRemove = (event) => {
+    const dataId = event.detail.dataid;
+    const index = this.#segmentations.findIndex(
+      (seg) => seg.dataId === dataId);
+    if (index === -1) {
+      return;
+    }
+    const segmentation = this.#segmentations[index];
+    // keep the entry in the list: html ids and handlers use the
+    // segmentation index, clear its data id to mark it as removed
+    segmentation.dataId = undefined;
+    if (this.#selectedSegmentation === segmentation) {
+      this.#selectedSegmentation = undefined;
+    }
+
+    // remove segmentation item
+    const item = this.#rootDoc.getElementById(getSegmentationHtmlId(index));
+    if (item) {
+      item.remove();
+    }
+
+    // remove from overlap checker
+    if (this.#withOverlapCheck) {
+      for (const selectId of [
+        'overlap-checker-select-list-0',
+        'overlap-checker-select-list-1'
+      ]) {
+        const select = this.#rootDoc.getElementById(selectId);
+        const option = select?.querySelector(`option[value="${index}"]`);
+        if (option) {
+          option.remove();
+        }
+      }
+    }
+
+    // disable merge if no more possible
+    if (this.#withMerge && !this.#canMerge()) {
+      const mergeSegButton =
+        this.#rootDoc.getElementById(`${prefixes.mergeSaveSeg}0`);
+      if (mergeSegButton) {
+        mergeSegButton.disabled = true;
+      }
+      if (this.#withRtss) {
+        const mergeRtssButton =
+          this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
+        if (mergeRtssButton) {
+          mergeRtssButton.disabled = true;
         }
       }
     }

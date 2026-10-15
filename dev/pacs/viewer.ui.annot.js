@@ -81,6 +81,8 @@ export class AnnotationUI {
   registerListeners() {
     this.#dwvService.addEventListener('dataadd',
       this.#onDataAdd);
+    this.#dwvService.addEventListener('dataremove',
+      this.#onDataRemove);
     this.#dwvService.addEventListener('drawlayeradd',
       this.#onDrawLayerAdd);
     this.#dwvService.addEventListener('annotationadd',
@@ -568,6 +570,22 @@ export class AnnotationUI {
       const annotList = this.#rootDoc.getElementById('annotationgroup-list');
       annotList.appendChild(item);
       annotList.appendChild(addItem);
+    }
+  };
+
+  /**
+   * Handle 'dataremove' event.
+   *
+   * @param {CustomEvent} event The event.
+   */
+  #onDataRemove = (event) => {
+    const dataId = event.detail.dataid;
+    // remove annotation group item if present
+    // (data is already removed from the data controller)
+    const item = this.#rootDoc.getElementById(
+      getAnnotationGroupDivId(dataId));
+    if (item) {
+      item.remove();
     }
   };
 
