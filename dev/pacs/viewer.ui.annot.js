@@ -332,14 +332,11 @@ export class AnnotationUI {
       this.#deleteAnnotation(annotationGroup, annotationId);
     };
 
-    // disable/enable buttons if group is editable or not
-    annotationGroup.addEventListener(
-      'annotationgroupeditablechange', function (event) {
-        const disabled = !event.detail.data;
-        inputColour.disabled = disabled;
-        deleteButton.disabled = disabled;
-      }
-    );
+    // disable buttons if group is not editable
+    // (updated by the group 'annotationgroupeditablechange' listener)
+    const disabled = !annotationGroup.isEditable();
+    inputColour.disabled = disabled;
+    deleteButton.disabled = disabled;
 
     // content
     const contentDiv = document.createElement('div');
@@ -509,6 +506,18 @@ export class AnnotationUI {
     for (const annotation of annotationGroup.getList()) {
       listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
     }
+
+    // disable/enable annotation buttons if group is editable or not
+    // (one listener per group, covers annotations added later)
+    annotationGroup.addEventListener(
+      'annotationgroupeditablechange', function (event) {
+        const disabled = !event.detail.data;
+        const elements = listDiv.querySelectorAll('[id^="cb-"], [id^="db-"]');
+        for (const element of elements) {
+          element.disabled = disabled;
+        }
+      }
+    );
 
     // data-item-header
     const headerDiv = document.createElement('div');
