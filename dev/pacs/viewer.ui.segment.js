@@ -364,7 +364,7 @@ export class SegmentationUI {
     segList.appendChild(addItem);
 
     if (this.#withOverlapCheck) {
-      this.#addOverlapCheckerSelection(segmentation, _segmentations.length - 1);
+      this.#addOverlapCheckerSelection(_segmentations.length - 1);
     }
   }
 
@@ -735,6 +735,11 @@ export class SegmentationUI {
       throw new Error('No delete span parent');
     }
     const nextItem = listItem.nextSibling;
+    // store selected state before removal
+    const selectInput = this.#rootDoc.getElementById(
+      getHtmlId(prefixes.select, segmentId)
+    );
+    const wasSelected = selectInput !== null && selectInput.checked;
 
     // get mask
     const dataCtrl = this.#service.getDataController();
@@ -743,12 +748,19 @@ export class SegmentationUI {
     if (typeof data !== 'undefined') {
       const segment =
         getSegment(indices.segmentNumber, segmentation.segments);
+      const viewButton = this.#rootDoc.getElementById(
+        getHtmlId(prefixes.view, segmentId)
+      );
       // create delete command
       const delCmd = new DeleteSegmentCommand(data.image, segment);
       delCmd.onExecute = function () {
         listItem.remove();
         if (segmentation.viewHelper.isHidden(segment.number)) {
-          segmentation.viewHelper.removeFromHidden(segment);
+          segmentation.viewHelper.removeFromHidden(segment.number);
+          // undo brings the segment back visible
+          if (viewButton !== null) {
+            setButtonPressed(viewButton, false);
+          }
         }
       };
       delCmd.onUndo = function () {
@@ -760,26 +772,21 @@ export class SegmentationUI {
         const undoCtrl = this.#service.getUndoController();
         undoCtrl.addToUndoStack(delCmd);
       }
+      // update labels
+      this.#calculateLabels(segmentation.dataId);
     } else {
       listItem.remove();
     }
 
-    // update labels
-    this.#calculateLabels(segmentation.dataId);
-
-    // select first segment
-    const spanChildren = parent.childNodes;
-    for (const spanNode of spanChildren) {
-      if (spanNode.nodeName === 'LI') {
-        const spanNodeChildren = spanNode.childNodes;
-        for (const node of spanNodeChildren) {
-          if (node.nodeName === 'INPUT') {
-            const input = node;
-            input.checked = true;
-            break;
-          }
-        }
-        break;
+    // select first remaining segment if the deleted one was selected
+    if (wasSelected) {
+      const firstInput = parent.querySelector(
+        'input[type=\'radio\'][name=\'select-segment\']'
+      );
+      if (firstInput !== null) {
+        firstInput.checked = true;
+        // trigger onchange to pass the selection to the brush
+        firstInput.dispatchEvent(new Event('change'));
       }
     }
   };
@@ -1334,22 +1341,23 @@ export class SegmentationUI {
   /**
    * Add to the list of segmentations on the overlap checker.
    *
-   * @param {Segmentation} segmentation The segmentation to add.
    * @param {number} segmentationIndex The segmentation index.
    */
-  #addOverlapCheckerSelection(segmentation, segmentationIndex) {
+  #addOverlapCheckerSelection(segmentationIndex) {
     const overlapSelect0 =
       this.#rootDoc.getElementById('overlap-checker-select-list-0');
     const overlapSelect1 =
       this.#rootDoc.getElementById('overlap-checker-select-list-1');
 
+    // use the segmentation index as value: the data id can be
+    // undefined at this point (segmentation without mask yet)
     const newOption0 = document.createElement('option');
     newOption0.innerHTML = getSegmentationHtmlId(segmentationIndex);
-    newOption0.value = segmentation.dataId;
+    newOption0.value = segmentationIndex.toString();
 
     const newOption1 = document.createElement('option');
     newOption1.innerHTML = getSegmentationHtmlId(segmentationIndex);
-    newOption1.value = segmentation.dataId;
+    newOption1.value = segmentationIndex.toString();
 
     overlapSelect0.appendChild(newOption0);
     overlapSelect1.appendChild(newOption1);
@@ -1388,11 +1396,20 @@ export class SegmentationUI {
     overlapChecker.appendChild(overlapResult);
 
     overlapButton.onclick = (/*event*/) => {
-      const segment0 = overlapSelect0.value;
-      const segment1 = overlapSelect1.value;
+      const segmentation0 =
+        _segmentations[parseInt(overlapSelect0.value, 10)];
+      const segmentation1 =
+        _segmentations[parseInt(overlapSelect1.value, 10)];
       const dataCtrl = this.#service.getDataController();
-      const maskImage0 = dataCtrl.get(segment0).image;
-      const maskImage1 = dataCtrl.get(segment1).image;
+      const maskData0 = dataCtrl.get(segmentation0?.dataId);
+      const maskData1 = dataCtrl.get(segmentation1?.dataId);
+      if (typeof maskData0 === 'undefined' ||
+        typeof maskData1 === 'undefined') {
+        overlapResult.innerHTML = 'Cannot check overlap: missing mask data.';
+        return;
+      }
+      const maskImage0 = maskData0.image;
+      const maskImage1 = maskData1.image;
       const segHelper0 = new MaskSegmentHelper(maskImage0);
       const segHelper1 = new MaskSegmentHelper(maskImage1);
       const overlap = segHelper0.findOverlap(segHelper1);
