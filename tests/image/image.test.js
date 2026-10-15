@@ -777,6 +777,10 @@ describe('image', () => {
       'does not contain an unknown uid');
     assert.notOk(image.containsImageUids([]),
       'empty uid list is not contained');
+    assert.notOk(image.containsImageUids(null),
+      'null uid list is not contained');
+    assert.notOk(image.containsImageUids(undefined),
+      'undefined uid list is not contained');
   });
 
   /**

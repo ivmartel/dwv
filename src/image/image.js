@@ -283,7 +283,8 @@ export class Image extends EventTarget {
     this.#rawGeometry = null;
     this.#rawBuffer = null;
     const origins = this.#geometry.getOrigins();
-    this.#imageSlices = origins.map((origin, index) => ({
+    const originsArray = Array.isArray(origins) ? origins : [origins];
+    this.#imageSlices = originsArray.map((origin, index) => ({
       uid: typeof imageUids !== 'undefined' ? imageUids[index] : undefined,
       origin
     }));
@@ -387,7 +388,8 @@ export class Image extends EventTarget {
    * @returns {boolean} True if all uids are in this image uids.
    */
   containsImageUids(uids) {
-    return uids.length > 0 && uids.every((uid) => this.includesImageUid(uid));
+    return Array.isArray(uids) && uids.length > 0 &&
+      uids.every((uid) => this.includesImageUid(uid));
   }
 
   /**
