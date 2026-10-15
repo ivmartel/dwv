@@ -36,15 +36,16 @@ import {
  * @import {RGB} from '../../src/utils/colour.js';
  * @import {Statistics} from '../../src/math/stats.js';
  * @import {Label} from '../../src/image/label.js';
+ * @import {MaskImage} from '../../src/image/maskImage.js';
  */
 
 /**
  * Segmentation type.
  *
  * @typedef Segmentation
- * @property {number} dataId The segmentation data ID.
- * @property {object[]} labels The segmentation labels.
- * @property {boolean} hasNewSegments If the segmentation is new.
+ * @property {string|undefined} dataId The segmentation data ID,
+ *   undefined until the mask is created.
+ * @property {Label[]} labels The segmentation labels.
  * @property {MaskSegment[]} segments The segmentation segments.
  * @property {MaskSegmentViewHelper} viewHelper A view helper.
  */
@@ -308,7 +309,7 @@ export class SegmentationUI {
   /**
    * Calculate mask labels.
    *
-   * @param {number} dataId The data id.
+   * @param {string} dataId The data id.
    */
   #calculateLabels(dataId) {
     const dataCtrl = this.#service.getDataController();
@@ -395,9 +396,7 @@ export class SegmentationUI {
           const segmentation = {
             dataId,
             labels: [],
-            hasNewSegments: false,
             segments: [segment],
-            selectedSegmentNumber: segmentNumber,
             viewHelper: new MaskSegmentViewHelper()
           };
           // add to list
@@ -420,7 +419,6 @@ export class SegmentationUI {
               segHelper.addSegment(segment);
             }
           }
-          segmentation.hasNewSegments = false;
         }
       } else {
         // segmentation from loaded file, pass segments to ui
@@ -430,7 +428,6 @@ export class SegmentationUI {
           const segmentation = {
             dataId,
             labels: [],
-            hasNewSegments: true,
             segments: imgMeta.custom.segments.slice(),
             viewHelper: new MaskSegmentViewHelper()
           };
@@ -522,7 +519,6 @@ export class SegmentationUI {
       const segmentation = {
         dataId: undefined,
         labels: [],
-        hasNewSegments: true,
         segments: [this.#getNewSegment(1)],
         viewHelper: new MaskSegmentViewHelper()
       };
@@ -556,7 +552,6 @@ export class SegmentationUI {
    * @param {Segmentation} segmentation The segmentation.
    */
   #appSelectSegment(segmentNumber, segmentation) {
-    segmentation.selectedSegmentNumber = segmentNumber;
     const dataCtrl = this.#service.getDataController();
 
     // add segment if not present
@@ -1041,8 +1036,6 @@ export class SegmentationUI {
     const newSegment = this.#getNewSegment(maxNumber + 1);
     // add to list
     segments.push(newSegment);
-    // update flag
-    segmentation.hasNewSegments = true;
 
     // add item to list
     const listDivId = `${getSegmentationHtmlId(segmentationIndex)}-list`;
@@ -1132,7 +1125,7 @@ export class SegmentationUI {
   /**
    * Save a segmentation or RTSS.
    *
-   * @param {Image} maskImage The mask data.
+   * @param {MaskImage} maskImage The mask data.
    * @param {string} fileName The file name.
    * @param {boolean} asRtss Whether to save as RTSS.
    */
