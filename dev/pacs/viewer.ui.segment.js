@@ -1011,18 +1011,18 @@ export class SegmentationUI {
     } catch (error) {
       logger.error(error.message);
       alert(error.message);
+      return;
     }
-    if (dicomBuffer !== undefined) {
-      // view as Blob to allow download
-      const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-      // update generate button
-      const element = document.createElement('a');
-      element.href = window.URL.createObjectURL(blob);
-      element.download = `${fileName}.dcm`;
-      // trigger download
-      element.click();
-      URL.revokeObjectURL(element.href);
-    }
+    // view as Blob to allow download
+    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+
+    // temporary link to download
+    const element = document.createElement('a');
+    element.href = window.URL.createObjectURL(blob);
+    element.download = `${fileName}.dcm`;
+    // trigger download
+    element.click();
+    URL.revokeObjectURL(element.href);
   };
 
   /**

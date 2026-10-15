@@ -418,12 +418,13 @@ export class AnnotationUI {
     const dicomElements = factory.toDicom(annotationGroup, extraTags);
     // write
     const writer = new DicomWriter();
-    let dicomBuffer = null;
+    let dicomBuffer;
     try {
       dicomBuffer = writer.getBuffer(dicomElements);
     } catch (error) {
       logger.error(error.message);
       alert(error.message);
+      return;
     }
     const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
 
