@@ -162,7 +162,8 @@ export class AnnotationUI {
    * Add an annotation group to the active view layer.
    */
   #addAnnotationGroup() {
-    const divId = 'layerGroup0';
+    // get the reference data id from the main layer group
+    const divId = this.#dwvService.getMainLayerGroupDivId();
     const stgCtrl = this.#dwvService.getStageController();
     const layerGroup = stgCtrl.getLayerGroupByDivId(divId);
     // add annotation group

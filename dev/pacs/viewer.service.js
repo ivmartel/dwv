@@ -212,6 +212,16 @@ export class ViewerService extends EventTarget {
   };
 
   /**
+   * Get the layer group div id.
+   *
+   * @returns {string} The div id.
+   */
+  getMainLayerGroupDivId() {
+    // TODO: hard coded, find a better way
+    return 'layerGroup0';
+  }
+
+  /**
    * Register the load listeners: logging, load counters and progress,
    * load abort (on error or via keyboard shortcut) and render
    * if not done at first load item.
