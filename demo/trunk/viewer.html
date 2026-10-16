@@ -333,6 +333,52 @@ hr.vertical {
   background-color: #dde;
   border: 1px dashed #4a5bb9;
 }
+.data-item-list-item-details {
+  max-width: 400px;
+  margin: 2px 3px;
+  padding-top: 2px;
+  border-top: 1px solid #aaa;
+  cursor: default;
+  font-size: small;
+
+  /* group title and values on one line, wrap if needed */
+  .quantification-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 1em;
+    row-gap: 2px;
+    margin-top: 3px;
+  }
+  .quantification-group:first-child {
+    margin-top: 0;
+  }
+  .quantification-title {
+    font-weight: bold;
+  }
+  /* pairs flow in the group line (avoids the title alone on a line) */
+  .quantification {
+    display: contents;
+    div {
+      display: flex;
+      gap: 0.3em;
+    }
+    dt {
+      opacity: 0.75;
+    }
+    dt::after {
+      content: ':';
+    }
+    dd {
+      margin: 0;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+  .quantification-empty {
+    font-style: italic;
+  }
+}
 
 </style>
 
