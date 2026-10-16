@@ -45,6 +45,107 @@ function getAnnotationDivId(annotation, dataId) {
 }
 
 /**
+ * Quantification keys related to pixel values, other keys are
+ *   considered as geometric (lowercase, compared case insensitive).
+ */
+const pixelValueKeys = [
+  'min', 'max', 'mean', 'stddev', 'median', 'p25', 'p75'
+];
+
+/**
+ * Specific quantification labels, others use the general rule
+ *   of `getQuantificationLabel` (lowercase keys, compared case insensitive).
+ */
+const quantificationLabels = {
+  stddev: 'standard deviation',
+  surface: 'area'
+};
+
+/**
+ * Get a readable label for a quantification key.
+ *
+ * @param {string} key The quantification key.
+ * @returns {string} The label.
+ */
+function getQuantificationLabel(key) {
+  const specific = quantificationLabels[key.toLowerCase()];
+  if (typeof specific !== 'undefined') {
+    return specific;
+  }
+  // percentile: 'p25' -> '25th percentile'
+  const percentile = key.match(/^p(\d+)$/);
+  if (percentile !== null) {
+    return `${percentile[1]}th percentile`;
+  }
+  // general rule: 'someKey' -> 'some key'
+  return key.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+}
+
+/**
+ * Format a quantification value with its unit.
+ *
+ * @param {number} value The value.
+ * @param {string} [unit] The unit (translation key).
+ * @returns {string} The formatted value.
+ */
+function formatQuantificationValue(value, unit) {
+  const absValue = Math.abs(value);
+  let digits = 2;
+  if (absValue >= 100) {
+    digits = 1;
+  } else if (absValue !== 0 && absValue < 1) {
+    digits = 3;
+  }
+  let res = value.toLocaleString(undefined, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  });
+  if (typeof unit !== 'undefined') {
+    let unitStr = i18n.t(unit);
+    if (typeof unitStr === 'undefined') {
+      unitStr = unit;
+    }
+    // no space before degree symbol
+    res += unitStr === '°' ? unitStr : ` ${unitStr}`;
+  }
+  return res;
+}
+
+/**
+ * Get the quantification as groups of label and value pairs.
+ *
+ * @param {Record<string, object>|undefined} quantification The annotation
+ *   quantification.
+ * @returns {{title: string, items: {label: string, value: string}[]}[]}
+ *   The non empty groups, empty if no quantification.
+ */
+function getQuantificationGroups(quantification) {
+  if (typeof quantification === 'undefined') {
+    return [];
+  }
+  const geometry = {title: 'Geometry', items: []};
+  const pixelValues = {title: 'Pixel values', items: []};
+  for (const key of Object.keys(quantification)) {
+    const quant = quantification[key];
+    // skip undefined values (for ex surface on non calibrated data)
+    if (typeof quant === 'undefined' ||
+      typeof quant.value !== 'number') {
+      continue;
+    }
+    const item = {
+      label: getQuantificationLabel(key),
+      value: formatQuantificationValue(quant.value, quant.unit)
+    };
+    if (pixelValueKeys.includes(key.toLowerCase())) {
+      pixelValues.items.push(item);
+    } else {
+      geometry.items.push(item);
+    }
+  }
+  return [geometry, pixelValues].filter(group => group.items.length !== 0);
+}
+
+/**
  * Annotation UI.
  */
 export class AnnotationUI {
@@ -182,30 +283,66 @@ export class AnnotationUI {
   }
 
   /**
-   * Show an annotation information.
+   * Render an annotation quantification.
    *
+   * @param {HTMLDivElement} detailsDiv The details element.
+   * @param {Annotation} annotation The annotation.
+   */
+  #renderQuantification(detailsDiv, annotation) {
+    const groups = getQuantificationGroups(annotation.quantification);
+    if (groups.length === 0) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'quantification-empty';
+      emptyDiv.appendChild(document.createTextNode('No quantification.'));
+      detailsDiv.replaceChildren(emptyDiv);
+      return;
+    }
+    const elements = [];
+    for (const group of groups) {
+      const title = document.createElement('div');
+      title.className = 'quantification-title';
+      title.appendChild(document.createTextNode(group.title));
+      const list = document.createElement('dl');
+      list.className = 'quantification';
+      for (const item of group.items) {
+        const term = document.createElement('dt');
+        term.appendChild(document.createTextNode(item.label));
+        const value = document.createElement('dd');
+        value.appendChild(document.createTextNode(item.value));
+        // wrap pair to allow several per line
+        const pair = document.createElement('div');
+        pair.appendChild(term);
+        pair.appendChild(value);
+        list.appendChild(pair);
+      }
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'quantification-group';
+      groupDiv.appendChild(title);
+      groupDiv.appendChild(list);
+      elements.push(groupDiv);
+    }
+    detailsDiv.replaceChildren(...elements);
+  }
+
+  /**
+   * Toggle an annotation information section.
+   *
+   * @param {HTMLButtonElement} infoButton The info button.
+   * @param {HTMLDivElement} detailsDiv The details element.
    * @param {AnnotationGroup} annotationGroup The annotation group.
    * @param {string} annotationId The annotation tracking UID.
    */
-  #showAnnotationInfo(annotationGroup, annotationId) {
-    // get annotation (the group can replace it on update)
-    const annotation = annotationGroup.find(annotationId);
-
-    let qStr = 'Quantification:\n';
-    if (typeof annotation.quantification !== 'undefined') {
-      const keys = Object.keys(annotation.quantification);
-      for (const key of keys) {
-        const quant = annotation.quantification[key];
-        qStr += `- ${key}: ${quant.value.toPrecision(4)}`;
-        if (typeof quant.unit !== 'undefined') {
-          qStr += i18n.t(quant.unit);
-        }
-        qStr += '\n';
-      }
-    } else {
-      qStr = 'No quantification.';
+  #toggleAnnotationInfo(infoButton, detailsDiv, annotationGroup,
+    annotationId) {
+    const open = detailsDiv.hidden;
+    if (open) {
+      // get annotation (the group can replace it on update)
+      const annotation = annotationGroup.find(annotationId);
+      this.#renderQuantification(detailsDiv, annotation);
     }
-    alert(qStr);
+    detailsDiv.hidden = !open;
+    setButtonPressed(infoButton, open);
+    infoButton.setAttribute('aria-expanded', String(open));
   }
 
   /**
@@ -301,13 +438,27 @@ export class AnnotationUI {
     const dataCtrl = this.#dwvService.getDataController();
     const annotationGroup = dataCtrl.get(dataId).annotationGroup;
 
+    // quantification details (folded by default)
+    const detailsDiv = document.createElement('div');
+    detailsDiv.id = `qd-${annotationDivId}`;
+    detailsDiv.className = 'data-item-list-item-details';
+    detailsDiv.hidden = true;
+    detailsDiv.onclick = (event) => {
+      // do not propagate to parent (triggers goto)
+      event.stopPropagation();
+    };
+
     const infoButton = getButton('Info');
+    setButtonPressed(infoButton, false);
     infoButton.id = `ib-${annotationDivId}`;
-    infoButton.title = 'Information';
+    infoButton.title = 'Show/hide quantification';
+    infoButton.setAttribute('aria-expanded', 'false');
+    infoButton.setAttribute('aria-controls', detailsDiv.id);
     infoButton.onclick = (event) => {
       // do not propagate to parent (triggers goto)
       event.stopPropagation();
-      this.#showAnnotationInfo(annotationGroup, annotationId);
+      this.#toggleAnnotationInfo(
+        infoButton, detailsDiv, annotationGroup, annotationId);
     };
 
     const inputColour = document.createElement('input');
@@ -373,6 +524,7 @@ export class AnnotationUI {
     item.className = 'data-item-list-item';
     item.appendChild(contentDiv);
     item.appendChild(actionsDiv);
+    item.appendChild(detailsDiv);
     item.title = 'Go to annotation';
 
     // click on li to go to annotation
@@ -654,8 +806,15 @@ export class AnnotationUI {
     const dataId = event.detail.dataid;
     const keys = event.detail.keys;
 
+    const annotationDivId = getAnnotationDivId(annotation, dataId);
+
+    // update quantification if shown
+    const detailsDiv = this.#rootDoc.getElementById(`qd-${annotationDivId}`);
+    if (detailsDiv && !detailsDiv.hidden) {
+      this.#renderQuantification(detailsDiv, annotation);
+    }
+
     if (typeof keys !== 'undefined') {
-      const annotationDivId = getAnnotationDivId(annotation, dataId);
       // update colour input
       if (keys.includes('colour')) {
         const inputColour = this.#rootDoc.getElementById(
