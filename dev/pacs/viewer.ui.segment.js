@@ -4,7 +4,6 @@ import {
   hexToRgb,
 } from '../../src/utils/colour.js';
 import {logger} from '../../src/utils/logger.js';
-import {i18n} from '../../src/utils/i18n.js';
 import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
 import {
   MaskFactory,
@@ -26,6 +25,10 @@ import {
   setButtonPressed,
   isButtonPressed
 } from './viewer.ui.icons.js';
+import {
+  getQuantificationGroups,
+  renderQuantification
+} from './viewer.ui.quantification.js';
 
 /**
  * @import {ViewerService} from './viewer.service.js';
@@ -34,6 +37,7 @@ import {
  * @import {Statistics} from '../../src/math/stats.js';
  * @import {Label} from '../../src/image/label.js';
  * @import {MaskImage} from '../../src/image/maskImage.js';
+ * @import {QuantificationGroup} from './viewer.ui.quantification.js';
  */
 
 /**
@@ -108,6 +112,7 @@ const prefixes = {
   mergeSaveRtss: 'merge-save-rtss-',
   volumes: 'span-volumes-',
   info: 'info-',
+  details: 'details-',
   li: 'li-'
 };
 
@@ -320,6 +325,17 @@ export class SegmentationUI {
 
     if (typeof segmentation !== 'undefined') {
       segmentation.labels = event.detail.labels;
+      // update quantification if shown
+      const segmentationIndex = this.#segmentations.indexOf(segmentation);
+      for (const segment of segmentation.segments) {
+        const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
+        const detailsDiv = this.#rootDoc.getElementById(
+          getHtmlId(prefixes.details, segmentId));
+        if (detailsDiv && !detailsDiv.hidden) {
+          renderQuantification(detailsDiv,
+            this.#getSegmentQuantificationGroups(segment, segmentation));
+        }
+      }
     }
   };
 
@@ -797,64 +813,79 @@ export class SegmentationUI {
   }
 
   /**
-   * Show a segment information.
+   * Get a segment quantification groups.
    *
    * @param {MaskSegment} segment The segment.
    * @param {Segmentation} segmentation The segmentation.
+   * @returns {QuantificationGroup[]} The quantification groups.
    */
-  #showSegmentInfo(segment, segmentation) {
+  #getSegmentQuantificationGroups(segment, segmentation) {
     const labelsInfo = this.#getLabelsInfo(segment, segmentation);
-
-    const statsToString = (stats) => {
-      return `min ${stats.min.toPrecision(4)}, ` +
-        `mean ${stats.mean.toPrecision(4)}, ` +
-        `max ${stats.max.toPrecision(4)}`;
-    };
     const statsList = this.#getHistogramStats(segment, segmentation);
     // only show the volume index for multi volume data
-    const intensityName = (volume) => {
-      return statsList.length > 1 ? `pixels (#${volume})` : 'pixels';
+    const volumeSuffix = (volume) => {
+      return statsList.length > 1 ? ` (#${volume})` : '';
+    };
+    // statistics as quantification
+    const statsToQuantification = (stats) => {
+      const res = {};
+      for (const key of Object.keys(stats)) {
+        res[key] = {value: stats[key]};
+      }
+      return res;
     };
     // same label order as labels info
     const segmentLabels = segmentation.labels.filter(
       (label) => label.id === segment.number);
 
-    let qStr = 'Quantification:\n';
-    let i = 0;
+    const groups = [];
     const nLabels = labelsInfo.length;
-    const tab = nLabels > 1 ? '  ' : '';
-    for (const labelInfo of labelsInfo) {
-      if (nLabels > 1) {
-        qStr += `- label #${i}\n`;
-      }
-      const keys = Object.keys(labelInfo);
-      for (const key of keys) {
-        const quant = labelInfo[key];
-        qStr += `${tab}- ${key}: ${
-          quant.value.toPrecision(4)
-        }${i18n.t(quant.unit)}`;
-        qStr += '\n';
-      }
+    for (let i = 0; i < nLabels; ++i) {
+      const prefix = nLabels > 1 ? `Label #${i} ` : '';
+      groups.push(...getQuantificationGroups(labelsInfo[i], {
+        geometry: prefix === '' ? 'Geometry' : `${prefix}geometry`
+      }));
       // label histogram stats, if available
       for (const item of statsList) {
         const labelItem = item.labelStats?.find(
           (element) => element.label === segmentLabels[i]);
         if (typeof labelItem !== 'undefined') {
-          qStr += `${tab}- ${intensityName(item.volume)}: ` +
-            `${statsToString(labelItem.stats)}\n`;
+          const title = prefix === ''
+            ? 'Pixel values' : `${prefix}pixel values`;
+          groups.push(...getQuantificationGroups(
+            statsToQuantification(labelItem.stats),
+            {pixelValues: title + volumeSuffix(item.volume)}));
         }
       }
-      ++i;
     }
     // global histogram stats
     if (nLabels > 1) {
-      qStr += '\n';
       for (const item of statsList) {
-        qStr += `- all ${intensityName(item.volume)}: ` +
-          `${statsToString(item.stats)}\n`;
+        groups.push(...getQuantificationGroups(
+          statsToQuantification(item.stats),
+          {pixelValues: `All pixel values${volumeSuffix(item.volume)}`}));
       }
     }
-    alert(qStr);
+    return groups;
+  }
+
+  /**
+   * Toggle a segment information section.
+   *
+   * @param {HTMLButtonElement} infoButton The info button.
+   * @param {HTMLDivElement} detailsDiv The details element.
+   * @param {MaskSegment} segment The segment.
+   * @param {Segmentation} segmentation The segmentation.
+   */
+  #toggleSegmentInfo(infoButton, detailsDiv, segment, segmentation) {
+    const open = detailsDiv.hidden;
+    if (open) {
+      renderQuantification(detailsDiv,
+        this.#getSegmentQuantificationGroups(segment, segmentation));
+    }
+    detailsDiv.hidden = !open;
+    setButtonPressed(infoButton, open);
+    infoButton.setAttribute('aria-expanded', String(open));
   }
 
   /**
@@ -889,13 +920,26 @@ export class SegmentationUI {
     selectLabel.title = selectInput.title;
     selectLabel.appendChild(document.createTextNode(segment.label));
 
+    // quantification details (folded by default)
+    const detailsDiv = document.createElement('div');
+    detailsDiv.id = getHtmlId(prefixes.details, segmentId);
+    detailsDiv.className = 'data-item-list-item-details';
+    detailsDiv.hidden = true;
+    detailsDiv.onclick = (event) => {
+      // do not propagate to parent that triggers goto
+      event.stopPropagation();
+    };
+
     const infoButton = getButton('Info');
+    setButtonPressed(infoButton, false);
     infoButton.id = getHtmlId(prefixes.info, segmentId);
-    infoButton.title = 'Information';
+    infoButton.title = 'Show/hide quantification';
+    infoButton.setAttribute('aria-expanded', 'false');
+    infoButton.setAttribute('aria-controls', detailsDiv.id);
     infoButton.onclick = (event) => {
       // do not propagate to parent that triggers goto
       event.stopPropagation();
-      this.#showSegmentInfo(segment, segmentation);
+      this.#toggleSegmentInfo(infoButton, detailsDiv, segment, segmentation);
     };
 
     // segment colour
@@ -957,6 +1001,7 @@ export class SegmentationUI {
     item.title = 'Go to segment';
     item.appendChild(contentDiv);
     item.appendChild(actionsDiv);
+    item.appendChild(detailsDiv);
 
     // click on li to go to segment
     item.onclick = () => {
