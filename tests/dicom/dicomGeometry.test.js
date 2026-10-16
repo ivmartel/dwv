@@ -1,6 +1,7 @@
 import {describe, test, assert, vi} from 'vitest';
 import {
   getFramesGeometry,
+  getFramesTimepoints,
   getSortedFramesGeometry
 } from '../../src/dicom/dicomGeometry.js';
 import {
@@ -234,6 +235,36 @@ describe('getSortedFramesGeometry', () => {
       assert.equal(res[f].getSize().get(2), 1, `frame ${f} one slice`);
       assert.equal(res[f].getSpacing().get(2), 1, `frame ${f} slice spacing`);
     }
+  });
+
+});
+
+describe('getFramesTimepoints', () => {
+  const config = syntheticData[0];
+  const syntax = '1.2.840.10008.1.2.1';
+
+  test('timepoints of multi-volume frames', () => {
+    const elements = getStructureElementsList(
+      config, syntax, unsortedMultiframeMultiVolumeStructure)[0];
+    assert.deepEqual(getFramesTimepoints(elements), {
+      tag: 'TemporalPositionIndex',
+      syncTable: [
+        {timepointIndex: 0, tagValue: 1},
+        {timepointIndex: 1, tagValue: 2}
+      ]
+    });
+  });
+
+  test('undefined for b-value volumes', () => {
+    const elements = getStructureElementsList(
+      config, syntax, unsortedMultiframeMultiVolumeBValueStructure)[0];
+    assert.isUndefined(getFramesTimepoints(elements));
+  });
+
+  test('undefined without per-frame functional groups', () => {
+    const elements = getStructureElementsList(
+      config, syntax, singleSliceStructure)[0];
+    assert.isUndefined(getFramesTimepoints(elements));
   });
 
 });

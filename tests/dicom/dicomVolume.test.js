@@ -2,7 +2,9 @@ import {describe, test, assert, vi} from 'vitest';
 import {
   defaultVolumeIdCandidates,
   getVolumeIdTagValue,
+  getTimepoints,
   getVolumeIndices,
+  guessTimepoints,
   guessVolumeIndices
 } from '../../src/dicom/dicomVolume.js';
 import {getFrameElements} from '../../src/dicom/dicomFunctionalGroup.js';
@@ -171,6 +173,55 @@ describe('dicom', () => {
     test('has AcquisitionTime last', () => {
       const names = defaultVolumeIdCandidates.map(item => item.name);
       assert.equal(names[names.length - 1], 'AcquisitionTime');
+    });
+
+    test('candidates order', () => {
+      assert.deepEqual(defaultVolumeIdCandidates.map(item => item.name), [
+        'TemporalPositionIdentifier',
+        'TemporalPositionIndex',
+        'DiffusionBValue',
+        'EchoTime',
+        'TriggerTime',
+        'InversionTime',
+        'AcquisitionTime'
+      ]);
+    });
+
+    test('timepoint candidates', () => {
+      const names = defaultVolumeIdCandidates
+        .filter(candidate => candidate.timepoint)
+        .map(candidate => candidate.name);
+      assert.deepEqual(names, [
+        'TemporalPositionIdentifier',
+        'TemporalPositionIndex'
+      ]);
+    });
+
+    test('getTimepoints for timepoint candidates only', () => {
+      const elementsList = [{value: 5}, {value: 9}, {value: 5}, {value: 9}];
+      const makeGuess = candidate => ({
+        volumeIndices: [0, 1, 0, 1],
+        getter: elements => elements.value,
+        candidate
+      });
+      assert.deepEqual(
+        getTimepoints(makeGuess({
+          name: 'TemporalPositionIndex', timepoint: true
+        }), elementsList),
+        {
+          tag: 'TemporalPositionIndex',
+          syncTable: [
+            {timepointIndex: 0, tagValue: 5},
+            {timepointIndex: 1, tagValue: 9}
+          ]
+        });
+      assert.isUndefined(getTimepoints(makeGuess({
+        name: 'AcquisitionTime'
+      }), elementsList), 'time value tag');
+      assert.isUndefined(getTimepoints(makeGuess({
+        name: 'DiffusionBValue'
+      }), elementsList), 'b-value tag');
+      assert.isUndefined(getTimepoints(undefined, elementsList));
     });
 
     test('TemporalPositionIdentifier getter', () => {
@@ -685,6 +736,38 @@ describe('dicom', () => {
       }, enhancedMRElements);
       assert.isUndefined(guessVolumeIndices(
         getFramesElements(elements), [0, 1, 0, 1], 2));
+    });
+
+    test('guessTimepoints for timepoint volumes', () => {
+      const elements = makePerFrameElements({
+        temporalPositions: [2, 2, 1, 1],
+        bValues: [0, 1000, 0, 1000]
+      }, enhancedMRElements);
+      assert.deepEqual(
+        guessTimepoints(getFramesElements(elements), [0, 1, 0, 1], 2),
+        {
+          tag: 'TemporalPositionIndex',
+          syncTable: [
+            {timepointIndex: 0, tagValue: 1},
+            {timepointIndex: 1, tagValue: 2}
+          ]
+        });
+    });
+
+    test('guessTimepoints undefined for non timepoint volumes', () => {
+      // b-value volumes
+      const bValueElements = makePerFrameElements({
+        temporalPositions: [1, 1, 1, 1],
+        bValues: [1000, 1000, 50, 50]
+      }, enhancedMRElements);
+      assert.isUndefined(guessTimepoints(
+        getFramesElements(bValueElements), [0, 1, 0, 1], 2));
+      // no valid candidate
+      const noVolumeElements = makePerFrameElements({
+        temporalPositions: [1, 1, 1, 1]
+      }, enhancedMRElements);
+      assert.isUndefined(guessTimepoints(
+        getFramesElements(noVolumeElements), [0, 1, 0, 1], 2));
     });
 
     test('uses custom candidates', () => {

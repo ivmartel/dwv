@@ -99,6 +99,7 @@ export function makeMockLayerGroup(viewLayer = null, layer = null) {
     getPositionHelper: vi.fn(() => posHelper),
     canScroll: vi.fn(() => false),
     moreThanOne: vi.fn(() => false),
+    canScrollTimepoints: vi.fn(() => false),
     addScale: vi.fn(),
     addTranslation: vi.fn(),
     draw: vi.fn(),

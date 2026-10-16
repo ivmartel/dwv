@@ -15,6 +15,7 @@ import {
 } from './dicomImage.js';
 import {
   getVolumeIdTagValue,
+  guessTimepoints,
   guessVolumeIndices
 } from './dicomVolume.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
@@ -39,6 +40,7 @@ import {
 /**
  * @import {DataElement} from './dataElement.js';
  * @import {DicomFunctionalGroup} from './dicomFunctionalGroup.js';
+ * @import {Timepoints} from './volumeTypes.js';
  */
 
 /**
@@ -451,4 +453,34 @@ export function getSortedFramesGeometry(dataElements) {
     ));
   }
   return res;
+}
+
+/**
+ * Get the timepoints of a multi-frame data.
+ *
+ * @param {DataElements} dataElements The DICOM data elements.
+ * @returns {Timepoints|undefined} The timepoints, undefined if the
+ *   frames are not a multivolume time series.
+ */
+export function getFramesTimepoints(dataElements) {
+  const funcGroups = getPerFrameFunctionalGroups(dataElements);
+  if (typeof funcGroups === 'undefined' ||
+    funcGroups.some(funcGroup => typeof funcGroup === 'undefined')) {
+    return undefined;
+  }
+  const uniqueOrigins = [];
+  const sliceIndices = [];
+  for (const funcGroup of funcGroups) {
+    const origin = point3DFromArray(funcGroup.imagePosPat);
+    let sliceIndex = uniqueOrigins.findIndex(getEqualPoint3DFunction(origin));
+    if (sliceIndex === -1) {
+      sliceIndex = uniqueOrigins.length;
+      uniqueOrigins.push(origin);
+    }
+    sliceIndices.push(sliceIndex);
+  }
+  const frameElementsList = funcGroups.map(
+    (_funcGroup, index) => getFrameElements(dataElements, index));
+  return guessTimepoints(
+    frameElementsList, sliceIndices, uniqueOrigins.length);
 }

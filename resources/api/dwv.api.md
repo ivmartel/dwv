@@ -298,6 +298,11 @@ export class DataController extends EventTarget {
     getNextDataId(): string;
     getStashed(dataId: string): DicomData | undefined;
     getStashedDataIds(): string[];
+    getTimepointSyncTable(dataId: string): Array<{
+        timepointIndex: number;
+        tagValue: number;
+    }> | undefined;
+    getTimepointTag(dataId: string): string | undefined;
     markDataAsComplete(dataId: string): {
         imageHasChanged: any;
     };
@@ -723,6 +728,7 @@ class Image_2 extends EventTarget {
     getRescaledValueAtOffset(offset: number): number;
     getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     getSecondaryOffset(index: Index): number;
+    getTimepoints(): Timepoints | undefined;
     getValue(i: number, j: number, k: number, f?: number): number;
     getValueAtIndex(index: Index): number;
     getValueAtOffset(offset: number): number;
@@ -734,6 +740,7 @@ class Image_2 extends EventTarget {
     isMask(): boolean;
     isMonochrome(): boolean;
     isResampled(): boolean;
+    isTimeSeries(): boolean;
     replaceBuffer(newBuffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
     resample(orientation: Matrix33, interpolated?: boolean | undefined, centerOfRotation?: Point | undefined): void;
     revert(): void;
@@ -743,6 +750,7 @@ class Image_2 extends EventTarget {
     setPhotometricInterpretation(interp: string): void;
     setPlanarConfiguration(config: number): void;
     setRescaleSlopeAndIntercept(inRsi: RescaleSlopeAndIntercept, offset?: number): void;
+    setTimepoints(timepoints: Timepoints | undefined): void;
     transform(operator: Function): Image_2;
     updatePaletteColourMap(index: number, colour: RGB): void;
 }
@@ -825,6 +833,7 @@ export class LayerGroup extends EventTarget {
     addViewLayer(): ViewLayer;
     bindInfoData(dataId: string): void;
     canScroll(): boolean;
+    canScrollTimepoints(): boolean;
     display(flag: boolean): void;
     draw(): void;
     empty(): void;
@@ -1405,6 +1414,15 @@ export class TagInfo {
 }
 
 // @public
+export type Timepoints = {
+    tag: string;
+    syncTable: Array<{
+        timepointIndex: number;
+        tagValue: number;
+    }>;
+};
+
+// @public
 export class ToolboxController {
     constructor(toolList: object);
     bindLayerGroup(layerGroup: LayerGroup, layer: ViewLayer | DrawLayer): void;
@@ -1519,6 +1537,7 @@ export class ViewController {
     bindImageAndLayer(viewLayer: ViewLayer): void;
     canQuantifyImage(): boolean;
     canScroll(): boolean;
+    canScrollTimepoints(): boolean;
     // @deprecated
     canWindowLevel(): boolean;
     equalImageMeta(meta: object): boolean;
@@ -1645,6 +1664,7 @@ export type VolumeIdCandidate = {
     name: string;
     getter: Function;
     preLoad?: boolean;
+    timepoint?: boolean;
 };
 
 // @public

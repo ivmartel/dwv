@@ -1316,9 +1316,14 @@ export class App extends EventTarget {
    */
   setLayerGroupsBinders(list) {
     const instances = [];
+    const getTimepointSyncTable = (dataId) =>
+      this.#dataController.getTimepointSyncTable(dataId);
+    const getTimepointTag = (dataId) =>
+      this.#dataController.getTimepointTag(dataId);
     for (let i = 0; i < list.length; ++i) {
       if (typeof binderList[list[i]] !== 'undefined') {
-        instances.push(new binderList[list[i]]);
+        instances.push(new binderList[list[i]](
+          getTimepointSyncTable, getTimepointTag));
       }
     }
     this.#stageController.setBinders(instances);
@@ -1625,7 +1630,7 @@ export class App extends EventTarget {
         const layerGroup = this.#stageController.getActiveLayerGroup();
         const positionHelper = layerGroup.getPositionHelper();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
-          if (layerGroup.moreThanOne(3)) {
+          if (layerGroup.canScrollTimepoints()) {
             positionHelper.decrementPosition(3);
           }
         } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
@@ -1633,7 +1638,7 @@ export class App extends EventTarget {
             positionHelper.incrementPositionAlongScroll();
           }
         } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
-          if (layerGroup.moreThanOne(3)) {
+          if (layerGroup.canScrollTimepoints()) {
             positionHelper.incrementPosition(3);
           }
         } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down

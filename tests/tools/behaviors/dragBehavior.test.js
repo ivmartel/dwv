@@ -467,7 +467,27 @@ describe('tools/behaviors', () => {
         posHelper.incrementPositionAlongScroll.mock.calls.length, 1);
     });
 
-    test('onDrag increments dimension 3 when dx > 0 and moreThanOne(3)', () => {
+    test('onDrag increments dimension 3 when dx > 0 for a time series',
+      () => {
+        const layerGroup = makeMockLayerGroup();
+        layerGroup.canScroll.mockReturnValue(false);
+        layerGroup.moreThanOne.mockReturnValue(true);
+        layerGroup.canScrollTimepoints.mockReturnValue(true);
+        const posHelper = layerGroup.getPositionHelper();
+
+        const drag = new DragStep(
+          new Point2D(0, 0),
+          new Point2D(20, 0),
+          {threshold: {x: 15, y: 15}}
+        );
+        behavior.onDrag(drag, layerGroup);
+
+        assert.equal(posHelper.incrementPosition.mock.calls.length, 1);
+        assert.equal(posHelper.incrementPosition.mock.calls[0][0], 3);
+      });
+
+    test('onDrag does not move dimension 3 of a non time series', () => {
+      // for example diffusion b-values: multivolume but not a time series
       const layerGroup = makeMockLayerGroup();
       layerGroup.canScroll.mockReturnValue(false);
       layerGroup.moreThanOne.mockReturnValue(true);
@@ -480,8 +500,8 @@ describe('tools/behaviors', () => {
       );
       behavior.onDrag(drag, layerGroup);
 
-      assert.equal(posHelper.incrementPosition.mock.calls.length, 1);
-      assert.equal(posHelper.incrementPosition.mock.calls[0][0], 3);
+      assert.equal(posHelper.incrementPosition.mock.calls.length, 0);
+      assert.equal(posHelper.decrementPosition.mock.calls.length, 0);
     });
   });
 
