@@ -223,17 +223,36 @@ export class InfoData extends EventTarget {
    * Handle a changed slice event.
    *
    * @param {CustomEvent} event The slicechange event.
+   * @deprecated Since v0.37, please use onPositionChange.
    */
   onSliceChange = (event) => {
+    logger.debug(
+      'InfoData.onSliceChange: deprecated since v0.37,' +
+      ' please use onPositionChange.'
+    );
+    this.onPositionChange(event);
+  };
+
+  /**
+   * Handle a changed position event: updates the tags on slice change
+   *   and the position event items.
+   *
+   * @param {CustomEvent} event The positionchange event.
+   */
+  onPositionChange = (event) => {
     const dataid = event.detail?.dataid;
     if (dataid !== this.#dataId) {
       return;
     }
+    let hasSliceChanged = false;
     const eventData = event.detail?.data;
     if (typeof eventData !== 'undefined' &&
       typeof eventData.imageUid !== 'undefined' &&
       this.#currentDataUid !== eventData.imageUid) {
       this.#currentDataUid = eventData.imageUid;
+      hasSliceChanged = true;
+    }
+    if (hasSliceChanged || this.#eventNames.includes(event.type)) {
       this.#updateData(event);
     }
   };
@@ -316,10 +335,13 @@ export class InfoData extends EventTarget {
    */
   addAppListeners() {
     // listen to update tags data
-    this.#app.addEventListener('positionchange', this.onSliceChange);
+    this.#app.addEventListener('positionchange', this.onPositionChange);
     // add event listeners
+    // (positionchange is handled by onPositionChange)
     for (const eventName of this.#eventNames) {
-      this.#app.addEventListener(eventName, this.#updateData);
+      if (eventName !== 'positionchange') {
+        this.#app.addEventListener(eventName, this.#updateData);
+      }
     }
     // update flag
     this.#isListening = true;
@@ -330,10 +352,13 @@ export class InfoData extends EventTarget {
    */
   removeAppListeners() {
     // stop listening to update tags data
-    this.#app.removeEventListener('positionchange', this.onSliceChange);
+    this.#app.removeEventListener('positionchange', this.onPositionChange);
     // remove event listeners
+    // (positionchange is handled by onPositionChange)
     for (const eventName of this.#eventNames) {
-      this.#app.removeEventListener(eventName, this.#updateData);
+      if (eventName !== 'positionchange') {
+        this.#app.removeEventListener(eventName, this.#updateData);
+      }
     }
     // update flag
     this.#isListening = false;

@@ -750,9 +750,18 @@ export class LayerGroup extends EventTarget {
 
     const layer = this.#layers[index];
     if (typeof this.#infoLayer !== 'undefined') {
-      this.unbindInfoData();
-      const dataId = layer.getDataId();
-      this.bindInfoData(dataId);
+      // a draw layer has no info data: use its reference view layer one
+      let infoLayer = layer;
+      if (layer instanceof DrawLayer) {
+        infoLayer = this.getViewLayerById(layer.getReferenceLayerId());
+      }
+      const dataId = infoLayer?.getDataId();
+      // only switch binding if there is info data for the new data
+      if (typeof this.#infoDatas[dataId] !== 'undefined' &&
+        dataId !== this.#infoDataId) {
+        this.unbindInfoData();
+        this.bindInfoData(dataId);
+      }
     }
 
     /**
@@ -1265,7 +1274,7 @@ export class LayerGroup extends EventTarget {
     const dataid = event.detail?.dataid;
     const infoData = this.#infoDatas[dataid];
     if (typeof infoData !== 'undefined') {
-      infoData.onSliceChange(event);
+      infoData.onPositionChange(event);
     }
   };
 
