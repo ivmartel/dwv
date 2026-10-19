@@ -24,6 +24,7 @@ import {logger} from '../utils/logger.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {TypedArray} from '../math/arrayTypes.js';
  */
 
 /**
@@ -352,9 +353,7 @@ export class ImageFactory {
    * Get an {@link Image} object from the read DICOM file.
    *
    * @param {DataElements} dataElements The DICOM tags.
-   * @param {Uint8Array | Int8Array |
-   *   Uint16Array | Int16Array |
-   *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+   * @param {TypedArray} pixelBuffer The pixel buffer.
    * @param {number} numberOfItems The number of load items.
    * @param {number} [frameNumber] The frame number if the pixel buffer
    *   only contains one frame of a multi-frame data: the image is

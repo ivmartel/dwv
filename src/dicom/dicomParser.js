@@ -22,6 +22,10 @@ import {DataReader} from './dataReader.js';
 import {logger} from '../utils/logger.js';
 
 /**
+ * @import {TypedArray} from '../math/arrayTypes.js';
+ */
+
+/**
  * List of DICOM data elements indexed via a 8 character string formed from
  * the group and element numbers.
  *
@@ -485,8 +489,7 @@ function guessTransferSyntax(firstDataElement) {
  * @param {number} pixelRepresentation The pixel representation,
  *   0:unsigned;1:signed.
  * @param {number} size The size of the new array.
- * @returns {Uint8Array|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array}
- *   The good typed array.
+ * @returns {TypedArray} The good typed array.
  */
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
   let res = null;

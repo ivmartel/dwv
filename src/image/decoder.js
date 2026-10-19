@@ -1,13 +1,7 @@
 import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 /**
- * List of compatible typed arrays.
- *
- * @typedef {(
- *   Uint8Array | Int8Array |
- *   Uint16Array | Int16Array |
- *   Uint32Array | Int32Array
- * )} TypedArray
+ * @import {TypedArray} from '../math/arrayTypes.js';
  */
 
 /**

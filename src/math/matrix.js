@@ -5,6 +5,10 @@ import {isSimilar} from './number.js';
 import {logger} from '../utils/logger.js';
 
 /**
+ * @import {TypedArray} from './arrayTypes.js';
+ */
+
+/**
  * Immutable 3x3 Matrix.
  */
 export class Matrix33 {
@@ -184,12 +188,6 @@ export class Matrix33 {
 
   /**
    * Multiply this matrix by a 3D typed array.
-   *
-   * @typedef {(
-   *   Uint8Array | Int8Array |
-   *   Uint16Array | Int16Array |
-   *   Uint32Array | Int32Array
-   * )} TypedArray
    *
    * @param {TypedArray} sourceArray The input 3D array.
    * @param {TypedArray} outArray The array to write to.

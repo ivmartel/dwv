@@ -20,6 +20,9 @@ import {
   precisionRound
 } from './number.js';
 
+// also export typedefs
+export * from './arrayTypes.js';
+
 export {
   Circle,
   Ellipse,

@@ -4,6 +4,10 @@ import {BIG_EPSILON} from '../math/number.js';
 import {getTypedArray} from '../dicom/dicomParser.js';
 
 /**
+ * @import {TypedArray} from '../math/arrayTypes.js';
+ */
+
+/**
  * Resampling file class.
  */
 export class ResamplingFilter {

@@ -18,6 +18,7 @@ import {Histogram} from './histogram.js';
  * @import {ColourMap} from './luts.js';
  * @import {Point} from '../math/point.js';
  * @import {MaskImage} from './maskImage.js';
+ * @import {TypedArray} from '../math/arrayTypes.js';
  */
 
 
@@ -108,16 +109,6 @@ export class Image extends EventTarget {
    * @type {Geometry}
    */
   #geometry;
-
-  /**
-   * List of compatible typed arrays.
-   *
-   * @typedef {(
-   *   Uint8Array | Int8Array |
-   *   Uint16Array | Int16Array |
-   *   Uint32Array | Int32Array
-   * )} TypedArray
-   */
 
   /**
    * Constructor signature shared by {@link Image} and its subclasses,
