@@ -11,6 +11,7 @@ import {
   isVersionInBounds,
   cleanString,
   hasDicomPrefix,
+  getTypedArrayLike,
   DicomParser
 } from '../../src/dicom/dicomParser.js';
 import {
@@ -458,5 +459,29 @@ describe('dicom', () => {
       assert.deepEqual(list[0][0], files00, 'Study#1:Series#0 file names');
     }
   );
+
+  /**
+   * Tests for {@link getTypedArrayLike}.
+   *
+   * @function module:tests/dicom~getTypedArrayLike
+   */
+  test('getTypedArrayLike', () => {
+    const arrays = [
+      new Uint8Array(1),
+      new Int8Array(1),
+      new Uint16Array(1),
+      new Int16Array(1),
+      new Uint32Array(1),
+      new Int32Array(1),
+      new Float32Array(1),
+      new Float64Array(1)
+    ];
+    for (const array of arrays) {
+      const res = getTypedArrayLike(array, 3);
+      assert.equal(res.constructor, array.constructor,
+        `${array.constructor.name} type`);
+      assert.equal(res.length, 3, `${array.constructor.name} length`);
+    }
+  });
 
 });

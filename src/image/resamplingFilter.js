@@ -1,7 +1,7 @@
 
 import {Matrix33} from '../math/matrix.js';
 import {BIG_EPSILON} from '../math/number.js';
-import {getTypedArray} from '../dicom/dicomParser.js';
+import {getTypedArrayLike} from '../dicom/dicomParser.js';
 
 /**
  * @import {TypedArray} from '../math/arrayTypes.js';
@@ -112,7 +112,6 @@ export class ResamplingFilter {
    * Generate the buffer for the resampled frame.
    *
    * @param {TypedArray} sourceImageBuffer The current image buffer.
-   * @param {number} pixelRepresentation The source image pixel representation.
    * @param {number[]} targetSize The size of the target.
    * @param {number[]} targetUnitVectors The buffer offset space unit vectors.
    *
@@ -120,17 +119,13 @@ export class ResamplingFilter {
    */
   #generateReturnBuffer(
     sourceImageBuffer,
-    pixelRepresentation,
     targetSize,
     targetUnitVectors
   ) {
     const totalSize = targetUnitVectors[2] * targetSize[2];
 
-    const targetImageBuffer = getTypedArray(
-      sourceImageBuffer.BYTES_PER_ELEMENT * 8,
-      pixelRepresentation,
-      totalSize
-    );
+    const targetImageBuffer = getTypedArrayLike(
+      sourceImageBuffer, totalSize);
 
     if (targetImageBuffer === null) {
       throw new Error('Cannot reallocate data for image resampling.');
@@ -156,11 +151,8 @@ export class ResamplingFilter {
     const targetSpacing = workerMessage.targetSpacing;
 
     const sourceImageBuffer = workerMessage.sourceImageBuffer;
-    const pixelRepresentation = workerMessage.pixelRepresentation;
-
     const targetImageBuffer = this.#generateReturnBuffer(
       sourceImageBuffer,
-      pixelRepresentation,
       targetSize,
       targetUnitVectors
     );

@@ -514,13 +514,43 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
       }
     }
   } catch (error) {
-    if (error instanceof RangeError) {
-      const powerOf2 = Math.floor(Math.log(size) / Math.log(2));
-      logger.error(`Cannot allocate array of size: ${
-        size } (>2^${powerOf2}).`);
-    }
+    logAllocationError(error, size);
   }
   return res;
+}
+
+/**
+ * Get a new TypedArray of the same type as the input one
+ *   (preserves float arrays, unlike `getTypedArray`).
+ *
+ * @param {TypedArray} array The model array.
+ * @param {number} size The size of the new array.
+ * @returns {TypedArray} The new array or null if the allocation failed.
+ */
+export function getTypedArrayLike(array, size) {
+  let res = null;
+  try {
+    const ArrayConstructor =
+      /** @type {new (size: number) => TypedArray} */ (array.constructor);
+    res = new ArrayConstructor(size);
+  } catch (error) {
+    logAllocationError(error, size);
+  }
+  return res;
+}
+
+/**
+ * Log a typed array allocation error.
+ *
+ * @param {Error} error The allocation error.
+ * @param {number} size The size of the array.
+ */
+function logAllocationError(error, size) {
+  if (error instanceof RangeError) {
+    const powerOf2 = Math.floor(Math.log(size) / Math.log(2));
+    logger.error(`Cannot allocate array of size: ${
+      size } (>2^${powerOf2}).`);
+  }
 }
 
 /**

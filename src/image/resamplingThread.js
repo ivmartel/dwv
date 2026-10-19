@@ -2,7 +2,7 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
 import {Point3D} from '../math/point.js';
 import {Geometry} from './geometry.js';
 import {Size} from './size.js';
-import {getTypedArray} from '../dicom/dicomParser.js';
+import {getTypedArrayLike} from '../dicom/dicomParser.js';
 import {Spacing} from './spacing.js';
 
 /**
@@ -360,21 +360,16 @@ export function generateResampledGeometry(
  * Generate the buffer for the resampled image.
  *
  * @param {TypedArray} sourceImageBuffer The current image buffer.
- * @param {number} pixelRepresentation The source image pixel representation.
  * @param {Size} targetSize The size of the target.
  *
  * @returns {TypedArray} The new buffer.
  */
 export function generateBuffer(
   sourceImageBuffer,
-  pixelRepresentation,
   targetSize
 ) {
-  const targetImageBuffer = getTypedArray(
-    sourceImageBuffer.BYTES_PER_ELEMENT * 8,
-    pixelRepresentation,
-    targetSize.getTotalSize()
-  );
+  const targetImageBuffer = getTypedArrayLike(
+    sourceImageBuffer, targetSize.getTotalSize());
 
   if (targetImageBuffer === null) {
     throw new Error('Cannot reallocate data for image resampling.');
@@ -439,7 +434,6 @@ export class ResamplingThread {
     const targetImageBuffer =
       generateBuffer(
         sourceImageBuffer,
-        pixelRepresentation,
         targetImageGeometry.getSize()
       );
 

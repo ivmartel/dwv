@@ -2,7 +2,7 @@ import {Index} from '../math/index.js';
 import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
 import {arrayContains} from '../utils/array.js';
-import {getTypedArray} from '../dicom/dicomParser.js';
+import {getTypedArrayLike} from '../dicom/dicomParser.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {ResamplingThread} from './resamplingThread.js';
@@ -805,10 +805,7 @@ export class Image extends EventTarget {
     // save buffer
     let tmpBuffer = this.#buffer;
     // create new
-    this.#buffer = getTypedArray(
-      this.#buffer.BYTES_PER_ELEMENT * 8,
-      this.#meta.PixelRepresentation,
-      size);
+    this.#buffer = getTypedArrayLike(this.#buffer, size);
     if (this.#buffer === null) {
       throw new Error('Cannot reallocate data for image.');
     }
