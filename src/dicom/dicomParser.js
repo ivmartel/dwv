@@ -22,7 +22,7 @@ import {DataReader} from './dataReader.js';
 import {logger} from '../utils/logger.js';
 
 /**
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {IntTypedArray, TypedArray} from '../math/arrayTypes.js';
  */
 
 /**
@@ -489,7 +489,7 @@ function guessTransferSyntax(firstDataElement) {
  * @param {number} pixelRepresentation The pixel representation,
  *   0:unsigned;1:signed.
  * @param {number} size The size of the new array.
- * @returns {TypedArray} The good typed array.
+ * @returns {IntTypedArray} The good typed array.
  */
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
   let res = null;
