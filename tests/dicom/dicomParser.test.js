@@ -19,6 +19,9 @@ import {
   getPixelDataTag
 } from '../../src/dicom/dicomTag.js';
 import {getFileListFromDicomDir} from '../../src/dicom/dicomDir.js';
+import {DicomWriter} from '../../src/dicom/dicomWriter.js';
+import {transferSyntaxKeywords} from '../../src/dicom/dictionary.js';
+import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
 import dwvTestSimple from '../data/dwv-test-simple.dcm?inline';
@@ -459,6 +462,92 @@ describe('dicom', () => {
       assert.deepEqual(list[0][0], files00, 'Study#1:Series#0 file names');
     }
   );
+
+  /**
+   * Write then parse data elements with the input pixel data.
+   *
+   * @param {number} pixelRepresentation The pixel representation.
+   * @param {string} pixelTagKey The pixel data tag key.
+   * @param {object} pixelElement The pixel data element.
+   * @returns {object} The parsed pixel data element.
+   */
+  const writeAndParsePixels = function (
+    pixelRepresentation, pixelTagKey, pixelElement) {
+    const tags = {
+      Modality: 'RTDOSE',
+      SOPClassUID: '1.2.840.10008.5.1.4.1.1.481.2',
+      MediaStorageSOPClassUID: '1.2.840.10008.5.1.4.1.1.481.2',
+      SOPInstanceUID: '1.2.826.0.1.3680043.9.7278.1.3333.1',
+      MediaStorageSOPInstanceUID: '1.2.826.0.1.3680043.9.7278.1.3333.1',
+      StudyInstanceUID: '1.2.826.0.1.3680043.9.7278.1.1111.1',
+      SeriesInstanceUID: '1.2.826.0.1.3680043.9.7278.1.2222.1',
+      TransferSyntaxUID: transferSyntaxKeywords.ExplicitVRLittleEndian,
+      PhotometricInterpretation: 'MONOCHROME2',
+      SamplesPerPixel: 1,
+      PixelRepresentation: pixelRepresentation,
+      Rows: 2,
+      Columns: 2,
+      BitsAllocated: 32,
+      BitsStored: 32,
+      HighBit: 31
+    };
+    const elements = generateDataElements(tags)[0];
+    delete elements['7FE00010'];
+    elements[pixelTagKey] = pixelElement;
+
+    const parser = new DicomParser();
+    parser.parse(new DicomWriter().getBuffer(elements));
+    return parser.getDicomElements()[pixelTagKey];
+  };
+
+  /**
+   * Tests for 32 bits integer pixel data parsing.
+   *
+   * @function module:tests/dicom~integer32PixelData
+   */
+  test('32 bits integer pixel data parsing', () => {
+    // unsigned: values above 16 bits
+    const uValues = new Uint32Array([0, 65536, 123456789, 4294967295]);
+    const uElement = writeAndParsePixels(0, '7FE00010', {
+      tag: getPixelDataTag(),
+      vr: 'OW',
+      vl: uValues.byteLength,
+      value: uValues
+    });
+    assert.ok(uElement.value[0] instanceof Uint32Array, 'unsigned type');
+    assert.deepEqual(Array.from(uElement.value[0]), Array.from(uValues),
+      'unsigned values');
+
+    // signed
+    const sValues = new Int32Array([-2147483648, -1, 70000, 2147483647]);
+    const sElement = writeAndParsePixels(1, '7FE00010', {
+      tag: getPixelDataTag(),
+      vr: 'OW',
+      vl: sValues.byteLength,
+      value: sValues
+    });
+    assert.ok(sElement.value[0] instanceof Int32Array, 'signed type');
+    assert.deepEqual(Array.from(sElement.value[0]), Array.from(sValues),
+      'signed values');
+  });
+
+  /**
+   * Tests for float pixel data parsing.
+   *
+   * @function module:tests/dicom~floatPixelData
+   */
+  test('Float pixel data parsing', () => {
+    const values = new Float32Array([-1.5, 0, 0.25, 1234.5]);
+    const element = writeAndParsePixels(0, '7FE00008', {
+      tag: new Tag('7FE0', '0008'),
+      vr: 'OF',
+      vl: values.byteLength,
+      value: values
+    });
+    assert.ok(element.value[0] instanceof Float32Array, 'float type');
+    assert.deepEqual(Array.from(element.value[0]), Array.from(values),
+      'float values');
+  });
 
   /**
    * Tests for {@link getTypedArrayLike}.

@@ -657,6 +657,10 @@ export class DicomWriter {
       byteOffset = writer.writeUint32Array(byteOffset, value);
     } else if (value instanceof Int32Array) {
       byteOffset = writer.writeInt32Array(byteOffset, value);
+    } else if (value instanceof Float32Array) {
+      byteOffset = writer.writeFloat32Array(byteOffset, value);
+    } else if (value instanceof Float64Array) {
+      byteOffset = writer.writeFloat64Array(byteOffset, value);
     } else if (value instanceof BigUint64Array) {
       byteOffset = writer.writeUint64Array(byteOffset, value);
     } else if (value instanceof BigInt64Array) {
@@ -1257,6 +1261,10 @@ export class DicomWriter {
               size = Math.ceil(size / 8);
             } else if (bitsAllocated === 16) {
               size *= Uint16Array.BYTES_PER_ELEMENT;
+            } else if (bitsAllocated === 32) {
+              size *= Uint32Array.BYTES_PER_ELEMENT;
+            } else if (bitsAllocated === 64) {
+              size *= Float64Array.BYTES_PER_ELEMENT;
             }
           }
         } else if (typeof vrType !== 'undefined') {

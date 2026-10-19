@@ -1047,9 +1047,17 @@ export class DicomParser {
           );
           element.vr = 'OW';
         }
-        // read
+        // read: float pixel data have dedicated tags, PixelData
+        // is integer data
         data = [];
-        if (bitsAllocated === 1) {
+        const tagKey = tag.getKey();
+        if (tagKey === '7FE00008') {
+          // FloatPixelData
+          data.push(reader.readFloat32Array(offset, vl));
+        } else if (tagKey === '7FE00009') {
+          // DoubleFloatPixelData
+          data.push(reader.readFloat64Array(offset, vl));
+        } else if (bitsAllocated === 1) {
           data.push(reader.readBinaryArray(
             offset, vl, pixelTags.imageBufferSize));
         } else if (bitsAllocated === 8) {
@@ -1065,9 +1073,11 @@ export class DicomParser {
             data.push(reader.readInt16Array(offset, vl));
           }
         } else if (bitsAllocated === 32) {
-          data.push(reader.readFloat32Array(offset, vl));
-        } else if (bitsAllocated === 64) {
-          data.push(reader.readFloat64Array(offset, vl));
+          if (pixelRepresentation === 0) {
+            data.push(reader.readUint32Array(offset, vl));
+          } else {
+            data.push(reader.readInt32Array(offset, vl));
+          }
         } else {
           throw new Error(`Unsupported bits allocated: ${bitsAllocated}`);
         }
