@@ -1,5 +1,6 @@
 import {Point, Point3D} from '../math/point.js';
 import {WindowLevel} from '../image/windowLevel.js';
+import {TIME_DIM_INDEX} from '../image/geometry.js';
 
 /**
  * @import {LayerGroup} from './layerGroup.js';
@@ -105,9 +106,92 @@ export class MaskViewBinder {
 }
 
 /**
+ * Check if a position change only modified non spatial dimensions.
+ *
+ * @param {number[]} [diffDims] The modified dimensions.
+ * @returns {boolean} True if only non spatial dimensions changed.
+ */
+function isVolumeOnlyMove(diffDims) {
+  return Array.isArray(diffDims) &&
+    diffDims.length !== 0 &&
+    diffDims.every((dim) => dim >= TIME_DIM_INDEX);
+}
+
+/**
+ * Check if a position change did not modify any index, for example a
+ * change within the same voxel.
+ *
+ * @param {number[]} [diffDims] The modified index dimensions.
+ * @returns {boolean} True if no index dimension changed.
+ */
+function isUnchangedPosition(diffDims) {
+  return Array.isArray(diffDims) && diffDims.length === 0;
+}
+
+/**
+ * Get the target timepoint with the same tag value as the source
+ * timepoint.
+ *
+ * @param {Function|undefined} getTimepointSyncTable The timepoint sync
+ *   table getter.
+ * @param {Function|undefined} getTimepointTag The timepoint tag getter.
+ * @param {string} sourceDataId The source data id.
+ * @param {string} targetDataId The target data id.
+ * @param {number} sourceTimepoint The source timepoint index.
+ * @returns {number|undefined} The target timepoint index, undefined if
+ *   not found.
+ */
+function getMatchingTimepoint(
+  getTimepointSyncTable, getTimepointTag,
+  sourceDataId, targetDataId, sourceTimepoint) {
+  if (typeof getTimepointSyncTable !== 'function' ||
+    typeof getTimepointTag !== 'function') {
+    return undefined;
+  }
+  const sourceTag = getTimepointTag(sourceDataId);
+  const targetTag = getTimepointTag(targetDataId);
+  if (typeof sourceTag === 'undefined' || sourceTag !== targetTag) {
+    return undefined;
+  }
+  const sourceTagValue = getTimepointSyncTable(sourceDataId)?.find(
+    (entry) => entry.timepointIndex === sourceTimepoint)?.tagValue;
+  if (typeof sourceTagValue === 'undefined') {
+    return undefined;
+  }
+  const targetSyncTable = getTimepointSyncTable(targetDataId);
+  return targetSyncTable?.find(
+    (entry) => entry.tagValue === sourceTagValue)?.timepointIndex;
+}
+
+/**
  * Position binder.
  */
 export class PositionBinder {
+  /**
+   * Timepoint sync table getter.
+   *
+   * @type {Function|undefined}
+   */
+  #getTimepointSyncTable;
+
+  /**
+   * Timepoint tag getter.
+   *
+   * @type {Function|undefined}
+   */
+  #getTimepointTag;
+
+  /**
+   * @param {Function} [getTimepointSyncTable] The timepoint sync table
+   *   getter, takes a data id.
+   * @param {Function} [getTimepointTag] The timepoint tag getter, takes
+   *   a data id.
+   */
+  constructor(getTimepointSyncTable, getTimepointTag) {
+    this.#getTimepointSyncTable = getTimepointSyncTable;
+    this.#getTimepointTag = getTimepointTag;
+  }
+
   /**
    * Get the associated event.
    *
@@ -122,11 +206,19 @@ export class PositionBinder {
    * @param {LayerGroup} layerGroup The input lqyer group.
    * @returns {EventListener} The event handler.
    */
-  getCallback = function (layerGroup) {
+  getCallback = (layerGroup) => {
+    const getTimepointSyncTable = this.#getTimepointSyncTable;
+    const getTimepointTag = this.#getTimepointTag;
     return function (/** @type {CustomEvent} */ event) {
       const dataid = event.detail?.dataid;
       const value = event.detail?.value;
-      const pointValues = value[1];
+      // only propagate index changes: a change within the same voxel
+      // keeps the current position of the other views
+      if (isUnchangedPosition(event.detail?.diffDims)) {
+        return;
+      }
+      // copy to not modify the shared event value
+      const pointValues = [...value[1]];
       const vls = layerGroup.getViewLayersByDataId(dataid);
       let vl;
       let sameData = false;
@@ -137,15 +229,36 @@ export class PositionBinder {
       } else {
         vl = layerGroup.getBaseViewLayer();
       }
+      // no view layer: data not loaded yet
+      if (typeof vl === 'undefined') {
+        return;
+      }
       const vc = vl.getViewController();
       // bind 3D for all
       // bind 4D if same data, otherwise use 3D and keep current
       const currentPos = vc.getCurrentPosition();
+      if (!vc.moreThanOne(vc.getScrollDimIndex())) {
+        // single slice view: follow the in-plane position, keep the slice
+        const planePos = vc.getPositionFromPlanePoint(
+          vc.getPlanePositionFromPosition(new Point(pointValues)));
+        for (let i = 0; i < TIME_DIM_INDEX; ++i) {
+          pointValues[i] = planePos.get(i);
+        }
+      } else if (isVolumeOnlyMove(event.detail?.diffDims)) {
+        // time only change: keep the spatial position
+        for (let i = 0; i < TIME_DIM_INDEX; ++i) {
+          pointValues[i] = currentPos.get(i);
+        }
+      }
       const currentDims = currentPos.length();
       const inputDims = pointValues.length;
       if (!sameData &&
-        inputDims > 3 && currentDims > 3) {
-        pointValues[3] = currentPos.get(3);
+        inputDims > TIME_DIM_INDEX && currentDims > TIME_DIM_INDEX) {
+        // matching timepoint for time series, else keep current
+        pointValues[TIME_DIM_INDEX] = getMatchingTimepoint(
+          getTimepointSyncTable, getTimepointTag,
+          dataid, vl.getDataId(), pointValues[TIME_DIM_INDEX]) ??
+          currentPos.get(TIME_DIM_INDEX);
       }
       vc.setCurrentPosition(new Point(pointValues));
     };

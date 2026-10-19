@@ -9,11 +9,77 @@ import {
   getLayerDetailsFromEvent,
   getScaledOffset,
 } from '../../src/gui/layerGroup.js';
+import {PositionBinder} from '../../src/gui/binders.js';
+import {Point} from '../../src/math/point.js';
+import {Size} from '../../src/image/size.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'gui/layerGroup.js' file.
  */
+
+/**
+ * Create a layer group mock with one view layer, as used by the
+ * position binder.
+ *
+ * @param {string} dataId The view layer data id.
+ * @param {number[]} position The view layer current position.
+ * @param {number[]} size The view layer image size.
+ * @returns {{layerGroup: object, vc: object}} The layer group and its
+ *   view controller.
+ */
+function makeBinderLayerGroup(dataId, position, size) {
+  // identity orientation and origin: plane x, y are the world x, y
+  const vc = {
+    getCurrentPosition: () => new Point(position),
+    moreThanOne: (dim) => new Size(size).moreThanOne(dim),
+    getScrollDimIndex: () => 2,
+    getPlanePositionFromPosition: (point) => ({
+      getX: () => point.get(0),
+      getY: () => point.get(1)
+    }),
+    getPositionFromPlanePoint: (point2D) => {
+      const values = [...position];
+      values[0] = point2D.getX();
+      values[1] = point2D.getY();
+      return new Point(values);
+    },
+    setCurrentPosition: vi.fn()
+  };
+  const vl = {
+    getViewController: () => vc,
+    getDataId: () => dataId
+  };
+  const layerGroup = {
+    getViewLayersByDataId: (id) => id === dataId ? [vl] : [],
+    getBaseViewLayer: () => vl
+  };
+  return {layerGroup, vc};
+}
+
+/**
+ * Create a position change event.
+ *
+ * @param {string} dataid The source data id.
+ * @param {number[]} position The source position.
+ * @param {number[]} diffDims The modified dimensions.
+ * @returns {CustomEvent} The event.
+ */
+function makePositionEvent(dataid, position, diffDims) {
+  return new CustomEvent('positionchange', {
+    detail: {dataid, value: [[], position], diffDims}
+  });
+}
+
+/**
+ * Get the position set on a view controller mock.
+ *
+ * @param {object} vc The view controller mock.
+ * @returns {number[]} The position values.
+ */
+function getSetPosition(vc) {
+  return vc.setCurrentPosition.mock.calls[0][0].getValues();
+}
 
 describe('gui', () => {
 
@@ -587,6 +653,129 @@ describe('gui', () => {
     assert.equal(warnSpy.mock.calls[0][0], 'No layer to show crosshair');
     lg.setShowCrosshair(false);
     assert.equal(lg.getShowCrosshair(), false);
+  });
+
+
+  /**
+   * Tests for {@link PositionBinder}: same data.
+   *
+   * @function module:tests/gui~positionBinderSameData
+   */
+  test('PositionBinder binds the full position of the same data', () => {
+    const {layerGroup, vc} =
+      makeBinderLayerGroup('data0', [0, 0, 1, 0], [2, 2, 5, 3]);
+    new PositionBinder().getCallback(layerGroup)(
+      makePositionEvent('data0', [1, 1, 3, 2], [2, 3]));
+    assert.deepEqual(getSetPosition(vc), [1, 1, 3, 2]);
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: time series with the same tag.
+   *
+   * @function module:tests/gui~positionBinderTimeSeries
+   */
+  test('PositionBinder matches the timepoint tag value of time series',
+    () => {
+      const tables = {
+        source: [
+          {timepointIndex: 0, tagValue: 10},
+          {timepointIndex: 1, tagValue: 20}
+        ],
+        target: [
+          {timepointIndex: 0, tagValue: 20},
+          {timepointIndex: 1, tagValue: 30}
+        ]
+      };
+      const binder = new PositionBinder(
+        (dataId) => tables[dataId],
+        () => 'TemporalPositionIdentifier');
+      const {layerGroup, vc} =
+        makeBinderLayerGroup('target', [0, 0, 1, 1], [2, 2, 5, 2]);
+      binder.getCallback(layerGroup)(
+        makePositionEvent('source', [1, 1, 3, 1], [2]));
+      assert.deepEqual(getSetPosition(vc), [1, 1, 3, 0],
+        'timepoint with the same tag value');
+    });
+
+  /**
+   * Tests for {@link PositionBinder}: no matching timepoint.
+   *
+   * @function module:tests/gui~positionBinderNoMatch
+   */
+  test('PositionBinder keeps the timepoint without a matching tag', () => {
+    const table = [{timepointIndex: 0, tagValue: 10}];
+    // different timepoint tags
+    const binder0 = new PositionBinder(
+      () => table,
+      (dataId) => dataId === 'source' ? 'TemporalPositionIdentifier'
+        : 'TemporalPositionIndex');
+    const target0 = makeBinderLayerGroup('target', [0, 0, 1, 1], [2, 2, 5, 2]);
+    binder0.getCallback(target0.layerGroup)(
+      makePositionEvent('source', [1, 1, 3, 0], [2]));
+    assert.deepEqual(getSetPosition(target0.vc), [1, 1, 3, 1],
+      'different tags');
+    // no timepoint lookups (not time series)
+    const target1 = makeBinderLayerGroup('target', [0, 0, 1, 1], [2, 2, 5, 2]);
+    new PositionBinder().getCallback(target1.layerGroup)(
+      makePositionEvent('source', [1, 1, 3, 0], [2]));
+    assert.deepEqual(getSetPosition(target1.vc), [1, 1, 3, 1],
+      'no lookups');
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: timepoint only move.
+   *
+   * @function module:tests/gui~positionBinderVolumeOnlyMove
+   */
+  test('PositionBinder keeps the target slice on a timepoint only move',
+    () => {
+      const {layerGroup, vc} =
+        makeBinderLayerGroup('data0', [0, 0, 1, 0], [2, 2, 5, 3]);
+      new PositionBinder().getCallback(layerGroup)(
+        makePositionEvent('data0', [1, 1, 3, 2], [3]));
+      assert.deepEqual(getSetPosition(vc), [0, 0, 1, 2]);
+    });
+
+  /**
+   * Tests for {@link PositionBinder}: single slice target.
+   *
+   * @function module:tests/gui~positionBinderSingleSlice
+   */
+  test('PositionBinder follows the in-plane position of a single slice ' +
+    'target', () => {
+    const {layerGroup, vc} =
+      makeBinderLayerGroup('data0', [0, 0, 1, 0], [2, 2, 1, 3]);
+    new PositionBinder().getCallback(layerGroup)(
+      makePositionEvent('data0', [1, 1, 3, 2], [0, 1, 2, 3]));
+    assert.deepEqual(getSetPosition(vc), [1, 1, 1, 2],
+      'in-plane position followed, slice kept');
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: target still loading.
+   *
+   * @function module:tests/gui~positionBinderLoading
+   */
+  test('PositionBinder ignores a target still loading', () => {
+    const layerGroup = {
+      getViewLayersByDataId: () => [],
+      getBaseViewLayer: () => undefined
+    };
+    assert.doesNotThrow(() => new PositionBinder().getCallback(layerGroup)(
+      makePositionEvent('data0', [1, 1, 3, 2], [2])));
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: shared event value.
+   *
+   * @function module:tests/gui~positionBinderEventValue
+   */
+  test('PositionBinder does not modify the event value', () => {
+    const {layerGroup} =
+      makeBinderLayerGroup('data0', [0, 0, 1, 0], [2, 2, 5, 3]);
+    const event = makePositionEvent('data0', [1, 1, 3, 2], [3]);
+    new PositionBinder().getCallback(layerGroup)(event);
+    assert.deepEqual(event.detail.value[1], [1, 1, 3, 2]);
   });
 
 });

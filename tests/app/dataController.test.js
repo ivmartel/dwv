@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi} from 'vitest';
 import {
   DicomData,
   DicomSliceDataList,
@@ -25,10 +25,16 @@ import syntheticData from '/tests/data/synthetic-img.json';
  * Related DICOM tag keys.
  */
 const TagKeys = {
+  SOPClassUID: '00080016',
   AcquisitionTime: '00080032',
   EchoTime: '00180081',
   TemporalPositionIdentifier: '00200100'
 };
+
+/**
+ * MR image storage SOP class UID.
+ */
+const MRSOPClassUID = '1.2.840.10008.5.1.4.1.1.4';
 
 /**
  * Create a data element with a given VR and value.
@@ -67,6 +73,96 @@ function makeSliceData(z, uid, meta) {
   });
   data.image = image;
   return data;
+}
+
+/**
+ * Create a 2 origins x 2 volumes slice list whose volumes are
+ * separated by TemporalPositionIdentifier (time series).
+ *
+ * @returns {DicomSliceDataList} The slice list.
+ */
+function makeTimeSeriesList() {
+  const list = new DicomSliceDataList();
+  let uid = 0;
+  for (const z of [0, 1]) {
+    for (const tpi of [1, 2]) {
+      list.add(makeSliceData(z, String(uid++), {
+        [TagKeys.TemporalPositionIdentifier]:
+          makeDataElement('IS', [String(tpi)])
+      }));
+    }
+  }
+  return list;
+}
+
+/**
+ * Create multi-frame files of 2 frames at the same 2 positions, one
+ * volume per file.
+ *
+ * @param {number[]} temporalPositions The TemporalPositionIndex of each
+ *   file (same for its frames).
+ * @param {number[]} bValues The b-value of each file (same for its
+ *   frames).
+ * @returns {Array<Record<string, DataElement>>} The files elements.
+ */
+function makeOneVolumeFiles(temporalPositions, bValues) {
+  return temporalPositions.map((temporalPosition, index) => {
+    const config = structuredClone(syntheticData[0]);
+    config.tags.SOPInstanceUID += `.${index}`;
+    const elements = getStructureElementsList(config, '1.2.840.10008.1.2.1', {
+      numberOfFrames: 2,
+      genOptions: {
+        frames3D: true,
+        framePositionOrder: [0, 1],
+        frameTemporalPositions: [temporalPosition, temporalPosition],
+        frameBValues: [bValues[index], bValues[index]]
+      }
+    })[0];
+    // distinct instance numbers (meta merge id)
+    elements['00200013'].value = [String(index + 1)];
+    return elements;
+  });
+}
+
+/**
+ * Get the diffusion b-value of a generated multi-frame file (same for
+ * all its frames) from its first per frame functional group.
+ *
+ * @param {Record<string, DataElement>} elements The file DICOM tags.
+ * @returns {number|undefined} The b-value.
+ */
+function getFrameBValue(elements) {
+  const group = elements['52009230']?.value?.[0];
+  const value =
+    group?.['00189117']?.value?.[0]?.['00189087']?.value?.[0];
+  return typeof value !== 'undefined' ? Number(value) : undefined;
+}
+
+/**
+ * Send the frames of files to a data controller as DicomBufferToData
+ * does.
+ *
+ * @param {DataController} dc The data controller.
+ * @param {string} dataId The data id.
+ * @param {Array<Record<string, DataElement>>} filesElements The files.
+ * @param {number} numberOfFrames The number of frames per file.
+ */
+function sendFrames(dc, dataId, filesElements, numberOfFrames) {
+  for (const elements of filesElements) {
+    const buffer = elements['7FE00010'].value;
+    const frameSize = buffer.length / numberOfFrames;
+    for (let f = 0; f < numberOfFrames; ++f) {
+      const data = new DicomData(elements);
+      data.buffer = buffer.subarray(f * frameSize, (f + 1) * frameSize);
+      data.numberOfItems = filesElements.length;
+      data.frameNumber = f;
+      if (typeof dc.get(dataId) === 'undefined') {
+        dc.add(dataId, data);
+      } else {
+        dc.update(dataId, data);
+      }
+    }
+  }
 }
 
 describe('app', () => {
@@ -444,5 +540,222 @@ describe('app', () => {
       list0.buildData();
     }, Error, 'Cannot create image for multi-volume');
   });
+
+  test('DicomSliceDataList buildData timepoints for time volumes', () => {
+    assert.deepEqual(
+      makeTimeSeriesList().buildData().timepoints,
+      {
+        tag: 'TemporalPositionIdentifier',
+        syncTable: [
+          {timepointIndex: 0, tagValue: 1},
+          {timepointIndex: 1, tagValue: 2}
+        ]
+      },
+      'time series timepoints');
+  });
+
+  test('DicomSliceDataList buildData timepoints for b-value volumes', () => {
+    // volumes separated by the b-value
+    const list0 = new DicomSliceDataList();
+    let uid = 0;
+    for (const z of [0, 1]) {
+      for (const bvalue of [0, 800]) {
+        list0.add(makeSliceData(z, String(uid++), {
+          [TagKeys.SOPClassUID]: makeDataElement('UI', [MRSOPClassUID]),
+          [TagKeys.TemporalPositionIdentifier]: makeDataElement('IS', ['1']),
+          [TagKeys.DiffusionBValue]: makeDataElement('FD', [String(bvalue)])
+        }));
+      }
+    }
+    assert.equal(list0.buildData().timepoints, undefined,
+      'no timepoints for b-value volumes');
+  });
+
+  test('DicomSliceDataList buildData timepoints with custom getter',
+    () => {
+      // custom getter: not time based
+      custom.getPostLoadVolumeIdTagValue = function (meta) {
+        return parseInt(
+          meta[TagKeys.TemporalPositionIdentifier].value[0], 10);
+      };
+      try {
+        assert.equal(makeTimeSeriesList().buildData().timepoints, undefined,
+          'no timepoints for a custom getter');
+      } finally {
+        custom.getPostLoadVolumeIdTagValue = undefined;
+      }
+    });
+
+  test('DataController markDataAsComplete without 4th dimension', () => {
+    const dc0 = new DataController();
+    const data = makeSliceData(0, 'uid3D', {});
+    dc0.add('data3D', data);
+    dc0.markDataAsComplete('data3D');
+    assert.equal(
+      dc0.getTimepointTag('data3D'), undefined, 'no timepoint tag');
+    assert.equal(
+      dc0.getTimepointSyncTable('data3D'), undefined, 'no sync table');
+    // unknown data
+    assert.equal(dc0.getTimepointTag('unknown'), undefined,
+      'unknown data timepoint tag');
+    assert.equal(dc0.getTimepointSyncTable('unknown'), undefined,
+      'unknown data sync table');
+  });
+
+  test('DataController markDataAsComplete rebuilt b-value data', () => {
+    // same time for all files: rebuilt with b-value volumes
+    const filesElements = makeOneVolumeFiles([1, 1, 1], [800, 0, 50]);
+    const dc0 = new DataController();
+    sendFrames(dc0, '0', filesElements, 2);
+    assert.ok(dc0.get('0').hasDuplicateOrigin(), 'has duplicate origin');
+    dc0.markDataAsComplete('0');
+
+    assert.equal(dc0.getTimepointTag('0'), undefined,
+      'no timepoint tag for b-value volumes');
+    assert.equal(dc0.getTimepointSyncTable('0'), undefined,
+      'no sync table for b-value volumes');
+  });
+
+  test('DataController markDataAsComplete rebuilt time series', () => {
+    // no time while loading: rebuilt with time volumes
+    custom.getVolumeIdTagValue = function () {
+      return undefined;
+    };
+    try {
+      const temporalPositions = [3, 1, 2];
+      const filesElements =
+        makeOneVolumeFiles(temporalPositions, [0, 0, 0]);
+      const dc0 = new DataController();
+      sendFrames(dc0, '0', filesElements, 2);
+      assert.ok(dc0.get('0').hasDuplicateOrigin(), 'has duplicate origin');
+      const guessSpy =
+        vi.spyOn(DicomSliceDataList.prototype, 'guessTimepoints');
+      dc0.markDataAsComplete('0');
+      assert.equal(guessSpy.mock.calls.length, 0,
+        'timepoints from the build grouping, no second grouping');
+      guessSpy.mockRestore();
+
+      assert.equal(dc0.getTimepointTag('0'), 'TemporalPositionIndex',
+        'timepoint tag');
+      const table = dc0.getTimepointSyncTable('0');
+      assert.deepEqual(table.map(entry => entry.tagValue), [1, 2, 3],
+        'sync table tag values in volume order');
+      // each table entry matches the volume shown at its index
+      const image = dc0.get('0').image;
+      for (const entry of table) {
+        const fileIndex = temporalPositions.indexOf(entry.tagValue);
+        assert.equal(
+          image.getImageUid(new Index([0, 0, 0, entry.timepointIndex])),
+          filesElements[fileIndex]['00080018'].value[0],
+          `timepoint ${entry.timepointIndex} is the file with ` +
+          `TemporalPositionIndex ${entry.tagValue}`);
+      }
+    } finally {
+      custom.getVolumeIdTagValue = undefined;
+    }
+  });
+
+  test('DataController markDataAsComplete b-value built while loading',
+    () => {
+      // b-value volumes built while loading
+      custom.getVolumeIdTagValue = function (elements) {
+        return getFrameBValue(elements);
+      };
+      try {
+        const filesElements = makeOneVolumeFiles([1, 1, 1], [800, 0, 50]);
+        const dc0 = new DataController();
+        sendFrames(dc0, '0', filesElements, 2);
+        assert.notOk(dc0.get('0').hasDuplicateOrigin(),
+          'no duplicate origin');
+        dc0.markDataAsComplete('0');
+
+        assert.equal(dc0.getTimepointTag('0'), undefined,
+          'no timepoint tag for b-value volumes');
+        assert.equal(dc0.getTimepointSyncTable('0'), undefined,
+          'no sync table for b-value volumes');
+      } finally {
+        custom.getVolumeIdTagValue = undefined;
+      }
+    });
+
+  test('DataController markDataAsComplete data built while loading',
+    () => {
+      // time volumes built while loading, files not in time order
+      const temporalPositions = [3, 1, 2];
+      const filesElements =
+        makeOneVolumeFiles(temporalPositions, [0, 0, 0]);
+      const dc0 = new DataController();
+      sendFrames(dc0, '0', filesElements, 2);
+      assert.notOk(dc0.get('0').hasDuplicateOrigin(),
+        'no duplicate origin');
+      dc0.markDataAsComplete('0');
+
+      assert.equal(dc0.getTimepointTag('0'), 'TemporalPositionIndex',
+        'timepoint tag');
+      const table = dc0.getTimepointSyncTable('0');
+      assert.deepEqual(table.map(entry => entry.tagValue), [1, 2, 3],
+        'sync table tag values');
+      // each table entry matches the volume shown at its index
+      const image = dc0.get('0').image;
+      for (const entry of table) {
+        const fileIndex = temporalPositions.indexOf(entry.tagValue);
+        assert.equal(
+          image.getImageUid(new Index([0, 0, 0, entry.timepointIndex])),
+          filesElements[fileIndex]['00080018'].value[0],
+          `timepoint ${entry.timepointIndex} is the file with ` +
+          `TemporalPositionIndex ${entry.tagValue}`);
+      }
+    });
+
+  test('DataController timepoints follow the data lifecycle', () => {
+    const dc0 = new DataController();
+    const loadTimeSeries = (dataId) => {
+      sendFrames(dc0, dataId, makeOneVolumeFiles([1, 2], [0, 0]), 2);
+      dc0.markDataAsComplete(dataId);
+      assert.equal(dc0.getTimepointTag(dataId), 'TemporalPositionIndex',
+        `${dataId} timepoint tag`);
+    };
+
+    // stash and unstash keep the timepoints
+    loadTimeSeries('0');
+    const table = dc0.getTimepointSyncTable('0');
+    dc0.stash('0');
+    assert.equal(dc0.getTimepointTag('0'), undefined,
+      'no timepoint tag for stashed data');
+    assert.equal(dc0.getTimepointSyncTable('0'), undefined,
+      'no sync table for stashed data');
+    dc0.unstash('0');
+    assert.equal(dc0.getTimepointTag('0'), 'TemporalPositionIndex',
+      'timepoint tag after unstash');
+    assert.equal(dc0.getTimepointSyncTable('0'), table,
+      'sync table after unstash');
+
+    // remove clears the timepoints
+    dc0.remove('0');
+    assert.equal(dc0.getTimepointTag('0'), undefined,
+      'no timepoint tag after remove');
+    assert.equal(dc0.getTimepointSyncTable('0'), undefined,
+      'no sync table after remove');
+
+    // reset clears the timepoints
+    loadTimeSeries('1');
+    dc0.reset();
+    assert.equal(dc0.getTimepointTag('1'), undefined,
+      'no timepoint tag after reset');
+  });
+
+
+  test('DataController repeated markDataAsComplete keeps the timepoints',
+    () => {
+      const dc0 = new DataController();
+      sendFrames(dc0, '0', makeOneVolumeFiles([3, 1, 2], [0, 0, 0]), 2);
+      dc0.markDataAsComplete('0');
+      const table = dc0.getTimepointSyncTable('0');
+      dc0.markDataAsComplete('0');
+      assert.equal(dc0.getTimepointTag('0'), 'TemporalPositionIndex',
+        'tag kept');
+      assert.deepEqual(dc0.getTimepointSyncTable('0'), table,
+        'sync table kept');
+    });
 
 });

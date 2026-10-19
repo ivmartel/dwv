@@ -21,6 +21,9 @@ import {Matrix33} from '../math/matrix.js';
 // 5 decimals, leading to rounding differences of 1e-5
 export const DIRECTION_EPSILON = 1e-4;
 
+// index of the time dimension
+export const TIME_DIM_INDEX = 3;
+
 /**
  * @import {SourcedNumberValue} from '../math/types.js';
  */
@@ -390,6 +393,15 @@ export class Geometry {
       count += item.origins.length;
     }
     return count;
+  }
+
+  /**
+   * Get the time values of the time points, in volume order.
+   *
+   * @returns {number[]} The time values, empty if no time.
+   */
+  getTimes() {
+    return Object.keys(this.#timeOrigins).map(Number);
   }
 
   /**
