@@ -19,6 +19,16 @@
  * @property {Function} getter The volume id getter.
  * @property {boolean} [preLoad] Flag to also use the candidate
  *   while loading.
+ * @property {boolean} [timeBased] Flag for a time based candidate.
+ */
+
+/**
+ * Timepoints of a multivolume time series.
+ *
+ * @typedef {object} Timepoints
+ * @property {string} tag The timepoint tag name.
+ * @property {Array<{timepointIndex: number, tagValue: number}>} syncTable
+ *   The timepoint index and tag value of each volume.
  */
 
 // ESM module marker

@@ -1316,9 +1316,14 @@ export class App extends EventTarget {
    */
   setLayerGroupsBinders(list) {
     const instances = [];
+    const getTimepointSyncTable = (dataId) =>
+      this.#dataController.getTimepointSyncTable(dataId);
+    const getTimepointTag = (dataId) =>
+      this.#dataController.getTimepointTag(dataId);
     for (let i = 0; i < list.length; ++i) {
       if (typeof binderList[list[i]] !== 'undefined') {
-        instances.push(new binderList[list[i]]);
+        instances.push(new binderList[list[i]](
+          getTimepointSyncTable, getTimepointTag));
       }
     }
     this.#stageController.setBinders(instances);

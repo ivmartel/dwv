@@ -571,6 +571,25 @@ describe('image', () => {
       'cannot append slice with different orientation');
   });
 
+  /**
+   * Tests for {@link Geometry} getTimes.
+   *
+   * @function module:tests/image~geometryGetTimes
+   */
+  test('Geometry getTimes', () => {
+    const size = new Size([2, 2, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origin = new Point3D(0, 0, 0);
+    assert.deepEqual(
+      new Geometry([origin], size, spacing).getTimes(), [], 'no time');
+    const geometry = new Geometry([origin], size, spacing, undefined, 3);
+    geometry.appendFrame(origin, 1);
+    geometry.appendFrame(origin, 2);
+    assert.deepEqual(geometry.getTimes(), [1, 2, 3], 'volume order');
+    assert.equal(geometry.getCurrentNumberOfSlicesBeforeTime(3), 2,
+      'time 3 is the third volume');
+  });
+
 });
 
 describe('getSliceGeometrySpacing', () => {

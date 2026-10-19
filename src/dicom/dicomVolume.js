@@ -89,6 +89,8 @@ export const defaultPrivateBValueRules = [
  * Candidates flagged with `preLoad` are also used while loading
  * (see `getVolumeIdTagValue`): they must not vary between the
  * slices of a single volume.
+ * Candidates flagged with `timeBased` separate the timepoints of a time
+ * series.
  *
  * @type {VolumeIdCandidate[]}
  */
@@ -97,12 +99,14 @@ export const defaultVolumeIdCandidates = [
     name: 'TemporalPositionIdentifier',
     getter: makeNumericTagGetter(
       TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10)),
-    preLoad: true
+    preLoad: true,
+    timeBased: true
   },
   {
     name: 'TemporalPositionIndex',
     getter: getTemporalPositionIndex,
-    preLoad: true
+    preLoad: true,
+    timeBased: true
   },
   {
     name: 'DiffusionBValue',
@@ -509,7 +513,7 @@ function getAcquisitionTime(elements) {
  * @returns {VolumeIdCandidate[]}
  *   The candidates.
  */
-function getVolumeIdCandidates() {
+export function getVolumeIdCandidates() {
   return typeof custom.volumeIdCandidates !== 'undefined'
     ? custom.volumeIdCandidates
     : defaultVolumeIdCandidates;
@@ -574,8 +578,9 @@ export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
  *   of each item.
  * @param {number[]} sliceIndices The slice index of each item.
  * @param {number} numberOfSlices The number of distinct slices.
- * @returns {{volumeIndices: number[], getter: Function}|undefined}
- *   The volume index of each item and the volume id getter that
+ * @returns {{volumeIndices: number[], getter: Function,
+ *   candidate: VolumeIdCandidate}|undefined}
+ *   The volume index of each item, the getter and the candidate that
  *   produced them, undefined if no candidate produces a valid grouping.
  */
 export function guessVolumeIndices(
@@ -600,7 +605,7 @@ export function guessVolumeIndices(
       values, sliceIndices, numberOfSlices);
     if (typeof volumeIndices !== 'undefined') {
       logger.debug(`Using '${candidate.name}' as volume id`);
-      return {volumeIndices, getter: candidate.getter};
+      return {volumeIndices, getter: candidate.getter, candidate};
     }
   }
   return undefined;
