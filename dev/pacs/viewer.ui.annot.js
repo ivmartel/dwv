@@ -42,9 +42,19 @@ function getAnnotationGroupDivId(dataId) {
  * @returns {string} The divId.
  */
 function getAnnotationDivId(annotation, dataId) {
+  return getAnnotationIdDivId(annotation.trackingUid, dataId);
+}
+
+/**
+ * Get the annotation divId from its id.
+ *
+ * @param {string} annotationId The annotation tracking UID.
+ * @param {string} dataId The data ID.
+ * @returns {string} The divId.
+ */
+function getAnnotationIdDivId(annotationId, dataId) {
   const prefix = getAnnotationGroupDivId(dataId);
-  const suffix = `annotation${annotation.trackingUid}`;
-  return `${prefix}-${suffix}`;
+  return `${prefix}-annotation${annotationId}`;
 }
 
 /**
@@ -94,6 +104,8 @@ export class AnnotationUI {
       this.#onAnnotationUpdate);
     this.#dwvService.addEventListener('annotationremove',
       this.#onAnnotationRemove);
+    this.#dwvService.addEventListener('annotationselect',
+      this.#onAnnotationSelect);
   };
 
   /**
@@ -391,19 +403,27 @@ export class AnnotationUI {
 
     // click on li to go to annotation
     item.onclick = () => {
-      // remove selected class from other rows
-      const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
-      if (mainlist) {
-        const items = mainlist.querySelectorAll('.data-item-list-item');
-        items.forEach(item2 => item2.classList.remove('selected'));
-      }
-      // mark this row as selected
-      item.classList.add('selected');
-
+      this.#selectAnnotationItem(item);
       this.#gotoAnnotation(annotationGroup, annotationId, dataId);
     };
 
     return item;
+  }
+
+  /**
+   * Mark an annotation list item as selected, unselecting the others.
+   *
+   * @param {HTMLElement} item The annotation list item.
+   */
+  #selectAnnotationItem(item) {
+    // remove selected class from other rows
+    const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
+    if (mainlist) {
+      const items = mainlist.querySelectorAll('.data-item-list-item');
+      items.forEach(item2 => item2.classList.remove('selected'));
+    }
+    // mark this row as selected
+    item.classList.add('selected');
   }
 
   /**
@@ -702,6 +722,21 @@ export class AnnotationUI {
     const item = this.#rootDoc.getElementById(annotationDivId);
     if (item) {
       item.remove();
+    }
+  };
+
+  /**
+   * Handle 'annotationselect' event.
+   *
+   * @param {CustomEvent} event The event.
+   */
+  #onAnnotationSelect = (event) => {
+    const annotationDivId = getAnnotationIdDivId(
+      event.detail.annotationid, event.detail.dataid);
+    const item = this.#rootDoc.getElementById(annotationDivId);
+    if (item) {
+      this.#selectAnnotationItem(item);
+      item.scrollIntoView({block: 'nearest'});
     }
   };
 
