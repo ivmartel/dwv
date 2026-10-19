@@ -276,6 +276,134 @@ describe('image', () => {
   );
 
   /**
+   * Tests for {@link View} generateImageData MONO with 32 bits
+   *   integer data.
+   *
+   * @function module:tests/image~generateDataMonoInt32
+   */
+  test('Generate data MONO int32 - #DWV-REQ-UI-02-001 Display image',
+    () => {
+      // create an image
+      const size0 = 2;
+      const imgSize0 = new Size([size0, size0, 1]);
+      const imgSpacing0 = new Spacing([1, 1, 1]);
+      const imgOrigin0 = new Point3D(0, 0, 0);
+      const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
+      const buffer0 = new Int32Array([-100000, 0, 100000, 200000]);
+      const image0 = new Image(imgGeometry0, buffer0);
+      image0.setMeta({
+        BitsAllocated: 32,
+        BitsStored: 32,
+        PixelRepresentation: 1
+      });
+      image0.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 0));
+      // create a view
+      const view0 = new View(image0);
+      // create the image data
+      const imageData = {
+        width: size0,
+        height: size0,
+        data: new Uint8ClampedArray(size0 * size0 * 4)
+      };
+
+      // default window level
+      view0.setWindowLevelMinMax();
+      // call generate data
+      view0.generateImageData(imageData);
+      // rescaled values: [-200000, 0, 200000, 400000]
+      const theoData0 = [
+        0,
+        0,
+        0,
+        255,
+        85,
+        85,
+        85,
+        255,
+        170,
+        170,
+        170,
+        255,
+        255,
+        255,
+        255,
+        255
+      ];
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data');
+    }
+  );
+
+  /**
+   * Tests for {@link View} generateImageData MONO with integer data
+   *   and no bits stored.
+   *
+   * @function module:tests/image~generateDataMonoNoBitsStored
+   */
+  test('Generate data MONO no bits stored - #DWV-REQ-UI-02-001 Display image',
+    () => {
+      // create an image
+      const size0 = 2;
+      const imgSize0 = new Size([size0, size0, 1]);
+      const imgSpacing0 = new Spacing([1, 1, 1]);
+      const imgOrigin0 = new Point3D(0, 0, 0);
+      const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
+      const buffer0 = new Uint16Array([0, 100, 200, 300]);
+      const image0 = new Image(imgGeometry0, buffer0);
+      // no bits stored
+      image0.setMeta({
+        BitsAllocated: 16,
+        PixelRepresentation: 0
+      });
+      image0.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 0));
+      // create a view
+      const view0 = new View(image0);
+      // create the image data
+      const imageData = {
+        width: size0,
+        height: size0,
+        data: new Uint8ClampedArray(size0 * size0 * 4)
+      };
+
+      // default window level
+      view0.setWindowLevelMinMax();
+      // call generate data
+      view0.generateImageData(imageData);
+      // rescaled values: [0, 200, 400, 600]
+      const theoData0 = [
+        0,
+        0,
+        0,
+        255,
+        85,
+        85,
+        85,
+        255,
+        170,
+        170,
+        170,
+        255,
+        255,
+        255,
+        255,
+        255
+      ];
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data');
+
+      // update meta: data can now use lookup tables
+      image0.setMeta({
+        BitsAllocated: 16,
+        BitsStored: 16,
+        PixelRepresentation: 0
+      });
+      view0.generateImageData(imageData);
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data after meta update');
+    }
+  );
+
+  /**
    * Tests for {@link View} generateImageData RGB.
    *
    * @function module:tests/image~generateDataRgb

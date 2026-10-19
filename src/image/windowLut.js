@@ -54,8 +54,14 @@ export class WindowLut {
   constructor(modalityLut, isSigned, isDiscrete) {
     this.#modalityLut = modalityLut;
 
-    if (isSigned) {
-      const size = this.#modalityLut.getLength();
+    if (isDiscrete &&
+      typeof this.#modalityLut.getLength() === 'undefined') {
+      throw new Error('Cannot create window LUT without LUT length');
+    }
+
+    // signed shift is only needed to index a LUT
+    const size = this.#modalityLut.getLength();
+    if (isSigned && typeof size !== 'undefined') {
       this.#signedShift = size / 2;
     } else {
       this.#signedShift = 0;

@@ -3,6 +3,25 @@
  */
 
 /**
+ * Maximum number of bits stored for which a pre-computed LUT is created.
+ *
+ * @type {number}
+ */
+const MAX_LUT_BITS_STORED = 16;
+
+/**
+ * Check if a pre-computed LUT can be created for the input bits stored.
+ *
+ * @param {number} bitsStored The number of bits used to store the data.
+ * @returns {boolean} True if a LUT can be created.
+ */
+export function isLutBitsStored(bitsStored) {
+  return Number.isInteger(bitsStored) &&
+    bitsStored > 0 &&
+    bitsStored <= MAX_LUT_BITS_STORED;
+}
+
+/**
  * Modality LUT class: compensates for any modality-specific presentation.
  * Typically consists of a rescale slope and intercept to
  * rescale the data range.
@@ -26,9 +45,10 @@ export class ModalityLut {
   #isIdRsi;
 
   /**
-   * The size of the LUT array.
+   * The size of the LUT array, undefined if the bits stored
+   *   do not allow to create a LUT.
    *
-   * @type {number}
+   * @type {number|undefined}
    */
   #length;
 
@@ -41,16 +61,24 @@ export class ModalityLut {
 
   /**
    * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
-   * @param {number} bitsStored The number of bits used to store the data.
+   * @param {number} [bitsStored] The number of bits used to store the data.
+   *   No LUT length is set (see `getLength`) if undefined or larger
+   *   than the maximum LUT bits stored (16).
    */
   constructor(rsi, bitsStored) {
     this.#rsi = rsi;
     this.#isIdRsi = rsi.isID();
 
-    this.#length = Math.pow(2, bitsStored);
+    if (isLutBitsStored(bitsStored)) {
+      this.#length = Math.pow(2, bitsStored);
+    }
 
     // create lut if not identity RSI
     if (!this.#isIdRsi) {
+      if (typeof this.#length === 'undefined') {
+        throw new Error(
+          `Cannot create modality LUT for bits stored: ${bitsStored}`);
+      }
       this.#lut = new Float32Array(this.#length);
       for (let i = 0; i < this.#length; ++i) {
         this.#lut[i] = this.#rsi.apply(i);
@@ -70,7 +98,8 @@ export class ModalityLut {
   /**
    * Get the length of the LUT array.
    *
-   * @returns {number} The length of the LUT array.
+   * @returns {number|undefined} The length of the LUT array, undefined
+   *   if the bits stored do not allow to create a LUT.
    */
   getLength() {
     return this.#length;

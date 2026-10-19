@@ -1,5 +1,5 @@
 import {Index} from '../math/index.js';
-import {ModalityLut} from './modalityLut.js';
+import {ModalityLut, isLutBitsStored} from './modalityLut.js';
 import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
 import {VoiLut} from './voiLut.js';
@@ -110,7 +110,9 @@ export class View extends EventTarget {
   #image;
 
   /**
-   * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
+   * Window lookup table: pre-computed for constant RSI integer data
+   *   with a limited number of bits stored, applied on rescaled
+   *   values otherwise.
    *
    * @type {WindowLut}
    */
@@ -122,6 +124,13 @@ export class View extends EventTarget {
    * @type {boolean}
    */
   #isConstantRSI;
+
+  /**
+   * Flag for image data that can use pre-computed lookup tables.
+   *
+   * @type {boolean}
+   */
+  #isLutData;
 
   /**
    * Window presets.
@@ -476,10 +485,21 @@ export class View extends EventTarget {
    *
    * @returns {boolean} True if the image buffer is a float array.
    */
-  #isFloatImage() {
+  #isFloat() {
     const buffer = this.#image.getBuffer();
     return buffer instanceof Float32Array ||
       buffer instanceof Float64Array;
+  }
+
+  /**
+   * Check if the image data can use pre-computed lookup tables:
+   *   integer data with a limited number of bits stored.
+   *
+   * @returns {boolean} True if the image data can use lookup tables.
+   */
+  #canUseLut() {
+    return !this.#isFloat() &&
+      isLutBitsStored(this.#image.getMeta().BitsStored);
   }
 
   /**
@@ -520,20 +540,22 @@ export class View extends EventTarget {
 
     // get the window lut
     if (typeof this.#isConstantRSI === 'undefined' ||
-      this.#image.isConstantRSI() !== this.#isConstantRSI) {
+      this.#image.isConstantRSI() !== this.#isConstantRSI ||
+      this.#canUseLut() !== this.#isLutData) {
       this.#isConstantRSI = this.#image.isConstantRSI();
-      // set or update windowLut if isConstantRSI has changed
+      this.#isLutData = this.#canUseLut();
+      // set or update windowLut if isConstantRSI or isLutData has changed
       // (can be different at first slice and after having loaded
       //  the full volume...)
-      const isFloat = this.#isFloatImage();
       let rsi;
       let isDiscrete;
-      if (this.#isConstantRSI && !isFloat) {
+      if (this.#isConstantRSI && this.#isLutData) {
         rsi = this.#image.getRescaleSlopeAndIntercept();
         isDiscrete = true;
       } else {
-        // non constant RSI or float data: no pre-computed lookup tables,
-        // the values are rescaled by the iterator
+        // non constant RSI, float or large integer data:
+        // no pre-computed lookup tables, the values are rescaled
+        // by the iterator
         rsi = new RescaleSlopeAndIntercept(1, 0);
         isDiscrete = false;
       }
@@ -544,7 +566,7 @@ export class View extends EventTarget {
       // create the window lookup table
       this.#windowLut = new WindowLut(
         modalityLut,
-        !isFloat && this.#image.getMeta().PixelRepresentation === 1,
+        !this.#isFloat() && this.#image.getMeta().PixelRepresentation === 1,
         isDiscrete);
     }
 
@@ -1064,7 +1086,7 @@ export class View extends EventTarget {
     }
 
     const image = this.getImage();
-    const isRescaled = !image.isConstantRSI() || this.#isFloatImage();
+    const isRescaled = !image.isConstantRSI() || !this.#canUseLut();
     const iterator = getSliceIterator(
       image, index, isRescaled, this.getOrientation());
 
