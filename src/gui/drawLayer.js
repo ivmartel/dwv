@@ -619,12 +619,22 @@ export class DrawLayer {
   activateCurrentPositionShapes(flag) {
     const konvaLayer = this.getKonvaLayer();
 
+    const drawController = this.getDrawController();
+    const canActivate = flag &&
+      drawController.getAnnotationGroup().isEditable();
+
     // stop stage listening
     this.#konvaStage.listening(false);
 
     if (typeof this.#shapeHandler !== 'undefined') {
-      // reset shape editor (remove anchors)
-      this.#shapeHandler.disableAndResetEditor();
+      // reset shape editor (remove anchors) if its shape
+      // is not at the current position anymore
+      const editorGroup = this.#shapeHandler.getEditorShapeGroup();
+      if (!canActivate ||
+        typeof editorGroup === 'undefined' ||
+        editorGroup.getParent() !== this.#getCurrentPosGroup()) {
+        this.#shapeHandler.disableAndResetEditor();
+      }
       // remove listeners for all position groups
       const allPosGroups = konvaLayer.getChildren();
       for (const posGroup of allPosGroups) {
@@ -639,9 +649,7 @@ export class DrawLayer {
     }
 
     // activate shape listeners if possible
-    const drawController = this.getDrawController();
-    if (flag &&
-      drawController.getAnnotationGroup().isEditable()) {
+    if (canActivate) {
       // start stage listening
       this.#konvaStage.listening(true);
       // shape groups at the current position
