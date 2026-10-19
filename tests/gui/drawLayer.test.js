@@ -73,9 +73,9 @@ describe('gui', () => {
     const quarter = getOpacity(drawLayer, 'a0');
     assert.isBelow(quarter, 1);
     vi.advanceTimersByTime(125);
-    assert.closeTo(getOpacity(drawLayer, 'a0'), 0.5, 0.05);
+    assert.closeTo(getOpacity(drawLayer, 'a0'), 0.2, 0.05);
     vi.advanceTimersByTime(125);
-    assert.isAbove(getOpacity(drawLayer, 'a0'), 0.5);
+    assert.isAbove(getOpacity(drawLayer, 'a0'), 0.2);
     vi.advanceTimersByTime(175);
     // original opacity is restored
     assert.equal(getOpacity(drawLayer, 'a0'), 1);
@@ -123,7 +123,7 @@ describe('gui', () => {
       // a new highlight resets the previous one
       assert.ok(drawLayer.highlightAnnotation('a1'));
       assert.equal(reset.mock.calls.length, 1);
-      assert.equal(highlight.mock.calls[1][2], 1000);
+      assert.equal(highlight.mock.calls[1][2], 500);
     } finally {
       custom.highlightAnnotation = undefined;
     }

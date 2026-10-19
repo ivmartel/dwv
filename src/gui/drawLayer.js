@@ -1000,7 +1000,7 @@ export class DrawLayer {
         this.#resetHighlight = undefined;
       }
     };
-    // opacity goes from 1 to 0.8 and back to 1 over the duration
+    // opacity goes from 1 to 0.2 and back to 1 over the duration
     // (the animation redraws the layer at each frame)
     const anim = new Konva.Animation((frame) => {
       if (frame.time >= duration) {
