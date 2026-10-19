@@ -221,6 +221,61 @@ describe('image', () => {
   );
 
   /**
+   * Tests for {@link View} generateImageData MONO with float data.
+   *
+   * @function module:tests/image~generateDataMonoFloat
+   */
+  test('Generate data MONO float - #DWV-REQ-UI-02-001 Display image',
+    () => {
+      // create an image
+      const size0 = 2;
+      const imgSize0 = new Size([size0, size0, 1]);
+      const imgSpacing0 = new Spacing([1, 1, 1]);
+      const imgOrigin0 = new Point3D(0, 0, 0);
+      const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
+      const buffer0 = new Float32Array([-1.5, 0.25, 2, 3.75]);
+      const image0 = new Image(imgGeometry0, buffer0);
+      // float data: no bits stored
+      image0.setMeta({BitsAllocated: 32});
+      image0.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 0));
+      // create a view
+      const view0 = new View(image0);
+      // create the image data
+      const imageData = {
+        width: size0,
+        height: size0,
+        data: new Uint8ClampedArray(size0 * size0 * 4)
+      };
+
+      // default window level
+      view0.setWindowLevelMinMax();
+      // call generate data
+      view0.generateImageData(imageData);
+      // rescaled values: [-3, 0.5, 4, 7.5]
+      const theoData0 = [
+        0,
+        0,
+        0,
+        255,
+        93,
+        93,
+        93,
+        255,
+        187,
+        187,
+        187,
+        255,
+        255,
+        255,
+        255,
+        255
+      ];
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data');
+    }
+  );
+
+  /**
    * Tests for {@link View} generateImageData RGB.
    *
    * @function module:tests/image~generateDataRgb

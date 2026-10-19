@@ -472,6 +472,17 @@ export class View extends EventTarget {
   }
 
   /**
+   * Check if the image data is float.
+   *
+   * @returns {boolean} True if the image buffer is a float array.
+   */
+  #isFloatImage() {
+    const buffer = this.#image.getBuffer();
+    return buffer instanceof Float32Array ||
+      buffer instanceof Float64Array;
+  }
+
+  /**
    * Get the window LUT of the image.
    * Warning: can be undefined in no window/level was set.
    *
@@ -514,12 +525,15 @@ export class View extends EventTarget {
       // set or update windowLut if isConstantRSI has changed
       // (can be different at first slice and after having loaded
       //  the full volume...)
+      const isFloat = this.#isFloatImage();
       let rsi;
       let isDiscrete;
-      if (this.#isConstantRSI) {
+      if (this.#isConstantRSI && !isFloat) {
         rsi = this.#image.getRescaleSlopeAndIntercept();
         isDiscrete = true;
       } else {
+        // non constant RSI or float data: no pre-computed lookup tables,
+        // the values are rescaled by the iterator
         rsi = new RescaleSlopeAndIntercept(1, 0);
         isDiscrete = false;
       }
@@ -530,7 +544,7 @@ export class View extends EventTarget {
       // create the window lookup table
       this.#windowLut = new WindowLut(
         modalityLut,
-        this.#image.getMeta().PixelRepresentation === 1,
+        !isFloat && this.#image.getMeta().PixelRepresentation === 1,
         isDiscrete);
     }
 
@@ -1050,7 +1064,7 @@ export class View extends EventTarget {
     }
 
     const image = this.getImage();
-    const isRescaled = !image.isConstantRSI();
+    const isRescaled = !image.isConstantRSI() || this.#isFloatImage();
     const iterator = getSliceIterator(
       image, index, isRescaled, this.getOrientation());
 
