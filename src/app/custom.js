@@ -1,5 +1,6 @@
 /**
  * @import {WindowLevel} from '../image/windowLevel.js';
+ * @import Konva from 'konva';
  * @import {
  *   PrivateBValueRule,
  *   VolumeIdCandidate
@@ -48,6 +49,20 @@ export const custom = {
    * @param {Function} callback The callback to launch on dialogue exit.
    */
   openRoiDialog: undefined,
+
+  /**
+   * Highlight an annotation shape group. Defaults to a pulse dimming
+   *   the group opacity. The draw layer ensures only one annotation is
+   *   highlighted at a time by calling the returned reset function
+   *   before a new highlight.
+   *
+   * @param {Konva.Group} group The annotation shape group.
+   * @param {Konva.Layer} layer The konva layer containing the group.
+   * @param {number} duration The highlight duration in milliseconds.
+   * @returns {Function|undefined} A function to reset the highlight
+   *   before its end.
+   */
+  highlightAnnotation: undefined,
 
   /**
    * Get the volume id from a list of dicom tags.

@@ -12,6 +12,7 @@ import {
   isNodeNameLabel
 } from '../tools/shapes/drawBounds.js';
 import {Style} from '../gui/style.js';
+import {custom} from '../app/custom.js';
 
 // external
 import Konva from 'konva';
@@ -131,6 +132,13 @@ export class DrawLayer {
    * @type {Scalar2D}
    */
   #flipOffset = {x: 0, y: 0};
+
+  /**
+   * The current annotation highlight reset function.
+   *
+   * @type {Function|undefined}
+   */
+  #resetHighlight;
 
   /**
    * The draw controller.
@@ -947,6 +955,63 @@ export class DrawLayer {
 
     // udpate
     this.draw();
+
+    return true;
+  }
+
+  /**
+   * Temporarily highlight an annotation: its opacity progressively
+   *   dims to half and comes back to normal in one pulse. Only one
+   *   annotation is highlighted at a time: a new call resets the
+   *   previous highlight.
+   *
+   * @param {string} id The id of the annotation.
+   * @param {number} [duration] The highlight duration in milliseconds,
+   *   defaults to 1000.
+   * @returns {boolean} False if the annotation shape cannot be found.
+   */
+  highlightAnnotation(id, duration) {
+    if (typeof duration === 'undefined') {
+      duration = 500;
+    }
+    // reset previous highlight
+    if (typeof this.#resetHighlight !== 'undefined') {
+      this.#resetHighlight();
+    }
+    // get the group (annotation and group have same id)
+    const group = this.#getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+
+    // custom highlight
+    if (typeof custom.highlightAnnotation !== 'undefined') {
+      this.#resetHighlight = custom.highlightAnnotation(
+        group, this.getKonvaLayer(), duration);
+      return true;
+    }
+
+    const opacity = group.opacity();
+    const reset = () => {
+      anim.stop();
+      group.opacity(opacity);
+      this.draw();
+      if (this.#resetHighlight === reset) {
+        this.#resetHighlight = undefined;
+      }
+    };
+    // opacity goes from 1 to 0.8 and back to 1 over the duration
+    // (the animation redraws the layer at each frame)
+    const anim = new Konva.Animation((frame) => {
+      if (frame.time >= duration) {
+        reset();
+        return false;
+      }
+      const dim = 0.8 * Math.sin(Math.PI * frame.time / duration);
+      group.opacity(opacity * (1 - dim));
+    }, this.getKonvaLayer());
+    this.#resetHighlight = reset;
+    anim.start();
 
     return true;
   }

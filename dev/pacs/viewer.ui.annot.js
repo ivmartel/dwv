@@ -280,6 +280,7 @@ export class AnnotationUI {
         .getDrawLayersByDataId(dataId);
       for (const layer of drawLayers) {
         layer.setCurrentPosition(annotCentroid);
+        layer.highlightAnnotation(annotationId);
       }
     } else {
       logger.warn('No centroid for annotation');
