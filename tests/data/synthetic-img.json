@@ -890,5 +890,93 @@
       "BitsStored": 12,
       "HighBit": 11
     }
+  },
+  {
+    "name": "test-img-10",
+    "tags": {
+      "Modality": "MR",
+      "SOPClassUID": "1.2.840.10008.5.1.4.1.1.30",
+      "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.30",
+      "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.11",
+      "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.11",
+      "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.11",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "float pixel data test image",
+      "PatientID": "0123456",
+      "PatientName": "dwv^PatientName",
+      "OtherPatientNames": "dwv^PatientOtherName",
+      "PhotometricInterpretation": "MONOCHROME2",
+      "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "ImageType": [
+        "ORIGINAL",
+        "PRIMARY"
+      ],
+      "ImageOrientationPatient": [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "ImagePositionPatient": [
+        0,
+        0,
+        0
+      ],
+      "SamplesPerPixel": 1,
+      "Rows": 32,
+      "Columns": 32,
+      "PixelSpacing": [
+        1,
+        1
+      ],
+      "BitsAllocated": 32
+    }
+  },
+  {
+    "name": "test-img-11",
+    "tags": {
+      "Modality": "MR",
+      "SOPClassUID": "1.2.840.10008.5.1.4.1.1.30",
+      "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.30",
+      "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.12",
+      "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.12",
+      "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.12",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "double float pixel data test image",
+      "PatientID": "0123456",
+      "PatientName": "dwv^PatientName",
+      "OtherPatientNames": "dwv^PatientOtherName",
+      "PhotometricInterpretation": "MONOCHROME2",
+      "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "ImageType": [
+        "ORIGINAL",
+        "PRIMARY"
+      ],
+      "ImageOrientationPatient": [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "ImagePositionPatient": [
+        0,
+        0,
+        0
+      ],
+      "SamplesPerPixel": 1,
+      "Rows": 32,
+      "Columns": 32,
+      "PixelSpacing": [
+        1,
+        1
+      ],
+      "BitsAllocated": 64
+    }
   }
 ]

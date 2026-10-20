@@ -1,6 +1,6 @@
 
 import {getTypedArray} from '../../src/dicom/dicomParser.js';
-import {getPixelDataTag} from '../../src/dicom/dicomTag.js';
+import {getPixelDataTag, Tag} from '../../src/dicom/dicomTag.js';
 import {
   getOrientationName,
   Orientation,
@@ -115,7 +115,6 @@ const _requiredPixelTags = [
   'Rows',
   'Columns',
   'BitsAllocated',
-  'PixelRepresentation',
   'SamplesPerPixel',
   'PhotometricInterpretation'
 ];
@@ -182,6 +181,14 @@ export function generatePixelDataFromJSONTags(
   if (!checkTags(tags, _requiredPixelTags, true)) {
     throw new Error('Missing meta data for dicom creation.');
   }
+  // float pixel data: 32 bits without PixelRepresentation or 64 bits
+  // (see the Floating Point Image Pixel module)
+  const isFloat = tags.BitsAllocated === 64 ||
+    (tags.BitsAllocated === 32 &&
+      typeof tags.PixelRepresentation === 'undefined');
+  if (!isFloat && !checkTags(tags, ['PixelRepresentation'], true)) {
+    throw new Error('Missing meta data for dicom creation.');
+  }
 
   // extract info from tags
   const numberOfRows = tags.Rows;
@@ -233,8 +240,17 @@ export function generatePixelDataFromJSONTags(
   }
 
   // create pixel array
-  const pixels = getTypedArray(
-    bitsAllocated, pixelRepresentation, dataLength);
+  let pixels;
+  if (isFloat) {
+    if (bitsAllocated === 32) {
+      pixels = new Float32Array(dataLength);
+    } else {
+      pixels = new Float64Array(dataLength);
+    }
+  } else {
+    pixels = getTypedArray(
+      bitsAllocated, pixelRepresentation, dataLength);
+  }
 
   // pixels generator
   if (typeof _pixelGenerators[genOptions.pixelGeneratorName] === 'undefined') {
@@ -278,6 +294,25 @@ export function generatePixelDataFromJSONTags(
     genOptions.sliceNumber,
     genOptions.frameNumber
   );
+
+  // float pixel data: dedicated tags, non integer values
+  if (isFloat) {
+    for (let i = 0; i < pixels.length; ++i) {
+      pixels[i] /= 10;
+    }
+    let tag = new Tag('7FE0', '0008');
+    let vr = 'OF';
+    if (bitsAllocated === 64) {
+      tag = new Tag('7FE0', '0009');
+      vr = 'OD';
+    }
+    return {
+      tag,
+      vr,
+      vl: pixels.byteLength,
+      value: pixels
+    };
+  }
 
   // RLE: encapsulated pixel data, one fragment per frame
   if (tags.TransferSyntaxUID === transferSyntaxKeywords.RLELossless) {
@@ -478,7 +513,8 @@ function generateSingleFileDataElements(tags0, genOptions) {
   const dicomElements = getElementsFromSimpleTagValues(tags);
   // pixels
   if (isImageModality(tags.Modality)) {
-    dicomElements['7FE00010'] = generatePixelDataFromJSONTags(tags, genOptions);
+    const pixelElement = generatePixelDataFromJSONTags(tags, genOptions);
+    dicomElements[pixelElement.tag.getKey()] = pixelElement;
   }
 
   return dicomElements;

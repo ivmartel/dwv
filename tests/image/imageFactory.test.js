@@ -14,6 +14,7 @@ import {
   unsortedMultiframeMultiVolumeBValueStructure
 } from '../../dev/dicom/dataStructures.js';
 import {logger} from '../../src/utils/logger.js';
+import {getAnyPixelDataElement} from '../../src/dicom/dicomTag.js';
 
 import syntheticData from '/tests/data/synthetic-img.json';
 
@@ -91,7 +92,7 @@ describe('ImageFactory', () => {
     beforeAll(() => {
       const elements = getStructureElementsList(
         config, '1.2.840.10008.1.2.1', singleSliceStructure)[0];
-      buffer = elements['7FE00010'].value;
+      buffer = getAnyPixelDataElement(elements).value;
 
       const factory = new ImageFactory();
       warning = factory.checkElements(elements);
@@ -354,7 +355,7 @@ describe('ImageFactory', () => {
     beforeAll(() => {
       elements = getStructureElementsList(
         config, '1.2.840.10008.1.2.1', structure)[0];
-      buffer = elements['7FE00010'].value;
+      buffer = getAnyPixelDataElement(elements).value;
       // frames moved to their spatial slot
       const frameSize = buffer.length / order.length;
       sortedBuffer = buffer.slice();
@@ -425,7 +426,7 @@ describe('ImageFactory', () => {
     beforeAll(() => {
       elements = getStructureElementsList(
         config, '1.2.840.10008.1.2.1', structure)[0];
-      buffer = elements['7FE00010'].value;
+      buffer = getAnyPixelDataElement(elements).value;
       frameSize = buffer.length / numberOfFrames;
       // frames moved to their (volume, slice) slot
       expectedBuffer = buffer.slice();
