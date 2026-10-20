@@ -1057,6 +1057,11 @@ export class SegmentationUI {
       this.#gotoSegment(segment, segmentation);
     };
 
+    // mark row as selected along with the radio
+    if (selectSegment) {
+      this.#selectSegmentItems([item]);
+    }
+
     return item;
   }
 
