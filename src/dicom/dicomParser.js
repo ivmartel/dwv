@@ -1355,13 +1355,17 @@ export class DicomParser {
     if (hasAnyPixelDataElement(this.#dataElements)) {
       // PixelRepresentation 0->unsigned, 1->signed
       let pixelRepresentation = 0;
-      dataElement = this.#dataElements[TagKeys.PixelRepresentation];
-      if (typeof dataElement !== 'undefined') {
-        dataElement.value = this.#interpretElement(dataElement, dataReader);
-        pixelRepresentation = dataElement.value[0];
-      } else {
-        logger.warn(
-          'Reading DICOM pixel data with default pixelRepresentation.');
+      // only present for pixel data (not float)
+      const pixelData = this.#dataElements[TagKeys.PixelData];
+      if (typeof pixelData !== 'undefined') {
+        dataElement = this.#dataElements[TagKeys.PixelRepresentation];
+        if (typeof dataElement !== 'undefined') {
+          dataElement.value = this.#interpretElement(dataElement, dataReader);
+          pixelRepresentation = dataElement.value[0];
+        } else {
+          logger.warn(
+            'Reading DICOM pixel data with default pixelRepresentation.');
+        }
       }
 
       // BitsAllocated
