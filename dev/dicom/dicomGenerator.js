@@ -189,6 +189,11 @@ export function generatePixelDataFromJSONTags(
   if (!isFloat && !checkTags(tags, ['PixelRepresentation'], true)) {
     throw new Error('Missing meta data for dicom creation.');
   }
+  // float pixel data cannot be encapsulated (see PS3.5 A.4)
+  if (isFloat &&
+    tags.TransferSyntaxUID === transferSyntaxKeywords.RLELossless) {
+    throw new Error('Float pixel data cannot be RLE encoded.');
+  }
 
   // extract info from tags
   const numberOfRows = tags.Rows;
