@@ -678,6 +678,8 @@ export class AnnotationUI {
   #onAnnotationAdd = (event) => {
     const annotation = event.detail.data;
     const dataId = event.detail.dataid;
+    // reset selection
+    this.#clearAnnotationSelection();
     // add item to list
     const listDivId = `${getAnnotationGroupDivId(dataId)}-list`;
     const listDiv = this.#rootDoc.getElementById(listDivId);
