@@ -203,18 +203,19 @@ export class Histogram {
 
     let total = 0;
     let sum = 0;
-    let sumSqr = 0;
     for (const entry of entries) {
       total += entry.count;
       sum += entry.value * entry.count;
-      sumSqr += entry.value * entry.value * entry.count;
     }
     const mean = sum / total;
-    // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-    let variance = sumSqr / total - mean * mean;
-    if (variance < 0) {
-      variance = 0;
+    // two pass algorithm like `getBasicStats` (`math/stats.js`), see
+    // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+    let sumSqrDiff = 0;
+    for (const entry of entries) {
+      const diff = entry.value - mean;
+      sumSqrDiff += diff * diff * entry.count;
     }
+    const variance = sumSqrDiff / total;
 
     const stats = new Statistics(
       entries[0].value,

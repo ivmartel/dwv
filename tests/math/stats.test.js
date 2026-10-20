@@ -46,6 +46,15 @@ describe('math', () => {
     assert.equal(q1.mean, 7, 'mean.1');
     // stdDev
     assert.equal(q1.stdDev, 2.9832867780352594, 'stdDev.1');
+
+    // empty array
+    assert.isUndefined(getBasicStats([]), 'empty');
+
+    // large values with small variance
+    const arr2 = [1e9 + 1, 1e9 + 2, 1e9 + 3];
+    const q2 = getBasicStats(arr2);
+    assert.equal(q2.mean, 1e9 + 2, 'mean.2');
+    assert.approximately(q2.stdDev, Math.sqrt(2 / 3), 1e-12, 'stdDev.2');
   });
 
   /**
@@ -71,6 +80,21 @@ describe('math', () => {
     assert.equal(q1.p25, 23.75, 'p25.1');
     // p75
     assert.equal(q1.p75, 47.5, 'p75.1');
+
+    // single value
+    const q2 = getStats([5], ['median']);
+    assert.equal(q2.median, 5, 'median.2');
+    assert.equal(q2.p25, 5, 'p25.2');
+    assert.equal(q2.p75, 5, 'p75.2');
+
+    // empty array
+    assert.isUndefined(getStats([], ['median']), 'empty');
+
+    // input is not modified
+    const arr3 = [3, 1, 2];
+    const q3 = getStats(arr3, ['median']);
+    assert.equal(q3.median, 2, 'median.3');
+    assert.deepEqual(arr3, [3, 1, 2], 'input not sorted');
   });
 
   /**

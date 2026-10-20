@@ -244,18 +244,20 @@ export class Ellipse {
           regions, index);
         const unit = viewController.getPixelUnit();
         const quantif = getStats(values, flags);
-        quant.min = {value: quantif.min, unit};
-        quant.max = {value: quantif.max, unit};
-        quant.mean = {value: quantif.mean, unit};
-        quant.stdDev = {value: quantif.stdDev, unit};
-        if (typeof quantif.median !== 'undefined') {
-          quant.median = {value: quantif.median, unit};
-        }
-        if (typeof quantif.p25 !== 'undefined') {
-          quant.p25 = {value: quantif.p25, unit};
-        }
-        if (typeof quantif.p75 !== 'undefined') {
-          quant.p75 = {value: quantif.p75, unit};
+        if (typeof quantif !== 'undefined') {
+          quant.min = {value: quantif.min, unit};
+          quant.max = {value: quantif.max, unit};
+          quant.mean = {value: quantif.mean, unit};
+          quant.stdDev = {value: quantif.stdDev, unit};
+          if (typeof quantif.median !== 'undefined') {
+            quant.median = {value: quantif.median, unit};
+          }
+          if (typeof quantif.p25 !== 'undefined') {
+            quant.p25 = {value: quantif.p25, unit};
+          }
+          if (typeof quantif.p75 !== 'undefined') {
+            quant.p75 = {value: quantif.p75, unit};
+          }
         }
       }
     }
