@@ -25,8 +25,8 @@ const TagKeys = {
   Columns: '00280011',
   BitsAllocated: '00280100',
   PixelRepresentation: '00280103',
-  FloatPixelData: '7FE00009',
-  DoubleFloatPixelData: '7FE00008'
+  FloatPixelData: '7FE00008',
+  DoubleFloatPixelData: '7FE00009'
 };
 
 /**
@@ -204,7 +204,7 @@ export class DicomBufferToData {
         safeGet(dataElements, TagKeys.DoubleFloatPixelData);
       if (typeof floatPixelData !== 'undefined' ||
         typeof doubleFloatPixelData !== 'undefined') {
-        pixelMeta.isSigned === 1;
+        pixelMeta.isSigned = true;
       } else {
         pixelMeta.missing.push('pixelRepresentation');
       }
