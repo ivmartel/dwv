@@ -49,6 +49,8 @@ import {
  * @property {Label[]} labels The segmentation labels.
  * @property {MaskSegment[]} segments The segmentation segments.
  * @property {MaskSegmentViewHelper} viewHelper A view helper.
+ * @property {number} [selectedSegmentNumber] The number of the segment
+ *   selected for the brush, undefined if none.
  */
 
 /**
@@ -100,12 +102,10 @@ const prefixes = {
   segmentation: 'segmentation',
   segment: 'segment',
   span: 'span-',
-  select: 'select-',
   colour: 'colour-',
   view: 'view-',
   delete: 'delete-',
   addSegment: 'add-segment-',
-  selectEraser: 'select-eraser-',
   saveSeg: 'save-seg-',
   saveRtss: 'save-rtss-',
   mergeSaveSeg: 'merge-save-seg-',
@@ -193,12 +193,6 @@ export class SegmentationUI {
    */
   #segmentations = [];
 
-  /**
-   * The segmentation of the current brush selection (segment or eraser).
-   *
-   * @type {Segmentation|undefined}
-   */
-  #selectedSegmentation;
 
   /**
    * @param {ViewerService} service The associated viewer service.
@@ -257,6 +251,16 @@ export class SegmentationUI {
     this.#service.addEventListener('labelschanged', this.#onLabelsChanged);
     this.#service.addEventListener('tap', this.#onTap);
   };
+
+  /**
+   * Get the segmentation of the current brush selection.
+   *
+   * @returns {Segmentation|undefined} The segmentation.
+   */
+  #getSelectedSegmentation() {
+    return this.#segmentations.find(
+      (seg) => typeof seg.selectedSegmentNumber !== 'undefined');
+  }
 
   /**
    * Mark segment list items as selected, unselecting the others.
@@ -439,7 +443,7 @@ export class SegmentationUI {
       const segHelper = new MaskSegmentHelper(maskImage);
       if (segHelper.getNumberOfSegments() === 0) {
         // manually created segmentation with no segments
-        const segmentation = this.#selectedSegmentation;
+        const segmentation = this.#getSelectedSegmentation();
         if (typeof segmentation === 'undefined') {
           // default segment created at first brush
           const segmentNumber = 1;
@@ -526,9 +530,7 @@ export class SegmentationUI {
     // keep the entry in the list: html ids and handlers use the
     // segmentation index, clear its data id to mark it as removed
     segmentation.dataId = undefined;
-    if (this.#selectedSegmentation === segmentation) {
-      this.#selectedSegmentation = undefined;
-    }
+    segmentation.selectedSegmentNumber = undefined;
 
     // remove segmentation item
     const item = this.#rootDoc.getElementById(getSegmentationHtmlId(index));
@@ -636,7 +638,11 @@ export class SegmentationUI {
    * @param {Segmentation} segmentation The segmentation.
    */
   #appSelectSegment(segmentNumber, segmentation) {
-    this.#selectedSegmentation = segmentation;
+    // store selection: only one selected segment for all segmentations
+    for (const seg of this.#segmentations) {
+      seg.selectedSegmentNumber = undefined;
+    }
+    segmentation.selectedSegmentNumber = segmentNumber;
     const dataCtrl = this.#service.getDataController();
 
     // add segment if not present
@@ -655,7 +661,6 @@ export class SegmentationUI {
 
     // app features
     const features = {
-      brushMode: 'add',
       selectedSegmentNumber: segmentNumber,
       maskDataId: undefined,
       createMask: false
@@ -666,31 +671,7 @@ export class SegmentationUI {
       features.createMask = true;
     }
     logger.debug(
-      `set tool features [add] ${JSON.stringify(features)}`);
-    this.#service.setToolFeatures(features);
-  }
-
-  /**
-   * Select the erase in the brush tool.
-   *
-   * @param {Segmentation} segmentation The segmentation.
-   */
-  #appSelectEraser(segmentation) {
-    this.#selectedSegmentation = segmentation;
-    // app features
-    const features = {
-      brushMode: 'del',
-      maskDataId: undefined,
-      createMask: false
-    };
-    if (typeof segmentation.dataId !== 'undefined') {
-      features.maskDataId = segmentation.dataId;
-    } else {
-      // reset the brush mask id: do not erase in another mask
-      features.createMask = true;
-    }
-    logger.debug(
-      `set tool features [del] ${JSON.stringify(features)}`);
+      `set tool features [select] ${JSON.stringify(features)}`);
     this.#service.setToolFeatures(features);
   }
 
@@ -799,17 +780,17 @@ export class SegmentationUI {
    * @param {MaskSegment} segment The segment.
    * @param {Segmentation} segmentation The segmentation.
    * @param {HTMLLIElement} listItem The segment list item.
-   * @param {HTMLInputElement} selectInput The segment select input.
    * @param {HTMLButtonElement} viewButton The segment view button.
    */
-  #deleteSegment(segment, segmentation, listItem, selectInput, viewButton) {
+  #deleteSegment(segment, segmentation, listItem, viewButton) {
     const parent = listItem.parentNode;
     if (!parent) {
       throw new Error('No segment item parent');
     }
     const nextItem = listItem.nextSibling;
     // store selected state before removal
-    const wasSelected = selectInput.checked;
+    const wasSelected =
+      segmentation.selectedSegmentNumber === segment.number;
 
     // get mask
     const dataCtrl = this.#service.getDataController();
@@ -849,13 +830,17 @@ export class SegmentationUI {
 
     // select first remaining segment if the deleted one was selected
     if (wasSelected) {
-      const firstInput = parent.querySelector(
-        'input[type=\'radio\'][name=\'select-segment\']'
-      );
-      if (firstInput !== null) {
-        firstInput.checked = true;
-        // trigger onchange to pass the selection to the brush
-        firstInput.dispatchEvent(new Event('change'));
+      segmentation.selectedSegmentNumber = undefined;
+      const segmentationIndex = this.#segmentations.indexOf(segmentation);
+      for (const remaining of segmentation.segments) {
+        const segmentId =
+          getSegmentHtmlId(remaining.number, segmentationIndex);
+        const item = parent.querySelector(
+          `#${getHtmlId(prefixes.li, segmentId)}`);
+        if (item instanceof HTMLElement) {
+          this.#selectSegment(item, remaining, segmentation);
+          break;
+        }
       }
     }
   }
@@ -937,6 +922,18 @@ export class SegmentationUI {
   }
 
   /**
+   * Select a segment: mark its row as selected and pass it to the brush.
+   *
+   * @param {HTMLElement} item The segment list item.
+   * @param {MaskSegment} segment The segment.
+   * @param {Segmentation} segmentation The segmentation.
+   */
+  #selectSegment(item, segment, segmentation) {
+    this.#selectSegmentItems([item]);
+    this.#appSelectSegment(segment.number, segmentation);
+  }
+
+  /**
    * Get the HTML span element for a segment.
    *
    * @param {MaskSegment} segment The segment.
@@ -948,25 +945,10 @@ export class SegmentationUI {
     const segmentation = this.#segmentations[segmentationIndex];
     const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
 
-    // segment select
-    const selectInput = document.createElement('input');
-    selectInput.type = 'radio';
-    selectInput.name = 'select-segment';
-    selectInput.id = getHtmlId(prefixes.select, segmentId);
-    selectInput.title = segmentId;
-    selectInput.onchange = () => {
-      this.#appSelectSegment(segment.number, segmentation);
-    };
-
-    if (selectSegment) {
-      selectInput.checked = true;
-      this.#appSelectSegment(segment.number, segmentation);
-    }
-
-    const selectLabel = document.createElement('label');
-    selectLabel.htmlFor = selectInput.id;
-    selectLabel.title = selectInput.title;
-    selectLabel.appendChild(document.createTextNode(segment.label));
+    // segment label
+    const labelSpan = document.createElement('span');
+    labelSpan.title = segmentId;
+    labelSpan.appendChild(document.createTextNode(`🖌️ ${segment.label}`));
 
     // quantification details (folded by default)
     const detailsDiv = document.createElement('div');
@@ -1025,15 +1007,13 @@ export class SegmentationUI {
     deleteButton.onclick = (event) => {
       // do not propagate to parent that triggers goto
       event.stopPropagation();
-      this.#deleteSegment(
-        segment, segmentation, item, selectInput, viewButton);
+      this.#deleteSegment(segment, segmentation, item, viewButton);
     };
 
     // content
     const contentDiv = document.createElement('div');
     contentDiv.className = 'data-item-list-item-content';
-    contentDiv.appendChild(selectInput);
-    contentDiv.appendChild(selectLabel);
+    contentDiv.appendChild(labelSpan);
 
     // actions
     const actionsDiv = document.createElement('div');
@@ -1046,20 +1026,19 @@ export class SegmentationUI {
     // list item
     item.id = getHtmlId(prefixes.li, segmentId);
     item.className = 'data-item-list-item';
-    item.title = 'Go to segment';
+    item.title = 'Select and go to segment';
     item.appendChild(contentDiv);
     item.appendChild(actionsDiv);
     item.appendChild(detailsDiv);
 
-    // click on li to go to segment
+    // click on li to select and go to segment
     item.onclick = () => {
-      this.#selectSegmentItems([item]);
+      this.#selectSegment(item, segment, segmentation);
       this.#gotoSegment(segment, segmentation);
     };
 
-    // mark row as selected along with the radio
     if (selectSegment) {
-      this.#selectSegmentItems([item]);
+      this.#selectSegment(item, segment, segmentation);
     }
 
     return item;
@@ -1360,30 +1339,6 @@ export class SegmentationUI {
     contentDiv.id = `${segmentationName}-content`;
     contentDiv.className = 'data-item-content';
     contentDiv.appendChild(listDiv);
-
-    // segment eraser
-    const eraserInput = document.createElement('input');
-    eraserInput.type = 'radio';
-    eraserInput.name = 'select-segment';
-    eraserInput.title = 'Eraser';
-    eraserInput.id = getHtmlId(prefixes.selectEraser, segmentationName);
-    eraserInput.onchange = () => {
-      this.#appSelectEraser(segmentation);
-    };
-
-    const eraserLabel = document.createElement('label');
-    eraserLabel.htmlFor = eraserInput.id;
-    eraserLabel.title = eraserInput.title;
-    eraserLabel.appendChild(document.createTextNode('Eraser'));
-
-    // action span
-    const postActionsDiv = document.createElement('span');
-    postActionsDiv.id = `span-action-${segmentationName}`;
-    postActionsDiv.appendChild(eraserInput);
-    postActionsDiv.appendChild(eraserLabel);
-
-    // append span to item
-    contentDiv.appendChild(postActionsDiv);
 
     // segmentation item
     const segmentationItem = document.createElement('li');

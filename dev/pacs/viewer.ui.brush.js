@@ -72,10 +72,26 @@ export class BrushToolUI {
     );
     res.appendChild(controlDiv);
 
+    // eraser: switch the brush mode, default to add
+    this.#service.setToolFeatures({brushMode: 'add'});
+    const eraserInput = document.createElement('input');
+    eraserInput.type = 'checkbox';
+    eraserInput.id = 'brush-eraser';
+    eraserInput.checked = false;
+    eraserInput.onchange = () => {
+      this.#service.setToolFeatures({
+        brushMode: eraserInput.checked ? 'del' : 'add'
+      });
+    };
+    const eraserLabel = document.createElement('label');
+    eraserLabel.htmlFor = eraserInput.id;
+    eraserLabel.appendChild(document.createTextNode('Eraser'));
+    res.appendChild(eraserInput);
+    res.appendChild(eraserLabel);
+
     // if no segmentations, use default
     if (!document.getElementById('segmentation-list')) {
       const features = {
-        brushMode: 'add',
         selectedSegmentNumber: 1,
         createMask: true
       };
