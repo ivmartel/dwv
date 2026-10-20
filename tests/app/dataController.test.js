@@ -325,12 +325,10 @@ describe('app', () => {
   });
 
   test('DicomSliceDataList buildData respects custom override', () => {
-    // custom.getPostLoadVolumeIdTagValue always returns the same value:
+    // the only custom candidate always returns the same value:
     // volumes cannot be discriminated so buildData must throw, even
-    // though TemporalPositionIdentifier (a valid candidate) is present.
-    custom.getPostLoadVolumeIdTagValue = function () {
-      return 0;
-    };
+    // though TemporalPositionIdentifier (a default candidate) is present.
+    custom.volumeIdCandidates = [{name: 'Custom', getter: () => 0}];
     try {
       const list0 = new DicomSliceDataList();
       const zs = [0, 1];
@@ -348,7 +346,7 @@ describe('app', () => {
         list0.buildData();
       }, Error, 'Cannot create image for multi-volume');
     } finally {
-      custom.getPostLoadVolumeIdTagValue = undefined;
+      custom.volumeIdCandidates = undefined;
     }
   });
 

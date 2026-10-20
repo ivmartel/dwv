@@ -504,19 +504,6 @@ describe('dicom', () => {
       assert.isUndefined(getVolumeIdTagValue(elements));
     });
 
-    test('uses deprecated custom getter with a warning', () => {
-      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
-      custom.getVolumeIdTagValue = () => 7;
-      try {
-        assert.equal(getVolumeIdTagValue({}), 7);
-        assert.equal(getVolumeIdTagValue({}), 7);
-        assert.equal(warnSpy.mock.calls.length, 1, 'warn once');
-      } finally {
-        custom.getVolumeIdTagValue = undefined;
-        warnSpy.mockRestore();
-      }
-    });
-
     test('uses custom pre load candidates', () => {
       const elements = {
         [TagKeys.EchoTime]: makeDataElement('DS', ['90']),
@@ -705,16 +692,50 @@ describe('dicom', () => {
       }
     });
 
-    test('uses custom post load getter only', () => {
+    test('uses custom candidates only', () => {
       const elements = makePerFrameElements({
         temporalPositions: [2, 2, 1, 1]
       });
-      custom.getPostLoadVolumeIdTagValue = () => 1;
+      custom.volumeIdCandidates = [{name: 'Custom', getter: () => 1}];
       try {
         assert.isUndefined(guessVolumeIndices(
           getFramesElements(elements), [0, 1, 0, 1], 2));
       } finally {
+        custom.volumeIdCandidates = undefined;
+      }
+    });
+
+  });
+
+  describe('deprecated custom getters', () => {
+
+    test('getVolumeIdTagValue warns once', () => {
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+      custom.getVolumeIdTagValue = () => 1;
+      try {
+        getVolumeIdTagValue({});
+        getVolumeIdTagValue({});
+        assert.equal(warnSpy.mock.calls.length, 1, 'warn once');
+        assert.include(
+          warnSpy.mock.calls[0][0], 'custom.getVolumeIdTagValue');
+      } finally {
+        custom.getVolumeIdTagValue = undefined;
+        warnSpy.mockRestore();
+      }
+    });
+
+    test('getPostLoadVolumeIdTagValue warns once', () => {
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+      custom.getPostLoadVolumeIdTagValue = () => 1;
+      try {
+        guessVolumeIndices([{}, {}], [0, 1], 2);
+        guessVolumeIndices([{}, {}], [0, 1], 2);
+        assert.equal(warnSpy.mock.calls.length, 1, 'warn once');
+        assert.include(
+          warnSpy.mock.calls[0][0], 'custom.getPostLoadVolumeIdTagValue');
+      } finally {
         custom.getPostLoadVolumeIdTagValue = undefined;
+        warnSpy.mockRestore();
       }
     });
 
