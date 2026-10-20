@@ -1330,7 +1330,7 @@ export class Image extends EventTarget {
   #calculateHistogram() {
     const size = this.getGeometry().getSize();
     const sliceSize = size.getDimSize(2);
-    const histogram = new ImageHistogram();
+    const histogram = new ImageHistogram(this.getMeta().pixelUnit);
     for (let start = 0, leni = size.getTotalSize();
       start < leni; start += sliceSize) {
       // rsi of this slice (index ignored for constant rsi)

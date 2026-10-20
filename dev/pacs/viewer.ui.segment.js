@@ -886,7 +886,7 @@ export class SegmentationUI {
           const title = prefix === ''
             ? 'Pixel values' : `${prefix}pixel values`;
           groups.push(...getQuantificationGroups(
-            statsToQuantification(labelItem.stats, item.unit),
+            statsToQuantification(labelItem.stats, labelItem.unit),
             {pixelValues: title + volumeSuffix(item.volume)}));
         }
       }
@@ -1179,9 +1179,10 @@ export class SegmentationUI {
    * @param {MaskSegment} segment The segment.
    * @param {Segmentation} segmentation The segmentation.
    * @returns {{volume: number, stats: Statistics, unit?: string,
-   *   labelStats?: {label: Label, stats: Statistics}[]}[]} The statistics,
-   *   with the reference image pixel unit and per label statistics
-   *   if available, empty if the reference image is not available.
+   *   labelStats?: {label: Label, stats: Statistics, unit?: string}[]}[]}
+   *   The statistics with their histogram unit, with per label
+   *   statistics if available, empty if the reference image is
+   *   not available.
    */
   #getHistogramStats(segment, segmentation) {
     const dataCtrl = this.#service.getDataController();
@@ -1199,7 +1200,6 @@ export class SegmentationUI {
       return [];
     }
     const refImage = dataCtrl.get(refDataId).image;
-    const unit = refImage.getMeta().pixelUnit;
 
     let volumeHistograms;
     try {
@@ -1217,7 +1217,11 @@ export class SegmentationUI {
       if (typeof stats === 'undefined') {
         continue;
       }
-      const resItem = {volume: item.volume, stats, unit};
+      const resItem = {
+        volume: item.volume,
+        stats,
+        unit: item.histogram.getUnit()
+      };
       if (typeof item.labelHistograms !== 'undefined') {
         resItem.labelStats = [];
         for (const labelItem of item.labelHistograms) {
@@ -1225,7 +1229,8 @@ export class SegmentationUI {
           if (typeof labelStats !== 'undefined') {
             resItem.labelStats.push({
               label: labelItem.label,
-              stats: labelStats
+              stats: labelStats,
+              unit: labelItem.histogram.getUnit()
             });
           }
         }

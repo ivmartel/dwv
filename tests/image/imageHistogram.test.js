@@ -82,6 +82,11 @@ describe('image', () => {
     assert.deepEqual(histogram.getRescaledRange(), {min: -3, max: -1});
   });
 
+  test('ImageHistogram unit', () => {
+    assert.isUndefined(new ImageHistogram().getUnit(), 'no unit');
+    assert.equal(new ImageHistogram('HU').getUnit(), 'HU', 'unit');
+  });
+
   test('ImageHistogram empty', () => {
     const histogram = new ImageHistogram();
 

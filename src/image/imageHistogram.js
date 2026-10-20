@@ -23,6 +23,29 @@ export class ImageHistogram {
   #groups = [];
 
   /**
+   * Unit of the rescaled values.
+   *
+   * @type {string|undefined}
+   */
+  #unit;
+
+  /**
+   * @param {string} [unit] The unit of the rescaled values.
+   */
+  constructor(unit) {
+    this.#unit = unit;
+  }
+
+  /**
+   * Get the unit of the rescaled values.
+   *
+   * @returns {string|undefined} The unit, undefined if not known.
+   */
+  getUnit() {
+    return this.#unit;
+  }
+
+  /**
    * Get the raw value histogram for an RSI, creating it if needed.
    *
    * @param {RescaleSlopeAndIntercept} rsi The RSI of the raw values.

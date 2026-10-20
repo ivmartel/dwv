@@ -638,6 +638,8 @@ export class MaskImage extends Image {
     const sliceSize = imageSize.getDimSize(2);
 
     const maskBuffer = this.getBuffer();
+    // histogram values are reference image values
+    const unit = image.getMeta().pixelUnit;
 
     /**
      * Add the image values of the segment voxels of a slice range
@@ -684,7 +686,7 @@ export class MaskImage extends Image {
     const result = [];
     for (let v = 0; v < numberOfVolumes; ++v) {
       // mask is always 3D spatial: reuse it for each volume
-      const histogram = new ImageHistogram();
+      const histogram = new ImageHistogram(unit);
       fillHistogram(histogram, v, 0, sliceIndices.length - 1);
 
       /**
@@ -694,7 +696,7 @@ export class MaskImage extends Image {
       const item = {volume: v, histogram};
       if (typeof segmentLabels !== 'undefined') {
         item.labelHistograms = segmentLabels.map((label) => {
-          const labelHistogram = new ImageHistogram();
+          const labelHistogram = new ImageHistogram(unit);
           fillHistogram(labelHistogram, v, label.minZ, label.maxZ);
           return {label, histogram: labelHistogram};
         });
