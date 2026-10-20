@@ -14,6 +14,7 @@ import {overlayConfig} from './overlays.js';
  * @import {DataController} from '../../src/app/dataController.js';
  * @import {StageController} from '../../src/app/stageController.js';
  * @import {UndoController} from '../../src/app/undoController.js';
+ * @import {ToolboxController} from '../../src/app/toolboxController.js';
  * @import {DicomData} from '../../src/app/dataController.js';
  * @import {Matrix33} from '../../src/math/matrix.js';
  */
@@ -401,6 +402,15 @@ export class ViewerService extends EventTarget {
    */
   getUndoController() {
     return this.#app.getUndoController();
+  }
+
+  /**
+   * Get the toolbox controller.
+   *
+   * @returns {ToolboxController} The controller.
+   */
+  getToolboxController() {
+    return this.#app.getToolboxController();
   }
 
   // load
