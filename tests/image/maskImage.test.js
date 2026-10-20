@@ -9,6 +9,7 @@ import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
+import {logger} from '../../src/utils/logger.js';
 
 // run the labeling synchronously, without web workers
 vi.mock('../../src/image/labelingThread.js', async (importOriginal) => {
@@ -392,9 +393,17 @@ describe('MaskImage', () => {
       });
       const image = new Image(geom, new Uint8Array([3, 4]), ['0']);
 
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
       const result = mask.getHistogramBySegment(image, 'missing');
+      const warnCalls = warnSpy.mock.calls;
+      warnSpy.mockRestore();
 
       assert.deepEqual(result, []);
+      assert.deepEqual(
+        warnCalls,
+        [['getHistogramBySegment: unknown segment id: missing']],
+        'unknown segment warning logged'
+      );
     }
   );
 
