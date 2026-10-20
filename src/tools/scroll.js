@@ -11,6 +11,8 @@ import {PositionSetTapBehavior} from './behaviors/tapBehavior.js';
 
 /**
  * Scroll class.
+ * A tap sets the current position and fires a `tap` event with the
+ * annotations and segments under it (see {@link PositionSetTapBehavior}).
  *
  * @example
  * import {App, AppOptions, ViewConfig, ToolConfig} from '//esm.sh/dwv';
@@ -101,16 +103,24 @@ export class Scroll extends LayerGroupPointer {
    */
   constructor(app) {
     const tooltipHover = new TooltipHoverBehavior();
+    const tapBehavior = new PositionSetTapBehavior();
     super({
       stageController: app.getStageController(),
       dragBehavior: new ScrollDragBehavior(),
       hoverBehavior: tooltipHover,
       wheelBehavior: new ScrollWheelBehavior(),
       doubleClickBehavior: new PlayDoubleClickBehavior(),
-      tapBehavior: new PositionSetTapBehavior()
+      tapBehavior
     });
     this.#app = app;
     this.#tooltipHover = tooltipHover;
+
+    for (const type of this.getEventNames()) {
+      tapBehavior.addEventListener(type, (e) => {
+        const ce = /** @type {CustomEvent} */ (e);
+        this.dispatchEvent(new CustomEvent(type, {detail: ce.detail}));
+      });
+    }
   }
 
   /**
@@ -151,6 +161,15 @@ export class Scroll extends LayerGroupPointer {
    */
   init() {
     // does nothing
+  }
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {string[]} The list of event names.
+   */
+  getEventNames() {
+    return ['tap'];
   }
 
 } // Scroll class

@@ -6,6 +6,7 @@ import {isIdentityMat33} from '../math/matrix.js';
 import {Size} from '../image/size.js';
 import {Spacing} from '../image/spacing.js';
 import {Image} from '../image/image.js';
+import {MaskImage} from '../image/maskImage.js';
 import {Geometry} from '../image/geometry.js';
 import {PlaneHelper} from '../image/planeHelper.js';
 import {
@@ -385,6 +386,26 @@ export class ViewController {
       value = image.getRescaledValueAtIndex(index);
     }
     return value;
+  }
+
+  /**
+   * Get the numbers of the mask segments at the input position.
+   *
+   * @param {Point} position The input position.
+   * @returns {number[]} The list of segment numbers, empty if the image
+   *   is not a mask, for background or if out of bounds.
+   */
+  getSegmentNumbersAtPosition(position) {
+    const image = this.#view.getImage();
+    if (!(image instanceof MaskImage)) {
+      return [];
+    }
+    const geometry = image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    if (!geometry.isIndexInBounds(index)) {
+      return [];
+    }
+    return image.getSegmentNumbersAtIndex(index);
   }
 
   /**

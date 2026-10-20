@@ -127,3 +127,13 @@ describe('math', () => {
   );
 
 });
+
+describe('math rectangle contains', () => {
+  test('Rectangle contains', () => {
+    const r0 = new Rectangle(new Point2D(10, 10), new Point2D(0, 0));
+    assert.ok(r0.contains(new Point2D(5, 5)), 'inside');
+    assert.ok(r0.contains(new Point2D(0, 10)), 'on corner');
+    assert.notOk(r0.contains(new Point2D(11, 5)), 'outside');
+    assert.ok(r0.contains(new Point2D(11, 5), 1), 'within tolerance');
+  });
+});

@@ -255,6 +255,54 @@ export class SegmentationUI {
     this.#service.addEventListener('dataadd', this.#onDataAdd);
     this.#service.addEventListener('dataremove', this.#onDataRemove);
     this.#service.addEventListener('labelschanged', this.#onLabelsChanged);
+    this.#service.addEventListener('tap', this.#onTap);
+  };
+
+  /**
+   * Mark segment list items as selected, unselecting the others.
+   *
+   * @param {HTMLElement[]} items The segment list items.
+   */
+  #selectSegmentItems(items) {
+    // remove selected class from other rows
+    const mainlist = this.#rootDoc.getElementById('segmentation-list');
+    if (mainlist) {
+      const allItems = mainlist.querySelectorAll('.data-item-list-item');
+      allItems.forEach(item => item.classList.remove('selected'));
+    }
+    // mark these rows as selected
+    items.forEach(item => item.classList.add('selected'));
+  }
+
+  /**
+   * Handle 'tap' event: select the tapped segments rows,
+   *   or clear the selection if no segment was tapped.
+   *
+   * @param {CustomEvent} event The event.
+   */
+  #onTap = (event) => {
+    const items = [];
+    for (const hit of event.detail.segments) {
+      const segmentationIndex = this.#segmentations.findIndex((seg) => {
+        return seg.dataId === hit.dataid;
+      });
+      if (segmentationIndex === -1) {
+        continue;
+      }
+      for (const segmentNumber of hit.segmentnumbers) {
+        const segmentId = getSegmentHtmlId(segmentNumber, segmentationIndex);
+        const item = this.#rootDoc.getElementById(
+          getHtmlId(prefixes.li, segmentId));
+        if (item) {
+          items.push(item);
+        }
+      }
+    }
+    // an empty list clears the selection
+    this.#selectSegmentItems(items);
+    if (items.length !== 0) {
+      items[0].scrollIntoView({block: 'nearest'});
+    }
   };
 
   /**
@@ -1005,15 +1053,7 @@ export class SegmentationUI {
 
     // click on li to go to segment
     item.onclick = () => {
-      // remove selected class from other rows
-      const mainlist = this.#rootDoc.getElementById('segmentation-list');
-      if (mainlist) {
-        const items = mainlist.querySelectorAll('.data-item-list-item');
-        items.forEach(item2 => item2.classList.remove('selected'));
-      }
-      // mark this row as selected
-      item.classList.add('selected');
-
+      this.#selectSegmentItems([item]);
       this.#gotoSegment(segment, segmentation);
     };
 

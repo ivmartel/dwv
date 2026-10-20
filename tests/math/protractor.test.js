@@ -53,3 +53,16 @@ describe('math', () => {
   );
 
 });
+
+describe('math protractor contains', () => {
+  test('Protractor contains', () => {
+    const p0 = new Protractor([
+      new Point2D(0, 10),
+      new Point2D(0, 0),
+      new Point2D(10, 0)
+    ]);
+    assert.ok(p0.contains(new Point2D(0, 5)), 'on first line');
+    assert.ok(p0.contains(new Point2D(5, 1), 1), 'near second line');
+    assert.notOk(p0.contains(new Point2D(5, 5), 1), 'inside the angle');
+  });
+});

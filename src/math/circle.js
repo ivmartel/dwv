@@ -81,6 +81,19 @@ export class Circle {
     return this.#radius;
   }
 
+  /**
+   * Check if a point is inside the circle, or within a tolerance
+   *   of its outline.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the outline
+   *   for an outside point, defaults to 0.
+   * @returns {boolean} True if the point is in the circle.
+   */
+  contains(point, tolerance = 0) {
+    return point.getDistance(this.#centre) <= this.#radius + tolerance;
+  }
+
 
   /**
    * Check for equality.

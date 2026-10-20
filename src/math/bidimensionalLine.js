@@ -1,5 +1,5 @@
 import {Point2D} from './point.js';
-import {Line} from './line.js';
+import {Line, getDistanceToSegment} from './line.js';
 
 /**
  * @import {ViewController} from '../app/viewController.js';
@@ -140,6 +140,36 @@ export class BidimensionalLine {
       (this.#begin.getX() + this.#end.getX()) / 2,
       (this.#begin.getY() + this.#end.getY()) / 2,
     );
+  }
+
+  /**
+   * Check if a point is on the main or short axis, within a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the axes,
+   *   defaults to 0.
+   * @returns {boolean} True if the point is on one of the axes.
+   */
+  contains(point, tolerance = 0) {
+    if (getDistanceToSegment(point, this.#begin, this.#end) <= tolerance) {
+      return true;
+    }
+    const length = this.getLength();
+    if (typeof this.shortAxisCenter === 'undefined' || length === 0) {
+      return false;
+    }
+    // short axis: perpendicular to the main axis, through its center,
+    // L1 on one side and L2 on the other
+    const px = -this.getDeltaY() / length;
+    const py = this.getDeltaX() / length;
+    const center = this.shortAxisCenter;
+    const l1 = this.shortAxisL1 ?? 0;
+    const l2 = this.shortAxisL2 ?? 0;
+    const shortBegin = new Point2D(
+      center.getX() + px * l1, center.getY() + py * l1);
+    const shortEnd = new Point2D(
+      center.getX() - px * l2, center.getY() - py * l2);
+    return getDistanceToSegment(point, shortBegin, shortEnd) <= tolerance;
   }
 
   /**

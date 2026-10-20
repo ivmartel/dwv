@@ -87,3 +87,13 @@ describe('math', () => {
   );
 
 });
+
+describe('math circle contains', () => {
+  test('Circle contains', () => {
+    const c0 = new Circle(new Point2D(0, 0), 5);
+    assert.ok(c0.contains(new Point2D(3, 4)), 'on outline');
+    assert.ok(c0.contains(new Point2D(1, 1)), 'inside');
+    assert.notOk(c0.contains(new Point2D(4, 4)), 'outside');
+    assert.ok(c0.contains(new Point2D(4, 4), 1), 'within tolerance');
+  });
+});

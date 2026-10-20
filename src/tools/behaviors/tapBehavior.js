@@ -1,10 +1,17 @@
 import {logger} from '../../utils/logger.js';
+import {Point2D} from '../../math/point.js';
 import {getActiveOrDrawRefViewLayer} from './utils.js';
 
 /**
- * @import {Point2D} from '../../math/point.js';
  * @import {LayerGroup} from '../../gui/layerGroup.js';
  */
+
+/**
+ * Tap hit tolerance, in display pixels.
+ *
+ * @type {number}
+ */
+const TAP_TOLERANCE = 5;
 
 /**
  * Tap (no drag move): subclasses implement {@link TapBehavior#onTap}.
@@ -98,12 +105,38 @@ export class TapBehavior extends EventTarget {
 }
 
 /**
+ * Tap hit result for an annotation.
+ *
+ * @typedef {object} AnnotationTapHit
+ * @property {string} annotationid The annotation tracking UID.
+ * @property {string} dataid The annotation group data id.
+ */
+
+/**
+ * Tap hit result for a segmentation.
+ *
+ * @typedef {object} SegmentationTapHit
+ * @property {string} dataid The segmentation data id.
+ * @property {number[]} segmentnumbers The numbers of the segments
+ *   under the tap (several if segments overlap).
+ */
+
+/**
  * Tap sets the current slice/index from the display position (plane point).
+ * It then emits a `tap` event, on every tap, with as detail:
+ * - `position`: the tapped position values,
+ * - `annotations`: an {@link AnnotationTapHit} for the top most
+ *   annotation under the tap, one per draw layer with a hit,
+ * - `segments`: a {@link SegmentationTapHit} per mask view layer with
+ *   segments under the tap.
+ * Empty `annotations` and `segments` mean that nothing was hit, for
+ * example to reset a selection.
  */
 export class PositionSetTapBehavior extends TapBehavior {
 
   /**
-   * Set stack position from the tapped display point (plane coordinates).
+   * Set stack position from the tapped display point (plane coordinates)
+   *   and emit the `tap` event.
    *
    * @param {Point2D} point Display position.
    * @param {LayerGroup} layerGroup The layer group.
@@ -117,10 +150,80 @@ export class PositionSetTapBehavior extends TapBehavior {
       logger.warn('No view layer to set current position');
       return;
     }
+
     const viewController = viewLayer.getViewController();
     const planePos = viewLayer.displayToPlanePos(point);
     const position = viewController.getPositionFromPlanePoint(planePos);
     viewController.setCurrentPosition(position);
+
+    this.dispatchEvent(new CustomEvent('tap', {
+      detail: {
+        position: position.getValues(),
+        annotations: this.#getAnnotationHits(point, layerGroup),
+        segments: this.#getSegmentationHits(point, layerGroup)
+      }
+    }));
+  }
+
+  /**
+   * Get the top most annotation under the input point for each
+   *   visible draw layer.
+   *
+   * @param {Point2D} point Display position.
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {AnnotationTapHit[]} The hits, empty if none.
+   */
+  #getAnnotationHits(point, layerGroup) {
+    const hits = [];
+    for (const drawLayer of layerGroup.getDrawLayers()) {
+      if (!drawLayer.isVisible()) {
+        continue;
+      }
+      const refViewLayer = layerGroup.getViewLayerById(
+        drawLayer.getReferenceLayerId());
+      if (typeof refViewLayer === 'undefined') {
+        continue;
+      }
+      const planePos = refViewLayer.displayToPlanePos(point);
+      const tolerance = refViewLayer.displayToPlaneScale(
+        new Point2D(TAP_TOLERANCE, TAP_TOLERANCE)).getX();
+      const annotation = drawLayer.getAnnotationAt(planePos, tolerance);
+      if (typeof annotation !== 'undefined') {
+        hits.push({
+          annotationid: annotation.trackingUid,
+          dataid: drawLayer.getDataId()
+        });
+      }
+    }
+    return hits;
+  }
+
+  /**
+   * Get the segments under the input point for each visible
+   *   mask view layer.
+   *
+   * @param {Point2D} point Display position.
+   * @param {LayerGroup} layerGroup The layer group.
+   * @returns {SegmentationTapHit[]} The hits, empty if none.
+   */
+  #getSegmentationHits(point, layerGroup) {
+    const hits = [];
+    const maskViewLayers = layerGroup.getViewLayers(
+      (layer) => layer.isVisible() && layer.getViewController().isMask());
+    for (const maskViewLayer of maskViewLayers) {
+      const viewController = maskViewLayer.getViewController();
+      const planePos = maskViewLayer.displayToPlanePos(point);
+      const position = viewController.getPositionFromPlanePoint(planePos);
+      const segmentNumbers =
+        viewController.getSegmentNumbersAtPosition(position);
+      if (segmentNumbers.length !== 0) {
+        hits.push({
+          dataid: maskViewLayer.getDataId(),
+          segmentnumbers: segmentNumbers
+        });
+      }
+    }
+    return hits;
   }
 
 }

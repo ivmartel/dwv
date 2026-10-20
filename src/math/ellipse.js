@@ -100,6 +100,25 @@ export class Ellipse {
   }
 
   /**
+   * Check if a point is inside the ellipse, the ellipse radii being
+   *   extended by a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional radius extension, defaults to 0.
+   * @returns {boolean} True if the point is in the ellipse.
+   */
+  contains(point, tolerance = 0) {
+    const a = this.#a + tolerance;
+    const b = this.#b + tolerance;
+    if (a <= 0 || b <= 0) {
+      return false;
+    }
+    const dx = (point.getX() - this.#centre.getX()) / a;
+    const dy = (point.getY() - this.#centre.getY()) / b;
+    return dx * dx + dy * dy <= 1;
+  }
+
+  /**
    * Check for equality.
    *
    * @param {Ellipse} rhs The object to compare to.

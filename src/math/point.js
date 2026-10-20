@@ -66,6 +66,17 @@ export class Point2D {
   }
 
   /**
+   * Check if a point is at this point, within a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance, defaults to 0.
+   * @returns {boolean} True if the point is within tolerance.
+   */
+  contains(point, tolerance = 0) {
+    return this.getDistance(point) <= tolerance;
+  }
+
+  /**
    * Check for Point2D equality.
    *
    * @param {Point2D} rhs The other point to compare to.

@@ -1,4 +1,4 @@
-import {Line, getAngle} from './line.js';
+import {Line, getAngle, getDistanceToSegment} from './line.js';
 
 /**
  * @import {Point2D} from '../math/point.js';
@@ -56,6 +56,24 @@ export class Protractor {
    */
   getCentroid() {
     return this.#points[1];
+  }
+
+  /**
+   * Check if a point is on one of the protractor lines, within a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the lines,
+   *   defaults to 0.
+   * @returns {boolean} True if the point is on the protractor.
+   */
+  contains(point, tolerance = 0) {
+    for (let i = 0; i < this.#points.length - 1; ++i) {
+      if (getDistanceToSegment(
+        point, this.#points[i], this.#points[i + 1]) <= tolerance) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

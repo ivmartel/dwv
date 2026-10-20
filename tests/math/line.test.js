@@ -6,7 +6,8 @@ import {
   areOrthogonal,
   getPerpendicularLine,
   getPerpendicularLineAtDistance,
-  isPointInLineRange
+  isPointInLineRange,
+  getDistanceToSegment
 } from '../../src/math/line.js';
 
 /**
@@ -275,6 +276,32 @@ describe('math', () => {
     assert.ok(isPointInLineRange(p04, l00), 'isPointInLineRange #4');
     const p05 = new Point2D(1, 0);
     assert.ok(isPointInLineRange(p05, l00), 'isPointInLineRange #5');
+  });
+
+});
+
+describe('math line contains', () => {
+
+  test('getDistanceToSegment', () => {
+    const b = new Point2D(0, 0);
+    const e = new Point2D(10, 0);
+    assert.equal(getDistanceToSegment(new Point2D(5, 3), b, e), 3,
+      'distance to segment middle');
+    assert.equal(getDistanceToSegment(new Point2D(13, 4), b, e), 5,
+      'distance past the end is to the end point');
+    assert.equal(getDistanceToSegment(new Point2D(-3, -4), b, e), 5,
+      'distance before the begin is to the begin point');
+    assert.equal(getDistanceToSegment(new Point2D(3, 4), b, b), 5,
+      'degenerate segment is a point');
+  });
+
+  test('Line contains', () => {
+    const l0 = new Line(new Point2D(0, 0), new Point2D(10, 10));
+    assert.ok(l0.contains(new Point2D(5, 5)), 'point on line');
+    assert.notOk(l0.contains(new Point2D(5, 6)), 'point off line, no tol');
+    assert.ok(l0.contains(new Point2D(5, 6), 1), 'point within tolerance');
+    assert.notOk(l0.contains(new Point2D(12, 12), 1),
+      'point on line extension');
   });
 
 });

@@ -23,6 +23,7 @@ export function makeMockViewController() {
     getPositionFromPlanePoint: vi.fn(() => ({
       getX: vi.fn(() => 10),
       getY: vi.fn(() => 20),
+      getValues: vi.fn(() => [10, 20, 0]),
       getWithNew2D: vi.fn(() => ({x: 10, y: 20}))
     })),
     getOffset3DFromPlaneOffset: vi.fn(() => (new Vector3D(0, 1, 2))),
@@ -96,6 +97,8 @@ export function makeMockLayerGroup(viewLayer = null, layer = null) {
     getActiveLayer: vi.fn(() => layer || makeMockLayer()),
     getViewLayerById: vi.fn(() => vl),
     getViewLayersFromActive: vi.fn(() => [vl]),
+    getViewLayers: vi.fn(() => []),
+    getDrawLayers: vi.fn(() => []),
     getPositionHelper: vi.fn(() => posHelper),
     canScroll: vi.fn(() => false),
     moreThanOne: vi.fn(() => false),

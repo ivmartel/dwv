@@ -139,6 +139,19 @@ export class Line {
   }
 
   /**
+   * Check if a point is on the line, within a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the line,
+   *   defaults to 0.
+   * @returns {boolean} True if the point is on the line.
+   */
+  contains(point, tolerance = 0) {
+    return getDistanceToSegment(
+      point, this.getBegin(), this.getEnd()) <= tolerance;
+  }
+
+  /**
    * Get the slope of the line.
    *
    * @returns {number} The slope of the line.
@@ -259,6 +272,31 @@ export function isPointInLineRange(point, line) {
     point.getX() <= maxX &&
     point.getY() >= minY &&
     point.getY() <= maxY;
+}
+
+/**
+ * Get the distance between a point and a line segment.
+ *
+ * @param {Point2D} point The input point.
+ * @param {Point2D} begin The segment begin point.
+ * @param {Point2D} end The segment end point.
+ * @returns {number} The distance to the closest point of the segment.
+ */
+export function getDistanceToSegment(point, begin, end) {
+  const dx = end.getX() - begin.getX();
+  const dy = end.getY() - begin.getY();
+  const length2 = dx * dx + dy * dy;
+  // projection of the point on the segment, clamped to [0, 1]
+  let t = 0;
+  if (length2 !== 0) {
+    t = ((point.getX() - begin.getX()) * dx +
+      (point.getY() - begin.getY()) * dy) / length2;
+    t = Math.max(0, Math.min(1, t));
+  }
+  return Math.hypot(
+    point.getX() - (begin.getX() + t * dx),
+    point.getY() - (begin.getY() + t * dy)
+  );
 }
 
 /**

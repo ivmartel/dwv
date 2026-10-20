@@ -1,7 +1,9 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
 import {Annotation} from '../../src/image/annotation.js';
 import {DicomCode} from '../../src/dicom/dicomCode.js';
-import {Point3D} from '../../src/math/point.js';
+import {Point2D, Point3D} from '../../src/math/point.js';
+import {Rectangle} from '../../src/math/rectangle.js';
+import {Path} from '../../src/math/path.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
 // ---------------------------------------------------------------------------
@@ -596,4 +598,29 @@ describe('image', () => {
   }
   );
 
+});
+
+describe('Annotation contains', () => {
+  test('delegates to the math shape', () => {
+    const annotation = new Annotation();
+    annotation.mathShape = new Rectangle(new Point2D(0, 0), new Point2D(4, 4));
+    assert.ok(annotation.contains(new Point2D(2, 2)), 'inside');
+    assert.notOk(annotation.contains(new Point2D(6, 2)), 'outside');
+    assert.ok(annotation.contains(new Point2D(6, 2), 2), 'within tolerance');
+  });
+
+  test('arrow uses the tip to tail segment', () => {
+    const annotation = new Annotation();
+    annotation.mathShape = new Point2D(0, 0);
+    annotation.referencePoints = [new Point2D(10, 0)];
+    assert.ok(annotation.contains(new Point2D(5, 1), 1), 'near the shaft');
+    assert.notOk(annotation.contains(new Point2D(12, 0), 1), 'past the tail');
+  });
+
+  test('false without a math shape contains', () => {
+    const annotation = new Annotation();
+    assert.notOk(annotation.contains(new Point2D(0, 0)), 'no math shape');
+    annotation.mathShape = new Path();
+    assert.notOk(annotation.contains(new Point2D(0, 0)), 'path');
+  });
 });

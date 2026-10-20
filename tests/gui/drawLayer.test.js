@@ -2,6 +2,11 @@
 import {describe, test, assert, vi, beforeEach, afterEach} from 'vitest';
 import {DrawLayer} from '../../src/gui/drawLayer.js';
 import {custom} from '../../src/app/custom.js';
+import {Annotation} from '../../src/image/annotation.js';
+import {AnnotationGroup} from '../../src/image/annotationGroup.js';
+import {Circle} from '../../src/math/circle.js';
+import {Index} from '../../src/math/index.js';
+import {Point, Point2D, Point3D} from '../../src/math/point.js';
 
 // external
 import Konva from 'konva';
@@ -127,6 +132,88 @@ describe('gui', () => {
     } finally {
       custom.highlightAnnotation = undefined;
     }
+  });
+
+});
+
+/**
+ * Create a draw layer at a current position with circle annotations.
+ *
+ * @param {object[]} circles The circles as {id, x, y, r}.
+ * @returns {DrawLayer} The draw layer.
+ */
+function createPositionedDrawLayer(circles) {
+  const div = document.createElement('div');
+  document.body.appendChild(div);
+  const drawLayer = new DrawLayer(div);
+  drawLayer.initialise({x: 100, y: 100}, {x: 1, y: 1}, 'ref');
+  vi.spyOn(drawLayer, 'draw').mockImplementation(() => {});
+  drawLayer.setPlaneHelper(/** @type {object} */ ({
+    getPlanePoints: () => [new Point3D(0, 0, 0)],
+    isAquisitionOrientation: () => true
+  }));
+  const annotations = [];
+  for (const circle of circles) {
+    const annotation = new Annotation();
+    annotation.trackingUid = circle.id;
+    annotation.mathShape =
+      new Circle(new Point2D(circle.x, circle.y), circle.r);
+    annotations.push(annotation);
+  }
+  drawLayer.setAnnotationGroup(
+    new AnnotationGroup(annotations), 'data0', () => {});
+  drawLayer.setCurrentPosition(new Point([0, 0, 0]), new Index([0, 0, 0]));
+  // creates the current position group
+  drawLayer.activateCurrentPositionShapes(true);
+  const posGroup = drawLayer.getKonvaLayer().findOne('.position-group');
+  for (const circle of circles) {
+    posGroup.add(new Konva.Group({id: circle.id}));
+  }
+  return drawLayer;
+}
+
+describe('gui DrawLayer getAnnotationAt', () => {
+
+  afterEach(() => {
+    document.body.replaceChildren();
+    vi.restoreAllMocks();
+  });
+
+  test('returns the top most annotation containing the point', () => {
+    const drawLayer = createPositionedDrawLayer([
+      {id: 'a0', x: 10, y: 10, r: 5},
+      {id: 'a1', x: 14, y: 10, r: 5}
+    ]);
+    assert.equal(
+      drawLayer.getAnnotationAt(new Point2D(7, 10))?.trackingUid, 'a0',
+      'only a0');
+    assert.equal(
+      drawLayer.getAnnotationAt(new Point2D(12, 10))?.trackingUid, 'a1',
+      'overlap: last drawn wins');
+    assert.isUndefined(
+      drawLayer.getAnnotationAt(new Point2D(50, 50)), 'no annotation');
+    assert.equal(
+      drawLayer.getAnnotationAt(new Point2D(21, 10), 2)?.trackingUid, 'a1',
+      'within tolerance');
+  });
+
+  test('skips hidden annotations', () => {
+    const drawLayer = createPositionedDrawLayer([
+      {id: 'a0', x: 10, y: 10, r: 5},
+      {id: 'a1', x: 10, y: 10, r: 5}
+    ]);
+    drawLayer.setAnnotationVisibility('a1', false);
+    assert.equal(
+      drawLayer.getAnnotationAt(new Point2D(10, 10))?.trackingUid, 'a0',
+      'hidden a1 skipped');
+  });
+
+  test('undefined without current position', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+    const drawLayer = new DrawLayer(div);
+    drawLayer.initialise({x: 100, y: 100}, {x: 1, y: 1}, 'ref');
+    assert.isUndefined(drawLayer.getAnnotationAt(new Point2D(0, 0)));
   });
 
 });

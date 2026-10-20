@@ -4,6 +4,7 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import {Matrix33} from '../../src/math/matrix.js';
+import {Index} from '../../src/math/index.js';
 import {Image} from '../../src/image/image.js';
 import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
@@ -670,4 +671,41 @@ describe('MaskImage', () => {
     }
   );
 
+});
+
+describe('MaskImage getSegmentNumbersAtIndex', () => {
+  test('without overlap', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+    const mask = new MaskImage(geom, new Uint8Array([0, 2, 3]), ['0']);
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([0, 0, 0])), [], 'background');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([1, 0, 0])), [2], 'segment 2');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([2, 0, 0])), [3], 'segment 3');
+  });
+
+  test('with overlap', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+      new Size([3, 1, 2]), new Spacing([1, 1, 1]));
+    const collection = new SegmentCollection(geom);
+    // slice 1: segment 1 on x=0,1 and segment 2 on x=1,2
+    collection.addFrame(1, new Uint8Array([1, 1, 0]), 0, 1, 3, 1);
+    collection.addFrame(2, new Uint8Array([0, 1, 1]), 0, 1, 3, 2);
+    const mask = new MaskImage(geom, collection.getLabelMap(), ['0', '1'],
+      collection);
+    assert.ok(mask.getHasOverlap(), 'mask has overlap');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([0, 0, 1])), [1], 'only 1');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([1, 0, 1])), [1, 2],
+      'overlap 1 and 2');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([2, 0, 1])), [2], 'only 2');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([1, 0, 0])), [],
+      'slice without segments');
+  });
 });

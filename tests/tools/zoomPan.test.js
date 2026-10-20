@@ -18,6 +18,7 @@ vi.mock('../../src/app/application.js', () => ({
 }));
 
 import {ZoomAndPan} from '../../src/tools/zoomPan.js';
+import {PositionSetTapBehavior} from '../../src/tools/behaviors/tapBehavior.js';
 
 describe('ZoomAndPan', () => {
 
@@ -82,5 +83,28 @@ describe('ZoomAndPan', () => {
 
     assert.equal(cancelSpy.mock.calls.length, 1);
     cancelSpy.mockRestore();
+  });
+
+  test('forwards the tap behavior events', () => {
+    const mockApp = {
+      getStageController: () => ({getLayerGroupByDivId: () => undefined}),
+      onKeydown: vi.fn()
+    };
+    // capture the tap behavior instance via its listener registration
+    const listenerSpy = vi.spyOn(
+      PositionSetTapBehavior.prototype, 'addEventListener');
+    const zoomPan = new ZoomAndPan(mockApp);
+    const tapBehavior = listenerSpy.mock.contexts[0];
+    assert.ok(tapBehavior instanceof PositionSetTapBehavior);
+
+    assert.deepEqual(zoomPan.getEventNames(),
+      ['tap']);
+    for (const type of zoomPan.getEventNames()) {
+      const listener = vi.fn();
+      zoomPan.addEventListener(type, listener);
+      tapBehavior.dispatchEvent(new CustomEvent(type, {detail: {a: 1}}));
+      assert.equal(listener.mock.calls.length, 1, `${type} forwarded`);
+      assert.deepEqual(listener.mock.calls[0][0].detail, {a: 1});
+    }
   });
 });

@@ -101,3 +101,23 @@ describe('BidimensionalLine', () => {
     assert.throws(() => b.quantify(viewController), /getLengthUnit/);
   });
 });
+
+describe('BidimensionalLine contains', () => {
+  test('main axis only', () => {
+    const b = new BidimensionalLine(new Point2D(0, 0), new Point2D(10, 0));
+    assert.ok(b.contains(new Point2D(5, 0.5), 1), 'near main axis');
+    assert.notOk(b.contains(new Point2D(5, 3), 1), 'no short axis');
+  });
+
+  test('main and short axis', () => {
+    const b = new BidimensionalLine(new Point2D(0, 0), new Point2D(10, 0));
+    b.shortAxisCenter = new Point2D(5, 0);
+    // perpendicular is (0, 1): L1 towards +y, L2 towards -y
+    b.shortAxisL1 = 4;
+    b.shortAxisL2 = 2;
+    assert.ok(b.contains(new Point2D(5, 3), 0.5), 'on short axis L1 side');
+    assert.ok(b.contains(new Point2D(5, -2)), 'short axis L2 end');
+    assert.notOk(b.contains(new Point2D(5, -3), 0.5), 'past L2 end');
+    assert.notOk(b.contains(new Point2D(7, 3), 0.5), 'off both axes');
+  });
+});

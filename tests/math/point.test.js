@@ -194,3 +194,12 @@ describe('math', () => {
   });
 
 });
+
+describe('math point contains', () => {
+  test('Point2D contains', () => {
+    const p0 = new Point2D(1, 1);
+    assert.ok(p0.contains(new Point2D(1, 1)), 'same point');
+    assert.notOk(p0.contains(new Point2D(4, 5)), 'other point');
+    assert.ok(p0.contains(new Point2D(4, 5), 5), 'within tolerance');
+  });
+});

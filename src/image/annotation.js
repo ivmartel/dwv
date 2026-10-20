@@ -1,13 +1,13 @@
 import {logger} from '../utils/logger.js';
 import {getFlags, replaceFlags} from '../utils/string.js';
-import {Point, Point3D} from '../math/point.js';
+import {Point, Point2D, Point3D} from '../math/point.js';
 import {getOrientationName} from '../math/orientation.js';
+import {getDistanceToSegment} from '../math/line.js';
 import {defaultToolOptions, toolOptions} from '../tools/toolOptions.js';
 import {guid} from '../math/stats.js';
 import {getUID} from '../dicom/dicomWriter.js';
 
 /**
- * @import {Point2D} from '../math/point.js';
  * @import {Index} from '../math/index.js';
  * @import {NumberValue} from '../math/number.js';
  * @import {ViewController} from '../app/viewController.js';
@@ -338,6 +338,28 @@ export class Annotation {
       }
     }
     return res;
+  }
+
+  /**
+   * Check if a plane point is on the annotation math shape,
+   *   within a tolerance.
+   *
+   * @param {Point2D} point The plane point to check.
+   * @param {number} [tolerance] Optional maximum distance to the shape,
+   *   defaults to 0.
+   * @returns {boolean} True if the point is on the shape.
+   */
+  contains(point, tolerance = 0) {
+    // arrow: the math shape is the tip and the reference point the tail
+    if (this.mathShape instanceof Point2D &&
+      typeof this.referencePoints?.[0] !== 'undefined') {
+      return getDistanceToSegment(
+        point, this.mathShape, this.referencePoints[0]) <= tolerance;
+    }
+    if (typeof this.mathShape?.contains !== 'function') {
+      return false;
+    }
+    return this.mathShape.contains(point, tolerance);
   }
 
   /**

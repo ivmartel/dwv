@@ -7,7 +7,8 @@ import {
 import {Point2D} from '../../../src/math/point.js';
 import {
   makeMockLayerGroup,
-  makeMockViewLayer
+  makeMockViewLayer,
+  makeMockViewController
 } from './utils.js';
 import * as loggerModule from '../../../src/utils/logger.js';
 
@@ -102,6 +103,120 @@ describe('tools/behaviors', () => {
       behavior.onTap(point, layerGroup);
 
       assert.equal(viewLayer.displayToPlanePos.mock.calls.length, 1);
+    });
+
+    /**
+     * Collect the events of a type fired by the behavior.
+     *
+     * @param {string} type The event type.
+     * @returns {object[]} The list of event details, filled on fire.
+     */
+    function collect(type) {
+      const details = [];
+      behavior.addEventListener(type, (event) => {
+        details.push(event.detail);
+      });
+      return details;
+    }
+
+    /**
+     * Create a draw layer mock.
+     *
+     * @param {object|undefined} annotation The annotation at any point.
+     * @param {boolean} [visible] The layer visibility, default true.
+     * @returns {object} The draw layer mock.
+     */
+    function makeMockDrawLayer(annotation, visible = true) {
+      return {
+        isVisible: vi.fn(() => visible),
+        getReferenceLayerId: vi.fn(() => 'ref'),
+        getDataId: vi.fn(() => 'draw-data-id'),
+        getAnnotationAt: vi.fn(() => annotation)
+      };
+    }
+
+    /**
+     * Create a mask view layer mock.
+     *
+     * @param {number[]} segmentNumbers The segment numbers at any position.
+     * @returns {object} The view layer mock.
+     */
+    function makeMockMaskViewLayer(segmentNumbers) {
+      const vc = makeMockViewController();
+      vc.isMask = vi.fn(() => true);
+      vc.getSegmentNumbersAtPosition = vi.fn(() => segmentNumbers);
+      const vl = makeMockViewLayer(vc);
+      vl.isVisible = vi.fn(() => true);
+      vl.getDataId = vi.fn(() => 'mask-data-id');
+      return vl;
+    }
+
+    test('onTap on an annotation fires tap with the annotation', () => {
+      const layerGroup = makeMockLayerGroup();
+      const drawLayer = makeMockDrawLayer({trackingUid: 'uid0'});
+      layerGroup.getDrawLayers.mockReturnValue([drawLayer]);
+      const taps = collect('tap');
+
+      behavior.onTap(new Point2D(10, 20), layerGroup);
+
+      assert.deepEqual(taps, [{
+        position: [10, 20, 0],
+        annotations: [{annotationid: 'uid0', dataid: 'draw-data-id'}],
+        segments: []
+      }]);
+      // tolerance: 5 display pixels with a 0.5 plane scale mock
+      assert.equal(drawLayer.getAnnotationAt.mock.calls[0][1], 0.5);
+      const viewController = layerGroup.getActiveViewLayer()
+        .getViewController();
+      assert.equal(viewController.setCurrentPosition.mock.calls.length, 1,
+        'position still set');
+    });
+
+    test('onTap on a segment fires tap with the segments', () => {
+      const layerGroup = makeMockLayerGroup();
+      const maskViewLayer = makeMockMaskViewLayer([1, 3]);
+      layerGroup.getViewLayers.mockImplementation(
+        (callbackFn) => [maskViewLayer].filter(callbackFn));
+      const taps = collect('tap');
+
+      behavior.onTap(new Point2D(10, 20), layerGroup);
+
+      assert.deepEqual(taps, [{
+        position: [10, 20, 0],
+        annotations: [],
+        segments: [{dataid: 'mask-data-id', segmentnumbers: [1, 3]}]
+      }]);
+    });
+
+    test('onTap on empty space fires tap with empty hits', () => {
+      const layerGroup = makeMockLayerGroup();
+      layerGroup.getDrawLayers.mockReturnValue([
+        makeMockDrawLayer(undefined),
+        makeMockDrawLayer({trackingUid: 'hidden'}, false)
+      ]);
+      const maskViewLayer = makeMockMaskViewLayer([]);
+      layerGroup.getViewLayers.mockImplementation(
+        (callbackFn) => [maskViewLayer].filter(callbackFn));
+      const taps = collect('tap');
+
+      behavior.onTap(new Point2D(10, 20), layerGroup);
+
+      assert.deepEqual(taps, [{
+        position: [10, 20, 0],
+        annotations: [],
+        segments: []
+      }]);
+    });
+
+    test('onTap fires no tap when no view layer', () => {
+      const layerGroup = makeMockLayerGroup();
+      layerGroup.getActiveViewLayer.mockReturnValue(undefined);
+      vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+      const taps = collect('tap');
+
+      behavior.onTap(new Point2D(10, 20), layerGroup);
+
+      assert.equal(taps.length, 0);
     });
   });
 });

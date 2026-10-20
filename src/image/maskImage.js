@@ -171,6 +171,35 @@ export class MaskImage extends Image {
   }
 
   /**
+   * Get the numbers of the segments present at an index.
+   * When segments overlap, all the segments at the index are returned,
+   * not only the one stored in the buffer (first wins).
+   *
+   * @param {Index} index The index, no bounds check.
+   * @returns {number[]} The sorted list of segment numbers,
+   *   empty for background.
+   */
+  getSegmentNumbersAtIndex(index) {
+    const numbers = new Set();
+    const value = this.getValueAtIndex(index);
+    if (value !== 0) {
+      numbers.add(value);
+    }
+    if (this.getHasOverlap()) {
+      const size = this.getGeometry().getSize();
+      const sliceOffset = index.get(0) + index.get(1) * size.get(0);
+      const segments = this.#segmentCollection.getAll();
+      for (const [segNumber, sliceMap] of segments) {
+        const sliceBuf = sliceMap.get(index.get(2));
+        if (typeof sliceBuf !== 'undefined' && sliceBuf[sliceOffset] !== 0) {
+          numbers.add(segNumber);
+        }
+      }
+    }
+    return [...numbers].sort((a, b) => a - b);
+  }
+
+  /**
    * Get the offsets where the buffer equals the input value.
    * Loops through the whole volume, can get long for big data...
    *

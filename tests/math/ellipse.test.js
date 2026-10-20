@@ -130,3 +130,13 @@ describe('math', () => {
   });
 
 });
+
+describe('math ellipse contains', () => {
+  test('Ellipse contains', () => {
+    const e0 = new Ellipse(new Point2D(0, 0), 10, 2);
+    assert.ok(e0.contains(new Point2D(9, 0)), 'inside along a');
+    assert.notOk(e0.contains(new Point2D(0, 3)), 'outside along b');
+    assert.ok(e0.contains(new Point2D(0, 3), 1), 'within tolerance');
+    assert.notOk(e0.contains(new Point2D(8, 2)), 'outside diagonal');
+  });
+});

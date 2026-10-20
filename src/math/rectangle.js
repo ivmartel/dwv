@@ -183,6 +183,22 @@ export class Rectangle {
   }
 
   /**
+   * Check if a point is inside the rectangle, or within a tolerance
+   *   of its outline.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the outline
+   *   for an outside point, defaults to 0.
+   * @returns {boolean} True if the point is in the rectangle.
+   */
+  contains(point, tolerance = 0) {
+    return point.getX() >= this.getBegin().getX() - tolerance &&
+      point.getX() <= this.getEnd().getX() + tolerance &&
+      point.getY() >= this.getBegin().getY() - tolerance &&
+      point.getY() <= this.getEnd().getY() + tolerance;
+  }
+
+  /**
    * Quantify a rectangle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.

@@ -18,7 +18,7 @@ import {custom} from '../app/custom.js';
 import Konva from 'konva';
 
 /**
- * @import {Point, Point3D} from '../math/point.js';
+ * @import {Point, Point2D, Point3D} from '../math/point.js';
  * @import {Vector3D} from '../math/vector.js';
  * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
  * @import {Index} from '../math/index.js';
@@ -922,6 +922,36 @@ export class DrawLayer {
       this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
       this.#zoomOffset = newZoomOffset;
+    }
+  }
+
+  /**
+   * Get the top most visible annotation at the current position
+   *   that contains the input plane point.
+   *
+   * @param {Point2D} planePoint The plane point, in the reference
+   *   view layer plane coordinates.
+   * @param {number} [tolerance] Optional maximum distance to a shape,
+   *   in plane coordinates, defaults to 0.
+   * @returns {Annotation|undefined} The annotation, undefined if none.
+   */
+  getAnnotationAt(planePoint, tolerance = 0) {
+    const posGroup = this.getKonvaLayer().getChildren(
+      isNodeWithId(this.#currentPosGroupId))[0];
+    if (!(posGroup instanceof Konva.Group) || !posGroup.isVisible()) {
+      return;
+    }
+    const drawController = this.getDrawController();
+    // last child is drawn on top
+    const shapeGroups = posGroup.getChildren().slice().reverse();
+    for (const shapeGroup of shapeGroups) {
+      if (!shapeGroup.isVisible()) {
+        continue;
+      }
+      const annotation = drawController.getAnnotation(shapeGroup.id());
+      if (annotation?.contains(planePoint, tolerance)) {
+        return annotation;
+      }
     }
   }
 
