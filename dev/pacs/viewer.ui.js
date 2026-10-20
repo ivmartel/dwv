@@ -887,17 +887,17 @@ export class ViewerUI {
   }
 
   /**
-   * Setup the tools radio buttons (first one checked) and
+   * Setup the tools buttons (first one selected) and
    * the tool options div.
    */
   #setupToolsCheckboxes() {
-    const getKeyCheck = function (char, input) {
+    const getKeyCheck = function (char, button) {
       return function (event) {
         if (!event.ctrlKey &&
           !event.altKey &&
           !event.shiftKey &&
           event.key === char) {
-          input.click();
+          button.click();
         }
       };
     };
@@ -907,37 +907,53 @@ export class ViewerUI {
     for (let i = 0; i < keys.length; ++i) {
       const key = keys[i];
 
-      const input = document.createElement('input');
-      input.name = 'tools';
-      input.type = 'radio';
-      input.id = `tool-${i}`;
-      input.title = key;
-      input.onchange = () => {
+      const button = document.createElement('button');
+      button.name = 'tools';
+      button.id = `tool-${i}`;
+      button.title = key;
+      button.appendChild(document.createTextNode(key));
+      button.onclick = () => {
+        this.#selectToolButton(button);
         this.#setAppTool(key);
       };
 
       // select first one
       if (i === 0) {
-        input.checked = true;
+        this.#selectToolButton(button);
       }
 
-      const label = document.createElement('label');
-      label.htmlFor = input.id;
-      label.title = input.title;
-      label.appendChild(document.createTextNode(input.title));
-
-      fieldset.appendChild(input);
-      fieldset.appendChild(label);
+      // let the tool UI merge its own selection with the button
+      const featuresUI = this.#toolFeaturesUI[key];
+      if (typeof featuresUI?.getToolButtonHtml !== 'undefined') {
+        fieldset.appendChild(featuresUI.getToolButtonHtml(button));
+      } else {
+        fieldset.appendChild(button);
+      }
 
       // keyboard shortcut
       const shortcut = key[0].toLowerCase();
-      window.addEventListener('keydown', getKeyCheck(shortcut, input));
+      window.addEventListener('keydown', getKeyCheck(shortcut, button));
     }
 
     // tool options
     const div = document.createElement('div');
     div.id = 'toolOptions';
     fieldset.appendChild(div);
+  }
+
+  /**
+   * Mark a tool button as selected, unselecting the others.
+   *
+   * @param {HTMLButtonElement} button The button to select.
+   */
+  #selectToolButton(button) {
+    const buttons = document.querySelectorAll('button[name="tools"]');
+    for (const item of buttons) {
+      item.classList.remove('selected');
+      item.setAttribute('aria-pressed', 'false');
+    }
+    button.classList.add('selected');
+    button.setAttribute('aria-pressed', 'true');
   }
 
   /**
@@ -995,7 +1011,7 @@ export class ViewerUI {
    */
   #getSelectedToolName() {
     let res;
-    const element = document.querySelector('input[name="tools"]:checked');
+    const element = document.querySelector('button[name="tools"].selected');
     if (element) {
       res = element.title;
     }

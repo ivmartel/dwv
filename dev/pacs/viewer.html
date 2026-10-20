@@ -317,6 +317,45 @@ hr.vertical {
 {
   display: inline-block;
 }
+#tools button.selected {
+  background-color: #dde;
+  border: 1px solid #4a5bb9;
+}
+.tool-split-button {
+  position: relative;
+  display: inline-block;
+  button[name="tools"] {
+    margin-right: 0;
+  }
+  .tool-menu-toggle {
+    margin-left: 0;
+    padding: 2px 1px;
+  }
+}
+.tool-menu {
+  position: absolute;
+  z-index: 10;
+  left: 3px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 2px 0;
+  list-style-type: none;
+  background-color: #fff;
+  border: 1px solid #aaa;
+  font-size: small;
+  li {
+    padding: 2px 8px;
+    cursor: pointer;
+  }
+  li:hover,
+  li:focus {
+    background-color: #ccc;
+  }
+}
+.tool-menu[hidden] {
+  display: none;
+}
 .data-item-list {
   list-style-type: none;
   padding: 0;

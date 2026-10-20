@@ -91,3 +91,71 @@ export function getControlDiv(
 
   return div;
 };
+
+/**
+ * Merge a tool button with an option menu: selecting an option
+ * in the menu calls the select callback and presses the tool button.
+ *
+ * @param {HTMLButtonElement} toolButton The tool button.
+ * @param {string[]} options The menu options.
+ * @param {Function} onSelect Callback called with the selected option
+ *   before the tool button is pressed.
+ * @param {string} idPrefix The prefix of the menu item ids.
+ * @param {string} toggleTitle The title of the menu toggle button.
+ * @returns {HTMLElement} The tool button with its option menu.
+ */
+export function getSplitButton(
+  toolButton, options, onSelect, idPrefix, toggleTitle) {
+  const res = document.createElement('span');
+  res.className = 'tool-split-button';
+  res.appendChild(toolButton);
+
+  const menu = document.createElement('ul');
+  menu.className = 'tool-menu';
+  menu.hidden = true;
+
+  const toggle = document.createElement('button');
+  toggle.className = 'tool-menu-toggle';
+  toggle.title = toggleTitle;
+  toggle.setAttribute('aria-haspopup', 'true');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.appendChild(document.createTextNode('▾'));
+
+  const showMenu = (flag) => {
+    menu.hidden = !flag;
+    toggle.setAttribute('aria-expanded', flag ? 'true' : 'false');
+  };
+  toggle.onclick = () => {
+    showMenu(menu.hidden);
+  };
+  // close menu on outside click
+  document.addEventListener('click', (event) => {
+    if (!res.contains(event.target)) {
+      showMenu(false);
+    }
+  });
+
+  for (const option of options) {
+    const item = document.createElement('li');
+    item.id = `${idPrefix}${option}`;
+    item.tabIndex = 0;
+    item.appendChild(document.createTextNode(option));
+    const selectOption = () => {
+      showMenu(false);
+      onSelect(option);
+      toolButton.click();
+    };
+    item.onclick = selectOption;
+    item.onkeydown = (event) => {
+      if (event.key === 'Enter') {
+        selectOption();
+      }
+    };
+    menu.appendChild(item);
+  }
+
+  res.appendChild(toggle);
+  res.appendChild(menu);
+
+  return res;
+};

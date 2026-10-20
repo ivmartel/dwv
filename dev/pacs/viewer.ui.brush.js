@@ -1,4 +1,4 @@
-import {getControlDiv} from './viewer.utils.js';
+import {getControlDiv, getSplitButton} from './viewer.utils.js';
 
 /**
  * @import {ViewerService} from './viewer.service.js';
@@ -15,6 +15,13 @@ export class BrushToolUI {
    * @type {ViewerService}
    */
   #service;
+
+  /**
+   * The brush mode: 'add' for brush, 'del' for eraser.
+   *
+   * @type {string}
+   */
+  #brushMode = 'add';
 
   /**
    * @param {ViewerService} service The associated viewer service.
@@ -37,7 +44,28 @@ export class BrushToolUI {
    * @returns {object|undefined} The value.
    */
   getValue() {
-    return undefined;
+    return {brushMode: this.#brushMode};
+  };
+
+  /**
+   * Merge the tool button with a brush/eraser menu: the button displays
+   * the selected mode, selecting a mode in the menu updates
+   * the button text and presses it.
+   *
+   * @param {HTMLButtonElement} toolButton The tool button.
+   * @returns {HTMLElement} The tool button with its mode menu.
+   */
+  getToolButtonHtml(toolButton) {
+    const modes = {
+      Brush: 'add',
+      Eraser: 'del'
+    };
+    const onSelect = (modeName) => {
+      this.#brushMode = modes[modeName];
+      toolButton.textContent = modeName;
+    };
+    return getSplitButton(
+      toolButton, Object.keys(modes), onSelect, 'brush-mode-', 'Select mode');
   };
 
   /**
@@ -71,23 +99,6 @@ export class BrushToolUI {
       1
     );
     res.appendChild(controlDiv);
-
-    // eraser: switch the brush mode, default to add
-    this.#service.setToolFeatures({brushMode: 'add'});
-    const eraserInput = document.createElement('input');
-    eraserInput.type = 'checkbox';
-    eraserInput.id = 'brush-eraser';
-    eraserInput.checked = false;
-    eraserInput.onchange = () => {
-      this.#service.setToolFeatures({
-        brushMode: eraserInput.checked ? 'del' : 'add'
-      });
-    };
-    const eraserLabel = document.createElement('label');
-    eraserLabel.htmlFor = eraserInput.id;
-    eraserLabel.appendChild(document.createTextNode('Eraser'));
-    res.appendChild(eraserInput);
-    res.appendChild(eraserLabel);
 
     // if no segmentations, use default
     if (!document.getElementById('segmentation-list')) {

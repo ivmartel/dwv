@@ -1,4 +1,5 @@
 import {DicomCode} from '../../src/dicom/dicomCode.js';
+import {getSplitButton} from './viewer.utils.js';
 
 /**
  * @import {ViewerService} from './viewer.service.js';
@@ -24,12 +25,25 @@ export class DrawToolUI {
   #toolConfig;
 
   /**
+   * The selected shape name.
+   *
+   * @type {string|undefined}
+   */
+  #shapeName;
+
+  /**
    * @param {ViewerService} service The associated viewer service.
    * @param {object} toolConfig The tool configuration.
    */
   constructor(service, toolConfig) {
     this.#service = service;
     this.#toolConfig = toolConfig;
+    // default to rectangle if available
+    const shapeNames = this.#toolConfig.options;
+    if (typeof shapeNames !== 'undefined') {
+      this.#shapeName = shapeNames.includes('Rectangle')
+        ? 'Rectangle' : shapeNames[0];
+    }
   }
 
   /**
@@ -43,7 +57,6 @@ export class DrawToolUI {
    * @returns {object|undefined} The value.
    */
   getValue() {
-    const shapeSelect = document.getElementById('draw-shape-select');
     // example annotation meta data added at draw time
     // (not sure of the concept-value association)
     const concept0 = new DicomCode('Processing type');
@@ -63,7 +76,7 @@ export class DrawToolUI {
       return true;
     };
     return {
-      shapeName: shapeSelect.value,
+      shapeName: this.#shapeName,
       annotationMeta: [
         {concept: concept0, value: value0}
       ],
@@ -76,32 +89,33 @@ export class DrawToolUI {
   };
 
   /**
+   * Merge the tool button with a shape menu: the button displays
+   * the selected shape, selecting a shape in the menu updates
+   * the button text and presses it.
+   *
+   * @param {HTMLButtonElement} toolButton The tool button.
+   * @returns {HTMLElement} The tool button with its shape menu.
+   */
+  getToolButtonHtml(toolButton) {
+    const shapeNames = this.#toolConfig.options;
+    if (typeof shapeNames === 'undefined') {
+      return toolButton;
+    }
+    toolButton.textContent = `Draw: ${this.#shapeName}`;
+    const onSelect = (shapeName) => {
+      this.#shapeName = shapeName;
+      toolButton.textContent = `Draw: ${shapeName}`;
+    };
+    return getSplitButton(
+      toolButton, shapeNames, onSelect, 'shape-', 'Select shape');
+  };
+
+  /**
    * Get the HTML element of the tool UI.
    *
    * @returns {HTMLElement|undefined} The element.
    */
   getHtml() {
-    const shapeSelect = document.createElement('select');
-    shapeSelect.id = 'draw-shape-select';
-
-    const shapeNames = this.#toolConfig.options;
-    if (typeof shapeNames === 'undefined') {
-      return;
-    }
-
-    for (const shapeName of shapeNames) {
-      const opt = document.createElement('option');
-      opt.id = `shape-${shapeName}`;
-      opt.value = shapeName;
-      opt.appendChild(document.createTextNode(shapeName));
-      shapeSelect.appendChild(opt);
-    }
-
-    shapeSelect.onchange = (event) => {
-      const element = event.target;
-      this.#service.setToolFeatures({shapeName: element.value});
-    };
-
     const autoColourInput = document.createElement('input');
     autoColourInput.type = 'checkbox';
     autoColourInput.id = 'draw-auto-colour';
@@ -130,7 +144,6 @@ export class DrawToolUI {
     const res = document.createElement('span');
     res.id = 'toolFeatures';
     res.className = 'toolFeatures';
-    res.appendChild(shapeSelect);
     res.appendChild(autoColourInput);
     res.appendChild(autoLabel);
     res.appendChild(colourInput);
