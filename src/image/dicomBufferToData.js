@@ -24,7 +24,9 @@ const TagKeys = {
   Rows: '00280010',
   Columns: '00280011',
   BitsAllocated: '00280100',
-  PixelRepresentation: '00280103'
+  PixelRepresentation: '00280103',
+  FloatPixelData: '7FE00009',
+  DoubleFloatPixelData: '7FE00008'
 };
 
 /**
@@ -196,7 +198,16 @@ export class DicomBufferToData {
     if (typeof pixelRepresentation !== 'undefined') {
       pixelMeta.isSigned = (pixelRepresentation === 1);
     } else {
-      pixelMeta.missing.push('pixelRepresentation');
+      const floatPixelData =
+        safeGet(dataElements, TagKeys.FloatPixelData);
+      const doubleFloatPixelData =
+        safeGet(dataElements, TagKeys.DoubleFloatPixelData);
+      if (typeof floatPixelData !== 'undefined' ||
+        typeof doubleFloatPixelData !== 'undefined') {
+        pixelMeta.isSigned === 1;
+      } else {
+        pixelMeta.missing.push('pixelRepresentation');
+      }
     }
     // slice size
     const columns = safeGet(dataElements, TagKeys.Columns);
