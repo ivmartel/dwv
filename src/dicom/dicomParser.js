@@ -1354,7 +1354,7 @@ export class DicomParser {
     let pixelTags;
     if (hasAnyPixelDataElement(this.#dataElements)) {
       // PixelRepresentation 0->unsigned, 1->signed
-      let pixelRepresentation = 0;
+      let pixelRepresentation;
       // only present for pixel data (not float)
       const pixelData = this.#dataElements[TagKeys.PixelData];
       if (typeof pixelData !== 'undefined') {
@@ -1365,6 +1365,7 @@ export class DicomParser {
         } else {
           logger.warn(
             'Reading DICOM pixel data with default pixelRepresentation.');
+          pixelRepresentation = 0;
         }
       }
 
