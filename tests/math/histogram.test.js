@@ -1,33 +1,41 @@
 import {describe, test, assert} from 'vitest';
-import {Histogram} from '../../src/image/histogram.js';
-import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
+import {Histogram} from '../../src/math/histogram.js';
 import {getStats} from '../../src/math/stats.js';
 
 /**
- * Tests for the 'image/histogram.js' file.
+ * Tests for the 'math/histogram.js' file.
  */
-
-const idRsi = new RescaleSlopeAndIntercept(1, 0);
 
 /**
- * Build a histogram from intensity -> count pairs.
+ * Build a histogram from value -> count pairs.
  *
- * @param {Record<number, number>} counts Map of intensity to count.
- * @param {RescaleSlopeAndIntercept} [rsi] Optional RSI, defaults to id.
+ * @param {Record<number, number>} counts Map of value to count.
  * @returns {Histogram} The histogram.
  */
-function buildHistogram(counts, rsi) {
+function buildHistogram(counts) {
   const histogram = new Histogram();
-  const rawCounts = histogram.getRawCounts(rsi ?? idRsi);
   for (const [value, count] of Object.entries(counts)) {
-    if (count !== 0) {
-      rawCounts.set(Number(value), count);
-    }
+    histogram.add(Number(value), count);
   }
   return histogram;
 }
 
-describe('histogram', () => {
+describe('math', () => {
+
+  test('Histogram add', () => {
+    const histogram = new Histogram();
+    histogram.add(3);
+    histogram.add(1);
+    histogram.add(3);
+    histogram.add(2, 4);
+
+    assert.deepEqual(histogram.getEntries(), [
+      {value: 1, count: 1},
+      {value: 2, count: 4},
+      {value: 3, count: 2}
+    ]);
+    assert.equal(histogram.getTotal(), 7);
+  });
 
   test('Histogram keeps negative values', () => {
     const histogram = buildHistogram({'-1000': 3, 0: 1, 40: 2});
@@ -38,46 +46,7 @@ describe('histogram', () => {
       {value: 40, count: 2}
     ]);
     assert.equal(histogram.getTotal(), 6);
-    assert.deepEqual(histogram.getRescaledRange(), {min: -1000, max: 40});
     assert.deepEqual(histogram.getRange(), {min: -1000, max: 40});
-  });
-
-  test('Histogram rescales non integer values', () => {
-    const rsi = new RescaleSlopeAndIntercept(0.5, -1024);
-    const histogram = buildHistogram({1: 2, 2: 1, 3: 4}, rsi);
-
-    assert.deepEqual(histogram.getEntries(), [
-      {value: -1023.5, count: 2},
-      {value: -1023, count: 1},
-      {value: -1022.5, count: 4}
-    ]);
-    assert.deepEqual(histogram.getRange(), {min: 1, max: 3});
-    assert.deepEqual(
-      histogram.getRescaledRange(), {min: -1023.5, max: -1022.5});
-  });
-
-  test('Histogram merges equal values from different RSI', () => {
-    const histogram = new Histogram();
-    // 10 * 1 + 0 = 10, 5 * 2 + 0 = 10, 2 * 2 + 0 = 4
-    histogram.add(10, new RescaleSlopeAndIntercept(1, 0));
-    histogram.add(5, new RescaleSlopeAndIntercept(2, 0));
-    histogram.add(5, new RescaleSlopeAndIntercept(2, 0));
-    histogram.add(2, new RescaleSlopeAndIntercept(2, 0));
-
-    assert.deepEqual(histogram.getEntries(), [
-      {value: 4, count: 1},
-      {value: 10, count: 3}
-    ]);
-    assert.equal(histogram.getTotal(), 4);
-  });
-
-  test('Histogram sorts entries with negative slope', () => {
-    const rsi = new RescaleSlopeAndIntercept(-1, 0);
-    const histogram = buildHistogram({1: 1, 2: 2, 3: 3}, rsi);
-
-    assert.deepEqual(
-      histogram.getEntries().map((entry) => entry.value), [-3, -2, -1]);
-    assert.deepEqual(histogram.getRescaledRange(), {min: -3, max: -1});
   });
 
   test('Histogram empty', () => {
@@ -85,34 +54,25 @@ describe('histogram', () => {
 
     assert.deepEqual(histogram.getEntries(), []);
     assert.equal(histogram.getTotal(), 0);
-    assert.isUndefined(histogram.getRescaledRange());
     assert.isUndefined(histogram.getRange());
+    assert.isUndefined(histogram.getStats());
   });
 
-  test('Histogram getCountInRescaledRange', () => {
+  test('Histogram getCountInRange', () => {
     const histogram = buildHistogram({'-5': 1, 0: 2, 5: 3, 10: 4});
 
-    assert.equal(histogram.getCountInRescaledRange(0, 10), 5, '[0, 10)');
-    assert.equal(
-      histogram.getCountInRescaledRange(undefined, 5), 3, '[-inf, 5)');
-    assert.equal(histogram.getCountInRescaledRange(5), 7, '[5, +inf]');
-    assert.equal(histogram.getCountInRescaledRange(), 10, 'unbounded');
+    assert.equal(histogram.getCountInRange(0, 10), 5, '[0, 10)');
+    assert.equal(histogram.getCountInRange(undefined, 5), 3, '[-inf, 5)');
+    assert.equal(histogram.getCountInRange(5), 7, '[5, +inf]');
+    assert.equal(histogram.getCountInRange(), 10, 'unbounded');
   });
 
   test('Histogram getIntervalPercentages', () => {
-    // intensities: 0×25, 1×40, 5×20, 10×15 → total 100
+    // values: 0×25, 1×40, 5×20, 10×15 → total 100
     // thresholds [1, 5] → [0, 1), [1, 5), [5, 10]
     const histogram = buildHistogram({0: 25, 1: 40, 5: 20, 10: 15});
 
     assert.deepEqual(histogram.getIntervalPercentages([1, 5]), [25, 40, 35]);
-  });
-
-  test('Histogram getIntervalPercentages with non integer values', () => {
-    // values 0.5, 1, 1.5, 2 with counts 1, 1, 1, 1
-    const rsi = new RescaleSlopeAndIntercept(0.5, 0);
-    const histogram = buildHistogram({1: 1, 2: 1, 3: 1, 4: 1}, rsi);
-
-    assert.deepEqual(histogram.getIntervalPercentages([1.5]), [50, 50]);
   });
 
   test('Histogram getIntervalPercentages returns 0 when empty', () => {
@@ -138,13 +98,12 @@ describe('histogram', () => {
 
   test('Histogram getStats matches getStats on values', () => {
     const counts = {'-3': 2, 0: 1, 4: 3, 7: 1, 10: 2};
-    const rsi = new RescaleSlopeAndIntercept(0.5, 1);
-    const histogram = buildHistogram(counts, rsi);
-    // the full list of rescaled values
+    const histogram = buildHistogram(counts);
+    // the full list of values
     const values = [];
-    for (const [raw, count] of Object.entries(counts)) {
+    for (const [value, count] of Object.entries(counts)) {
       for (let i = 0; i < count; ++i) {
-        values.push(rsi.apply(Number(raw)));
+        values.push(Number(value));
       }
     }
     const theo = getStats(values, ['median', 'p25', 'p75']);
@@ -170,15 +129,13 @@ describe('histogram', () => {
     assert.equal(stats.p75, 3.25, 'p75');
   });
 
-  test('Histogram getStats single value and empty', () => {
+  test('Histogram getStats single value', () => {
     const stats = buildHistogram({5: 3}).getStats();
     assert.equal(stats.min, 5);
     assert.equal(stats.max, 5);
     assert.equal(stats.mean, 5);
     assert.equal(stats.stdDev, 0);
     assert.equal(stats.median, 5);
-
-    assert.isUndefined(new Histogram().getStats());
   });
 
 });

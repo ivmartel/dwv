@@ -8,7 +8,7 @@ import {isMonochrome} from '../dicom/dicomImage.js';
 import {ResamplingThread} from './resamplingThread.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
-import {Histogram} from './histogram.js';
+import {ImageHistogram} from './imageHistogram.js';
 
 /**
  * @import {Geometry} from './geometry.js';
@@ -242,7 +242,7 @@ export class Image extends EventTarget {
   /**
    * Histogram.
    *
-   * @type {Histogram|null}
+   * @type {ImageHistogram|null}
    */
   #histogram = null;
 
@@ -1149,7 +1149,7 @@ export class Image extends EventTarget {
   /**
    * Get the histogram.
    *
-   * @returns {Histogram} The histogram.
+   * @returns {ImageHistogram} The histogram.
    */
   getHistogram() {
     if (!this.#histogram) {
@@ -1325,20 +1325,19 @@ export class Image extends EventTarget {
   /**
    * Calculate the histogram of the image.
    *
-   * @returns {Histogram} The histogram.
+   * @returns {ImageHistogram} The histogram.
    */
   #calculateHistogram() {
     const size = this.getGeometry().getSize();
     const sliceSize = size.getDimSize(2);
-    const histogram = new Histogram();
+    const histogram = new ImageHistogram();
     for (let start = 0, leni = size.getTotalSize();
       start < leni; start += sliceSize) {
       // rsi of this slice (index ignored for constant rsi)
-      const counts = histogram.getRawCounts(
+      const sliceHistogram = histogram.getHistogram(
         this.getRescaleSlopeAndIntercept(size.offsetToIndex(start)));
       for (let i = start; i < start + sliceSize; ++i) {
-        const value = this.getValueAtOffset(i);
-        counts.set(value, (counts.get(value) ?? 0) + 1);
+        sliceHistogram.add(this.getValueAtOffset(i));
       }
     }
     return histogram;

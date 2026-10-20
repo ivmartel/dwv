@@ -860,10 +860,10 @@ export class SegmentationUI {
       return statsList.length > 1 ? ` (#${volume})` : '';
     };
     // statistics as quantification
-    const statsToQuantification = (stats) => {
+    const statsToQuantification = (stats, unit) => {
       const res = {};
       for (const key of Object.keys(stats)) {
-        res[key] = {value: stats[key]};
+        res[key] = {value: stats[key], unit};
       }
       return res;
     };
@@ -886,7 +886,7 @@ export class SegmentationUI {
           const title = prefix === ''
             ? 'Pixel values' : `${prefix}pixel values`;
           groups.push(...getQuantificationGroups(
-            statsToQuantification(labelItem.stats),
+            statsToQuantification(labelItem.stats, item.unit),
             {pixelValues: title + volumeSuffix(item.volume)}));
         }
       }
@@ -895,7 +895,7 @@ export class SegmentationUI {
     if (nLabels > 1) {
       for (const item of statsList) {
         groups.push(...getQuantificationGroups(
-          statsToQuantification(item.stats),
+          statsToQuantification(item.stats, item.unit),
           {pixelValues: `All pixel values${volumeSuffix(item.volume)}`}));
       }
     }
@@ -1178,10 +1178,10 @@ export class SegmentationUI {
    *
    * @param {MaskSegment} segment The segment.
    * @param {Segmentation} segmentation The segmentation.
-   * @returns {{volume: number, stats: Statistics,
+   * @returns {{volume: number, stats: Statistics, unit?: string,
    *   labelStats?: {label: Label, stats: Statistics}[]}[]} The statistics,
-   *   with per label statistics if available, empty if the reference
-   *   image is not available.
+   *   with the reference image pixel unit and per label statistics
+   *   if available, empty if the reference image is not available.
    */
   #getHistogramStats(segment, segmentation) {
     const dataCtrl = this.#service.getDataController();
@@ -1199,6 +1199,7 @@ export class SegmentationUI {
       return [];
     }
     const refImage = dataCtrl.get(refDataId).image;
+    const unit = refImage.getMeta().pixelUnit;
 
     let volumeHistograms;
     try {
@@ -1216,7 +1217,7 @@ export class SegmentationUI {
       if (typeof stats === 'undefined') {
         continue;
       }
-      const resItem = {volume: item.volume, stats};
+      const resItem = {volume: item.volume, stats, unit};
       if (typeof item.labelHistograms !== 'undefined') {
         resItem.labelStats = [];
         for (const labelItem of item.labelHistograms) {

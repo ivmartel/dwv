@@ -29,18 +29,19 @@ vi.mock('../../src/image/labelingThread.js', async (importOriginal) => {
 });
 
 /**
- * @import {Histogram} from '../../src/image/histogram.js';
+ * @import {ImageHistogram} from '../../src/image/imageHistogram.js';
  */
 
 /**
  * Get the count of a rescaled value in a histogram.
  *
- * @param {Histogram} histogram The histogram.
+ * @param {ImageHistogram} histogram The histogram.
  * @param {number} value The rescaled value.
  * @returns {number|undefined} The count, undefined if absent.
  */
 function countOf(histogram, value) {
-  return histogram.getEntries().find((entry) => entry.value === value)?.count;
+  return histogram.getRescaledHistogram().getEntries().find(
+    (entry) => entry.value === value)?.count;
 }
 
 /**
@@ -488,7 +489,8 @@ describe('MaskImage', () => {
 
       const result = mask.getHistogramBySegment(image, '1');
 
-      assert.deepEqual(result[0].histogram.getEntries(), [
+      const entries = result[0].histogram.getRescaledHistogram().getEntries();
+      assert.deepEqual(entries, [
         {value: -1023.5, count: 1},
         {value: -1023, count: 1}
       ]);
@@ -517,7 +519,8 @@ describe('MaskImage', () => {
 
       const result = mask.getHistogramBySegment(image, '1');
 
-      assert.deepEqual(result[0].histogram.getEntries(), [
+      const entries = result[0].histogram.getRescaledHistogram().getEntries();
+      assert.deepEqual(entries, [
         {value: 10, count: 1},
         {value: 20, count: 1}
       ]);
@@ -637,7 +640,8 @@ describe('MaskImage', () => {
       const labelHistograms = result[0].labelHistograms;
       assert.equal(labelHistograms.length, 2, 'one histogram per label');
       const values = labelHistograms.map(
-        (item) => item.histogram.getEntries().map((entry) => entry.value));
+        (item) => item.histogram.getRescaledHistogram().getEntries().map(
+          (entry) => entry.value));
       values.sort((a, b) => a[0] - b[0]);
       assert.deepEqual(values, [[10], [20, 30, 40]], 'label values');
       for (const item of labelHistograms) {

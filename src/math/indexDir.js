@@ -1,5 +1,6 @@
 import {Circle} from './circle.js';
 import {Ellipse} from './ellipse.js';
+import {Histogram} from './histogram.js';
 import {Index} from './index.js';
 import {Matrix33} from './matrix.js';
 import {NumberRange} from './number.js';
@@ -26,6 +27,7 @@ export * from './arrayTypes.js';
 export {
   Circle,
   Ellipse,
+  Histogram,
   Index,
   Matrix33,
   NumberRange,

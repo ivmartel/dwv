@@ -1,62 +1,37 @@
-import {Statistics} from '../math/stats.js';
+import {Statistics} from './stats.js';
 
 /**
- * Histogram utilities.
- */
-
-/**
- * @import {RescaleSlopeAndIntercept} from './rsi.js';
- * @import {NumberRange} from '../math/number.js';
+ * @import {NumberRange} from './number.js';
  */
 
 /**
  * Histogram entry.
  *
  * @typedef {object} HistogramEntry
- * @property {number} value The rescaled value.
+ * @property {number} value The value.
  * @property {number} count The number of occurrences.
  */
 
 /**
- * Histogram of image values.
- *
- * Raw (stored) values are counted per rescale slope and intercept (RSI):
- * values sharing an RSI share one count map. Values are rescaled when
- * read. An image with a constant RSI only has one group.
+ * Histogram of values: number of occurrences per distinct value.
  */
 export class Histogram {
 
   /**
-   * Raw value counts per RSI.
+   * Value to count map.
    *
-   * @type {{rsi: RescaleSlopeAndIntercept, counts: Map<number, number>}[]}
+   * @type {Map<number, number>}
    */
-  #groups = [];
+  #counts = new Map();
 
   /**
-   * Get the raw value counts for an RSI, creating them if needed.
+   * Add occurrences of a value.
    *
-   * @param {RescaleSlopeAndIntercept} rsi The RSI of the raw values.
-   * @returns {Map<number, number>} The raw value to count map.
+   * @param {number} value The value.
+   * @param {number} [count] The number of occurrences, defaults to 1.
    */
-  getRawCounts(rsi) {
-    let group = this.#groups.find((item) => item.rsi.equals(rsi));
-    if (typeof group === 'undefined') {
-      group = {rsi, counts: new Map()};
-      this.#groups.push(group);
-    }
-    return group.counts;
-  }
-
-  /**
-   * Add one raw value.
-   *
-   * @param {number} rawValue The raw value.
-   * @param {RescaleSlopeAndIntercept} rsi The RSI of the raw value.
-   */
-  add(rawValue, rsi) {
-    const counts = this.getRawCounts(rsi);
-    counts.set(rawValue, (counts.get(rawValue) ?? 0) + 1);
+  add(value, count = 1) {
+    this.#counts.set(value, (this.#counts.get(value) ?? 0) + count);
   }
 
   /**
@@ -66,49 +41,36 @@ export class Histogram {
    */
   getTotal() {
     let total = 0;
-    for (const group of this.#groups) {
-      for (const count of group.counts.values()) {
-        total += count;
-      }
+    for (const count of this.#counts.values()) {
+      total += count;
     }
     return total;
   }
 
   /**
-   * Get the histogram entries: rescaled values (equal values from
-   * different RSI merged) sorted in ascending order.
+   * Get the histogram entries sorted by ascending value.
    *
    * @returns {HistogramEntry[]} The entries.
    */
   getEntries() {
-    /** @type {Map<number, number>} */
-    const merged = new Map();
-    for (const group of this.#groups) {
-      for (const [rawValue, count] of group.counts) {
-        const value = group.rsi.apply(rawValue);
-        merged.set(value, (merged.get(value) ?? 0) + count);
-      }
-    }
-    return Array.from(merged, ([value, count]) => ({value, count}))
+    return Array.from(this.#counts, ([value, count]) => ({value, count}))
       .sort((a, b) => a.value - b.value);
   }
 
   /**
-   * Get the value range (raw values).
+   * Get the value range.
    *
    * @returns {NumberRange|undefined} The range, undefined if empty.
    */
   getRange() {
     let min;
     let max;
-    for (const group of this.#groups) {
-      for (const rawValue of group.counts.keys()) {
-        if (typeof min === 'undefined' || rawValue < min) {
-          min = rawValue;
-        }
-        if (typeof max === 'undefined' || rawValue > max) {
-          max = rawValue;
-        }
+    for (const value of this.#counts.keys()) {
+      if (typeof min === 'undefined' || value < min) {
+        min = value;
+      }
+      if (typeof max === 'undefined' || value > max) {
+        max = value;
       }
     }
     if (typeof min === 'undefined') {
@@ -118,46 +80,18 @@ export class Histogram {
   }
 
   /**
-   * Get the rescaled value range.
-   *
-   * @returns {NumberRange|undefined} The range, undefined if empty.
-   */
-  getRescaledRange() {
-    let min;
-    let max;
-    for (const group of this.#groups) {
-      for (const rawValue of group.counts.keys()) {
-        const value = group.rsi.apply(rawValue);
-        if (typeof min === 'undefined' || value < min) {
-          min = value;
-        }
-        if (typeof max === 'undefined' || value > max) {
-          max = value;
-        }
-      }
-    }
-    if (typeof min === 'undefined') {
-      return undefined;
-    }
-    return {min, max};
-  }
-
-  /**
-   * Get the number of values with a rescaled value in [min, max).
+   * Get the number of values in [min, max).
    *
    * @param {number} [min] Inclusive lower bound, unbounded if undefined.
    * @param {number} [max] Exclusive upper bound, unbounded if undefined.
    * @returns {number} The count.
    */
-  getCountInRescaledRange(min, max) {
+  getCountInRange(min, max) {
     let sum = 0;
-    for (const group of this.#groups) {
-      for (const [rawValue, count] of group.counts) {
-        const value = group.rsi.apply(rawValue);
-        if ((typeof min === 'undefined' || value >= min) &&
-          (typeof max === 'undefined' || value < max)) {
-          sum += count;
-        }
+    for (const [value, count] of this.#counts) {
+      if ((typeof min === 'undefined' || value >= min) &&
+        (typeof max === 'undefined' || value < max)) {
+        sum += count;
       }
     }
     return sum;
@@ -168,10 +102,9 @@ export class Histogram {
    * interior thresholds.
    *
    * For thresholds `[1, 5]`, the intervals are `[min, 1)`, `[1, 5)` and
-   * `[5, max]`, where `min` / `max` are the histogram rescaled range.
+   * `[5, max]`, where `min` / `max` are the histogram range.
    *
-   * @param {number[]} thresholds Interior rescaled cut points in ascending
-   *   order.
+   * @param {number[]} thresholds Interior cut points in ascending order.
    * @returns {number[]} The percentages in [0, 100], one per interval
    *   (`thresholds.length + 1` entries), all 0 for an empty histogram.
    */
@@ -181,14 +114,14 @@ export class Histogram {
     const bounds = [undefined, ...thresholds, undefined];
     const percentages = [];
     for (let i = 0; i < bounds.length - 1; ++i) {
-      const count = this.getCountInRescaledRange(bounds[i], bounds[i + 1]);
+      const count = this.getCountInRange(bounds[i], bounds[i + 1]);
       percentages.push(total === 0 ? 0 : (count * 100) / total);
     }
     return percentages;
   }
 
   /**
-   * Get the statistics of the rescaled values: minimum, maximum, mean,
+   * Get the statistics of the values: minimum, maximum, mean,
    * standard deviation, median, 25th and 75th percentiles.
    * Gives the same results as `getStats` (`math/stats.js`) on the full
    * list of values.

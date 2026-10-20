@@ -163,7 +163,8 @@ describe('image', () => {
     const image0 = new Image(imgGeometry0, buffer0);
 
     // histogram
-    const entries = image0.getHistogram().getEntries();
+    const entries =
+      image0.getHistogram().getRescaledHistogram().getEntries();
     assert.equal(entries.length, size0 * size0, 'histogram size');
     let histoContentTest = true;
     for (let j = 0; j < size0 * size0; ++j) {
@@ -185,7 +186,9 @@ describe('image', () => {
       [imgOrigin0], new Size([2, 2, 1]), imgSpacing0);
     const image1 = new Image(imgGeometry1, [-2, -1, 0, 1]);
     image1.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(0.5, 10));
-    assert.deepEqual(image1.getHistogram().getEntries(), [
+    const entries1 =
+      image1.getHistogram().getRescaledHistogram().getEntries();
+    assert.deepEqual(entries1, [
       {value: 9, count: 1},
       {value: 9.5, count: 1},
       {value: 10, count: 1},

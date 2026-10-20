@@ -8,7 +8,7 @@ import {ImageContour} from './imageContour.js';
 import {Image} from './image.js';
 import {logger} from '../utils/logger.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
-import {Histogram} from './histogram.js';
+import {ImageHistogram} from './imageHistogram.js';
 
 /**
  * @import {Geometry} from './geometry.js';
@@ -589,7 +589,7 @@ export class MaskImage extends Image {
    * appears in voxels belonging to the given segment of this mask.
    * Segmentations are 3D: the same mask is applied to every volume.
    * Raw values are counted per rescale slope and intercept and rescaled
-   * when read from the {@link Histogram}.
+   * when read from the {@link ImageHistogram}.
    *
    * If labels are available (see {@link MaskImage#getLabels}), each entry
    * also has `labelHistograms`: one histogram per label of the segment, made of
@@ -600,8 +600,8 @@ export class MaskImage extends Image {
    * @param {Image} image The reference image (intensities).
    * @param {string} segmentId Segment tracking UID, or segment number as
    *   string.
-   * @returns {{volume: number, histogram: Histogram,
-   *   labelHistograms?: {label: Label, histogram: Histogram}[]}[]} One
+   * @returns {{volume: number, histogram: ImageHistogram,
+   *   labelHistograms?: {label: Label, histogram: ImageHistogram}[]}[]} One
    *   entry per volume.
    */
   getHistogramBySegment(image, segmentId) {
@@ -643,7 +643,7 @@ export class MaskImage extends Image {
      * Add the image values of the segment voxels of a slice range
      * to a histogram.
      *
-     * @param {Histogram} histogram The histogram to fill.
+     * @param {ImageHistogram} histogram The histogram to fill.
      * @param {number} v The volume index.
      * @param {number} kMin The first mask slice index.
      * @param {number} kMax The last mask slice index (inclusive).
@@ -657,14 +657,13 @@ export class MaskImage extends Image {
         const rsi = image.getRescaleSlopeAndIntercept(
           imageSize.offsetToIndex(imageStart));
         // one lookup per slice, not per voxel
-        const counts = histogram.getRawCounts(rsi);
+        const sliceHistogram = histogram.getHistogram(rsi);
 
         for (let i = 0; i < sliceSize; ++i) {
           if (maskBuffer[maskStart + i] !== segmentValue) {
             continue;
           }
-          const value = image.getValueAtOffset(imageStart + i);
-          counts.set(value, (counts.get(value) ?? 0) + 1);
+          sliceHistogram.add(image.getValueAtOffset(imageStart + i));
         }
       }
     };
@@ -685,17 +684,17 @@ export class MaskImage extends Image {
     const result = [];
     for (let v = 0; v < numberOfVolumes; ++v) {
       // mask is always 3D spatial: reuse it for each volume
-      const histogram = new Histogram();
+      const histogram = new ImageHistogram();
       fillHistogram(histogram, v, 0, sliceIndices.length - 1);
 
       /**
-       * @type {{volume: number, histogram: Histogram,
-       *   labelHistograms?: {label: Label, histogram: Histogram}[]}}
+       * @type {{volume: number, histogram: ImageHistogram,
+       *   labelHistograms?: {label: Label, histogram: ImageHistogram}[]}}
        */
       const item = {volume: v, histogram};
       if (typeof segmentLabels !== 'undefined') {
         item.labelHistograms = segmentLabels.map((label) => {
-          const labelHistogram = new Histogram();
+          const labelHistogram = new ImageHistogram();
           fillHistogram(labelHistogram, v, label.minZ, label.maxZ);
           return {label, histogram: labelHistogram};
         });

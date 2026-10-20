@@ -45,7 +45,7 @@ import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
 import {SegmentCollection} from './segmentCollection.js';
 import {Diameter, Diameters, Label} from './label.js';
 import {WindowPreset} from './windowPreset.js';
-import {Histogram} from './histogram.js';
+import {ImageHistogram} from './imageHistogram.js';
 
 export {
   Annotation,
@@ -56,8 +56,8 @@ export {
   Diameter,
   Diameters,
   Geometry,
-  Histogram,
   Image,
+  ImageHistogram,
   MaskImage,
   ImageContour,
   Label,
