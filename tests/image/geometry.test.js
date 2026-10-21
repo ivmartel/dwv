@@ -474,6 +474,49 @@ describe('image', () => {
   });
 
   /**
+   * Tests for {@link Geometry#checkTimeOrigins}.
+   *
+   * @function module:tests/image~geometryCheckTimeOrigins
+   */
+  test('Geometry checkTimeOrigins', () => {
+    const size = new Size([1, 1, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origin0 = new Point3D(0, 0, 0);
+    const origin1 = new Point3D(0, 0, 1);
+
+    // no time
+    const geometry0 = new Geometry([origin0], size, spacing);
+    assert.ok(geometry0.checkTimeOrigins().success,
+      'checkTimeOrigins no time');
+
+    // consistent time points
+    const geometry1 = new Geometry([origin0], size, spacing);
+    geometry1.appendOrigin(origin1, 1);
+    geometry1.setInitialTime(0);
+    geometry1.appendFrame(origin0, 1);
+    geometry1.appendOrigin(origin1, 1, 1);
+    assert.ok(geometry1.checkTimeOrigins().success,
+      'checkTimeOrigins consistent');
+
+    // different slice count
+    const geometry2 = new Geometry([origin0], size, spacing);
+    geometry2.appendOrigin(origin1, 1);
+    geometry2.setInitialTime(0);
+    geometry2.appendFrame(origin0, 1);
+    assert.notOk(geometry2.checkTimeOrigins().success,
+      'checkTimeOrigins different slice count');
+
+    // different origin
+    const geometry3 = new Geometry([origin0], size, spacing);
+    geometry3.appendOrigin(origin1, 1);
+    geometry3.setInitialTime(0);
+    geometry3.appendFrame(origin0, 1);
+    geometry3.appendOrigin(new Point3D(0, 0, 4), 1, 1);
+    assert.notOk(geometry3.checkTimeOrigins().success,
+      'checkTimeOrigins different origin');
+  });
+
+  /**
    * Tests for {@link Geometry#sortOrigins}.
    *
    * @function module:tests/image~geometrySortOrigins

@@ -230,6 +230,40 @@ export class Geometry {
   }
 
   /**
+   * Check that all time points have the same origins as the
+   * initial time point (same number and same values in the
+   * same order).
+   *
+   * @returns {BooleanResult} Result with success set to true if
+   *   the time origins are consistent.
+   */
+  checkTimeOrigins() {
+    // no time points to compare to
+    if (typeof this.#initialTime === 'undefined') {
+      return new BooleanResult(true);
+    }
+    for (const key of Object.keys(this.#timeOrigins)) {
+      const timeOrigins = this.#timeOrigins[key];
+      if (timeOrigins.length !== this.#origins.length) {
+        return {
+          success: false,
+          message: `Different number of slices for time ${key}: ` +
+            `${timeOrigins.length} vs ${this.#origins.length}`
+        };
+      }
+      for (let i = 0; i < timeOrigins.length; ++i) {
+        if (!timeOrigins[i].equals(this.#origins[i])) {
+          return {
+            success: false,
+            message: `Different origin for time ${key} at slice ${i}`
+          };
+        }
+      }
+    }
+    return new BooleanResult(true);
+  }
+
+  /**
    * Get the object origin.
    * This should be the lowest origin to ease calculations (?).
    *

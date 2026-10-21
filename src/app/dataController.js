@@ -893,6 +893,13 @@ export class DataController extends EventTarget {
       data.meta = finalData.meta;
       // mark image as changed
       res.imageHasChanged = true;
+    } else if (typeof data.image !== 'undefined') {
+      // volumes created while loading (pre-load volume id): check
+      // they share the same origins, as the post-load path does
+      const check = data.image.getGeometry().checkTimeOrigins();
+      if (!check.success) {
+        throw new Error(`Inconsistent volumes: ${check.message}`);
+      }
     }
     // release the slice list (also when not used)
     delete this.#tmpSliceList[dataId];
