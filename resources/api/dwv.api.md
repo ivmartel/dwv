@@ -304,6 +304,11 @@ export class DataController extends EventTarget {
     getNextDataId(): string;
     getStashed(dataId: string): DicomData | undefined;
     getStashedDataIds(): string[];
+    getTimepointSyncTable(dataId: string): Array<{
+        timepointIndex: number;
+        tagValue: number;
+    }> | undefined;
+    getTimepointTag(dataId: string): string | undefined;
     markDataAsComplete(dataId: string): {
         imageHasChanged: any;
     };
@@ -394,6 +399,7 @@ export class DicomData {
     meta: Record<string, DataElement>;
     numberOfItems: number;
     setComplete(flag: boolean): void;
+    timepoints: Timepoints | undefined;
     warn: string[];
 }
 
@@ -571,6 +577,7 @@ export class Geometry {
     getSize(viewOrientation?: Matrix33): Size;
     getSliceIndex(origin: Point3D, time?: number): number;
     getSpacing(viewOrientation?: Matrix33): Spacing;
+    getTimes(): number[];
     hasSlicesAtTime(time: number): boolean;
     includesOrigin(point3D: Point3D, tol?: number): boolean;
     indexToWorld(index: Index): Point;
@@ -1439,6 +1446,15 @@ export class TagInfo {
 }
 
 // @public
+export type Timepoints = {
+    tag: string;
+    syncTable: Array<{
+        timepointIndex: number;
+        tagValue: number;
+    }>;
+};
+
+// @public
 export class ToolboxController {
     constructor(toolList: object);
     bindLayerGroup(layerGroup: LayerGroup, layer: ViewLayer | DrawLayer): void;
@@ -1697,6 +1713,7 @@ export type VolumeIdCandidate = {
     name: string;
     getter: Function;
     preLoad?: boolean;
+    timeBased?: boolean;
 };
 
 // @public
