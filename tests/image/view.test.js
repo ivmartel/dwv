@@ -4,6 +4,7 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Image} from '../../src/image/image.js';
+import {MaskImage} from '../../src/image/maskImage.js';
 import {View} from '../../src/image/view.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
@@ -589,6 +590,51 @@ describe('image', () => {
     const view1 = new View(image1);
     assert.deepEqual(view1.getCurrentIndex().getValues(), [2, 2, 2],
       '3D initial index');
+  });
+
+  test('View segment highlight', () => {
+    const size = new Size([2, 2, 1]);
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0)], size, new Spacing([1, 1, 1]));
+    const buffer = new Uint8Array([0, 1, 2, 1]);
+    const mask = new MaskImage(geometry, buffer, ['0']);
+    const view = new View(mask);
+    view.setContourThickness(0);
+    view.setFillOpacity(0.5);
+
+    let nEvents = 0;
+    view.addEventListener('segmenthighlightchange', () => {
+      ++nEvents;
+    });
+
+    const fill = 0xff * 0.5;
+    assert.isUndefined(view.getSegmentHighlight());
+    assert.equal(view.getAlphaFunction()(1, 1), fill);
+
+    view.setSegmentHighlight(1, 0.5);
+    assert.equal(nEvents, 1);
+    assert.deepEqual(view.getSegmentHighlight(),
+      {segmentNumber: 1, opacity: 0.5});
+    const alpha = view.getAlphaFunction();
+    // highlighted segment
+    assert.equal(alpha(1, 1), fill * 0.5);
+    // other segment and background are not affected
+    assert.equal(alpha(2, 2), fill);
+    assert.equal(alpha(0, 0), 0);
+
+    // default and clamped opacity
+    view.setSegmentHighlight(2);
+    assert.equal(view.getSegmentHighlight().opacity, 1);
+    view.setSegmentHighlight(2, 2);
+    assert.equal(view.getSegmentHighlight().opacity, 1);
+    view.setSegmentHighlight(2, -1);
+    assert.equal(alpha(2, 2), 0);
+
+    // reset
+    view.setSegmentHighlight();
+    assert.equal(nEvents, 5);
+    assert.isUndefined(view.getSegmentHighlight());
+    assert.equal(alpha(2, 2), fill);
   });
 
 });

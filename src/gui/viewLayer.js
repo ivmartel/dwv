@@ -8,6 +8,7 @@ import {
   InteractionEventNames
 } from './generic.js';
 import {getScaledOffset} from './layerGroup.js';
+import {custom} from '../app/custom.js';
 
 /**
  * @import {Vector3D} from '../math/vector.js';
@@ -185,6 +186,13 @@ export class ViewLayer {
   #needsDataUpdate = null;
 
   /**
+   * The current segment highlight reset function.
+   *
+   * @type {Function|undefined}
+   */
+  #resetHighlight;
+
+  /**
    * The associated data id.
    *
    * @type {string}
@@ -284,6 +292,8 @@ export class ViewLayer {
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
     view.addEventListener('maskviewchange', this.#onMaskViewChange);
+    view.addEventListener(
+      'segmenthighlightchange', this.#onSegmentHighlightChange);
     // propagate view events
     for (const eventName of viewEventNames) {
       view.addEventListener(eventName, this.#fireEvent);
@@ -510,6 +520,66 @@ export class ViewLayer {
         value: [this.#opacity]
       }
     }));
+  }
+
+  /**
+   * Temporarily highlight a segment: its opacity progressively
+   *   dims and comes back to normal in one pulse. Only one
+   *   segment is highlighted at a time: a new call resets the
+   *   previous highlight.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @param {number} [duration] The highlight duration in milliseconds,
+   *   defaults to 750.
+   * @returns {boolean} False if the layer is not a segmentation one.
+   */
+  highlightSegment(segmentNumber, duration) {
+    if (typeof duration === 'undefined') {
+      duration = 750;
+    }
+    // reset previous highlight
+    if (typeof this.#resetHighlight !== 'undefined') {
+      this.#resetHighlight();
+    }
+    if (!this.#viewController.isMask()) {
+      return false;
+    }
+
+    // custom highlight
+    if (typeof custom.highlightSegment !== 'undefined') {
+      this.#resetHighlight = custom.highlightSegment(
+        this, segmentNumber, duration);
+      return true;
+    }
+
+    let requestId;
+    const reset = () => {
+      cancelAnimationFrame(requestId);
+      this.#viewController.setSegmentHighlight();
+      if (this.#resetHighlight === reset) {
+        this.#resetHighlight = undefined;
+      }
+    };
+    // opacity goes from 1 to 0.2 and back to 1 over the duration
+    // (setting the highlight regenerates and redraws the layer)
+    let start;
+    const animate = (time) => {
+      if (typeof start === 'undefined') {
+        start = time;
+      }
+      const elapsed = time - start;
+      if (elapsed >= duration) {
+        reset();
+        return;
+      }
+      const dim = 0.8 * Math.sin(Math.PI * elapsed / duration);
+      this.#viewController.setSegmentHighlight(segmentNumber, 1 - dim);
+      requestId = requestAnimationFrame(animate);
+    };
+    this.#resetHighlight = reset;
+    requestId = requestAnimationFrame(animate);
+
+    return true;
   }
 
   /**
@@ -1273,6 +1343,14 @@ export class ViewLayer {
       this.#needsDataUpdate = true;
       this.draw();
     }
+  };
+
+  /**
+   * Handle segment highlight change.
+   */
+  #onSegmentHighlightChange = () => {
+    this.#needsDataUpdate = true;
+    this.draw();
   };
 
   /**

@@ -902,6 +902,31 @@ export class ViewController {
   }
 
   /**
+   * Get the segment highlight.
+   *
+   * @returns {{segmentNumber: number, opacity: number}|undefined}
+   *   The highlighted segment number and its opacity factor.
+   */
+  getSegmentHighlight() {
+    return this.#view.getSegmentHighlight();
+  }
+
+  /**
+   * Set the segment highlight: the opacity of the given segment
+   *   is multiplied by the input factor. Only one segment can be
+   *   highlighted at a time.
+   * This only has an effect on segmentation views.
+   *
+   * @param {number} [segmentNumber] The segment number,
+   *   undefined to remove the highlight.
+   * @param {number} [opacity] The opacity factor (between 0 and 1),
+   *   defaults to 1.
+   */
+  setSegmentHighlight(segmentNumber, opacity) {
+    this.#view.setSegmentHighlight(segmentNumber, opacity);
+  }
+
+  /**
    * Get the fill opacity relative to the global opacity.
    *
    * @returns {number} The fill opacity (between 0 and 1).

@@ -238,12 +238,28 @@ export class View extends EventTarget {
       return 0;
     }
 
+    let alpha = this.#getMaskAlpha(index);
+    // highlighted segment
+    if (typeof this.#segmentHighlight !== 'undefined' &&
+      value === this.#segmentHighlight.segmentNumber) {
+      alpha *= this.#segmentHighlight.opacity;
+    }
+    return alpha;
+  };
+
+  /**
+   * Get the mask alpha of a non background and visible value.
+   *
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the value in [0,255] range.
+   */
+  #getMaskAlpha(index) {
     if (this.getContourThickness() !== 0) {
       // ideally getContourDistance would be passed in by an
       // iterator, but that would require a large change to a
       // lot of components for this one edge case.
-      // (this function is only ever installed as the active alpha
-      // function when isMask() is true, so #image is a MaskImage here)
+      // (this function is only called by the mask alpha function,
+      // only installed when isMask() is true, so #image is a MaskImage here)
       const contourDistance =
         /** @type {MaskImage} */ (this.#image).getContour().getDistance(
           index,
@@ -256,7 +272,14 @@ export class View extends EventTarget {
     }
 
     return 0xff * this.getFillOpacity();
-  };
+  }
+
+  /**
+   * Highlighted segment: its number and opacity factor.
+   *
+   * @type {{segmentNumber: number, opacity: number}|undefined}
+   */
+  #segmentHighlight;
 
   /**
    * Segment view helper to handle
@@ -347,6 +370,52 @@ export class View extends EventTarget {
     this.#segmentViewHelper = helper;
 
     this.dispatchEvent(new CustomEvent('alphafuncchange'));
+  }
+
+  /**
+   * Get the segment highlight.
+   *
+   * @returns {{segmentNumber: number, opacity: number}|undefined}
+   *   The highlighted segment number and its opacity factor.
+   */
+  getSegmentHighlight() {
+    return this.#segmentHighlight;
+  }
+
+  /**
+   * Set the segment highlight: the opacity of the given segment
+   *   is multiplied by the input factor. Only one segment can be
+   *   highlighted at a time.
+   * This only has an effect on segmentation views.
+   *
+   * @param {number} [segmentNumber] The segment number,
+   *   undefined to remove the highlight.
+   * @param {number} [opacity] The opacity factor (between 0 and 1),
+   *   defaults to 1.
+   * @fires View#segmenthighlightchange
+   */
+  setSegmentHighlight(segmentNumber, opacity) {
+    if (typeof segmentNumber === 'undefined') {
+      this.#segmentHighlight = undefined;
+    } else {
+      if (typeof opacity === 'undefined') {
+        opacity = 1;
+      }
+      this.#segmentHighlight = {
+        segmentNumber,
+        opacity: Math.min(Math.max(opacity, 0), 1)
+      };
+    }
+
+    /**
+     * Segment highlight change event. Not propagated to the app
+     *   (not part of `viewEventNames`) since it can be fired at
+     *   each frame of a highlight animation.
+     *
+     * @event View#segmenthighlightchange
+     * @type {CustomEvent}
+     */
+    this.dispatchEvent(new CustomEvent('segmenthighlightchange'));
   }
 
   /**

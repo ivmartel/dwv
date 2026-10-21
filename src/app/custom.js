@@ -1,6 +1,7 @@
 /**
  * @import {WindowLevel} from '../image/windowLevel.js';
  * @import Konva from 'konva';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
  * @import {
  *   PrivateBValueRule,
  *   VolumeIdCandidate
@@ -63,6 +64,21 @@ export const custom = {
    *   before its end.
    */
   highlightAnnotation: undefined,
+
+  /**
+   * Highlight a segment of a segmentation view layer. Defaults to a
+   *   pulse dimming the segment opacity (see
+   *   `ViewController.setSegmentHighlight`). The view layer ensures
+   *   only one segment is highlighted at a time by calling the
+   *   returned reset function before a new highlight.
+   *
+   * @param {ViewLayer} viewLayer The segmentation view layer.
+   * @param {number} segmentNumber The segment number.
+   * @param {number} duration The highlight duration in milliseconds.
+   * @returns {Function|undefined} A function to reset the highlight
+   *   before its end.
+   */
+  highlightSegment: undefined,
 
   /**
    * Get the volume id from a list of dicom tags.

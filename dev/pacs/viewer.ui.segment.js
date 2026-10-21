@@ -740,6 +740,7 @@ export class SegmentationUI {
       const layers = stgCtrl.getViewLayersByDataId(dataId);
       for (const layer of layers) {
         layer.setCurrentPosition(label.centroid);
+        layer.highlightSegment(segment.number);
       }
     } else {
       logger.warn('No label for this segment');
