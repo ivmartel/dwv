@@ -443,6 +443,7 @@ export class DicomWriter {
    * Each DICOM element will be checked to see if a rule is applicable.
    * First checked by tagKey, tagName and then by groupName,
    * if nothing is found the default rule is applied.
+   * Rules are also applied to the elements of sequence items.
    *
    * @param {Record<string, WriterRule>} rules The input rules.
    * @param {boolean} [addMissingTags] If true, explicit tags that
@@ -527,11 +528,18 @@ export class DicomWriter {
   /**
    * Get the element to write according to the class rules.
    * Priority order: tagName, groupName, default.
+   * Private tags are removed if requested, whatever the rules.
+   * For sequences, rules are also applied to the item elements.
    *
    * @param {DataElement} element The element to check.
    * @returns {DataElement|null} The element to write, can be null.
    */
   getElementToWrite(element) {
+    // remove private tags if requested
+    if (this.#removePrivateTags && element.tag.isPrivate()) {
+      return null;
+    }
+
     // get group and tag string name
     const groupName = getDicomTagGroupName(element.tag);
     const tagInfo = getDicomTagInfo(element.tag);
@@ -553,8 +561,46 @@ export class DicomWriter {
       // 4. default
       rule = this.#rules.default;
     }
-    // apply action on element and return
-    return writerActions[rule.action](element, rule.value);
+    // apply action on element
+    const elementToWrite = writerActions[rule.action](element, rule.value);
+
+    // apply rules to sequence items
+    if (elementToWrite !== null &&
+      elementToWrite.vr === 'SQ' &&
+      Array.isArray(elementToWrite.value)) {
+      elementToWrite.value = elementToWrite.value.map(
+        (item) => this.#getItemToWrite(item));
+    }
+
+    return elementToWrite;
+  }
+
+  /**
+   * Get the sequence item to write according to the class rules.
+   *
+   * @param {Record<string, DataElement>} item The sequence item.
+   * @returns {Record<string, DataElement>} The item to write.
+   */
+  #getItemToWrite(item) {
+    // check data
+    if (item === null || typeof item !== 'object') {
+      return item;
+    }
+    const newItem = {};
+    for (const key of Object.keys(item)) {
+      const element = item[key];
+      element.tag = getTagFromKey(key);
+      // keep item tags as is
+      if (isItemTag(element.tag)) {
+        newItem[key] = element;
+        continue;
+      }
+      const elementToWrite = this.getElementToWrite(element);
+      if (elementToWrite !== null) {
+        newItem[key] = elementToWrite;
+      }
+    }
+    return newItem;
   }
 
   /**
@@ -934,10 +980,6 @@ export class DicomWriter {
     for (const key of keys) {
       const originalElement = dataElements[key];
       originalElement.tag = getTagFromKey(key);
-      // skip private tags if requested
-      if (this.#removePrivateTags && originalElement.tag.isPrivate()) {
-        continue;
-      }
       element = this.getElementToWrite(originalElement);
       if (element !== null &&
         !fmiglTag.equals(element.tag) &&
@@ -1144,10 +1186,6 @@ export class DicomWriter {
             subElement.tag = getTagFromKey(itemKey);
 
             if (isItemTag(subElement.tag)) {
-              continue;
-            }
-            // skip private tags if requested
-            if (this.#removePrivateTags && subElement.tag.isPrivate()) {
               continue;
             }
             // set item value

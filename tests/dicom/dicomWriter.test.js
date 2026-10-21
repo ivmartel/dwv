@@ -273,6 +273,60 @@ describe('dicom', () => {
   });
 
   /**
+   * Tests for {@link DicomWriter} rules applied to sequence items.
+   *
+   * @function module:tests/dicom~writeRulesInSequence
+   */
+  test('Write rules in sequence', () => {
+    /**
+     * Get a data element.
+     *
+     * @param {string} vr The element VR.
+     * @param {string} value The element value.
+     * @returns {DataElement} The data element.
+     */
+    const getElement = function (vr, value) {
+      const element = new DataElement(vr);
+      element.value = [value];
+      return element;
+    };
+
+    const parser = new DicomParser();
+    parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+    const elements = parser.getDicomElements();
+    // patient tags in ReferencedImageSequence item
+    const seqItem = elements['00081140'].value[0];
+    seqItem['00100010'] = getElement('PN', 'seq^PatientName');
+    seqItem['00100020'] = getElement('LO', 'seq-patient-id');
+    seqItem['00100030'] = getElement('DA', '19830101');
+
+    const rules = {
+      default: {action: 'copy', value: null},
+      '00100010': {action: 'replace', value: 'anonymise-name'},
+      PatientID: {action: 'clear', value: null},
+      Patient: {action: 'remove', value: null}
+    };
+    const writer = new DicomWriter();
+    writer.setRules(rules);
+    const newParser = new DicomParser();
+    newParser.parse(writer.getBuffer(elements));
+    const tags = newParser.getDicomElements();
+
+    // top level
+    assert.equal(tags['00100010'].value[0], 'anonymise-name', 'top name');
+    assert.notOk(tags['00100030'], 'top birth date');
+    // sequence item
+    const item = tags['00081140'].value[0];
+    assert.equal(item['00100010'].value[0], 'anonymise-name', 'seq name');
+    assert.equal(item['00100020'].value[0], '', 'seq id');
+    assert.notOk(item['00100030'], 'seq birth date');
+    // other tags are kept
+    assert.equal(item['00081155'].value[0],
+      '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
+      'seq other');
+  });
+
+  /**
    * Tests for {@link DicomWriter} anomnymisation and add tags.
    * Using remote file for CI integration.
    *
