@@ -427,6 +427,63 @@ describe('dicom', () => {
   });
 
   /**
+   * Tests for {@link DicomWriter} rule values not modified by writing.
+   *
+   * @function module:tests/dicom~writeRuleValueReuse
+   */
+  test('Write rules with sequence value reuse', () => {
+    /**
+     * Get a data element.
+     *
+     * @param {string} vr The element VR.
+     * @param {string} value The element value.
+     * @returns {DataElement} The data element.
+     */
+    const getElement = function (vr, value) {
+      const element = new DataElement(vr);
+      element.value = [value];
+      return element;
+    };
+    /**
+     * Get a code sequence item.
+     *
+     * @returns {Record<string, DataElement>} The item.
+     */
+    const getCodeItem = function () {
+      return {
+        '00080100': getElement('SH', '113100'),
+        '00080102': getElement('SH', 'DCM'),
+        '00080104': getElement('LO', 'Basic Application Confidentiality')
+      };
+    };
+    // test data has a ReferencedImageSequence (replaced)
+    // and no DeidentificationMethodCodeSequence (added)
+    const rules = {
+      default: {action: 'copy', value: null},
+      '00081140': {action: 'replace', value: getCodeItem()},
+      '00120064': {action: 'replace', value: getCodeItem()}
+    };
+    const writer = new DicomWriter();
+    writer.setRules(rules, true);
+    // write twice with the same rules
+    for (let i = 0; i < 2; ++i) {
+      const parser = new DicomParser();
+      parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+      const newParser = new DicomParser();
+      newParser.parse(writer.getBuffer(parser.getDicomElements()));
+      const tags = newParser.getDicomElements();
+      for (const key of ['00081140', '00120064']) {
+        const item = tags[key].value[0];
+        assert.equal(item['00080100'].value[0], '113100', `${key} #${i}`);
+        assert.equal(item['00080104'].value[0],
+          'Basic Application Confidentiality', `${key} meaning #${i}`);
+      }
+    }
+    // rule values are not modified
+    assert.deepEqual(rules['00120064'].value, getCodeItem(), 'rule value');
+  });
+
+  /**
    * Tests for {@link DicomWriter} rules applied to sequence items.
    *
    * @function module:tests/dicom~writeRulesInSequence

@@ -79,10 +79,41 @@ const writerActions = {
     return item;
   },
   replace(item, value) {
-    item.value = [value];
+    // clone to not modify the rule value when writing
+    item.value = [cloneRuleValue(value)];
     return item;
   }
 };
+
+/**
+ * Deep clone a writer rule value: arrays, typed arrays, data elements
+ * and plain objects (for example sequence items) are cloned,
+ * other values (strings, numbers, tags...) are returned as is.
+ *
+ * @param {any} value The value to clone.
+ * @returns {any} The cloned value.
+ */
+function cloneRuleValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(cloneRuleValue);
+  }
+  if (ArrayBuffer.isView(value) && !(value instanceof DataView)) {
+    // typed array
+    return /** @type {Uint8Array} */ (value).slice();
+  }
+  if (value instanceof DataElement ||
+    (value !== null &&
+      typeof value === 'object' &&
+      Object.getPrototypeOf(value) === Object.prototype)) {
+    const clone = value instanceof DataElement
+      ? new DataElement(value.vr) : {};
+    for (const key of Object.keys(value)) {
+      clone[key] = cloneRuleValue(value[key]);
+    }
+    return clone;
+  }
+  return value;
+}
 
 /**
  * Get simple (non official) DICOM anonymisation rules.
@@ -1208,7 +1239,8 @@ export class DicomWriter {
       const tagInfo = getDicomTagInfo(tag);
       const dataElement = new DataElement(tagInfo?.getVr());
       dataElement.tag = tag;
-      const value = this.#rules[key].value;
+      // clone to not modify the rule value when writing
+      const value = cloneRuleValue(this.#rules[key].value);
       // add element
       let size = getDataElementPrefixByteSize(dataElement.vr, isImplicit);
       size += this.#setElementValue(dataElement, [value], isImplicit);
