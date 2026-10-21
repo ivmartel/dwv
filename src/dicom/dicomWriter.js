@@ -1,7 +1,8 @@
 import {
   is32bitVLVR,
   isCharSetStringVR,
-  vrTypes
+  vrTypes,
+  tagGroups
 } from './dictionary.js';
 import {
   Tag,
@@ -91,13 +92,68 @@ const writerActions = {
 export function getDefaultAnonymisationRules() {
   return {
     default: {action: 'copy', value: null},
-    PatientName: {action: 'replace', value: 'Anonymized'}, // tag
-    'Meta Element': {action: 'copy', value: null}, // group '0002'
-    Acquisition: {action: 'copy', value: null}, // group '0018'
-    'Image Presentation': {action: 'copy', value: null}, // group '0028'
-    Procedure: {action: 'copy', value: null}, // group '0040'
-    'Pixel Data': {action: 'copy', value: null} // group '7fe0'
+    '00100010': {action: 'replace', value: 'Anonymized'} // PatientName
   };
+}
+
+/**
+ * Translate writer rules indexed by tag or group name into
+ * rules indexed by tag or group key, as expected by the writer.
+ * A group name is translated into all the groups that have it
+ * (for example 'Curve' gives '5000', '5002'...).
+ * Warning: group names are not defined by the DICOM standard, they come
+ * from the GDCM group name list (see `tagGroups`), which does not cover
+ * all groups. Prefer group keys.
+ * Rules already indexed by key (or `default`) are kept as is and
+ * take precedence over translated ones. Unknown names are dropped.
+ *
+ * @param {Record<string, WriterRule>} rules The name based rules.
+ * @returns {Record<string, WriterRule>} The key based rules.
+ */
+export function translateWriterRules(rules) {
+  /** @type {Record<string, WriterRule>} */
+  const translated = {};
+  /** @type {Record<string, WriterRule>} */
+  const keyRules = {};
+  for (const name of Object.keys(rules)) {
+    const rule = rules[name];
+    if (name === 'default') {
+      keyRules[name] = rule;
+      continue;
+    }
+    if (isWriterRuleKey(name)) {
+      keyRules[name.toUpperCase()] = rule;
+      continue;
+    }
+    // tag name
+    const tag = getTagFromDictionary(name);
+    if (typeof tag !== 'undefined') {
+      translated[tag.getKey()] = rule;
+      continue;
+    }
+    // group name
+    const groups = Object.keys(tagGroups).filter(
+      (group) => tagGroups[group] === name);
+    if (groups.length !== 0) {
+      for (const group of groups) {
+        translated[group] = rule;
+      }
+      continue;
+    }
+    logger.warn(`Cannot translate unknown writer rule name: ${name}`);
+  }
+  return {...translated, ...keyRules};
+}
+
+/**
+ * Check if a writer rule index is a tag key ('########')
+ *   or a group key ('####').
+ *
+ * @param {string} key The rule index.
+ * @returns {boolean} True if the index is a tag or group key.
+ */
+function isWriterRuleKey(key) {
+  return /^([0-9A-F]{4}){1,2}$/i.test(key);
 }
 
 /**
@@ -460,11 +516,12 @@ export class DicomWriter {
   /**
    * Set the writing rules.
    * List of writer rules indexed by either `default`,
-   *   tagKey, tagName or groupName.
+   *   tag key (for example '00100010') or group key (for example '0010').
    * Each DICOM element will be checked to see if a rule is applicable.
-   * First checked by tagKey, tagName and then by groupName,
+   * First checked by tag key and then by group key,
    * if nothing is found the default rule is applied.
    * Rules are also applied to the elements of sequence items.
+   * Use `translateWriterRules` to convert tag or group name based rules.
    *
    * @param {Record<string, WriterRule>} rules The input rules.
    * @param {boolean} [addMissingTags] If true, explicit tags that
@@ -473,6 +530,15 @@ export class DicomWriter {
    */
   setRules(rules, addMissingTags) {
     this.#rules = rules;
+
+    // warn about rules that will never apply
+    const nonKeyIndices = Object.keys(rules).filter(
+      (key) => key !== 'default' && !isWriterRuleKey(key));
+    if (nonKeyIndices.length !== 0) {
+      logger.warn(`Writer rules not indexed by tag or group key: ${
+        nonKeyIndices.join(', ')} (they will be ignored, ` +
+        'use translateWriterRules for name based rules)');
+    }
 
     // default compulsory list is empty
     this.#compulsoryTags = [];
@@ -485,27 +551,12 @@ export class DicomWriter {
         if (rule.action === 'replace' &&
           typeof rule.value !== 'undefined' &&
           rule.value !== null) {
-          // check if key really exists
-          let isKey = false;
-          if (key.length === 8) {
-            const tag = getTagFromKey(key);
-            const tagInfo = getDicomTagInfo(tag);
-            isKey = typeof tagInfo?.getName() !== 'undefined';
-          }
-          // get tag key, rules can use key or tag name
-          let tagKey;
-          if (isKey) {
-            tagKey = key;
-          } else {
-            // try tag name
-            const tag = getTagFromDictionary(key);
-            if (typeof tag !== 'undefined') {
-              tagKey = tag.getKey();
+          // only add tags that are in the dictionary
+          if (key.length === 8 && isWriterRuleKey(key)) {
+            const tagInfo = getDicomTagInfo(getTagFromKey(key));
+            if (typeof tagInfo !== 'undefined') {
+              this.#compulsoryTags.push(key);
             }
-          }
-          // add to list
-          if (typeof tagKey !== 'undefined') {
-            this.#compulsoryTags.push(tagKey);
           }
         }
       }
@@ -548,7 +599,7 @@ export class DicomWriter {
 
   /**
    * Get the element to write according to the class rules.
-   * Priority order: tagName, groupName, default.
+   * Priority order: tag key, group key, default.
    * Non whitelisted private tags are removed if a whitelist
    * is set, whatever the rules.
    * For sequences, rules are also applied to the item elements.
@@ -564,25 +615,15 @@ export class DicomWriter {
       return null;
     }
 
-    // get group and tag string name
-    const groupName = getDicomTagGroupName(element.tag);
-    const tagInfo = getDicomTagInfo(element.tag);
-    const tagName = tagInfo?.getName();
-
     // apply rules:
-    let rule;
-    if (typeof this.#rules[element.tag.getKey()] !== 'undefined') {
-      // 1. tag itself
-      rule = this.#rules[element.tag.getKey()];
-    } else if (typeof tagName !== 'undefined' &&
-      typeof this.#rules[tagName] !== 'undefined') {
-      // 2. tag name
-      rule = this.#rules[tagName];
-    } else if (typeof this.#rules[groupName] !== 'undefined') {
-      // 3. group name
-      rule = this.#rules[groupName];
-    } else {
-      // 4. default
+    // 1. tag
+    let rule = this.#rules[element.tag.getKey()];
+    if (typeof rule === 'undefined') {
+      // 2. group
+      rule = this.#rules[element.tag.getGroup()];
+    }
+    if (typeof rule === 'undefined') {
+      // 3. default
       rule = this.#rules.default;
     }
     // apply action on element
@@ -1065,14 +1106,7 @@ export class DicomWriter {
       const tagInfo = getDicomTagInfo(tag);
       const dataElement = new DataElement(tagInfo?.getVr());
       dataElement.tag = tag;
-      // rules are indexed by key or tag name
-      let value;
-      if (typeof this.#rules[key] !== 'undefined') {
-        value = this.#rules[key].value;
-      } else {
-        const name = tagInfo?.getName();
-        value = this.#rules[name].value;
-      }
+      const value = this.#rules[key].value;
       // add element
       let size = getDataElementPrefixByteSize(dataElement.vr, isImplicit);
       size += this.#setElementValue(dataElement, [value], isImplicit);

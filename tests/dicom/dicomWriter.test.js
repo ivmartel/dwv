@@ -4,7 +4,8 @@ import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
 import {
   DicomWriter,
-  getUID
+  getUID,
+  translateWriterRules
 } from '../../src/dicom/dicomWriter.js';
 import {
   getTagFromDictionary,
@@ -137,7 +138,7 @@ describe('dicom', () => {
 
       const patientsNameAnonymised = 'anonymise-name';
       const patientsIdAnonymised = 'anonymise-id';
-      // rules with different levels: full tag, tag name and group name
+      // rules with different levels: tag key and group key
       const rules = {
         default: {
           action: 'copy', value: null
@@ -145,10 +146,10 @@ describe('dicom', () => {
         '00100010': {
           action: 'replace', value: patientsNameAnonymised
         },
-        PatientID: {
+        '00100020': {
           action: 'replace', value: patientsIdAnonymised
         },
-        Patient: {
+        '0010': {
           action: 'remove', value: null
         }
       };
@@ -288,6 +289,88 @@ describe('dicom', () => {
   });
 
   /**
+   * Tests for {@link DicomWriter} setRules warning for name based rules.
+   *
+   * @function module:tests/dicom~setRulesNameWarning
+   */
+  test('setRules name based rules warning', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const writer = new DicomWriter();
+    // key based rules: no warning
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      '00100010': {action: 'remove', value: null},
+      '0010': {action: 'remove', value: null}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 0, 'no warning');
+    // name based rules: warning
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      PatientName: {action: 'remove', value: null},
+      Patient: {action: 'remove', value: null}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 1, 'one warning');
+    assert.include(consoleSpy.mock.calls[0][0], 'PatientName, Patient');
+    consoleSpy.mockRestore();
+  });
+
+  /**
+   * Tests for {@link translateWriterRules}.
+   *
+   * @function module:tests/dicom~translateWriterRules
+   */
+  test('translateWriterRules', () => {
+    const copy = {action: 'copy', value: null};
+    const remove = {action: 'remove', value: null};
+    const clear = {action: 'clear', value: null};
+    const replace = {action: 'replace', value: 'name'};
+    const rules = translateWriterRules({
+      default: remove,
+      // tag name
+      PatientName: replace,
+      // tag name and key for the same tag: key wins
+      PatientID: replace,
+      '00100020': clear,
+      // group name
+      'Meta Element': copy,
+      // group name with multiple groups
+      Curve: remove,
+      // group name and key for the same group: key wins
+      Patient: remove,
+      '0010': copy,
+      // lower case key
+      '7fe00010': copy,
+      // unknown name
+      NotATagName: copy
+    });
+    const expected = {
+      default: remove,
+      '00100010': replace,
+      '00100020': clear,
+      '0002': copy,
+      5000: remove,
+      5002: remove,
+      5004: remove,
+      5006: remove,
+      5008: remove,
+      '500A': remove,
+      '500C': remove,
+      '500E': remove,
+      5010: remove,
+      5012: remove,
+      5014: remove,
+      5016: remove,
+      5018: remove,
+      '501A': remove,
+      '501C': remove,
+      '501E': remove,
+      '0010': copy,
+      '7FE00010': copy
+    };
+    assert.deepEqual(rules, expected);
+  });
+
+  /**
    * Tests for {@link DicomWriter} rules applied to sequence items.
    *
    * @function module:tests/dicom~writeRulesInSequence
@@ -318,8 +401,8 @@ describe('dicom', () => {
     const rules = {
       default: {action: 'copy', value: null},
       '00100010': {action: 'replace', value: 'anonymise-name'},
-      PatientID: {action: 'clear', value: null},
-      Patient: {action: 'remove', value: null}
+      '00100020': {action: 'clear', value: null},
+      '0010': {action: 'remove', value: null}
     };
     const writer = new DicomWriter();
     writer.setRules(rules);
@@ -358,7 +441,7 @@ describe('dicom', () => {
       const patientsName = 'dwv^PatientName';
       const patientComments = '';
       const issuerOfPatientID = 'dwv.org';
-      // rule with tagKey, tagName and non existing tag
+      // rule with tag keys and non existing tag
       const rules = {
         default: {
           action: 'copy', value: null
@@ -366,10 +449,12 @@ describe('dicom', () => {
         '00104000': {
           action: 'replace', value: patientComments
         },
-        IssuerOfPatientID: {
+        // IssuerOfPatientID
+        '00100021': {
           action: 'replace', value: issuerOfPatientID
         },
-        PatientBirthDateInAlternativeCalendar: {
+        // PatientBirthDateInAlternativeCalendar
+        '00100033': {
           action: 'replace', value: null
         },
         BADKEY00: {
@@ -562,7 +647,7 @@ describe('dicom', () => {
     result.tags.ReferringPhysicianIdentificationSequence = '';
 
     return {
-      rules: {
+      rules: translateWriterRules({
         default: {
           action: 'copy', value: null
         },
@@ -582,7 +667,7 @@ describe('dicom', () => {
           action: 'replace',
           value: result.tags.ReferringPhysicianIdentificationSequence
         }
-      },
+      }),
       result
     };
   }

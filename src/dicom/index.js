@@ -8,6 +8,7 @@ import {
 } from './dicomParser.js';
 import {
   getUID,
+  translateWriterRules,
   DicomWriter,
   WriterRule
 } from './dicomWriter.js';
@@ -86,6 +87,7 @@ export {
   getManufacturer,
   getNormalisedManufacturer,
   hasDicomPrefix,
+  translateWriterRules,
   defaultPrivateBValueRules,
   defaultVolumeIdCandidates,
 };

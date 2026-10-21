@@ -1,6 +1,9 @@
 import {logger} from '../../../src/utils/logger.js';
 import {DicomParser} from '../../../src/dicom/dicomParser.js';
-import {DicomWriter} from '../../../src/dicom/dicomWriter.js';
+import {
+  DicomWriter,
+  translateWriterRules
+} from '../../../src/dicom/dicomWriter.js';
 
 // global vars
 // rules file
@@ -54,10 +57,11 @@ function generate() {
     return;
   }
   // create writer with textarea rules
+  // (translated since they can use tag or group names)
   const writer = new DicomWriter();
   const addMissingTags = true;
   writer.setRules(
-    JSON.parse(document.getElementById('rules').value),
+    translateWriterRules(JSON.parse(document.getElementById('rules').value)),
     addMissingTags);
   let dicomBuffer = null;
   try {
