@@ -586,6 +586,7 @@ export class DicomWriter {
     if (item === null || typeof item !== 'object') {
       return item;
     }
+    /** @type {Record<string, DataElement>} */
     const newItem = {};
     for (const key of Object.keys(item)) {
       const element = item[key];
