@@ -14,6 +14,7 @@ export class Annotation {
     addMetaItem(concept: DicomCode, value: DicomCode | string): void;
     canView(): boolean;
     colour: string;
+    contains(point: Point2D, tolerance?: number): boolean;
     getCentroid(): Point | undefined;
     getFactory(): object | undefined;
     getMetaConceptIds(): string[];
@@ -243,6 +244,7 @@ export class ChangeSegmentColourCommand extends Command {
 // @public
 export class Circle {
     constructor(centre: Point2D, radius: number);
+    contains(point: Point2D, tolerance?: number): boolean;
     equals(rhs: Circle): boolean;
     getCenter(): Point2D;
     getCentroid(): Point2D;
@@ -278,6 +280,10 @@ export namespace custom {
     privateBValueRules: PrivateBValueRule[];
     let // (undocumented)
     openRoiDialog: any;
+    let // (undocumented)
+    highlightAnnotation: any;
+    let // (undocumented)
+    highlightSegment: any;
     let // (undocumented)
     getVolumeIdTagValue: any;
     let // (undocumented)
@@ -418,7 +424,7 @@ export class DicomWriter {
     getBuffer(dataElements: Record<string, DataElement>): ArrayBuffer;
     getElementToWrite(element: DataElement): DataElement | null;
     setFixUnknownVR(flag: boolean): void;
-    setRemovePrivateTags(flag: boolean): void;
+    setPrivateTagsWhitelist(keys: string[] | undefined): void;
     setRules(rules: Record<string, WriterRule>, addMissingTags?: boolean): void;
     setUseUnVrForPrivateSq(flag: boolean): void;
     useSpecialTextEncoder(): void;
@@ -480,6 +486,7 @@ export class DrawLayer {
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
+    getAnnotationAt(planePoint: Point2D, tolerance?: number): Annotation | undefined;
     getBaseSize(): Scalar2D;
     getDataId(): string;
     getDrawController(): DrawController;
@@ -489,6 +496,7 @@ export class DrawLayer {
     getNumberOfDraws(): number | undefined;
     getOpacity(): number;
     getReferenceLayerId(): string;
+    highlightAnnotation(id: string, duration?: number): boolean;
     initialise(size: Scalar2D, spacing: Scalar2D, refLayerId: string): void;
     initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
     isAnnotationVisible(id: string): boolean;
@@ -525,6 +533,7 @@ export class DrawShapeHandler extends EventTarget {
 // @public
 export class Ellipse {
     constructor(centre: Point2D, a: number, b: number);
+    contains(point: Point2D, tolerance?: number): boolean;
     equals(rhs: Ellipse): boolean;
     getA(): number;
     getB(): number;
@@ -538,6 +547,9 @@ export class Ellipse {
 
 // @public
 export function equalWl(wl0: WindowLevel, wl1: WindowLevel): boolean;
+
+// @public
+export type FloatTypedArray = Float32Array | Float64Array;
 
 // @public
 export class Geometry {
@@ -647,7 +659,7 @@ export function getTagFromKey(key: string): Tag;
 export function getTouchPoints(event: TouchEvent): Point2D[];
 
 // @public
-export function getTypedArray(bitsAllocated: number, pixelRepresentation: number, size: number): Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array;
+export function getTypedArray(bitsAllocated: number, pixelRepresentation: number, size: number): IntTypedArray;
 
 // @public
 export function getUID(tagName: string): string;
@@ -666,14 +678,12 @@ export function hexToRgb(hexStr: string): RGB;
 
 // @public
 export class Histogram {
-    add(rawValue: number, rsi: RescaleSlopeAndIntercept): void;
-    getCountInRescaledRange(min?: number, max?: number): number;
+    add(value: number, count?: number): void;
+    getCountInRange(min?: number, max?: number): number;
     // Warning: (ae-forgotten-export) The symbol "HistogramEntry" needs to be exported by the entry point index.d.ts
     getEntries(): HistogramEntry[];
     getIntervalPercentages(thresholds: number[]): number[];
     getRange(): NumberRange | undefined;
-    getRawCounts(rsi: RescaleSlopeAndIntercept): Map<number, number>;
-    getRescaledRange(): NumberRange | undefined;
     // Warning: (ae-forgotten-export) The symbol "Statistics" needs to be exported by the entry point index.d.ts
     getStats(): Statistics | undefined;
     getTotal(): number;
@@ -686,7 +696,7 @@ export namespace i18n {
 
 // @public
 class Image_2 extends EventTarget {
-    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: string[]);
+    constructor(geometry: Geometry, buffer: TypedArray, imageUids?: string[]);
     appendFrame(time: number, origin: Point3D): void;
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
     appendSlice(rhs: Image_2): void;
@@ -701,14 +711,14 @@ class Image_2 extends EventTarget {
     compose(rhs: Image_2, operator: Function): Image_2;
     containsImageUids(uids: string[]): boolean;
     convolute2D(weights: number[]): Image_2;
-    convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
-    getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
+    convoluteBuffer(weights: number[], buffer: TypedArray, startOffset: number): void;
+    getBuffer(): TypedArray;
     getComplete(): boolean;
     getDataRange(): NumberRange;
     getGeometry(): Geometry;
     // @deprecated
     getHasOverlap(): boolean;
-    getHistogram(): Histogram;
+    getHistogram(): ImageHistogram;
     getImageUid(index?: Index): string;
     getInitialIndex(): Index;
     getMeta(): Record<string, any>;
@@ -734,7 +744,7 @@ class Image_2 extends EventTarget {
     isMask(): boolean;
     isMonochrome(): boolean;
     isResampled(): boolean;
-    replaceBuffer(newBuffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
+    replaceBuffer(newBuffer: TypedArray): void;
     resample(orientation: Matrix33, interpolated?: boolean | undefined, centerOfRotation?: Point | undefined): void;
     revert(): void;
     setComplete(flag: boolean): void;
@@ -759,6 +769,20 @@ export class ImageContour {
 }
 
 // @public
+export class ImageHistogram {
+    constructor(unit?: string);
+    add(rawValue: number, rsi: RescaleSlopeAndIntercept): void;
+    getHistogram(rsi: RescaleSlopeAndIntercept): Histogram;
+    getIntervalPercentages(thresholds: number[]): number[];
+    getRange(): NumberRange | undefined;
+    getRescaledHistogram(): Histogram;
+    getRescaledRange(): NumberRange | undefined;
+    getStats(): Statistics | undefined;
+    getTotal(): number;
+    getUnit(): string | undefined;
+}
+
+// @public
 export class Index {
     constructor(values: number[]);
     add(rhs: Index): Index;
@@ -780,6 +804,8 @@ export class InfoData extends EventTarget {
     addAppListeners(): void;
     addItemMeta(data: Record<string, DataElement>): void;
     isListening(): boolean;
+    onPositionChange: (event: CustomEvent) => void;
+    // @deprecated
     onSliceChange: (event: CustomEvent) => void;
     removeAppListeners(): void;
     reset(): void;
@@ -794,6 +820,9 @@ export class InfoDataItem {
     tags: string[] | undefined;
     value: string;
 }
+
+// @public
+export type IntTypedArray = (Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array);
 
 // @public
 export function isEqualRgb(c1: RGB, c2: RGB): boolean;
@@ -921,16 +950,17 @@ export class MaskImage extends Image_2 {
     getContour(): ImageContour;
     getHistogramBySegment(image: Image_2, segmentId: string): {
         volume: number;
-        histogram: Histogram;
+        histogram: ImageHistogram;
         labelHistograms?: {
             label: Label;
-            histogram: Histogram;
+            histogram: ImageHistogram;
         }[];
     }[];
     getLabels(): Label[] | undefined;
     getMaskReferencedSeriesUID(): string | undefined;
     getOffsets(value: number | RGB): number[];
     getSegmentCollection(): SegmentCollection;
+    getSegmentNumbersAtIndex(index: Index): number[];
     initializeContour(): void;
     recalculateLabels(): void;
     setAtOffsets(offsets: number[], value: number | RGB): void;
@@ -1002,7 +1032,7 @@ export class Matrix33 {
     multiplyArray3D(array3D: number[]): number[];
     multiplyIndex3D(index3D: Index): Index;
     multiplyPoint3D(point3D: Point3D): Point3D;
-    multiplyTypedArray3D(sourceArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, outArray: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
+    multiplyTypedArray3D(sourceArray: TypedArray, outArray: TypedArray): void;
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
 }
@@ -1092,6 +1122,7 @@ export class Point {
 // @public
 export class Point2D {
     constructor(x: number, y: number);
+    contains(point: Point2D, tolerance?: number): boolean;
     equals(rhs: Point2D): boolean;
     getCentroid(): Point2D;
     getDistance(point2D: Point2D): number;
@@ -1154,6 +1185,7 @@ export type PrivateBValueRule = {
 // @public
 export class Protractor {
     constructor(points: Point2D[]);
+    contains(point: Point2D, tolerance?: number): boolean;
     getCentroid(): Point2D;
     getLength(): number;
     getPoint(index: number): Point2D | undefined;
@@ -1163,6 +1195,7 @@ export class Protractor {
 // @public
 export class Rectangle {
     constructor(begin: Point2D, end: Point2D);
+    contains(point: Point2D, tolerance?: number): boolean;
     equals(rhs: Rectangle): boolean;
     getBegin(): Point2D;
     getCentroid(): Point2D;
@@ -1209,6 +1242,7 @@ export class ROI {
     constructor(points?: Point2D[]);
     addPoint(point: Point2D): void;
     addPoints(rhs: Point2D[]): void;
+    contains(point: Point2D, tolerance?: number): boolean;
     getCentroid(): Point2D | undefined;
     getLength(): number;
     getPoint(index: number): Point2D | undefined;
@@ -1431,6 +1465,12 @@ export const toolList: Record<string, any>;
 export const toolOptions: Record<string, Record<string, any>>;
 
 // @public
+export function translateWriterRules(rules: Record<string, WriterRule>): Record<string, WriterRule>;
+
+// @public
+export type TypedArray = IntTypedArray | FloatTypedArray;
+
+// @public
 export class UndoController extends EventTarget {
     addToUndoStack: (cmd: object) => void;
     getCurrentStackIndex(): number;
@@ -1474,6 +1514,10 @@ export class View extends EventTarget {
     getOriginForImageUid(uid: string): Point3D | undefined;
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
     getScrollDimIndex(): number;
+    getSegmentHighlight(): {
+        segmentNumber: number;
+        opacity: number;
+    } | undefined;
     getWindowLevel(): WindowLevel;
     getWindowLevelMinMax(): WindowLevel;
     getWindowPresets(): Record<string, WindowPreset>;
@@ -1491,6 +1535,7 @@ export class View extends EventTarget {
     setImage(image: Image_2): void;
     setMaskViewHelper(helper: MaskSegmentViewHelper): void;
     setOrientation(mat33: Matrix33): void;
+    setSegmentHighlight(segmentNumber?: number, opacity?: number): void;
     setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
     setWindowLevelMinMax(): void;
     setWindowLevelPreset(name: string, silent?: boolean): void;
@@ -1555,6 +1600,11 @@ export class ViewController {
     getPositionHelper(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollDimIndex(): number;
+    getSegmentHighlight(): {
+        segmentNumber: number;
+        opacity: number;
+    } | undefined;
+    getSegmentNumbersAtPosition(position: Point): number[];
     getSopClassUid(): string | undefined;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];
@@ -1576,6 +1626,7 @@ export class ViewController {
     setFillOpacity(opacity: number): void;
     setImage(img: Image_2): void;
     setMaskViewHelper(helper: MaskSegmentViewHelper): void;
+    setSegmentHighlight(segmentNumber?: number, opacity?: number): void;
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setWindowLevel(wl: WindowLevel): void;
     setWindowLevelPreset(name: string): void;
@@ -1616,6 +1667,7 @@ export class ViewLayer {
     getOpacity(): number;
     getScale(): Scalar2D;
     getViewController(): ViewController;
+    highlightSegment(segmentNumber: number, duration?: number): boolean;
     initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
     initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
     isValidPosition(): boolean;
@@ -1673,6 +1725,18 @@ export class WriterRule {
     constructor(action: string);
     action: string;
     value: any | undefined;
+}
+
+// @public (undocumented)
+export namespace WriterRuleActions {
+    let // (undocumented)
+    copy: string;
+    let // (undocumented)
+    remove: string;
+    let // (undocumented)
+    clear: string;
+    let // (undocumented)
+    replace: string;
 }
 
 // (No @packageDocumentation comment for this package)
