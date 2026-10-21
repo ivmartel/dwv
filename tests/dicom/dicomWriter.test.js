@@ -256,9 +256,9 @@ describe('dicom', () => {
     assert.equal(tags['00081140'].value[0]['00111001'].value[0],
       'private-seq', 'seq #0');
 
-    // remove private tags
+    // remove private tags: empty whitelist
     const writer = new DicomWriter();
-    writer.setRemovePrivateTags(true);
+    writer.setPrivateTagsWhitelist([]);
     tags = writeAndParse(writer);
     assert.notOk(tags['00090010'], 'top creator #1');
     assert.notOk(tags['00091001'], 'top #1');
@@ -270,6 +270,21 @@ describe('dicom', () => {
       '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
       'seq public #1');
     assert.equal(tags['00100010'].value[0], 'dwv^PatientName', 'public #1');
+
+    // remove private tags except whitelisted ones (and their creator)
+    const writer2 = new DicomWriter();
+    writer2.setPrivateTagsWhitelist(['00111001']);
+    tags = writeAndParse(writer2);
+    assert.notOk(tags['00090010'], 'top creator #2');
+    assert.notOk(tags['00091001'], 'top #2');
+    const item2 = tags['00081140'].value[0];
+    assert.equal(item2['00110010'].value[0], 'DWV_TEST', 'seq creator #2');
+    assert.equal(item2['00111001'].value[0], 'private-seq', 'seq #2');
+
+    // undefined whitelist: back to keeping all private tags
+    writer2.setPrivateTagsWhitelist(undefined);
+    tags = writeAndParse(writer2);
+    assert.equal(tags['00091001'].value[0], 'private-top', 'top #3');
   });
 
   /**

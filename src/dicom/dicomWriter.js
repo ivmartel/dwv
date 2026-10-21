@@ -361,14 +361,14 @@ export class DicomWriter {
   #fixUnknownVR = true;
 
   /**
-   * Flag to remove private tags (odd group number), including
-   * the ones in sequence items. Default to false. Overrides
-   * writing rules, if set to true a private tag is removed
-   * even if a rule says copy or replace for it.
+   * Keys of the private tags (odd group number) to write, including
+   * their private creators. If undefined (default), all private
+   * tags are written. If defined, all other private tags are removed,
+   * including the ones in sequence items, whatever the writing rules.
    *
-   * @type {boolean}
+   * @type {Set<string>|undefined}
    */
-  #removePrivateTags = false;
+  #privateTagsWhitelist;
 
   /**
    * Default rules: just copy.
@@ -426,14 +426,35 @@ export class DicomWriter {
   }
 
   /**
-   * Set the remove private tags flag. If true, private tags
-   * (odd group number) are not written, including the ones
-   * in sequence items. Takes precedence over the writing rules.
+   * Set the list of private tags (odd group number) to write.
+   * All other private tags are not written, including the ones
+   * in sequence items. Takes precedence over the writing rules,
+   * whitelisted tags still go through them.
+   * The private creator of each whitelisted tag is also kept:
+   * for example, whitelisting '0019100C' also keeps '00190010'.
+   * Use an empty list to remove all private tags and undefined
+   * to keep them all (default).
    *
-   * @param {boolean} flag True to remove private tags.
+   * @param {string[]|undefined} keys The list of private tag keys
+   *   (as '########').
    */
-  setRemovePrivateTags(flag) {
-    this.#removePrivateTags = flag;
+  setPrivateTagsWhitelist(keys) {
+    if (typeof keys === 'undefined') {
+      this.#privateTagsWhitelist = undefined;
+      return;
+    }
+    this.#privateTagsWhitelist = new Set();
+    for (const key of keys) {
+      this.#privateTagsWhitelist.add(key);
+      // private data elements (gggg,xxee) with xx in [10,FF]
+      // are reserved by the private creator (gggg,00xx)
+      const tag = getTagFromKey(key);
+      const element = tag.getElement();
+      if (parseInt(element, 16) >= 0x1000) {
+        this.#privateTagsWhitelist.add(
+          `${tag.getGroup()}00${element.substring(0, 2)}`);
+      }
+    }
   }
 
   /**
@@ -528,15 +549,18 @@ export class DicomWriter {
   /**
    * Get the element to write according to the class rules.
    * Priority order: tagName, groupName, default.
-   * Private tags are removed if requested, whatever the rules.
+   * Non whitelisted private tags are removed if a whitelist
+   * is set, whatever the rules.
    * For sequences, rules are also applied to the item elements.
    *
    * @param {DataElement} element The element to check.
    * @returns {DataElement|null} The element to write, can be null.
    */
   getElementToWrite(element) {
-    // remove private tags if requested
-    if (this.#removePrivateTags && element.tag.isPrivate()) {
+    // remove non whitelisted private tags
+    if (typeof this.#privateTagsWhitelist !== 'undefined' &&
+      element.tag.isPrivate() &&
+      !this.#privateTagsWhitelist.has(element.tag.getKey())) {
       return null;
     }
 
