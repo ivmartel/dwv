@@ -122,7 +122,7 @@ export function translateWriterRules(rules) {
       continue;
     }
     if (isWriterRuleKey(name)) {
-      keyRules[name.toUpperCase()] = rule;
+      keyRules[normaliseWriterRuleKey(name)] = rule;
       continue;
     }
     // tag name
@@ -147,13 +147,81 @@ export function translateWriterRules(rules) {
 
 /**
  * Check if a writer rule index is a tag key ('########')
- *   or a group key ('####').
+ *   or a group key ('####'), possibly a range using 'x'
+ *   as any hex digit (for example '60xx3000').
  *
  * @param {string} key The rule index.
  * @returns {boolean} True if the index is a tag or group key.
  */
 function isWriterRuleKey(key) {
-  return /^([0-9A-F]{4}){1,2}$/i.test(key);
+  return /^([0-9A-FX]{4}){1,2}$/i.test(key);
+}
+
+/**
+ * Normalise a writer rule key: upper case hex digits
+ *   and lower case 'x'.
+ *
+ * @param {string} key The rule key.
+ * @returns {string} The normalised key.
+ */
+function normaliseWriterRuleKey(key) {
+  return key.toUpperCase().replaceAll('X', 'x');
+}
+
+/**
+ * Check if a writer rule key is a range (contains 'x').
+ *
+ * @param {string} key The rule key.
+ * @returns {boolean} True if the key is a range.
+ */
+function isWriterRuleRange(key) {
+  return key.toLowerCase().includes('x');
+}
+
+/**
+ * Writer range rule.
+ *
+ * @typedef {object} WriterRangeRule
+ * @property {string} range The normalised range key.
+ * @property {WriterRule} rule The rule.
+ */
+
+/**
+ * Get the range rules of a given key length, sorted by specificity:
+ *   the ones with less 'x' first.
+ *
+ * @param {Record<string, WriterRule>} rules The rules.
+ * @param {number} length The key length: 8 for tags, 4 for groups.
+ * @returns {WriterRangeRule[]} The sorted range rules.
+ */
+function getWriterRangeRules(rules, length) {
+  const countX = (str) => str.split('x').length - 1;
+  return Object.keys(rules)
+    .filter((key) => key.length === length &&
+      isWriterRuleKey(key) &&
+      isWriterRuleRange(key))
+    .map((key) => ({range: normaliseWriterRuleKey(key), rule: rules[key]}))
+    // stable sort: keeps input order for same specificity
+    .sort((a, b) => countX(a.range) - countX(b.range));
+}
+
+/**
+ * Find the first range rule matching a key.
+ *
+ * @param {WriterRangeRule[]} rangeRules The sorted range rules.
+ * @param {string} key The tag or group key.
+ * @returns {WriterRule|undefined} The matching rule if found.
+ */
+function findWriterRangeRule(rangeRules, key) {
+  const match = (range) => {
+    for (let i = 0; i < range.length; ++i) {
+      if (range[i] !== 'x' && range[i] !== key[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+  return rangeRules.find((item) => match(item.range))?.rule;
 }
 
 /**
@@ -443,6 +511,20 @@ export class DicomWriter {
   #rules = this.#defaultRules;
 
   /**
+   * Tag range rules (for example '60xx3000'), sorted by specificity.
+   *
+   * @type {WriterRangeRule[]}
+   */
+  #tagRangeRules = [];
+
+  /**
+   * Group range rules (for example '60xx'), sorted by specificity.
+   *
+   * @type {WriterRangeRule[]}
+   */
+  #groupRangeRules = [];
+
+  /**
    * List of compulsory tags keys.
    *
    * @type {string[]}
@@ -517,9 +599,15 @@ export class DicomWriter {
    * Set the writing rules.
    * List of writer rules indexed by either `default`,
    *   tag key (for example '00100010') or group key (for example '0010').
+   * Keys can be ranges using 'x' as any hex digit, as in the DICOM
+   *   standard repeating groups notation: for example '60xx3000'
+   *   (tag range) or '50xx' (group range). Note that 'x' matches any
+   *   hex digit: '60xx' also matches odd (private) groups.
    * Each DICOM element will be checked to see if a rule is applicable.
-   * First checked by tag key and then by group key,
-   * if nothing is found the default rule is applied.
+   * First checked by tag key, tag range, group key and then group range,
+   * if nothing is found the default rule is applied. If several ranges
+   * match, the most specific one (with less 'x') is used, and, for same
+   * specificity, the first one in the rules order.
    * Rules are also applied to the elements of sequence items.
    * Use `translateWriterRules` to convert tag or group name based rules.
    *
@@ -530,6 +618,8 @@ export class DicomWriter {
    */
   setRules(rules, addMissingTags) {
     this.#rules = rules;
+    this.#tagRangeRules = getWriterRangeRules(rules, 8);
+    this.#groupRangeRules = getWriterRangeRules(rules, 4);
 
     // warn about rules that will never apply
     const nonKeyIndices = Object.keys(rules).filter(
@@ -552,7 +642,9 @@ export class DicomWriter {
           typeof rule.value !== 'undefined' &&
           rule.value !== null) {
           // only add tags that are in the dictionary
-          if (key.length === 8 && isWriterRuleKey(key)) {
+          if (key.length === 8 &&
+            isWriterRuleKey(key) &&
+            !isWriterRuleRange(key)) {
             const tagInfo = getDicomTagInfo(getTagFromKey(key));
             if (typeof tagInfo !== 'undefined') {
               this.#compulsoryTags.push(key);
@@ -599,7 +691,7 @@ export class DicomWriter {
 
   /**
    * Get the element to write according to the class rules.
-   * Priority order: tag key, group key, default.
+   * Priority order: tag key, tag range, group key, group range, default.
    * Non whitelisted private tags are removed if a whitelist
    * is set, whatever the rules.
    * For sequences, rules are also applied to the item elements.
@@ -616,14 +708,24 @@ export class DicomWriter {
     }
 
     // apply rules:
+    const key = element.tag.getKey();
+    const group = element.tag.getGroup();
     // 1. tag
-    let rule = this.#rules[element.tag.getKey()];
+    let rule = this.#rules[key];
     if (typeof rule === 'undefined') {
-      // 2. group
-      rule = this.#rules[element.tag.getGroup()];
+      // 2. tag range
+      rule = findWriterRangeRule(this.#tagRangeRules, key);
     }
     if (typeof rule === 'undefined') {
-      // 3. default
+      // 3. group
+      rule = this.#rules[group];
+    }
+    if (typeof rule === 'undefined') {
+      // 4. group range
+      rule = findWriterRangeRule(this.#groupRangeRules, group);
+    }
+    if (typeof rule === 'undefined') {
+      // 5. default
       rule = this.#rules.default;
     }
     // apply action on element

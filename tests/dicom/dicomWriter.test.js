@@ -2,6 +2,7 @@
 import {describe, test, assert, vi} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
+import {getTagFromKey} from '../../src/dicom/dicomTag.js';
 import {
   DicomWriter,
   getUID,
@@ -312,6 +313,61 @@ describe('dicom', () => {
     assert.equal(consoleSpy.mock.calls.length, 1, 'one warning');
     assert.include(consoleSpy.mock.calls[0][0], 'PatientName, Patient');
     consoleSpy.mockRestore();
+  });
+
+  /**
+   * Tests for {@link DicomWriter} range rules.
+   *
+   * @function module:tests/dicom~writeRangeRules
+   */
+  test('Write range rules', () => {
+    const writer = new DicomWriter();
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      // tag range: overlay data and comments
+      '60xx3000': {action: 'remove', value: null},
+      '60xx4000': {action: 'remove', value: null},
+      // less specific tag range
+      '60xxxxx0': {action: 'clear', value: null},
+      // exact tag beats tag range
+      60023000: {action: 'replace', value: 'exact-tag'},
+      // group range
+      '50xx': {action: 'remove', value: null},
+      // exact group beats group range
+      5002: {action: 'replace', value: 'exact-group'},
+      // tag range beats exact group
+      '5004xxxx': {action: 'replace', value: 'tag-range'},
+      5004: {action: 'remove', value: null},
+      // lower case hex and upper case 'X'
+      '7fXX': {action: 'clear', value: null}
+    });
+    /**
+     * Get the written value of a test element with the given key.
+     *
+     * @param {string} key The element key.
+     * @returns {Array|null} The written value or null if removed.
+     */
+    const write = function (key) {
+      const element = new DataElement('LO');
+      element.tag = getTagFromKey(key);
+      element.value = ['value'];
+      const res = writer.getElementToWrite(element);
+      return res === null ? null : res.value;
+    };
+    // tag ranges
+    assert.isNull(write('60003000'), 'overlay data');
+    assert.isNull(write('601E4000'), 'overlay comments');
+    assert.deepEqual(write('60000010'), [], 'less specific range');
+    assert.deepEqual(write('60000011'), ['value'], 'no range match');
+    assert.deepEqual(write('60023000'), ['exact-tag'], 'exact tag');
+    // group ranges
+    assert.isNull(write('50000010'), 'curve');
+    assert.isNull(write('501E3000'), 'curve last');
+    assert.deepEqual(write('50020010'), ['exact-group'], 'exact group');
+    assert.deepEqual(write('50040010'), ['tag-range'], 'tag range first');
+    assert.deepEqual(write('7FE00010'), [], 'case');
+    // default
+    assert.deepEqual(write('00100010'), ['value'], 'default');
   });
 
   /**
