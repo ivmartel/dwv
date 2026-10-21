@@ -5,6 +5,7 @@ import {DataElement} from '../../src/dicom/dataElement.js';
 import {getTagFromKey} from '../../src/dicom/dicomTag.js';
 import {
   DicomWriter,
+  WriterRuleActions,
   getUID,
   translateWriterRules
 } from '../../src/dicom/dicomWriter.js';
@@ -316,6 +317,80 @@ describe('dicom', () => {
   });
 
   /**
+   * Tests for {@link DicomWriter} setRules warning for unknown actions.
+   *
+   * @function module:tests/dicom~setRulesUnknownActionWarning
+   */
+  test('setRules unknown action warning', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const writer = new DicomWriter();
+    // known actions: no warning
+    writer.setRules({
+      default: {action: WriterRuleActions.copy, value: null},
+      '00100010': {action: WriterRuleActions.remove, value: null},
+      '00100020': {action: WriterRuleActions.clear, value: null},
+      '00100030': {action: WriterRuleActions.replace, value: '19000101'}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 0, 'no warning');
+    // unknown actions: warning
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      '00100010': {action: 'delete', value: null},
+      '00100020': {action: 'Remove', value: null}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 1, 'one warning');
+    assert.include(consoleSpy.mock.calls[0][0], '00100010, 00100020');
+    consoleSpy.mockRestore();
+  });
+
+  /**
+   * Tests for {@link DicomWriter} unknown action rules fallback.
+   *
+   * @function module:tests/dicom~writeUnknownActionFallback
+   */
+  test('Write unknown action rules fallback', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    /**
+     * Get the written value of a test element with the given key.
+     *
+     * @param {DicomWriter} writer The writer.
+     * @param {string} key The element key.
+     * @returns {Array|null} The written value or null if removed.
+     */
+    const write = function (writer, key) {
+      const element = new DataElement('LO');
+      element.tag = getTagFromKey(key);
+      element.value = ['value'];
+      const res = writer.getElementToWrite(element);
+      return res === null ? null : res.value;
+    };
+
+    const writer = new DicomWriter();
+    writer.setRules({
+      default: {action: WriterRuleActions.remove, value: null},
+      // unknown: falls back to the group rule
+      '00100010': {action: 'delete', value: null},
+      '0010': {action: WriterRuleActions.clear, value: null},
+      // unknown: falls back to the default rule
+      '00200010': {action: 'Replace', value: 'x'}
+    });
+    assert.deepEqual(write(writer, '00100010'), [], 'group fallback');
+    assert.isNull(write(writer, '00200010'), 'default fallback');
+
+    // unknown default: falls back to copy
+    writer.setRules({
+      default: {action: 'keep', value: null}
+    });
+    assert.deepEqual(write(writer, '00100010'), ['value'], 'copy fallback');
+
+    // missing default: falls back to copy
+    writer.setRules({});
+    assert.deepEqual(write(writer, '00100010'), ['value'], 'no default');
+
+    consoleSpy.mockRestore();
+  });
+
+  /**
    * Tests for {@link DicomWriter} range rules.
    *
    * @function module:tests/dicom~writeRangeRules
@@ -563,10 +638,12 @@ describe('dicom', () => {
     seqItem['00100030'] = getElement('DA', '19830101');
 
     const rules = {
-      default: {action: 'copy', value: null},
-      '00100010': {action: 'replace', value: 'anonymise-name'},
-      '00100020': {action: 'clear', value: null},
-      '0010': {action: 'remove', value: null}
+      default: {action: WriterRuleActions.copy, value: null},
+      '00100010': {
+        action: WriterRuleActions.replace, value: 'anonymise-name'
+      },
+      '00100020': {action: WriterRuleActions.clear, value: null},
+      '0010': {action: WriterRuleActions.remove, value: null}
     };
     const writer = new DicomWriter();
     writer.setRules(rules);

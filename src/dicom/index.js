@@ -10,7 +10,8 @@ import {
   getUID,
   translateWriterRules,
   DicomWriter,
-  WriterRule
+  WriterRule,
+  WriterRuleActions
 } from './dicomWriter.js';
 import {addTagsToDictionary} from './dictionary.js';
 import {
@@ -66,6 +67,7 @@ export {
   Tag,
   TagInfo,
   WriterRule,
+  WriterRuleActions,
   NormalisedManufacturers,
   addTagsToDictionary,
   getDwvVersion,

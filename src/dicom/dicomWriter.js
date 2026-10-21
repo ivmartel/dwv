@@ -38,11 +38,21 @@ import {logger} from '../utils/logger.js';
 let _uidCount = 0;
 
 /**
+ * Writer rule actions.
+ */
+export const WriterRuleActions = {
+  copy: 'copy',
+  remove: 'remove',
+  clear: 'clear',
+  replace: 'replace'
+};
+
+/**
  * Writer rule.
  */
 export class WriterRule {
   /**
-   * Rule action: `copy`, `remove`, `clear` or `replace`.
+   * Rule action, one of the `WriterRuleActions` values.
    *
    * @type {string}
    */
@@ -57,7 +67,8 @@ export class WriterRule {
   value;
 
   /**
-   * @param {string} action The rule action.
+   * @param {string} action The rule action, one of the
+   *   `WriterRuleActions` values.
    */
   constructor(action) {
     this.action = action;
@@ -70,17 +81,17 @@ export class WriterRule {
  * @type {Record<string, Function>}
  */
 const writerActions = {
-  copy(item) {
+  [WriterRuleActions.copy](item) {
     return item;
   },
-  remove() {
+  [WriterRuleActions.remove]() {
     return null;
   },
-  clear(item) {
+  [WriterRuleActions.clear](item) {
     item.value = [];
     return item;
   },
-  replace(item, value) {
+  [WriterRuleActions.replace](item, value) {
     item.value = getRuleElementValue(value);
     return item;
   }
@@ -136,8 +147,9 @@ function cloneRuleValue(value) {
  */
 export function getDefaultAnonymisationRules() {
   return {
-    default: {action: 'copy', value: null},
-    '00100010': {action: 'replace', value: 'Anonymized'} // PatientName
+    default: {action: WriterRuleActions.copy, value: null},
+    // PatientName
+    '00100010': {action: WriterRuleActions.replace, value: 'Anonymized'}
   };
 }
 
@@ -545,7 +557,7 @@ export class DicomWriter {
    * @type {Record<string, WriterRule>}
    */
   #defaultRules = {
-    default: {action: 'copy', value: null}
+    default: {action: WriterRuleActions.copy, value: null}
   };
 
   /**
@@ -655,6 +667,9 @@ export class DicomWriter {
    * specificity, the first one in the rules order.
    * Rules are also applied to the elements of sequence items.
    * Use `translateWriterRules` to convert tag or group name based rules.
+   * Rules with an unknown action are ignored (with a warning), the
+   * next matching rule is then used. If there is no valid default
+   * rule, the default is to copy.
    *
    * @param {Record<string, WriterRule>} rules The input rules.
    * @param {boolean} [addMissingTags] If true, explicit tags that
@@ -662,10 +677,6 @@ export class DicomWriter {
    *   added if missing. Defaults to false.
    */
   setRules(rules, addMissingTags) {
-    this.#rules = rules;
-    this.#tagRangeRules = getWriterRangeRules(rules, 8);
-    this.#groupRangeRules = getWriterRangeRules(rules, 4);
-
     // warn about rules that will never apply
     const nonKeyIndices = Object.keys(rules).filter(
       (key) => key !== 'default' && !isWriterRuleKey(key));
@@ -674,6 +685,28 @@ export class DicomWriter {
         nonKeyIndices.join(', ')} (they will be ignored, ` +
         'use translateWriterRules for name based rules)');
     }
+    // remove rules with an unknown action
+    const actions = Object.values(WriterRuleActions);
+    /** @type {Record<string, WriterRule>} */
+    const validRules = {};
+    const unknownActionIndices = [];
+    for (const key of Object.keys(rules)) {
+      if (actions.includes(rules[key]?.action)) {
+        validRules[key] = rules[key];
+      } else {
+        unknownActionIndices.push(key);
+      }
+    }
+    if (unknownActionIndices.length !== 0) {
+      logger.warn(`Writer rules with unknown action: ${
+        unknownActionIndices.join(', ')} (they will be ignored, ` +
+        `expected one of: ${actions.join(', ')})`);
+    }
+    rules = validRules;
+
+    this.#rules = rules;
+    this.#tagRangeRules = getWriterRangeRules(rules, 8);
+    this.#groupRangeRules = getWriterRangeRules(rules, 4);
 
     // default compulsory list is empty
     this.#compulsoryTags = [];
@@ -683,7 +716,7 @@ export class DicomWriter {
       const keys = Object.keys(rules);
       for (const key of keys) {
         const rule = rules[key];
-        if (rule.action === 'replace' &&
+        if (rule.action === WriterRuleActions.replace &&
           typeof rule.value !== 'undefined' &&
           rule.value !== null) {
           // only add tags that are in the dictionary
@@ -771,7 +804,7 @@ export class DicomWriter {
     }
     if (typeof rule === 'undefined') {
       // 5. default
-      rule = this.#rules.default;
+      rule = this.#rules.default ?? this.#defaultRules.default;
     }
     // apply action on element
     const elementToWrite = writerActions[rule.action](element, rule.value);
