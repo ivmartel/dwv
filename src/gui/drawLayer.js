@@ -999,13 +999,13 @@ export class DrawLayer {
 
   /**
    * Temporarily highlight an annotation: its opacity progressively
-   *   dims to half and comes back to normal in one pulse. Only one
+   *   dims to 20% and comes back to normal in one pulse. Only one
    *   annotation is highlighted at a time: a new call resets the
    *   previous highlight.
    *
    * @param {string} id The id of the annotation.
    * @param {number} [duration] The highlight duration in milliseconds,
-   *   defaults to 1000.
+   *   defaults to 500.
    * @returns {boolean} False if the annotation shape cannot be found.
    */
   highlightAnnotation(id, duration) {
