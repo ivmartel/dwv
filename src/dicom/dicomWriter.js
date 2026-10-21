@@ -49,6 +49,8 @@ export class WriterRule {
   action;
   /**
    * Optional value to use for replace action.
+   * A single value or an array of values for multi-valued
+   * elements (for example `['A', 'B']` or a list of sequence items).
    *
    * @type {any|undefined}
    */
@@ -79,11 +81,23 @@ const writerActions = {
     return item;
   },
   replace(item, value) {
-    // clone to not modify the rule value when writing
-    item.value = [cloneRuleValue(value)];
+    item.value = getRuleElementValue(value);
     return item;
   }
 };
+
+/**
+ * Get the element value from a replace rule value: an array value is
+ * used as the element value list, a single value is put in an array.
+ * The value is cloned to not modify the rule value when writing.
+ *
+ * @param {any} value The rule value.
+ * @returns {Array} The element value.
+ */
+function getRuleElementValue(value) {
+  const clone = cloneRuleValue(value);
+  return Array.isArray(clone) ? clone : [clone];
+}
 
 /**
  * Deep clone a writer rule value: arrays, typed arrays, data elements
@@ -1239,11 +1253,10 @@ export class DicomWriter {
       const tagInfo = getDicomTagInfo(tag);
       const dataElement = new DataElement(tagInfo?.getVr());
       dataElement.tag = tag;
-      // clone to not modify the rule value when writing
-      const value = cloneRuleValue(this.#rules[key].value);
+      const value = getRuleElementValue(this.#rules[key].value);
       // add element
       let size = getDataElementPrefixByteSize(dataElement.vr, isImplicit);
-      size += this.#setElementValue(dataElement, [value], isImplicit);
+      size += this.#setElementValue(dataElement, value, isImplicit);
       rawElements.push(dataElement);
       totalSize += size;
     }

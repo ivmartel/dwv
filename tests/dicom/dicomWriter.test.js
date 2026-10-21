@@ -484,6 +484,57 @@ describe('dicom', () => {
   });
 
   /**
+   * Tests for {@link DicomWriter} replace rules with multiple values.
+   *
+   * @function module:tests/dicom~writeReplaceMultipleValues
+   */
+  test('Write replace rules with multiple values', () => {
+    /**
+     * Get a code sequence item.
+     *
+     * @param {string} code The code value.
+     * @returns {Record<string, DataElement>} The item.
+     */
+    const getCodeItem = function (code) {
+      const element = new DataElement('SH');
+      element.value = [code];
+      return {'00080100': element};
+    };
+    // test data has a ReferencedImageSequence (replaced)
+    // and no DeidentificationMethod(CodeSequence) (added)
+    const rules = {
+      default: {action: 'copy', value: null},
+      '00081140': {
+        action: 'replace',
+        value: [getCodeItem('113100'), getCodeItem('113105')]
+      },
+      '00120063': {action: 'replace', value: ['method-a', 'method-b']},
+      '00120064': {
+        action: 'replace',
+        value: [getCodeItem('113100'), getCodeItem('113105')]
+      }
+    };
+    const writer = new DicomWriter();
+    writer.setRules(rules, true);
+    const parser = new DicomParser();
+    parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+    const newParser = new DicomParser();
+    newParser.parse(writer.getBuffer(parser.getDicomElements()));
+    const tags = newParser.getDicomElements();
+
+    // multi-valued string
+    assert.deepEqual(tags['00120063'].value, ['method-a', 'method-b'],
+      'added multi-valued');
+    // sequences with multiple items
+    for (const key of ['00081140', '00120064']) {
+      const items = tags[key].value;
+      assert.equal(items.length, 2, `${key} length`);
+      assert.equal(items[0]['00080100'].value[0], '113100', `${key} #0`);
+      assert.equal(items[1]['00080100'].value[0], '113105', `${key} #1`);
+    }
+  });
+
+  /**
    * Tests for {@link DicomWriter} rules applied to sequence items.
    *
    * @function module:tests/dicom~writeRulesInSequence
