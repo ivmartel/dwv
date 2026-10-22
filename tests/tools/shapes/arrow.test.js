@@ -50,16 +50,19 @@ describe('tools/shapes/arrow', () => {
     assert.equal(f.getNPoints(), a.getNPoints());
   });
 
-  test('setAnnotationMathShape sets tip and tail like annotator', () => {
-    const f = new ArrowFactory();
-    const annotation = makeArrowAnnotation(undefined, undefined);
-    const tip = p(10, 20);
-    const tail = p(30, 40);
-    f.setAnnotationMathShape(annotation, [tip, tail]);
-    assert.equal(annotation.mathShape, tip);
-    assert.equal(annotation.referencePoints[0], tail);
-    assert.equal(annotation.setTextExpr.mock.calls[0][0]['*'], '');
-  });
+  test(
+    'setAnnotationMathShape sets tip and tail like annotator - ' +
+    '#DWV-REQ-UI-07-001 Draw arrow',
+    () => {
+      const f = new ArrowFactory();
+      const annotation = makeArrowAnnotation(undefined, undefined);
+      const tip = p(10, 20);
+      const tail = p(30, 40);
+      f.setAnnotationMathShape(annotation, [tip, tail]);
+      assert.equal(annotation.mathShape, tip);
+      assert.equal(annotation.referencePoints[0], tail);
+      assert.equal(annotation.setTextExpr.mock.calls[0][0]['*'], '');
+    });
 
   test('updateAnnotationOnTranslation delegates to annotator', () => {
     const f = new ArrowFactory();

@@ -180,27 +180,29 @@ describe('tools/draw', () => {
         (c) => c[0] === 'positionchange'));
     });
 
-  test('Delete removes annotation via undo stack', () => {
-    vi.spyOn(DrawShapeHandler.prototype, 'getEditorAnnotation')
-      .mockReturnValue({
-        trackingUid: 'ann-1'
+  test(
+    'Delete removes annotation via undo stack - #DWV-REQ-UI-08-001 Draw delete',
+    () => {
+      vi.spyOn(DrawShapeHandler.prototype, 'getEditorAnnotation')
+        .mockReturnValue({
+          trackingUid: 'ann-1'
+        });
+      const removeAnnotation = vi.fn();
+      const drawLayer = {
+        getDrawController: vi.fn(() => ({
+          removeAnnotation
+        }))
+      };
+      const app = makeDrawApp({
+        getActiveLayerGroup: vi.fn(() => ({
+          getActiveDrawLayer: vi.fn(() => drawLayer)
+        })),
+        addToUndoStack: vi.fn()
       });
-    const removeAnnotation = vi.fn();
-    const drawLayer = {
-      getDrawController: vi.fn(() => ({
-        removeAnnotation
-      }))
-    };
-    const app = makeDrawApp({
-      getActiveLayerGroup: vi.fn(() => ({
-        getActiveDrawLayer: vi.fn(() => drawLayer)
-      })),
-      addToUndoStack: vi.fn()
+      const draw = new Draw(app);
+      draw.keydown({key: 'Delete'});
+      assert.equal(removeAnnotation.mock.calls.length, 1);
+      assert.equal(removeAnnotation.mock.calls[0][0], 'ann-1');
+      assert.equal(app.addToUndoStack.mock.calls.length, 1);
     });
-    const draw = new Draw(app);
-    draw.keydown({key: 'Delete'});
-    assert.equal(removeAnnotation.mock.calls.length, 1);
-    assert.equal(removeAnnotation.mock.calls[0][0], 'ann-1');
-    assert.equal(app.addToUndoStack.mock.calls.length, 1);
-  });
 });

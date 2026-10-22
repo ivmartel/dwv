@@ -42,15 +42,19 @@ describe('tools/behaviors', () => {
       behavior = new ScrollWheelBehavior();
     });
 
-    test('onWheelTick increments scroll when up=true and canScroll', () => {
-      const layerGroup = makeMockLayerGroup();
-      layerGroup.canScroll.mockReturnValue(true);
-      const posHelper = layerGroup.getPositionHelper();
+    test(
+      'onWheelTick increments scroll when up=true and canScroll - ' +
+      '#DWV-REQ-UI-05-003 Slice scroll tool',
+      () => {
+        const layerGroup = makeMockLayerGroup();
+        layerGroup.canScroll.mockReturnValue(true);
+        const posHelper = layerGroup.getPositionHelper();
 
-      behavior.onWheelTick(true, layerGroup);
+        behavior.onWheelTick(true, layerGroup);
 
-      assert.equal(posHelper.incrementPositionAlongScroll.mock.calls.length, 1);
-    });
+        assert.equal(
+          posHelper.incrementPositionAlongScroll.mock.calls.length, 1);
+      });
 
     test('onWheelTick decrements scroll when up=false and canScroll', () => {
       const layerGroup = makeMockLayerGroup();
@@ -100,17 +104,20 @@ describe('tools/behaviors', () => {
       behavior = new ZoomWheelBehavior();
     });
 
-    test('onWheel zooms when layerGroup is defined', () => {
-      const layerGroup = makeMockLayerGroup();
-      const viewLayer = makeMockViewLayer();
-      layerGroup.getActiveViewLayer.mockReturnValue(viewLayer);
+    test(
+      'onWheel zooms when layerGroup is defined - ' +
+      '#DWV-REQ-UI-05-004 Zoom/Pan tool',
+      () => {
+        const layerGroup = makeMockLayerGroup();
+        const viewLayer = makeMockViewLayer();
+        layerGroup.getActiveViewLayer.mockReturnValue(viewLayer);
 
-      const event = makeMockWheelEvent(-120);
-      behavior.onWheel(event, layerGroup);
+        const event = makeMockWheelEvent(-120);
+        behavior.onWheel(event, layerGroup);
 
-      assert.equal(layerGroup.addScale.mock.calls.length, 1);
-      assert.equal(layerGroup.draw.mock.calls.length, 1);
-    });
+        assert.equal(layerGroup.addScale.mock.calls.length, 1);
+        assert.equal(layerGroup.draw.mock.calls.length, 1);
+      });
 
     test('onWheel does nothing when layerGroup is undefined', () => {
       const event = makeMockWheelEvent(-120);

@@ -53,20 +53,23 @@ describe('tools/behaviors', () => {
       assert.ok(behavior);
     });
 
-    test('onDoubleClick sets window center from clicked pixel', () => {
-      const viewLayer = makeMockViewLayer();
-      const layerGroup = makeMockLayerGroup(viewLayer);
+    test(
+      'onDoubleClick sets window center from clicked pixel - ' +
+      '#DWV-REQ-UI-05-001 Window/Level tool',
+      () => {
+        const viewLayer = makeMockViewLayer();
+        const layerGroup = makeMockLayerGroup(viewLayer);
 
-      const point = new Point2D(100, 200);
-      behavior.onDoubleClick(point, layerGroup);
+        const point = new Point2D(100, 200);
+        behavior.onDoubleClick(point, layerGroup);
 
-      const viewController = viewLayer.getViewController();
-      assert.equal(viewController.setWindowLevel.mock.calls.length, 1);
-      const wlArg = viewController.setWindowLevel.mock.calls[0][0];
-      assert.ok(wlArg instanceof WindowLevel);
-      assert.equal(wlArg.center, 50);
-      assert.equal(wlArg.width, 100);
-    });
+        const viewController = viewLayer.getViewController();
+        assert.equal(viewController.setWindowLevel.mock.calls.length, 1);
+        const wlArg = viewController.setWindowLevel.mock.calls[0][0];
+        assert.ok(wlArg instanceof WindowLevel);
+        assert.equal(wlArg.center, 50);
+        assert.equal(wlArg.width, 100);
+      });
 
     test('onDoubleClick does nothing when no view layer', () => {
       const layerGroup = makeMockLayerGroup();

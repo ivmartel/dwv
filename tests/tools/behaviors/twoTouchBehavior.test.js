@@ -86,19 +86,22 @@ describe('tools/behaviors', () => {
       assert.notOk(result);
     });
 
-    test('onUpdate zooms when line length ratio != 1', () => {
-      const layerGroup = makeMockLayerGroup();
-      behavior.onStart([new Point2D(0, 0), new Point2D(10, 10)]);
+    test(
+      'onUpdate zooms when line length ratio != 1 - ' +
+      '#DWV-REQ-UI-05-004 Zoom/Pan tool',
+      () => {
+        const layerGroup = makeMockLayerGroup();
+        behavior.onStart([new Point2D(0, 0), new Point2D(10, 10)]);
 
-      // Move points to change the line length
-      behavior.onUpdate([new Point2D(0, 0), new Point2D(15, 15)], layerGroup);
+        // Move points to change the line length
+        behavior.onUpdate([new Point2D(0, 0), new Point2D(15, 15)], layerGroup);
 
-      // Verify zoom was applied
-      const addScaleCalls = layerGroup.addScale.mock.calls.length;
-      const drawCalls = layerGroup.draw.mock.calls.length;
-      assert.equal(addScaleCalls, 1);
-      assert.equal(drawCalls, 1);
-    });
+        // Verify zoom was applied
+        const addScaleCalls = layerGroup.addScale.mock.calls.length;
+        const drawCalls = layerGroup.draw.mock.calls.length;
+        assert.equal(addScaleCalls, 1);
+        assert.equal(drawCalls, 1);
+      });
 
     test('onUpdate scrolls when points move vertically with ratio=1', () => {
       const layerGroup = makeMockLayerGroup();

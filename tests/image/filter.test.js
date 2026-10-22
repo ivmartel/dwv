@@ -114,22 +114,25 @@ describe('image', () => {
    *
    * @function module:tests/image~thresholdFilterOutsideRange
    */
-  test('ThresholdFilter replaces out-of-range values with imageMin', () => {
+  test(
+    'ThresholdFilter replaces out-of-range values with imageMin - ' +
+    '#DWV-REQ-UI-06-001 Image thresholding',
+    () => {
     // values: 10 (min), 20, 30, 40, 50
     // imageMin = 10; threshold [25, 45]
     // expected: [10, 10, 30, 40, 10]
-    const img = makeImage(5, 1, [10, 20, 30, 40, 50]);
-    const f = new ThresholdFilter();
-    f.setOriginalImage(img);
-    f.setMin(25);
-    f.setMax(45);
-    const buf = f.update().getBuffer();
-    assert.equal(buf[0], 10, 'value at imageMin left as imageMin');
-    assert.equal(buf[1], 10, 'value below min → imageMin');
-    assert.equal(buf[2], 30, 'value in range kept');
-    assert.equal(buf[3], 40, 'value in range kept');
-    assert.equal(buf[4], 10, 'value above max → imageMin');
-  });
+      const img = makeImage(5, 1, [10, 20, 30, 40, 50]);
+      const f = new ThresholdFilter();
+      f.setOriginalImage(img);
+      f.setMin(25);
+      f.setMax(45);
+      const buf = f.update().getBuffer();
+      assert.equal(buf[0], 10, 'value at imageMin left as imageMin');
+      assert.equal(buf[1], 10, 'value below min → imageMin');
+      assert.equal(buf[2], 30, 'value in range kept');
+      assert.equal(buf[3], 40, 'value in range kept');
+      assert.equal(buf[4], 10, 'value above max → imageMin');
+    });
 
   // ---------------------------------------------------------------------------
   // SharpenFilter
@@ -190,15 +193,18 @@ describe('image', () => {
    *
    * @function module:tests/image~sharpenFilterCenterPixel
    */
-  test('SharpenFilter amplifies isolated centre pixel by factor 5', () => {
+  test(
+    'SharpenFilter amplifies isolated centre pixel by factor 5 - ' +
+    '#DWV-REQ-UI-06-002 Image contrast enhancement',
+    () => {
     // 3×3, all zeros except centre (index 4)
-    const values = [0, 0, 0, 0, 100, 0, 0, 0, 0];
-    const img = makeImage(3, 3, values);
-    const f = new SharpenFilter();
-    f.setOriginalImage(img);
-    const buf = f.update().getBuffer();
-    assert.equal(buf[4], 500, 'centre pixel amplified: 5 × 100');
-  });
+      const values = [0, 0, 0, 0, 100, 0, 0, 0, 0];
+      const img = makeImage(3, 3, values);
+      const f = new SharpenFilter();
+      f.setOriginalImage(img);
+      const buf = f.update().getBuffer();
+      assert.equal(buf[4], 500, 'centre pixel amplified: 5 × 100');
+    });
 
   // ---------------------------------------------------------------------------
   // SobelFilter
@@ -259,30 +265,34 @@ describe('image', () => {
    *
    * @function module:tests/image~sobelFilterStepEdge
    */
-  test('SobelFilter detects a vertical step edge', () => {
+  test(
+    'SobelFilter detects a vertical step edge - ' +
+    '#DWV-REQ-UI-06-003 Image contour extraction',
+    () => {
     // 3×3 image: left column = 0, right column = 100
     // centre column = 0  (sharp left–right boundary)
     /* eslint-disable @stylistic/js/array-element-newline */
-    const img = makeImage(3, 3, [
-      0, 0, 100,
-      0, 0, 100,
-      0, 0, 100
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-    const f = new SobelFilter();
-    f.setOriginalImage(img);
-    const buf = f.update().getBuffer();
+      const img = makeImage(3, 3, [
+        0, 0, 100,
+        0, 0, 100,
+        0, 0, 100
+      ]);
+      /* eslint-enable @stylistic/js/array-element-newline */
+      const f = new SobelFilter();
+      f.setOriginalImage(img);
+      const buf = f.update().getBuffer();
 
-    // Centre pixel (1,1):
-    //   gradX kernel [1,0,-1, 2,0,-2, 1,0,-1]:
-    //     1×0 + 0 + (-1)×100 + 2×0 + 0 + (-2)×100 + 1×0 + 0 + (-1)×100
-    //     = -100 - 200 - 100 = -400
-    //   gradY kernel [1,2,1, 0,0,0, -1,-2,-1] → all rows identical → gradY = 0
-    //   result = floor(sqrt(400² + 0²)) = 400
-    assert.equal(buf[4], 400, 'centre pixel gradient magnitude');
+      // Centre pixel (1,1):
+      //   gradX kernel [1,0,-1, 2,0,-2, 1,0,-1]:
+      //     1×0 + 0 + (-1)×100 + 2×0 + 0 + (-2)×100 + 1×0 + 0 + (-1)×100
+      //     = -100 - 200 - 100 = -400
+      //   gradY kernel [1,2,1, 0,0,0, -1,-2,-1] → all rows identical
+      //     → gradY = 0
+      //   result = floor(sqrt(400² + 0²)) = 400
+      assert.equal(buf[4], 400, 'centre pixel gradient magnitude');
 
-    // Uniform left column → no gradient
-    assert.equal(buf[0], 0, 'top-left: no horizontal gradient (left edge)');
-  });
+      // Uniform left column → no gradient
+      assert.equal(buf[0], 0, 'top-left: no horizontal gradient (left edge)');
+    });
 
 });
