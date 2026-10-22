@@ -4,6 +4,10 @@
     {
       "name": "io",
       "description": "Definitions:\n- _HTML File_: represents file data typically obtained from the underlying file system. It is provided via an HTML input field with the 'file' type or via drag and drop (see W3C [FileAPI](https://www.w3.org/TR/FileAPI/)).\n- _URL_: the data is accessed via a URL which resolves to data published on the same server as the application or on one that allows Cross-Origin Resource Sharing (CORS). A _discrete_ URL is a URL that represents a single file or medium. A _multipart_ URL represents a document that's comprised of multiple component parts (see wikipedia [MIME#Multipart_messages](https://en.wikipedia.org/wiki/MIME#Multipart_messages)).\n- _ZIP_: archive file format that supports lossless data compression. A ZIP file may contain one or more files or directories that may have been compressed (see wikipedia [ZIP](<https://en.wikipedia.org/wiki/ZIP_(file_format)>)).\n\nNote: for more details about which parts of the DICOM standard are supported, see the DICOM [conformance](./tutorial-conformance.html) page."
+    },
+    {
+      "name": "ui",
+      "description": "Definitions:\n- _View_: the display of an image (or part of it) in an HTML `<canvas>` element. Multiple views can display the same data, for example with different orientations.\n- _Tool_: an interaction mode that transforms user input (mouse, touch or keyboard) on a view into changes of the displayed data or of its annotations."
     }
   ],
   "requirements": [
@@ -179,7 +183,7 @@
       "id": "DWV-REQ-UI-04-003",
       "name": "Views zoom/pan synchronisation",
       "group": "ui",
-      "description": "The user can decide to synchronise or not the window/level between different views."
+      "description": "The user can decide to synchronise or not the zoom/pan between different views."
     },
     {
       "id": "DWV-REQ-UI-04-004",
@@ -191,13 +195,13 @@
       "id": "DWV-REQ-UI-05-001",
       "name": "Window/Level tool",
       "group": "ui",
-      "description": "The user can change the window/level of the displayed data via specific interaction on the image `<canvas>`:\n- `left click drag up/down` or `one touch drag up/down` changes the window,\n- `left click drag left/right` or `one touch drag up/down` changes the level,\n- `double left click` or `double touch` centre's the window/level on the clicked intensity,\n- `left click` or `touch` shows the position and intensity.\n\nThe user must be able to reset the window/level to their original values."
+      "description": "The user can change the window/level of the displayed data via specific interaction on the image `<canvas>`:\n- `left click drag up/down` or `one touch drag up/down` changes the window,\n- `left click drag left/right` or `one touch drag left/right` changes the level,\n- `double left click` or `double touch` centres the window/level on the clicked intensity,\n- `left click` or `touch` shows the position and intensity.\n\nThe user must be able to reset the window/level to their original values."
     },
     {
       "id": "DWV-REQ-UI-05-002",
       "name": "Window/Level presets",
       "group": "ui",
-      "description": "Specific window/level data pre-sets must be made available. Only data with CT modality will provide some. They are ['name' (window center, window width)]:\n- 'mediastinum' (40, 400),\n- 'lung' (-500, 1500),\n- 'bone' (500, 2000),\n- 'brain' (40, 80),\n- 'head' (90, 350)."
+      "description": "Specific window/level presets must be made available: the ones defined in the DICOM data, a 'minmax' one calculated from the image intensities and, depending on the data modality, default ones. The default presets can be overridden by the embedding application. Only data with CT modality has default presets, they are ['name' (window center, window width)]:\n- 'mediastinum' (40, 400),\n- 'lung' (-500, 1500),\n- 'bone' (500, 2000),\n- 'brain' (40, 80),\n- 'head' (90, 350)."
     },
     {
       "id": "DWV-REQ-UI-05-003",
@@ -251,31 +255,31 @@
       "id": "DWV-REQ-UI-07-003",
       "name": "Draw ellipse",
       "group": "ui",
-      "description": "The user can draw an ellipse shape on the displayed data. An ellipse is characterised by a center point and two radiuses. The center can be changed when moving the complete shape, the radiuses via control points on the shape. The following measures are provided with the shape: radius a, radius b and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape."
+      "description": "The user can draw an ellipse shape on the displayed data. An ellipse is characterised by a center point and two radiuses. The center can be changed when moving the complete shape, the radiuses via control points on the shape. A label can be associated to the shape. The following measures are provided with the shape: radius a, radius b and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape."
     },
     {
       "id": "DWV-REQ-UI-07-004",
       "name": "Draw free hand",
       "group": "ui",
-      "description": "The user can draw a free hand shape on the displayed data. A free hand shape is a non closed shape charaterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape."
+      "description": "The user can draw a free hand shape on the displayed data. A free hand shape is a non closed shape characterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape."
     },
     {
       "id": "DWV-REQ-UI-07-005",
       "name": "Draw protractor",
       "group": "ui",
-      "description": "The user can draw a protractor shape on the displayed data. A protractor is charaterised by three modifiable anchor points. The shape can be moved in its entirety. The following measure are provided with the shape: the angle between the two lines that form the protractor. No quantifications are provided with the shape."
+      "description": "The user can draw a protractor shape on the displayed data. A protractor is characterised by three modifiable anchor points. The shape can be moved in its entirety. The following measures are provided with the shape: the angle between the two lines that form the protractor. No quantifications are provided with the shape."
     },
     {
       "id": "DWV-REQ-UI-07-006",
       "name": "Draw rectangle",
       "group": "ui",
-      "description": "The user can draw a rectangle shape on the displayed data. A rectangle is charaterised by four modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: width, height and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape."
+      "description": "The user can draw a rectangle shape on the displayed data. A rectangle is characterised by four modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: width, height and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape."
     },
     {
       "id": "DWV-REQ-UI-07-007",
       "name": "Draw ruler",
       "group": "ui",
-      "description": "The user can draw a ruler shape on the displayed data. An arrow is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measure are provided with the shape: the length of the line. No quantifications are provided with the shape."
+      "description": "The user can draw a ruler shape on the displayed data. A ruler is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: the length of the line. No quantifications are provided with the shape."
     },
     {
       "id": "DWV-REQ-UI-07-008",
@@ -293,7 +297,7 @@
       "id": "DWV-REQ-UI-08-002",
       "name": "Draw action undo/redo",
       "group": "ui",
-      "description": "The user can undo/redo all actions of the draw tool using `CRTL-Z` and `CRTL-Y` or special buttons on touch enabled devices. The actions are: anchor move, shape move, shape creation and shape deletion."
+      "description": "The user can undo/redo all actions of the draw tool using `CTRL-Z` and `CTRL-Y` or special buttons on touch enabled devices. The actions are: anchor move, shape move, shape creation and shape deletion."
     },
     {
       "id": "DWV-REQ-UI-09-001",
