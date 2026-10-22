@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: |
           rm -Rf ./build
-          yarn run build
+          yarn run build-ci
       - name: Prepare for deploy (if master or develop branch)
         if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
         run: |
