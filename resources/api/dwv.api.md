@@ -558,6 +558,7 @@ export class Geometry {
     appendOrigin(origin: Point3D, index: number, time?: number): void;
     canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
     canAppendSlice(rhs: Geometry): BooleanResult;
+    checkTimeOrigins(): BooleanResult;
     clone(): Geometry;
     equals(rhs: Geometry): boolean;
     getCurrentNumberOfSlicesBeforeTime(time: number): number | undefined;
