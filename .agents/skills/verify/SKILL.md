@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Verify a dwv change the way CI does (lint, vitest with coverage, webpack + tsc types + api-extractor build) plus repo-specific checks (API report drift, deprecation hygiene). Use after editing src/ or tests/, before committing, or when asked to "verify", "check", or "make sure CI passes".
+description: Verify a dwv change the way CI does (lint, vitest with coverage, webpack + tsc types + api-extractor build) plus repo-specific checks (clean test output, jsdoc site build, API report drift, deprecation hygiene). Use after editing src/ or tests/, before committing, or when asked to "verify", "check", or "make sure CI passes".
 ---
 
 # Verify a dwv change
@@ -40,15 +40,17 @@ The rules that most often bite are `jsdoc/tag-lines` (exactly one blank line
 before the first `@tag`) and `jsdoc/require-description-complete-sentence`
 (descriptions start with a capital letter and end with a period).
 
-## 2. Full CI pipeline (required before saying "done")
+## 2. Full verify (required before saying "done")
 
-Run the CI steps in CI order and stop at the first failure:
+Run the CI steps in CI order, then the extra `doc` step, and stop at the
+first failure:
 
 ```bash
 yarn install --immutable   # only if package.json / yarn.lock changed
 yarn lint
 yarn test-ci
 rm -rf ./build && yarn build
+yarn doc                   # not in CI, but must stay error free
 ```
 
 Each step has its own pass criteria:
@@ -59,6 +61,13 @@ Each step has its own pass criteria:
 - **test-ci**: all tests pass, and the coverage `text-summary` shows statements,
   branches, functions and lines all at or above 50% (vitest exits non-zero
   if not). It also writes `build/test-results.json`.
+  The output must also be **free of logs**: no `stdout |` / `stderr |`
+  blocks from vitest (console or `logger` output from the code under test,
+  e.g. expected warnings or errors). A test that triggers a log on purpose
+  should silence it (for example `vi.spyOn(logger, 'warn')
+  .mockImplementation(() => {})`, then check the spy was called) rather than
+  let it print. Report any remaining log as a fail with the test that
+  produced it.
 - **build**: three sub-steps, and any of them can fail:
   - `pack`: webpack prod bundle.
   - `types`: `tsc -p resources/api/tsconfig.json`. The jsdoc types must
@@ -68,6 +77,16 @@ Each step has its own pass criteria:
     rewrites `resources/api/dwv.api.md` (see step 3). CI runs `yarn build-ci`
     instead, whose `api-ci` step fails on API changes that aren't in the
     committed `dwv.api.md`, and on any api-extractor warning.
+- **doc**: `yarn doc` (jsdoc over `src` and `tests`, `strict` mode, output in
+  `build/doc`) exits 0 and prints no `ERROR` or `WARNING` lines. Bad jsdoc
+  syntax (unknown tags, broken `{@link}`, malformed types) that lint and
+  `tsc` accept can still fail here. In particular, jsdoc's type parser is
+  stricter than TypeScript: it rejects constructor types
+  (`{new (size: number) => T}`), optional record fields (`{a?: T}`) and
+  arrays of inline records (`{{a: T}[]}`). Move such types into a named
+  `@typedef` (with `@property {T} [a]` for optional fields) or use
+  `Array<{a: T}>`. Run it after `build`, since
+  `rm -rf ./build` would delete its output.
 
 The suite takes a few minutes. Run it in the background and wait for the
 notification instead of polling.
@@ -118,6 +137,7 @@ not, say that visual behaviour was not checked.
 ## 5. Report
 
 End with a short table, one row per step: `install` / `lint` / `test-ci`
-(with the 4 coverage numbers) / `build` / `api drift` /
+(with the 4 coverage numbers, and whether the output had logs) / `build` /
+`doc` / `api drift` /
 `conventions` / `manual`, each marked pass, fail or skipped, with a reason
 for anything not a pass. Include the first error of any failing step verbatim.
