@@ -9,6 +9,7 @@ import {
   getUID,
   translateWriterRules
 } from '../../src/dicom/dicomWriter.js';
+import {logger} from '../../src/utils/logger.js';
 import {
   getTagFromDictionary,
 } from '../../src/dicom/dicomTagInfo.js';
@@ -455,6 +456,7 @@ describe('dicom', () => {
     const remove = {action: 'remove', value: null};
     const clear = {action: 'clear', value: null};
     const replace = {action: 'replace', value: 'name'};
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
     const rules = translateWriterRules({
       default: remove,
       // tag name
@@ -474,6 +476,13 @@ describe('dicom', () => {
       // unknown name
       NotATagName: copy
     });
+    const warnCalls = warnSpy.mock.calls;
+    warnSpy.mockRestore();
+    assert.deepEqual(
+      warnCalls,
+      [['Cannot translate unknown writer rule name: NotATagName']],
+      'unknown name warning logged'
+    );
     const expected = {
       default: remove,
       '00100010': replace,
@@ -718,7 +727,19 @@ describe('dicom', () => {
 
       // write buffer
       const dicomWriter = new DicomWriter();
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
       dicomWriter.setRules(rules, true);
+      const warnCalls = warnSpy.mock.calls;
+      warnSpy.mockRestore();
+      assert.deepEqual(
+        warnCalls,
+        [[
+          'Writer rules not indexed by tag or group key: BADKEY00 ' +
+          '(they will be ignored, use translateWriterRules for name ' +
+          'based rules)'
+        ]],
+        'bad key warning logged'
+      );
       const buffer = dicomWriter.getBuffer(rawTags);
       // parse new buffer
       dicomParser = new DicomParser();

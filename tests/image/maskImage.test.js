@@ -698,8 +698,16 @@ describe('MaskImage getSegmentNumbersAtIndex', () => {
     // slice 1: segment 1 on x=0,1 and segment 2 on x=1,2
     collection.addFrame(1, new Uint8Array([1, 1, 0]), 0, 1, 3, 1);
     collection.addFrame(2, new Uint8Array([0, 1, 1]), 0, 1, 3, 2);
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
     const mask = new MaskImage(geom, collection.getLabelMap(), ['0', '1'],
       collection);
+    const warnCalls = warnSpy.mock.calls;
+    warnSpy.mockRestore();
+    assert.deepEqual(
+      warnCalls,
+      [['SegmentCollection: detected overlapping segments']],
+      'overlap warning logged'
+    );
     assert.ok(mask.getHasOverlap(), 'mask has overlap');
     assert.deepEqual(
       mask.getSegmentNumbersAtIndex(new Index([0, 0, 1])), [1], 'only 1');
