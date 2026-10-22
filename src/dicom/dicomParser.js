@@ -531,7 +531,7 @@ export function getTypedArrayLike(array, size) {
   let res = null;
   try {
     const ArrayConstructor =
-      /** @type {new (size: number) => TypedArray} */ (array.constructor);
+      /** @type {function(new:TypedArray, number)} */ (array.constructor);
     res = new ArrayConstructor(size);
   } catch (error) {
     logAllocationError(error, size);

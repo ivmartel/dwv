@@ -15,6 +15,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {RGB} from '../utils/colour.js';
  * @import {Label} from './label.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
+ * @import {SegmentHistogram} from './histogramTypes.js';
  */
 
 const ML_PER_MM = 0.001; // ml/mm^3
@@ -600,9 +601,7 @@ export class MaskImage extends Image {
    * @param {Image} image The reference image (intensities).
    * @param {string} segmentId Segment tracking UID, or segment number as
    *   string.
-   * @returns {{volume: number, histogram: ImageHistogram,
-   *   labelHistograms?: {label: Label, histogram: ImageHistogram}[]}[]} One
-   *   entry per volume.
+   * @returns {SegmentHistogram[]} One entry per volume.
    */
   getHistogramBySegment(image, segmentId) {
     const segment = this.#findSegmentById(segmentId);
@@ -689,10 +688,7 @@ export class MaskImage extends Image {
       const histogram = new ImageHistogram(unit);
       fillHistogram(histogram, v, 0, sliceIndices.length - 1);
 
-      /**
-       * @type {{volume: number, histogram: ImageHistogram,
-       *   labelHistograms?: {label: Label, histogram: ImageHistogram}[]}}
-       */
+      /** @type {SegmentHistogram} */
       const item = {volume: v, histogram};
       if (typeof segmentLabels !== 'undefined') {
         item.labelHistograms = segmentLabels.map((label) => {

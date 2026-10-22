@@ -843,6 +843,12 @@ export class Label {
 }
 
 // @public
+export type LabelHistogram = {
+    label: Label;
+    histogram: ImageHistogram;
+};
+
+// @public
 export function labToUintLab(triplet: object): object;
 
 // @public
@@ -949,14 +955,7 @@ export class MaskImage extends Image_2 {
     constructor(geometry: Geometry, buffer: Uint8Array, imageUids?: string[], segmentCollection?: SegmentCollection);
     clone(): MaskImage;
     getContour(): ImageContour;
-    getHistogramBySegment(image: Image_2, segmentId: string): {
-        volume: number;
-        histogram: ImageHistogram;
-        labelHistograms?: {
-            label: Label;
-            histogram: ImageHistogram;
-        }[];
-    }[];
+    getHistogramBySegment(image: Image_2, segmentId: string): SegmentHistogram[];
     getLabels(): Label[] | undefined;
     getMaskReferencedSeriesUID(): string | undefined;
     getOffsets(value: number | RGB): number[];
@@ -1318,6 +1317,13 @@ export class SegmentCollection {
     shiftSlices(sliceIndexThreshold: number, numberOfSlices: number): void;
     updateAtOffset(offset: number, previousValue: number, newValue: number): void;
 }
+
+// @public
+export type SegmentHistogram = {
+    volume: number;
+    histogram: ImageHistogram;
+    labelHistograms?: LabelHistogram[];
+};
 
 // @public
 export type SimpleSequenceValue = {

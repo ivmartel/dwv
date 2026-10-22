@@ -18,7 +18,7 @@ export class ImageHistogram {
   /**
    * Raw value histograms per RSI.
    *
-   * @type {{rsi: RescaleSlopeAndIntercept, histogram: Histogram}[]}
+   * @type {Array<{rsi: RescaleSlopeAndIntercept, histogram: Histogram}>}
    */
   #groups = [];
 

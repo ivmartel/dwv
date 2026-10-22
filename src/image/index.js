@@ -47,6 +47,8 @@ import {Diameter, Diameters, Label} from './label.js';
 import {WindowPreset} from './windowPreset.js';
 import {ImageHistogram} from './imageHistogram.js';
 
+export * from './histogramTypes.js';
+
 export {
   Annotation,
   AnnotationGroup,
