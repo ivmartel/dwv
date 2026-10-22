@@ -140,82 +140,92 @@ describe('MaskFactory', () => {
     );
   });
 
-  test('create: non-overlapping squares pixel values in label map', () => {
-    const image = buildMaskImage('test-seg-00');
+  test(
+    'create: non-overlapping squares pixel values in label map - ' +
+    '#DWV-REQ-IO-06-001 Load DICOM SEG',
+    () => {
+      const image = buildMaskImage('test-seg-00');
 
-    const buf = image.getBuffer();
-    const width = 32;
-    // square 1 center at (col=7, row=7)
-    assert.equal(buf[7 * width + 7], 1, 'square 1 center is segment 1');
-    // square 2 center at (col=15, row=15)
-    assert.equal(buf[15 * width + 15], 2, 'square 2 center is segment 2');
-    // gap between the two squares
-    assert.equal(buf[11 * width + 11], 0, 'gap between squares is background');
-  });
+      const buf = image.getBuffer();
+      const width = 32;
+      // square 1 center at (col=7, row=7)
+      assert.equal(buf[7 * width + 7], 1, 'square 1 center is segment 1');
+      // square 2 center at (col=15, row=15)
+      assert.equal(buf[15 * width + 15], 2, 'square 2 center is segment 2');
+      // gap between the two squares
+      assert.equal(buf[11 * width + 11], 0,
+        'gap between squares is background');
+    });
 
-  test('create: non-overlapping squares segment collection', () => {
-    const image = buildMaskImage('test-seg-00');
+  test(
+    'create: non-overlapping squares segment collection - ' +
+    '#DWV-REQ-IO-06-001 Load DICOM SEG',
+    () => {
+      const image = buildMaskImage('test-seg-00');
 
-    const collection = image.getSegmentCollection();
-    assert.ok(collection !== undefined, 'segment collection exists');
+      const collection = image.getSegmentCollection();
+      assert.ok(collection !== undefined, 'segment collection exists');
 
-    const all = collection.getAll();
-    assert.equal(all.size, 2, 'two per-segment entries');
+      const all = collection.getAll();
+      assert.equal(all.size, 2, 'two per-segment entries');
 
-    const width = 32;
-    const seg1 = all.get(1)?.get(0);
-    const seg2 = all.get(2)?.get(0);
-    assert.ok(seg1 !== undefined, 'segment 1 slice 0 present');
-    assert.ok(seg2 !== undefined, 'segment 2 slice 0 present');
+      const width = 32;
+      const seg1 = all.get(1)?.get(0);
+      const seg2 = all.get(2)?.get(0);
+      assert.ok(seg1 !== undefined, 'segment 1 slice 0 present');
+      assert.ok(seg2 !== undefined, 'segment 2 slice 0 present');
 
-    // segment 1 covers col=4..10, row=4..10
-    assert.equal(seg1[7 * width + 7], 1, 'seg 1 buf: center pixel = 1');
-    assert.equal(seg1[15 * width + 15], 0, 'seg 1 buf: sq 2 pixel = 0');
+      // segment 1 covers col=4..10, row=4..10
+      assert.equal(seg1[7 * width + 7], 1, 'seg 1 buf: center pixel = 1');
+      assert.equal(seg1[15 * width + 15], 0, 'seg 1 buf: sq 2 pixel = 0');
 
-    // segment 2 covers col=12..18, row=12..18
-    assert.equal(seg2[15 * width + 15], 2, 'seg 2 buf: center pixel = 2');
-    assert.equal(seg2[7 * width + 7], 0, 'seg 2 buf: sq 1 pixel = 0');
-  });
+      // segment 2 covers col=12..18, row=12..18
+      assert.equal(seg2[15 * width + 15], 2, 'seg 2 buf: center pixel = 2');
+      assert.equal(seg2[7 * width + 7], 0, 'seg 2 buf: sq 1 pixel = 0');
+    });
 
-  test('toDicom: non-overlapping squares round-trip', () => {
-    const config = syntheticData.find(c => c.name === 'test-seg-00');
-    const refImage = buildRefImage();
-    const image = buildMaskImage('test-seg-00');
+  test(
+    'toDicom: non-overlapping squares round-trip - ' +
+    '#DWV-REQ-IO-05-003 Write DICOM SEG',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-seg-00');
+      const refImage = buildRefImage();
+      const image = buildMaskImage('test-seg-00');
 
-    const factory = new MaskFactory();
-    const segments = image.getMeta().custom.segments;
-    const outElements = factory.toDicom(image, segments, refImage);
+      const factory = new MaskFactory();
+      const segments = image.getMeta().custom.segments;
+      const outElements = factory.toDicom(image, segments, refImage);
 
-    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
-    assert.equal(
-      getReferencedSeriesUID(outElements),
-      refConfig.tags.SeriesInstanceUID,
-      'output referencedSeriesUID matches test-img-00'
-    );
-
-    const inSegs = getSegmentsFromElements(configToElements(config));
-    const outSegs = getSegmentsFromElements(outElements);
-
-    assert.equal(outSegs.length, inSegs.length, 'same segment count');
-    for (let i = 0; i < inSegs.length; i++) {
-      assert.equal(outSegs[i].label, inSegs[i].label, `seg ${i + 1} label`);
+      const refConfig = syntheticData.find(c => c.name === 'test-img-00');
       assert.equal(
-        outSegs[i].displayRGBValue.r,
-        inSegs[i].displayRGBValue.r,
-        `seg ${i + 1} red`
+        getReferencedSeriesUID(outElements),
+        refConfig.tags.SeriesInstanceUID,
+        'output referencedSeriesUID matches test-img-00'
       );
-      assert.equal(
-        outSegs[i].displayRGBValue.g,
-        inSegs[i].displayRGBValue.g,
-        `seg ${i + 1} green`
-      );
-      assert.equal(
-        outSegs[i].displayRGBValue.b,
-        inSegs[i].displayRGBValue.b,
-        `seg ${i + 1} blue`
-      );
-    }
-  });
+
+      const inSegs = getSegmentsFromElements(configToElements(config));
+      const outSegs = getSegmentsFromElements(outElements);
+
+      assert.equal(outSegs.length, inSegs.length, 'same segment count');
+      for (let i = 0; i < inSegs.length; i++) {
+        assert.equal(outSegs[i].label, inSegs[i].label, `seg ${i + 1} label`);
+        assert.equal(
+          outSegs[i].displayRGBValue.r,
+          inSegs[i].displayRGBValue.r,
+          `seg ${i + 1} red`
+        );
+        assert.equal(
+          outSegs[i].displayRGBValue.g,
+          inSegs[i].displayRGBValue.g,
+          `seg ${i + 1} green`
+        );
+        assert.equal(
+          outSegs[i].displayRGBValue.b,
+          inSegs[i].displayRGBValue.b,
+          `seg ${i + 1} blue`
+        );
+      }
+    });
 
   // -------------------------------------------------------------------------
   // Overlapping squares — test-seg-01
@@ -298,48 +308,51 @@ describe('MaskFactory', () => {
     );
   });
 
-  test('toDicom: overlapping squares round-trip', () => {
+  test(
+    'toDicom: overlapping squares round-trip - ' +
+    '#DWV-REQ-IO-05-003 Write DICOM SEG',
+    () => {
     // hide logging
-    vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+      vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
 
-    const config = syntheticData.find(c => c.name === 'test-seg-01');
-    const refImage = buildRefImage();
-    const image = buildMaskImage('test-seg-01');
+      const config = syntheticData.find(c => c.name === 'test-seg-01');
+      const refImage = buildRefImage();
+      const image = buildMaskImage('test-seg-01');
 
-    const factory = new MaskFactory();
-    const segments = image.getMeta().custom.segments;
-    const outElements = factory.toDicom(image, segments, refImage);
+      const factory = new MaskFactory();
+      const segments = image.getMeta().custom.segments;
+      const outElements = factory.toDicom(image, segments, refImage);
 
-    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
-    assert.equal(
-      getReferencedSeriesUID(outElements),
-      refConfig.tags.SeriesInstanceUID,
-      'output referencedSeriesUID matches test-img-00'
-    );
-
-    const inSegs = getSegmentsFromElements(configToElements(config));
-    const outSegs = getSegmentsFromElements(outElements);
-
-    assert.equal(outSegs.length, inSegs.length, 'same segment count');
-    for (let i = 0; i < inSegs.length; i++) {
-      assert.equal(outSegs[i].label, inSegs[i].label, `seg ${i + 1} label`);
+      const refConfig = syntheticData.find(c => c.name === 'test-img-00');
       assert.equal(
-        outSegs[i].displayRGBValue.r,
-        inSegs[i].displayRGBValue.r,
-        `seg ${i + 1} red`
+        getReferencedSeriesUID(outElements),
+        refConfig.tags.SeriesInstanceUID,
+        'output referencedSeriesUID matches test-img-00'
       );
-      assert.equal(
-        outSegs[i].displayRGBValue.g,
-        inSegs[i].displayRGBValue.g,
-        `seg ${i + 1} green`
-      );
-      assert.equal(
-        outSegs[i].displayRGBValue.b,
-        inSegs[i].displayRGBValue.b,
-        `seg ${i + 1} blue`
-      );
-    }
-  });
+
+      const inSegs = getSegmentsFromElements(configToElements(config));
+      const outSegs = getSegmentsFromElements(outElements);
+
+      assert.equal(outSegs.length, inSegs.length, 'same segment count');
+      for (let i = 0; i < inSegs.length; i++) {
+        assert.equal(outSegs[i].label, inSegs[i].label, `seg ${i + 1} label`);
+        assert.equal(
+          outSegs[i].displayRGBValue.r,
+          inSegs[i].displayRGBValue.r,
+          `seg ${i + 1} red`
+        );
+        assert.equal(
+          outSegs[i].displayRGBValue.g,
+          inSegs[i].displayRGBValue.g,
+          `seg ${i + 1} green`
+        );
+        assert.equal(
+          outSegs[i].displayRGBValue.b,
+          inSegs[i].displayRGBValue.b,
+          `seg ${i + 1} blue`
+        );
+      }
+    });
 
 });
 

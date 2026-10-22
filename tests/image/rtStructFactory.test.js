@@ -93,85 +93,95 @@ describe('RtStructFactory', () => {
     );
   });
 
-  test('create: non-overlapping squares pixel values in label map', () => {
-    const config = syntheticData.find(c => c.name === 'test-rtss-00');
-    const factory = new RtStructFactory();
-    const image = factory.create(configToElements(config), buildRefImage());
+  test(
+    'create: non-overlapping squares pixel values in label map - ' +
+    '#DWV-REQ-IO-06-002 Load DICOM RTSTRUCT',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-rtss-00');
+      const factory = new RtStructFactory();
+      const image = factory.create(configToElements(config), buildRefImage());
 
-    const buf = image.getBuffer();
-    const width = 32;
-    // square 1 center at (col=7, row=7) → offset 7*32+7 = 231
-    assert.equal(buf[7 * width + 7], 1, 'square 1 center is segment 1');
-    // square 2 center at (col=15, row=15) → offset 15*32+15 = 495
-    assert.equal(buf[15 * width + 15], 2, 'square 2 center is segment 2');
-    // gap between the two squares
-    assert.equal(buf[11 * width + 11], 0, 'gap between squares is background');
-  });
+      const buf = image.getBuffer();
+      const width = 32;
+      // square 1 center at (col=7, row=7) → offset 7*32+7 = 231
+      assert.equal(buf[7 * width + 7], 1, 'square 1 center is segment 1');
+      // square 2 center at (col=15, row=15) → offset 15*32+15 = 495
+      assert.equal(buf[15 * width + 15], 2, 'square 2 center is segment 2');
+      // gap between the two squares
+      assert.equal(buf[11 * width + 11], 0,
+        'gap between squares is background');
+    });
 
-  test('create: non-overlapping squares segment collection', () => {
-    const config = syntheticData.find(c => c.name === 'test-rtss-00');
-    const factory = new RtStructFactory();
-    const image = factory.create(configToElements(config), buildRefImage());
+  test(
+    'create: non-overlapping squares segment collection - ' +
+    '#DWV-REQ-IO-06-002 Load DICOM RTSTRUCT',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-rtss-00');
+      const factory = new RtStructFactory();
+      const image = factory.create(configToElements(config), buildRefImage());
 
-    const collection = image.getSegmentCollection();
-    assert.ok(collection !== undefined, 'segment collection exists');
+      const collection = image.getSegmentCollection();
+      assert.ok(collection !== undefined, 'segment collection exists');
 
-    const all = collection.getAll();
-    assert.equal(all.size, 2, 'two per-segment entries');
+      const all = collection.getAll();
+      assert.equal(all.size, 2, 'two per-segment entries');
 
-    const width = 32;
-    const seg1 = all.get(1)?.get(0);
-    const seg2 = all.get(2)?.get(0);
-    assert.ok(seg1 !== undefined, 'segment 1 slice 0 present');
-    assert.ok(seg2 !== undefined, 'segment 2 slice 0 present');
+      const width = 32;
+      const seg1 = all.get(1)?.get(0);
+      const seg2 = all.get(2)?.get(0);
+      assert.ok(seg1 !== undefined, 'segment 1 slice 0 present');
+      assert.ok(seg2 !== undefined, 'segment 2 slice 0 present');
 
-    // segment 1 covers col=4..10, row=4..10
-    assert.equal(seg1[7 * width + 7], 1, 'seg 1 buf: center pixel = 1');
-    assert.equal(seg1[15 * width + 15], 0, 'seg 1 buf: sq 2 pixel = 0');
+      // segment 1 covers col=4..10, row=4..10
+      assert.equal(seg1[7 * width + 7], 1, 'seg 1 buf: center pixel = 1');
+      assert.equal(seg1[15 * width + 15], 0, 'seg 1 buf: sq 2 pixel = 0');
 
-    // segment 2 covers col=12..18, row=12..18
-    assert.equal(seg2[15 * width + 15], 2, 'seg 2 buf: center pixel = 2');
-    assert.equal(seg2[7 * width + 7], 0, 'seg 2 buf: sq 1 pixel = 0');
-  });
+      // segment 2 covers col=12..18, row=12..18
+      assert.equal(seg2[15 * width + 15], 2, 'seg 2 buf: center pixel = 2');
+      assert.equal(seg2[7 * width + 7], 0, 'seg 2 buf: sq 1 pixel = 0');
+    });
 
-  test('toDicom: non-overlapping squares round-trip', () => {
-    const config = syntheticData.find(c => c.name === 'test-rtss-00');
-    const factory = new RtStructFactory();
-    const refImage = buildRefImage();
-    const image = factory.create(configToElements(config), refImage);
-    const outElements = factory.toDicom(image, undefined, refImage);
+  test(
+    'toDicom: non-overlapping squares round-trip - ' +
+    '#DWV-REQ-IO-05-004 Write DICOM RTSTRUCT',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-rtss-00');
+      const factory = new RtStructFactory();
+      const refImage = buildRefImage();
+      const image = factory.create(configToElements(config), refImage);
+      const outElements = factory.toDicom(image, undefined, refImage);
 
-    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
-    assert.equal(
-      getReferencedSeriesUIDFromRTStruct(outElements),
-      refConfig.tags.SeriesInstanceUID,
-      'output referencedSeriesUID matches test-img-00'
-    );
-
-    const inRois = getRTStructFromElements(configToElements(config));
-    const outRois = getRTStructFromElements(outElements);
-
-    assert.equal(outRois.length, inRois.length, 'same ROI count');
-    for (let i = 0; i < inRois.length; i++) {
-      assert.equal(outRois[i].name, inRois[i].name, `ROI ${i + 1} name`);
+      const refConfig = syntheticData.find(c => c.name === 'test-img-00');
       assert.equal(
-        outRois[i].colour.r, inRois[i].colour.r, `ROI ${i + 1} red`
+        getReferencedSeriesUIDFromRTStruct(outElements),
+        refConfig.tags.SeriesInstanceUID,
+        'output referencedSeriesUID matches test-img-00'
       );
-      assert.equal(
-        outRois[i].colour.g, inRois[i].colour.g, `ROI ${i + 1} green`
-      );
-      assert.equal(
-        outRois[i].colour.b, inRois[i].colour.b, `ROI ${i + 1} blue`
-      );
-      assert.ok(outRois[i].contours.length > 0, `ROI ${i + 1} has contours`);
-      for (const c of outRois[i].contours) {
-        assert.ok(c.points3D.length >= 9, 'contour has at least 3 points');
+
+      const inRois = getRTStructFromElements(configToElements(config));
+      const outRois = getRTStructFromElements(outElements);
+
+      assert.equal(outRois.length, inRois.length, 'same ROI count');
+      for (let i = 0; i < inRois.length; i++) {
+        assert.equal(outRois[i].name, inRois[i].name, `ROI ${i + 1} name`);
         assert.equal(
-          c.points3D.length % 3, 0, 'contour data length is multiple of 3'
+          outRois[i].colour.r, inRois[i].colour.r, `ROI ${i + 1} red`
         );
+        assert.equal(
+          outRois[i].colour.g, inRois[i].colour.g, `ROI ${i + 1} green`
+        );
+        assert.equal(
+          outRois[i].colour.b, inRois[i].colour.b, `ROI ${i + 1} blue`
+        );
+        assert.ok(outRois[i].contours.length > 0, `ROI ${i + 1} has contours`);
+        for (const c of outRois[i].contours) {
+          assert.ok(c.points3D.length >= 9, 'contour has at least 3 points');
+          assert.equal(
+            c.points3D.length % 3, 0, 'contour data length is multiple of 3'
+          );
+        }
       }
-    }
-  });
+    });
 
   // -------------------------------------------------------------------------
   // Overlapping squares — test-rtss-01
@@ -307,49 +317,55 @@ describe('RtStructFactory', () => {
   // Outer square: col=4..20, row=4..20 | Hole: col=10..14, row=10..14
   // -------------------------------------------------------------------------
 
-  test('create: square with hole punches out the hole', () => {
-    const config = syntheticData.find(c => c.name === 'test-rtss-02');
-    const factory = new RtStructFactory();
-    const image = factory.create(configToElements(config), buildRefImage());
+  test(
+    'create: square with hole punches out the hole - ' +
+    '#DWV-REQ-IO-06-002 Load DICOM RTSTRUCT',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-rtss-02');
+      const factory = new RtStructFactory();
+      const image = factory.create(configToElements(config), buildRefImage());
 
-    const buf = image.getBuffer();
-    const width = 32;
-    // outer, outside the hole
-    assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
-    // inside the hole
-    assert.equal(buf[12 * width + 12], 0, 'hole area is background');
-    // fully outside the square
-    assert.equal(buf[2 * width + 2], 0, 'outside square is background');
-  });
+      const buf = image.getBuffer();
+      const width = 32;
+      // outer, outside the hole
+      assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
+      // inside the hole
+      assert.equal(buf[12 * width + 12], 0, 'hole area is background');
+      // fully outside the square
+      assert.equal(buf[2 * width + 2], 0, 'outside square is background');
+    });
 
-  test('toDicom: square with hole round-trip preserves the hole', () => {
-    const config = syntheticData.find(c => c.name === 'test-rtss-02');
-    const factory = new RtStructFactory();
-    const refImage = buildRefImage();
-    const image = factory.create(configToElements(config), refImage);
-    const outElements = factory.toDicom(image, undefined, refImage);
+  test(
+    'toDicom: square with hole round-trip preserves the hole - ' +
+    '#DWV-REQ-IO-05-004 Write DICOM RTSTRUCT',
+    () => {
+      const config = syntheticData.find(c => c.name === 'test-rtss-02');
+      const factory = new RtStructFactory();
+      const refImage = buildRefImage();
+      const image = factory.create(configToElements(config), refImage);
+      const outElements = factory.toDicom(image, undefined, refImage);
 
-    const outRois = getRTStructFromElements(outElements);
-    assert.equal(outRois.length, 1, 'one ROI');
-    assert.equal(
-      outRois[0].contours.length, 2,
-      'outer boundary and hole are both written as contours'
-    );
-    for (const c of outRois[0].contours) {
+      const outRois = getRTStructFromElements(outElements);
+      assert.equal(outRois.length, 1, 'one ROI');
       assert.equal(
-        c.type, 'CLOSEDPLANAR_XOR',
-        'hole-bearing contours are tagged CLOSEDPLANAR_XOR'
+        outRois[0].contours.length, 2,
+        'outer boundary and hole are both written as contours'
       );
-    }
+      for (const c of outRois[0].contours) {
+        assert.equal(
+          c.type, 'CLOSEDPLANAR_XOR',
+          'hole-bearing contours are tagged CLOSEDPLANAR_XOR'
+        );
+      }
 
-    // re-import the round-tripped RTSS and check the hole survived
-    const roundTripImage = factory.create(outElements, refImage);
-    const buf = roundTripImage.getBuffer();
-    const width = 32;
-    assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
-    assert.equal(buf[12 * width + 12], 0, 'hole area is background');
-    assert.equal(buf[2 * width + 2], 0, 'outside square is background');
-  });
+      // re-import the round-tripped RTSS and check the hole survived
+      const roundTripImage = factory.create(outElements, refImage);
+      const buf = roundTripImage.getBuffer();
+      const width = 32;
+      assert.equal(buf[6 * width + 6], 1, 'outer area is segment 1');
+      assert.equal(buf[12 * width + 12], 0, 'hole area is background');
+      assert.equal(buf[2 * width + 2], 0, 'outside square is background');
+    });
 
   test('create: accepts CLOSEDPLANAR_XOR contours and punches out the hole',
     () => {

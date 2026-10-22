@@ -66,7 +66,9 @@ describe('tools/behaviors', () => {
       assert.equal(posHelper.decrementPositionAlongScroll.mock.calls.length, 1);
     });
 
-    test('onWheelTick increments dimension 3 when up=true and moreThanOne(3)',
+    test(
+      'onWheelTick increments dimension 3 when up=true and moreThanOne(3) - ' +
+      '#DWV-REQ-UI-03-005 Change image volume',
       () => {
         const layerGroup = makeMockLayerGroup();
         layerGroup.canScroll.mockReturnValue(false);

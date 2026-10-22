@@ -440,77 +440,91 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~readTid1500V0Arrow
    */
-  test('Read tid1500 v0 arrow', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Arrow);
-    checkGroupCommonProperties(annotationGroup, 'arrow');
-    checkArrowGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 arrow - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Arrow);
+      checkGroupCommonProperties(annotationGroup, 'arrow');
+      checkArrowGroup(annotationGroup);
+    });
 
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a circle.
    *
    * @function module:tests/annotation~readTid1500V0Circle
    */
-  test('Read tid1500 v0 circle', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Circle);
-    checkGroupCommonProperties(annotationGroup, 'circle');
-    checkCircleGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 circle - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Circle);
+      checkGroupCommonProperties(annotationGroup, 'circle');
+      checkCircleGroup(annotationGroup);
+    });
 
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing an ellipse.
    *
    * @function module:tests/annotation~readTid1500V0Ellipse
    */
-  test('Read tid1500 v0 ellipse', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Ellipse);
-    checkGroupCommonProperties(annotationGroup, 'ellipse');
-    checkEllipseGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 ellipse - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Ellipse);
+      checkGroupCommonProperties(annotationGroup, 'ellipse');
+      checkEllipseGroup(annotationGroup);
+    });
 
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a protractor.
    *
    * @function module:tests/annotation~readTid1500V0Protractor
    */
-  test('Read tid1500 v0 protractor', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Protractor);
-    checkGroupCommonProperties(annotationGroup, 'protractor');
-    checkProtractorGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 protractor - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Protractor);
+      checkGroupCommonProperties(annotationGroup, 'protractor');
+      checkProtractorGroup(annotationGroup);
+    });
 
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a rectangle.
    *
    * @function module:tests/annotation~readTid1500V0Rectangle
    */
-  test('Read tid1500 v0 rectangle', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Rectangle);
-    checkGroupCommonProperties(annotationGroup, 'rectangle');
-    checkRectangleGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 rectangle - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Rectangle);
+      checkGroupCommonProperties(annotationGroup, 'rectangle');
+      checkRectangleGroup(annotationGroup);
+    });
 
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a roi.
    *
    * @function module:tests/annotation~readTid1500V0Roi
    */
-  test('Read tid1500 v0 roi', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Roi);
-    checkGroupCommonProperties(annotationGroup, 'roi');
-    checkRoiGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 roi - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Roi);
+      checkGroupCommonProperties(annotationGroup, 'roi');
+      checkRoiGroup(annotationGroup);
+    });
 
   /**
    * Tests for {@link Annotation} from tid1500 v0 containing a ruler.
    *
    * @function module:tests/annotation~readTid1500V0Ruler
    */
-  test('Read tid1500 v0 ruler', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Ruler);
-    checkGroupCommonProperties(annotationGroup, 'ruler');
-    checkRulerGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 ruler - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Ruler);
+      checkGroupCommonProperties(annotationGroup, 'ruler');
+      checkRulerGroup(annotationGroup);
+    });
 
   /**
    * Test BidimensionalLine DICOM SR import/export roundtrip.
@@ -639,10 +653,13 @@ describe('annotation', () => {
    *
    * @function module:tests/annotation~readTid1500V0Bidimensional
    */
-  test('Read tid1500 v0 bidimensional', () => {
-    const annotationGroup = getAnnotationGroup(tid1500v0Bidimensional);
-    checkGroupCommonProperties(annotationGroup, 'bidimensional');
-    checkBidimensionalGroup(annotationGroup);
-  });
+  test(
+    'Read tid1500 v0 bidimensional - ' +
+    '#DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const annotationGroup = getAnnotationGroup(tid1500v0Bidimensional);
+      checkGroupCommonProperties(annotationGroup, 'bidimensional');
+      checkBidimensionalGroup(annotationGroup);
+    });
 
 });

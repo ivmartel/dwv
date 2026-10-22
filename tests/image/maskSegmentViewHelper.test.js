@@ -35,11 +35,14 @@ describe('image', () => {
    *
    * @function module:tests/image~maskSegmentViewHelperAddToHidden
    */
-  test('MaskSegmentViewHelper addToHidden makes segment hidden', () => {
-    helper.addToHidden(1);
-    assert.ok(helper.isHidden(1), 'hidden after add');
-    assert.notOk(helper.isHidden(2), 'other segments unaffected');
-  });
+  test(
+    'MaskSegmentViewHelper addToHidden makes segment hidden - ' +
+    '#DWV-REQ-UI-02-004 Display segmentation',
+    () => {
+      helper.addToHidden(1);
+      assert.ok(helper.isHidden(1), 'hidden after add');
+      assert.notOk(helper.isHidden(2), 'other segments unaffected');
+    });
 
   /**
    * Tests that addToHidden is a no-op for an already-hidden segment.
@@ -65,13 +68,16 @@ describe('image', () => {
    *
    * @function module:tests/image~maskSegmentViewHelperRemoveFromHidden
    */
-  test('MaskSegmentViewHelper removeFromHidden unhides a segment', () => {
-    helper.addToHidden(1);
-    helper.addToHidden(2);
-    helper.removeFromHidden(1);
-    assert.notOk(helper.isHidden(1), 'segment 1 removed');
-    assert.ok(helper.isHidden(2), 'segment 2 unaffected');
-  });
+  test(
+    'MaskSegmentViewHelper removeFromHidden unhides a segment - ' +
+    '#DWV-REQ-UI-02-004 Display segmentation',
+    () => {
+      helper.addToHidden(1);
+      helper.addToHidden(2);
+      helper.removeFromHidden(1);
+      assert.notOk(helper.isHidden(1), 'segment 1 removed');
+      assert.ok(helper.isHidden(2), 'segment 2 unaffected');
+    });
 
   /**
    * Tests that removeFromHidden is a no-op for a segment not in the list.

@@ -473,22 +473,25 @@ describe('tools/behaviors', () => {
         posHelper.incrementPositionAlongScroll.mock.calls.length, 1);
     });
 
-    test('onDrag increments dimension 3 when dx > 0 and moreThanOne(3)', () => {
-      const layerGroup = makeMockLayerGroup();
-      layerGroup.canScroll.mockReturnValue(false);
-      layerGroup.moreThanOne.mockReturnValue(true);
-      const posHelper = layerGroup.getPositionHelper();
+    test(
+      'onDrag increments dimension 3 when dx > 0 and moreThanOne(3) - ' +
+      '#DWV-REQ-UI-03-005 Change image volume',
+      () => {
+        const layerGroup = makeMockLayerGroup();
+        layerGroup.canScroll.mockReturnValue(false);
+        layerGroup.moreThanOne.mockReturnValue(true);
+        const posHelper = layerGroup.getPositionHelper();
 
-      const drag = new DragStep(
-        new Point2D(0, 0),
-        new Point2D(20, 0),
-        {threshold: {x: 15, y: 15}}
-      );
-      behavior.onDrag(drag, layerGroup);
+        const drag = new DragStep(
+          new Point2D(0, 0),
+          new Point2D(20, 0),
+          {threshold: {x: 15, y: 15}}
+        );
+        behavior.onDrag(drag, layerGroup);
 
-      assert.equal(posHelper.incrementPosition.mock.calls.length, 1);
-      assert.equal(posHelper.incrementPosition.mock.calls[0][0], 3);
-    });
+        assert.equal(posHelper.incrementPosition.mock.calls.length, 1);
+        assert.equal(posHelper.incrementPosition.mock.calls[0][0], 3);
+      });
   });
 
   describe('OpacityDragBehavior', () => {

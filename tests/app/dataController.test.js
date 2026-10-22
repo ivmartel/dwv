@@ -191,7 +191,9 @@ describe('app', () => {
    *
    * @function module:tests/app~datacontrollerMultiFrameMultiVolumePerFile
    */
-  test('DataController builds multi-frame files with multiple volumes',
+  test(
+    'DataController builds multi-frame files with multiple volumes - ' +
+    '#DWV-REQ-IO-07-001 Load multi-volume data',
     () => {
       // 2 files, each one with 2 volumes of 2 frames at the same
       // positions: the first item of 2 volumes comes from the same
@@ -250,33 +252,36 @@ describe('app', () => {
    *
    * @function module:tests/app~dicomSliceDataListBuildData
    */
-  test('DicomSliceDataList buildData guesses volume id tag', () => {
+  test(
+    'DicomSliceDataList buildData guesses volume id tag - ' +
+    '#DWV-REQ-IO-07-001 Load multi-volume data',
+    () => {
     // 2 origins (z=0, z=1) x 2 volumes (TemporalPositionIdentifier 1/2).
     // AcquisitionTime is constant across all slices so it cannot be
     // used to discriminate volumes: the guess must skip it and use
     // TemporalPositionIdentifier instead.
-    const list0 = new DicomSliceDataList();
-    const zs = [0, 1];
-    const tpis = [1, 2];
-    let uid = 0;
-    for (const z of zs) {
-      for (const tpi of tpis) {
-        list0.add(makeSliceData(z, String(uid++), {
-          [TagKeys.AcquisitionTime]: makeDataElement('TM', ['080000']),
-          [TagKeys.TemporalPositionIdentifier]:
+      const list0 = new DicomSliceDataList();
+      const zs = [0, 1];
+      const tpis = [1, 2];
+      let uid = 0;
+      for (const z of zs) {
+        for (const tpi of tpis) {
+          list0.add(makeSliceData(z, String(uid++), {
+            [TagKeys.AcquisitionTime]: makeDataElement('TM', ['080000']),
+            [TagKeys.TemporalPositionIdentifier]:
             makeDataElement('IS', [String(tpi)])
-        }));
+          }));
+        }
       }
-    }
 
-    const res0 = list0.buildData();
-    assert.equal(
-      res0.image.getGeometry().getSize().get(2), 2, 'volume0 slice count');
-    assert.deepEqual(
-      res0.image.getGeometry().getOrigins(),
-      [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
-      'volume0 origins');
-  });
+      const res0 = list0.buildData();
+      assert.equal(
+        res0.image.getGeometry().getSize().get(2), 2, 'volume0 slice count');
+      assert.deepEqual(
+        res0.image.getGeometry().getOrigins(),
+        [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+        'volume0 origins');
+    });
 
   test('DicomSliceDataList buildData merges meta with correct ids', () => {
     // each volume's own TemporalPositionIdentifier value must end up

@@ -120,6 +120,48 @@
       "description": "The user can save image and anonymised meta data to a DICOM file."
     },
     {
+      "id": "DWV-REQ-IO-05-003",
+      "name": "Write DICOM SEG",
+      "group": "io",
+      "description": "The user can save a segmentation as a DICOM Segmentation (SEG) file. The segmentation is saved as a binary segmentation that references the image it was created on. Each segment keeps its number, label and colour."
+    },
+    {
+      "id": "DWV-REQ-IO-05-004",
+      "name": "Write DICOM RTSTRUCT",
+      "group": "io",
+      "description": "The user can save a segmentation as a DICOM RT Structure Set (RTSTRUCT) file. The segments are converted to closed planar contours (one or more per slice) that reference the image the segmentation was created on. Each segment is saved as a Region Of Interest (ROI) that keeps its number, name and colour."
+    },
+    {
+      "id": "DWV-REQ-IO-05-005",
+      "name": "Write DICOM SR annotations",
+      "group": "io",
+      "description": "The user can save annotations as a DICOM Structured Report (SR) file following the TID 1500 Measurement Report template. Each annotation is saved with its shape, its label, its measures and quantifications, and a reference to the image it was drawn on."
+    },
+    {
+      "id": "DWV-REQ-IO-06-001",
+      "name": "Load DICOM SEG",
+      "group": "io",
+      "description": "The user can load a DICOM Segmentation (SEG) file. Once loaded, the user can access the segmentation as a mask image and its list of segments (number, label and colour)."
+    },
+    {
+      "id": "DWV-REQ-IO-06-002",
+      "name": "Load DICOM RTSTRUCT",
+      "group": "io",
+      "description": "The user can load a DICOM RT Structure Set (RTSTRUCT) file. The image series referenced by the structure set must be loaded first. The contours of each Region Of Interest (ROI) are converted into a mask image aligned with the referenced image; each ROI becomes a segment (number, name and colour)."
+    },
+    {
+      "id": "DWV-REQ-IO-06-003",
+      "name": "Load DICOM SR annotations",
+      "group": "io",
+      "description": "The user can load annotations from a DICOM Structured Report (SR) file following the TID 1500 Measurement Report template. Once loaded, the user can access the annotations: their shape, label, measures, quantifications and the image they reference."
+    },
+    {
+      "id": "DWV-REQ-IO-07-001",
+      "name": "Load multi-volume data",
+      "group": "io",
+      "description": "The user can load data that contains multiple volumes of the same geometry, for example a time series or a diffusion acquisition with multiple b-values. The data can be provided as multiple single-frame files or as one multi-frame file. The volumes are identified using DICOM tags such as Temporal Position Identifier, Temporal Position Index or Diffusion b-value. The embedding application can change the list of tags used."
+    },
+    {
       "id": "DWV-REQ-UI-01-001",
       "name": "Integration in web application",
       "group": "ui",
@@ -144,6 +186,18 @@
       "description": "The user can load multiple data in a single HTML div. This will result in multiple HTML `<canvas>` aligned with each other by using the Image Position Patient DICOM tag."
     },
     {
+      "id": "DWV-REQ-UI-02-004",
+      "name": "Display segmentation",
+      "group": "ui",
+      "description": "The user can display a segmentation (loaded from a DICOM SEG or RTSTRUCT file, or created by the user) over the image it references. The segmentation is aligned with the image and each segment is shown with its colour. The user can show or hide each segment."
+    },
+    {
+      "id": "DWV-REQ-UI-02-005",
+      "name": "Display annotations",
+      "group": "ui",
+      "description": "The user can display annotations (loaded from a DICOM SR file or drawn by the user) over the image they reference. Each annotation is shown on the slice it was drawn on, with its label, measures and quantifications."
+    },
+    {
       "id": "DWV-REQ-UI-03-001",
       "name": "Change image window/level",
       "group": "ui",
@@ -166,6 +220,12 @@
       "name": "Change image opacity",
       "group": "ui",
       "description": "The user can change the opacity of the displayed image. On change, a `opacitychange` event will be fired containing the changed values."
+    },
+    {
+      "id": "DWV-REQ-UI-03-005",
+      "name": "Change image volume",
+      "group": "ui",
+      "description": "For multi-volume data, the user can change the displayed volume while keeping the current position in the volume. On change, a `positionchange` event will be fired containing the changed values."
     },
     {
       "id": "DWV-REQ-UI-04-001",

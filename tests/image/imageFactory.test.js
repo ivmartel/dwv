@@ -455,24 +455,27 @@ describe('ImageFactory', () => {
       }
     });
 
-    test('frames image: slices and volumes', () => {
-      const image = createFramesImage(
-        new ImageFactory(), elements, 1, numberOfFrames);
-      const geometry = image.getGeometry();
-      assert.deepEqual(
-        geometry.getSize().getValues(),
-        [tags.Columns, tags.Rows, numberOfSlices, 2],
-        'size');
-      const origins = geometry.getOrigins();
-      assert.equal(origins.length, numberOfSlices, 'one origin per slice');
-      for (let i = 0; i < numberOfSlices; ++i) {
+    test(
+      'frames image: slices and volumes - ' +
+      '#DWV-REQ-IO-07-001 Load multi-volume data',
+      () => {
+        const image = createFramesImage(
+          new ImageFactory(), elements, 1, numberOfFrames);
+        const geometry = image.getGeometry();
         assert.deepEqual(
-          origins[i].getValues(), [0, 0, i], `slice ${i} origin`);
-      }
-      assert.deepEqual(
-        Array.from(image.getBuffer()), Array.from(expectedBuffer),
-        'buffer in volume then spatial order');
-    });
+          geometry.getSize().getValues(),
+          [tags.Columns, tags.Rows, numberOfSlices, 2],
+          'size');
+        const origins = geometry.getOrigins();
+        assert.equal(origins.length, numberOfSlices, 'one origin per slice');
+        for (let i = 0; i < numberOfSlices; ++i) {
+          assert.deepEqual(
+            origins[i].getValues(), [0, 0, i], `slice ${i} origin`);
+        }
+        assert.deepEqual(
+          Array.from(image.getBuffer()), Array.from(expectedBuffer),
+          'buffer in volume then spatial order');
+      });
 
     test('frames image: append order does not matter', () => {
       const factory = new ImageFactory();
