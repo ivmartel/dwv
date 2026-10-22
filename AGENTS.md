@@ -56,15 +56,22 @@ these steps all succeed, in this order:
    warnings at zero anyway.
 3. `yarn test-ci` — all vitest tests pass and coverage stays at or above
    50% for statements, branches, functions and lines (`vitest.config.js`).
-4. `yarn build` — the webpack bundle, the `tsc` type generation (so the
-   jsdoc types must type-check) and api-extractor must all succeed. The
-   `api` step runs with `--local`: an API change rewrites
-   `resources/api/dwv.api.md` instead of failing, and that file is only
-   committed at release time.
+4. `yarn build-ci` — the webpack bundle, the `tsc` type generation (so the
+   jsdoc types must type-check) and api-extractor must all succeed. Its
+   `api-ci` step runs api-extractor without `--local`: it fails on any
+   api-extractor warning, and when the public API no longer matches the
+   committed `resources/api/dwv.api.md`. The local `yarn build` runs `api`
+   with `--local`, which rewrites `dwv.api.md` instead; commit that update
+   with the change that caused it.
 
 On pushes to `develop` or `master` CI also runs `yarn build-demo` and
 publishes the demo to `gh-pages` (`demo/trunk` or `demo/stable`). To
-reproduce CI locally, run `yarn lint && yarn test-ci && yarn build`.
+reproduce CI locally, run `yarn lint && yarn test-ci && yarn build-ci`.
+
+The `verify` skill (`.agents/skills/verify/SKILL.md`) wraps these steps with
+the repo-specific checks CI does not do: reporting `dwv.api.md` changes and
+reviewing the diff against the conventions below. Use it before reporting a
+change as done.
 
 ## Requirements traceability
 
