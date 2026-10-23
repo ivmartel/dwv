@@ -22,7 +22,7 @@ import {DataReader} from './dataReader.js';
 import {logger} from '../utils/logger.js';
 
 /**
- * @import {IntTypedArray, TypedArray} from '../math/arrayTypes.js';
+ * @import {IntTypedArray, TypedArray} from '../math/types.js';
  */
 
 /**

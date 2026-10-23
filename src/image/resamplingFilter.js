@@ -4,7 +4,7 @@ import {BIG_EPSILON} from '../math/number.js';
 import {getTypedArrayLike} from '../dicom/dicomParser.js';
 
 /**
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**

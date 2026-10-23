@@ -24,7 +24,7 @@ import {logger} from '../utils/logger.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**

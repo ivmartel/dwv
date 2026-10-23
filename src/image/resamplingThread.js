@@ -8,7 +8,7 @@ import {Spacing} from './spacing.js';
 /**
  * @import {Matrix33} from '../math/matrix.js';
  * @import {Point} from '../math/point.js';
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**

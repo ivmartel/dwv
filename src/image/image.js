@@ -18,7 +18,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {ColourMap} from './luts.js';
  * @import {Point} from '../math/point.js';
  * @import {MaskImage} from './maskImage.js';
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {TypedArray} from '../math/types.js';
  * @import {VolumeId} from '../dicom/volumeTypes.js';
  */
 

@@ -1,7 +1,7 @@
 import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 /**
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**

@@ -22,7 +22,7 @@ import {
 } from './number.js';
 
 // also export typedefs
-export * from './arrayTypes.js';
+export * from './types.js';
 
 export {
   Circle,
