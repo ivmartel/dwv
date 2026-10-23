@@ -278,7 +278,7 @@ function getFrameGeometry(dataElements, frameNumber) {
       new Size([size2D[0], size2D[1], 1]),
       geometry.getSpacing(),
       geometry.getOrientation(),
-      frameNumber
+      {value: frameNumber}
     );
   }
   return res;

@@ -1,7 +1,11 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
 import {Annotation} from '../../src/image/annotation.js';
 import {DicomCode} from '../../src/dicom/dicomCode.js';
-import {Point2D, Point3D} from '../../src/math/point.js';
+import {Point, Point2D, Point3D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
 import {Rectangle} from '../../src/math/rectangle.js';
 import {Path} from '../../src/math/path.js';
 import * as loggerModule from '../../src/utils/logger.js';
@@ -408,6 +412,46 @@ describe('image', () => {
       assert.equal(ann.referencedFrameNumber, timeIndex + 1,
         `frame number for time index ${timeIndex}`);
     }
+  });
+
+  /**
+   * Tests that {@link Annotation#getCentroid} uses the volume id
+   * of the referenced frame.
+   *
+   * @function module:tests/image~annotationCentroidVolumeId
+   */
+  test('Annotation getCentroid with volume ids', () => {
+    // 2 slices, 3 volumes with ids 0, 500 and 1000
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([4, 4, 1]), new Spacing([1, 1, 1]),
+      undefined, {name: 'DiffusionBValue', value: 0});
+    geometry.appendOrigin(new Point3D(0, 0, 1), 1, 0);
+    for (const value of [500, 1000]) {
+      geometry.appendFrame(
+        new Point3D(0, 0, 0), {name: 'DiffusionBValue', value});
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1, value);
+    }
+
+    let position = geometry.indexToWorld(new Index([0, 0, 0, 2]));
+    const vc = new MockViewController({uid: 'sop-001'});
+    vc.getCurrentPosition = () => position;
+    vc.getCurrentIndex = () => geometry.worldToIndex(position);
+    vc.getIndexFromPosition = (point) => geometry.worldToIndex(point);
+    vc.getPositionFromIndex = (index) => geometry.indexToWorld(index);
+    vc.getScrollDimIndex = () => 2;
+    vc.getPositionFromPlanePoint = (point, k) =>
+      new Point([point.getX(), point.getY(), k, position.get(3)]);
+
+    const ann = new Annotation();
+    ann.init(vc);
+    assert.equal(ann.referencedFrameNumber, 3, 'frame number');
+
+    ann.mathShape = new Rectangle(new Point2D(0, 0), new Point2D(2, 2));
+    // move to the first volume: the centroid stays on the third
+    position = geometry.indexToWorld(new Index([0, 0, 0, 0]));
+    const centroid = ann.getCentroid();
+    assert.deepEqual(
+      centroid.getValues(), [1, 1, 0, 1000], 'centroid with volume id');
   });
 
   /**

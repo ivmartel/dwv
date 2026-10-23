@@ -332,7 +332,8 @@ describe('ImageFactory', () => {
         assert.deepEqual(
           geometry.getSize().getValues(), [tags.Columns, tags.Rows, 1],
           `frame ${f} size`);
-        assert.equal(geometry.getInitialTime(), f, `frame ${f} time`);
+        assert.deepEqual(
+          geometry.getInitialTime(), {value: f}, `frame ${f} time`);
         assert.equal(
           image.getMeta().sliceCapacity, 2 * numberOfFrames,
           `frame ${f} sliceCapacity is the total number of frames`);
@@ -415,6 +416,14 @@ describe('ImageFactory', () => {
     const positions = structure.genOptions.framePositionOrder;
     // volume 0 is the lowest TemporalPositionIndex or b-value
     const volumes = [1, 1, 0, 0];
+    // the frame time is the frame TemporalPositionIndex or b-value
+    const isBValue = typeof structure.genOptions.frameBValues !== 'undefined';
+    const volumeIds = isBValue
+      ? structure.genOptions.frameBValues
+      : structure.genOptions.frameTemporalPositions;
+    const volumeIdInfo = isBValue
+      ? {name: 'DiffusionBValue', tagKey: '00189087', unit: 'unit.smm2'}
+      : {name: 'TemporalPositionIndex', tagKey: '00209128'};
     const numberOfFrames = structure.numberOfFrames;
     const numberOfSlices = 2;
 
@@ -437,7 +446,7 @@ describe('ImageFactory', () => {
       }
     });
 
-    test('frame image: frame position and volume index as time', () => {
+    test('frame image: frame position and volume id as time', () => {
       for (let f = 0; f < numberOfFrames; ++f) {
         const image = new ImageFactory().create(
           elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 1, f);
@@ -448,7 +457,9 @@ describe('ImageFactory', () => {
         assert.deepEqual(
           geometry.getOrigin().getValues(), [0, 0, positions[f]],
           `frame ${f} origin`);
-        assert.equal(geometry.getInitialTime(), volumes[f], `frame ${f} time`);
+        assert.deepEqual(
+          geometry.getInitialTime(), {...volumeIdInfo, value: volumeIds[f]},
+          `frame ${f} time`);
         assert.equal(
           image.getMeta().sliceCapacity, numberOfFrames,
           `frame ${f} sliceCapacity is the total number of frames`);
@@ -475,6 +486,11 @@ describe('ImageFactory', () => {
         assert.deepEqual(
           Array.from(image.getBuffer()), Array.from(expectedBuffer),
           'buffer in volume then spatial order');
+        assert.deepEqual(
+          geometry.getVolumeIds(),
+          [...new Set(volumeIds)].sort((a, b) => a - b)
+            .map(value => ({...volumeIdInfo, value})),
+          'volume ids');
       });
 
     test('frames image: append order does not matter', () => {
@@ -510,8 +526,8 @@ describe('ImageFactory', () => {
     for (let f = 0; f < numberOfFrames; ++f) {
       const image = new ImageFactory().create(
         elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 1, f);
-      assert.equal(
-        image.getGeometry().getInitialTime(), f, `frame ${f} time`);
+      assert.deepEqual(
+        image.getGeometry().getInitialTime(), {value: f}, `frame ${f} time`);
     }
     warnSpy.mockRestore();
   });
