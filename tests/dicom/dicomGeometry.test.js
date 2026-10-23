@@ -200,8 +200,9 @@ describe('getSortedFramesGeometry', () => {
       unsortedMultiframeMultiVolumeBValueStructure
     ]) {
       const positions = structure.genOptions.framePositionOrder;
-      // volume 0 is the lowest TemporalPositionIndex or b-value
-      const volumes = [1, 1, 0, 0];
+      // the frame time is the frame TemporalPositionIndex or b-value
+      const volumeIds = structure.genOptions.frameTemporalPositions ??
+        structure.genOptions.frameBValues;
       const elements = getStructureElementsList(config, syntax, structure)[0];
       const res = getSortedFramesGeometry(elements);
       assert.isDefined(res, structure.name);
@@ -214,8 +215,13 @@ describe('getSortedFramesGeometry', () => {
           [[0, 0, positions[f]]],
           `${structure.name} frame ${f} origin`);
         assert.equal(
-          res[f].getInitialTime(), volumes[f],
+          res[f].getInitialTime().value, volumeIds[f],
           `${structure.name} frame ${f} time`);
+        assert.equal(
+          res[f].getInitialTime().name,
+          typeof structure.genOptions.frameBValues !== 'undefined'
+            ? 'DiffusionBValue' : 'TemporalPositionIndex',
+          `${structure.name} frame ${f} volume id name`);
       }
     }
   });

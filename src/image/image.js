@@ -19,6 +19,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {Point} from '../math/point.js';
  * @import {MaskImage} from './maskImage.js';
  * @import {TypedArray} from '../math/types.js';
+ * @import {VolumeId} from '../dicom/volumeTypes.js';
  */
 
 
@@ -46,7 +47,7 @@ export const imageEventNames = [
  */
 function getSliceIndex(volumeGeometry, sliceGeometry) {
   // possible time
-  const timeId = sliceGeometry.getInitialTime();
+  const timeId = sliceGeometry.getInitialTime()?.value;
   // index values
   const values = [];
   // x, y
@@ -54,9 +55,10 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
   values.push(0);
   // z
   values.push(volumeGeometry.getSliceIndex(sliceGeometry.getOrigin(), timeId));
-  // time
+  // time: volume index if the time is a volume id
   if (typeof timeId !== 'undefined') {
-    values.push(timeId);
+    const volumeIndex = volumeGeometry.getVolumeIndex(timeId);
+    values.push(volumeIndex !== -1 ? volumeIndex : timeId);
   }
   // return index
   return new Index(values);
@@ -964,7 +966,8 @@ export class Image extends EventTarget {
     let size = this.getGeometry().getSize();
 
     // possible time
-    const timeId = rhs.getGeometry().getInitialTime();
+    const time = rhs.getGeometry().getInitialTime();
+    const timeId = time?.value;
 
     const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
 
@@ -973,7 +976,7 @@ export class Image extends EventTarget {
     if (typeof timeId !== 'undefined' &&
       !this.#geometry.hasSlicesAtTime(timeId)) {
       // update grometry
-      this.appendFrame(timeId, rhs.getGeometry().getOrigin());
+      this.appendFrame(time, rhs.getGeometry().getOrigin());
       // update size
       size = this.#geometry.getSize();
       // update flag
@@ -1100,13 +1103,14 @@ export class Image extends EventTarget {
     // append
     this.#buffer.set(frameBuffer, frameSize * frameIndex);
     // update geometry
-    this.appendFrame(frameIndex, new Point3D(0, 0, 0));
+    this.appendFrame({value: frameIndex}, new Point3D(0, 0, 0));
   }
 
   /**
    * Append a frame to the image.
    *
-   * @param {number} time The frame time value.
+   * @param {VolumeId} time The frame time: a volume id or, without
+   *   name, a frame index.
    * @param {Point3D} origin The origin of the frame.
    */
   appendFrame(time, origin) {
@@ -1611,6 +1615,11 @@ export class Image extends EventTarget {
 
     this.#buffer = resampled.buffer;
     this.#geometry = resampled.geometry;
+    // keep volume ids
+    const volumeIds = source.geometry.getVolumeIds();
+    if (typeof volumeIds !== 'undefined') {
+      this.#geometry.setVolumeIds(volumeIds);
+    }
     this.#resamplingJobId = resampled.jobId;
 
     this.dispatchEvent(new CustomEvent('imagecontentchange'));

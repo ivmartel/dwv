@@ -14,7 +14,7 @@ import {
   getSpacingFromMeasure
 } from './dicomImage.js';
 import {
-  getVolumeIdTagValue,
+  getVolumeId,
   guessVolumeIndices
 } from './dicomVolume.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
@@ -113,9 +113,9 @@ export function getRootGeometry(dataElements) {
   // geometry
   const origin = new Point3D(
     slicePosition[0], slicePosition[1], slicePosition[2]);
-  const time = getVolumeIdTagValue(dataElements);
+  const volumeId = getVolumeId(dataElements);
 
-  return new Geometry([origin], size, spacing, orientationMatrix, time);
+  return new Geometry([origin], size, spacing, orientationMatrix, volumeId);
 }
 
 /**
@@ -366,9 +366,9 @@ export function getFramesGeometry(
   // stamp a tag-derived time (for example TemporalPositionIndex), so
   // the frames of a multi-frame file are appended to their timepoint
   // (see ImageFactory getFrameGeometry)
-  const time = getVolumeIdTagValue(dataElements);
-  if (typeof time !== 'undefined') {
-    geometry.setInitialTime(time);
+  const volumeId = getVolumeId(dataElements);
+  if (typeof volumeId !== 'undefined') {
+    geometry.setInitialTime(volumeId);
   }
 
   return geometry;
@@ -377,10 +377,10 @@ export function getFramesGeometry(
 /**
  * Get the geometry of each frame from the per-frame functional groups:
  *   a one slice geometry with the frame position and the frame time.
- *   The frame time is the data time (if any) if the frame positions
+ *   The frame time is the data volume id (if any) if the frame positions
  *   are unique. If frames share positions (several volumes in one
- *   file), the frame time is the frame volume index, derived from
- *   volume ids (see dicomVolume guessVolumeIndices).
+ *   file), the frame time is the frame volume id (see dicomVolume
+ *   guessVolumeIndices).
  *
  * @param {DataElements} dataElements The DICOM data elements.
  * @returns {Geometry[]|undefined} The list of geometries indexed by
@@ -431,7 +431,7 @@ export function getSortedFramesGeometry(dataElements) {
         'not using them for geometry');
       return;
     }
-    frameTimes = guess.volumeIndices;
+    frameTimes = guess.volumeIds;
   }
 
   // common geometry (spacing, orientation, time)

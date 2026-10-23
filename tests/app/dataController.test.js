@@ -5,6 +5,7 @@ import {
   DataController
 } from '../../src/app/dataController.js';
 import {Point3D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
 import {Image} from '../../src/image/image.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
@@ -25,6 +26,7 @@ import syntheticData from '/tests/data/synthetic-img.json';
  */
 const TagKeys = {
   AcquisitionTime: '00080032',
+  EchoTime: '00180081',
   TemporalPositionIdentifier: '00200100'
 };
 
@@ -197,7 +199,9 @@ describe('app', () => {
     () => {
       // 2 files, each one with 2 volumes of 2 frames at the same
       // positions: the first item of 2 volumes comes from the same
-      // file, the meta merge has to use the frame b-value
+      // file, the meta merge has to use the frame b-value.
+      // The volume ids (b-values) of the 2 files are different:
+      // the volumes are appended while loading, no rebuild needed
       const filesBValues = [[0, 0, 800, 800], [50, 50, 1000, 1000]];
       const numberOfFrames = 4;
       const filesElements = filesBValues.map((bValues, index) => {
@@ -220,14 +224,17 @@ describe('app', () => {
       });
 
       // send frames as DicomBufferToData does
+      // (frames filled with their b-value to check the final layout)
       const dc0 = new DataController();
       const dataId = '0';
-      for (const elements of filesElements) {
+      for (let i = 0; i < filesElements.length; ++i) {
+        const elements = filesElements[i];
         const buffer = elements['7FE00010'].value;
         const frameSize = buffer.length / numberOfFrames;
         for (let f = 0; f < numberOfFrames; ++f) {
           const data = new DicomData(elements);
-          data.buffer = buffer.subarray(f * frameSize, (f + 1) * frameSize);
+          data.buffer = buffer.subarray(f * frameSize, (f + 1) * frameSize)
+            .fill(filesBValues[i][f]);
           data.numberOfItems = filesElements.length;
           data.frameNumber = f;
           if (typeof dc0.get(dataId) === 'undefined') {
@@ -237,14 +244,30 @@ describe('app', () => {
           }
         }
       }
-      assert.ok(dc0.get(dataId).hasDuplicateOrigin(), 'has duplicate origin');
+      assert.notOk(dc0.get(dataId).hasDuplicateOrigin(),
+        'has duplicate origin');
 
       const res0 = dc0.markDataAsComplete(dataId);
-      assert.ok(res0.imageHasChanged, 'image has changed');
+      assert.notOk(res0.imageHasChanged, 'image has changed');
 
-      const size = dc0.get(dataId).image.getGeometry().getSize();
+      const image = dc0.get(dataId).image;
+      const size = image.getGeometry().getSize();
       assert.equal(size.get(2), 2, 'number of slices');
       assert.equal(size.get(3), 4, 'number of volumes');
+      const volumeIds = [0, 50, 800, 1000];
+      const geometry = image.getGeometry();
+      assert.deepEqual(geometry.getVolumeIds(), volumeIds.map(value => ({
+        name: 'DiffusionBValue',
+        value,
+        tagKey: '00189087',
+        unit: 'unit.smm2'
+      })), 'volume ids');
+      for (let v = 0; v < volumeIds.length; ++v) {
+        for (let k = 0; k < 2; ++k) {
+          assert.equal(image.getValue(0, 0, k, v), volumeIds[v],
+            `value of slice ${k} of volume ${v}`);
+        }
+      }
     });
 
   /**
@@ -281,7 +304,48 @@ describe('app', () => {
         res0.image.getGeometry().getOrigins(),
         [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
         'volume0 origins');
+      const geometry = res0.image.getGeometry();
+      assert.deepEqual(geometry.getVolumeIds(), [1, 2].map(value => ({
+        name: 'TemporalPositionIdentifier',
+        value,
+        tagKey: TagKeys.TemporalPositionIdentifier
+      })), 'volume ids');
     });
+
+  test('DicomSliceDataList buildData uses volume id values', () => {
+    // fractional, unsorted EchoTime (a post load candidate)
+    const list0 = new DicomSliceDataList();
+    const echoTimes = [9.2, 4.6];
+    let uid = 0;
+    for (const z of [1, 0]) {
+      for (const echoTime of echoTimes) {
+        const data = makeSliceData(z, String(uid++), {
+          [TagKeys.EchoTime]: makeDataElement('DS', [String(echoTime)])
+        });
+        data.image.getBuffer().fill(echoTime * 10 + z);
+        list0.add(data);
+      }
+    }
+
+    const image = list0.buildData().image;
+    const geometry = image.getGeometry();
+    assert.deepEqual(geometry.getVolumeIds(), [4.6, 9.2].map(value => ({
+      name: 'EchoTime',
+      value,
+      tagKey: TagKeys.EchoTime,
+      unit: 'unit.ms'
+    })), 'volume ids');
+    for (let v = 0; v < 2; ++v) {
+      for (let k = 0; k < 2; ++k) {
+        assert.equal(image.getValue(0, 0, k, v), [46, 92][v] + k,
+          `value of slice ${k} of volume ${v}`);
+      }
+    }
+    // position of volume 1 holds its echo time
+    const position = image.getGeometry().indexToWorld(
+      new Index([0, 0, 0, 1]));
+    assert.equal(position.get(3), 9.2, 'volume 1 position');
+  });
 
   test('DicomSliceDataList buildData merges meta with correct ids', () => {
     // each volume's own TemporalPositionIdentifier value must end up
@@ -325,8 +389,16 @@ describe('app', () => {
     }
 
     const res0 = list0.buildData();
-    assert.equal(
-      res0.image.getGeometry().getSize().get(2), 2, 'volume0 slice count');
+    const geometry = res0.image.getGeometry();
+    assert.equal(geometry.getSize().get(2), 2, 'volume0 slice count');
+    // times since the first acquisition
+    assert.deepEqual(
+      geometry.getVolumeIds(), [0, 3600].map(value => ({
+        name: 'AcquisitionTime',
+        value,
+        tagKey: TagKeys.AcquisitionTime,
+        unit: 'unit.s'
+      })), 'volume ids');
   });
 
   test('DicomSliceDataList buildData respects custom override', () => {
