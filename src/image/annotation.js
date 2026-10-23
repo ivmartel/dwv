@@ -5,10 +5,10 @@ import {getOrientationName} from '../math/orientation.js';
 import {getDistanceToSegment} from '../math/line.js';
 import {defaultToolOptions, toolOptions} from '../tools/toolOptions.js';
 import {guid} from '../math/stats.js';
+import {Index} from '../math/index.js';
 import {getUID} from '../dicom/dicomWriter.js';
 
 /**
- * @import {Index} from '../math/index.js';
  * @import {NumberValue} from '../math/number.js';
  * @import {ViewController} from '../app/viewController.js';
  * @import {PlaneHelper} from './planeHelper.js';
@@ -216,7 +216,10 @@ export class Annotation {
     this.referencedSopInstanceUID = viewController.getCurrentImageUid();
     this.referencedSopClassUID = viewController.getSopClassUid();
     if (currentPosition.length() > 3) {
-      this.referencedFrameNumber = currentPosition.get(3) + 1;
+      // the position can hold a volume id, use the index
+      const currentIndex =
+        viewController.getIndexFromPosition(currentPosition);
+      this.referencedFrameNumber = currentIndex.get(3) + 1;
     }
     // set plane origin (not saved with file)
     this.planeOrigin =
@@ -305,7 +308,7 @@ export class Annotation {
       }
       const values = [origin.getX(), origin.getY(), origin.getZ()];
       if (typeof this.referencedFrameNumber !== 'undefined') {
-        values.push(this.referencedFrameNumber - 1);
+        values.push(this.#getFramePositionValue());
       }
       const originPoint = new Point(values);
       res = this.#viewController.getIndexFromPosition(originPoint);
@@ -333,11 +336,24 @@ export class Annotation {
       // add frame number if defined
       if (typeof this.referencedFrameNumber !== 'undefined') {
         const values = res.getValues();
-        values[3] = this.referencedFrameNumber - 1;
+        values[3] = this.#getFramePositionValue();
         res = new Point(values);
       }
     }
     return res;
+  }
+
+  /**
+   * Get the fourth dimension position value of the referenced frame:
+   *   the volume id if the image has some, the frame index otherwise.
+   *
+   * @returns {number} The position value.
+   */
+  #getFramePositionValue() {
+    const values = this.#viewController.getCurrentIndex().getValues();
+    values[3] = this.referencedFrameNumber - 1;
+    return this.#viewController.getPositionFromIndex(
+      new Index(values)).get(3);
   }
 
   /**

@@ -733,6 +733,17 @@ export class ViewController {
   }
 
   /**
+   * Get the world position of an index.
+   *
+   * @param {Index} index The index.
+   * @returns {Point} The position.
+   */
+  getPositionFromIndex(index) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(index);
+  }
+
+  /**
    * Set the current index.
    *
    * @param {Index} index The index.

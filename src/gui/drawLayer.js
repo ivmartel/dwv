@@ -1202,9 +1202,10 @@ export class DrawLayer {
       // use plane points
       points = planePoints;
     }
+    // use the index: the position can hold a volume id
     let timeIndex;
-    if (position.length() > 3) {
-      timeIndex = position.get(3);
+    if (index.length() > 3) {
+      timeIndex = index.get(3);
     }
     const posGroupId = this.#getPositionId(points, timeIndex);
 
