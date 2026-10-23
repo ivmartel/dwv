@@ -1603,6 +1603,7 @@ export class ViewController {
     getPlanePoints(position: Point): Point3D[];
     getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
     getPlanePositionFromPosition(point: Point): Point2D;
+    getPositionFromIndex(index: Index): Point;
     getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     getPositionHelper(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
