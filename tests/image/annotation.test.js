@@ -396,9 +396,13 @@ describe('image', () => {
     for (const timeIndex of [0, 2]) {
       const ann = new Annotation();
       const vc = new MockViewController({uid: 'sop-001'});
+      // the position holds a volume id, the index the volume index
       vc.getCurrentPosition = () => ({
         length: () => 4,
-        get: (i) => (i === 3 ? timeIndex : 0)
+        get: (i) => (i === 3 ? timeIndex * 500 : 0)
+      });
+      vc.getIndexFromPosition = (position) => ({
+        get: (i) => (i === 3 ? position.get(3) / 500 : 0)
       });
       ann.init(vc);
       assert.equal(ann.referencedFrameNumber, timeIndex + 1,
