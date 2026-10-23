@@ -353,7 +353,7 @@ export class Image extends EventTarget {
     const uidIndex = this.#imageUids.indexOf(uid);
     if (uidIndex !== -1) {
       const origins = this.getGeometry().getOrigins();
-      origin = origins[uidIndex];
+      origin = origins[uidIndex % origins.length];
     }
     return origin;
   }
