@@ -5,7 +5,7 @@ import {isSimilar} from './number.js';
 import {logger} from '../utils/logger.js';
 
 /**
- * @import {TypedArray} from './arrayTypes.js';
+ * @import {TypedArray} from './types.js';
  */
 
 /**

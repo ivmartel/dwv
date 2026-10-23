@@ -4,7 +4,7 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
  * @import {Geometry} from './geometry.js';
  * @import {Size} from './size.js';
  * @import {Spacing} from './spacing.js';
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**

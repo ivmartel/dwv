@@ -9,7 +9,7 @@ import {PixelBufferDecoder} from './decoder.js';
 import {DicomData} from '../app/dataController.js';
 
 /**
- * @import {TypedArray} from '../math/arrayTypes.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**
