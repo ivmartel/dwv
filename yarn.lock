@@ -6073,7 +6073,7 @@ __metadata:
     jsdoc: "npm:^4.0.5"
     jsdom: "npm:^30.0.1"
     jszip: "npm:^3.10.1"
-    konva: "npm:~10.7.0"
+    konva: "npm:~10.9.0"
     magic-wand-tool: "npm:~1.1.7"
     typescript: "npm:5.6.3"
     vite: "npm:^8.3.0"
@@ -9283,9 +9283,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"konva@npm:~10.7.0":
-  version: 10.7.1
-  resolution: "konva@npm:10.7.1"
+"konva@npm:~10.9.0":
+  version: 10.9.0
+  resolution: "konva@npm:10.9.0"
   peerDependencies:
     canvas: ^3.0.0
     skia-canvas: ^3.0.0
@@ -9294,7 +9294,7 @@ __metadata:
       optional: true
     skia-canvas:
       optional: true
-  checksum: 10c0/558bff33b3af9bffaeffcb316c207da3cc85a3e2779497f12c576cbf8c7c756648a0d25f847d1ff858277fc7a3890e90b2d3c6beaf5f56fb48b49d091697f661
+  checksum: 10c0/89d1c79956283d331d19366254a61363812a739da28f3a51fd9920a86fa6b5d1aff65a60485060688198e5a9930d0663badafc2d49085f0b115cde520f714320
   languageName: node
   linkType: hard
 
