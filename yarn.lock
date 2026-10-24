@@ -6588,8 +6588,8 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-jsdoc@npm:^65.0.2":
-  version: 65.2.4
-  resolution: "eslint-plugin-jsdoc@npm:65.2.4"
+  version: 65.3.11
+  resolution: "eslint-plugin-jsdoc@npm:65.3.11"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.98.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -6612,7 +6612,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/e196aa2b5f773fcd4c6d7ad803a217e0efb8caaeecff0beb0cba0353ceced862858e3ab556366017ec69d80988fb7f258cdf49bee2bc5b597bb73fc90b6d7e5c
+  checksum: 10c0/5b5281bfa058681fb6a101df11b2bfc4e06f37c5debeb3209fd3b4bf8a23e80783b309e993188d1ccff2d36f9386a7c943102787ea74212cb817bba7f7e12ab3
   languageName: node
   linkType: hard
 
