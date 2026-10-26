@@ -803,11 +803,9 @@ export class Index {
 }
 
 // @public
-export type IndexValue = {
-    value: number;
+export type IndexValue = NumberValue & {
     name?: string;
     tagKey?: string;
-    unit?: string;
 };
 
 // @public
