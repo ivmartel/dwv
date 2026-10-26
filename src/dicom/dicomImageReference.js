@@ -6,7 +6,7 @@ import {
 /**
  * @import {DataElement} from './dataElement.js';
  * @import {SopInstanceReference} from './dicomSopInstanceReference.js';
- * @import {SimpleTagValues} from './simpleTagValues.js';
+ * @import {SimpleTagValues} from './types.js';
  */
 
 /**

@@ -7,27 +7,10 @@ import {DataElement} from './dataElement.js';
 import {logger} from '../utils/logger.js';
 
 /**
- * A simple (non sequence) tag value: either a single primitive
- *   or, for multi-valued VRs, an array of primitives.
- *
- * @typedef {string | number | string[] | number[]} SimpleTagValue
- */
-
-/**
- * A simple sequence (VR=SQ) tag value.
- *
- * @typedef {object} SimpleSequenceValue
- * @property {SimpleTagValues[]} value The sequence items.
- * @property {boolean} [undefinedLength] Undefined length flag.
- */
-
-/**
- * The meta data as simple tag values: indexed by tag name instead of
- *   tag key, with direct values (no element object) for non sequence,
- *   non merged tags.
- *
- * @typedef {Record<string, SimpleTagValue | SimpleSequenceValue>}
+ * @import {
+ *   SimpleSequenceValue,
  *   SimpleTagValues
+ * } from './types.js';
  */
 
 /**

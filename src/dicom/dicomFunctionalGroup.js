@@ -13,7 +13,7 @@ import {
 
 /**
  * @import {Spacing} from '../image/spacing.js';
- * @import {SimpleTagValues} from './simpleTagValues.js';
+ * @import {SimpleTagValues} from './types.js';
  */
 
 /**

@@ -1,5 +1,8 @@
 // Math related typedefs, in their own file to allow exporting them
 // without functions.
+// Keep this file type only: typedefs and JSDoc `@import` only, no
+// runtime import or code, so that it stays a leaf of the module graph
+// and cannot create circular dependencies.
 
 /**
  * List of compatible integer typed arrays.

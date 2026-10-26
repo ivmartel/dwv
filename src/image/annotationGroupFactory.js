@@ -53,7 +53,7 @@ import {Point2D, Point3D} from '../math/point.js';
 
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
- * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
+ * @import {SimpleTagValues} from '../dicom/types.js';
  */
 
 /**

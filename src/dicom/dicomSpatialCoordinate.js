@@ -10,7 +10,7 @@ import {BidimensionalLine} from '../math/bidimensionalLine.js';
 
 /**
  * @import {DataElement} from './dataElement.js';
- * @import {SimpleTagValues} from './simpleTagValues.js';
+ * @import {SimpleTagValues} from './types.js';
  */
 
 /**

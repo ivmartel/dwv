@@ -11,7 +11,7 @@ import {
  * @import {DataElement} from './dataElement.js';
  * @import {MeasuredValue} from './dicomMeasuredValue.js';
  * @import {DicomCode} from './dicomCode.js';
- * @import {SimpleTagValues} from './simpleTagValues.js';
+ * @import {SimpleTagValues} from './types.js';
  */
 
 /**

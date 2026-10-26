@@ -52,10 +52,14 @@ import {
   defaultPrivateBValueRules,
   defaultVolumeIdCandidates
 } from './dicomVolume.js';
+import {
+  getAsSimpleTagValues,
+  getElementsFromSimpleTagValues,
+  mergeTagValues
+} from './simpleTagValues.js';
 
 // also export typedefs
-export * from './simpleTagValues.js';
-export * from './volumeTypes.js';
+export * from './types.js';
 
 export {
   DataElement,
@@ -92,4 +96,7 @@ export {
   translateWriterRules,
   defaultPrivateBValueRules,
   defaultVolumeIdCandidates,
+  getAsSimpleTagValues,
+  getElementsFromSimpleTagValues,
+  mergeTagValues,
 };

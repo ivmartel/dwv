@@ -15,7 +15,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {RGB} from '../utils/colour.js';
  * @import {Label} from './label.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
- * @import {SegmentHistogram} from './histogramTypes.js';
+ * @import {SegmentHistogram} from './types.js';
  */
 
 const ML_PER_MM = 0.001; // ml/mm^3

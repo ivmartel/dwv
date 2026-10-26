@@ -20,7 +20,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {MaskImage} from './maskImage.js';
  * @import {TypedArray} from '../math/types.js';
  * @import {SourcedNumberValue} from '../math/types.js';
- * @import {VolumeValue} from '../dicom/volumeTypes.js';
+ * @import {VolumeValue} from '../dicom/types.js';
  */
 
 

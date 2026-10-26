@@ -17,7 +17,7 @@ import {logger} from '../utils/logger.js';
  * @import {
  *   PrivateBValueRule,
  *   VolumeIdCandidate
- * } from './volumeTypes.js';
+ * } from './types.js';
  * @import {SourcedNumberValue} from '../math/types.js';
  */
 

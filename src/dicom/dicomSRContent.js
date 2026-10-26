@@ -32,7 +32,7 @@ import {MeasuredValue} from './dicomMeasuredValue.js';
 /**
  * @import {DataElement} from './dataElement.js';
  * @import {DicomCode} from './dicomCode.js';
- * @import {SimpleTagValues} from './simpleTagValues.js';
+ * @import {SimpleTagValues} from './types.js';
  */
 
 /**

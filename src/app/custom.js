@@ -5,7 +5,7 @@
  * @import {
  *   PrivateBValueRule,
  *   VolumeIdCandidate
- * } from '../dicom/volumeTypes.js';
+ * } from '../dicom/types.js';
  */
 
 /**

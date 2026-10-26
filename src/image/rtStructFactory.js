@@ -24,7 +24,7 @@ import {logger} from '../utils/logger.js';
 /**
  * @import {Image} from './image.js';
  * @import {DataElement} from '../dicom/dataElement.js';
- * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
+ * @import {SimpleTagValues} from '../dicom/types.js';
  */
 
 /**

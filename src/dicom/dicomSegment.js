@@ -16,7 +16,7 @@ import {getDefaultColour} from '../utils/colour.js';
  * @import {DataElement} from './dataElement.js';
  * @import {DicomCode} from './dicomCode.js';
  * @import {RGB} from '../utils/colour.js';
- * @import {SimpleTagValues} from './simpleTagValues.js';
+ * @import {SimpleTagValues} from './types.js';
  */
 
 /**

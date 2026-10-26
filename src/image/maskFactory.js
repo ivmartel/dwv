@@ -45,7 +45,7 @@ import {DataElement} from '../dicom/dataElement.js';
 /**
  * @import {Image} from '../image/image.js';
  * @import {MaskSegment} from '../dicom/dicomSegment.js';
- * @import {SimpleTagValues} from '../dicom/simpleTagValues.js';
+ * @import {SimpleTagValues} from '../dicom/types.js';
  */
 
 /**
