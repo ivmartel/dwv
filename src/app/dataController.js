@@ -24,6 +24,7 @@ import {
  * @import {Image} from '../image/image.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {AnnotationGroup} from '../image/annotationGroup.js';
+ * @import {IndexValue} from '../math/types.js';
  */
 
 /**
@@ -223,7 +224,7 @@ export class DicomData {
     // check if append is possible
     const geom0 = this.image.getGeometry();
     const canAppend = geom0.canAppendOrigin(
-      geom1.getOrigin(), geom1.getInitialTime());
+      geom1.getOrigin(), geom1.getInitialTime()?.value);
 
     // store result if not possible to stop future appends
     if (!canAppend.success) {
@@ -310,7 +311,7 @@ export class DicomSliceDataList {
     }
 
     // guess the volume id tag and get indices per volumes
-    const {volsIndices, volumeIndexGetter} =
+    const {volsIndices, volumeIds, volumeIndexGetter} =
       this.#guessVolumesIndices(originList);
 
     if (typeof volsIndices === 'undefined') {
@@ -340,7 +341,7 @@ export class DicomSliceDataList {
       // image
       for (const index of indices) {
         const sliceImage = this.#list[index].image;
-        sliceImage.getGeometry().setInitialTime(i);
+        sliceImage.getGeometry().setInitialTime(volumeIds[i]);
         if (typeof image === 'undefined') {
           image = sliceImage;
         } else {
@@ -358,9 +359,10 @@ export class DicomSliceDataList {
    * @param {object[]} originList The list of origins and their
    *   occurences, as returned by #getOriginList.
    * @returns {{volsIndices: number[][]|undefined,
-   *   volumeIndexGetter: Function|undefined}} The indices per volume
-   *   and the getter that produced them, both undefined if no
-   *   candidate worked.
+   *   volumeIds: IndexValue[]|undefined,
+   *   volumeIndexGetter: Function|undefined}} The indices per volume,
+   *   the id of each volume and the volume id value getter that
+   *   produced them, all undefined if no candidate worked.
    */
   #guessVolumesIndices(originList) {
     // slice index of each data
@@ -381,22 +383,29 @@ export class DicomSliceDataList {
     if (typeof guess === 'undefined') {
       return {
         volsIndices: undefined,
+        volumeIds: undefined,
         volumeIndexGetter: undefined
       };
     }
 
     // data indices per volume, in origin list order
     const volsIndices = [];
+    const volumeIds = [];
     for (const item of originList) {
       for (const index of item.indices) {
         const volIndex = guess.volumeIndices[index];
         if (typeof volsIndices[volIndex] === 'undefined') {
           volsIndices[volIndex] = [];
+          volumeIds[volIndex] = guess.volumeIds[index];
         }
         volsIndices[volIndex].push(index);
       }
     }
-    return {volsIndices, volumeIndexGetter: guess.getter};
+    return {
+      volsIndices,
+      volumeIds,
+      volumeIndexGetter: guess.getter
+    };
   }
 
   /**

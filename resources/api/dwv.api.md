@@ -553,8 +553,8 @@ export type FloatTypedArray = Float32Array | Float64Array;
 
 // @public
 export class Geometry {
-    constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
-    appendFrame(origin: Point3D, time: number): void;
+    constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: IndexValue);
+    appendFrame(origin: Point3D, time: IndexValue): void;
     appendOrigin(origin: Point3D, index: number, time?: number): void;
     canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
     canAppendSlice(rhs: Geometry): BooleanResult;
@@ -563,7 +563,7 @@ export class Geometry {
     equals(rhs: Geometry): boolean;
     getCurrentNumberOfSlicesBeforeTime(time: number): number | undefined;
     getCurrentTotalNumberOfSlices(): number;
-    getInitialTime(): number;
+    getInitialTime(): IndexValue | undefined;
     getOrientation(): Matrix33;
     getOrigin(): Point3D;
     getOrigins(): Point3D[];
@@ -572,6 +572,8 @@ export class Geometry {
     getSize(viewOrientation?: Matrix33): Size;
     getSliceIndex(origin: Point3D, time?: number): number;
     getSpacing(viewOrientation?: Matrix33): Spacing;
+    getVolumeIds(): IndexValue[] | undefined;
+    getVolumeIndex(value: number): number;
     hasSlicesAtTime(time: number): boolean;
     includesOrigin(point3D: Point3D, tol?: number): boolean;
     indexToWorld(index: Index): Point;
@@ -579,7 +581,8 @@ export class Geometry {
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
     isSimilar(rhs: Geometry, tol?: number): boolean;
     pointToWorld(point: Point3D): Point3D;
-    setInitialTime(time: number): void;
+    setInitialTime(time: IndexValue): void;
+    setVolumeIds(volumeIds: IndexValue[]): void;
     sortOrigins(): void;
     toString(): string;
     updateSliceSpacing(): void;
@@ -698,7 +701,7 @@ export namespace i18n {
 // @public
 class Image_2 extends EventTarget {
     constructor(geometry: Geometry, buffer: TypedArray, imageUids?: string[]);
-    appendFrame(time: number, origin: Point3D): void;
+    appendFrame(time: IndexValue, origin: Point3D): void;
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
     appendSlice(rhs: Image_2): void;
     calculateDataRange(): object;
@@ -798,6 +801,14 @@ export class Index {
     previous(dim: number): Index;
     toString(): string;
 }
+
+// @public
+export type IndexValue = {
+    value: number;
+    name?: string;
+    tagKey?: string;
+    unit?: string;
+};
 
 // @public
 export class InfoData extends EventTarget {
@@ -1705,6 +1716,7 @@ export type VolumeIdCandidate = {
     name: string;
     getter: Function;
     preLoad?: boolean;
+    relative?: boolean;
 };
 
 // @public
