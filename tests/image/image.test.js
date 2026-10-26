@@ -1,5 +1,5 @@
 import {describe, test, assert, vi} from 'vitest';
-import {Point3D} from '../../src/math/point.js';
+import {Point, Point3D} from '../../src/math/point.js';
 import {Index} from '../../src/math/index.js';
 import {getStats} from '../../src/math/stats.js';
 import {arrayEquals} from '../../src/utils/array.js';
@@ -803,6 +803,97 @@ describe('image', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+
+  /**
+   * Tests for {@link Image#getRescaledValuesAtPosition}.
+   *
+   * @function module:tests/image~getRescaledValuesAtPosition
+   */
+  test('Image getRescaledValuesAtPosition', () => {
+    // 2x2x2 image, 2 volumes with ids 50 and 1000
+    const volumeIds = [50, 1000].map(value => ({
+      name: 'DiffusionBValue',
+      value,
+      tagKey: '00189087',
+      unit: 'unit.smm2'
+    }));
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]),
+      undefined, volumeIds[0]);
+    geometry.appendOrigin(new Point3D(0, 0, 1), 1, 50);
+    geometry.appendFrame(new Point3D(0, 0, 0), volumeIds[1]);
+    geometry.appendOrigin(new Point3D(0, 0, 1), 1, 1000);
+    // value: offset
+    const buffer = new Uint8Array(16);
+    for (let i = 0; i < buffer.length; ++i) {
+      buffer[i] = i;
+    }
+    const image = new Image(geometry, buffer);
+    image.setMeta({PixelRepresentation: 0, pixelUnit: 'HU'});
+    image.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 1));
+
+    // (1, 0, 1): offset 5 in volume 0, 13 in volume 1
+    const res0 = image.getRescaledValuesAtPosition(new Point([1, 0, 1]));
+    assert.deepEqual(res0, [
+      {volumeId: volumeIds[0], pixValue: {value: 11, unit: 'HU'}},
+      {volumeId: volumeIds[1], pixValue: {value: 27, unit: 'HU'}}
+    ], 'values');
+    // a volume id in the position is ignored
+    const res1 = image.getRescaledValuesAtPosition(
+      new Point([1, 0, 1, 1000]));
+    assert.deepEqual(res1, res0, 'values with volume id');
+    // returned volume ids are copies
+    res0[0].volumeId.value = 0;
+    assert.equal(geometry.getVolumeIds()[0].value, 50, 'volume id copy');
+
+    // out of bounds
+    const res2 = image.getRescaledValuesAtPosition(new Point([3, 0, 0]));
+    assert.deepEqual(res2, [], 'out of bounds');
+    const res3 = image.getRescaledValuesAtPosition(new Point([0, 0, 5]));
+    assert.deepEqual(res3, [], 'out of bounds z');
+
+    // 3D image: one value, volume index as id, no unit
+    const image3d = new Image(
+      new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1])),
+      new Uint8Array([1, 2, 3, 4]));
+    image3d.setMeta({PixelRepresentation: 0});
+    const res4 = image3d.getRescaledValuesAtPosition(new Point([0, 1, 0]));
+    assert.deepEqual(res4, [
+      {volumeId: {value: 0}, pixValue: {value: 3, unit: undefined}}
+    ], '3d values');
+
+    // frames without volume ids: volume index as id
+    const frames = new Image(
+      new Geometry(
+        [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1]),
+        undefined, {value: 0}),
+      new Uint8Array([3]));
+    frames.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
+    frames.appendFrameBuffer(new Uint8Array([7]), 1);
+    const res5 = frames.getRescaledValuesAtPosition(new Point([0, 0, 0]));
+    assert.deepEqual(res5, [
+      {volumeId: {value: 0}, pixValue: {value: 3, unit: undefined}},
+      {volumeId: {value: 1}, pixValue: {value: 7, unit: undefined}}
+    ], 'frame values');
+
+    // volume ids not matching the number of volumes: volume index as id
+    image.getGeometry().setVolumeIds([volumeIds[0]]);
+    const res6 = image.getRescaledValuesAtPosition(new Point([1, 0, 1]));
+    assert.deepEqual(res6, [
+      {volumeId: {value: 0}, pixValue: {value: 11, unit: 'HU'}},
+      {volumeId: {value: 1}, pixValue: {value: 27, unit: 'HU'}}
+    ], 'mismatched volume ids');
+
+    // more than one component: no values
+    const rgb = new Image(
+      new Geometry(
+        [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1])),
+      new Uint8Array([1, 2, 3]));
+    rgb.setMeta({PixelRepresentation: 0});
+    const res7 = rgb.getRescaledValuesAtPosition(new Point([0, 0, 0]));
+    assert.deepEqual(res7, [], 'rgb');
   });
 
 });

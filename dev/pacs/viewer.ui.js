@@ -3,12 +3,14 @@ import {precisionRound} from '../../src/math/number.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
 import {Matrix33} from '../../src/math/matrix.js';
+import {i18n} from '../../src/utils/i18n.js';
 
 import {DataTableUI} from './viewer.ui.datatable.js';
 import {AnnotationUI} from './viewer.ui.annot.js';
 import {SegmentationUI} from './viewer.ui.segment.js';
 import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
+import {formatQuantificationValue} from './viewer.ui.quantification.js';
 
 /**
  * @import {ViewerService} from './viewer.service.js';
@@ -257,6 +259,14 @@ export class ViewerUI {
   #selectedLayoutIndex = 0;
 
   /**
+   * The last position change event detail, used to refresh the
+   *   position text at load end.
+   *
+   * @type {object|undefined}
+   */
+  #lastPositionDetail;
+
+  /**
    * The tools configuration.
    *
    * @type {object}
@@ -384,17 +394,10 @@ export class ViewerUI {
 
     this.#service.addEventListener('positionchange', (event) => {
       const input = document.getElementById('position');
-      const values = event.detail.value[1];
-      let text = `(index: ${event.detail.value[0]})`;
-      if (event.detail.value.length > 2) {
-        text += ` value: ${event.detail.value[2]}`;
-      }
-      input.value = values.map(getPrecisionRound(2));
-      // index as small text
-      const span = document.getElementById('positionspan');
-      if (span) {
-        span.innerHTML = text;
-      }
+      input.value = event.detail.value[1].map(getPrecisionRound(2));
+      // index and values as small text
+      this.#lastPositionDetail = event.detail;
+      this.#updatePositionText(event.detail);
       // update sliders' value
       this.#updateSliders(this.#getSelectedLayout());
     });
@@ -438,6 +441,10 @@ export class ViewerUI {
       // update sliders with new data info
       // (has to be after full load)
       this.#initSliders(this.#getSelectedLayout());
+      // volume values are skipped while loading: refresh them
+      if (typeof this.#lastPositionDetail !== 'undefined') {
+        this.#updatePositionText(this.#lastPositionDetail);
+      }
       // add post-load listeners
       this.#addPostLoadListeners();
     });
@@ -633,6 +640,71 @@ export class ViewerUI {
         throw new Error('No files to load');
       }
     });
+  }
+
+  /**
+   * Update the position text: index, value and, for images with
+   *   several volumes, the rescaled values of all volumes, as
+   *   'value: 3640 | Per EchoTime: (4.6 ms, 3640), (9.2 ms, 2000)'.
+   *
+   * @param {object} detail The position change event detail.
+   */
+  #updatePositionText(detail) {
+    const span = document.getElementById('positionspan');
+    if (!span) {
+      return;
+    }
+    let text = `(index: ${detail.value[0]})`;
+    if (detail.value.length > 2) {
+      text += ` value: ${detail.value[2]}`;
+    }
+    const perVolume = this.#getPerVolumeText(detail.dataid, detail.value[1]);
+    if (typeof perVolume !== 'undefined') {
+      text += ` | ${perVolume}`;
+    }
+    span.textContent = text;
+  }
+
+  /**
+   * Get the rescaled values of all volumes at a position as text.
+   *
+   * @param {string} [dataId] The data id, defaults to the first data.
+   * @param {number[]} positionValues The world position values.
+   * @returns {string|undefined} The text, undefined if the image
+   *   is not complete or does not have several volumes.
+   */
+  #getPerVolumeText(dataId, positionValues) {
+    const dataCtrl = this.#service.getDataController();
+    const data = dataCtrl.get(dataId ?? dataCtrl.getDataIds()[0]);
+    // skip while loading: the volumes of a partially loaded image
+    //   are not at their final buffer offsets
+    if (typeof data?.image === 'undefined' ||
+      !data.image.getComplete()) {
+      return undefined;
+    }
+    const volumeValues = data.image.getRescaledValuesAtPosition(
+      new Point(positionValues));
+    if (volumeValues.length < 2) {
+      return undefined;
+    }
+    // limit the number of displayed values
+    const maxValues = 10;
+    const texts = [];
+    for (const item of volumeValues.slice(0, maxValues)) {
+      const volumeId = item.volumeId;
+      let id = `${volumeId.value}`;
+      if (typeof volumeId.unit !== 'undefined') {
+        id += ` ${i18n.t(volumeId.unit) ?? volumeId.unit}`;
+      }
+      const value = formatQuantificationValue(
+        item.pixValue.value, item.pixValue.unit);
+      texts.push(`(${id}, ${value})`);
+    }
+    if (volumeValues.length > maxValues) {
+      texts.push(`... (${volumeValues.length} volumes)`);
+    }
+    const name = volumeValues[0].volumeId.name ?? 'volume';
+    return `Per ${name}: ${texts.join(', ')}`;
   }
 
   /**

@@ -44,7 +44,7 @@ function getQuantificationLabel(key) {
  * @param {string} [unit] The unit (translation key).
  * @returns {string} The formatted value.
  */
-function formatQuantificationValue(value, unit) {
+export function formatQuantificationValue(value, unit) {
   const absValue = Math.abs(value);
   let digits = 2;
   if (absValue >= 100) {
@@ -52,10 +52,7 @@ function formatQuantificationValue(value, unit) {
   } else if (absValue !== 0 && absValue < 1) {
     digits = 3;
   }
-  let res = value.toLocaleString(undefined, {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits
-  });
+  let res = value.toFixed(digits);
   if (typeof unit !== 'undefined') {
     let unitStr = i18n.t(unit);
     if (typeof unitStr === 'undefined') {

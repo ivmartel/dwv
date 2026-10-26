@@ -735,6 +735,7 @@ class Image_2 extends EventTarget {
     getRescaledValue(i: number, j: number, k: number, f?: number): number;
     getRescaledValueAtIndex(index: Index): number;
     getRescaledValueAtOffset(offset: number): number;
+    getRescaledValuesAtPosition(position: Point): VolumeValue[];
     getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     getSecondaryOffset(index: Index): number;
     getValue(i: number, j: number, k: number, f?: number): number;
@@ -1715,6 +1716,12 @@ export type VolumeIdCandidate = {
     getter: Function;
     preLoad?: boolean;
     relative?: boolean;
+};
+
+// @public
+export type VolumeValue = {
+    volumeId: SourcedNumberValue;
+    pixValue: NumberValue;
 };
 
 // @public

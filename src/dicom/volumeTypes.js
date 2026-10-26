@@ -2,7 +2,7 @@
 // without the volume functions.
 
 /**
- * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {NumberValue, SourcedNumberValue} from '../math/types.js';
  */
 
 /**
@@ -29,6 +29,15 @@
  *   relative to the smallest one, for example to get times since
  *   the first acquisition instead of timestamps. Not applied while
  *   loading.
+ */
+
+/**
+ * Pixel value of one volume.
+ *
+ * @typedef {object} VolumeValue
+ * @property {SourcedNumberValue} volumeId The volume id: with name and unit
+ *   if the image has volume ids, else just the volume index.
+ * @property {NumberValue} pixValue The rescaled pixel value and its unit.
  */
 
 // ESM module marker

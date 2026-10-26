@@ -20,6 +20,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {MaskImage} from './maskImage.js';
  * @import {TypedArray} from '../math/types.js';
  * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {VolumeValue} from '../dicom/volumeTypes.js';
  */
 
 
@@ -1254,6 +1255,57 @@ export class Image extends EventTarget {
       }
     }
     return val;
+  }
+
+  /**
+   * Get the rescaled values of all volumes (fourth dimension) at
+   *   a position.
+   *
+   * @param {Point} position The world position, only its first
+   *   three dimensions are used.
+   * @returns {VolumeValue[]} The values with their unit and volume id,
+   *   ordered by volume index, empty if the position is out of bounds
+   *   or if the image cannot be quantified (more than one component).
+   */
+  getRescaledValuesAtPosition(position) {
+    const result = [];
+    if (!this.canQuantify()) {
+      return result;
+    }
+    const geometry = this.getGeometry();
+    const size = geometry.getSize();
+    const unit = this.getMeta().pixelUnit;
+    // spatial index, with a volume index if the image has volumes
+    const values = geometry.worldToIndex(position).getValues().slice(0, 3);
+    const hasVolumes = size.length() > 3;
+    if (hasVolumes) {
+      values.push(0);
+    }
+    if (!geometry.isIndexInBounds(new Index(values))) {
+      return result;
+    }
+    const nVolumes = hasVolumes ? size.get(3) : 1;
+    // use the volume ids only if there is one per volume
+    // (not the case while loading for example)
+    let volumeIds = geometry.getVolumeIds();
+    if (volumeIds?.length !== nVolumes) {
+      volumeIds = undefined;
+    }
+    for (let v = 0; v < nVolumes; ++v) {
+      if (hasVolumes) {
+        values[3] = v;
+      }
+      const volumeId = typeof volumeIds !== 'undefined'
+        ? {...volumeIds[v]} : {value: v};
+      result.push({
+        volumeId,
+        pixValue: {
+          value: this.getRescaledValueAtIndex(new Index(values)),
+          unit
+        }
+      });
+    }
+    return result;
   }
 
   /**
