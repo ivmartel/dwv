@@ -24,6 +24,14 @@
  */
 
 /**
+ * Number value and its unit.
+ *
+ * @typedef {object} NumberValue
+ * @property {number} value The value.
+ * @property {string} [unit] The value unit.
+ */
+
+/**
  * Value of an index, as for example a volume id: the value of the
  * volume (fourth dimension) index, for example
  * `{name: 'EchoTime', value: 4.6, tagKey: '00180081', unit: 'unit.ms'}`.

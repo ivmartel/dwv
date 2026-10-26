@@ -2,7 +2,7 @@ import {Line, getAngle, getDistanceToSegment} from './line.js';
 
 /**
  * @import {Point2D} from '../math/point.js';
- * @import {NumberValue} from './number.js';
+ * @import {NumberValue} from './types.js';
  * @import {ViewController} from '../app/viewController.js';
  */
 

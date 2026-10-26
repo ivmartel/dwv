@@ -16,10 +16,7 @@ import {
 } from './orientation.js';
 import {getEllipseIndices} from './ellipse.js';
 import {getRectangleIndices} from './rectangle.js';
-import {
-  NumberValue,
-  precisionRound
-} from './number.js';
+import {precisionRound} from './number.js';
 
 // also export typedefs
 export * from './types.js';
@@ -40,7 +37,6 @@ export {
   Scalar2D,
   Scalar3D,
   Vector3D,
-  NumberValue,
   Orientation,
   getOrientationName,
   getEllipseIndices,

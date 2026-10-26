@@ -9,7 +9,7 @@ import {Index} from '../math/index.js';
 import {getUID} from '../dicom/dicomWriter.js';
 
 /**
- * @import {NumberValue} from '../math/number.js';
+ * @import {NumberValue} from '../math/types.js';
  * @import {ViewController} from '../app/viewController.js';
  * @import {PlaneHelper} from './planeHelper.js';
  * @import {DicomCode} from '../dicom/dicomCode.js';

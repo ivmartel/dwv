@@ -1074,10 +1074,10 @@ export class NumberRange {
 }
 
 // @public
-export class NumberValue {
-    unit: string | undefined;
+export type NumberValue = {
     value: number;
-}
+    unit?: string;
+};
 
 // @public (undocumented)
 export namespace Orientation {

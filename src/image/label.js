@@ -1,6 +1,6 @@
 /**
  * @import {Point} from '../math/point.js';
- * @import {NumberValue} from '../math/number.js';
+ * @import {NumberValue} from '../math/types.js';
  */
 
 /**

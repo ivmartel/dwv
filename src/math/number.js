@@ -11,20 +11,6 @@ export const REAL_WORLD_EPSILON = 1e-4;
 export const REAL_WORLD_EXPONENT = 5;
 
 /**
- * Class to store a number value and a unit.
- */
-export class NumberValue {
-  /**
-   * @type {number}
-   */
-  value;
-  /**
-   * @type {string|undefined}
-   */
-  unit;
-}
-
-/**
  * Number range: [min, max].
  */
 export class NumberRange {

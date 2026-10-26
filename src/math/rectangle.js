@@ -5,7 +5,7 @@ import {Index} from './index.js';
 /**
  * @import {ViewController} from '../app/viewController.js';
  * @import {Scalar2D} from './scalar.js';
- * @import {NumberValue} from './number.js';
+ * @import {NumberValue} from './types.js';
  */
 
 /**
