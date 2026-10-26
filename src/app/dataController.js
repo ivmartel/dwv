@@ -24,7 +24,7 @@ import {
  * @import {Image} from '../image/image.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {AnnotationGroup} from '../image/annotationGroup.js';
- * @import {VolumeId} from '../dicom/volumeTypes.js';
+ * @import {IndexValue} from '../math/types.js';
  */
 
 /**
@@ -359,7 +359,7 @@ export class DicomSliceDataList {
    * @param {object[]} originList The list of origins and their
    *   occurences, as returned by #getOriginList.
    * @returns {{volsIndices: number[][]|undefined,
-   *   volumeIds: VolumeId[]|undefined,
+   *   volumeIds: IndexValue[]|undefined,
    *   volumeIndexGetter: Function|undefined}} The indices per volume,
    *   the id of each volume and the volume id value getter that
    *   produced them, all undefined if no candidate worked.

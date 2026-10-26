@@ -16,9 +16,9 @@ import {logger} from '../utils/logger.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {
  *   PrivateBValueRule,
- *   VolumeIdCandidate,
- *   VolumeId
+ *   VolumeIdCandidate
  * } from './volumeTypes.js';
+ * @import {IndexValue} from '../math/types.js';
  */
 
 /**
@@ -137,14 +137,14 @@ export const defaultVolumeIdCandidates = [
  * @param {number|undefined} value The volume id value.
  * @param {string} tagKey The key of the tag the value is read from.
  * @param {string} [unit] The value unit as an i18n key.
- * @returns {VolumeId|undefined} The volume id, undefined if the
+ * @returns {IndexValue|undefined} The volume id, undefined if the
  *   value is undefined.
  */
 function createVolumeId(value, tagKey, unit) {
   if (typeof value === 'undefined') {
     return undefined;
   }
-  /** @type {VolumeId} */
+  /** @type {IndexValue} */
   const res = {value, tagKey};
   if (typeof unit !== 'undefined') {
     res.unit = unit;
@@ -363,7 +363,7 @@ function parseNumber(value, parse) {
  * a b-value, for example a dimension index).
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
- * @returns {VolumeId|undefined} The volume id, if present.
+ * @returns {IndexValue|undefined} The volume id, if present.
  */
 function getDiffusionBValueVolumeId(elements) {
   let res;
@@ -418,7 +418,7 @@ function getDiffusionBValueVolumeId(elements) {
  * Get the volume id for MR images (can be time, b-value...).
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
- * @returns {VolumeId|undefined} The volume id, if present.
+ * @returns {IndexValue|undefined} The volume id, if present.
  */
 function getMRVolumeId(elements) {
   let res;
@@ -460,7 +460,7 @@ function getFrameTemporalPositionIndex(group) {
  * Get the temporal position index for enhanced multi-frame images.
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
- * @returns {VolumeId|undefined} The volume id, if present.
+ * @returns {IndexValue|undefined} The volume id, if present.
  */
 function getTemporalPositionIndex(elements) {
   return createVolumeId(
@@ -509,7 +509,7 @@ function warnDeprecatedOnce(message) {
  *
  * @param {VolumeIdCandidate} candidate The candidate.
  * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {VolumeId|undefined} The volume id, if present.
+ * @returns {IndexValue|undefined} The volume id, if present.
  */
 function getCandidateVolumeId(candidate, elements) {
   const volumeId = candidate.getter(elements);
@@ -542,7 +542,7 @@ function getDeprecatedCandidate(getter) {
  * candidates flagged with `preLoad` (see defaultVolumeIdCandidates).
  *
  * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {VolumeId|undefined} The volume id if available.
+ * @returns {IndexValue|undefined} The volume id if available.
  */
 export function getVolumeId(elements) {
   if (typeof custom.getVolumeIdTagValue !== 'undefined') {
@@ -581,7 +581,7 @@ export function getVolumeIdTagValue(elements) {
  * midnight are correctly ordered.
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
- * @returns {VolumeId|undefined} The volume id, if present.
+ * @returns {IndexValue|undefined} The volume id, if present.
  */
 function getAcquisitionTime(elements) {
   if (typeof safeGet(elements, TagKeys.AcquisitionTime) === 'undefined') {
@@ -663,8 +663,8 @@ export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
 /**
  * Get volume ids with values relative to the smallest one.
  *
- * @param {VolumeId[]} volumeIds The volume ids.
- * @returns {VolumeId[]} The relative volume ids.
+ * @param {IndexValue[]} volumeIds The volume ids.
+ * @returns {IndexValue[]} The relative volume ids.
  */
 function getRelativeVolumeIds(volumeIds) {
   const min = Math.min(...volumeIds.map(volumeId => volumeId.value));
@@ -685,7 +685,7 @@ function getRelativeVolumeIds(volumeIds) {
  * @param {number} numberOfSlices The number of distinct slices.
  * @returns {{
  *   volumeIndices: number[],
- *   volumeIds: VolumeId[],
+ *   volumeIds: IndexValue[],
  *   getter: Function
  * }|undefined}
  *   The volume index and volume id of each item (relative to the
