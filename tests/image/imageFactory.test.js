@@ -422,8 +422,8 @@ describe('ImageFactory', () => {
       ? structure.genOptions.frameBValues
       : structure.genOptions.frameTemporalPositions;
     const volumeIdInfo = isBValue
-      ? {name: 'DiffusionBValue', tagKey: '00189087', unit: 'unit.smm2'}
-      : {name: 'TemporalPositionIndex', tagKey: '00209128'};
+      ? {source: 'DiffusionBValue', tagKey: '00189087', unit: 'unit.smm2'}
+      : {source: 'TemporalPositionIndex', tagKey: '00209128'};
     const numberOfFrames = structure.numberOfFrames;
     const numberOfSlices = 2;
 

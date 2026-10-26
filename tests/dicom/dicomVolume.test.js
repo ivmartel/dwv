@@ -600,7 +600,7 @@ describe('dicom', () => {
           },
           value: 3,
           info: {
-            name: 'TemporalPositionIdentifier',
+            source: 'TemporalPositionIdentifier',
             tagKey: TagKeys.TemporalPositionIdentifier
           }
         },
@@ -609,7 +609,7 @@ describe('dicom', () => {
           elements: makeMultiFrameElements(2),
           value: 2,
           info: {
-            name: 'TemporalPositionIndex',
+            source: 'TemporalPositionIndex',
             tagKey: TagKeys.TemporalPositionIndex
           }
         },
@@ -621,7 +621,7 @@ describe('dicom', () => {
           },
           value: 800.5,
           info: {
-            name: 'DiffusionBValue',
+            source: 'DiffusionBValue',
             tagKey: TagKeys.DiffusionBValue,
             unit: 'unit.smm2'
           }
@@ -635,7 +635,7 @@ describe('dicom', () => {
           },
           value: 1000,
           info: {
-            name: 'DiffusionBValue',
+            source: 'DiffusionBValue',
             tagKey: TagKeys.SiemensBValue,
             unit: 'unit.smm2'
           }
@@ -650,7 +650,7 @@ describe('dicom', () => {
           },
           value: 500,
           info: {
-            name: 'DiffusionBValue',
+            source: 'DiffusionBValue',
             tagKey: TagKeys.GEBValue,
             unit: 'unit.smm2'
           }
@@ -665,7 +665,7 @@ describe('dicom', () => {
           },
           value: 1000,
           info: {
-            name: 'DiffusionBValue',
+            source: 'DiffusionBValue',
             tagKey: TagKeys.HitachiBValue,
             unit: 'unit.smm2'
           }
@@ -681,7 +681,7 @@ describe('dicom', () => {
           },
           value: 800,
           info: {
-            name: 'DiffusionBValue',
+            source: 'DiffusionBValue',
             tagKey: TagKeys.DiffusionBValue,
             unit: 'unit.smm2'
           }
@@ -691,7 +691,7 @@ describe('dicom', () => {
           elements: makeEnhancedMRElements([1000, 1000]),
           value: 1000,
           info: {
-            name: 'DiffusionBValue',
+            source: 'DiffusionBValue',
             tagKey: TagKeys.DiffusionBValue,
             unit: 'unit.smm2'
           }
@@ -716,13 +716,13 @@ describe('dicom', () => {
     test('uses custom candidates volume id', () => {
       custom.volumeIdCandidates = [{
         name: 'custom',
-        getter: () => ({value: 90, tagKey: 'key', name: 'other'}),
+        getter: () => ({value: 90, tagKey: 'key', source: 'other'}),
         preLoad: true
       }];
       try {
         // the candidate name is used
         assert.deepEqual(getVolumeId({}),
-          {name: 'custom', value: 90, tagKey: 'key'});
+          {source: 'custom', value: 90, tagKey: 'key'});
       } finally {
         custom.volumeIdCandidates = undefined;
       }
@@ -749,7 +749,7 @@ describe('dicom', () => {
       assert.deepEqual(res.volumeIds.map(volumeId => volumeId.value),
         [0, 0, 60, 60], 'relative values');
       assert.deepEqual(res.volumeIds[2], {
-        name: 'AcquisitionTime',
+        source: 'AcquisitionTime',
         value: 60,
         tagKey: TagKeys.AcquisitionTime,
         unit: 'unit.s'
@@ -795,7 +795,7 @@ describe('dicom', () => {
       assert.deepEqual(
         res.volumeIds.map(volumeId => volumeId.value), [2, 2, 1, 1]);
       assert.deepEqual(res.volumeIds[0], {
-        name: 'TemporalPositionIndex',
+        source: 'TemporalPositionIndex',
         value: 2,
         tagKey: TagKeys.TemporalPositionIndex
       });
@@ -813,7 +813,7 @@ describe('dicom', () => {
       assert.deepEqual(
         res.volumeIds.map(volumeId => volumeId.value), [1000, 1000, 50, 50]);
       assert.deepEqual(res.volumeIds[0], {
-        name: 'DiffusionBValue',
+        source: 'DiffusionBValue',
         value: 1000,
         tagKey: TagKeys.DiffusionBValue,
         unit: 'unit.smm2'
@@ -840,7 +840,7 @@ describe('dicom', () => {
       assert.deepEqual(res.volumeIndices, [0, 0, 1, 1]);
       // dimension index: no b-value unit
       assert.deepEqual(res.volumeIds[0], {
-        name: 'DiffusionBValue',
+        source: 'DiffusionBValue',
         value: 1,
         tagKey: TagKeys.DimensionIndexValues
       });
@@ -918,7 +918,7 @@ describe('dicom', () => {
         assert.include(
           warnSpy.mock.calls[0][0], 'custom.getVolumeIdTagValue');
         // no tag key
-        assert.deepEqual(getVolumeId({}), {name: 'custom', value: 1});
+        assert.deepEqual(getVolumeId({}), {source: 'custom', value: 1});
       } finally {
         custom.getVolumeIdTagValue = undefined;
         warnSpy.mockRestore();

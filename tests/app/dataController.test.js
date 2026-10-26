@@ -257,7 +257,7 @@ describe('app', () => {
       const volumeIds = [0, 50, 800, 1000];
       const geometry = image.getGeometry();
       assert.deepEqual(geometry.getVolumeIds(), volumeIds.map(value => ({
-        name: 'DiffusionBValue',
+        source: 'DiffusionBValue',
         value,
         tagKey: '00189087',
         unit: 'unit.smm2'
@@ -306,7 +306,7 @@ describe('app', () => {
         'volume0 origins');
       const geometry = res0.image.getGeometry();
       assert.deepEqual(geometry.getVolumeIds(), [1, 2].map(value => ({
-        name: 'TemporalPositionIdentifier',
+        source: 'TemporalPositionIdentifier',
         value,
         tagKey: TagKeys.TemporalPositionIdentifier
       })), 'volume ids');
@@ -330,7 +330,7 @@ describe('app', () => {
     const image = list0.buildData().image;
     const geometry = image.getGeometry();
     assert.deepEqual(geometry.getVolumeIds(), [4.6, 9.2].map(value => ({
-      name: 'EchoTime',
+      source: 'EchoTime',
       value,
       tagKey: TagKeys.EchoTime,
       unit: 'unit.ms'
@@ -394,7 +394,7 @@ describe('app', () => {
     // times since the first acquisition
     assert.deepEqual(
       geometry.getVolumeIds(), [0, 3600].map(value => ({
-        name: 'AcquisitionTime',
+        source: 'AcquisitionTime',
         value,
         tagKey: TagKeys.AcquisitionTime,
         unit: 'unit.s'

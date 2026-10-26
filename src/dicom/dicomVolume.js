@@ -516,7 +516,7 @@ function getCandidateVolumeId(candidate, elements) {
   if (typeof volumeId === 'undefined') {
     return undefined;
   }
-  return {...volumeId, name: candidate.name};
+  return {...volumeId, source: candidate.name};
 }
 
 /**

@@ -22,7 +22,7 @@
  * @property {string} name The candidate name.
  * @property {Function} getter The volume id getter:
  *   `(elements) => SourcedNumberValue|undefined`, the returned volume id
- *   does not need a name (the candidate name is used).
+ *   does not need a source (the candidate name is used).
  * @property {boolean} [preLoad] Flag to also use the candidate
  *   while loading.
  * @property {boolean} [relative] Flag to make the volume id values

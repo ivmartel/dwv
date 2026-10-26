@@ -548,7 +548,7 @@ describe('image', () => {
    * @function module:tests/image~geometryNonIntegerTimes
    */
   test('Geometry non integer times', () => {
-    const info = {name: 'EchoTime', tagKey: '00180081', unit: 'unit.ms'};
+    const info = {source: 'EchoTime', tagKey: '00180081', unit: 'unit.ms'};
     // out of order, fractional and negative
     const geometry = createVolumesGeometry([12.5, 3.2, -1], info);
 
@@ -594,7 +594,7 @@ describe('image', () => {
    * @function module:tests/image~geometryVolumeIdPosition
    */
   test('Geometry volume id position', () => {
-    const info = {name: 'DiffusionBValue'};
+    const info = {source: 'DiffusionBValue'};
     const geometry = createVolumesGeometry([1000, 0, 500], info);
     assert.deepEqual(
       geometry.getSize().getValues(), [1, 1, 2, 3], 'size');
@@ -668,7 +668,7 @@ describe('image', () => {
     const t0 = Date.UTC(2026, 0, 1) / 1000 + 36000;
     const values = [t0, t0 + 60, t0 + 120];
     const geometry = createVolumesGeometry(
-      values, {name: 'AcquisitionTime'});
+      values, {source: 'AcquisitionTime'});
 
     for (let v = 0; v < values.length; ++v) {
       assert.equal(geometry.getVolumeIndex(values[v]), v, `index ${v}`);
@@ -712,7 +712,7 @@ describe('image', () => {
     }, Error, 'Geometry time must be an object');
 
     // volume ids follow time changes
-    const info = {name: 'EchoTime'};
+    const info = {source: 'EchoTime'};
     geometry.setInitialTime({...info, value: 10});
     assert.deepEqual(
       geometry.getVolumeIds(), [{...info, value: 10}], 'initial');

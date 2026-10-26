@@ -747,7 +747,7 @@ describe('image', () => {
     try {
       // 2 slices, 2 volumes with ids 50 and 1000
       const volumeIds = [50, 1000].map(value => ({
-        name: 'DiffusionBValue',
+        source: 'DiffusionBValue',
         value,
         tagKey: '00189087',
         unit: 'unit.smm2'
@@ -813,7 +813,7 @@ describe('image', () => {
   test('Image getRescaledValuesAtPosition', () => {
     // 2x2x2 image, 2 volumes with ids 50 and 1000
     const volumeIds = [50, 1000].map(value => ({
-      name: 'DiffusionBValue',
+      source: 'DiffusionBValue',
       value,
       tagKey: '00189087',
       unit: 'unit.smm2'

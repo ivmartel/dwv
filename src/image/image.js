@@ -1111,7 +1111,7 @@ export class Image extends EventTarget {
    * Append a frame to the image.
    *
    * @param {SourcedNumberValue} time The frame time: a volume id or, without
-   *   name, a frame index.
+   *   source, a frame index.
    * @param {Point3D} origin The origin of the frame.
    */
   appendFrame(time, origin) {

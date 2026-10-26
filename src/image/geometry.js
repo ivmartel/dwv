@@ -129,7 +129,7 @@ export class Geometry {
   #spacing;
 
   /**
-   * Time points: the time (a volume id or, without name, a frame
+   * Time points: the time (a volume id or, without source, a frame
    * index) and its origins, indexed by time value.
    *
    * @type {Map<number, {time: SourcedNumberValue, origins: Point3D[]}>}
@@ -165,7 +165,7 @@ export class Geometry {
    * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
    *   default to 3*3 identity).
    * @param {SourcedNumberValue} [time] Optional time: a volume id or, without
-   *   name, a frame index (for example `{value: 2}`).
+   *   source, a frame index (for example `{value: 2}`).
    */
   constructor(origins, size, spacing, orientation, time) {
     this.#origins = origins;
@@ -184,7 +184,7 @@ export class Geometry {
   /**
    * Store a time and its origins.
    *
-   * @param {SourcedNumberValue} time The time: a volume id or, without name,
+   * @param {SourcedNumberValue} time The time: a volume id or, without source,
    *   a frame index.
    * @param {Point3D[]} origins The time origins.
    * @throws {Error} If the time is not an object with a number value.
@@ -227,7 +227,7 @@ export class Geometry {
    * Set the initial time.
    *
    * @param {SourcedNumberValue} time The new time: a volume id or, without
-   *   name, a frame index.
+   *   source, a frame index.
    */
   setInitialTime(time) {
     if (typeof this.#initialTime !== 'undefined') {
@@ -240,7 +240,7 @@ export class Geometry {
   /**
    * Get the volume ids: the time of each volume, sorted by ascending
    *   value, the array index being the volume index. Times are volume
-   *   ids if they have a name.
+   *   ids if they have a source.
    *
    * @returns {SourcedNumberValue[]|undefined} The volume ids, undefined if the
    *   times are not volume ids.
@@ -263,7 +263,7 @@ export class Geometry {
       .map(item => item.time)
       .sort((a, b) => a.value - b.value);
     if (volumeIds.length === 0 ||
-      volumeIds.some(time => typeof time.name === 'undefined')) {
+      volumeIds.some(time => typeof time.source === 'undefined')) {
       this.#volumeIdsData = undefined;
     } else {
       const values = volumeIds.map(volumeId => volumeId.value);
@@ -759,7 +759,7 @@ export class Geometry {
    *
    * @param {Point3D} origin The origin to append.
    * @param {SourcedNumberValue} time The frame time: a volume id or, without
-   *   name, a frame index.
+   *   source, a frame index.
    */
   appendFrame(origin, time) {
     // add origin to list

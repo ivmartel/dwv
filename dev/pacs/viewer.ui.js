@@ -703,7 +703,7 @@ export class ViewerUI {
     if (volumeValues.length > maxValues) {
       texts.push(`... (${volumeValues.length} volumes)`);
     }
-    const name = volumeValues[0].volumeId.name ?? 'volume';
+    const name = volumeValues[0].volumeId.source ?? 'volume';
     return `Per ${name}: ${texts.join(', ')}`;
   }
 

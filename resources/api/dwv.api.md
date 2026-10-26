@@ -1373,7 +1373,7 @@ export class Size {
 
 // @public
 export type SourcedNumberValue = NumberValue & {
-    name?: string;
+    source?: string;
     tagKey?: string;
 };
 

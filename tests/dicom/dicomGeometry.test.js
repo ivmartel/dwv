@@ -218,10 +218,10 @@ describe('getSortedFramesGeometry', () => {
           res[f].getInitialTime().value, volumeIds[f],
           `${structure.name} frame ${f} time`);
         assert.equal(
-          res[f].getInitialTime().name,
+          res[f].getInitialTime().source,
           typeof structure.genOptions.frameBValues !== 'undefined'
             ? 'DiffusionBValue' : 'TemporalPositionIndex',
-          `${structure.name} frame ${f} volume id name`);
+          `${structure.name} frame ${f} volume id source`);
       }
     }
   });
