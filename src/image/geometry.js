@@ -22,7 +22,7 @@ import {Matrix33} from '../math/matrix.js';
 export const DIRECTION_EPSILON = 1e-4;
 
 /**
- * @import {IndexValue} from '../math/types.js';
+ * @import {SourcedNumberValue} from '../math/types.js';
  */
 
 /**
@@ -79,7 +79,7 @@ function getClosestOriginResidual(point3D, origins, orientation) {
  * Sorted volume ids and the values derived from them.
  *
  * @typedef {object} VolumeIdsData
- * @property {IndexValue[]} volumeIds The volume ids, sorted by value.
+ * @property {SourcedNumberValue[]} volumeIds The volume ids, sorted by value.
  * @property {number[]} values The sorted values.
  * @property {number} tolerance The value matching tolerance: half the
  *   smallest gap between values (0.5 for a single value).
@@ -132,14 +132,14 @@ export class Geometry {
    * Time points: the time (a volume id or, without name, a frame
    * index) and its origins, indexed by time value.
    *
-   * @type {Map<number, {time: IndexValue, origins: Point3D[]}>}
+   * @type {Map<number, {time: SourcedNumberValue, origins: Point3D[]}>}
    */
   #times = new Map();
 
   /**
    * Initial time.
    *
-   * @type {IndexValue|undefined}
+   * @type {SourcedNumberValue|undefined}
    */
   #initialTime;
 
@@ -164,7 +164,7 @@ export class Geometry {
    * @param {Spacing} spacing The object spacing.
    * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
    *   default to 3*3 identity).
-   * @param {IndexValue} [time] Optional time: a volume id or, without
+   * @param {SourcedNumberValue} [time] Optional time: a volume id or, without
    *   name, a frame index (for example `{value: 2}`).
    */
   constructor(origins, size, spacing, orientation, time) {
@@ -184,7 +184,7 @@ export class Geometry {
   /**
    * Store a time and its origins.
    *
-   * @param {IndexValue} time The time: a volume id or, without name,
+   * @param {SourcedNumberValue} time The time: a volume id or, without name,
    *   a frame index.
    * @param {Point3D[]} origins The time origins.
    * @throws {Error} If the time is not an object with a number value.
@@ -217,7 +217,7 @@ export class Geometry {
   /**
    * Get the time that was passed at construction.
    *
-   * @returns {IndexValue|undefined} The time.
+   * @returns {SourcedNumberValue|undefined} The time.
    */
   getInitialTime() {
     return this.#initialTime;
@@ -226,7 +226,7 @@ export class Geometry {
   /**
    * Set the initial time.
    *
-   * @param {IndexValue} time The new time: a volume id or, without
+   * @param {SourcedNumberValue} time The new time: a volume id or, without
    *   name, a frame index.
    */
   setInitialTime(time) {
@@ -242,7 +242,7 @@ export class Geometry {
    *   value, the array index being the volume index. Times are volume
    *   ids if they have a name.
    *
-   * @returns {IndexValue[]|undefined} The volume ids, undefined if the
+   * @returns {SourcedNumberValue[]|undefined} The volume ids, undefined if the
    *   times are not volume ids.
    */
   getVolumeIds() {
@@ -284,7 +284,7 @@ export class Geometry {
    * Set the volume ids of a geometry without times (for example a
    *   resampled one): the volumes all have the current origins.
    *
-   * @param {IndexValue[]} volumeIds The volume ids, sorted by ascending
+   * @param {SourcedNumberValue[]} volumeIds The volume ids, sorted by ascending
    *   value, one per volume (fourth dimension).
    */
   setVolumeIds(volumeIds) {
@@ -758,7 +758,7 @@ export class Geometry {
    * Append a frame to the geometry.
    *
    * @param {Point3D} origin The origin to append.
-   * @param {IndexValue} time The frame time: a volume id or, without
+   * @param {SourcedNumberValue} time The frame time: a volume id or, without
    *   name, a frame index.
    */
   appendFrame(origin, time) {

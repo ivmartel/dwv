@@ -2,7 +2,7 @@
 // without the volume functions.
 
 /**
- * @import {IndexValue} from '../math/types.js';
+ * @import {SourcedNumberValue} from '../math/types.js';
  */
 
 /**
@@ -21,7 +21,7 @@
  * @typedef {object} VolumeIdCandidate
  * @property {string} name The candidate name.
  * @property {Function} getter The volume id getter:
- *   `(elements) => IndexValue|undefined`, the returned volume id
+ *   `(elements) => SourcedNumberValue|undefined`, the returned volume id
  *   does not need a name (the candidate name is used).
  * @property {boolean} [preLoad] Flag to also use the candidate
  *   while loading.

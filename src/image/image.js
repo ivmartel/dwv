@@ -19,7 +19,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {Point} from '../math/point.js';
  * @import {MaskImage} from './maskImage.js';
  * @import {TypedArray} from '../math/types.js';
- * @import {IndexValue} from '../math/types.js';
+ * @import {SourcedNumberValue} from '../math/types.js';
  */
 
 
@@ -1109,7 +1109,7 @@ export class Image extends EventTarget {
   /**
    * Append a frame to the image.
    *
-   * @param {IndexValue} time The frame time: a volume id or, without
+   * @param {SourcedNumberValue} time The frame time: a volume id or, without
    *   name, a frame index.
    * @param {Point3D} origin The origin of the frame.
    */
