@@ -114,6 +114,13 @@ communication — controllers re-listen to their children's events and
 re-dispatch them upward, so most state changes eventually surface as an
 event on the top-level `App`.
 
+Public typedefs (the ones that are part of the API) live in a single
+`<folder>/types.js` per source folder (currently `dicom`, `image`, `math`),
+re-exported by the folder's `index.js` with `export * from './types.js'`.
+Typedefs only used inside one module stay in that module. Keep `types.js`
+type only: typedefs and JSDoc `@import` only, no runtime import or code, so
+it stays a leaf of the module graph and cannot create circular dependencies.
+
 ### App and its controllers (`src/app/`)
 
 `App` (`application.js`) is the public facade and central event bus, but it
@@ -290,7 +297,7 @@ embedding applications — check it before adding new hardcoded
 modality-specific behavior. `custom.volumeIdCandidates` and
 `custom.privateBValueRules` replace the defaults; extend the exported
 `defaultVolumeIdCandidates`/`defaultPrivateBValueRules` (from `dicom/index.js`,
-typedefs in `volumeTypes.js`) rather than rewriting them.
+typedefs in `dicom/types.js`) rather than rewriting them.
 `custom.getVolumeIdTagValue`/`getPostLoadVolumeIdTagValue` are deprecated
 since v0.37.
 

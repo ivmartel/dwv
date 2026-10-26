@@ -104,7 +104,6 @@ removed exports, signature changes) so the user knows it's intentional, and
 **keep the file in the change**: CI fails if `dwv.api.md` doesn't match the
 public API. Then run `yarn api-ci` (needs the `build/types` from the build)
 to check that it passes the way it will in CI, warnings included.
-`AGENTS.md` is only updated at release time, not per change.
 
 ### Convention review of the diff
 
