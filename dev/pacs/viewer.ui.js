@@ -643,26 +643,27 @@ export class ViewerUI {
   }
 
   /**
-   * Update the position text: index, value and, for images with
-   *   several volumes, the rescaled values of all volumes, as
-   *   'value: 3640 | Per EchoTime: (4.6 ms, 3640), (9.2 ms, 2000)'.
+   * Update the position texts: the spatial one with index and value,
+   *   as '(index: 1,2,3) value: 3640', and, for images with several
+   *   volumes, the temporal one with the rescaled values of all volumes,
+   *   as 'Per EchoTime: (4.6 ms, 3640), (9.2 ms, 2000)'.
    *
    * @param {object} detail The position change event detail.
    */
   #updatePositionText(detail) {
     const span = document.getElementById('positionspan');
-    if (!span) {
-      return;
+    if (span) {
+      let text = `(index: ${detail.value[0]})`;
+      if (detail.value.length > 2) {
+        text += ` value: ${detail.value[2]}`;
+      }
+      span.textContent = text;
     }
-    let text = `(index: ${detail.value[0]})`;
-    if (detail.value.length > 2) {
-      text += ` value: ${detail.value[2]}`;
+    const temporalSpan = document.getElementById('temporalpositionspan');
+    if (temporalSpan) {
+      temporalSpan.textContent =
+        this.#getPerVolumeText(detail.dataid, detail.value[1]) ?? '';
     }
-    const perVolume = this.#getPerVolumeText(detail.dataid, detail.value[1]);
-    if (typeof perVolume !== 'undefined') {
-      text += ` | ${perVolume}`;
-    }
-    span.textContent = text;
   }
 
   /**

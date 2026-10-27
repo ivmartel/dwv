@@ -83,6 +83,32 @@ fieldset ul {
   padding: 5px;
   background-color: #E8E8E8;
 }
+.split-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+/* each div takes half of the line, its content wraps inside
+  (growing vertically) instead of moving the divs to a new line */
+.split-line > div {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.split-line > div:last-child {
+  justify-content: flex-end;
+}
+/* temporal position on its own line, hidden when empty */
+#temporalpositionspan {
+  flex-basis: 100%;
+}
+#temporalpositionspan:empty {
+  display: none;
+}
 .toolFeatures {
   margin: 0 5px;
 }
@@ -439,19 +465,21 @@ hr.vertical {
 <!-- DWV -->
 <div id="dwv"></div>
 
-<div id="position-line" class="line">
-  <label for="position">Position:</label>
-  <input type="text" id="position" autocomplete="off" >
-  <span id="positionspan"></span>
-</div>
-
-<div id="layout-line" class="line">
-  <label for="changelayout">Layout:</label>
-  <select name="layout" id="changelayout" autocomplete="off" disabled>
-  </select>
-  <button id="resetviews" disabled>Reset views</button>
-  <input type="checkbox" id="changesmoothing">
-  <label for="changesmoothing">Smoothing</label>
+<div class="line split-line">
+  <div id="position-line">
+    <label for="position">Position:</label>
+    <input type="text" id="position" autocomplete="off" >
+    <span id="positionspan"></span>
+    <span id="temporalpositionspan"></span>
+  </div>
+  <div id="layout-line">
+    <label for="changelayout">Layout:</label>
+    <select name="layout" id="changelayout" autocomplete="off" disabled>
+    </select>
+    <button id="resetviews" disabled>Reset views</button>
+    <input type="checkbox" id="changesmoothing">
+    <label for="changesmoothing">Smoothing</label>
+  </div>
 </div>
 
 <div id="tools-line" class="line">
