@@ -119,7 +119,7 @@ export function getSplitButton(
   toggle.title = toggleTitle;
   toggle.setAttribute('aria-haspopup', 'true');
   toggle.setAttribute('aria-expanded', 'false');
-  toggle.appendChild(document.createTextNode('▾'));
+  toggle.appendChild(document.createTextNode('▼'));
 
   const showMenu = (flag) => {
     menu.hidden = !flag;
