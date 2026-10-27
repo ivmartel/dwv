@@ -10,7 +10,11 @@
 <!-- Style -->
 <style type="text/css">
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Courier New', monospace;
+  font-size: small;
+}
+button, input, select, textarea {
+  font: inherit;
 }
 html, body {
   height: 99%;
@@ -33,12 +37,14 @@ progress {
   width: 40%;
 }
 span {
-  font-size: small;
   font-style: italic;
 }
 button {
   margin: 0 3px;
   padding: 2px 3px;
+  /* fixed line height so fallback fonts (e.g. for the split
+    button toggle glyph) do not change the button height */
+  line-height: 1.2;
 }
 input[type=number] {
   width: 75px;
@@ -53,7 +59,6 @@ select {
 }
 fieldset {
   legend {
-    font-size: small;
     font-style: italic;
   }
 }
@@ -66,7 +71,6 @@ fieldset ul {
   border: 1px dotted gray;
 }
 #about {
-  font-size: small;
   font-style: italic;
 }
 #layersdetails {
@@ -235,7 +239,7 @@ hr.vertical {
 .info {
   color: #cde;
   text-shadow: 1px 1px #000;
-  font-size: 80%;
+  font-size: 0.8rem;
   max-width: 50%;
   max-height: 50%;
   overflow: auto;
@@ -247,7 +251,7 @@ hr.vertical {
 .info-c {
   color: #ff0;
   text-shadow: 1px 1px #000;
-  font-size: 120%;
+  font-size: 1.2rem;
 }
 /* top left */
 .info-tl {
@@ -343,7 +347,6 @@ hr.vertical {
   list-style-type: none;
   background-color: #fff;
   border: 1px solid #aaa;
-  font-size: small;
   li {
     padding: 2px 8px;
     cursor: pointer;
