@@ -109,8 +109,6 @@ const prefixes = {
   addSegment: 'add-segment-',
   saveSeg: 'save-seg-',
   saveRtss: 'save-rtss-',
-  mergeSaveSeg: 'merge-save-seg-',
-  mergeSaveRtss: 'merge-save-rtss-',
   volumes: 'span-volumes-',
   info: 'info-',
   details: 'details-',
@@ -167,18 +165,11 @@ export class SegmentationUI {
   #withRtss = true;
 
   /**
-   * With overlap check flag.
+   * With segmentation extra (overlap check and merge) flag.
    *
    * @type {boolean}
    */
-  #withOverlapCheck = true;
-
-  /**
-   * With merge flag.
-   *
-   * @type {boolean}
-   */
-  #withMerge = true;
+  #withSegExtra = true;
 
   /**
    * Colour array to pick from.
@@ -251,6 +242,12 @@ export class SegmentationUI {
     this.#service.addEventListener('dataremove', this.#onDataRemove);
     this.#service.addEventListener('labelschanged', this.#onLabelsChanged);
     this.#service.addEventListener('tap', this.#onTap);
+
+    // seg extra html
+    // (note: not a listener...)
+    if (this.#withSegExtra) {
+      this.#setupSegExtraHtml();
+    }
   };
 
   /**
@@ -420,7 +417,7 @@ export class SegmentationUI {
       segList.appendChild(item);
     }
 
-    if (this.#withOverlapCheck) {
+    if (this.#withSegExtra) {
       this.#addOverlapCheckerSelection(this.#segmentations.length - 1);
     }
   }
@@ -497,21 +494,6 @@ export class SegmentationUI {
           }
         }
       }
-
-      if (this.#withMerge && this.#canMerge()) {
-        const mergeSegButton =
-          this.#rootDoc.getElementById(`${prefixes.mergeSaveSeg}0`);
-        if (mergeSegButton) {
-          mergeSegButton.disabled = false;
-        }
-        if (this.#withRtss) {
-          const mergeRtssButton =
-            this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
-          if (mergeRtssButton) {
-            mergeRtssButton.disabled = false;
-          }
-        }
-      }
     }
   };
 
@@ -540,7 +522,7 @@ export class SegmentationUI {
     }
 
     // remove from overlap checker
-    if (this.#withOverlapCheck) {
+    if (this.#withSegExtra) {
       for (const selectId of [
         'overlap-checker-select-list-0',
         'overlap-checker-select-list-1'
@@ -551,36 +533,9 @@ export class SegmentationUI {
           option.remove();
         }
       }
-    }
-
-    // disable merge if no more possible
-    if (this.#withMerge && !this.#canMerge()) {
-      const mergeSegButton =
-        this.#rootDoc.getElementById(`${prefixes.mergeSaveSeg}0`);
-      if (mergeSegButton) {
-        mergeSegButton.disabled = true;
-      }
-      if (this.#withRtss) {
-        const mergeRtssButton =
-          this.#rootDoc.getElementById(`${prefixes.mergeSaveRtss}0`);
-        if (mergeRtssButton) {
-          mergeRtssButton.disabled = true;
-        }
-      }
+      this.#updateSegExtraDisabled();
     }
   };
-
-  /**
-   * Check if the first two segmentations can be merged:
-   * they both need mask data.
-   *
-   * @returns {boolean} True if mergeable.
-   */
-  #canMerge() {
-    return this.#segmentations.length > 1 &&
-      typeof this.#segmentations[0].dataId !== 'undefined' &&
-      typeof this.#segmentations[1].dataId !== 'undefined';
-  }
 
   /**
    * Setup the html for the segmentation list.
@@ -621,14 +576,44 @@ export class SegmentationUI {
       return;
     }
     containerDiv.appendChild(segList);
+  }
 
-    if (this.#withOverlapCheck) {
-      const overlapChecker = this.#getSegmentationOverlapHtml();
-      containerDiv.appendChild(overlapChecker);
+  /**
+   * Setup the html for the segmentation extra (overlap check and merge),
+   *   disabled until a segmentation is added.
+   */
+  #setupSegExtraHtml() {
+    // insert in the extra section, before the tests
+    const testsEl = this.#rootDoc.getElementById('tests');
+    if (!testsEl) {
+      logger.warn('Cannot find tests element');
+      return;
     }
-    if (this.#withMerge) {
-      const mergeHtml = this.#getSegmentationMergeHtml();
-      containerDiv.appendChild(mergeHtml);
+    const overlapChecker = this.#getSegExtraHtml();
+    testsEl.parentElement.insertBefore(overlapChecker, testsEl);
+    this.#updateSegExtraDisabled();
+  }
+
+  /**
+   * Enable the segmentation extra controls if there are at least
+   *   two segmentations to compare, disable them otherwise.
+   */
+  #updateSegExtraDisabled() {
+    const overlapChecker = this.#rootDoc.getElementById('overlap-checker');
+    if (!overlapChecker) {
+      return;
+    }
+    const select0 = this.#rootDoc.getElementById(
+      'overlap-checker-select-list-0');
+    const select1 = this.#rootDoc.getElementById(
+      'overlap-checker-select-list-1');
+    const disabled = !select0 || select0.options.length < 2;
+    // when activating, select the second segmentation in the second list
+    if (!disabled && select1?.disabled) {
+      select1.selectedIndex = 1;
+    }
+    for (const element of overlapChecker.querySelectorAll('select, button')) {
+      element.disabled = disabled;
     }
   }
 
@@ -1090,21 +1075,13 @@ export class SegmentationUI {
   }
 
   /**
-   * Merge the first two segmentations and save the result.
+   * Merge two mask images and save the result.
    *
+   * @param {MaskImage} maskImage0 The first mask image.
+   * @param {MaskImage} maskImage1 The second mask image.
    * @param {boolean} asRtss Whether to save as RTSS.
    */
-  #mergeSave(asRtss) {
-    if (!this.#canMerge()) {
-      throw new Error('Cannot merge segmentations without mask data');
-    }
-    // merge first two masks
-    const dataCtrl = this.#service.getDataController();
-    const maskId0 = this.#segmentations[0].dataId;
-    const maskImage0 = dataCtrl.get(maskId0).image;
-    const maskId1 = this.#segmentations[1].dataId;
-    const maskImage1 = dataCtrl.get(maskId1).image;
-
+  #mergeSave(maskImage0, maskImage1, asRtss) {
     const mergedImage = mergeMaskImages(maskImage0, maskImage1);
 
     // save
@@ -1389,28 +1366,33 @@ export class SegmentationUI {
 
     overlapSelect0.appendChild(newOption0);
     overlapSelect1.appendChild(newOption1);
+
+    this.#updateSegExtraDisabled();
   }
 
   /**
-   * Get the HTML for the segmentation overlap checker.
+   * Get the HTML for the segmentation extra (overlap check and merge).
    *
-   * @returns {HTMLLIElement} The HTML element.
+   * @returns {HTMLDivElement} The HTML element.
    */
-  #getSegmentationOverlapHtml() {
+  #getSegExtraHtml() {
     // create overlap checker
     const overlapChecker = document.createElement('div');
     overlapChecker.id = 'overlap-checker';
-
-    // label
-    const overlapLabel = document.createElement('label');
-    overlapLabel.innerHTML = 'Overlap:';
-    overlapChecker.appendChild(overlapLabel);
+    overlapChecker.className = 'line';
 
     // dropdowns
     const overlapSelect0 = document.createElement('select');
     const overlapSelect1 = document.createElement('select');
     overlapSelect0.id = 'overlap-checker-select-list-0';
     overlapSelect1.id = 'overlap-checker-select-list-1';
+
+    // label
+    const overlapLabel = document.createElement('label');
+    overlapLabel.htmlFor = overlapSelect0.id;
+    overlapLabel.textContent = 'Segmentations:';
+    overlapChecker.appendChild(overlapLabel);
+
     overlapChecker.appendChild(overlapSelect0);
     overlapChecker.appendChild(overlapSelect1);
 
@@ -1421,9 +1403,15 @@ export class SegmentationUI {
 
     // result holder
     const overlapResult = document.createElement('div');
-    overlapChecker.appendChild(overlapResult);
 
-    overlapButton.onclick = (/*event*/) => {
+    /**
+     * Get the mask images of the selected segmentations.
+     *
+     * @param {string} action The action name, for the error message.
+     * @returns {MaskImage[]|undefined} The two mask images or undefined
+     *   if one is missing.
+     */
+    const getSelectedMaskImages = (action) => {
       const segmentation0 =
         this.#segmentations[parseInt(overlapSelect0.value, 10)];
       const segmentation1 =
@@ -1433,11 +1421,42 @@ export class SegmentationUI {
       const maskData1 = dataCtrl.get(segmentation1?.dataId);
       if (typeof maskData0 === 'undefined' ||
         typeof maskData1 === 'undefined') {
-        overlapResult.textContent = 'Cannot check overlap: missing mask data.';
+        overlapResult.textContent = `Cannot ${action}: missing mask data.`;
         return;
       }
-      const maskImage0 = maskData0.image;
-      const maskImage1 = maskData1.image;
+      return [maskData0.image, maskData1.image];
+    };
+
+    const saveSegButton = getButton('Save');
+    saveSegButton.title = 'Merge and Save SEG';
+    saveSegButton.onclick = () => {
+      const maskImages = getSelectedMaskImages('merge');
+      if (typeof maskImages !== 'undefined') {
+        this.#mergeSave(maskImages[0], maskImages[1], false);
+      }
+    };
+    overlapChecker.appendChild(saveSegButton);
+
+    if (this.#withRtss) {
+      const saveRtssButton = getButton('Save');
+      saveRtssButton.title = 'Merge and Save RTSS';
+      saveRtssButton.onclick = () => {
+        const maskImages = getSelectedMaskImages('merge');
+        if (typeof maskImages !== 'undefined') {
+          this.#mergeSave(maskImages[0], maskImages[1], true);
+        }
+      };
+      overlapChecker.appendChild(saveRtssButton);
+    }
+
+    overlapChecker.appendChild(overlapResult);
+
+    overlapButton.onclick = (/*event*/) => {
+      const maskImages = getSelectedMaskImages('check overlap');
+      if (typeof maskImages === 'undefined') {
+        return;
+      }
+      const [maskImage0, maskImage1] = maskImages;
       const segHelper0 = new MaskSegmentHelper(maskImage0);
       const segHelper1 = new MaskSegmentHelper(maskImage1);
       const overlap = segHelper0.findOverlap(segHelper1);
@@ -1465,45 +1484,6 @@ export class SegmentationUI {
     };
 
     return overlapChecker;
-  }
-
-  /**
-   * Get the HTML for the segmentation merge.
-   *
-   * @returns {HTMLLIElement} The HTML element.
-   */
-  #getSegmentationMergeHtml() {
-    // create main div
-    const mergeDiv = document.createElement('div');
-    mergeDiv.id = 'segmentation-merge';
-
-    // label
-    const mergeLabel = document.createElement('label');
-    mergeLabel.innerHTML = 'Merge Segmentation 0 & 1:';
-    mergeDiv.appendChild(mergeLabel);
-
-    const saveSegButton = getButton('Save');
-    saveSegButton.disabled = true;
-    saveSegButton.title = 'Merge and Save SEG';
-    saveSegButton.id = getHtmlId(prefixes.mergeSaveSeg, '0');
-    saveSegButton.onclick = () => {
-      this.#mergeSave(false);
-    };
-
-    const saveRtssButton = getButton('Save');
-    saveRtssButton.disabled = true;
-    saveRtssButton.title = 'Merge and Save RTSS';
-    saveRtssButton.id = getHtmlId(prefixes.mergeSaveRtss, '0');
-    saveRtssButton.onclick = () => {
-      this.#mergeSave(true);
-    };
-
-    mergeDiv.appendChild(saveSegButton);
-    if (this.#withRtss) {
-      mergeDiv.appendChild(saveRtssButton);
-    }
-
-    return mergeDiv;
   }
 
 }; // SegmentationUI
