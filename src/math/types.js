@@ -37,16 +37,16 @@
  */
 
 /**
- * Number value with its source, as for example a volume id: the value
- * of the volume (fourth dimension) index, for example
- * `{source: 'EchoTime', value: 4.6, tagKey: '00180081', unit: 'unit.ms'}`.
- * A number value with:
- * - source: the name of the value source, for example the volume id
- *   candidate that produced it,
- * - tagKey: the key of the DICOM tag the value is read from.
+ * Number value and its unit, with its source, for example
+ * `{value: 4.6, unit: 'unit.ms', source: 'EchoTime', tagKey: '00180081'}`.
  *
- * @typedef {NumberValue & {source?: string, tagKey?: string}}
- *   SourcedNumberValue
+ * @typedef {object} SourcedNumberValue
+ * @property {number} value The value.
+ * @property {string} [unit] The value unit, see NumberValue.
+ * @property {string} [source] The name of the value source, for
+ *   example the volume id candidate that produced it.
+ * @property {string} [tagKey] The key of the DICOM tag the value is
+ *   read from.
  */
 
 // ESM module marker

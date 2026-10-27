@@ -1372,7 +1372,9 @@ export class Size {
 }
 
 // @public
-export type SourcedNumberValue = NumberValue & {
+export type SourcedNumberValue = {
+    value: number;
+    unit?: string;
     source?: string;
     tagKey?: string;
 };
