@@ -10,8 +10,10 @@ import {
   getScaledOffset,
 } from '../../src/gui/layerGroup.js';
 import {PositionBinder} from '../../src/gui/binders.js';
-import {Point} from '../../src/math/point.js';
+import {Point, Point3D} from '../../src/math/point.js';
 import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
 /**
@@ -55,6 +57,23 @@ function makeBinderLayerGroup(dataId, position, size) {
     getBaseViewLayer: () => vl
   };
   return {layerGroup, vc};
+}
+
+/**
+ * Create a geometry with volume ids.
+ *
+ * @param {string} name The volume id name.
+ * @param {number[]} values The volume id values.
+ * @returns {Geometry} The geometry.
+ */
+function makeVolumeGeometry(name, values) {
+  const geometry = new Geometry(
+    [new Point3D(0, 0, 0)],
+    new Size([2, 2, 1, values.length]),
+    new Spacing([1, 1, 1]));
+  geometry.setVolumeIds(
+    values.map(value => ({value, source: name, tagKey: name})));
+  return geometry;
 }
 
 /**
@@ -655,7 +674,6 @@ describe('gui', () => {
     assert.equal(lg.getShowCrosshair(), false);
   });
 
-
   /**
    * Tests for {@link PositionBinder}: same data.
    *
@@ -670,64 +688,62 @@ describe('gui', () => {
   });
 
   /**
-   * Tests for {@link PositionBinder}: time series with the same tag.
+   * Tests for {@link PositionBinder}: same volume id origin.
    *
-   * @function module:tests/gui~positionBinderTimeSeries
+   * @function module:tests/gui~positionBinderSameVolumeIdOrigin
    */
-  test('PositionBinder matches the timepoint tag value of time series',
-    () => {
-      const tables = {
-        source: [
-          {timepointIndex: 0, tagValue: 10},
-          {timepointIndex: 1, tagValue: 20}
-        ],
-        target: [
-          {timepointIndex: 0, tagValue: 20},
-          {timepointIndex: 1, tagValue: 30}
-        ]
-      };
-      const binder = new PositionBinder(
-        (dataId) => tables[dataId],
-        () => 'TemporalPositionIdentifier');
-      const {layerGroup, vc} =
-        makeBinderLayerGroup('target', [0, 0, 1, 1], [2, 2, 5, 2]);
-      binder.getCallback(layerGroup)(
-        makePositionEvent('source', [1, 1, 3, 1], [2]));
-      assert.deepEqual(getSetPosition(vc), [1, 1, 3, 0],
-        'timepoint with the same tag value');
-    });
-
-  /**
-   * Tests for {@link PositionBinder}: no matching timepoint.
-   *
-   * @function module:tests/gui~positionBinderNoMatch
-   */
-  test('PositionBinder keeps the timepoint without a matching tag', () => {
-    const table = [{timepointIndex: 0, tagValue: 10}];
-    // different timepoint tags
-    const binder0 = new PositionBinder(
-      () => table,
-      (dataId) => dataId === 'source' ? 'TemporalPositionIdentifier'
-        : 'TemporalPositionIndex');
-    const target0 = makeBinderLayerGroup('target', [0, 0, 1, 1], [2, 2, 5, 2]);
-    binder0.getCallback(target0.layerGroup)(
-      makePositionEvent('source', [1, 1, 3, 0], [2]));
-    assert.deepEqual(getSetPosition(target0.vc), [1, 1, 3, 1],
-      'different tags');
-    // no timepoint lookups (not time series)
-    const target1 = makeBinderLayerGroup('target', [0, 0, 1, 1], [2, 2, 5, 2]);
-    new PositionBinder().getCallback(target1.layerGroup)(
-      makePositionEvent('source', [1, 1, 3, 0], [2]));
-    assert.deepEqual(getSetPosition(target1.vc), [1, 1, 3, 1],
-      'no lookups');
+  test('PositionBinder follows the volume id of the same origin', () => {
+    const geometries = {
+      source: makeVolumeGeometry('TemporalPositionIdentifier', [1, 2]),
+      target: makeVolumeGeometry('TemporalPositionIdentifier', [2, 3])
+    };
+    const binder = new PositionBinder((dataId) => geometries[dataId]);
+    const {layerGroup, vc} =
+      makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
+    binder.getCallback(layerGroup)(
+      makePositionEvent('source', [1, 1, 3, 2], [2]));
+    assert.deepEqual(getSetPosition(vc), [1, 1, 3, 2],
+      'volume id value followed');
   });
 
   /**
-   * Tests for {@link PositionBinder}: timepoint only move.
+   * Tests for {@link PositionBinder}: no matching volume id.
+   *
+   * @function module:tests/gui~positionBinderNoMatch
+   */
+  test('PositionBinder keeps the volume without a matching id', () => {
+    const geometries = {
+      source: makeVolumeGeometry('TemporalPositionIdentifier', [1, 2]),
+      other: makeVolumeGeometry('DiffusionBValue', [0, 1]),
+      target: makeVolumeGeometry('TemporalPositionIdentifier', [2, 3])
+    };
+    const binder = new PositionBinder((dataId) => geometries[dataId]);
+    // different origin
+    const target0 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
+    binder.getCallback(target0.layerGroup)(
+      makePositionEvent('other', [1, 1, 3, 1], [2]));
+    assert.deepEqual(getSetPosition(target0.vc), [1, 1, 3, 3],
+      'different origin');
+    // same origin, value not in target
+    const target1 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
+    binder.getCallback(target1.layerGroup)(
+      makePositionEvent('source', [1, 1, 3, 1], [2]));
+    assert.deepEqual(getSetPosition(target1.vc), [1, 1, 3, 3],
+      'value not in target');
+    // no geometry getter
+    const target2 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
+    new PositionBinder().getCallback(target2.layerGroup)(
+      makePositionEvent('source', [1, 1, 3, 2], [2]));
+    assert.deepEqual(getSetPosition(target2.vc), [1, 1, 3, 3],
+      'no getter');
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: volume only move.
    *
    * @function module:tests/gui~positionBinderVolumeOnlyMove
    */
-  test('PositionBinder keeps the target slice on a timepoint only move',
+  test('PositionBinder keeps the target slice on a volume only move',
     () => {
       const {layerGroup, vc} =
         makeBinderLayerGroup('data0', [0, 0, 1, 0], [2, 2, 5, 3]);
@@ -749,6 +765,52 @@ describe('gui', () => {
       makePositionEvent('data0', [1, 1, 3, 2], [0, 1, 2, 3]));
     assert.deepEqual(getSetPosition(vc), [1, 1, 1, 2],
       'in-plane position followed, slice kept');
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: single slice target volume move.
+   *
+   * @function module:tests/gui~positionBinderSingleSliceVolumeMove
+   */
+  test('PositionBinder keeps the in-plane position of a single slice ' +
+    'target on a volume only move', () => {
+    const {layerGroup, vc} =
+      makeBinderLayerGroup('data0', [0, 0, 1, 0], [2, 2, 1, 3]);
+    new PositionBinder().getCallback(layerGroup)(
+      makePositionEvent('data0', [1, 1, 3, 2], [3]));
+    assert.deepEqual(getSetPosition(vc), [0, 0, 1, 2],
+      'in-plane position and slice kept, volume followed');
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: unchanged position.
+   *
+   * @function module:tests/gui~positionBinderUnchanged
+   */
+  test('PositionBinder ignores an unchanged position', () => {
+    const {layerGroup, vc} =
+      makeBinderLayerGroup('data0', [0, 0, 1], [2, 2, 5]);
+    const callback = new PositionBinder().getCallback(layerGroup);
+    callback(makePositionEvent('data0', [1, 1, 3], []));
+    assert.equal(vc.setCurrentPosition.mock.calls.length, 0,
+      'unchanged position not synced');
+    callback(makePositionEvent('data0', [1, 1, 3], [2]));
+    assert.equal(vc.setCurrentPosition.mock.calls.length, 1,
+      'changed position synced');
+  });
+
+  /**
+   * Tests for {@link PositionBinder}: unchanged position of other data.
+   *
+   * @function module:tests/gui~positionBinderUnchangedOtherData
+   */
+  test('PositionBinder follows an unchanged index of other data', () => {
+    // other data can have a finer grid
+    const {layerGroup, vc} =
+      makeBinderLayerGroup('target', [0, 0, 1], [2, 2, 5]);
+    new PositionBinder().getCallback(layerGroup)(
+      makePositionEvent('source', [1.5, 1, 3], []));
+    assert.deepEqual(getSetPosition(vc), [1.5, 1, 3]);
   });
 
   /**

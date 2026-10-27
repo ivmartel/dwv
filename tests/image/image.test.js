@@ -896,4 +896,142 @@ describe('image', () => {
     assert.deepEqual(res7, [], 'rgb');
   });
 
+
+  /**
+   * Tests for {@link Image#resample} of an image with volume ids.
+   *
+   * @function module:tests/image~imageResampleVolumeIds
+   */
+  test('Image resample keeps volume ids', async () => {
+    vi.stubGlobal('Worker', FakeResamplingWorker);
+    try {
+      // 2 slices, 2 volumes with ids 50 and 1000
+      const volumeIds = [50, 1000].map(value => ({
+        source: 'DiffusionBValue',
+        value,
+        tagKey: '00189087',
+        unit: 'unit.smm2'
+      }));
+      const geometry = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]),
+        undefined, volumeIds[0]);
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1, 50);
+      geometry.appendFrame(new Point3D(0, 0, 0), volumeIds[1]);
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1, 1000);
+      // volume values: 1 then 2
+      const buffer = new Uint8Array(16);
+      buffer.fill(1, 0, 8);
+      buffer.fill(2, 8);
+      const image = new Image(geometry, buffer);
+      image.setMeta({PixelRepresentation: 0});
+
+      // 90 degrees rotation around Z
+      /* eslint-disable @stylistic/js/array-element-newline */
+      const orientation = new Matrix33([
+        0, -1, 0,
+        1, 0, 0,
+        0, 0, 1
+      ]);
+      /* eslint-enable @stylistic/js/array-element-newline */
+      const complete = new Promise(resolve => {
+        image.addEventListener('imageresamplingcomplete', resolve);
+      });
+      image.resample(orientation, false);
+      await complete;
+
+      assert.ok(image.isResampled(), 'is resampled');
+      assert.ok(
+        image.getGeometry().getOrientation().equals(orientation),
+        'resampled orientation');
+      assert.deepEqual(
+        image.getGeometry().getVolumeIds(), volumeIds, 'volume ids');
+      const position = image.getGeometry().indexToWorld(
+        new Index([0, 0, 0, 1]));
+      assert.equal(position.get(3), 1000, 'volume 1 position');
+      for (let v = 0; v < 2; ++v) {
+        for (let k = 0; k < 2; ++k) {
+          assert.equal(image.getValue(0, 0, k, v), v + 1,
+            `value of slice ${k} of volume ${v}`);
+        }
+      }
+
+      // revert: back to the original geometry
+      image.revert();
+      assert.notOk(image.isResampled(), 'is not resampled');
+      assert.deepEqual(
+        image.getGeometry().getVolumeIds(), volumeIds, 'reverted volume ids');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+
+  /**
+   * Tests for {@link Image#resample} of an image with volume ids.
+   *
+   * @function module:tests/image~imageResampleVolumeIds
+   */
+  test('Image resample keeps volume ids', async () => {
+    vi.stubGlobal('Worker', FakeResamplingWorker);
+    try {
+      // 2 slices, 2 volumes with ids 50 and 1000
+      const volumeIds = [50, 1000].map(value => ({
+        source: 'DiffusionBValue',
+        value,
+        tagKey: '00189087',
+        unit: 'unit.smm2'
+      }));
+      const geometry = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]),
+        undefined, volumeIds[0]);
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1, 50);
+      geometry.appendFrame(new Point3D(0, 0, 0), volumeIds[1]);
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1, 1000);
+      // volume values: 1 then 2
+      const buffer = new Uint8Array(16);
+      buffer.fill(1, 0, 8);
+      buffer.fill(2, 8);
+      const image = new Image(geometry, buffer);
+      image.setMeta({PixelRepresentation: 0});
+
+      // 90 degrees rotation around Z
+      /* eslint-disable @stylistic/js/array-element-newline */
+      const orientation = new Matrix33([
+        0, -1, 0,
+        1, 0, 0,
+        0, 0, 1
+      ]);
+      /* eslint-enable @stylistic/js/array-element-newline */
+      const complete = new Promise(resolve => {
+        image.addEventListener('imageresamplingcomplete', resolve);
+      });
+      image.resample(orientation, false);
+      await complete;
+
+      assert.ok(image.isResampled(), 'is resampled');
+      assert.ok(
+        image.getGeometry().getOrientation().equals(orientation),
+        'resampled orientation');
+      assert.deepEqual(
+        image.getGeometry().getVolumeIds(), volumeIds, 'volume ids');
+      const position = image.getGeometry().indexToWorld(
+        new Index([0, 0, 0, 1]));
+      assert.equal(position.get(3), 1000, 'volume 1 position');
+      for (let v = 0; v < 2; ++v) {
+        for (let k = 0; k < 2; ++k) {
+          assert.equal(image.getValue(0, 0, k, v), v + 1,
+            `value of slice ${k} of volume ${v}`);
+        }
+      }
+
+      // revert: back to the original geometry
+      image.revert();
+      assert.notOk(image.isResampled(), 'is not resampled');
+      assert.deepEqual(
+        image.getGeometry().getVolumeIds(), volumeIds, 'reverted volume ids');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
 });

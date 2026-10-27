@@ -90,8 +90,6 @@ export const defaultPrivateBValueRules = [
  * Candidates flagged with `preLoad` are also used while loading
  * (see `getVolumeIdTagValue`): they must not vary between the
  * slices of a single volume.
- * Candidates flagged with `timeBased` separate the timepoints of a time
- * series.
  *
  * @type {VolumeIdCandidate[]}
  */
@@ -100,14 +98,12 @@ export const defaultVolumeIdCandidates = [
     name: 'TemporalPositionIdentifier',
     getter: makeNumericTagGetter(
       TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10)),
-    preLoad: true,
-    timeBased: true
+    preLoad: true
   },
   {
     name: 'TemporalPositionIndex',
     getter: getTemporalPositionIndex,
-    preLoad: true,
-    timeBased: true
+    preLoad: true
   },
   {
     name: 'DiffusionBValue',
@@ -610,7 +606,7 @@ function getAcquisitionTime(elements) {
  * @returns {VolumeIdCandidate[]}
  *   The candidates.
  */
-export function getVolumeIdCandidates() {
+function getVolumeIdCandidates() {
   return typeof custom.volumeIdCandidates !== 'undefined'
     ? custom.volumeIdCandidates
     : defaultVolumeIdCandidates;

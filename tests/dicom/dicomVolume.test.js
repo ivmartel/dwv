@@ -174,16 +174,6 @@ describe('dicom', () => {
       assert.equal(names[names.length - 1], 'AcquisitionTime');
     });
 
-    test('time based candidates', () => {
-      const names = defaultVolumeIdCandidates
-        .filter(candidate => candidate.timeBased)
-        .map(candidate => candidate.name);
-      assert.deepEqual(names, [
-        'TemporalPositionIdentifier',
-        'TemporalPositionIndex'
-      ]);
-    });
-
     test('TemporalPositionIdentifier getter', () => {
       const getter = getCandidate('TemporalPositionIdentifier');
       const elements = {

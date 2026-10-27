@@ -304,11 +304,6 @@ export class DataController extends EventTarget {
     getNextDataId(): string;
     getStashed(dataId: string): DicomData | undefined;
     getStashedDataIds(): string[];
-    getTimepointSyncTable(dataId: string): Array<{
-        timepointIndex: number;
-        tagValue: number;
-    }> | undefined;
-    getTimepointTag(dataId: string): string | undefined;
     markDataAsComplete(dataId: string): {
         imageHasChanged: any;
     };
@@ -399,7 +394,6 @@ export class DicomData {
     meta: Record<string, DataElement>;
     numberOfItems: number;
     setComplete(flag: boolean): void;
-    timepoints: Timepoints | undefined;
     warn: string[];
 }
 
@@ -1460,15 +1454,6 @@ export class TagInfo {
     getName(): string;
     getVr(): string;
 }
-
-// @public
-export type Timepoints = {
-    tag: string;
-    syncTable: Array<{
-        timepointIndex: number;
-        tagValue: number;
-    }>;
-};
 
 // @public
 export class ToolboxController {
