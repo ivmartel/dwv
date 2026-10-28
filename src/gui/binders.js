@@ -1,8 +1,10 @@
 import {Point, Point3D} from '../math/point.js';
 import {WindowLevel} from '../image/windowLevel.js';
+import {SPATIAL_DIMS, VOLUME_DIM_INDEX} from '../image/geometry.js';
 
 /**
  * @import {LayerGroup} from './layerGroup.js';
+ * @import {ViewController} from '../app/viewController.js';
  */
 
 /**
@@ -105,6 +107,62 @@ export class MaskViewBinder {
 }
 
 /**
+ * Check if only non spatial dimensions changed.
+ *
+ * @param {number[]} [diffDims] The modified dimensions.
+ * @returns {boolean} True if only non spatial dimensions changed.
+ */
+function isVolumeOnlyMove(diffDims) {
+  return Array.isArray(diffDims) &&
+    diffDims.length !== 0 &&
+    diffDims.every((dim) => dim >= SPATIAL_DIMS);
+}
+
+/**
+ * Check if the position index did not change.
+ *
+ * @param {number[]} [diffDims] The modified dimensions.
+ * @returns {boolean} True if no index dimension changed.
+ */
+function isUnchangedPosition(diffDims) {
+  return Array.isArray(diffDims) && diffDims.length === 0;
+}
+
+/**
+ * Get the bound position of a target view.
+ *
+ * @param {ViewController} vc The target view controller.
+ * @param {number[]} values The source position values.
+ * @param {boolean} keepVolume True to keep the target volume.
+ * @param {number[]} [diffDims] The modified dimensions.
+ * @returns {Point} The target position.
+ */
+function getBoundPosition(vc, values, keepVolume, diffDims) {
+  // copy to keep the event value
+  const res = [...values];
+  const currentPos = vc.getCurrentPosition();
+  if (isVolumeOnlyMove(diffDims)) {
+    // volume change: keep the spatial position
+    for (let i = 0; i < SPATIAL_DIMS; ++i) {
+      res[i] = currentPos.get(i);
+    }
+  } else if (!vc.moreThanOne(vc.getScrollDimIndex())) {
+    // single slice: keep the slice
+    const planePos = vc.getPositionFromPlanePoint(
+      vc.getPlanePositionFromPosition(new Point(res)));
+    for (let i = 0; i < SPATIAL_DIMS; ++i) {
+      res[i] = planePos.get(i);
+    }
+  }
+  if (keepVolume &&
+    res.length > VOLUME_DIM_INDEX &&
+    currentPos.length() > VOLUME_DIM_INDEX) {
+    res[VOLUME_DIM_INDEX] = currentPos.get(VOLUME_DIM_INDEX);
+  }
+  return new Point(res);
+}
+
+/**
  * Position binder.
  */
 export class PositionBinder {
@@ -118,6 +176,9 @@ export class PositionBinder {
   };
   /**
    * Get the event handler.
+   * The event must be dispatched by the source layer group: for other
+   * data, its target is used to get the source view controller.
+   * Without it, the target view keeps its volume.
    *
    * @param {LayerGroup} layerGroup The input lqyer group.
    * @returns {EventListener} The event handler.
@@ -126,7 +187,7 @@ export class PositionBinder {
     return function (/** @type {CustomEvent} */ event) {
       const dataid = event.detail?.dataid;
       const value = event.detail?.value;
-      const pointValues = value[1];
+      const diffDims = event.detail?.diffDims;
       const vls = layerGroup.getViewLayersByDataId(dataid);
       let vl;
       let sameData = false;
@@ -137,17 +198,25 @@ export class PositionBinder {
       } else {
         vl = layerGroup.getBaseViewLayer();
       }
-      const vc = vl.getViewController();
-      // bind 3D for all
-      // bind 4D if same data, otherwise use 3D and keep current
-      const currentPos = vc.getCurrentPosition();
-      const currentDims = currentPos.length();
-      const inputDims = pointValues.length;
-      if (!sameData &&
-        inputDims > 3 && currentDims > 3) {
-        pointValues[3] = currentPos.get(3);
+      // same data: skip same voxel changes
+      if (sameData && isUnchangedPosition(diffDims)) {
+        return;
       }
-      vc.setCurrentPosition(new Point(pointValues));
+      // exit if no view layer
+      if (typeof vl === 'undefined') {
+        return;
+      }
+      // bind 4D if same data or volume origin, otherwise keep current
+      const vc = vl.getViewController();
+      let keepVolume = false;
+      if (!sameData) {
+        const sourceVc = /** @type {LayerGroup} */ (event.target)
+          ?.getViewLayersByDataId(dataid)[0]?.getViewController();
+        keepVolume = typeof sourceVc === 'undefined' ||
+          !vc.canSyncVolume(sourceVc, value[1][VOLUME_DIM_INDEX]);
+      }
+      vc.setCurrentPosition(getBoundPosition(
+        vc, value[1], keepVolume, diffDims));
     };
   };
 }

@@ -690,6 +690,34 @@ describe('image', () => {
   });
 
   /**
+   * Tests for {@link Geometry#canSyncVolume}.
+   *
+   * @function module:tests/image~geometryCanSyncVolume
+   */
+  test('Geometry canSyncVolume', () => {
+    const info = {source: 'TemporalPositionIdentifier', tagKey: '00200100'};
+    const target = createVolumesGeometry([2, 3], info);
+
+    // same volume id origin
+    const source = createVolumesGeometry([1, 2], info);
+    assert.ok(target.canSyncVolume(source, 2), 'value in target');
+    assert.notOk(target.canSyncVolume(source, 1), 'value not in target');
+
+    // different volume id origin
+    const otherSource = createVolumesGeometry(
+      [2, 3], {source: 'DiffusionBValue', tagKey: '00189087'});
+    assert.notOk(target.canSyncVolume(otherSource, 2), 'other source');
+    const otherTagKey = createVolumesGeometry(
+      [2, 3], {source: 'TemporalPositionIdentifier', tagKey: '00209128'});
+    assert.notOk(target.canSyncVolume(otherTagKey, 2), 'other tag key');
+
+    // no volume ids (frame indices)
+    const frames = createVolumesGeometry([2, 3]);
+    assert.notOk(target.canSyncVolume(frames, 2), 'source without ids');
+    assert.notOk(frames.canSyncVolume(source, 2), 'target without ids');
+  });
+
+  /**
    * Tests for {@link Geometry} time checks and volume ids updates.
    *
    * @function module:tests/image~geometryTimeUpdates

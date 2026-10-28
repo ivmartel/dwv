@@ -21,6 +21,11 @@ import {Matrix33} from '../math/matrix.js';
 // 5 decimals, leading to rounding differences of 1e-5
 export const DIRECTION_EPSILON = 1e-4;
 
+// number of spatial dimensions
+export const SPATIAL_DIMS = 3;
+// volume dimension index
+export const VOLUME_DIM_INDEX = SPATIAL_DIMS;
+
 /**
  * @import {SourcedNumberValue} from '../math/types.js';
  */
@@ -310,6 +315,26 @@ export class Geometry {
     const tolerance = 1e-9 * Math.max(1, Math.abs(value));
     return data.values.findIndex(
       item => Math.abs(item - value) <= tolerance);
+  }
+
+  /**
+   * Check if the volume of this geometry can follow the one of another
+   *   geometry: both volume ids have the same origin and the input
+   *   volume id value is one of this geometry.
+   *
+   * @param {Geometry} geometry The geometry to follow.
+   * @param {number} value The volume id value to follow.
+   * @returns {boolean} True if the volume can follow.
+   */
+  canSyncVolume(geometry, value) {
+    const sourceId = geometry.getVolumeIds()?.[0];
+    const targetId = this.getVolumeIds()?.[0];
+    if (typeof sourceId === 'undefined' || typeof targetId === 'undefined') {
+      return false;
+    }
+    return sourceId.source === targetId.source &&
+      sourceId.tagKey === targetId.tagKey &&
+      this.getVolumeIndex(value) !== -1;
   }
 
   /**
