@@ -88,8 +88,8 @@ export const custom = {
    * @deprecated Since v0.37, please use volumeIdCandidates with
    *   a `preLoad` candidate, for example:
    *   `[{name: 'custom', getter: fn, preLoad: true},
-   *   ...defaultVolumeIdCandidates]`, the getter returning a volume id
-   *   (`{value}`) instead of a number.
+   *   ...defaultVolumeIdCandidates]`, the getter returning a sourced
+   *   number value (`{value}`) instead of a number.
    */
   getVolumeIdTagValue: undefined,
 
@@ -100,7 +100,8 @@ export const custom = {
    * @returns {number|undefined} The id value if available.
    * @deprecated Since v0.37, please use volumeIdCandidates, for example:
    *   `[{name: 'custom', getter: fn}, ...defaultVolumeIdCandidates]`,
-   *   the getter returning a volume id (`{value}`) instead of a number.
+   *   the getter returning a sourced number value (`{value}`) instead
+   *   of a number.
    */
   getPostLoadVolumeIdTagValue: undefined,
 
@@ -111,8 +112,9 @@ export const custom = {
    * `preLoad` are also used while loading: they must not vary between
    * the slices of a single volume. Overrides the default list from
    * `dicomVolume.js` (exported as `defaultVolumeIdCandidates`), which can
-   * be used to extend it. Candidate getters return a volume id
-   * (`{value, tagKey, unit}`).
+   * be used to extend it. Candidate getters return the id as a sourced
+   * number value (`{value, tagKey, unit}`), an id without unit is an
+   * index: its associated value is guessed once all data is loaded.
    *
    * @type {VolumeIdCandidate[]}
    */
