@@ -17,7 +17,7 @@ const TagKeys = {
 /**
  * DICOM record types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.3.2.2.html#table_F.3-3}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_F.3.2.2.html#table_F.3-3}.
  */
 const DirectoryRecordTypes = {
   study: 'STUDY',

@@ -345,7 +345,7 @@ export const transferSyntaxKeywords = {
 /**
  * Standard SOP Class UIDs indexed by keyword. Not comprehensive, just ones needed by DWV.
  *
- * See {@link https://dicom.nema.org/dicom/2013/output/chtml/part04/sect_B.5.html#table_B.5-1}.
+ * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part04/sect_B.5.html#table_B.5-1}.
  *
  * @type {Record<string, string>}
  */

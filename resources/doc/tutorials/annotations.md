@@ -23,7 +23,7 @@ SCOORD items are translated according to their `Graphic Type` ((0070,0023) see [
 
 Closed shapes are polylines that have the same point as first and last item in their point list.
 
-DWV uses the [Comprehensive 3D SR IOD](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.35.13.3.html#table_A.35.13-1) since it allows for the usage of the SCOORD3D value type.
+DWV uses the [Comprehensive 3D SR IOD](https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_A.35.13.3.html#table_A.35.13-1) since it allows for the usage of the SCOORD3D value type.
 
 ### TID 1500 format
 
