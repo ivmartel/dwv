@@ -132,15 +132,15 @@ export const defaultVolumeIdCandidates = [
 ];
 
 /**
- * Create a volume id.
+ * Create a sourced number value.
  *
- * @param {number|undefined} value The volume id value.
+ * @param {number|undefined} value The value.
  * @param {string} tagKey The key of the tag the value is read from.
  * @param {string} [unit] The value unit as an i18n key.
- * @returns {SourcedNumberValue|undefined} The volume id, undefined if the
- *   value is undefined.
+ * @returns {SourcedNumberValue|undefined} The sourced value, undefined
+ *   if the value is undefined.
  */
-function createVolumeId(value, tagKey, unit) {
+function createSourcedValue(value, tagKey, unit) {
   if (typeof value === 'undefined') {
     return undefined;
   }
@@ -463,7 +463,7 @@ function getFrameTemporalPositionIndex(group) {
  * @returns {SourcedNumberValue|undefined} The volume id, if present.
  */
 function getTemporalPositionIndex(elements) {
-  return createVolumeId(
+  return createSourcedValue(
     getConstantPerFrameValue(
       elements, getFrameTemporalPositionIndex, 'TemporalPositionIndex'),
     TagKeys.TemporalPositionIndex);
@@ -480,7 +480,7 @@ function getTemporalPositionIndex(elements) {
  */
 function makeNumericTagGetter(key, parse, unit) {
   return function (elements) {
-    return createVolumeId(
+    return createSourcedValue(
       parseNumber(safeGet(elements, key), parse), key, unit);
   };
 }
@@ -565,11 +565,11 @@ export function getVolumeId(elements) {
 }
 
 /**
- * Get the volume id value from a list of tags, used while loading
+ * Get the volume id number from a list of tags, used while loading
  * (see getVolumeId).
  *
  * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {number|undefined} The id value if available.
+ * @returns {number|undefined} The id if available.
  */
 export function getVolumeIdTagValue(elements) {
   return getVolumeId(elements)?.value;
@@ -596,7 +596,7 @@ function getAcquisitionTime(elements) {
       res += dateMs / 1000;
     }
   }
-  return createVolumeId(res, TagKeys.AcquisitionTime, 'unit.s');
+  return createSourcedValue(res, TagKeys.AcquisitionTime, 'unit.s');
 }
 
 /**
@@ -614,16 +614,16 @@ function getVolumeIdCandidates() {
 
 /**
  * Get the volume index of each item (file or frame) from its volume
- * id value. The grouping is valid if all items have a numeric value,
- * there are at least two distinct values and each (slice, volume)
+ * id. The grouping is valid if all items have a numeric id,
+ * there are at least two distinct ids and each (slice, volume)
  * pair is unique with a total of slices times volumes items: every
  * volume then contains every slice.
  *
- * @param {any[]} values The volume id value of each item.
+ * @param {any[]} values The volume id of each item.
  * @param {number[]} sliceIndices The slice index of each item.
  * @param {number} numberOfSlices The number of distinct slices.
  * @returns {number[]|undefined} The volume index of each item (volumes
- *   ordered by ascending value), undefined if the grouping is not valid.
+ *   ordered by ascending id), undefined if the grouping is not valid.
  */
 export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
   if (values.length !== sliceIndices.length) {
