@@ -4,7 +4,6 @@ import {SPATIAL_DIMS, VOLUME_DIM_INDEX} from '../image/geometry.js';
 
 /**
  * @import {LayerGroup} from './layerGroup.js';
- * @import {Geometry} from '../image/geometry.js';
  * @import {ViewController} from '../app/viewController.js';
  */
 
@@ -130,25 +129,6 @@ function isUnchangedPosition(diffDims) {
 }
 
 /**
- * Check if the target volume can follow the source one.
- *
- * @param {Geometry|undefined} sourceGeometry The source geometry.
- * @param {Geometry|undefined} targetGeometry The target geometry.
- * @param {number} value The source volume id value.
- * @returns {boolean} True if the target volume can follow.
- */
-function canSyncVolume(sourceGeometry, targetGeometry, value) {
-  const sourceId = sourceGeometry?.getVolumeIds()?.[0];
-  const targetId = targetGeometry?.getVolumeIds()?.[0];
-  if (typeof sourceId === 'undefined' || typeof targetId === 'undefined') {
-    return false;
-  }
-  return sourceId.source === targetId.source &&
-    sourceId.tagKey === targetId.tagKey &&
-    targetGeometry.getVolumeIndex(value) !== -1;
-}
-
-/**
  * Get the bound position of a target view.
  *
  * @param {ViewController} vc The target view controller.
@@ -187,20 +167,6 @@ function getBoundPosition(vc, values, keepVolume, diffDims) {
  */
 export class PositionBinder {
   /**
-   * Data geometry getter.
-   *
-   * @type {Function|undefined}
-   */
-  #getGeometry;
-
-  /**
-   * @param {Function} [getGeometry] The data geometry getter.
-   */
-  constructor(getGeometry) {
-    this.#getGeometry = getGeometry;
-  }
-
-  /**
    * Get the associated event.
    *
    * @returns {string} The event name.
@@ -210,12 +176,14 @@ export class PositionBinder {
   };
   /**
    * Get the event handler.
+   * The event must be dispatched by the source layer group: for other
+   * data, its target is used to get the source view controller.
+   * Without it, the target view keeps its volume.
    *
    * @param {LayerGroup} layerGroup The input lqyer group.
    * @returns {EventListener} The event handler.
    */
-  getCallback = (layerGroup) => {
-    const getGeometry = this.#getGeometry;
+  getCallback = function (layerGroup) {
     return function (/** @type {CustomEvent} */ event) {
       const dataid = event.detail?.dataid;
       const value = event.detail?.value;
@@ -239,12 +207,16 @@ export class PositionBinder {
         return;
       }
       // bind 4D if same data or volume origin, otherwise keep current
-      const canSync = typeof getGeometry !== 'undefined' &&
-        canSyncVolume(getGeometry(dataid), getGeometry(vl.getDataId()),
-          value[1][VOLUME_DIM_INDEX]);
       const vc = vl.getViewController();
+      let keepVolume = false;
+      if (!sameData) {
+        const sourceVc = /** @type {LayerGroup} */ (event.target)
+          ?.getViewLayersByDataId(dataid)[0]?.getViewController();
+        keepVolume = typeof sourceVc === 'undefined' ||
+          !vc.canSyncVolume(sourceVc, value[1][VOLUME_DIM_INDEX]);
+      }
       vc.setCurrentPosition(getBoundPosition(
-        vc, value[1], !sameData && !canSync, diffDims));
+        vc, value[1], keepVolume, diffDims));
     };
   };
 }

@@ -558,6 +558,7 @@ export class Geometry {
     appendOrigin(origin: Point3D, index: number, time?: number): void;
     canAppendOrigin(origin: Point3D, time?: number): BooleanResult;
     canAppendSlice(rhs: Geometry): BooleanResult;
+    canSyncVolume(geometry: Geometry, value: number): boolean;
     checkTimeOrigins(): BooleanResult;
     clone(): Geometry;
     equals(rhs: Geometry): boolean;
@@ -1581,6 +1582,7 @@ export class ViewController {
     bindImageAndLayer(viewLayer: ViewLayer): void;
     canQuantifyImage(): boolean;
     canScroll(): boolean;
+    canSyncVolume(viewController: ViewController, value: number): boolean;
     // @deprecated
     canWindowLevel(): boolean;
     equalImageMeta(meta: object): boolean;

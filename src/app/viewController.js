@@ -221,6 +221,18 @@ export class ViewController {
   }
 
   /**
+   * Check if the volume of this view can follow the one of another view.
+   *
+   * @param {ViewController} viewController The view controller to follow.
+   * @param {number} value The volume id value to follow.
+   * @returns {boolean} True if the volume can follow.
+   */
+  canSyncVolume(viewController, value) {
+    return this.#view.getImage().getGeometry().canSyncVolume(
+      viewController.#view.getImage().getGeometry(), value);
+  }
+
+  /**
    * Get the SOP image UID of the current image.
    *
    * @returns {string} The UID.

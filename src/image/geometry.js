@@ -318,6 +318,26 @@ export class Geometry {
   }
 
   /**
+   * Check if the volume of this geometry can follow the one of another
+   *   geometry: both volume ids have the same origin and the input
+   *   volume id value is one of this geometry.
+   *
+   * @param {Geometry} geometry The geometry to follow.
+   * @param {number} value The volume id value to follow.
+   * @returns {boolean} True if the volume can follow.
+   */
+  canSyncVolume(geometry, value) {
+    const sourceId = geometry.getVolumeIds()?.[0];
+    const targetId = this.getVolumeIds()?.[0];
+    if (typeof sourceId === 'undefined' || typeof targetId === 'undefined') {
+      return false;
+    }
+    return sourceId.source === targetId.source &&
+      sourceId.tagKey === targetId.tagKey &&
+      this.getVolumeIndex(value) !== -1;
+  }
+
+  /**
    * Check if the fourth dimension index to world conversion uses
    *   volume ids: if there are volume ids, one per volume.
    *

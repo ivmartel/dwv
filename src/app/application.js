@@ -1316,11 +1316,9 @@ export class App extends EventTarget {
    */
   setLayerGroupsBinders(list) {
     const instances = [];
-    const getGeometry = (dataId) =>
-      this.#dataController.get(dataId)?.image?.getGeometry();
     for (let i = 0; i < list.length; ++i) {
       if (typeof binderList[list[i]] !== 'undefined') {
-        instances.push(new binderList[list[i]](getGeometry));
+        instances.push(new binderList[list[i]]);
       }
     }
     this.#stageController.setBinders(instances);

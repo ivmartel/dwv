@@ -10,10 +10,16 @@ import {
   getScaledOffset,
 } from '../../src/gui/layerGroup.js';
 import {PositionBinder} from '../../src/gui/binders.js';
+import {Stage} from '../../src/gui/stage.js';
 import {Point, Point3D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Geometry} from '../../src/image/geometry.js';
+import {Image} from '../../src/image/image.js';
+import {View} from '../../src/image/view.js';
+import {ViewController} from '../../src/app/viewController.js';
+import {getIdentityMat33} from '../../src/math/matrix.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
 /**
@@ -27,12 +33,18 @@ import * as loggerModule from '../../src/utils/logger.js';
  * @param {string} dataId The view layer data id.
  * @param {number[]} position The view layer current position.
  * @param {number[]} size The view layer image size.
+ * @param {Geometry} [geometry] The view layer image geometry.
  * @returns {{layerGroup: object, vc: object}} The layer group and its
  *   view controller.
  */
-function makeBinderLayerGroup(dataId, position, size) {
+function makeBinderLayerGroup(dataId, position, size, geometry) {
   // identity orientation and origin: plane x, y are the world x, y
   const vc = {
+    geometry,
+    canSyncVolume: (viewController, value) =>
+      typeof geometry !== 'undefined' &&
+      typeof viewController.geometry !== 'undefined' &&
+      geometry.canSyncVolume(viewController.geometry, value),
     getCurrentPosition: () => new Point(position),
     moreThanOne: (dim) => new Size(size).moreThanOne(dim),
     getScrollDimIndex: () => 2,
@@ -52,11 +64,25 @@ function makeBinderLayerGroup(dataId, position, size) {
     getViewController: () => vc,
     getDataId: () => dataId
   };
-  const layerGroup = {
+  const layerGroup = Object.assign(new EventTarget(), {
     getViewLayersByDataId: (id) => id === dataId ? [vl] : [],
     getBaseViewLayer: () => vl
-  };
+  });
   return {layerGroup, vc};
+}
+
+/**
+ * Fire a position change event from a source layer group to a
+ * position binder of a target layer group.
+ *
+ * @param {PositionBinder} binder The position binder.
+ * @param {object} source The source layer group mock.
+ * @param {object} target The target layer group mock.
+ * @param {CustomEvent} event The position change event.
+ */
+function firePositionEvent(binder, source, target, event) {
+  source.addEventListener('positionchange', binder.getCallback(target));
+  source.dispatchEvent(event);
 }
 
 /**
@@ -693,16 +719,13 @@ describe('gui', () => {
    * @function module:tests/gui~positionBinderSameVolumeIdOrigin
    */
   test('PositionBinder follows the volume id of the same origin', () => {
-    const geometries = {
-      source: makeVolumeGeometry('TemporalPositionIdentifier', [1, 2]),
-      target: makeVolumeGeometry('TemporalPositionIdentifier', [2, 3])
-    };
-    const binder = new PositionBinder((dataId) => geometries[dataId]);
-    const {layerGroup, vc} =
-      makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
-    binder.getCallback(layerGroup)(
-      makePositionEvent('source', [1, 1, 3, 2], [2]));
-    assert.deepEqual(getSetPosition(vc), [1, 1, 3, 2],
+    const source = makeBinderLayerGroup('source', [0, 0, 1, 1], [2, 2, 5, 2],
+      makeVolumeGeometry('TemporalPositionIdentifier', [1, 2]));
+    const target = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2],
+      makeVolumeGeometry('TemporalPositionIdentifier', [2, 3]));
+    firePositionEvent(new PositionBinder(), source.layerGroup,
+      target.layerGroup, makePositionEvent('source', [1, 1, 3, 2], [2]));
+    assert.deepEqual(getSetPosition(target.vc), [1, 1, 3, 2],
       'volume id value followed');
   });
 
@@ -712,30 +735,34 @@ describe('gui', () => {
    * @function module:tests/gui~positionBinderNoMatch
    */
   test('PositionBinder keeps the volume without a matching id', () => {
-    const geometries = {
-      source: makeVolumeGeometry('TemporalPositionIdentifier', [1, 2]),
-      other: makeVolumeGeometry('DiffusionBValue', [0, 1]),
-      target: makeVolumeGeometry('TemporalPositionIdentifier', [2, 3])
-    };
-    const binder = new PositionBinder((dataId) => geometries[dataId]);
+    const binder = new PositionBinder();
+    const source = makeBinderLayerGroup('source', [0, 0, 1, 1], [2, 2, 5, 2],
+      makeVolumeGeometry('TemporalPositionIdentifier', [1, 2]));
+    const other = makeBinderLayerGroup('other', [0, 0, 1, 0], [2, 2, 5, 2],
+      makeVolumeGeometry('DiffusionBValue', [0, 1]));
+    const targetGeometry =
+      makeVolumeGeometry('TemporalPositionIdentifier', [2, 3]);
     // different origin
-    const target0 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
-    binder.getCallback(target0.layerGroup)(
+    const target0 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2],
+      targetGeometry);
+    firePositionEvent(binder, other.layerGroup, target0.layerGroup,
       makePositionEvent('other', [1, 1, 3, 1], [2]));
     assert.deepEqual(getSetPosition(target0.vc), [1, 1, 3, 3],
       'different origin');
     // same origin, value not in target
-    const target1 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
-    binder.getCallback(target1.layerGroup)(
+    const target1 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2],
+      targetGeometry);
+    firePositionEvent(binder, source.layerGroup, target1.layerGroup,
       makePositionEvent('source', [1, 1, 3, 1], [2]));
     assert.deepEqual(getSetPosition(target1.vc), [1, 1, 3, 3],
       'value not in target');
-    // no geometry getter
-    const target2 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2]);
-    new PositionBinder().getCallback(target2.layerGroup)(
+    // no source view layer
+    const target2 = makeBinderLayerGroup('target', [0, 0, 1, 3], [2, 2, 5, 2],
+      targetGeometry);
+    binder.getCallback(target2.layerGroup)(
       makePositionEvent('source', [1, 1, 3, 2], [2]));
     assert.deepEqual(getSetPosition(target2.vc), [1, 1, 3, 3],
-      'no getter');
+      'no source view layer');
   });
 
   /**
@@ -838,6 +865,79 @@ describe('gui', () => {
     const event = makePositionEvent('data0', [1, 1, 3, 2], [3]);
     new PositionBinder().getCallback(layerGroup)(event);
     assert.deepEqual(event.detail.value[1], [1, 1, 3, 2]);
+  });
+
+  /**
+   * Tests for {@link ViewController#canSyncVolume}, as used by the
+   * position binder.
+   *
+   * @function module:tests/gui~viewControllerCanSyncVolume
+   */
+  test('ViewController canSyncVolume', () => {
+    const createViewController = (geometry) => {
+      const image = new Image(
+        geometry, new Uint8Array(geometry.getSize().getTotalSize()));
+      const view = new View(image);
+      view.setOrientation(getIdentityMat33());
+      return new ViewController(view);
+    };
+    const target = createViewController(
+      makeVolumeGeometry('TemporalPositionIdentifier', [2, 3]));
+
+    // same volume id origin
+    const source = createViewController(
+      makeVolumeGeometry('TemporalPositionIdentifier', [1, 2]));
+    assert.ok(target.canSyncVolume(source, 2), 'value in target');
+    assert.notOk(target.canSyncVolume(source, 1), 'value not in target');
+
+    // different volume id origin
+    const other = createViewController(
+      makeVolumeGeometry('DiffusionBValue', [2, 3]));
+    assert.notOk(target.canSyncVolume(other, 2), 'other origin');
+
+    // no volume ids
+    const noIds = createViewController(new Geometry(
+      [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1])));
+    assert.notOk(target.canSyncVolume(noIds, 2), 'source without ids');
+    assert.notOk(noIds.canSyncVolume(source, 2), 'target without ids');
+  });
+
+  /**
+   * Tests for {@link PositionBinder} bound through a stage: the event is
+   * dispatched by a real source layer group.
+   *
+   * @function module:tests/gui~positionBinderStage
+   */
+  test('PositionBinder syncs the volume id of stage layer groups', () => {
+    const stage = new Stage();
+    // add a layer group with a view layer, starting at the last volume
+    const addLayerGroup = (id, volumeIds) => {
+      const div = document.createElement('div');
+      div.id = id;
+      document.body.appendChild(div);
+      const geometry = makeVolumeGeometry(
+        'TemporalPositionIdentifier', volumeIds);
+      const view = new View(new Image(
+        geometry, new Uint8Array(geometry.getSize().getTotalSize()), ['0']));
+      view.setOrientation(getIdentityMat33());
+      const viewLayer = stage.addLayerGroup(div).addViewLayer();
+      vi.spyOn(viewLayer, 'draw').mockImplementation(() => {});
+      viewLayer.setView(view, `${id}-data`);
+      const vc = viewLayer.getViewController();
+      vc.setCurrentPosition(
+        geometry.indexToWorld(new Index([0, 0, 0, 1])), true);
+      return vc;
+    };
+    const sourceVc = addLayerGroup('lg0', [1, 2]);
+    const targetVc = addLayerGroup('lg1', [2, 3]);
+    stage.setBinders([new PositionBinder()]);
+
+    // move the source to volume id 2: the target follows the id
+    sourceVc.setCurrentPosition(new Point([1, 1, 0, 2]));
+    assert.deepEqual(targetVc.getCurrentPosition().getValues(),
+      [1, 1, 0, 2], 'target position');
+    assert.deepEqual(targetVc.getCurrentIndex().getValues(),
+      [1, 1, 0, 0], 'target volume index of the id');
   });
 
 });
