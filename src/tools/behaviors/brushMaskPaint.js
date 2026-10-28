@@ -4,6 +4,7 @@ import {getEllipseIndices} from '../../math/ellipse.js';
 import {Image} from '../../image/image.js';
 import {MaskImage} from '../../image/maskImage.js';
 import {Size} from '../../image/size.js';
+import {Spacing} from '../../image/spacing.js';
 import {Geometry} from '../../image/geometry.js';
 import {ColourMap} from '../../image/luts.js';
 import {getDefaultDicomSegJson} from '../../image/maskFactory.js';
@@ -353,13 +354,16 @@ export class BrushMaskPaint extends EventTarget {
    */
   #createMaskImage(geometry, origin, meta, asMainMask = false) {
     // create data
-    const sizeValues = geometry.getSize().getValues();
+    // the mask is 3D: drop extra dimensions (for ex 4D source)
+    const sizeValues = geometry.getSize().getValues().slice(0, 3);
     sizeValues[2] = 1;
     const maskSize = new Size(sizeValues);
+    const maskSpacing = new Spacing(
+      geometry.getSpacing().getValues().slice(0, 3));
     const maskGeometry = new Geometry(
       [origin],
       maskSize,
-      geometry.getSpacing(),
+      maskSpacing,
       geometry.getOrientation()
     );
     const values = new Uint8Array(maskSize.getDimSize(2));
