@@ -19,6 +19,7 @@ import {logger} from '../utils/logger.js';
  *   VolumeIdCandidate
  * } from './types.js';
  * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {VolumeId} from '../image/types.js';
  */
 
 /**
@@ -30,6 +31,8 @@ const TagKeys = {
   Manufacturer: '00080070',
   AcquisitionDate: '00080022',
   AcquisitionTime: '00080032',
+  ContentDate: '00080023',
+  ContentTime: '00080033',
   DimensionIndexSequence: '00209222',
   DimensionIndexPointer: '00209165',
   SharedFunctionalGroupsSequence: '52009229',
@@ -40,6 +43,8 @@ const TagKeys = {
   DimensionIndexValues: '00209157',
   TemporalPositionIdentifier: '00200100',
   TemporalPositionIndex: '00209128',
+  TemporalPositionSequence: '00209310',
+  TemporalPositionTimeOffset: '0020930D',
   EchoTime: '00180081',
   TriggerTime: '00181060',
   InversionTime: '00180082'
@@ -90,6 +95,10 @@ export const defaultPrivateBValueRules = [
  * Candidates flagged with `preLoad` are also used while loading
  * (see `getVolumeIdTagValue`): they must not vary between the
  * slices of a single volume.
+ * Candidates either read an index (an id without unit, for example
+ * TemporalPositionIdentifier) or a value (for example EchoTime).
+ * The associated value of indices is guessed once all data is loaded
+ * (see `getVolumeValues`), values have none.
  *
  * @type {VolumeIdCandidate[]}
  */
@@ -127,6 +136,37 @@ export const defaultVolumeIdCandidates = [
     // seconds since the first acquisition
     name: 'AcquisitionTime',
     getter: getAcquisitionTime,
+    relative: true
+  }
+];
+
+/**
+ * Ordered list of candidate volume associated value getters, used for
+ * volume ids that are indices (without unit, for example
+ * TemporalPositionIdentifier) once all data is loaded: the first one
+ * that gives each volume a time span, the spans not overlapping and
+ * following the volume ids order, is kept (see `guessVolumeValues`).
+ * The associated value of a volume is its smallest value, relative to
+ * the one of the first volume for `relative` candidates. Same shape
+ * as volume id candidates (`preLoad` is not used).
+ *
+ * @type {VolumeIdCandidate[]}
+ */
+const volumeValueCandidates = [
+  {
+    name: 'TemporalPositionTimeOffset',
+    getter: getTemporalPositionTimeOffset
+  },
+  {
+    // seconds since the first acquisition
+    name: 'AcquisitionTime',
+    getter: getAcquisitionTime,
+    relative: true
+  },
+  {
+    // seconds since the first content
+    name: 'ContentTime',
+    getter: getContentTime,
     relative: true
   }
 ];
@@ -378,10 +418,10 @@ function getDiffusionBValueVolumeId(elements) {
     // standard tag
     const value = getStandardDiffusionBValueFromEMR(elements);
     if (typeof value !== 'undefined') {
-      res = {value, tagKey: TagKeys.DiffusionBValue, unit: bValueUnit};
+      res = {value, tagKey: TagKeys.DiffusionBValue};
     } else {
       // if not found, check non standard tag
-      // (a dimension index, not a b-value: no unit)
+      // (a dimension index, not a b-value)
       const index = getNonStandardDiffusionBValueFromEMR(elements);
       if (typeof index !== 'undefined') {
         logger.debug('Got b-value for enhanced MR from non standard tag');
@@ -392,26 +432,24 @@ function getDiffusionBValueVolumeId(elements) {
     // non standard for MR
     const nonStandard = getNonStandardDiffusionBValueFromMR(elements);
     if (typeof nonStandard !== 'undefined') {
-      res = {
-        value: nonStandard.value,
-        tagKey: nonStandard.key,
-        unit: bValueUnit
-      };
+      res = {value: nonStandard.value, tagKey: nonStandard.key};
     } else {
       // if not found, check standard EMR tag
       const value = getStandardDiffusionBValueFromEMR(elements);
       if (typeof value !== 'undefined') {
-        res = {value, tagKey: TagKeys.DiffusionBValue, unit: bValueUnit};
+        res = {value, tagKey: TagKeys.DiffusionBValue};
       }
     }
   }
 
-  // cast to number (FD/DS b-values can be fractional)
-  if (typeof res !== 'undefined') {
-    const value = parseNumber(res.value, parseFloat);
-    res = typeof value !== 'undefined' ? {...res, value} : undefined;
+  if (typeof res === 'undefined') {
+    return undefined;
   }
-  return res;
+  // cast to number (FD/DS b-values can be fractional)
+  const value = parseNumber(res.value, parseFloat);
+  const unit = res.tagKey !== TagKeys.DimensionIndexValues
+    ? bValueUnit : undefined;
+  return createSourcedValue(value, res.tagKey, unit);
 }
 
 /**
@@ -470,7 +508,41 @@ function getTemporalPositionIndex(elements) {
 }
 
 /**
- * Create a getter that reads a numeric volume id from a single tag.
+ * Get the temporal position time offset of a frame.
+ *
+ * @param {Record<string, DataElement>} group The per frame
+ *   functional group.
+ * @returns {number|undefined} The value, if present.
+ */
+function getFrameTemporalPositionTimeOffset(group) {
+  let res;
+  const temporalSeq = safeGetAll(group, TagKeys.TemporalPositionSequence);
+  if (typeof temporalSeq !== 'undefined') {
+    // should be only one
+    res = parseNumber(
+      safeGet(temporalSeq[0], TagKeys.TemporalPositionTimeOffset),
+      parseFloat);
+  }
+  return res;
+}
+
+/**
+ * Get the temporal position time offset (in seconds) for enhanced
+ * multi-frame images.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The value, if present.
+ */
+function getTemporalPositionTimeOffset(elements) {
+  return createSourcedValue(
+    getConstantPerFrameValue(
+      elements, getFrameTemporalPositionTimeOffset,
+      'TemporalPositionTimeOffset'),
+    TagKeys.TemporalPositionTimeOffset, 'unit.s');
+}
+
+/**
+ * Create a getter that reads a numeric value from a single tag.
  *
  * @param {string} key The tag key.
  * @param {Function} parse The string to number parser to use.
@@ -505,18 +577,19 @@ function warnDeprecatedOnce(message) {
 }
 
 /**
- * Get the volume id of a candidate, named after the candidate.
+ * Get the volume id of a candidate, its id named after the candidate.
  *
  * @param {VolumeIdCandidate} candidate The candidate.
  * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {SourcedNumberValue|undefined} The volume id, if present.
+ * @returns {VolumeId|undefined} The volume id, if present with
+ *   a number id.
  */
 function getCandidateVolumeId(candidate, elements) {
-  const volumeId = candidate.getter(elements);
-  if (typeof volumeId === 'undefined') {
+  const id = candidate.getter(elements);
+  if (typeof id?.value !== 'number') {
     return undefined;
   }
-  return {...volumeId, source: candidate.name};
+  return {id: {...id, source: candidate.name}};
 }
 
 /**
@@ -542,7 +615,7 @@ function getDeprecatedCandidate(getter) {
  * candidates flagged with `preLoad` (see defaultVolumeIdCandidates).
  *
  * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {SourcedNumberValue|undefined} The volume id if available.
+ * @returns {VolumeId|undefined} The volume id if available.
  */
 export function getVolumeId(elements) {
   if (typeof custom.getVolumeIdTagValue !== 'undefined') {
@@ -572,31 +645,56 @@ export function getVolumeId(elements) {
  * @returns {number|undefined} The id if available.
  */
 export function getVolumeIdTagValue(elements) {
-  return getVolumeId(elements)?.value;
+  return getVolumeId(elements)?.id.value;
 }
 
 /**
- * Get the acquisition time as a number of seconds. If the acquisition
- * date is available, it is included so that acquisitions spanning
- * midnight are correctly ordered.
+ * Get a time as a number of seconds. If the date is available, it is
+ * included so that times spanning midnight are correctly ordered.
  *
  * @param {Record<string, DataElement>} elements The DICOM tags.
- * @returns {SourcedNumberValue|undefined} The volume id, if present.
+ * @param {string} dateKey The date tag key.
+ * @param {string} timeKey The time tag key.
+ * @returns {SourcedNumberValue|undefined} The time, if present.
  */
-function getAcquisitionTime(elements) {
-  if (typeof safeGet(elements, TagKeys.AcquisitionTime) === 'undefined') {
+function getDateTimeInSeconds(elements, dateKey, timeKey) {
+  if (typeof safeGet(elements, timeKey) === 'undefined') {
     return undefined;
   }
-  let res = getTimeInSeconds(elements[TagKeys.AcquisitionTime]);
+  let res = getTimeInSeconds(elements[timeKey]);
   if (typeof res !== 'undefined' &&
-    typeof safeGet(elements, TagKeys.AcquisitionDate) !== 'undefined') {
-    const date = getDateObj(elements[TagKeys.AcquisitionDate]);
+    typeof safeGet(elements, dateKey) !== 'undefined') {
+    const date = getDateObj(elements[dateKey]);
     const dateMs = Date.UTC(date.year, date.monthIndex, date.day);
     if (!isNaN(dateMs)) {
       res += dateMs / 1000;
     }
   }
-  return createSourcedValue(res, TagKeys.AcquisitionTime, 'unit.s');
+  return createSourcedValue(res, timeKey, 'unit.s');
+}
+
+/**
+ * Get the acquisition time as a number of seconds (see
+ * getDateTimeInSeconds).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The time, if present.
+ */
+function getAcquisitionTime(elements) {
+  return getDateTimeInSeconds(
+    elements, TagKeys.AcquisitionDate, TagKeys.AcquisitionTime);
+}
+
+/**
+ * Get the content time as a number of seconds (see
+ * getDateTimeInSeconds).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The time, if present.
+ */
+function getContentTime(elements) {
+  return getDateTimeInSeconds(
+    elements, TagKeys.ContentDate, TagKeys.ContentTime);
 }
 
 /**
@@ -610,6 +708,27 @@ function getVolumeIdCandidates() {
   return typeof custom.volumeIdCandidates !== 'undefined'
     ? custom.volumeIdCandidates
     : defaultVolumeIdCandidates;
+}
+
+/**
+ * Get a volume id candidate from its name, including the deprecated
+ * custom getters (named 'custom').
+ *
+ * @param {string} name The candidate name.
+ * @returns {VolumeIdCandidate|undefined} The candidate, if found.
+ */
+function getVolumeIdCandidate(name) {
+  const candidates = [...getVolumeIdCandidates()];
+  // post load first, as in guessVolumeIndices
+  for (const getter of [
+    custom.getVolumeIdTagValue,
+    custom.getPostLoadVolumeIdTagValue
+  ]) {
+    if (typeof getter !== 'undefined') {
+      candidates.unshift(getDeprecatedCandidate(getter));
+    }
+  }
+  return candidates.find(candidate => candidate.name === name);
 }
 
 /**
@@ -661,15 +780,107 @@ export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
 }
 
 /**
- * Get volume ids with values relative to the smallest one.
+ * Get the associated value of each volume from a value candidate: the
+ * smallest value of the volume (relative to the one of the first
+ * volume for `relative` candidates). Each volume spans from its
+ * smallest to its largest value, the spans must not overlap and
+ * must follow the volume order.
  *
- * @param {SourcedNumberValue[]} volumeIds The volume ids.
- * @returns {SourcedNumberValue[]} The relative volume ids.
+ * @param {VolumeIdCandidate} candidate The candidate.
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM
+ *   tags of each item.
+ * @param {number[]} volumeIndices The volume index of each item.
+ * @returns {SourcedNumberValue[]|undefined} The associated value of each
+ *   volume, undefined if the candidate is not valid.
  */
-function getRelativeVolumeIds(volumeIds) {
-  const min = Math.min(...volumeIds.map(volumeId => volumeId.value));
-  return volumeIds.map(
-    volumeId => ({...volumeId, value: volumeId.value - min}));
+function getCandidateVolumeValues(candidate, elementsList, volumeIndices) {
+  const mins = [];
+  const maxs = [];
+  for (let i = 0; i < elementsList.length; ++i) {
+    const value = candidate.getter(elementsList[i]);
+    const volIndex = volumeIndices[i];
+    if (typeof value?.value !== 'number' || isNaN(value.value) ||
+      volIndex < 0) {
+      return undefined;
+    }
+    if (typeof mins[volIndex] === 'undefined' ||
+      value.value < mins[volIndex].value) {
+      mins[volIndex] = value;
+    }
+    if (typeof maxs[volIndex] === 'undefined' ||
+      value.value > maxs[volIndex]) {
+      maxs[volIndex] = value.value;
+    }
+  }
+  // spans must not overlap and follow the volume order
+  for (let v = 0; v < mins.length; ++v) {
+    if (typeof mins[v] === 'undefined' ||
+      (v > 0 && maxs[v - 1] >= mins[v].value)) {
+      return undefined;
+    }
+  }
+  const offset = candidate.relative === true ? mins[0].value : 0;
+  return mins.map(min => ({
+    ...min,
+    value: min.value - offset,
+    source: candidate.name
+  }));
+}
+
+/**
+ * Guess the associated value of each volume: value candidates are tried
+ * in order, the first valid one is kept (see volumeValueCandidates).
+ *
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM
+ *   tags of each item.
+ * @param {number[]} volumeIndices The volume index of each item.
+ * @returns {SourcedNumberValue[]|undefined} The associated value of each
+ *   volume, undefined if no candidate is valid.
+ */
+function guessVolumeValues(elementsList, volumeIndices) {
+  for (const candidate of volumeValueCandidates) {
+    const values =
+      getCandidateVolumeValues(candidate, elementsList, volumeIndices);
+    if (typeof values !== 'undefined') {
+      logger.debug(`Using '${candidate.name}' as volume value`);
+      return values;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Get the associated value of each volume, once all data is loaded:
+ * the id relative to the first one for `relative` candidates
+ * (for example AcquisitionTime), guessed for indices (ids without
+ * unit, for example TemporalPositionIdentifier, see
+ * volumeValueCandidates). Other ids have none.
+ *
+ * @param {VolumeId[]} volumeIds The volume ids, sorted by id (as
+ *   returned by Geometry.getVolumeIds).
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM
+ *   tags of each item (file or frame).
+ * @returns {SourcedNumberValue[]|undefined} The associated value of each
+ *   volume, undefined if not available.
+ */
+export function getVolumeValues(volumeIds, elementsList) {
+  const candidate = getVolumeIdCandidate(volumeIds[0].id.source);
+  if (typeof candidate === 'undefined') {
+    return undefined;
+  }
+  if (candidate.relative === true) {
+    const first = volumeIds[0].id.value;
+    return volumeIds.map(volumeId =>
+      ({...volumeId.id, value: volumeId.id.value - first}));
+  }
+  if (typeof volumeIds[0].id.unit !== 'undefined') {
+    return undefined;
+  }
+  const ids = volumeIds.map(volumeId => volumeId.id.value);
+  return guessVolumeValues(
+    elementsList,
+    elementsList.map(elements =>
+      ids.indexOf(getCandidateVolumeId(candidate, elements)?.id.value)));
 }
 
 /**
@@ -685,14 +896,13 @@ function getRelativeVolumeIds(volumeIds) {
  * @param {number} numberOfSlices The number of distinct slices.
  * @returns {{
  *   volumeIndices: number[],
- *   volumeIds: SourcedNumberValue[],
+ *   volumeIds: VolumeId[],
  *   getter: Function
  * }|undefined}
- *   The volume index and volume id of each item (relative to the
- *   smallest one for `relative` candidates) and the volume id
- *   value getter (`(elements) => number|undefined`, not relative)
- *   that produced them, undefined if no candidate produces a valid
- *   grouping.
+ *   The volume index and volume id of each item (without associated
+ *   value, see getVolumeValues) and the volume id getter
+ *   (`(elements) => number|undefined`) that produced them, undefined
+ *   if no candidate produces a valid grouping.
  */
 export function guessVolumeIndices(
   elementsList, sliceIndices, numberOfSlices) {
@@ -712,16 +922,15 @@ export function guessVolumeIndices(
     const volumeIds = elementsList.map(
       elements => getCandidateVolumeId(candidate, elements));
     const volumeIndices = getVolumeIndices(
-      volumeIds.map(volumeId => volumeId?.value),
+      volumeIds.map(volumeId => volumeId?.id.value),
       sliceIndices, numberOfSlices);
     if (typeof volumeIndices !== 'undefined') {
       logger.debug(`Using '${candidate.name}' as volume id`);
       return {
         volumeIndices,
-        volumeIds: candidate.relative === true
-          ? getRelativeVolumeIds(volumeIds)
-          : volumeIds,
-        getter: elements => candidate.getter(elements)?.value
+        volumeIds,
+        getter: elements =>
+          getCandidateVolumeId(candidate, elements)?.id.value
       };
     }
   }

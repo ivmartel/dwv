@@ -692,10 +692,12 @@ export class ViewerUI {
     const maxValues = 10;
     const texts = [];
     for (const item of volumeValues.slice(0, maxValues)) {
+      // associated value if any, else the id
       const volumeId = item.volumeId;
-      let id = `${volumeId.value}`;
-      if (typeof volumeId.unit !== 'undefined') {
-        id += ` ${i18n.t(volumeId.unit) ?? volumeId.unit}`;
+      const display = volumeId.value ?? volumeId.id;
+      let id = `${display.value}`;
+      if (typeof display.unit !== 'undefined') {
+        id += `${i18n.t(display.unit) ?? display.unit}`;
       }
       const value = formatQuantificationValue(
         item.pixValue.value, item.pixValue.unit);
@@ -704,7 +706,9 @@ export class ViewerUI {
     if (volumeValues.length > maxValues) {
       texts.push(`... (${volumeValues.length} volumes)`);
     }
-    const name = volumeValues[0].volumeId.source ?? 'volume';
+    // the name of the displayed value
+    const firstId = volumeValues[0].volumeId;
+    const name = (firstId.value ?? firstId.id).source ?? 'volume';
     return `Per ${name}: ${texts.join(', ')}`;
   }
 

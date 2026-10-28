@@ -4,6 +4,7 @@ import {
   getVolumeId,
   getVolumeIdTagValue,
   getVolumeIndices,
+  getVolumeValues,
   guessVolumeIndices
 } from '../../src/dicom/dicomVolume.js';
 import {getFrameElements} from '../../src/dicom/dicomFunctionalGroup.js';
@@ -30,6 +31,7 @@ const TagKeys = {
   SOPClassUID: '00080016',
   AcquisitionDate: '00080022',
   AcquisitionTime: '00080032',
+  ContentTime: '00080033',
   Manufacturer: '00080070',
   DiffusionBValue: '00189087',
   SiemensBValue: '0019100C',
@@ -37,6 +39,8 @@ const TagKeys = {
   HitachiBValue: '00291030',
   TemporalPositionIdentifier: '00200100',
   TemporalPositionIndex: '00209128',
+  TemporalPositionSequence: '00209310',
+  TemporalPositionTimeOffset: '0020930D',
   PerFrameFunctionalGroupsSequence: '52009230',
   MRDiffusionSequence: '00189117',
   FrameContentSequence: '00209111',
@@ -182,6 +186,17 @@ describe('dicom', () => {
       assert.equal(getter(elements)?.value, 3);
     });
 
+    test('TemporalPositionIdentifier getter is an index', () => {
+      const getter = getCandidate('TemporalPositionIdentifier');
+      const elements = {
+        [TagKeys.TemporalPositionIdentifier]: makeDataElement('IS', ['3']),
+        [TagKeys.TriggerTime]: makeDataElement('DS', ['120'])
+      };
+      // no unit: an index
+      assert.deepEqual(getter(elements),
+        {value: 3, tagKey: TagKeys.TemporalPositionIdentifier});
+    });
+
     test('TemporalPositionIdentifier getter with no tag', () => {
       const getter = getCandidate('TemporalPositionIdentifier');
       assert.equal(getter({}), undefined);
@@ -192,6 +207,7 @@ describe('dicom', () => {
       const elements = {
         [TagKeys.EchoTime]: makeDataElement('DS', ['35.5'])
       };
+      // a value: no associated value
       assert.deepEqual(getter(elements),
         {value: 35.5, tagKey: TagKeys.EchoTime, unit: 'unit.ms'});
     });
@@ -598,7 +614,7 @@ describe('dicom', () => {
           elements: {
             [TagKeys.TemporalPositionIdentifier]: makeDataElement('IS', ['3'])
           },
-          value: 3,
+          id: 3,
           info: {
             source: 'TemporalPositionIdentifier',
             tagKey: TagKeys.TemporalPositionIdentifier
@@ -607,7 +623,7 @@ describe('dicom', () => {
         {
           name: 'TemporalPositionIndex',
           elements: makeMultiFrameElements(2),
-          value: 2,
+          id: 2,
           info: {
             source: 'TemporalPositionIndex',
             tagKey: TagKeys.TemporalPositionIndex
@@ -619,7 +635,7 @@ describe('dicom', () => {
             [TagKeys.SOPClassUID]: mrSopClass,
             [TagKeys.DiffusionBValue]: makeDataElement('FD', [800.5])
           },
-          value: 800.5,
+          id: 800.5,
           info: {
             source: 'DiffusionBValue',
             tagKey: TagKeys.DiffusionBValue,
@@ -633,7 +649,7 @@ describe('dicom', () => {
             [TagKeys.Manufacturer]: makeDataElement('LO', ['SIEMENS']),
             [TagKeys.SiemensBValue]: makeDataElement('IS', ['1000'])
           },
-          value: 1000,
+          id: 1000,
           info: {
             source: 'DiffusionBValue',
             tagKey: TagKeys.SiemensBValue,
@@ -648,7 +664,7 @@ describe('dicom', () => {
               makeDataElement('LO', ['GE MEDICAL SYSTEMS']),
             [TagKeys.GEBValue]: makeDataElement('IS', ['500'])
           },
-          value: 500,
+          id: 500,
           info: {
             source: 'DiffusionBValue',
             tagKey: TagKeys.GEBValue,
@@ -663,7 +679,7 @@ describe('dicom', () => {
               'LO', ['Hitachi Medical Corporation']),
             [TagKeys.HitachiBValue]: makeDataElement('DS', ['1000'])
           },
-          value: 1000,
+          id: 1000,
           info: {
             source: 'DiffusionBValue',
             tagKey: TagKeys.HitachiBValue,
@@ -679,7 +695,7 @@ describe('dicom', () => {
               'UN', new Uint8Array([0x00, 0x00])),
             [TagKeys.DiffusionBValue]: makeDataElement('FD', [800])
           },
-          value: 800,
+          id: 800,
           info: {
             source: 'DiffusionBValue',
             tagKey: TagKeys.DiffusionBValue,
@@ -689,7 +705,7 @@ describe('dicom', () => {
         {
           name: 'enhanced MR b-value',
           elements: makeEnhancedMRElements([1000, 1000]),
-          value: 1000,
+          id: 1000,
           info: {
             source: 'DiffusionBValue',
             tagKey: TagKeys.DiffusionBValue,
@@ -699,8 +715,7 @@ describe('dicom', () => {
       ];
       for (const testCase of cases) {
         assert.deepEqual(getVolumeId(testCase.elements), {
-          ...testCase.info,
-          value: testCase.value
+          id: {...testCase.info, value: testCase.id}
         }, testCase.name);
       }
     });
@@ -720,19 +735,86 @@ describe('dicom', () => {
         preLoad: true
       }];
       try {
-        // the candidate name is used
+        // the candidate name is used as id source
         assert.deepEqual(getVolumeId({}),
-          {source: 'custom', value: 90, tagKey: 'key'});
+          {id: {value: 90, tagKey: 'key', source: 'custom'}});
       } finally {
         custom.volumeIdCandidates = undefined;
       }
     });
 
+    test('ignores custom candidates without number id', () => {
+      for (const res of [{value: 'abc'}, 90, {}]) {
+        custom.volumeIdCandidates = [{
+          name: 'custom',
+          getter: () => res,
+          preLoad: true
+        }];
+        try {
+          assert.isUndefined(getVolumeId({}), JSON.stringify(res));
+        } finally {
+          custom.volumeIdCandidates = undefined;
+        }
+      }
+    });
+
   });
 
-  describe('guessVolumeIndices relative candidate', () => {
+  describe('getVolumeValues', () => {
 
-    test('AcquisitionTime is relative to the first acquisition', () => {
+    /**
+     * Get the volume ids of a guess, one per volume in volume order.
+     *
+     * @param {object} guess The guessVolumeIndices result.
+     * @returns {object[]} The volume ids.
+     */
+    function getGuessVolumeIds(guess) {
+      const res = [];
+      for (let i = 0; i < guess.volumeIndices.length; ++i) {
+        res[guess.volumeIndices[i]] = guess.volumeIds[i];
+      }
+      return res;
+    }
+
+    /**
+     * Get the volume values of 2 slices times 2 volumes.
+     *
+     * @param {Array<Record<string, DataElement>>} elementsList The DICOM
+     *   tags of each item.
+     * @returns {object[]|undefined} The volume values.
+     */
+    function getValues(elementsList) {
+      const guess = guessVolumeIndices(elementsList, [0, 1, 0, 1], 2);
+      assert.deepEqual(guess.volumeIndices, [0, 0, 1, 1]);
+      // no associated values before load is complete
+      assert.isTrue(guess.volumeIds.every(
+        volumeId => typeof volumeId.value === 'undefined'));
+      return getVolumeValues(getGuessVolumeIds(guess), elementsList);
+    }
+
+    /**
+     * Get the DICOM tags of 2 slices times 2 volumes with temporal
+     * position identifiers and acquisition times.
+     *
+     * @param {string[]} acqTimes The acquisition time of each item.
+     * @param {string[]} [contentTimes] The content time of each item.
+     * @returns {Array<Record<string, DataElement>>} The DICOM tags.
+     */
+    function getElementsList(acqTimes, contentTimes) {
+      const ids = ['1', '1', '2', '2'];
+      return ids.map((id, i) => {
+        const res = {
+          [TagKeys.TemporalPositionIdentifier]: makeDataElement('IS', [id]),
+          [TagKeys.AcquisitionTime]: makeDataElement('TM', [acqTimes[i]])
+        };
+        if (typeof contentTimes !== 'undefined') {
+          res[TagKeys.ContentTime] = makeDataElement('TM', [contentTimes[i]]);
+        }
+        return res;
+      });
+    }
+
+    test('relative candidate: id relative to the first one', () => {
       // 2 slices, 2 volumes acquired across midnight
       const elementsList = [];
       const dateTimes = [['20260101', '235930'], ['20260102', '000030']];
@@ -744,19 +826,92 @@ describe('dicom', () => {
           });
         }
       }
-      const res = guessVolumeIndices(elementsList, [0, 1, 0, 1], 2);
-      assert.deepEqual(res.volumeIndices, [0, 0, 1, 1]);
-      assert.deepEqual(res.volumeIds.map(volumeId => volumeId.value),
-        [0, 0, 60, 60], 'relative values');
-      assert.deepEqual(res.volumeIds[2], {
+      const guess = guessVolumeIndices(elementsList, [0, 1, 0, 1], 2);
+      // the ids are not relative
+      const id0 = Date.UTC(2026, 0, 1) / 1000 + 23 * 3600 + 59 * 60 + 30;
+      const info = {
         source: 'AcquisitionTime',
-        value: 60,
         tagKey: TagKeys.AcquisitionTime,
         unit: 'unit.s'
-      });
-      // the value getter (meta merge) is not relative
-      assert.equal(res.getter(elementsList[0]),
-        Date.UTC(2026, 0, 1) / 1000 + 23 * 3600 + 59 * 60 + 30);
+      };
+      assert.deepEqual(guess.volumeIds[2], {id: {...info, value: id0 + 60}});
+      assert.equal(guess.getter(elementsList[0]), id0);
+      assert.deepEqual(
+        getVolumeValues(getGuessVolumeIds(guess), elementsList),
+        [{...info, value: 0}, {...info, value: 60}]);
+    });
+
+    test('guesses the associated value of indices', () => {
+      // acquisition time varies per slice: volume start times
+      const info = {
+        source: 'AcquisitionTime',
+        tagKey: TagKeys.AcquisitionTime,
+        unit: 'unit.s'
+      };
+      assert.deepEqual(
+        getValues(getElementsList(['080000', '080001', '080010', '080011'])),
+        [{...info, value: 0}, {...info, value: 10}]);
+    });
+
+    test('rejects overlapping or unordered values', () => {
+      const cases = [
+        // overlapping spans
+        ['080000', '080010', '080005', '080015'],
+        // reverse order
+        ['080010', '080011', '080000', '080001'],
+        // same time
+        ['080000', '080000', '080000', '080000']
+      ];
+      for (const acqTimes of cases) {
+        assert.isUndefined(
+          getValues(getElementsList(acqTimes)), acqTimes.join(','));
+      }
+    });
+
+    test('falls back to the next candidate', () => {
+      const values = getValues(getElementsList(
+        ['080000', '080000', '080000', '080000'],
+        ['090000', '090000', '090100', '090100']));
+      assert.deepEqual(values.map(value => [value.source, value.value]),
+        [['ContentTime', 0], ['ContentTime', 60]]);
+    });
+
+    test('uses the temporal position time offset of frames', () => {
+      // enhanced MR frames: temporal position index and time offset
+      const groups = [[1, 0], [1, 0], [2, 2.5], [2, 2.5]].map(
+        ([index, offset]) => ({
+          [TagKeys.FrameContentSequence]: makeDataElement('SQ', [{
+            [TagKeys.TemporalPositionIndex]: makeDataElement('US', [index])
+          }]),
+          [TagKeys.TemporalPositionSequence]: makeDataElement('SQ', [{
+            [TagKeys.TemporalPositionTimeOffset]:
+              makeDataElement('FD', [offset])
+          }])
+        }));
+      const elements = {
+        [TagKeys.PerFrameFunctionalGroupsSequence]:
+          makeDataElement('SQ', groups)
+      };
+      const values = getValues(
+        groups.map((_group, i) => getFrameElements(elements, i)));
+      assert.deepEqual(values, [0, 2.5].map(value => ({
+        value,
+        tagKey: TagKeys.TemporalPositionTimeOffset,
+        unit: 'unit.s',
+        source: 'TemporalPositionTimeOffset'
+      })));
+    });
+
+    test('undefined for values and unknown sources', () => {
+      // EchoTime ids: no associated value
+      const elementsList = ['10', '10', '20', '20'].map((echoTime, i) => ({
+        [TagKeys.EchoTime]: makeDataElement('DS', [echoTime]),
+        [TagKeys.AcquisitionTime]:
+          makeDataElement('TM', [['080000', '080001', '080010', '080011'][i]])
+      }));
+      assert.isUndefined(getValues(elementsList), 'values');
+      assert.isUndefined(getVolumeValues(
+        [{id: {value: 1, source: 'unknown'}}], elementsList), 'unknown');
     });
 
   });
@@ -793,12 +948,12 @@ describe('dicom', () => {
         getFramesElements(elements), [0, 1, 0, 1], 2);
       assert.deepEqual(res.volumeIndices, [1, 1, 0, 0]);
       assert.deepEqual(
-        res.volumeIds.map(volumeId => volumeId.value), [2, 2, 1, 1]);
-      assert.deepEqual(res.volumeIds[0], {
+        res.volumeIds.map(volumeId => volumeId.id.value), [2, 2, 1, 1]);
+      assert.deepEqual(res.volumeIds[0], {id: {
         source: 'TemporalPositionIndex',
         value: 2,
         tagKey: TagKeys.TemporalPositionIndex
-      });
+      }});
       assert.equal(res.getter(getFramesElements(elements)[2]), 1);
     });
 
@@ -811,13 +966,14 @@ describe('dicom', () => {
         getFramesElements(elements), [0, 1, 0, 1], 2);
       assert.deepEqual(res.volumeIndices, [1, 1, 0, 0]);
       assert.deepEqual(
-        res.volumeIds.map(volumeId => volumeId.value), [1000, 1000, 50, 50]);
-      assert.deepEqual(res.volumeIds[0], {
+        res.volumeIds.map(volumeId => volumeId.id.value),
+        [1000, 1000, 50, 50]);
+      assert.deepEqual(res.volumeIds[0], {id: {
         source: 'DiffusionBValue',
         value: 1000,
         tagKey: TagKeys.DiffusionBValue,
         unit: 'unit.smm2'
-      });
+      }});
     });
 
     test('uses Philips dimension index b-value', () => {
@@ -839,11 +995,11 @@ describe('dicom', () => {
         getFramesElements(elements), [0, 1, 0, 1], 2);
       assert.deepEqual(res.volumeIndices, [0, 0, 1, 1]);
       // dimension index: no b-value unit
-      assert.deepEqual(res.volumeIds[0], {
+      assert.deepEqual(res.volumeIds[0], {id: {
         source: 'DiffusionBValue',
         value: 1,
         tagKey: TagKeys.DimensionIndexValues
-      });
+      }});
 
       // not without the Philips manufacturer
       const otherElements = makePerFrameElements({dimensionIndexValues}, {
@@ -918,7 +1074,7 @@ describe('dicom', () => {
         assert.include(
           warnSpy.mock.calls[0][0], 'custom.getVolumeIdTagValue');
         // no tag key
-        assert.deepEqual(getVolumeId({}), {source: 'custom', value: 1});
+        assert.deepEqual(getVolumeId({}), {id: {source: 'custom', value: 1}});
       } finally {
         custom.getVolumeIdTagValue = undefined;
         warnSpy.mockRestore();

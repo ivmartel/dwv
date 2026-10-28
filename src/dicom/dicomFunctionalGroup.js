@@ -481,3 +481,20 @@ export function getFrameElements(elements, frameNumber) {
     [TagKeys.PerFrameFunctionalGroupsSequence]: frameGroupSeq
   };
 }
+
+/**
+ * Get the DICOM tags of each frame of a multi-frame file (see
+ * getFrameElements).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {Array<Record<string, DataElement>>} The DICOM tags of each
+ *   frame, the input tags if there are no per frame functional groups.
+ */
+export function getFramesElements(elements) {
+  const perFrameGroupSeq =
+    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+  if (typeof perFrameGroupSeq === 'undefined') {
+    return [elements];
+  }
+  return perFrameGroupSeq.map((_group, i) => getFrameElements(elements, i));
+}

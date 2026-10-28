@@ -746,12 +746,12 @@ describe('image', () => {
     vi.stubGlobal('Worker', FakeResamplingWorker);
     try {
       // 2 slices, 2 volumes with ids 50 and 1000
-      const volumeIds = [50, 1000].map(value => ({
+      const volumeIds = [50, 1000].map(value => ({id: {
         source: 'DiffusionBValue',
         value,
         tagKey: '00189087',
         unit: 'unit.smm2'
-      }));
+      }}));
       const geometry = new Geometry(
         [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]),
         undefined, volumeIds[0]);
@@ -812,12 +812,12 @@ describe('image', () => {
    */
   test('Image getRescaledValuesAtPosition', () => {
     // 2x2x2 image, 2 volumes with ids 50 and 1000
-    const volumeIds = [50, 1000].map(value => ({
+    const volumeIds = [50, 1000].map(value => ({id: {
       source: 'DiffusionBValue',
       value,
       tagKey: '00189087',
       unit: 'unit.smm2'
-    }));
+    }}));
     const geometry = new Geometry(
       [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]),
       undefined, volumeIds[0]);
@@ -844,8 +844,8 @@ describe('image', () => {
       new Point([1, 0, 1, 1000]));
     assert.deepEqual(res1, res0, 'values with volume id');
     // returned volume ids are copies
-    res0[0].volumeId.value = 0;
-    assert.equal(geometry.getVolumeIds()[0].value, 50, 'volume id copy');
+    res0[0].volumeId.id = {value: 0};
+    assert.equal(geometry.getVolumeIds()[0].id.value, 50, 'volume id copy');
 
     // out of bounds
     const res2 = image.getRescaledValuesAtPosition(new Point([3, 0, 0]));
@@ -861,29 +861,29 @@ describe('image', () => {
     image3d.setMeta({PixelRepresentation: 0});
     const res4 = image3d.getRescaledValuesAtPosition(new Point([0, 1, 0]));
     assert.deepEqual(res4, [
-      {volumeId: {value: 0}, pixValue: {value: 3, unit: undefined}}
+      {volumeId: {id: {value: 0}}, pixValue: {value: 3, unit: undefined}}
     ], '3d values');
 
     // frames without volume ids: volume index as id
     const frames = new Image(
       new Geometry(
         [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1]),
-        undefined, {value: 0}),
+        undefined, {id: {value: 0}}),
       new Uint8Array([3]));
     frames.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
     frames.appendFrameBuffer(new Uint8Array([7]), 1);
     const res5 = frames.getRescaledValuesAtPosition(new Point([0, 0, 0]));
     assert.deepEqual(res5, [
-      {volumeId: {value: 0}, pixValue: {value: 3, unit: undefined}},
-      {volumeId: {value: 1}, pixValue: {value: 7, unit: undefined}}
+      {volumeId: {id: {value: 0}}, pixValue: {value: 3, unit: undefined}},
+      {volumeId: {id: {value: 1}}, pixValue: {value: 7, unit: undefined}}
     ], 'frame values');
 
     // volume ids not matching the number of volumes: volume index as id
     image.getGeometry().setVolumeIds([volumeIds[0]]);
     const res6 = image.getRescaledValuesAtPosition(new Point([1, 0, 1]));
     assert.deepEqual(res6, [
-      {volumeId: {value: 0}, pixValue: {value: 11, unit: 'HU'}},
-      {volumeId: {value: 1}, pixValue: {value: 27, unit: 'HU'}}
+      {volumeId: {id: {value: 0}}, pixValue: {value: 11, unit: 'HU'}},
+      {volumeId: {id: {value: 1}}, pixValue: {value: 27, unit: 'HU'}}
     ], 'mismatched volume ids');
 
     // more than one component: no values

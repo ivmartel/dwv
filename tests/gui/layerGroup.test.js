@@ -98,7 +98,7 @@ function makeVolumeGeometry(name, values) {
     new Size([2, 2, 1, values.length]),
     new Spacing([1, 1, 1]));
   geometry.setVolumeIds(
-    values.map(value => ({value, source: name, tagKey: name})));
+    values.map(value => ({id: {value, source: name, tagKey: name}})));
   return geometry;
 }
 

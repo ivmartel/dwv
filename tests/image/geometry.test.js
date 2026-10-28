@@ -458,11 +458,11 @@ describe('image', () => {
     const geometry = new Geometry([origin0], size, spacing);
     // 2 slices for time 0, as Image#appendSlice would build it
     geometry.appendOrigin(origin1, 1);
-    geometry.setInitialTime({value: 0});
+    geometry.setInitialTime({id: {value: 0}});
 
     // second time point has a different (irregular) slice layout,
     // but the same slice count as time 0
-    geometry.appendFrame(new Point3D(0, 0, 0), {value: 1});
+    geometry.appendFrame(new Point3D(0, 0, 0), {id: {value: 1}});
     geometry.appendOrigin(new Point3D(0, 0, 4), 1, 1);
 
     assert.equal(
@@ -492,8 +492,8 @@ describe('image', () => {
     // consistent time points
     const geometry1 = new Geometry([origin0], size, spacing);
     geometry1.appendOrigin(origin1, 1);
-    geometry1.setInitialTime({value: 0});
-    geometry1.appendFrame(origin0, {value: 1});
+    geometry1.setInitialTime({id: {value: 0}});
+    geometry1.appendFrame(origin0, {id: {value: 1}});
     geometry1.appendOrigin(origin1, 1, 1);
     assert.ok(geometry1.checkTimeOrigins().success,
       'checkTimeOrigins consistent');
@@ -501,16 +501,16 @@ describe('image', () => {
     // different slice count
     const geometry2 = new Geometry([origin0], size, spacing);
     geometry2.appendOrigin(origin1, 1);
-    geometry2.setInitialTime({value: 0});
-    geometry2.appendFrame(origin0, {value: 1});
+    geometry2.setInitialTime({id: {value: 0}});
+    geometry2.appendFrame(origin0, {id: {value: 1}});
     assert.notOk(geometry2.checkTimeOrigins().success,
       'checkTimeOrigins different slice count');
 
     // different origin
     const geometry3 = new Geometry([origin0], size, spacing);
     geometry3.appendOrigin(origin1, 1);
-    geometry3.setInitialTime({value: 0});
-    geometry3.appendFrame(origin0, {value: 1});
+    geometry3.setInitialTime({id: {value: 0}});
+    geometry3.appendFrame(origin0, {id: {value: 1}});
     geometry3.appendOrigin(new Point3D(0, 0, 4), 1, 1);
     assert.notOk(geometry3.checkTimeOrigins().success,
       'checkTimeOrigins different origin');
@@ -520,15 +520,15 @@ describe('image', () => {
    * Create a 2 slices geometry with volumes, appended as
    * Image#appendSlice would.
    *
-   * @param {number[]} values The time values, in append order.
+   * @param {number[]} values The time id values, in append order.
    * @param {object} [volumeIdInfo] The volume id info (volume id
    *   without value), times are frame indices if undefined.
    * @returns {Geometry} The geometry.
    */
   function createVolumesGeometry(values, volumeIdInfo) {
     const times = typeof volumeIdInfo !== 'undefined'
-      ? values.map(value => ({...volumeIdInfo, value}))
-      : values.map(value => ({value}));
+      ? values.map(value => ({id: {...volumeIdInfo, value}}))
+      : values.map(value => ({id: {value}}));
     const origin0 = new Point3D(0, 0, 0);
     const origin1 = new Point3D(0, 0, 1);
     const geometry = new Geometry(
@@ -548,7 +548,7 @@ describe('image', () => {
    * @function module:tests/image~geometryNonIntegerTimes
    */
   test('Geometry non integer times', () => {
-    const info = {source: 'EchoTime', tagKey: '00180081', unit: 'unit.ms'};
+    const info = {source: 'EchoTime', tagKey: '00180081'};
     // out of order, fractional and negative
     const geometry = createVolumesGeometry([12.5, 3.2, -1], info);
 
@@ -564,7 +564,7 @@ describe('image', () => {
       geometry.getCurrentNumberOfSlicesBeforeTime(12.5), 4, 'before 12.5');
 
     assert.deepEqual(geometry.getVolumeIds(),
-      [-1, 3.2, 12.5].map(value => ({...info, value})), 'volume ids');
+      [-1, 3.2, 12.5].map(value => ({id: {...info, value}})), 'volume ids');
     assert.equal(geometry.getVolumeIndex(3.2), 1, 'index of 3.2');
     assert.equal(geometry.getVolumeIndex(3.3), -1, 'index of 3.3');
     assert.ok(geometry.checkTimeOrigins().success, 'consistent times');
@@ -573,17 +573,17 @@ describe('image', () => {
 
     // clone keeps the initial volume id
     const clone = geometry.clone();
-    assert.deepEqual(clone.getInitialTime(), {...info, value: 12.5},
+    assert.deepEqual(clone.getInitialTime(), {id: {...info, value: 12.5}},
       'clone initial time');
 
     // set initial time sets (or resets) the volume id
     const geometry1 = new Geometry(
       [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1]));
     assert.isUndefined(geometry1.getVolumeIds(), 'no times: no ids');
-    geometry1.setInitialTime({...info, value: 4.6});
+    geometry1.setInitialTime({id: {...info, value: 4.6}});
     assert.deepEqual(
-      geometry1.getVolumeIds(), [{...info, value: 4.6}], 'set time id');
-    geometry1.setInitialTime({value: 1});
+      geometry1.getVolumeIds(), [{id: {...info, value: 4.6}}], 'set time id');
+    geometry1.setInitialTime({id: {value: 1}});
     assert.isUndefined(geometry1.getVolumeIds(), 'frame index: no ids');
   });
 
@@ -650,7 +650,7 @@ describe('image', () => {
     const resampled = new Geometry(
       [new Point3D(0, 0, 0)], new Size([1, 1, 1, 3]),
       new Spacing([1, 1, 1, 1]));
-    const fullVolumeIds = volumeIds.map(value => ({...info, value}));
+    const fullVolumeIds = volumeIds.map(value => ({id: {...info, value}}));
     resampled.setVolumeIds(fullVolumeIds);
     assert.deepEqual(resampled.getVolumeIds(), fullVolumeIds, 'set ids');
     assert.equal(
@@ -727,7 +727,7 @@ describe('image', () => {
     const size = new Size([1, 1, 1]);
     const spacing = new Spacing([1, 1, 1]);
 
-    // times must be objects with a number value
+    // times must be objects with a number id
     assert.throws(() => {
       new Geometry([origin], size, spacing, undefined, 2);
     }, Error, 'Geometry time must be an object');
@@ -736,24 +736,59 @@ describe('image', () => {
       geometry.setInitialTime(1);
     }, Error, 'Geometry time must be an object');
     assert.throws(() => {
-      geometry.appendFrame(origin, {value: '1'});
+      geometry.appendFrame(origin, {id: {value: '1'}});
     }, Error, 'Geometry time must be an object');
 
     // volume ids follow time changes
     const info = {source: 'EchoTime'};
-    geometry.setInitialTime({...info, value: 10});
+    geometry.setInitialTime({id: {...info, value: 10}});
     assert.deepEqual(
-      geometry.getVolumeIds(), [{...info, value: 10}], 'initial');
-    geometry.appendFrame(origin, {...info, value: 5});
+      geometry.getVolumeIds(), [{id: {...info, value: 10}}], 'initial');
+    geometry.appendFrame(origin, {id: {...info, value: 5}});
     assert.deepEqual(geometry.getVolumeIds(),
-      [{...info, value: 5}, {...info, value: 10}], 'after append');
-    geometry.appendFrame(origin, {value: 20});
+      [{id: {...info, value: 5}}, {id: {...info, value: 10}}], 'after append');
+    geometry.appendFrame(origin, {id: {value: 20}});
     assert.isUndefined(geometry.getVolumeIds(), 'after unnamed append');
 
     // returned array is a copy
     const geometry1 = createVolumesGeometry([1, 2], info);
     geometry1.getVolumeIds().pop();
     assert.equal(geometry1.getVolumeIds().length, 2, 'copy');
+  });
+
+  /**
+   * Tests for {@link Geometry#setVolumeValues}.
+   *
+   * @function module:tests/image~geometrySetVolumeValues
+   */
+  test('Geometry setVolumeValues', () => {
+    const info = {source: 'TemporalPositionIdentifier'};
+    // volumes appended out of order
+    const geometry = createVolumesGeometry([2, 1], info);
+    const initialTime = geometry.getInitialTime();
+    const values = [
+      {value: 0, unit: 'unit.s', source: 'AcquisitionTime'},
+      {value: 10, unit: 'unit.s', source: 'AcquisitionTime'}
+    ];
+    geometry.setVolumeValues(values);
+    assert.deepEqual(geometry.getVolumeIds(), [
+      {id: {...info, value: 1}, value: values[0]},
+      {id: {...info, value: 2}, value: values[1]}
+    ], 'volume ids');
+    assert.deepEqual(geometry.getInitialTime(),
+      {id: {...info, value: 2}, value: values[1]}, 'initial time');
+    assert.isUndefined(initialTime.value, 'input not modified');
+    assert.equal(geometry.getVolumeIndex(2), 1, 'index');
+    assert.ok(geometry.checkTimeOrigins().success, 'origins kept');
+
+    assert.throws(() => {
+      geometry.setVolumeValues([values[0]]);
+    }, Error, 'Expected one value per volume id');
+    const noIds = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1]));
+    assert.throws(() => {
+      noIds.setVolumeValues([]);
+    }, Error, 'Expected one value per volume id');
   });
 
   /**

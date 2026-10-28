@@ -333,7 +333,7 @@ describe('ImageFactory', () => {
           geometry.getSize().getValues(), [tags.Columns, tags.Rows, 1],
           `frame ${f} size`);
         assert.deepEqual(
-          geometry.getInitialTime(), {value: f}, `frame ${f} time`);
+          geometry.getInitialTime(), {id: {value: f}}, `frame ${f} time`);
         assert.equal(
           image.getMeta().sliceCapacity, 2 * numberOfFrames,
           `frame ${f} sliceCapacity is the total number of frames`);
@@ -424,6 +424,7 @@ describe('ImageFactory', () => {
     const volumeIdInfo = isBValue
       ? {source: 'DiffusionBValue', tagKey: '00189087', unit: 'unit.smm2'}
       : {source: 'TemporalPositionIndex', tagKey: '00209128'};
+    const getVolumeId = value => ({id: {...volumeIdInfo, value}});
     const numberOfFrames = structure.numberOfFrames;
     const numberOfSlices = 2;
 
@@ -458,7 +459,7 @@ describe('ImageFactory', () => {
           geometry.getOrigin().getValues(), [0, 0, positions[f]],
           `frame ${f} origin`);
         assert.deepEqual(
-          geometry.getInitialTime(), {...volumeIdInfo, value: volumeIds[f]},
+          geometry.getInitialTime(), getVolumeId(volumeIds[f]),
           `frame ${f} time`);
         assert.equal(
           image.getMeta().sliceCapacity, numberOfFrames,
@@ -489,7 +490,7 @@ describe('ImageFactory', () => {
         assert.deepEqual(
           geometry.getVolumeIds(),
           [...new Set(volumeIds)].sort((a, b) => a - b)
-            .map(value => ({...volumeIdInfo, value})),
+            .map(getVolumeId),
           'volume ids');
       });
 
@@ -527,7 +528,8 @@ describe('ImageFactory', () => {
       const image = new ImageFactory().create(
         elements, buffer.subarray(f * frameSize, (f + 1) * frameSize), 1, f);
       assert.deepEqual(
-        image.getGeometry().getInitialTime(), {value: f}, `frame ${f} time`);
+        image.getGeometry().getInitialTime(), {id: {value: f}},
+        `frame ${f} time`);
     }
     warnSpy.mockRestore();
   });

@@ -28,6 +28,7 @@ export const VOLUME_DIM_INDEX = SPATIAL_DIMS;
 
 /**
  * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {VolumeId} from './types.js';
  */
 
 /**
@@ -84,10 +85,10 @@ function getClosestOriginResidual(point3D, origins, orientation) {
  * Sorted volume ids and the values derived from them.
  *
  * @typedef {object} VolumeIdsData
- * @property {SourcedNumberValue[]} volumeIds The volume ids, sorted by value.
- * @property {number[]} values The sorted values.
- * @property {number} tolerance The value matching tolerance: half the
- *   smallest gap between values (0.5 for a single value).
+ * @property {VolumeId[]} volumeIds The volume ids, sorted by id.
+ * @property {number[]} values The sorted ids.
+ * @property {number} tolerance The id matching tolerance: half the
+ *   smallest gap between ids (0.5 for a single id).
  */
 
 /**
@@ -135,16 +136,16 @@ export class Geometry {
 
   /**
    * Time points: the time (a volume id or, without source, a frame
-   * index) and its origins, indexed by time value.
+   * index) and its origins, indexed by time id.
    *
-   * @type {Map<number, {time: SourcedNumberValue, origins: Point3D[]}>}
+   * @type {Map<number, {time: VolumeId, origins: Point3D[]}>}
    */
   #times = new Map();
 
   /**
    * Initial time.
    *
-   * @type {SourcedNumberValue|undefined}
+   * @type {VolumeId|undefined}
    */
   #initialTime;
 
@@ -169,8 +170,8 @@ export class Geometry {
    * @param {Spacing} spacing The object spacing.
    * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
    *   default to 3*3 identity).
-   * @param {SourcedNumberValue} [time] Optional time: a volume id or, without
-   *   source, a frame index (for example `{value: 2}`).
+   * @param {VolumeId} [time] Optional time: a volume id or, without
+   *   source, a frame index (for example `{id: {value: 2}}`).
    */
   constructor(origins, size, spacing, orientation, time) {
     this.#origins = origins;
@@ -189,18 +190,18 @@ export class Geometry {
   /**
    * Store a time and its origins.
    *
-   * @param {SourcedNumberValue} time The time: a volume id or, without source,
+   * @param {VolumeId} time The time: a volume id or, without source,
    *   a frame index.
    * @param {Point3D[]} origins The time origins.
-   * @throws {Error} If the time is not an object with a number value.
+   * @throws {Error} If the time does not have a number id.
    */
   #setTime(time, origins) {
-    if (typeof time?.value !== 'number') {
+    if (typeof time?.id?.value !== 'number') {
       throw new Error(
-        'Geometry time must be an object with a number value, ' +
-        'for example {value: 2}');
+        'Geometry time must be an object with a number id, ' +
+        'for example {id: {value: 2}}');
     }
-    this.#times.set(time.value, {time, origins});
+    this.#times.set(time.id.value, {time, origins});
     this.#volumeIdsData = null;
   }
 
@@ -222,7 +223,7 @@ export class Geometry {
   /**
    * Get the time that was passed at construction.
    *
-   * @returns {SourcedNumberValue|undefined} The time.
+   * @returns {VolumeId|undefined} The time.
    */
   getInitialTime() {
     return this.#initialTime;
@@ -231,23 +232,49 @@ export class Geometry {
   /**
    * Set the initial time.
    *
-   * @param {SourcedNumberValue} time The new time: a volume id or, without
+   * @param {VolumeId} time The new time: a volume id or, without
    *   source, a frame index.
    */
   setInitialTime(time) {
     if (typeof this.#initialTime !== 'undefined') {
-      this.#times.delete(this.#initialTime.value);
+      this.#times.delete(this.#initialTime.id.value);
     }
     this.#setTime(time, this.#origins.slice());
     this.#initialTime = time;
   }
 
   /**
-   * Get the volume ids: the time of each volume, sorted by ascending
-   *   value, the array index being the volume index. Times are volume
-   *   ids if they have a source.
+   * Set the associated values of the volume ids, for example once
+   *   guessed after load (see dicomVolume getVolumeValues).
    *
-   * @returns {SourcedNumberValue[]|undefined} The volume ids, undefined if the
+   * @param {SourcedNumberValue[]} values The associated values, one per
+   *   volume id, in volume id order.
+   * @throws {Error} If the number of values is not the number of
+   *   volume ids.
+   */
+  setVolumeValues(values) {
+    const volumeIds = this.#getVolumeIdsData()?.volumeIds;
+    if (volumeIds?.length !== values.length) {
+      throw new Error('Expected one value per volume id');
+    }
+    for (let i = 0; i < volumeIds.length; ++i) {
+      const time = volumeIds[i];
+      const res = {...time, value: values[i]};
+      this.#times.set(time.id.value,
+        {time: res, origins: this.#times.get(time.id.value).origins});
+      if (this.#initialTime === time) {
+        this.#initialTime = res;
+      }
+    }
+    this.#volumeIdsData = null;
+  }
+
+  /**
+   * Get the volume ids: the time of each volume, sorted by ascending
+   *   id, the array index being the volume index. Times are volume
+   *   ids if their id has a source.
+   *
+   * @returns {VolumeId[]|undefined} The volume ids, undefined if the
    *   times are not volume ids.
    */
   getVolumeIds() {
@@ -266,12 +293,12 @@ export class Geometry {
     }
     const volumeIds = [...this.#times.values()]
       .map(item => item.time)
-      .sort((a, b) => a.value - b.value);
+      .sort((a, b) => a.id.value - b.id.value);
     if (volumeIds.length === 0 ||
-      volumeIds.some(time => typeof time.source === 'undefined')) {
+      volumeIds.some(time => typeof time.id.source === 'undefined')) {
       this.#volumeIdsData = undefined;
     } else {
-      const values = volumeIds.map(volumeId => volumeId.value);
+      const values = volumeIds.map(volumeId => volumeId.id.value);
       let minGap = Infinity;
       for (let i = 1; i < values.length; ++i) {
         minGap = Math.min(minGap, values[i] - values[i - 1]);
@@ -289,8 +316,8 @@ export class Geometry {
    * Set the volume ids of a geometry without times (for example a
    *   resampled one): the volumes all have the current origins.
    *
-   * @param {SourcedNumberValue[]} volumeIds The volume ids, sorted by ascending
-   *   value, one per volume (fourth dimension).
+   * @param {VolumeId[]} volumeIds The volume ids, sorted by ascending
+   *   id, one per volume (fourth dimension).
    */
   setVolumeIds(volumeIds) {
     this.#times.clear();
@@ -301,20 +328,20 @@ export class Geometry {
   }
 
   /**
-   * Get the index of a volume id value.
+   * Get the index of a volume id.
    *
-   * @param {number} value The volume id value.
+   * @param {number} id The volume id.
    * @returns {number} The volume index, -1 if not found.
    */
-  getVolumeIndex(value) {
+  getVolumeIndex(id) {
     const data = this.#getVolumeIdsData();
     if (typeof data === 'undefined') {
       return -1;
     }
     // ids are tag values: only allow float noise
-    const tolerance = 1e-9 * Math.max(1, Math.abs(value));
+    const tolerance = 1e-9 * Math.max(1, Math.abs(id));
     return data.values.findIndex(
-      item => Math.abs(item - value) <= tolerance);
+      item => Math.abs(item - id) <= tolerance);
   }
 
   /**
@@ -332,8 +359,8 @@ export class Geometry {
     if (typeof sourceId === 'undefined' || typeof targetId === 'undefined') {
       return false;
     }
-    return sourceId.source === targetId.source &&
-      sourceId.tagKey === targetId.tagKey &&
+    return sourceId.id.source === targetId.id.source &&
+      sourceId.id.tagKey === targetId.id.tagKey &&
       this.getVolumeIndex(value) !== -1;
   }
 
@@ -420,7 +447,7 @@ export class Geometry {
   /**
    * Check if a time point has associated slices.
    *
-   * @param {number} time The time value to check.
+   * @param {number} time The time id to check.
    * @returns {boolean} True if slices are present.
    */
   hasSlicesAtTime(time) {
@@ -431,7 +458,7 @@ export class Geometry {
    * Get the number of slices stored for time points preceding
    * the input one.
    *
-   * @param {number} time The time value to check.
+   * @param {number} time The time id to check.
    * @returns {number|undefined} The count.
    */
   getCurrentNumberOfSlicesBeforeTime(time) {
@@ -638,7 +665,7 @@ export class Geometry {
    * Point3D#getClosest) instead for that case.
    *
    * @param {Point3D} origin The origin to locate.
-   * @param {number} [time] Optional time value.
+   * @param {number} [time] Optional time id.
    * @returns {number} The slice index.
    */
   getSliceIndex(origin, time) {
@@ -705,7 +732,7 @@ export class Geometry {
     }
     // check origin
     const canAppendOrigin =
-      this.canAppendOrigin(rhs.getOrigin(), rhs.getInitialTime()?.value);
+      this.canAppendOrigin(rhs.getOrigin(), rhs.getInitialTime()?.id.value);
     if (!canAppendOrigin.success) {
       return canAppendOrigin;
     }
@@ -717,7 +744,7 @@ export class Geometry {
    * Check if an origin can be appended to this geometry.
    *
    * @param {Point3D} origin The origin to append.
-   * @param {number} [time] Optional time value.
+   * @param {number} [time] Optional time id.
    * @returns {BooleanResult} Result with success set to true if
    *   the origin is compatible.
    */
@@ -726,7 +753,7 @@ export class Geometry {
     const equalToOrigin = function (element) {
       return element.equals(origin);
     };
-    const initialValue = this.#initialTime?.value;
+    const initialValue = this.#initialTime?.id.value;
     if (typeof time !== 'undefined' && time !== initialValue) {
       // check if not already in list
       if (this.#times.has(time)) {
@@ -756,7 +783,7 @@ export class Geometry {
    *
    * @param {Point3D} origin The origin to append.
    * @param {number} index The index at which to append.
-   * @param {number} [time] Optional time value.
+   * @param {number} [time] Optional time id.
    */
   appendOrigin(origin, index, time) {
     // check if possible
@@ -770,7 +797,7 @@ export class Geometry {
       this.#times.get(time).origins.splice(index, 0, origin);
     }
     if (typeof time === 'undefined' ||
-      time === this.#initialTime?.value) {
+      time === this.#initialTime?.id.value) {
       this.#origins.splice(index, 0, origin);
       // increment second dimension
       const values = this.#size.getValues();
@@ -783,7 +810,7 @@ export class Geometry {
    * Append a frame to the geometry.
    *
    * @param {Point3D} origin The origin to append.
-   * @param {SourcedNumberValue} time The frame time: a volume id or, without
+   * @param {VolumeId} time The frame time: a volume id or, without
    *   source, a frame index.
    */
   appendFrame(origin, time) {

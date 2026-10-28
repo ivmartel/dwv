@@ -93,12 +93,12 @@ function setupCustom() {
   //   {
   //     name: 'ABCD0123',
   //     getter: function (elements) {
-  //       let value;
+  //       let res;
   //       const element = elements['ABCD0123'];
   //       if (typeof element !== 'undefined') {
-  //         value = parseInt(element.value[0], 10);
+  //         res = {value: parseInt(element.value[0], 10)};
   //       }
-  //       return value;
+  //       return res;
   //     },
   //     preLoad: true
   //   },

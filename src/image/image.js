@@ -19,7 +19,7 @@ import {ImageHistogram} from './imageHistogram.js';
  * @import {Point} from '../math/point.js';
  * @import {MaskImage} from './maskImage.js';
  * @import {TypedArray} from '../math/types.js';
- * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {VolumeId} from './types.js';
  * @import {VolumeValue} from '../dicom/types.js';
  */
 
@@ -48,7 +48,7 @@ export const imageEventNames = [
  */
 function getSliceIndex(volumeGeometry, sliceGeometry) {
   // possible time
-  const timeId = sliceGeometry.getInitialTime()?.value;
+  const timeId = sliceGeometry.getInitialTime()?.id.value;
   // index values
   const values = [];
   // x, y
@@ -968,7 +968,7 @@ export class Image extends EventTarget {
 
     // possible time
     const time = rhs.getGeometry().getInitialTime();
-    const timeId = time?.value;
+    const timeId = time?.id.value;
 
     const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
 
@@ -1104,13 +1104,13 @@ export class Image extends EventTarget {
     // append
     this.#buffer.set(frameBuffer, frameSize * frameIndex);
     // update geometry
-    this.appendFrame({value: frameIndex}, new Point3D(0, 0, 0));
+    this.appendFrame({id: {value: frameIndex}}, new Point3D(0, 0, 0));
   }
 
   /**
    * Append a frame to the image.
    *
-   * @param {SourcedNumberValue} time The frame time: a volume id or, without
+   * @param {VolumeId} time The frame time: a volume id or, without
    *   source, a frame index.
    * @param {Point3D} origin The origin of the frame.
    */
@@ -1296,7 +1296,7 @@ export class Image extends EventTarget {
         values[3] = v;
       }
       const volumeId = typeof volumeIds !== 'undefined'
-        ? {...volumeIds[v]} : {value: v};
+        ? {...volumeIds[v]} : {id: {value: v}};
       result.push({
         volumeId,
         pixValue: {

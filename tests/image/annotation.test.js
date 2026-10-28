@@ -424,11 +424,11 @@ describe('image', () => {
     // 2 slices, 3 volumes with ids 0, 500 and 1000
     const geometry = new Geometry(
       [new Point3D(0, 0, 0)], new Size([4, 4, 1]), new Spacing([1, 1, 1]),
-      undefined, {source: 'DiffusionBValue', value: 0});
+      undefined, {id: {source: 'DiffusionBValue', value: 0}});
     geometry.appendOrigin(new Point3D(0, 0, 1), 1, 0);
     for (const value of [500, 1000]) {
       geometry.appendFrame(
-        new Point3D(0, 0, 0), {source: 'DiffusionBValue', value});
+        new Point3D(0, 0, 0), {id: {source: 'DiffusionBValue', value}});
       geometry.appendOrigin(new Point3D(0, 0, 1), 1, value);
     }
 

@@ -5,7 +5,8 @@
 // and cannot create circular dependencies.
 
 /**
- * @import {NumberValue, SourcedNumberValue} from '../math/types.js';
+ * @import {NumberValue} from '../math/types.js';
+ * @import {VolumeId} from '../image/types.js';
  */
 
 /**
@@ -48,22 +49,25 @@
  * @typedef {object} VolumeIdCandidate
  * @property {string} name The candidate name.
  * @property {Function} getter The volume id getter:
- *   `(elements) => SourcedNumberValue|undefined`, the returned volume id
- *   does not need a source (the candidate name is used).
+ *   `(elements) => SourcedNumberValue|undefined`, the returned id
+ *   does not need a source (the candidate name is used), for
+ *   example `{value: 4.6, unit: 'unit.ms', tagKey: '00180081'}`.
+ *   An id without unit is an index: its associated value is guessed
+ *   once all data is loaded.
  * @property {boolean} [preLoad] Flag to also use the candidate
  *   while loading.
- * @property {boolean} [relative] Flag to make the volume id values
- *   relative to the smallest one, for example to get times since
- *   the first acquisition instead of timestamps. Not applied while
- *   loading.
+ * @property {boolean} [relative] Flag to display the ids relative to
+ *   the smallest one, for example to get times since the first
+ *   acquisition instead of timestamps. Not applied to the ids.
  */
 
 /**
  * Pixel value of one volume.
  *
  * @typedef {object} VolumeValue
- * @property {SourcedNumberValue} volumeId The volume id: with name and unit
- *   if the image has volume ids, else just the volume index.
+ * @property {VolumeId} volumeId The volume id: with source and
+ *   possible associated value if the image has volume ids, else just
+ *   the volume index as id.
  * @property {NumberValue} pixValue The rescaled pixel value and its unit.
  */
 

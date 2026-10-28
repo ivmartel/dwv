@@ -215,10 +215,10 @@ describe('getSortedFramesGeometry', () => {
           [[0, 0, positions[f]]],
           `${structure.name} frame ${f} origin`);
         assert.equal(
-          res[f].getInitialTime().value, volumeIds[f],
+          res[f].getInitialTime().id.value, volumeIds[f],
           `${structure.name} frame ${f} time`);
         assert.equal(
-          res[f].getInitialTime().source,
+          res[f].getInitialTime().id.source,
           typeof structure.genOptions.frameBValues !== 'undefined'
             ? 'DiffusionBValue' : 'TemporalPositionIndex',
           `${structure.name} frame ${f} volume id source`);

@@ -1,5 +1,8 @@
 import {mergeObjects} from '../utils/operator.js';
-import {getFrameElements} from '../dicom/dicomFunctionalGroup.js';
+import {
+  getFrameElements,
+  getFramesElements
+} from '../dicom/dicomFunctionalGroup.js';
 import {MaskFactory} from '../image/maskFactory.js';
 import {ImageFactory} from '../image/imageFactory.js';
 import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
@@ -9,6 +12,7 @@ import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet} from '../dicom/dataElement.js';
 import {
   getVolumeIdTagValue,
+  getVolumeValues,
   guessVolumeIndices
 } from '../dicom/dicomVolume.js';
 import {
@@ -24,7 +28,7 @@ import {
  * @import {Image} from '../image/image.js';
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {AnnotationGroup} from '../image/annotationGroup.js';
- * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {VolumeId} from '../image/types.js';
  */
 
 /**
@@ -224,7 +228,7 @@ export class DicomData {
     // check if append is possible
     const geom0 = this.image.getGeometry();
     const canAppend = geom0.canAppendOrigin(
-      geom1.getOrigin(), geom1.getInitialTime()?.value);
+      geom1.getOrigin(), geom1.getInitialTime()?.id.value);
 
     // store result if not possible to stop future appends
     if (!canAppend.success) {
@@ -286,6 +290,20 @@ export class DicomSliceDataList {
    */
   add(data) {
     this.#list.push(data);
+  }
+
+  /**
+   * Get the DICOM tags of each stored data. Frames share their file
+   * meta: the frame tags are used so that per-frame getters return
+   * the frame value.
+   *
+   * @returns {Array<Record<string, DataElement>>} The DICOM tags.
+   */
+  getElementsList() {
+    return this.#list.map(data =>
+      typeof data.frameNumber !== 'undefined'
+        ? getFrameElements(data.meta, data.frameNumber)
+        : data.meta);
   }
 
   /**
@@ -359,9 +377,9 @@ export class DicomSliceDataList {
    * @param {object[]} originList The list of origins and their
    *   occurences, as returned by #getOriginList.
    * @returns {{volsIndices: number[][]|undefined,
-   *   volumeIds: SourcedNumberValue[]|undefined,
+   *   volumeIds: VolumeId[]|undefined,
    *   volumeIndexGetter: Function|undefined}} The indices per volume,
-   *   the id of each volume and the volume id value getter that
+   *   the id of each volume and the volume id getter that
    *   produced them, all undefined if no candidate worked.
    */
   #guessVolumesIndices(originList) {
@@ -372,12 +390,7 @@ export class DicomSliceDataList {
         sliceIndices[index] = i;
       }
     }
-    // frames share their file meta: use the frame tags so that
-    // per-frame getters return the frame value
-    const elementsList = this.#list.map(data =>
-      typeof data.frameNumber !== 'undefined'
-        ? getFrameElements(data.meta, data.frameNumber)
-        : data.meta);
+    const elementsList = this.getElementsList();
     const guess = guessVolumeIndices(
       elementsList, sliceIndices, originList.length);
     if (typeof guess === 'undefined') {
@@ -910,6 +923,9 @@ export class DataController extends EventTarget {
         throw new Error(`Inconsistent volumes: ${check.message}`);
       }
     }
+
+    // volume associated values need all data
+    this.#setVolumeValues(dataId);
     // release the slice list (also when not used)
     delete this.#tmpSliceList[dataId];
 
@@ -917,6 +933,28 @@ export class DataController extends EventTarget {
     data.setComplete(true);
 
     return res;
+  }
+
+  /**
+   * Set the associated values of the volume ids of a data image (see
+   * dicomVolume getVolumeValues), from the DICOM tags of its loaded
+   * items: the stored slice data if any, else the frames of the data.
+   *
+   * @param {string} dataId The data id.
+   */
+  #setVolumeValues(dataId) {
+    const data = this.#dataList[dataId];
+    const geometry = data.image?.getGeometry();
+    const volumeIds = geometry?.getVolumeIds();
+    if (typeof volumeIds === 'undefined' || volumeIds.length < 2) {
+      return;
+    }
+    const elementsList = this.#tmpSliceList[dataId]?.getElementsList() ??
+      getFramesElements(data.meta);
+    const values = getVolumeValues(volumeIds, elementsList);
+    if (typeof values !== 'undefined') {
+      geometry.setVolumeValues(values);
+    }
   }
 
   /**

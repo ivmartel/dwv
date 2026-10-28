@@ -256,12 +256,12 @@ describe('app', () => {
       assert.equal(size.get(3), 4, 'number of volumes');
       const volumeIds = [0, 50, 800, 1000];
       const geometry = image.getGeometry();
-      assert.deepEqual(geometry.getVolumeIds(), volumeIds.map(value => ({
+      assert.deepEqual(geometry.getVolumeIds(), volumeIds.map(value => ({id: {
         source: 'DiffusionBValue',
         value,
         tagKey: '00189087',
         unit: 'unit.smm2'
-      })), 'volume ids');
+      }})), 'volume ids');
       for (let v = 0; v < volumeIds.length; ++v) {
         for (let k = 0; k < 2; ++k) {
           assert.equal(image.getValue(0, 0, k, v), volumeIds[v],
@@ -305,11 +305,11 @@ describe('app', () => {
         [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
         'volume0 origins');
       const geometry = res0.image.getGeometry();
-      assert.deepEqual(geometry.getVolumeIds(), [1, 2].map(value => ({
+      assert.deepEqual(geometry.getVolumeIds(), [1, 2].map(value => ({id: {
         source: 'TemporalPositionIdentifier',
         value,
         tagKey: TagKeys.TemporalPositionIdentifier
-      })), 'volume ids');
+      }})), 'volume ids');
     });
 
   test('DicomSliceDataList buildData uses volume id values', () => {
@@ -329,12 +329,12 @@ describe('app', () => {
 
     const image = list0.buildData().image;
     const geometry = image.getGeometry();
-    assert.deepEqual(geometry.getVolumeIds(), [4.6, 9.2].map(value => ({
+    assert.deepEqual(geometry.getVolumeIds(), [4.6, 9.2].map(value => ({id: {
       source: 'EchoTime',
       value,
       tagKey: TagKeys.EchoTime,
       unit: 'unit.ms'
-    })), 'volume ids');
+    }})), 'volume ids');
     for (let v = 0; v < 2; ++v) {
       for (let k = 0; k < 2; ++k) {
         assert.equal(image.getValue(0, 0, k, v), [46, 92][v] + k,
@@ -345,6 +345,59 @@ describe('app', () => {
     const position = image.getGeometry().indexToWorld(
       new Index([0, 0, 0, 1]));
     assert.equal(position.get(3), 9.2, 'volume 1 position');
+  });
+
+  test('DataController sets volume values once loaded', () => {
+    // 2 slices x 2 volumes, one file each: pre load
+    // TemporalPositionIdentifier (volumes appended while loading),
+    // acquisition time per slice
+    const items = [
+      [0, 1, '080000'], [1, 1, '080001'], [0, 2, '080010'], [1, 2, '080011']
+    ];
+    const dc0 = new DataController();
+    const dataId = '0';
+    for (let i = 0; i < items.length; ++i) {
+      const [z, tpi, acqTime] = items[i];
+      const config = structuredClone(syntheticData[0]);
+      config.tags.SOPInstanceUID += `.${i}`;
+      config.tags.MediaStorageSOPInstanceUID = config.tags.SOPInstanceUID;
+      config.tags.TemporalPositionIdentifier = String(tpi);
+      config.tags.AcquisitionTime = acqTime;
+      const elements = getStructureElementsList(
+        config, '1.2.840.10008.1.2.1', {genOptions: {}})[0];
+      // distinct instance numbers (meta merge id) and positions
+      elements['00200013'].value = [String(i + 1)];
+      elements['00200032'].value = [0, 0, z];
+      const data = new DicomData(elements);
+      data.buffer = elements['7FE00010'].value;
+      data.numberOfItems = items.length;
+      if (typeof dc0.get(dataId) === 'undefined') {
+        dc0.add(dataId, data);
+      } else {
+        dc0.update(dataId, data);
+      }
+    }
+    assert.notOk(dc0.get(dataId).hasDuplicateOrigin(),
+      'has duplicate origin');
+    const geometry = dc0.get(dataId).image.getGeometry();
+    assert.isTrue(geometry.getVolumeIds().every(
+      volumeId => typeof volumeId.value === 'undefined'),
+    'no values while loading');
+
+    dc0.markDataAsComplete(dataId);
+    const info = {
+      source: 'AcquisitionTime',
+      tagKey: TagKeys.AcquisitionTime,
+      unit: 'unit.s'
+    };
+    assert.deepEqual(geometry.getVolumeIds(), [1, 2].map((id, i) => ({
+      id: {
+        value: id,
+        tagKey: TagKeys.TemporalPositionIdentifier,
+        source: 'TemporalPositionIdentifier'
+      },
+      value: {...info, value: [0, 10][i]}
+    })), 'volume ids');
   });
 
   test('DicomSliceDataList buildData merges meta with correct ids', () => {
@@ -391,14 +444,15 @@ describe('app', () => {
     const res0 = list0.buildData();
     const geometry = res0.image.getGeometry();
     assert.equal(geometry.getSize().get(2), 2, 'volume0 slice count');
-    // times since the first acquisition
+    // ids in seconds since midnight, no associated value before
+    // load is complete
     assert.deepEqual(
-      geometry.getVolumeIds(), [0, 3600].map(value => ({
+      geometry.getVolumeIds(), [0, 3600].map(value => ({id: {
         source: 'AcquisitionTime',
-        value,
         tagKey: TagKeys.AcquisitionTime,
-        unit: 'unit.s'
-      })), 'volume ids');
+        unit: 'unit.s',
+        value: 8 * 3600 + value
+      }})), 'volume ids');
   });
 
   test('DicomSliceDataList buildData respects custom override', () => {
