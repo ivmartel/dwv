@@ -93,6 +93,35 @@ describe('RtStructFactory', () => {
     );
   });
 
+  test('create: frame of reference UID', () => {
+    const config = syntheticData.find(c => c.name === 'test-rtss-00');
+    const forUid = config.tags.FrameOfReferenceUID;
+    const factory = new RtStructFactory();
+
+    // root Frame of Reference module
+    const image0 = factory.create(configToElements(config), buildRefImage());
+    assert.equal(image0.getMeta().FrameOfReferenceUID, forUid,
+      'frame of reference UID from root');
+
+    // no Frame of Reference module (optional in RT Structure Set IOD):
+    // use ReferencedFrameOfReferenceSequence
+    const tags1 = structuredClone(config.tags);
+    delete tags1.FrameOfReferenceUID;
+    const image1 = factory.create(
+      getElementsFromSimpleTagValues(tags1), buildRefImage());
+    assert.equal(image1.getMeta().FrameOfReferenceUID, forUid,
+      'frame of reference UID from referenced sequence');
+
+    // none
+    const tags2 = structuredClone(tags1);
+    delete tags2.ReferencedFrameOfReferenceSequence.value[0]
+      .FrameOfReferenceUID;
+    const image2 = factory.create(
+      getElementsFromSimpleTagValues(tags2), buildRefImage());
+    assert.isUndefined(image2.getMeta().FrameOfReferenceUID,
+      'no frame of reference UID');
+  });
+
   test('create: non-overlapping squares pixel values in label map', () => {
     const config = syntheticData.find(c => c.name === 'test-rtss-00');
     const factory = new RtStructFactory();

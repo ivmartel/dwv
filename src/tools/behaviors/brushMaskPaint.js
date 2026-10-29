@@ -500,6 +500,10 @@ export class BrushMaskPaint extends EventTarget {
     firstSliceMeta.PatientID = tags.PatientID;
     firstSliceMeta.StudyInstanceUID = tags.StudyInstanceUID;
     firstSliceMeta.SeriesInstanceUID = tags.SeriesInstanceUID;
+    if (typeof tags.FrameOfReferenceUID === 'undefined') {
+      logger.warn('Mask source image has no FrameOfReferenceUID.');
+    }
+    firstSliceMeta.FrameOfReferenceUID = tags.FrameOfReferenceUID;
     const referencedSOPs = [
       {
         referencedSOPClassUID: tags.SOPClassUID,

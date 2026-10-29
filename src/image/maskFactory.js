@@ -434,6 +434,9 @@ export class MaskFactory {
     for (const key of metaKeys) {
       meta[key] = safeGetLocal(MetaTagKeys[key]);
     }
+    if (typeof meta.FrameOfReferenceUID === 'undefined') {
+      logger.warn('Loaded DICOM SEG has no FrameOfReferenceUID.');
+    }
 
     // dicom seg dimension
     meta.DimensionOrganizationSequence = dimension.organizations;
