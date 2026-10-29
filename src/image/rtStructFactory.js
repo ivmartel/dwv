@@ -1,6 +1,6 @@
 import {getRTStructFromElements} from '../dicom/dicomRTStruct.js';
 import {MaskSegment} from '../dicom/dicomSegment.js';
-import {safeGet} from '../dicom/dataElement.js';
+import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   dateToDateObj,
   getDicomDate,
@@ -28,6 +28,13 @@ import {logger} from '../utils/logger.js';
  */
 
 /**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  ReferencedFrameOfReferenceSequence: '30060010'
+};
+
+/**
  * Patient/study/series tags to copy into mask meta.
  */
 const MetaTagKeys = {
@@ -42,6 +49,26 @@ const MetaTagKeys = {
   SeriesNumber: '00200011',
   FrameOfReferenceUID: '00200052'
 };
+
+/**
+ * Get the referenced frame of reference UID from an RT Structure Set.
+ *
+ * Path: ReferencedFrameOfReferenceSequence (3006,0010) →
+ *   FrameOfReferenceUID (0020,0052), first item.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.8.5.html}.
+ *
+ * @param {Record<string, DataElement>} dataElements The data elements.
+ * @returns {string|undefined} The frame of reference UID.
+ */
+function getReferencedFrameOfReferenceUIDFromRTStruct(dataElements) {
+  const refForSeq = safeGetAll(
+    dataElements, TagKeys.ReferencedFrameOfReferenceSequence);
+  if (typeof refForSeq === 'undefined') {
+    return undefined;
+  }
+  return safeGet(refForSeq[0], MetaTagKeys.FrameOfReferenceUID);
+}
 
 /**
  * Required DICOM tags for RT Structure Set Storage.
@@ -592,6 +619,15 @@ export class RtStructFactory {
       if (typeof val !== 'undefined') {
         meta[key] = val;
       }
+    }
+    // the Frame of Reference module is optional in the RT Structure Set IOD,
+    // fallback to the (first) referenced frame of reference
+    if (typeof meta.FrameOfReferenceUID === 'undefined') {
+      meta.FrameOfReferenceUID =
+        getReferencedFrameOfReferenceUIDFromRTStruct(dataElements);
+    }
+    if (typeof meta.FrameOfReferenceUID === 'undefined') {
+      logger.warn('Loaded RT STRUCT has no FrameOfReferenceUID.');
     }
 
     // custom
