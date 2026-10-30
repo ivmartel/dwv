@@ -16,7 +16,7 @@ const TagKeys = {
 /**
  * DICOM spatial coordinate 3D (SCOORD3D): item of a SR content sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.9.html#table_C.18.9-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.9.html#table_C.18.9-1}.
  */
 export class SpatialCoordinate3D {
   /**

@@ -67,7 +67,7 @@ describe('dicom', () => {
       'Test #00 toString');
 
     // example codes
-    // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.10.html
+    // see https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_8.10.html
 
     const code01 = {
       meaning: 'Dimeglumine gadopentetate 469.01mg/mL inj soln 15mL pfld syr',

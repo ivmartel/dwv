@@ -2,10 +2,10 @@
 /* eslint @stylistic/js/max-len:0 */
 
 import dictionaryData from
-  'dcmstdtojs/dist/assets/2022a/dicom_tags.json' with {type: 'json'};
+  'dcmstdtojs/dist/assets/2024a/dicom_tags.json' with {type: 'json'};
 
 /**
- * DICOM tag dictionary 2022a.
+ * DICOM tag dictionary 2024a.
  *
  * @type {Record<string, Record<string, string[]>>}
  */
@@ -127,7 +127,7 @@ export const tagGroups = {
  * List of Value Representation (VR) with 32bit Value Length (VL).
  *
  * Added locally used 'ox'.
- * See {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1}.
+ * See {@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_7.html#table_7.1-1}.
  *
  * @type {Record<string, boolean>}
  */
@@ -162,7 +162,7 @@ export function is32bitVLVR(vr) {
  * List of string VR with extended or replaced default character repertoire defined in
  *   Specific Character Set (0008,0005).
  *
- * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2}.
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_6.html#sect_6.1.2.2}.
  *
  * @type {Record<string, boolean>}
  */
@@ -189,7 +189,7 @@ export function isCharSetStringVR(vr) {
 /**
  * VR equivalent javascript types.
  *
- * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
  *
  * @type {Record<string, string>}
  */
@@ -233,7 +233,7 @@ export const vrTypes = {
 /**
  * Transfer syntaxes.
  *
- * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part06/chapter_A.html#table_A-1}.
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part06/chapter_A.html#table_A-1}.
  *
  * @type {Record<string, string>}
  */
@@ -270,14 +270,26 @@ export const transferSyntaxes = {
   '1.2.840.10008.1.2.4.94': 'JPIP Referenced',
   '1.2.840.10008.1.2.4.95': 'JPIP Referenced Deflate',
   '1.2.840.10008.1.2.4.100': 'MPEG2 Main Profile / Main Level',
+  '1.2.840.10008.1.2.4.100.1': 'Fragmentable MPEG2 Main Profile / Main Level',
   '1.2.840.10008.1.2.4.101': 'MPEG2 Main Profile / High Level',
+  '1.2.840.10008.1.2.4.101.1': 'Fragmentable MPEG2 Main Profile / High Level',
   '1.2.840.10008.1.2.4.102': 'MPEG-4 AVC/H.264 High Profile / Level 4.1',
+  '1.2.840.10008.1.2.4.102.1': 'Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.1',
   '1.2.840.10008.1.2.4.103': 'MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1',
+  '1.2.840.10008.1.2.4.103.1': 'Fragmentable MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1',
   '1.2.840.10008.1.2.4.104': 'MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video',
+  '1.2.840.10008.1.2.4.104.1': 'Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video',
   '1.2.840.10008.1.2.4.105': 'MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video',
+  '1.2.840.10008.1.2.4.105.1': 'Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video',
   '1.2.840.10008.1.2.4.106': 'MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2',
+  '1.2.840.10008.1.2.4.106.1': 'Fragmentable MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2',
   '1.2.840.10008.1.2.4.107': 'HEVC/H.265 Main Profile / Level 5.1',
   '1.2.840.10008.1.2.4.108': 'HEVC/H.265 Main 10 Profile / Level 5.1',
+  '1.2.840.10008.1.2.4.201': 'High-Throughput JPEG 2000 Image Compression (Lossless Only)',
+  '1.2.840.10008.1.2.4.202': 'High-Throughput JPEG 2000 with RPCL Options Image Compression (Lossless Only)',
+  '1.2.840.10008.1.2.4.203': 'High-Throughput JPEG 2000 Image Compression',
+  '1.2.840.10008.1.2.4.204': 'JPIP HTJ2K Referenced',
+  '1.2.840.10008.1.2.4.205': 'JPIP HTJ2K Referenced Deflate',
   '1.2.840.10008.1.2.5': 'RLE Lossless',
   '1.2.840.10008.1.2.6.1': 'RFC 2557 MIME encapsulation (Retired)',
   '1.2.840.10008.1.2.6.2': 'XML Encoding (Retired)',
@@ -325,14 +337,26 @@ export const transferSyntaxKeywords = {
   JPIPReferenced: '1.2.840.10008.1.2.4.94',
   JPIPReferencedDeflate: '1.2.840.10008.1.2.4.95',
   MPEG2MPML: '1.2.840.10008.1.2.4.100',
+  MPEG2MPMLF: '1.2.840.10008.1.2.4.100.1',
   MPEG2MPHL: '1.2.840.10008.1.2.4.101',
+  MPEG2MPHLF: '1.2.840.10008.1.2.4.101.1',
   MPEG4HP41: '1.2.840.10008.1.2.4.102',
+  MPEG4HP41F: '1.2.840.10008.1.2.4.102.1',
   MPEG4HP41BD: '1.2.840.10008.1.2.4.103',
+  MPEG4HP41BDF: '1.2.840.10008.1.2.4.103.1',
   MPEG4HP422D: '1.2.840.10008.1.2.4.104',
+  MPEG4HP422DF: '1.2.840.10008.1.2.4.104.1',
   MPEG4HP423D: '1.2.840.10008.1.2.4.105',
+  MPEG4HP423DF: '1.2.840.10008.1.2.4.105.1',
   MPEG4HP42STEREO: '1.2.840.10008.1.2.4.106',
+  MPEG4HP42STEREOF: '1.2.840.10008.1.2.4.106.1',
   HEVCMP51: '1.2.840.10008.1.2.4.107',
   HEVCM10P51: '1.2.840.10008.1.2.4.108',
+  HTJ2KLossless: '1.2.840.10008.1.2.4.201',
+  HTJ2KLosslessRPCL: '1.2.840.10008.1.2.4.202',
+  HTJ2K: '1.2.840.10008.1.2.4.203',
+  JPIPHTJ2KReferenced: '1.2.840.10008.1.2.4.204',
+  JPIPHTJ2KReferencedDeflate: '1.2.840.10008.1.2.4.205',
   RLELossless: '1.2.840.10008.1.2.5',
   RFC2557MIMEEncapsulation: '1.2.840.10008.1.2.6.1',
   XMLEncoding: '1.2.840.10008.1.2.6.2',
@@ -345,7 +369,7 @@ export const transferSyntaxKeywords = {
 /**
  * Standard SOP Class UIDs indexed by keyword. Not comprehensive, just ones needed by DWV.
  *
- * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part04/sect_B.5.html#table_B.5-1}.
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part04/sect_B.5.html#table_B.5-1}.
  *
  * @type {Record<string, string>}
  */

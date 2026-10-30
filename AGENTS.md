@@ -23,10 +23,10 @@ syntaxes, DICOMweb...), use the `dicom` skill (`.agents/skills/dicom/SKILL.md`):
 look the answer up in the standard on dicom.nema.org and cite the section,
 rather than answering from memory.
 
-The code targets the DICOM standard **2022a** edition: the tag dictionary
+The code targets the DICOM standard **2024a** edition: the tag dictionary
 (`src/dicom/dictionary.js`) is loaded from
-`dcmstdtojs/dist/assets/2022a/dicom_tags.json`, and the links to the standard
-in the docs point to `/medical/dicom/2022a/`. The skill answers from that
+`dcmstdtojs/dist/assets/2024a/dicom_tags.json`, and the links to the standard
+in the docs point to `/medical/dicom/2024a/`. The skill answers from that
 edition, compares it with the current one and reports significant changes (for
 ex a tag or VR added or changed since).
 

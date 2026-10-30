@@ -176,7 +176,7 @@ export function isVersionInBounds(version, min, max) {
  * Check that an input buffer includes the DICOM prefix 'DICM'
  *   after the 128 bytes preamble.
  *
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part10/chapter_7.html#sect_7.1}.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
@@ -211,8 +211,8 @@ export function cleanString(inputStr) {
  * Get the utfLabel (used by the TextDecoder) from a character set term.
  *
  * References:
- * - DICOM [Value Encoding]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html},
- * - DICOM [Specific Character Set]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2},
+ * - DICOM [Value Encoding]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_6.html},
+ * - DICOM [Specific Character Set]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2},
  * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}.
  *
  * @param {string} charSetTerm The DICOM character set.
@@ -561,8 +561,8 @@ function logAllocationError(error, size) {
  *   the 'isTagWithVR' function first.
  *
  * Reference:
- * - [Data Element explicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1},
- * - [Data Element implicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_7.5.2.html#table_7.5-1}.
+ * - [Data Element explicit]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_7.html#table_7.1-1},
+ * - [Data Element implicit]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_7.5.2.html#table_7.5-1}.
  *
  * ```
  * | Tag | VR  | VL | Value |
@@ -826,7 +826,7 @@ export class DicomParser {
 
   /**
    * Read the pixel item data element.
-   * Ref: [Single frame fragments]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.4.html#table_A.4-1}.
+   * Ref: [Single frame fragments]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_A.4.html#table_A.4-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -865,7 +865,7 @@ export class DicomParser {
   /**
    * Read a DICOM data element.
    *
-   * Reference: [DICOM VRs]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
+   * Reference: [DICOM VRs]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -1039,7 +1039,7 @@ export class DicomParser {
         delete element.items;
       } else {
         // check bits allocated and VR
-        // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
+        // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_A.2.html
         if (bitsAllocated > 8 && vr === 'OB') {
           logger.warn(
             'Reading DICOM pixel data with bitsAllocated>8 and OB VR' +
@@ -1437,7 +1437,7 @@ export class DicomParser {
     this.#interpret(this.#dataElements, dataReader, pixelTags);
 
     // handle fragmented pixel buffer
-    // Reference: http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_8.2.html
+    // Reference: http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
     dataElement = this.#dataElements[TagKeys.PixelData];
     if (typeof dataElement !== 'undefined') {

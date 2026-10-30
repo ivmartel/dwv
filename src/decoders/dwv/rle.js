@@ -5,7 +5,7 @@ export class RleDecoder {
 
   /**
    * Decode a RLE buffer.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_G.3.html}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_G.3.html}.
    *
    * @param {Array} buffer The buffer to decode.
    * @param {number} bitsAllocated The bits allocated per element in the buffer.

@@ -114,7 +114,7 @@ export function getDimensionOrganization(dataElements) {
  *  SharedFunctionalGroupsSequence (5200,9229) or
  *  PerframeFunctionalGroupsSequence (5200,9230).
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.16.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.16.html}.
  */
 export class DicomFunctionalGroup {
   /**

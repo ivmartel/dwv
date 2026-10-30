@@ -191,7 +191,7 @@ export class AnnotationGroupFactory {
 
   /**
    * Check if input elements contain a TID 1500 annotation.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1500}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1500}.
    *
    * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 1500 annotation.
@@ -243,7 +243,7 @@ export class AnnotationGroupFactory {
 
   /**
    * Check if input elements contain a TID 4100 template.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/sect_ChestCADSRIODTemplates.html#sect_TID_4100}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/sect_ChestCADSRIODTemplates.html#sect_TID_4100}.
    *
    * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 4100 template.
@@ -618,7 +618,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is a measurement group follows TID 1410:
    * it must contain an image region.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1410}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1410}.
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {boolean} True if an image region was found.
@@ -669,7 +669,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is an SR content follows TID 300: it must be
    *   a 'contains' numeric value with an 'inferred from' scoord.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_300}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_300}.
    *
    * @param {DicomSRContent} item The SR content.
    * @returns {boolean} True if TID 300 measure.
@@ -693,7 +693,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is an SR content follows TID 1400: it must be
    *   a 'has properties' numeric value with an 'inferred from' scoord.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1400}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1400}.
    *
    * @param {DicomSRContent} item The SR content.
    * @returns {boolean} True if TID 300 measure.
@@ -717,7 +717,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is a measurement group follows TID 1501:
    * it must contain a measure.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1501}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1501}.
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {boolean} True if a measure was found.
@@ -1438,7 +1438,7 @@ export class AnnotationGroupFactory {
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     // class: Comprehensive 3D SR Storage
-    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_A.35.13.html
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.35.13.html
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.CompletionFlag = 'PARTIAL';
@@ -1695,7 +1695,7 @@ export class AnnotationGroupFactory {
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     // class: Comprehensive 3D SR Storage
-    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_A.35.13.html
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.35.13.html
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.CompletionFlag = 'PARTIAL';

@@ -26,7 +26,7 @@ export function isLutBitsStored(bitsStored) {
  * Typically consists of a rescale slope and intercept to
  * rescale the data range.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.11.html}.
  */
 export class ModalityLut {
 

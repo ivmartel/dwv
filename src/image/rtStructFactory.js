@@ -56,7 +56,7 @@ const MetaTagKeys = {
  * Path: ReferencedFrameOfReferenceSequence (3006,0010) →
  *   FrameOfReferenceUID (0020,0052), first item.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.8.5.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.8.5.html}.
  *
  * @param {Record<string, DataElement>} dataElements The data elements.
  * @returns {string|undefined} The frame of reference UID.

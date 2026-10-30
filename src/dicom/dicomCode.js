@@ -17,7 +17,7 @@ const TagKeys = {
 /**
  * DICOM code: item of a basic code sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_8.8.html}.
  */
 export class DicomCode {
   /**
@@ -151,7 +151,7 @@ export function getDicomCodeItem(code) {
 
 /**
  * DICOM codes.
- * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
+ * List: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_d.html}.
  */
 export const DcmCodes = {
   CADProcessingAndFindingsSummary: {
@@ -409,9 +409,9 @@ export function getQuantificationName(code) {
 
 /**
  * Quantification unit to UCUM key. Associated tags:
- * - Rescale type {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.html#sect_C.11.1.1.2},
- * - Units {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.9.html#sect_C.8.9.1.1.3}.
- * - SUV {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/sect_CID_85.html}.
+ * - Rescale type {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.11.html#sect_C.11.1.1.2},
+ * - Units {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.9.html#sect_C.8.9.1.1.3}.
+ * - SUV {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/sect_CID_85.html}.
  */
 const QuantificationUnit2UcumKey = {
   'unit.mm': 'mm',

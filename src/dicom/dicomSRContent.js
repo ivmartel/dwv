@@ -60,7 +60,7 @@ const TagKeys = {
 /**
  * DICOM relationship types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
  */
 export const RelationshipTypes = {
   contains: 'CONTAINS',
@@ -75,7 +75,7 @@ export const RelationshipTypes = {
 /**
  * DICOM value types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
  */
 export const ValueTypes = {
   text: 'TEXT',
@@ -99,7 +99,7 @@ export const ValueTypes = {
 /**
  * DICOM Continuity Of Contents.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.8.html#table_C.18.8-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.8.html#table_C.18.8-1}.
  */
 export const ContinuityOfContents = {
   separate: 'SEPARATE',
@@ -145,7 +145,7 @@ export function getContentTemplate(dataElements) {
 /**
  * DICOM SR content: item of a SR content sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.17.3.html}.
  */
 export class DicomSRContent {
   /**

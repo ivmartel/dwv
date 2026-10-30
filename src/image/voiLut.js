@@ -27,7 +27,7 @@ export const VoiLutFunctionNames = {
  * else y = ((x - c) / w + 0.5) * (ymax- ymin) + ymin
  * ```
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
  */
 export class VoiLutLinearFunction {
   /**
@@ -122,7 +122,7 @@ export class VoiLutLinearFunction {
  * y = (ymax − ymin) / (1 + exp(−4 * (x − c) / w)) + ymin
  * ```
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
  */
 export class VoiLutSigmoidFunction {
   /**

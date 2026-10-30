@@ -21,7 +21,7 @@ const TagKeys = {
 /**
  * DICOM image reference: item of a SR content sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.4.html#table_C.18.4-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.4.html#table_C.18.4-1}.
  */
 export class ImageReference {
   /**

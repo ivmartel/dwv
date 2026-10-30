@@ -293,7 +293,7 @@ export function getOrientationMatrix(dataElements) {
     safeGetAll(dataElements, TagKeys.ImageOrientationPatient);
   let orientationMatrix;
   // slice orientation (cosines are matrices' columns)
-  // http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
+  // http://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
   if (typeof imageOrientationPatient !== 'undefined') {
     orientationMatrix =
       getOrientationFromCosines(

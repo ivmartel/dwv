@@ -12,7 +12,7 @@ import {RleDecoder} from '../../../src/decoders/dwv/rle.js';
 /**
  * Create a RLE fragment from already encoded segments: 64 bytes header
  * (number of segments + 15 segment offsets) followed by the segments.
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_G.5.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_G.5.html}.
  *
  * @param {number[][]} segments The encoded segments, as byte values
  *   (negative counts can be given as signed values).

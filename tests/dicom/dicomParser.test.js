@@ -12,6 +12,8 @@ import {
   cleanString,
   hasDicomPrefix,
   getTypedArrayLike,
+  getTransferSyntaxName,
+  getSyntaxDecompressionName,
   DicomParser
 } from '../../src/dicom/dicomParser.js';
 import {
@@ -20,7 +22,10 @@ import {
 } from '../../src/dicom/dicomTag.js';
 import {getFileListFromDicomDir} from '../../src/dicom/dicomDir.js';
 import {DicomWriter} from '../../src/dicom/dicomWriter.js';
-import {transferSyntaxKeywords} from '../../src/dicom/dictionary.js';
+import {
+  dictionary,
+  transferSyntaxKeywords
+} from '../../src/dicom/dictionary.js';
 import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
@@ -571,6 +576,47 @@ describe('dicom', () => {
         `${array.constructor.name} type`);
       assert.equal(res.length, 3, `${array.constructor.name} length`);
     }
+  });
+
+  /**
+   * Tests for {@link getTransferSyntaxName} and
+   *   {@link getSyntaxDecompressionName}.
+   *
+   * @function module:tests/dicom~transferSyntax
+   */
+  test('transferSyntax', () => {
+    // known syntax
+    assert.equal(
+      getTransferSyntaxName(transferSyntaxKeywords.JPEGBaseline8Bit),
+      'JPEG Baseline (Process 1)', 'jpeg baseline name');
+    assert.equal(
+      getSyntaxDecompressionName(transferSyntaxKeywords.JPEG2000),
+      'jpeg2000', 'jpeg 2000 decompression');
+    // syntax added in 2024a: named but not decoded
+    assert.equal(
+      getTransferSyntaxName(transferSyntaxKeywords.HTJ2KLossless),
+      'High-Throughput JPEG 2000 Image Compression (Lossless Only)',
+      'htj2k lossless name');
+    for (const syntax of [
+      transferSyntaxKeywords.HTJ2KLossless,
+      transferSyntaxKeywords.HTJ2KLosslessRPCL,
+      transferSyntaxKeywords.HTJ2K
+    ]) {
+      assert.isUndefined(getSyntaxDecompressionName(syntax),
+        `no decompression for ${syntax}`);
+    }
+    // unknown syntax
+    assert.equal(getTransferSyntaxName('1.2.3'), 'Unknown', 'unknown name');
+  });
+
+  /**
+   * Tests for the dictionary edition.
+   *
+   * @function module:tests/dicom~dictionary
+   */
+  test('dictionary', () => {
+    // FrameType (0008,9007) VM is 4-5 since 2024a
+    assert.equal(dictionary['0008']['9007'][1], '4-5', 'FrameType VM');
   });
 
 });

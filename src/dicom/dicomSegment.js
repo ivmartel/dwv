@@ -38,7 +38,7 @@ const TagKeys = {
 /**
  * DICOM (mask) segment: item of a SegmentSequence (0062,0002).
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.20.4.html}.
  */
 export class MaskSegment {
   /**

@@ -14,7 +14,7 @@ const TagKeys = {
 /**
  * DICOM sop instance reference.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_10.8.html#table_10-11}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_10.8.html#table_10-11}.
  */
 export class SopInstanceReference {
   /**

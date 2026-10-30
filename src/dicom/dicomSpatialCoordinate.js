@@ -26,7 +26,7 @@ const TagKeys = {
 /**
  * DICOM graphic types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2}.
  */
 export const GraphicTypes = {
   point: 'POINT',
@@ -39,7 +39,7 @@ export const GraphicTypes = {
 /**
  * DICOM spatial coordinate (SCOORD): item of a SR content sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.6.html#table_C.18.6-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#table_C.18.6-1}.
  */
 export class SpatialCoordinate {
   /**

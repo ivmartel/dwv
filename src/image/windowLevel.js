@@ -51,7 +51,7 @@ export function equalWl(wl0, wl1) {
  * require a strictly positive width (the epsilon avoids a division
  * by zero).
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1}.
  *
  * @param {string} [voiLutFunctionName] The VOI LUT function name,
  *   defaults to 'LINEAR'.
