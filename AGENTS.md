@@ -7,7 +7,9 @@ This file provides guidance to AI agents when working with code in this reposito
 DWV (DICOM Web Viewer) is a zero-footprint, pure-JavaScript/HTML5 medical image
 viewer library. It parses and renders DICOM (and some non-DICOM) data and
 provides tools for manipulation (scroll, window/level, zoom, pan, MPR,
-annotation, filters). Not certified for diagnostic use. Licensed GPL-3.0.
+annotation, filters). Not certified for diagnostic use. Licensed GPL-3.0;
+contributions follow the guidelines and license terms in
+`.github/contributing.md`.
 
 Package manager is `yarn` (yarn v4, `packageManager` pinned in package.json).
 `corepack enable` is enough to get the right yarn version; npm also works for

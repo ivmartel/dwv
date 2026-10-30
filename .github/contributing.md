@@ -18,7 +18,7 @@ it, make comments and hopefully merge it.
 ## License Terms
 
 Code committed by you to this repository, whether written by you or a third party, must be
-governed by the GNU General Public License version 3 ([GNU GPL v3](http://www.gnu.org/licenses/gpl-3.0.en.html)). By contributing Code,
+governed by the GNU General Public License version 3 ([GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.html)). By contributing Code,
 you confirm that, to the best of your knowledge, the code does not violate the
 rights of any person or entity.
 
