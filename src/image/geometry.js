@@ -1158,8 +1158,59 @@ export function getSliceGeometrySpacing(origins) {
 }
 
 /**
+ * Volume ids to copy onto a merged geometry.
+ *
+ * A geometry qualifies when it has one id per volume and that count
+ * is the merged volume count. Copying them keeps world positions
+ * (volume ids) convertible back to volume indices.
+ *
+ * @param {Geometry} geometry The input geometry.
+ * @param {number|undefined} volumeCount The merged volume count.
+ * @returns {VolumeId[]|undefined} The ids to copy.
+ */
+function getVolumeIdsForMerge(geometry, volumeCount) {
+  if (typeof volumeCount !== 'number' ||
+    geometry.getSize().length() < 4 ||
+    geometry.getSize().get(3) !== volumeCount) {
+    return;
+  }
+  const volumeIds = geometry.getVolumeIds();
+  if (typeof volumeIds === 'undefined' ||
+    volumeIds.length !== volumeCount) {
+    return;
+  }
+  return volumeIds;
+}
+
+/**
+ * Check that two volume id lists match.
+ *
+ * @param {VolumeId[]} ids0 The first list.
+ * @param {VolumeId[]} ids1 The second list.
+ * @returns {boolean} True when source, tag and value match in order.
+ */
+function sameVolumeIds(ids0, ids1) {
+  if (ids0.length !== ids1.length) {
+    return false;
+  }
+  for (let i = 0; i < ids0.length; ++i) {
+    const id0 = ids0[i].id;
+    const id1 = ids1[i].id;
+    if (id0.value !== id1.value ||
+      id0.source !== id1.source ||
+      id0.tagKey !== id1.tagKey) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Merge two geometries into one using the merge size and
  *   smallest resolution.
+ * Volume ids are kept when one input defines them for the merged
+ *   volume count, or both define the same ids. A 3D overlay then
+ *   does not drop the 4D underlay volume index.
  * WARNING: needs to be called with the final geometries.
  *
  * @param {Geometry} geometry1 The first geometry.
@@ -1224,10 +1275,24 @@ export function mergeGeometries(geometry1, geometry2) {
     newOrigins.push(orientation.multiplyPoint3D(origin));
   }
 
-  return new Geometry(
+  const merged = new Geometry(
     newOrigins,
     newSize,
     newSpacing,
     orientation
   );
+  const volumeCount = newSize.length() > 3 ? newSize.get(3) : undefined;
+  const volumeIds1 = getVolumeIdsForMerge(geometry1, volumeCount);
+  const volumeIds2 = getVolumeIdsForMerge(geometry2, volumeCount);
+  if (typeof volumeIds1 !== 'undefined' &&
+    typeof volumeIds2 !== 'undefined') {
+    if (sameVolumeIds(volumeIds1, volumeIds2)) {
+      merged.setVolumeIds(volumeIds1);
+    }
+  } else if (typeof volumeIds1 !== 'undefined') {
+    merged.setVolumeIds(volumeIds1);
+  } else if (typeof volumeIds2 !== 'undefined') {
+    merged.setVolumeIds(volumeIds2);
+  }
+  return merged;
 }
