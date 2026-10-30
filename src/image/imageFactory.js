@@ -208,7 +208,7 @@ function getWindowPresets(dataElements, intensityFactor) {
     for (let j = 0; j < windowCenter.length; ++j) {
       const center = parseFloat(windowCenter[j]);
       let width = parseFloat(windowWidth[j]);
-      if (center && width && width !== 0) {
+      if (!isNaN(center) && !isNaN(width) && width !== 0) {
         name = '';
         if (typeof windowCWExplanation !== 'undefined') {
           name = windowCWExplanation[j];
@@ -216,10 +216,9 @@ function getWindowPresets(dataElements, intensityFactor) {
         if (name === '') {
           name = `Default${j}`;
         }
+        // the width minimum depends on the VOI LUT function:
+        // it is applied by the view
         width *= intensityFactor;
-        if (width < 1) {
-          width = 1;
-        }
         windowPresets[name] = new WindowPreset(
           name,
           [new WindowLevel(

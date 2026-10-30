@@ -253,18 +253,20 @@ describe('image', () => {
       // call generate data
       view0.generateImageData(imageData);
       // rescaled values: [-3, 0.5, 4, 7.5]
+      // float data defaults to LINEAR_EXACT: evenly spaced values
+      // map to 1/3 and 2/3 of 255 (84.99... is truncated to 84)
       const theoData0 = [
         0,
         0,
         0,
         255,
-        93,
-        93,
-        93,
+        84,
+        84,
+        84,
         255,
-        187,
-        187,
-        187,
+        170,
+        170,
+        170,
         255,
         255,
         255,

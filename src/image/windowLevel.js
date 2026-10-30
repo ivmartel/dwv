@@ -46,6 +46,27 @@ export function equalWl(wl0, wl1) {
 }
 
 /**
+ * Get the minimum window width allowed by a VOI LUT function:
+ * LINEAR requires a width of at least 1, LINEAR_EXACT and SIGMOID
+ * require a strictly positive width (the epsilon avoids a division
+ * by zero).
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1}.
+ *
+ * @param {string} [voiLutFunctionName] The VOI LUT function name,
+ *   defaults to 'LINEAR'.
+ * @returns {number} The minimum window width.
+ */
+export function getMinWindowWidth(voiLutFunctionName) {
+  let minWindowWidth = 1;
+  if (voiLutFunctionName === VoiLutFunctionNames.linear_exact ||
+    voiLutFunctionName === VoiLutFunctionNames.sigmoid) {
+    minWindowWidth = Number.EPSILON;
+  }
+  return minWindowWidth;
+}
+
+/**
  * Validate and constrain an input window level.
  *
  * @param {WindowLevel} wl The window level to validate.
@@ -67,19 +88,11 @@ export function validateWindowLevel(
   centerBound = Math.min(centerBound, range.max);
   centerBound = Math.max(centerBound, range.min);
 
-  // width minimum depends on voi lut function
-  // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1
-  // (use linear min as default)
-  let minWindowWidth = 1;
-  if (typeof voiLutFunctionName !== 'undefined' &&
-    (voiLutFunctionName === VoiLutFunctionNames.linear_exact ||
-      voiLutFunctionName === VoiLutFunctionNames.sigmoid)) {
-    minWindowWidth = 0;
-  }
-
+  // apply the minimum after the range limit: the width minimum
+  // takes precedence for data with a small range
   let widthBound = wl.width;
-  widthBound = Math.max(widthBound, minWindowWidth);
   widthBound = Math.min(widthBound, range.max - range.min);
+  widthBound = Math.max(widthBound, getMinWindowWidth(voiLutFunctionName));
 
   return new WindowLevel(centerBound, widthBound);
 }

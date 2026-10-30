@@ -2,7 +2,7 @@ import {Index} from '../math/index.js';
 import {ModalityLut, isLutBitsStored} from './modalityLut.js';
 import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
-import {VoiLut} from './voiLut.js';
+import {VoiLut, VoiLutFunctionNames} from './voiLut.js';
 import {
   WindowLevel,
   equalWl,
@@ -561,6 +561,21 @@ export class View extends EventTarget {
   }
 
   /**
+   * Get the VOI LUT function name: the one from the image meta data
+   * or, if not defined, LINEAR_EXACT for float data (LINEAR assumes
+   * integer pixel values) and undefined otherwise (LINEAR).
+   *
+   * @returns {string|undefined} The VOI LUT function name.
+   */
+  #getVoiLutFunctionName() {
+    let name = this.#image.getMeta().VOILUTFunction;
+    if (typeof name === 'undefined' && this.#isFloat()) {
+      name = VoiLutFunctionNames.linear_exact;
+    }
+    return name;
+  }
+
+  /**
    * Check if the image data can use pre-computed lookup tables:
    *   integer data with a limited number of bits stored.
    *
@@ -651,7 +666,7 @@ export class View extends EventTarget {
       // set lut window level
       const newVoiLut = new VoiLut(
         this.#currentWl,
-        this.#image.getMeta().VOILUTFunction
+        this.#getVoiLutFunctionName()
       );
       this.#windowLut.setVoiLut(newVoiLut);
     }
@@ -1008,7 +1023,7 @@ export class View extends EventTarget {
     const wlBound = validateWindowLevel(
       wl,
       this.#image.getRescaledDataRange(),
-      this.#image.getMeta().VOILUTFunction
+      this.#getVoiLutFunctionName()
     );
 
     // check if new wl
@@ -1122,7 +1137,7 @@ export class View extends EventTarget {
     return validateWindowLevel(
       new WindowLevel(center, width),
       range,
-      this.#image.getMeta().VOILUTFunction
+      this.#getVoiLutFunctionName()
     );
   }
 
