@@ -963,4 +963,25 @@ describe('mergeGeometries', () => {
     }, /different orientation/);
   });
 
+  test('4D volume ids survive a merge with a 3D geometry', () => {
+    const info = {source: 'DiffusionBValue'};
+    const origin0 = new Point3D(0, 0, 0);
+    const origin1 = new Point3D(0, 0, 1);
+    const underlay = new Geometry(
+      [origin0], new Size([1, 1, 1]), new Spacing([1, 1, 1]),
+      undefined, {id: {...info, value: 0}});
+    underlay.appendOrigin(origin1, 1, 0);
+    underlay.appendFrame(origin0, {id: {...info, value: 17}});
+    underlay.appendOrigin(origin1, 1, 17);
+    const overlay = new Geometry(
+      [origin0, origin1], new Size([1, 1, 2]), new Spacing([1, 1, 1]));
+
+    const merged = mergeGeometries(underlay, overlay);
+    const position = underlay.indexToWorld(new Index([0, 0, 0, 1]));
+    assert.equal(position.get(3), 17, 'world stores the volume id');
+    assert.equal(
+      merged.worldToIndex(position).get(3), 1, 'volume index');
+    assert.equal(merged.getSize().get(3), 2, 'volume count');
+  });
+
 });

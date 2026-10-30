@@ -60,6 +60,28 @@ function makeHelper(
   return {helper: new PositionHelper(view), geometry};
 }
 
+/**
+ * Build a position helper on an existing geometry.
+ *
+ * @param {Geometry} geometry The geometry.
+ * @param {number[]} initIndex Initial position as index values.
+ * @param {number} [scrollDim] Scroll dimension (default: 2 / z).
+ * @returns {PositionHelper} The helper.
+ */
+function makeViewHelper(geometry, initIndex, scrollDim = 2) {
+  let currentPosition = geometry.indexToWorld(new Index(initIndex));
+  const view = {
+    getImage: () => ({getGeometry: () => geometry}),
+    getCurrentPosition: () => currentPosition,
+    getScrollDimIndex: () => scrollDim,
+    setCurrentPosition: (pos) => {
+      currentPosition = pos;
+      return true;
+    }
+  };
+  return new PositionHelper(view);
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -358,5 +380,36 @@ describe('image', () => {
       'two slices merged → max scroll = 1'
     );
   });
+
+  test(
+    'PositionHelper merge scrolls a 4D underlay with a 3D overlay ' +
+    'at volume > 0',
+    () => {
+      const info = {source: 'DiffusionBValue'};
+      const origin0 = new Point3D(0, 0, 0);
+      const origin1 = new Point3D(0, 0, 1);
+      const underlayGeometry = new Geometry(
+        [origin0], new Size([1, 1, 1]), new Spacing([1, 1, 1]),
+        undefined, {id: {...info, value: 0}});
+      underlayGeometry.appendOrigin(origin1, 1, 0);
+      underlayGeometry.appendFrame(origin0, {id: {...info, value: 17}});
+      underlayGeometry.appendOrigin(origin1, 1, 17);
+      const overlayGeometry = new Geometry(
+        [origin0, origin1],
+        new Size([1, 1, 2]),
+        new Spacing([1, 1, 1]));
+
+      const underlay = makeViewHelper(underlayGeometry, [0, 0, 0, 1]);
+      const overlay = makeViewHelper(overlayGeometry, [0, 0, 0]);
+      underlay.merge(overlay);
+
+      assert.equal(underlay.getCurrentIndex().get(3), 1, 'volume index');
+      assert.ok(underlay.incrementPositionAlongScroll(), 'scroll slice');
+      assert.equal(
+        underlay.getCurrentPositionScrollValue(), 1, 'next slice');
+      assert.equal(
+        underlay.getCurrentIndex().get(3), 1, 'volume stays 1');
+    }
+  );
 
 });
