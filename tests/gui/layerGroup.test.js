@@ -9,7 +9,7 @@ import {
   getLayerDetailsFromEvent,
   getScaledOffset,
 } from '../../src/gui/layerGroup.js';
-import {PositionBinder} from '../../src/gui/binders.js';
+import {PositionBinder, WindowLevelBinder} from '../../src/gui/binders.js';
 import {Stage} from '../../src/gui/stage.js';
 import {Point, Point3D} from '../../src/math/point.js';
 import {Index} from '../../src/math/index.js';
@@ -124,6 +124,43 @@ function makePositionEvent(dataid, position, diffDims) {
  */
 function getSetPosition(vc) {
   return vc.setCurrentPosition.mock.calls[0][0].getValues();
+}
+
+/**
+ * Create a layer group mock with one view layer, as used by the
+ * window/level binder.
+ *
+ * @param {string} dataId The view layer data id.
+ * @param {string[]} presetNames The view controller preset names.
+ * @returns {{layerGroup: object, vc: object}} The layer group and its
+ *   view controller.
+ */
+function makeWindowLevelBinderLayerGroup(dataId, presetNames) {
+  const vc = {
+    getWindowLevelPresetsNames: () => presetNames,
+    setWindowLevel: vi.fn(),
+    setWindowLevelPreset: vi.fn()
+  };
+  const vl = {
+    getViewController: () => vc
+  };
+  const layerGroup = {
+    getViewLayersByDataId: (id) => id === dataId ? [vl] : []
+  };
+  return {layerGroup, vc};
+}
+
+/**
+ * Create a window/level change event.
+ *
+ * @param {string} dataid The source data id.
+ * @param {Array} value The event value: [center, width, presetName].
+ * @returns {CustomEvent} The event.
+ */
+function makeWindowLevelEvent(dataid, value) {
+  return new CustomEvent('wlchange', {
+    detail: {dataid, value}
+  });
 }
 
 describe('gui', () => {
@@ -938,6 +975,90 @@ describe('gui', () => {
       [1, 1, 0, 2], 'target position');
     assert.deepEqual(targetVc.getCurrentIndex().getValues(),
       [1, 1, 0, 0], 'target volume index of the id');
+  });
+
+  /**
+   * Tests for {@link WindowLevelBinder}: different data.
+   *
+   * @function module:tests/gui~windowLevelBinderOtherData
+   */
+  test('WindowLevelBinder ignores an event from different data', () => {
+    const {layerGroup, vc} =
+      makeWindowLevelBinderLayerGroup('data0', ['Abdomen']);
+    new WindowLevelBinder().getCallback(layerGroup)(
+      makeWindowLevelEvent('other', [50, 100, 'manual']));
+    assert.equal(vc.setWindowLevel.mock.calls.length, 0);
+    assert.equal(vc.setWindowLevelPreset.mock.calls.length, 0);
+  });
+
+  /**
+   * Tests for {@link WindowLevelBinder}: no preset name.
+   *
+   * @function module:tests/gui~windowLevelBinderNoName
+   */
+  test('WindowLevelBinder sets the window level values when no preset ' +
+    'name is given', () => {
+    const {layerGroup, vc} =
+      makeWindowLevelBinderLayerGroup('data0', ['Abdomen']);
+    new WindowLevelBinder().getCallback(layerGroup)(
+      makeWindowLevelEvent('data0', [50, 100]));
+    assert.equal(vc.setWindowLevelPreset.mock.calls.length, 0);
+    assert.equal(vc.setWindowLevel.mock.calls.length, 1);
+    const wl = vc.setWindowLevel.mock.calls[0][0];
+    assert.equal(wl.center, 50);
+    assert.equal(wl.width, 100);
+  });
+
+  /**
+   * Tests for {@link WindowLevelBinder}: 'manual' preset name.
+   *
+   * @function module:tests/gui~windowLevelBinderManual
+   */
+  test('WindowLevelBinder sets the window level values for a \'manual\' ' +
+    'preset name', () => {
+    // the target may already have its own (older) 'manual' preset
+    const {layerGroup, vc} =
+      makeWindowLevelBinderLayerGroup('data0', ['Abdomen', 'manual']);
+    new WindowLevelBinder().getCallback(layerGroup)(
+      makeWindowLevelEvent('data0', [50, 100, 'manual']));
+    assert.equal(vc.setWindowLevelPreset.mock.calls.length, 0);
+    assert.equal(vc.setWindowLevel.mock.calls.length, 1);
+    const wl = vc.setWindowLevel.mock.calls[0][0];
+    assert.equal(wl.center, 50);
+    assert.equal(wl.width, 100);
+  });
+
+  /**
+   * Tests for {@link WindowLevelBinder}: known preset name.
+   *
+   * @function module:tests/gui~windowLevelBinderKnownPreset
+   */
+  test('WindowLevelBinder sets the preset when the name is known', () => {
+    const {layerGroup, vc} =
+      makeWindowLevelBinderLayerGroup('data0', ['Abdomen']);
+    new WindowLevelBinder().getCallback(layerGroup)(
+      makeWindowLevelEvent('data0', [50, 100, 'Abdomen']));
+    assert.equal(vc.setWindowLevel.mock.calls.length, 0);
+    assert.equal(vc.setWindowLevelPreset.mock.calls.length, 1);
+    assert.equal(vc.setWindowLevelPreset.mock.calls[0][0], 'Abdomen');
+  });
+
+  /**
+   * Tests for {@link WindowLevelBinder}: unknown preset name.
+   *
+   * @function module:tests/gui~windowLevelBinderUnknownPreset
+   */
+  test('WindowLevelBinder sets the window level values for an unknown ' +
+    'preset name', () => {
+    const {layerGroup, vc} =
+      makeWindowLevelBinderLayerGroup('data0', ['Abdomen']);
+    new WindowLevelBinder().getCallback(layerGroup)(
+      makeWindowLevelEvent('data0', [50, 100, 'Lung']));
+    assert.equal(vc.setWindowLevelPreset.mock.calls.length, 0);
+    assert.equal(vc.setWindowLevel.mock.calls.length, 1);
+    const wl = vc.setWindowLevel.mock.calls[0][0];
+    assert.equal(wl.center, 50);
+    assert.equal(wl.width, 100);
   });
 
 });

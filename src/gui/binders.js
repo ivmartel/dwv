@@ -32,11 +32,13 @@ export class WindowLevelBinder {
       const viewLayers = layerGroup.getViewLayersByDataId(dataid);
       if (viewLayers.length !== 0) {
         const vc = viewLayers[0].getViewController();
-        if (value.length === 2) {
+        // use raw values for 'manual' (target may hold its own older values)
+        // or for a preset the target does not have
+        if (value[2] === 'manual' ||
+          !vc.getWindowLevelPresetsNames().includes(value[2])) {
           const wl = new WindowLevel(value[0], value[1]);
           vc.setWindowLevel(wl);
-        }
-        if (value.length === 3) {
+        } else {
           vc.setWindowLevelPreset(value[2]);
         }
       }
