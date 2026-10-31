@@ -1603,44 +1603,42 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/bhasha@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@clean-jsdoc-theme/bhasha@npm:5.2.0"
+"@clean-jsdoc-theme/bhasha@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@clean-jsdoc-theme/bhasha@npm:5.2.1"
   dependencies:
-    "@clean-jsdoc-theme/utils": "npm:^5.2.0"
+    "@clean-jsdoc-theme/utils": "npm:^5.2.1"
   peerDependencies:
     preact: ^10.22.0
-  checksum: 10c0/4eea0160656740db2f6a2085c6ad623c7e58d2e27697ee11cb246423886fa7a6c98ab3a84df11f0121ab9219775f78db267b22e4691aa44da604e4c1b03120f2
+  checksum: 10c0/1efdc27d0fe55fd56a06a11abbf4608ae133159775c10d44c8bb294a2cee2e41ea9a3446849eadd102ef99537a37e6ed153cadd9e740631995b259cde28f9687
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/dwar@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@clean-jsdoc-theme/dwar@npm:5.2.0"
+"@clean-jsdoc-theme/dwar@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@clean-jsdoc-theme/dwar@npm:5.2.1"
   dependencies:
-    "@clean-jsdoc-theme/rang": "npm:^5.2.0"
-    "@clean-jsdoc-theme/setu": "npm:^5.2.0"
-    "@clean-jsdoc-theme/utils": "npm:^5.2.0"
+    "@clean-jsdoc-theme/rang": "npm:^5.2.1"
+    "@clean-jsdoc-theme/utils": "npm:^5.2.1"
     "@mdx-js/mdx": "npm:^3.0.0"
     "@shikijs/rehype": "npm:^4.2.0"
     esbuild: "npm:^0.28.0"
-    pagefind: "npm:^1.1.0"
     preact-render-to-string: "npm:^6.5.13"
     remark-frontmatter: "npm:^5"
     remark-gfm: "npm:^4"
     shiki: "npm:^4.2.0"
   peerDependencies:
     preact: ^10.22.0
-  checksum: 10c0/85c4c8ce95be64e80f0b8a0a5d31b003052483324699b9fbf51346a444f6f90992e3c553f7c7eb81ec88e7492919d70ab2845f251cbf9b717a63442b13288abb
+  checksum: 10c0/23abd13add03fbee8958a13684faf239ad46bdd55f4a2b99358b78636971c9a0c90b54ef40d4a26b6d61d35b36f97916d8aeb2085b067541d0040fd146e9afa7
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/rang@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@clean-jsdoc-theme/rang@npm:5.2.0"
+"@clean-jsdoc-theme/rang@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@clean-jsdoc-theme/rang@npm:5.2.1"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.2.0"
-    "@clean-jsdoc-theme/utils": "npm:^5.2.0"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.2.1"
+    "@clean-jsdoc-theme/utils": "npm:^5.2.1"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     lucide-preact: "npm:^1.17.0"
@@ -1648,16 +1646,16 @@ __metadata:
     tailwind-merge: "npm:^3.6.0"
   peerDependencies:
     preact: ^10.22.0
-  checksum: 10c0/efb98f278b141f3afeb8f3a3f0ff23467f09389ea52aa3e399a08ab8ce65e8dff080e90f3aff6ea5c168cfdea2fa2ddc20b6313bb1801ecc79496688d816d171
+  checksum: 10c0/1f4819ab43c9dae31a75360ea60029980dd7593a1b862511fb46d320ac9b945120ca1937ef31562f962bb16b291a34ae172b8073954b81315ae9f620e56b07ca
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/setu@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@clean-jsdoc-theme/setu@npm:5.2.0"
+"@clean-jsdoc-theme/setu@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@clean-jsdoc-theme/setu@npm:5.2.1"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.2.0"
-    "@clean-jsdoc-theme/utils": "npm:^5.2.0"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.2.1"
+    "@clean-jsdoc-theme/utils": "npm:^5.2.1"
     "@jsdoc/salty": "npm:^0.2.12"
     hast-util-from-html: "npm:^2.0.3"
     hast-util-to-html: "npm:^9.0.5"
@@ -1671,16 +1669,16 @@ __metadata:
     turndown: "npm:^7.2.4"
   peerDependencies:
     preact: ^10.22.0
-  checksum: 10c0/d341f74aed061583922211fcefee023b8ab99badfc35c055dec183a336a1fd838c61011655a8972156e7a5ffa1556bcbfcafd80a313a56ce0deeccb5f9abfd66
+  checksum: 10c0/0a69c039fc1bbbcf2181cd2532daf938832a8b57e08b2074307cce0040aee1bc52a979c2390f2900ae4190acd4384859ea6ab93fc4eb23bed3696b95d64a8fb6
   languageName: node
   linkType: hard
 
-"@clean-jsdoc-theme/utils@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@clean-jsdoc-theme/utils@npm:5.2.0"
+"@clean-jsdoc-theme/utils@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@clean-jsdoc-theme/utils@npm:5.2.1"
   dependencies:
     zod: "npm:^4.3.6"
-  checksum: 10c0/de12b57408dc37b3816562356c91ddb956bc564c1cacfe620bb6a64c81200cd782c4251214a9324e3e2da6dfc966138ceff97fecf4c78c21d96b504decbde290
+  checksum: 10c0/4e7f86e5402bb2954a4fcafffee54bc3523397ba911e13debc6f2afcb6002bca38b1a511c22b3ad50593e4993e09a88a0ad6d45cd772e85541b3493edc7dff49
   languageName: node
   linkType: hard
 
@@ -2713,55 +2711,6 @@ __metadata:
   version: 0.153.0
   resolution: "@oxc-project/types@npm:0.153.0"
   checksum: 10c0/32011227bc4f0e6536c07ef79ce9254e5a453cdbfdb51b6717d0edc06b7d85a9a2a8ca12102de3b71f91a0e78d4facb538d17b28e6a7b6527ffc8901d8cd82c6
-  languageName: node
-  linkType: hard
-
-"@pagefind/darwin-arm64@npm:1.5.2":
-  version: 1.5.2
-  resolution: "@pagefind/darwin-arm64@npm:1.5.2"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@pagefind/darwin-x64@npm:1.5.2":
-  version: 1.5.2
-  resolution: "@pagefind/darwin-x64@npm:1.5.2"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@pagefind/freebsd-x64@npm:1.5.2":
-  version: 1.5.2
-  resolution: "@pagefind/freebsd-x64@npm:1.5.2"
-  conditions: os=freebsd & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@pagefind/linux-arm64@npm:1.5.2":
-  version: 1.5.2
-  resolution: "@pagefind/linux-arm64@npm:1.5.2"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@pagefind/linux-x64@npm:1.5.2":
-  version: 1.5.2
-  resolution: "@pagefind/linux-x64@npm:1.5.2"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@pagefind/windows-arm64@npm:1.5.2":
-  version: 1.5.2
-  resolution: "@pagefind/windows-arm64@npm:1.5.2"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@pagefind/windows-x64@npm:1.5.2":
-  version: 1.5.2
-  resolution: "@pagefind/windows-x64@npm:1.5.2"
-  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -5095,19 +5044,19 @@ __metadata:
   linkType: hard
 
 "clean-jsdoc-theme@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "clean-jsdoc-theme@npm:5.2.0"
+  version: 5.2.1
+  resolution: "clean-jsdoc-theme@npm:5.2.1"
   dependencies:
-    "@clean-jsdoc-theme/bhasha": "npm:^5.2.0"
-    "@clean-jsdoc-theme/dwar": "npm:^5.2.0"
-    "@clean-jsdoc-theme/rang": "npm:^5.2.0"
-    "@clean-jsdoc-theme/setu": "npm:^5.2.0"
-    "@clean-jsdoc-theme/utils": "npm:^5.2.0"
+    "@clean-jsdoc-theme/bhasha": "npm:^5.2.1"
+    "@clean-jsdoc-theme/dwar": "npm:^5.2.1"
+    "@clean-jsdoc-theme/rang": "npm:^5.2.1"
+    "@clean-jsdoc-theme/setu": "npm:^5.2.1"
+    "@clean-jsdoc-theme/utils": "npm:^5.2.1"
     ora: "npm:^9.3.0"
     preact: "npm:^10.22.0"
   peerDependencies:
     jsdoc: ">=4.x"
-  checksum: 10c0/a5734fe972e1f3808c9ba181bbb1eb7354a1983ff2a4572ef1a432ff7e25d4b161d9e465da2c30932bb45c9bc568f9e9e72f009ccd0efdae532962705fdc13c7
+  checksum: 10c0/839f849caac7bb2212ed70a4cd439cd48c6d4e00acb628e9479afbd6d3a1343b93c60e3a2fea2ad0902d5762e02dfb9a0d77bfadd1f45b8a9c48195361240fa7
   languageName: node
   linkType: hard
 
@@ -12035,38 +11984,6 @@ __metadata:
     unique-filename: "npm:^1.1.1"
     which: "npm:^1.3.1"
   checksum: 10c0/3ab988d5951006150a63159877f79d7a456eb57a66fd18c750da47719a370d703ed4c202d0b417cdbeb8927efd56fbcf41baba15d18c192db8df1bb49eb28807
-  languageName: node
-  linkType: hard
-
-"pagefind@npm:^1.1.0":
-  version: 1.5.2
-  resolution: "pagefind@npm:1.5.2"
-  dependencies:
-    "@pagefind/darwin-arm64": "npm:1.5.2"
-    "@pagefind/darwin-x64": "npm:1.5.2"
-    "@pagefind/freebsd-x64": "npm:1.5.2"
-    "@pagefind/linux-arm64": "npm:1.5.2"
-    "@pagefind/linux-x64": "npm:1.5.2"
-    "@pagefind/windows-arm64": "npm:1.5.2"
-    "@pagefind/windows-x64": "npm:1.5.2"
-  dependenciesMeta:
-    "@pagefind/darwin-arm64":
-      optional: true
-    "@pagefind/darwin-x64":
-      optional: true
-    "@pagefind/freebsd-x64":
-      optional: true
-    "@pagefind/linux-arm64":
-      optional: true
-    "@pagefind/linux-x64":
-      optional: true
-    "@pagefind/windows-arm64":
-      optional: true
-    "@pagefind/windows-x64":
-      optional: true
-  bin:
-    pagefind: lib/runner/bin.cjs
-  checksum: 10c0/bcc4f34f473bfeb09dc4cb464a3547bf958e11ee4dee4144ec7a364bd74b9f7c21f85be71e388b66d30923a9a453dcaed2f6b425f3e67631cadc9650ba741aab
   languageName: node
   linkType: hard
 
