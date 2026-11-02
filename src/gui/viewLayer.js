@@ -5,7 +5,8 @@ import {ViewController} from '../app/viewController.js';
 import {Point2D} from '../math/point.js';
 import {
   canCreateCanvas,
-  InteractionEventNames
+  InteractionEventNames,
+  getInteractionEventOptions
 } from './generic.js';
 import {getScaledOffset} from './layerGroup.js';
 import {custom} from '../app/custom.js';
@@ -1169,11 +1170,8 @@ export class ViewLayer {
     // interaction events
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
-      const eventName = names[i];
-      const passive = eventName !== 'wheel' &&
-        eventName !== 'touchstart';
-      this.#containerDiv.addEventListener(
-        eventName, this.#fireDomEvent, {passive});
+      this.#containerDiv.addEventListener(names[i], this.#fireDomEvent,
+        getInteractionEventOptions(names[i]));
     }
   }
 

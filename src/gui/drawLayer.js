@@ -1,7 +1,10 @@
 import {ListenerHandler} from '../utils/listen.js';
 import {DrawController} from '../app/drawController.js';
 import {getScaledOffset} from './layerGroup.js';
-import {InteractionEventNames} from './generic.js';
+import {
+  InteractionEventNames,
+  getInteractionEventOptions
+} from './generic.js';
 import {logger} from '../utils/logger.js';
 import {toStringId} from '../utils/array.js';
 import {precisionRound} from '../math/number.js';
@@ -1164,7 +1167,8 @@ export class DrawLayer {
     // interaction events
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
-      this.#containerDiv.addEventListener(names[i], this.#fireDomEvent);
+      this.#containerDiv.addEventListener(names[i], this.#fireDomEvent,
+        getInteractionEventOptions(names[i]));
     }
   }
 

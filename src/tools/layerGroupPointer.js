@@ -78,6 +78,9 @@ export const MouseEventButtons = {
  * Event entry points use the same names as tools (`mousedown`, `mousemove`,
  * `wheel`, `dblclick`, …). Those handlers are arrow functions so they stay
  * bound when the toolbox invokes them as bare callbacks (`func(event)`).
+ *
+ * `preventDefault` is only called on the `NonPassiveInteractionEventNames`
+ * (from `gui/generic.js`), the events the layers listen to as not passive.
  */
 export class LayerGroupPointer extends EventTarget {
 
@@ -238,8 +241,10 @@ export class LayerGroupPointer extends EventTarget {
   }
 
   /**
+   * Handle mouse wheel. Prevents the default (page scroll) only
+   * when the tool has a wheel behaviour.
+   *
    * @param {WheelEvent} event The mouse wheel event.
-   *   Calls `preventDefault` once before `onWheel` / tick handling.
    */
   wheel = (event) => {
     if (typeof this.#wheelBehavior === 'undefined') {
@@ -433,9 +438,14 @@ export class LayerGroupPointer extends EventTarget {
   };
 
   /**
+   * Handle touch start. Always prevents the default to stop the browser
+   * from scrolling or zooming the page and from emulating mouse events
+   * (which would be handled a second time by the mouse handlers).
+   *
    * @param {TouchEvent} event The touch start event.
    */
   touchstart = (event) => {
+    event.preventDefault();
     // reset
     if (this.#dragBehavior?.isActive()) {
       this.#dragBehavior.reset();
@@ -456,7 +466,6 @@ export class LayerGroupPointer extends EventTarget {
       // long single touch to dblclick
       const delay = this.#longTouchToDblClickMs;
       if (delay !== null && delay !== undefined && delay > 0) {
-        event.preventDefault();
         // @ts-expect-error -- recommended type is ReturnType<typeof
         //   setTimeout> but lint does not like it
         this.#longTouchTimerId = setTimeout(() => {

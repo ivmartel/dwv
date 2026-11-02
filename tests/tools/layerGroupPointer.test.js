@@ -844,4 +844,58 @@ describe('tools/layerGroupPointer', () => {
     assert.equal(onDoubleClick.mock.calls.length, 0);
     vi.useRealTimers();
   });
+
+  test('touchstart prevents default without long-touch delay', () => {
+    const {canvas} = setupLayerCanvas();
+    getTouchPointsSpy.mockReturnValue([new Point2D(1, 1)]);
+    const pointer = new LayerGroupPointer({
+      stageController: {getLayerGroupByDivId: () => ({})},
+      dragBehavior: new DragBehavior(),
+      longTouchToDblClickMs: null
+    });
+
+    const ev = touchEvent('touchstart', canvas);
+    pointer.touchstart(ev);
+    assert.ok(ev.defaultPrevented);
+  });
+
+  test('touchstart prevents default with two touches', () => {
+    const {canvas} = setupLayerCanvas();
+    getTouchPointsSpy.mockReturnValue([new Point2D(1, 1), new Point2D(2, 2)]);
+    const pointer = new LayerGroupPointer({
+      stageController: {getLayerGroupByDivId: () => ({})}
+    });
+
+    const ev = touchEvent('touchstart', canvas);
+    pointer.touchstart(ev);
+    assert.ok(ev.defaultPrevented);
+  });
+
+  test('preventDefault is only called on non passive interaction events',
+    () => {
+      const {canvas} = setupLayerCanvas();
+      getTouchPointsSpy.mockReturnValue([new Point2D(1, 1)]);
+      const pointer = new LayerGroupPointer({
+        stageController: {getLayerGroupByDivId: () => ({})},
+        dragBehavior: new DragBehavior(),
+        wheelBehavior: {onWheel: vi.fn(), onWheelTick: vi.fn()},
+        longTouchToDblClickMs: null
+      });
+
+      for (const name of generic.InteractionEventNames) {
+        let ev;
+        if (name === 'wheel') {
+          ev = wheelEvent(canvas, {wheelDeltaY: 120});
+        } else if (name.startsWith('touch')) {
+          ev = touchEvent(name, canvas);
+        } else {
+          ev = mouseEvent(name, canvas, 1, 1);
+        }
+        pointer[name](ev);
+        if (ev.defaultPrevented) {
+          assert.ok(generic.NonPassiveInteractionEventNames.includes(name),
+            `${name} default prevented but listened to as passive`);
+        }
+      }
+    });
 });

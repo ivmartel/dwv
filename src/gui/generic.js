@@ -16,6 +16,28 @@ export const InteractionEventNames = [
 ];
 
 /**
+ * List of the interaction event names whose default can be prevented
+ * by tools (see `LayerGroupPointer`): their listeners are not passive.
+ */
+export const NonPassiveInteractionEventNames = [
+  'wheel',
+  'touchstart'
+];
+
+/**
+ * Get the listener options of an interaction event: only the
+ * {@link NonPassiveInteractionEventNames} are not passive.
+ *
+ * @param {string} eventName The interaction event name.
+ * @returns {AddEventListenerOptions} The listener options.
+ */
+export function getInteractionEventOptions(eventName) {
+  return {
+    passive: !NonPassiveInteractionEventNames.includes(eventName)
+  };
+}
+
+/**
  * Get the positions (without the parent offset) of a list of touch events.
  *
  * @param {TouchList} touches The list of touch events.
