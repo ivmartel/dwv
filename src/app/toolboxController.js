@@ -40,12 +40,11 @@ export class ToolboxController {
   #boundLayers = {};
 
   /**
-   * Identifiers of the touches in progress, indexed by the id of the
-   * layer where they started (where their events are sent).
+   * Ids of the layers with a touch in progress.
    *
-   * @type {Record<string, Set<number>>}
+   * @type {Set<string>}
    */
-  #layerTouchIds = {};
+  #touchedLayerIds = new Set();
 
   /**
    * Layers that are not active anymore but stay bound until the end
@@ -189,7 +188,7 @@ export class ToolboxController {
     // remove from local list if preset
     const previous = this.#boundLayers[layerGroupDivId];
     if (typeof previous !== 'undefined') {
-      if (typeof this.#layerTouchIds[previous.getId()] !== 'undefined') {
+      if (this.#touchedLayerIds.has(previous.getId())) {
         // keep it bound until the end of its touch
         this.#pendingUnbindLayers[previous.getId()] = previous;
       } else {
@@ -207,39 +206,21 @@ export class ToolboxController {
   }
 
   /**
-   * Track the touches of a layer and unbind it at the end of its touch
-   * if it is not active anymore.
+   * End the touch of a layer and unbind it if it is not active anymore.
    *
    * @param {string} layerId The layer id.
-   * @param {TouchEvent} event The touch event.
+   * @param {TouchEvent} event The touch end or cancel event.
    */
-  #trackTouch(layerId, event) {
-    const touches = Array.from(event.changedTouches ?? []);
-    if (event.type === 'touchstart' && touches.length !== 0) {
-      if (typeof this.#layerTouchIds[layerId] === 'undefined') {
-        this.#layerTouchIds[layerId] = new Set();
-      }
-      for (const touch of touches) {
-        this.#layerTouchIds[layerId].add(touch.identifier);
-      }
-    } else if (event.type === 'touchend' || event.type === 'touchcancel') {
-      const touchIds = this.#layerTouchIds[layerId];
-      if (typeof touchIds === 'undefined') {
-        return;
-      }
-      for (const touch of touches) {
-        touchIds.delete(touch.identifier);
-      }
-      // other touches on the layer are still in progress
-      if (touchIds.size !== 0) {
-        return;
-      }
-      delete this.#layerTouchIds[layerId];
-      const pending = this.#pendingUnbindLayers[layerId];
-      if (typeof pending !== 'undefined') {
-        delete this.#pendingUnbindLayers[layerId];
-        this.#unbindLayer(pending);
-      }
+  #endTouch(layerId, event) {
+    // other touches started on the same target are still in progress
+    if (event.targetTouches?.length > 0) {
+      return;
+    }
+    this.#touchedLayerIds.delete(layerId);
+    const pending = this.#pendingUnbindLayers[layerId];
+    if (typeof pending !== 'undefined') {
+      delete this.#pendingUnbindLayers[layerId];
+      this.#unbindLayer(pending);
     }
   }
 
@@ -305,6 +286,12 @@ export class ToolboxController {
 
     if (typeof this.#callbackStore[layerId][eventType] === 'undefined') {
       const applySelectedTool = (event) => {
+        // store the touch before the tool handles it: the tool can
+        // change the active layer (for ex the draw tool creating a draw
+        // layer), the layer is then kept bound until the end of its touch
+        if (event.type === 'touchstart') {
+          this.#touchedLayerIds.add(layerId);
+        }
         // make sure we have a tool
         if (this.#selectedTool) {
           const func = this.#selectedTool[event.type];
@@ -312,8 +299,8 @@ export class ToolboxController {
             func(event);
           }
         }
-        if (event.type.startsWith('touch')) {
-          this.#trackTouch(layerId, event);
+        if (event.type === 'touchend' || event.type === 'touchcancel') {
+          this.#endTouch(layerId, event);
         }
       };
       // store callback

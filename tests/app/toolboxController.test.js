@@ -130,13 +130,14 @@ class TestLayerGroup extends EventTarget {
  * Create a touch-like event.
  *
  * @param {string} type The event type.
- * @param {number[]} [ids] The identifiers of the changed touches.
+ * @param {number} [nTargetTouches] The number of touches still on
+ *   the event target.
  * @returns {Event} The event.
  */
-function touchEvent(type, ids = [0]) {
+function touchEvent(type, nTargetTouches = 0) {
   const event = new Event(type);
-  Object.defineProperty(event, 'changedTouches', {
-    value: ids.map((identifier) => ({identifier}))
+  Object.defineProperty(event, 'targetTouches', {
+    value: new Array(nTargetTouches).fill({})
   });
   return event;
 }
@@ -373,6 +374,30 @@ describe('app', () => {
         ['touchstart', 'touchmove', 'touchend', 'touchstart']);
     });
 
+    test('active layer change from the tool touchstart keeps the ' +
+      'previous layer bound', () => {
+      const {controller, tool0} = makeController();
+      controller.setSelectedTool('tool0');
+      const group = new TestLayerGroup('group0');
+      const layer0 = new TestLayer('layer0');
+      const layer1 = new TestLayer('layer1');
+      controller.bindLayerGroup(group, layer0);
+
+      // for ex the draw tool creates a draw layer on touchstart
+      const touchstart = tool0.touchstart;
+      tool0.touchstart = (event) => {
+        touchstart(event);
+        group.fireActiveLayerChange({value: [layer1]});
+      };
+      layer0.dispatchEvent(touchEvent('touchstart'));
+      assert.equal(layer0.unbindCalls, 0);
+
+      layer0.dispatchEvent(touchEvent('touchmove'));
+      layer0.dispatchEvent(touchEvent('touchend'));
+      assert.deepEqual(tool0.events, ['touchstart', 'touchmove', 'touchend']);
+      assert.equal(layer0.unbindCalls, 1);
+    });
+
     test('previous layer stays bound while fingers remain', () => {
       const {controller} = makeController();
       const group = new TestLayerGroup('group0');
@@ -383,12 +408,12 @@ describe('app', () => {
       layer0.dispatchEvent(touchEvent('touchstart'));
       group.fireActiveLayerChange({value: [layer1]});
       // second finger on the same layer
-      layer0.dispatchEvent(touchEvent('touchstart', [1]));
+      layer0.dispatchEvent(touchEvent('touchstart', 2));
       // one finger up, one still down
-      layer0.dispatchEvent(touchEvent('touchend', [0]));
+      layer0.dispatchEvent(touchEvent('touchend', 1));
       assert.equal(layer0.unbindCalls, 0);
       // touch cancel also ends the touch
-      layer0.dispatchEvent(touchEvent('touchcancel', [1]));
+      layer0.dispatchEvent(touchEvent('touchcancel'));
       assert.equal(layer0.unbindCalls, 1);
     });
 
@@ -399,14 +424,14 @@ describe('app', () => {
       const layer1 = new TestLayer('layer1');
       controller.bindLayerGroup(group, layer0);
 
-      layer0.dispatchEvent(touchEvent('touchstart', [0]));
+      layer0.dispatchEvent(touchEvent('touchstart', 1));
       group.fireActiveLayerChange({value: [layer1]});
       // second finger lands on the new layer
-      layer1.dispatchEvent(touchEvent('touchstart', [1]));
+      layer1.dispatchEvent(touchEvent('touchstart', 1));
       // first finger up: previous layer has no more touches
-      layer0.dispatchEvent(touchEvent('touchend', [0]));
+      layer0.dispatchEvent(touchEvent('touchend'));
       assert.equal(layer0.unbindCalls, 1);
-      layer1.dispatchEvent(touchEvent('touchend', [1]));
+      layer1.dispatchEvent(touchEvent('touchend'));
       assert.equal(layer1.unbindCalls, 0);
     });
 
