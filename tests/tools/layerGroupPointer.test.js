@@ -898,4 +898,25 @@ describe('tools/layerGroupPointer', () => {
         }
       }
     });
+
+  test('touchcancel clears long-touch timer and resets drag', () => {
+    vi.useFakeTimers();
+    const {canvas} = setupLayerCanvas();
+    getTouchPointsSpy.mockReturnValue([new Point2D(1, 1)]);
+    const onDoubleClick = vi.fn();
+    const drag = new DragBehavior();
+    const pointer = new LayerGroupPointer({
+      stageController: {getLayerGroupByDivId: () => ({})},
+      dragBehavior: drag,
+      doubleClickBehavior: {onDoubleClick}
+    });
+
+    pointer.touchstart(touchEvent('touchstart', canvas));
+    assert.ok(drag.isActive());
+    pointer.touchcancel(touchEvent('touchcancel', canvas));
+    assert.equal(drag.isActive(), false);
+    vi.advanceTimersByTime(600);
+    assert.equal(onDoubleClick.mock.calls.length, 0);
+    vi.useRealTimers();
+  });
 });

@@ -541,6 +541,17 @@ export class LayerGroupPointer extends EventTarget {
     this.#downed = false;
   };
 
+  /**
+   * Handle touch cancel: the browser or the system interrupted the touch
+   * (for example an incoming call or an OS gesture), end it with
+   * {@link LayerGroupPointer#cancel}.
+   *
+   * @param {TouchEvent} _event The touch cancel event.
+   */
+  touchcancel = (_event) => {
+    this.cancel();
+  };
+
   #clearLongTouchTimer() {
     if (typeof this.#longTouchTimerId !== 'undefined') {
       clearTimeout(this.#longTouchTimerId);

@@ -114,11 +114,22 @@ export class Draw extends LayerGroupPointer {
     }
 
     if (event.key === 'Escape') {
-      this.#drawDrag.resetPlacement();
-      this.#drawTap.resetPlacement();
+      this.cancel();
       this.#drawSelect.disableAndResetEditor();
     }
   };
+
+  /**
+   * Cancel the current placement: clear the shape preview
+   * and end the behaviors.
+   *
+   * @override
+   */
+  cancel() {
+    this.#drawDrag.resetPlacement();
+    this.#drawTap.resetPlacement();
+    super.cancel();
+  }
 
   /**
    * Activate the tool.

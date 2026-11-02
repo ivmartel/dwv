@@ -123,6 +123,15 @@ describe('tools/draw', () => {
     assert.equal(tapSpy.mock.calls.length, 1);
   });
 
+  test('cancel calls resetPlacement on drag and tap behaviors', () => {
+    const dragSpy = vi.spyOn(DrawDragBehavior.prototype, 'resetPlacement');
+    const tapSpy = vi.spyOn(DrawTapBehavior.prototype, 'resetPlacement');
+    const draw = new Draw(makeDrawApp());
+    draw.touchcancel({type: 'touchcancel'});
+    assert.equal(dragSpy.mock.calls.length, 1);
+    assert.equal(tapSpy.mock.calls.length, 1);
+  });
+
   test('keydown forwards to app when tap inactive', () => {
     const app = makeDrawApp();
     const draw = new Draw(app);

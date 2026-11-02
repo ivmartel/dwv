@@ -12,7 +12,8 @@ export const InteractionEventNames = [
   'dblclick',
   'touchstart',
   'touchmove',
-  'touchend'
+  'touchend',
+  'touchcancel'
 ];
 
 /**
