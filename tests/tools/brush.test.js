@@ -108,6 +108,30 @@ describe('Brush', () => {
     assert.ok(ev.defaultPrevented);
   });
 
+  test('activate(false) restores default contextmenu', () => {
+    const div = document.createElement('div');
+    div.id = 'brush-view-test';
+    document.body.appendChild(div);
+
+    const app = {
+      onKeydown: vi.fn(),
+      getStageController: () => ({
+        getDataViewConfigs: () => ({
+          group0: [{divId: 'missing-div'}, {divId: 'brush-view-test'}]
+        })
+      })
+    };
+    const brush = new Brush(app);
+    brush.activate(true);
+    brush.activate(true);
+    brush.activate(false);
+
+    const ev = new MouseEvent('contextmenu', {bubbles: true, cancelable: true});
+    div.dispatchEvent(ev);
+
+    assert.equal(ev.defaultPrevented, false);
+  });
+
   test('setFeatures forwards to brush drag behavior', () => {
     const setFeaturesSpy = vi.spyOn(BrushDragBehavior.prototype, 'setFeatures');
     const app = {

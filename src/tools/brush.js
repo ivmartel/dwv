@@ -49,6 +49,23 @@ export class Brush extends LayerGroupPointer {
   #app;
 
   /**
+   * Div ids whose context menu is currently deactivated.
+   *
+   * @type {string[]}
+   */
+  #contextMenuDivIds = [];
+
+  /**
+   * Context menu handler: prevents the browser menu so that
+   * the right button can be used by the tool.
+   *
+   * @param {Event} event The context menu event.
+   */
+  #preventContextMenu = (event) => {
+    event.preventDefault();
+  };
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
@@ -103,15 +120,15 @@ export class Brush extends LayerGroupPointer {
    * @param {boolean} bool The flag to activate or not.
    */
   activate(bool) {
-    const stgCtrl = this.#app.getStageController();
-    const viewConfigs = stgCtrl.getDataViewConfigs();
-    const allDivIds = getUniqueDataViewConfigsDivIds(viewConfigs);
     if (bool) {
-      this.#deactivateDivIdsContextMenu(allDivIds);
+      const stgCtrl = this.#app.getStageController();
+      const viewConfigs = stgCtrl.getDataViewConfigs();
+      this.#deactivateDivIdsContextMenu(
+        getUniqueDataViewConfigsDivIds(viewConfigs));
       return;
     }
     this.cancel();
-    this.#reactivateDivIdsContextMenu(allDivIds);
+    this.#reactivateDivIdsContextMenu();
   }
 
   /**
@@ -121,34 +138,30 @@ export class Brush extends LayerGroupPointer {
    *   should be deactivated.
    */
   #deactivateDivIdsContextMenu(divIds) {
+    // avoid leaving listeners on previously stored divs
+    this.#reactivateDivIdsContextMenu();
     for (const divId of divIds) {
-      const element = document.querySelector(`#${divId}`);
+      const element = document.getElementById(divId);
       if (!element) {
-        return;
+        continue;
       }
-      element.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-      });
+      element.addEventListener('contextmenu', this.#preventContextMenu);
+      this.#contextMenuDivIds.push(divId);
     }
   }
 
   /**
-   * Reactivates the context menu on all dwv div ids.
-   *
-   * @param {string[]} divIds The div ids whose context menu
-   *   should be reactivated.
+   * Reactivates the context menu on the previously deactivated div ids.
    */
-  #reactivateDivIdsContextMenu(divIds) {
-    for (const divId of divIds) {
-      const element = document.querySelector(`#${divId}`);
+  #reactivateDivIdsContextMenu() {
+    for (const divId of this.#contextMenuDivIds) {
+      const element = document.getElementById(divId);
       if (!element) {
-        return;
+        continue;
       }
-      element.addEventListener('contextmenu', (_event) => {
-        // Intentionally empty
-      });
+      element.removeEventListener('contextmenu', this.#preventContextMenu);
     }
+    this.#contextMenuDivIds = [];
   }
 
   /**
