@@ -103,8 +103,12 @@ export class Histogram {
    * (values outside all intervals are not taken into account).
    *
    * For thresholds `[1, 5, 10]`, the intervals are `[1, 5)` and `[5, 10)`.
+   * An undefined first or last threshold makes the interval unbounded:
+   * for `[undefined, 5, undefined]`, the intervals are `[min, 5)` and
+   * `[5, max]`, where `min` / `max` are the histogram range.
    *
-   * @param {number[]} thresholds Interval bounds in ascending order.
+   * @param {Array<number|undefined>} thresholds Interval bounds in
+   *   ascending order, the first and last can be undefined.
    * @returns {number[]} The percentages in [0, 100], one per interval
    *   (`thresholds.length - 1` entries), all 0 if no value falls
    *   in the intervals.

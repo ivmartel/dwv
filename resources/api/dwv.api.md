@@ -688,7 +688,7 @@ export class Histogram {
     getCountInRange(min?: number, max?: number): number;
     // Warning: (ae-forgotten-export) The symbol "HistogramEntry" needs to be exported by the entry point index.d.ts
     getEntries(): HistogramEntry[];
-    getIntervalPercentages(thresholds: number[]): number[];
+    getIntervalPercentages(thresholds: Array<number | undefined>): number[];
     getRange(): NumberRange | undefined;
     // Warning: (ae-forgotten-export) The symbol "Statistics" needs to be exported by the entry point index.d.ts
     getStats(): Statistics | undefined;
@@ -780,7 +780,7 @@ export class ImageHistogram {
     constructor(unit?: string);
     add(rawValue: number, rsi: RescaleSlopeAndIntercept): void;
     getHistogram(rsi: RescaleSlopeAndIntercept): Histogram;
-    getIntervalPercentages(thresholds: number[]): number[];
+    getIntervalPercentages(thresholds: Array<number | undefined>): number[];
     getRange(): NumberRange | undefined;
     getRescaledHistogram(): Histogram;
     getRescaledRange(): NumberRange | undefined;

@@ -139,8 +139,8 @@ export class ImageHistogram {
    * consecutive rescaled thresholds,
    * see {@link Histogram#getIntervalPercentages}.
    *
-   * @param {number[]} thresholds Rescaled interval bounds in ascending
-   *   order.
+   * @param {Array<number|undefined>} thresholds Rescaled interval bounds
+   *   in ascending order, the first and last can be undefined.
    * @returns {number[]} The percentages in [0, 100], one per interval
    *   (`thresholds.length - 1` entries), all 0 if no value falls
    *   in the intervals.

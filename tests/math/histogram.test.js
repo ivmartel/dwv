@@ -98,6 +98,16 @@ describe('math', () => {
     assert.deepEqual(histogram.getIntervalPercentages([0, 5, 10]), [50, 50]);
   });
 
+  test('Histogram getIntervalPercentages with unbounded ends', () => {
+    // undefined first / last thresholds include the min / max
+    const histogram = buildHistogram({'-5': 25, 2: 25, 7: 25, 10: 25});
+
+    assert.deepEqual(
+      histogram.getIntervalPercentages([undefined, 5, undefined]), [50, 50]);
+    assert.deepEqual(
+      histogram.getIntervalPercentages([-10, 0, undefined]), [25, 75]);
+  });
+
   test('Histogram getIntervalPercentages with less than 2 thresholds', () => {
     const histogram = buildHistogram({2: 50, 100: 50});
 
