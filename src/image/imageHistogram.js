@@ -136,13 +136,14 @@ export class ImageHistogram {
 
   /**
    * Get the percentage of counts that fall in each interval defined by
-   * interior rescaled thresholds,
+   * consecutive rescaled thresholds,
    * see {@link Histogram#getIntervalPercentages}.
    *
-   * @param {number[]} thresholds Interior rescaled cut points in ascending
+   * @param {number[]} thresholds Rescaled interval bounds in ascending
    *   order.
    * @returns {number[]} The percentages in [0, 100], one per interval
-   *   (`thresholds.length + 1` entries), all 0 for an empty histogram.
+   *   (`thresholds.length - 1` entries), all 0 if no value falls
+   *   in the intervals.
    */
   getIntervalPercentages(thresholds) {
     return this.getRescaledHistogram().getIntervalPercentages(thresholds);

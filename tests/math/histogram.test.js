@@ -69,31 +69,40 @@ describe('math', () => {
 
   test('Histogram getIntervalPercentages', () => {
     // values: 0×25, 1×40, 5×20, 10×15 → total 100
-    // thresholds [1, 5] → [0, 1), [1, 5), [5, 10]
+    // thresholds [0, 1, 5, 11] → [0, 1), [1, 5), [5, 11)
     const histogram = buildHistogram({0: 25, 1: 40, 5: 20, 10: 15});
 
-    assert.deepEqual(histogram.getIntervalPercentages([1, 5]), [25, 40, 35]);
+    assert.deepEqual(
+      histogram.getIntervalPercentages([0, 1, 5, 11]), [25, 40, 35]);
   });
 
   test('Histogram getIntervalPercentages returns 0 when empty', () => {
     const histogram = new Histogram();
 
-    assert.deepEqual(histogram.getIntervalPercentages([1, 5]), [0, 0, 0]);
+    assert.deepEqual(histogram.getIntervalPercentages([0, 1, 5]), [0, 0]);
   });
 
   test('Histogram getIntervalPercentages uses semi-open bounds', () => {
-    // value 5 sits on the cut: belongs to [5, max], not [min, 5)
-    const histogram = buildHistogram({5: 10});
+    // value 5 sits on the cut: belongs to [5, 10), not [0, 5)
+    // value 10 sits on the upper bound: excluded
+    const histogram = buildHistogram({5: 10, 10: 10});
 
-    assert.deepEqual(histogram.getIntervalPercentages([5]), [0, 100]);
+    assert.deepEqual(histogram.getIntervalPercentages([0, 5, 10]), [0, 100]);
   });
 
-  test('Histogram getIntervalPercentages covers full range', () => {
-    // all mass is assigned → percentages sum to 100
+  test('Histogram getIntervalPercentages relative to intervals total', () => {
+    // values outside [0, 10) are not part of the total
+    const histogram = buildHistogram({'-5': 50, 2: 25, 7: 25, 20: 50});
+    histogram.add(NaN, 2);
+
+    assert.deepEqual(histogram.getIntervalPercentages([0, 5, 10]), [50, 50]);
+  });
+
+  test('Histogram getIntervalPercentages with less than 2 thresholds', () => {
     const histogram = buildHistogram({2: 50, 100: 50});
 
-    assert.deepEqual(histogram.getIntervalPercentages([10]), [50, 50]);
-    assert.deepEqual(histogram.getIntervalPercentages([]), [100]);
+    assert.deepEqual(histogram.getIntervalPercentages([10]), []);
+    assert.deepEqual(histogram.getIntervalPercentages([]), []);
   });
 
   test('Histogram getStats matches getStats on values', () => {

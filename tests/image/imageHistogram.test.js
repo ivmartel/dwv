@@ -94,7 +94,7 @@ describe('image', () => {
     assert.isUndefined(histogram.getRescaledRange());
     assert.isUndefined(histogram.getRange());
     assert.isUndefined(histogram.getStats());
-    assert.deepEqual(histogram.getIntervalPercentages([1, 5]), [0, 0, 0]);
+    assert.deepEqual(histogram.getIntervalPercentages([0, 1, 5]), [0, 0]);
   });
 
   test('ImageHistogram getIntervalPercentages uses rescaled values', () => {
@@ -102,7 +102,7 @@ describe('image', () => {
     const rsi = new RescaleSlopeAndIntercept(0.5, 0);
     const histogram = buildHistogram({1: 1, 2: 1, 3: 1, 4: 1}, rsi);
 
-    assert.deepEqual(histogram.getIntervalPercentages([1.5]), [50, 50]);
+    assert.deepEqual(histogram.getIntervalPercentages([0, 1.5, 3]), [50, 50]);
   });
 
   test('ImageHistogram getStats matches getStats on values', () => {

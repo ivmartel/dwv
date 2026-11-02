@@ -99,25 +99,23 @@ export class Histogram {
 
   /**
    * Get the percentage of counts that fall in each interval defined by
-   * interior thresholds.
+   * consecutive thresholds, relative to the total count in the intervals
+   * (values outside all intervals are not taken into account).
    *
-   * For thresholds `[1, 5]`, the intervals are `[min, 1)`, `[1, 5)` and
-   * `[5, max]`, where `min` / `max` are the histogram range.
+   * For thresholds `[1, 5, 10]`, the intervals are `[1, 5)` and `[5, 10)`.
    *
-   * @param {number[]} thresholds Interior cut points in ascending order.
+   * @param {number[]} thresholds Interval bounds in ascending order.
    * @returns {number[]} The percentages in [0, 100], one per interval
-   *   (`thresholds.length + 1` entries), all 0 for an empty histogram.
+   *   (`thresholds.length - 1` entries), all 0 if no value falls
+   *   in the intervals.
    */
   getIntervalPercentages(thresholds) {
-    const total = this.getTotal();
-    // open first and last intervals
-    const bounds = [undefined, ...thresholds, undefined];
-    const percentages = [];
-    for (let i = 0; i < bounds.length - 1; ++i) {
-      const count = this.getCountInRange(bounds[i], bounds[i + 1]);
-      percentages.push(total === 0 ? 0 : (count * 100) / total);
+    const counts = [];
+    for (let i = 0; i < thresholds.length - 1; ++i) {
+      counts.push(this.getCountInRange(thresholds[i], thresholds[i + 1]));
     }
-    return percentages;
+    const total = counts.reduce((sum, count) => sum + count, 0);
+    return counts.map((count) => total === 0 ? 0 : (count * 100) / total);
   }
 
   /**
