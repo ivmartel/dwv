@@ -40,6 +40,23 @@ export class ToolboxController {
   #boundLayers = {};
 
   /**
+   * Identifiers of the touches in progress, indexed by the id of the
+   * layer where they started (where their events are sent).
+   *
+   * @type {Record<string, Set<number>>}
+   */
+  #layerTouchIds = {};
+
+  /**
+   * Layers that are not active anymore but stay bound until the end
+   * of their touch, indexed by layer id: touch events keep going to
+   * the element where the touch started.
+   *
+   * @type {Record<string, ViewLayer|DrawLayer>}
+   */
+  #pendingUnbindLayers = {};
+
+  /**
    * @param {object} toolList The list of tool objects.
    */
   constructor(toolList) {
@@ -170,13 +187,60 @@ export class ToolboxController {
    */
   #internalBindLayerGroup(layerGroupDivId, layer) {
     // remove from local list if preset
-    if (typeof this.#boundLayers[layerGroupDivId] !== 'undefined') {
-      this.#unbindLayer(this.#boundLayers[layerGroupDivId]);
+    const previous = this.#boundLayers[layerGroupDivId];
+    if (typeof previous !== 'undefined') {
+      if (typeof this.#layerTouchIds[previous.getId()] !== 'undefined') {
+        // keep it bound until the end of its touch
+        this.#pendingUnbindLayers[previous.getId()] = previous;
+      } else {
+        this.#unbindLayer(previous);
+      }
     }
     // replace layer in local list
     this.#boundLayers[layerGroupDivId] = layer;
-    // bind layer
-    this.#bindLayer(layer);
+    // bind layer if not still bound
+    if (typeof this.#pendingUnbindLayers[layer.getId()] !== 'undefined') {
+      delete this.#pendingUnbindLayers[layer.getId()];
+    } else {
+      this.#bindLayer(layer);
+    }
+  }
+
+  /**
+   * Track the touches of a layer and unbind it at the end of its touch
+   * if it is not active anymore.
+   *
+   * @param {string} layerId The layer id.
+   * @param {TouchEvent} event The touch event.
+   */
+  #trackTouch(layerId, event) {
+    const touches = Array.from(event.changedTouches ?? []);
+    if (event.type === 'touchstart' && touches.length !== 0) {
+      if (typeof this.#layerTouchIds[layerId] === 'undefined') {
+        this.#layerTouchIds[layerId] = new Set();
+      }
+      for (const touch of touches) {
+        this.#layerTouchIds[layerId].add(touch.identifier);
+      }
+    } else if (event.type === 'touchend' || event.type === 'touchcancel') {
+      const touchIds = this.#layerTouchIds[layerId];
+      if (typeof touchIds === 'undefined') {
+        return;
+      }
+      for (const touch of touches) {
+        touchIds.delete(touch.identifier);
+      }
+      // other touches on the layer are still in progress
+      if (touchIds.size !== 0) {
+        return;
+      }
+      delete this.#layerTouchIds[layerId];
+      const pending = this.#pendingUnbindLayers[layerId];
+      if (typeof pending !== 'undefined') {
+        delete this.#pendingUnbindLayers[layerId];
+        this.#unbindLayer(pending);
+      }
+    }
   }
 
   /**
@@ -247,6 +311,9 @@ export class ToolboxController {
           if (func) {
             func(event);
           }
+        }
+        if (event.type.startsWith('touch')) {
+          this.#trackTouch(layerId, event);
         }
       };
       // store callback

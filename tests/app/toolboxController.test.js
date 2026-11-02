@@ -127,6 +127,21 @@ class TestLayerGroup extends EventTarget {
 }
 
 /**
+ * Create a touch-like event.
+ *
+ * @param {string} type The event type.
+ * @param {number[]} [ids] The identifiers of the changed touches.
+ * @returns {Event} The event.
+ */
+function touchEvent(type, ids = [0]) {
+  const event = new Event(type);
+  Object.defineProperty(event, 'changedTouches', {
+    value: ids.map((identifier) => ({identifier}))
+  });
+  return event;
+}
+
+/**
  * Create a controller with two test tools.
  *
  * @returns {object} The controller and its tools.
@@ -329,6 +344,93 @@ describe('app', () => {
       layer1.dispatchEvent(new Event('mousedown'));
       assert.deepEqual(tool0.events, ['mousedown']);
     });
+
+    test('active layer change during a touch keeps the previous layer ' +
+      'bound until the touch ends', () => {
+      const {controller, tool0} = makeController();
+      controller.setSelectedTool('tool0');
+      const group = new TestLayerGroup('group0');
+      const layer0 = new TestLayer('layer0');
+      const layer1 = new TestLayer('layer1');
+      controller.bindLayerGroup(group, layer0);
+
+      // for ex the draw tool creates a draw layer on touchstart
+      layer0.dispatchEvent(touchEvent('touchstart'));
+      group.fireActiveLayerChange({value: [layer1]});
+      assert.equal(layer0.unbindCalls, 0);
+      assert.equal(layer1.bindCalls, 1);
+
+      // the touch events still go to the previous layer
+      layer0.dispatchEvent(touchEvent('touchmove'));
+      layer0.dispatchEvent(touchEvent('touchend'));
+      assert.deepEqual(tool0.events, ['touchstart', 'touchmove', 'touchend']);
+      assert.equal(layer0.unbindCalls, 1);
+
+      // previous layer is not listened to anymore
+      layer0.dispatchEvent(touchEvent('touchstart'));
+      layer1.dispatchEvent(touchEvent('touchstart'));
+      assert.deepEqual(tool0.events,
+        ['touchstart', 'touchmove', 'touchend', 'touchstart']);
+    });
+
+    test('previous layer stays bound while fingers remain', () => {
+      const {controller} = makeController();
+      const group = new TestLayerGroup('group0');
+      const layer0 = new TestLayer('layer0');
+      const layer1 = new TestLayer('layer1');
+      controller.bindLayerGroup(group, layer0);
+
+      layer0.dispatchEvent(touchEvent('touchstart'));
+      group.fireActiveLayerChange({value: [layer1]});
+      // second finger on the same layer
+      layer0.dispatchEvent(touchEvent('touchstart', [1]));
+      // one finger up, one still down
+      layer0.dispatchEvent(touchEvent('touchend', [0]));
+      assert.equal(layer0.unbindCalls, 0);
+      // touch cancel also ends the touch
+      layer0.dispatchEvent(touchEvent('touchcancel', [1]));
+      assert.equal(layer0.unbindCalls, 1);
+    });
+
+    test('previous layer is unbound when its own touches end', () => {
+      const {controller} = makeController();
+      const group = new TestLayerGroup('group0');
+      const layer0 = new TestLayer('layer0');
+      const layer1 = new TestLayer('layer1');
+      controller.bindLayerGroup(group, layer0);
+
+      layer0.dispatchEvent(touchEvent('touchstart', [0]));
+      group.fireActiveLayerChange({value: [layer1]});
+      // second finger lands on the new layer
+      layer1.dispatchEvent(touchEvent('touchstart', [1]));
+      // first finger up: previous layer has no more touches
+      layer0.dispatchEvent(touchEvent('touchend', [0]));
+      assert.equal(layer0.unbindCalls, 1);
+      layer1.dispatchEvent(touchEvent('touchend', [1]));
+      assert.equal(layer1.unbindCalls, 0);
+    });
+
+    test('reactivating the touched layer during the touch keeps it bound',
+      () => {
+        const {controller, tool0} = makeController();
+        controller.setSelectedTool('tool0');
+        const group = new TestLayerGroup('group0');
+        const layer0 = new TestLayer('layer0');
+        const layer1 = new TestLayer('layer1');
+        controller.bindLayerGroup(group, layer0);
+
+        layer0.dispatchEvent(touchEvent('touchstart'));
+        group.fireActiveLayerChange({value: [layer1]});
+        group.fireActiveLayerChange({value: [layer0]});
+        assert.equal(layer0.bindCalls, 1);
+        assert.equal(layer1.unbindCalls, 1);
+
+        layer0.dispatchEvent(touchEvent('touchend'));
+        assert.equal(layer0.unbindCalls, 0);
+        layer0.dispatchEvent(new Event('mousedown'));
+        assert.deepEqual(tool0.events,
+          ['touchstart', 'touchend', 'mousedown']);
+      });
 
     test('active layer change without layer is ignored', () => {
       const {controller} = makeController();
