@@ -179,6 +179,13 @@ export class DrawLayer {
   #currentPosGroupId;
 
   /**
+   * Current time index.
+   *
+   * @type {number|undefined}
+   */
+  #currentTimeIndex;
+
+  /**
    * Draw shape handler.
    *
    * @type {DrawShapeHandler|undefined}
@@ -1207,11 +1214,12 @@ export class DrawLayer {
       points = planePoints;
     }
     // use the index: the position can hold a volume id
-    let timeIndex;
+    // (keep the current one if not provided, for ex from a 3D mask
+    // of a 4D image)
     if (index.length() > 3) {
-      timeIndex = index.get(3);
+      this.#currentTimeIndex = index.get(3);
     }
-    const posGroupId = this.#getPositionId(points, timeIndex);
+    const posGroupId = this.#getPositionId(points, this.#currentTimeIndex);
 
     this.#activateDrawLayer(posGroupId);
     // TODO: add check

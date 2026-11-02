@@ -217,3 +217,42 @@ describe('gui DrawLayer getAnnotationAt', () => {
   });
 
 });
+
+describe('gui DrawLayer setCurrentPosition', () => {
+
+  afterEach(() => {
+    document.body.replaceChildren();
+    vi.restoreAllMocks();
+  });
+
+  test('keeps the time index of a position without one', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+    const drawLayer = new DrawLayer(div);
+    drawLayer.initialise({x: 100, y: 100}, {x: 1, y: 1}, 'ref');
+    vi.spyOn(drawLayer, 'draw').mockImplementation(() => {});
+    drawLayer.setPlaneHelper(/** @type {object} */ ({
+      getPlanePoints: () => [new Point3D(0, 0, 0)],
+      isAquisitionOrientation: () => true
+    }));
+    drawLayer.setAnnotationGroup(new AnnotationGroup(), 'data0', () => {});
+    // 4D position: second volume
+    drawLayer.setCurrentPosition(
+      new Point([0, 0, 0, 1]), new Index([0, 0, 0, 1]));
+    // creates the current position group
+    drawLayer.activateCurrentPositionShapes(true);
+    const posGroup = drawLayer.getKonvaLayer().findOne('.position-group');
+    assert.ok(posGroup.isVisible(), 'visible at start');
+
+    // 3D position (for ex from a 3D mask): same volume
+    drawLayer.setCurrentPosition(
+      new Point([0, 0, 0]), new Index([0, 0, 0]));
+    assert.ok(posGroup.isVisible(), 'visible after 3D position');
+
+    // other volume
+    drawLayer.setCurrentPosition(
+      new Point([0, 0, 0, 0]), new Index([0, 0, 0, 0]));
+    assert.notOk(posGroup.isVisible(), 'hidden on other volume');
+  });
+
+});
