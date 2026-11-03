@@ -18,6 +18,17 @@ class ResamplingWorkerTask extends WorkerTask {
   constructor(message, info) {
     super(message, info);
   }
+  getStartMessage() {
+    // the source buffer can be a view on the whole image buffer (4D):
+    // posting it would copy the whole image, so post a copy of the view
+    // data only (made at run time to not keep copies for queued tasks)
+    // and transfer it to avoid a second copy
+    const sourceImageBuffer = this.startMessage.sourceImageBuffer.slice();
+    return {
+      message: {...this.startMessage, sourceImageBuffer},
+      transfer: [sourceImageBuffer.buffer]
+    };
+  }
   getWorker() {
     return new Worker(
       new URL('./resampling.worker.js', import.meta.url),
@@ -72,9 +83,9 @@ export function generateWorkerMessages(
   const sourceTotalSize = sourceSize.getTotalSize();
   const targetTotalSize = targetSize.getTotalSize();
 
-  const generateMessage = (sourceStartOffset, targetStartOffset, frame) => {
+  const generateMessage = (sourceFrameBuffer, targetStartOffset, frame) => {
     return {
-      sourceImageBuffer,
+      sourceImageBuffer: sourceFrameBuffer,
       sourceOrigin: sourceImageGeometry.getOrigin().getValues(),
       sourceSize: sourceImageGeometry.getSize().getValues(),
       sourceSpacing: sourceImageGeometry.getSpacing().getValues(),
@@ -92,7 +103,6 @@ export function generateWorkerMessages(
 
       pixelRepresentation,
       interpolate: interpolated,
-      sourceStartOffset,
       targetStartOffset,
 
       jobId,
@@ -101,18 +111,21 @@ export function generateWorkerMessages(
   };
 
   if (targetNDims <= 3) {
-    return [generateMessage(0, 0, 0)];
+    return [generateMessage(sourceImageBuffer, 0, 0)];
   }
 
   const frames = targetSize.get(3);
   const sourceFrameSize = sourceSize.getDimSize(3);
   const targetFrameSize = targetSize.getDimSize(3);
 
+  // pass a view on the frame data only: the task posts a copy of it
   const messages = [];
   for (let f = 0; f < frames; f++) {
     const sourceOffset = sourceFrameSize * f;
     const targetOffset = targetFrameSize * f;
-    messages.push(generateMessage(sourceOffset, targetOffset, f));
+    const sourceFrameBuffer = sourceImageBuffer.subarray(
+      sourceOffset, sourceOffset + sourceFrameSize);
+    messages.push(generateMessage(sourceFrameBuffer, targetOffset, f));
   }
 
   return messages;

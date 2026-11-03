@@ -1,4 +1,4 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi} from 'vitest';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
@@ -6,9 +6,11 @@ import {Matrix33} from '../../src/math/matrix.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {ResamplingFilter} from '../../src/image/resamplingFilter.js';
 import {
+  ResamplingThread,
   generateWorkerMessages,
   generateResampledGeometry
 } from '../../src/image/resamplingThread.js';
+import {ThreadPool} from '../../src/utils/thread.js';
 
 /**
  * Tests for the 'image/resamplingFilter.js' file.
@@ -374,6 +376,86 @@ describe('image', () => {
     );
 
     /* eslint-enable @stylistic/js/array-element-newline */
+  });
+
+  /**
+   * Get a 4D test geometry and buffer: 2 frames of 3x3x2, the second
+   *   frame values are the first ones plus 100.
+   *
+   * @returns {object} The geometry and buffer.
+   */
+  function get4DTestData() {
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0), new Point3D(0, 0, 3)],
+      new Size([3, 3, 2, 2]),
+      new Spacing([1, 2, 3, 1]),
+      new Matrix33([1, 0, 0, 0, 1, 0, 0, 0, 1])
+    );
+    const buffer = new Uint16Array(36);
+    for (let i = 0; i < 18; ++i) {
+      buffer[i] = i;
+      buffer[i + 18] = i + 100;
+    }
+    return {geometry, buffer};
+  }
+
+  /**
+   * Tests that {@link generateWorkerMessages} passes a view on each frame
+   * data for 4D data.
+   *
+   * @function module:tests/image~generateWorkerMessages4D
+   */
+  test('generateWorkerMessages passes frame views for 4D data', () => {
+    const {geometry, buffer} = get4DTestData();
+    const targetGeometry = generateResampledGeometry(
+      geometry, geometry.getOrientation());
+    const messages = generateWorkerMessages(
+      buffer, geometry, targetGeometry, 0, false, 'job');
+
+    assert.equal(messages.length, 2, 'one message per frame');
+    for (let f = 0; f < 2; ++f) {
+      const frameBuffer = messages[f].sourceImageBuffer;
+      assert.equal(frameBuffer.buffer, buffer.buffer,
+        `frame ${f}: view on the image buffer`);
+      assert.deepEqual(Array.from(frameBuffer),
+        Array.from(buffer.subarray(f * 18, (f + 1) * 18)),
+        `frame ${f}: frame data`);
+      assert.equal(messages[f].targetStartOffset, f * 18,
+        `frame ${f}: target offset`);
+    }
+  });
+
+  /**
+   * Tests that the resampling task start message holds a compact copy of
+   * the frame data and transfers it.
+   *
+   * @function module:tests/image~resamplingTaskStartMessage
+   */
+  test('ResamplingThread task posts a compact transferred copy', () => {
+    const addSpy = vi.spyOn(ThreadPool.prototype, 'addWorkerTask')
+      .mockImplementation(() => {});
+    const {geometry, buffer} = get4DTestData();
+
+    new ResamplingThread().run(
+      buffer, geometry, 0, geometry.getOrientation(), false);
+
+    assert.equal(addSpy.mock.calls.length, 2, 'one task per frame');
+    for (let f = 0; f < 2; ++f) {
+      const task = addSpy.mock.calls[f][0];
+      const {message, transfer} = task.getStartMessage();
+      const sent = message.sourceImageBuffer;
+      assert.ok(sent instanceof Uint16Array, `frame ${f}: same type`);
+      assert.deepEqual(Array.from(sent),
+        Array.from(buffer.subarray(f * 18, (f + 1) * 18)),
+        `frame ${f}: frame data`);
+      assert.equal(sent.buffer.byteLength, 18 * 2,
+        `frame ${f}: copy only holds the frame data`);
+      assert.equal(transfer.length, 1, `frame ${f}: one transferred object`);
+      assert.equal(transfer[0], sent.buffer,
+        `frame ${f}: copy buffer transferred`);
+    }
+    assert.equal(buffer.buffer.byteLength, 36 * 2, 'input left untouched');
+    addSpy.mockRestore();
   });
 
 });
