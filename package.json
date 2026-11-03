@@ -24,7 +24,7 @@
     "default": "./dist/dwv.min.js"
   },
   "engines": {
-    "node": ">= 14.0.0"
+    "node": ">= 18.0.0"
   },
   "browserslist": [
     ">1%, last 2 versions, not dead"

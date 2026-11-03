@@ -13,7 +13,7 @@ contributions follow the guidelines and license terms in
 
 Package manager is `yarn` (yarn v4, `packageManager` pinned in package.json).
 `corepack enable` is enough to get the right yarn version; npm also works for
-all scripts. Node >= 14 required (CI uses Node 26). Module type is `"module"`
+all scripts. Node >= 18 required (CI uses Node 26). Module type is `"module"`
 (ESM throughout `src/`).
 
 ## DICOM standard
