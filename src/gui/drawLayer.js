@@ -322,7 +322,28 @@ export class DrawLayer {
    * @param {number} alpha The opacity ([0:1] range).
    */
   setOpacity(alpha) {
-    this.#konvaStage.opacity(Math.min(Math.max(alpha, 0), 1));
+    const opacity = Math.min(Math.max(alpha, 0), 1);
+    if (opacity === this.#konvaStage.opacity()) {
+      return;
+    }
+
+    this.#konvaStage.opacity(opacity);
+
+    /**
+     * Opacity change event.
+     *
+     * @event App#opacitychange
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.srclayerid The source layer id.
+     * @property {string} detail.dataid The data id.
+     * @property {Array} detail.value The changed value.
+     */
+    this.#fireEvent(new CustomEvent('opacitychange', {
+      detail: {
+        value: [opacity]
+      }
+    }));
   }
 
   /**

@@ -928,6 +928,8 @@ export class LayerGroup extends EventTarget {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.addEventListener(
       'positionchange', this.#fireEvent);
+    // propagate opacity change
+    drawLayer.addEventListener('opacitychange', this.#fireEvent);
   }
 
   /**
@@ -941,6 +943,7 @@ export class LayerGroup extends EventTarget {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.removeEventListener(
       'positionchange', this.#fireEvent);
+    drawLayer.removeEventListener('opacitychange', this.#fireEvent);
   }
 
   /**
