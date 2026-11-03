@@ -77,13 +77,14 @@ describe('image', () => {
    *
    * @function module:tests/image~decoderConstructor
    */
-  test('PixelBufferDecoder constructor creates a ThreadPool with size 10',
-    () => {
-      new PixelBufferDecoder('jpeg-baseline');
-      assert.equal(ThreadPool.mock.calls.length, 1,
-        'ThreadPool constructed once');
-      assert.equal(ThreadPool.mock.calls[0][0], 10, 'pool size is 10');
-    }
+  test('PixelBufferDecoder constructor creates a ThreadPool with ' +
+    'the default size',
+  () => {
+    new PixelBufferDecoder('jpeg-baseline');
+    assert.equal(ThreadPool.mock.calls.length, 1,
+      'ThreadPool constructed once');
+    assert.isUndefined(ThreadPool.mock.calls[0][0], 'default pool size');
+  }
   );
 
   // -------------------------------------------------------------------------

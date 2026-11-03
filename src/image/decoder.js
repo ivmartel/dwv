@@ -104,7 +104,7 @@ export class PixelBufferDecoder {
   constructor(algoName) {
     this.#algoName = algoName;
     // create pool
-    this.#pool = new ThreadPool(10);
+    this.#pool = new ThreadPool();
   }
 
   /**

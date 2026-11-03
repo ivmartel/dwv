@@ -1,4 +1,60 @@
 /**
+ * Fallback default thread pool size, used if the number of logical
+ * processors is not available.
+ */
+const FALLBACK_POOL_SIZE = 4;
+
+/**
+ * Get the number of logical processors.
+ *
+ * @returns {number|undefined} The number of logical processors
+ *   (`navigator.hardwareConcurrency`), undefined if not available.
+ */
+function getHardwareConcurrency() {
+  let res;
+  if (typeof navigator !== 'undefined' &&
+    typeof navigator.hardwareConcurrency !== 'undefined' &&
+    navigator.hardwareConcurrency > 0) {
+    res = navigator.hardwareConcurrency;
+  }
+  return res;
+}
+
+/**
+ * Get the default thread pool size: half the number of logical
+ * processors (at least one), or {@link FALLBACK_POOL_SIZE} if not
+ * available. Leaves room for the main thread and limits the number of
+ * workers (and their buffer copies), which matters on memory limited
+ * devices such as iOS ones.
+ *
+ * @returns {number} The pool size.
+ */
+export function getDefaultPoolSize() {
+  const hardwareConcurrency = getHardwareConcurrency();
+  let res = FALLBACK_POOL_SIZE;
+  if (typeof hardwareConcurrency !== 'undefined') {
+    res = Math.max(1, Math.floor(hardwareConcurrency / 2));
+  }
+  return res;
+}
+
+/**
+ * Clamp a thread pool size to the number of logical processors,
+ * if available.
+ *
+ * @param {number} poolSize The pool size.
+ * @returns {number} The clamped pool size.
+ */
+export function clampPoolSize(poolSize) {
+  const hardwareConcurrency = getHardwareConcurrency();
+  if (typeof hardwareConcurrency !== 'undefined' &&
+    poolSize > hardwareConcurrency) {
+    poolSize = hardwareConcurrency;
+  }
+  return poolSize;
+}
+
+/**
  * Thread Pool.
  *
  * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
@@ -23,10 +79,19 @@ export class ThreadPool {
   #runningThreads;
 
   /**
-   * @param {number} poolSize The size of the pool.
+   * @param {number} [poolSize] The size of the pool, defaults to
+   *   {@link getDefaultPoolSize}. Must be a positive integer, it is
+   *   clamped to the number of logical processors if available.
    */
   constructor(poolSize) {
-    this.#poolSize = poolSize;
+    if (typeof poolSize === 'undefined') {
+      poolSize = getDefaultPoolSize();
+    }
+    if (!Number.isInteger(poolSize) || poolSize < 1) {
+      throw new Error(
+        `Thread pool size must be a positive integer: ${poolSize}`);
+    }
+    this.#poolSize = clampPoolSize(poolSize);
     // initialize members
     this.#init();
   }

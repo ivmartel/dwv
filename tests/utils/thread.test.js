@@ -1,5 +1,10 @@
 import {describe, test, assert, vi, beforeEach} from 'vitest';
-import {ThreadPool, WorkerTask} from '../../src/utils/thread.js';
+import {
+  ThreadPool,
+  WorkerTask,
+  getDefaultPoolSize,
+  clampPoolSize
+} from '../../src/utils/thread.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -85,6 +90,61 @@ describe('utils', () => {
   test('WorkerTask getWorker returns undefined by default', () => {
     const task = new WorkerTask({}, {});
     assert.isUndefined(task.getWorker());
+  });
+
+  /**
+   * Tests for {@link getDefaultPoolSize}.
+   *
+   * @function module:tests/utils~getDefaultPoolSize
+   */
+  test('getDefaultPoolSize', () => {
+    // half the hardware concurrency
+    vi.stubGlobal('navigator', {hardwareConcurrency: 8});
+    assert.equal(getDefaultPoolSize(), 4, 'half hardware concurrency');
+    vi.stubGlobal('navigator', {hardwareConcurrency: 5});
+    assert.equal(getDefaultPoolSize(), 2, 'rounded down');
+    // single processor: at least one
+    vi.stubGlobal('navigator', {hardwareConcurrency: 1});
+    assert.equal(getDefaultPoolSize(), 1, 'at least one');
+    // not available
+    vi.stubGlobal('navigator', {});
+    assert.equal(getDefaultPoolSize(), 4, 'fallback without concurrency');
+    vi.stubGlobal('navigator', undefined);
+    assert.equal(getDefaultPoolSize(), 4, 'fallback without navigator');
+    vi.unstubAllGlobals();
+  });
+
+  /**
+   * Tests for {@link ThreadPool} constructor input validation.
+   *
+   * @function module:tests/utils~ThreadPoolConstructor
+   */
+  test('ThreadPool constructor validates the pool size', () => {
+    assert.doesNotThrow(() => new ThreadPool(), 'undefined (default)');
+    assert.doesNotThrow(() => new ThreadPool(1), 'one');
+    assert.doesNotThrow(() => new ThreadPool(8), 'eight');
+    const badSizes = [0, -1, 1.5, Number.NaN, Infinity, null, '2'];
+    for (const size of badSizes) {
+      assert.throws(() => new ThreadPool(size), /positive integer/,
+        undefined, `throws for ${String(size)}`);
+    }
+  });
+
+  /**
+   * Tests for {@link clampPoolSize}.
+   *
+   * @function module:tests/utils~clampPoolSize
+   */
+  test('clampPoolSize', () => {
+    vi.stubGlobal('navigator', {hardwareConcurrency: 4});
+    assert.equal(clampPoolSize(2), 2, 'below: unchanged');
+    assert.equal(clampPoolSize(4), 4, 'at limit: unchanged');
+    assert.equal(clampPoolSize(10), 4, 'above: clamped');
+    vi.stubGlobal('navigator', {});
+    assert.equal(clampPoolSize(10), 10, 'no concurrency: unchanged');
+    vi.stubGlobal('navigator', undefined);
+    assert.equal(clampPoolSize(10), 10, 'no navigator: unchanged');
+    vi.unstubAllGlobals();
   });
 
   /**

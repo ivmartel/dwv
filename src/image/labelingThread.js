@@ -83,7 +83,7 @@ export class LabelingThread {
    *
    * @type {ThreadPool}
    */
-  #threadPool = new ThreadPool(navigator?.hardwareConcurrency ?? 4);
+  #threadPool = new ThreadPool(5);
 
   constructor() {
     this.#threadPool.onerror = ((e) => {
