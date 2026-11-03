@@ -512,13 +512,6 @@ export class DataController extends EventTarget {
   #dataIdCounter = -1;
 
   /**
-   * Constructor.
-   */
-  constructor() {
-    super();
-  }
-
-  /**
    * Get the next data id.
    *
    * @returns {string} The data id.

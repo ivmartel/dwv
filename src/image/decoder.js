@@ -8,9 +8,6 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
  * Decoder worker task: posts a compact copy of the input buffer.
  */
 class DecoderWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getStartMessage() {
     // the input buffer is usually a view on the whole file buffer:
     // posting it would copy the whole file, so post a copy of the view
@@ -28,9 +25,6 @@ class DecoderWorkerTask extends WorkerTask {
  * Jpeg baseline worker task.
  */
 class JpegBaselineWorkerTask extends DecoderWorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getWorker() {
     return new Worker(
       new URL('../decoders/pdfjs/jpegbaseline.worker.js', import.meta.url),
@@ -45,9 +39,6 @@ class JpegBaselineWorkerTask extends DecoderWorkerTask {
  * Jpeg lossless worker task.
  */
 class JpegLosslessWorkerTask extends DecoderWorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getWorker() {
     return new Worker(
       new URL('../decoders/rii-mango/jpegloss.worker.js', import.meta.url),
@@ -62,9 +53,6 @@ class JpegLosslessWorkerTask extends DecoderWorkerTask {
  * Jpeg 2000 worker task.
  */
 class Jpeg2000WorkerTask extends DecoderWorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getWorker() {
     return new Worker(
       new URL('../decoders/pdfjs/jpeg2000.worker.js', import.meta.url),
@@ -79,9 +67,6 @@ class Jpeg2000WorkerTask extends DecoderWorkerTask {
  * RLE worker task.
  */
 class RleWorkerTask extends DecoderWorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getWorker() {
     return new Worker(
       new URL('../decoders/dwv/rle.worker.js', import.meta.url),

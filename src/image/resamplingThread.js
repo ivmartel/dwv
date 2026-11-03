@@ -15,9 +15,6 @@ import {Spacing} from './spacing.js';
  * Resampling worker task.
  */
 class ResamplingWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getStartMessage() {
     // the source buffer can be a view on the whole image buffer (4D):
     // posting it would copy the whole image, so post a copy of the view

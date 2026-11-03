@@ -76,6 +76,9 @@ export default [
       // disallow useless string concatenation
       // https://eslint.org/docs/rules/no-useless-concat
       'no-useless-concat': 'error',
+      // disallow unnecessary constructors
+      // https://eslint.org/docs/rules/no-useless-constructor
+      'no-useless-constructor': 'error',
 
       // modern js idioms
 

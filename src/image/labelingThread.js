@@ -61,9 +61,6 @@ export function generateWorkerMessage(imageBuffer, imageGeometry) {
  * Labeling worker task.
  */
 class LabelingWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getWorker() {
     return new Worker(
       new URL('./labeling.worker.js', import.meta.url),
