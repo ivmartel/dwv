@@ -10,15 +10,6 @@ export default merge(webpackCommon, {
     clean: false,
   },
   target: 'node',
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: 'babel-loader'
-      }
-    ]
-  },
   externals: {
     konva: 'konva',
     jszip: 'jszip',
