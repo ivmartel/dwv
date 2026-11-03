@@ -83,6 +83,20 @@ describe('utils', () => {
   });
 
   /**
+   * Tests that {@link WorkerTask#getStartMessage} returns the start message
+   * with no transferred objects by default.
+   *
+   * @function module:tests/utils~WorkerTaskGetStartMessage
+   */
+  test('WorkerTask getStartMessage default', () => {
+    const msg = {buffer: new Uint8Array([1, 2])};
+    const task = new WorkerTask(msg, {});
+    const res = task.getStartMessage();
+    assert.equal(res.message, msg, 'start message');
+    assert.deepEqual(res.transfer, [], 'no transfer');
+  });
+
+  /**
    * Tests that {@link WorkerTask#getWorker} returns undefined by default.
    *
    * @function module:tests/utils~WorkerTaskGetWorker
@@ -208,6 +222,36 @@ describe('utils', () => {
         msg,
         'correct message forwarded'
       );
+      assert.deepEqual(
+        task.mockWorker.postMessage.mock.calls[0][1],
+        [],
+        'empty transfer list forwarded'
+      );
+    }
+  );
+
+  /**
+   * Tests that the worker thread posts the message and transfer list
+   * returned by {@link WorkerTask#getStartMessage}.
+   *
+   * @function module:tests/utils~threadPoolTransfer
+   */
+  test('ThreadPool posts the task start message with its transfer list',
+    () => {
+      const {pool} = makePool(1);
+      const task = makeTask({buffer: new Uint8Array([7])}, {});
+      const sent = {buffer: new Uint8Array([8])};
+      task.getStartMessage = () => ({
+        message: sent,
+        transfer: [sent.buffer.buffer]
+      });
+
+      pool.addWorkerTask(task);
+
+      const call = task.mockWorker.postMessage.mock.calls[0];
+      assert.equal(call[0], sent, 'getStartMessage message posted');
+      assert.equal(call[1].length, 1, 'one transferred object');
+      assert.equal(call[1][0], sent.buffer.buffer, 'transfer list posted');
     }
   );
 

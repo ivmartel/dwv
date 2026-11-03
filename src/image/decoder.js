@@ -5,9 +5,29 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
  */
 
 /**
+ * Decoder worker task: posts a compact copy of the input buffer.
+ */
+class DecoderWorkerTask extends WorkerTask {
+  constructor(message, info) {
+    super(message, info);
+  }
+  getStartMessage() {
+    // the input buffer is usually a view on the whole file buffer:
+    // posting it would copy the whole file, so post a copy of the view
+    // data only (made at run time to not keep copies for queued tasks)
+    // and transfer it to avoid a second copy
+    const buffer = this.startMessage.buffer.slice();
+    return {
+      message: {...this.startMessage, buffer},
+      transfer: [buffer.buffer]
+    };
+  }
+}
+
+/**
  * Jpeg baseline worker task.
  */
-class JpegBaselineWorkerTask extends WorkerTask {
+class JpegBaselineWorkerTask extends DecoderWorkerTask {
   constructor(message, info) {
     super(message, info);
   }
@@ -24,7 +44,7 @@ class JpegBaselineWorkerTask extends WorkerTask {
 /**
  * Jpeg lossless worker task.
  */
-class JpegLosslessWorkerTask extends WorkerTask {
+class JpegLosslessWorkerTask extends DecoderWorkerTask {
   constructor(message, info) {
     super(message, info);
   }
@@ -41,7 +61,7 @@ class JpegLosslessWorkerTask extends WorkerTask {
 /**
  * Jpeg 2000 worker task.
  */
-class Jpeg2000WorkerTask extends WorkerTask {
+class Jpeg2000WorkerTask extends DecoderWorkerTask {
   constructor(message, info) {
     super(message, info);
   }
@@ -58,7 +78,7 @@ class Jpeg2000WorkerTask extends WorkerTask {
 /**
  * RLE worker task.
  */
-class RleWorkerTask extends WorkerTask {
+class RleWorkerTask extends DecoderWorkerTask {
   constructor(message, info) {
     super(message, info);
   }

@@ -320,7 +320,8 @@ class WorkerThread {
       this.worker.onerror = this.onerror;
     }
     // launch the worker
-    this.worker.postMessage(this.runningTask.startMessage);
+    const {message, transfer} = this.runningTask.getStartMessage();
+    this.worker.postMessage(message, transfer);
   }
 
   /**
@@ -386,6 +387,19 @@ export class WorkerTask {
     this.startMessage = message;
     // information about the work data
     this.info = info;
+  }
+
+  /**
+   * Get the message to post to the worker, called just before
+   * running the task. The transferred objects are moved to the worker
+   * (no copy) and are no longer usable by the caller.
+   * Default returns the start message with no transferred objects.
+   *
+   * @returns {{message: object, transfer: Transferable[]}} The message
+   *   and the list of objects to transfer.
+   */
+  getStartMessage() {
+    return {message: this.startMessage, transfer: []};
   }
 
   /**

@@ -243,6 +243,35 @@ describe('image', () => {
     assert.equal(task.info, info, 'info forwarded');
   });
 
+  /**
+   * Tests that the decoder task start message holds a compact copy of the
+   * input buffer and transfers it.
+   *
+   * @function module:tests/image~decoderTaskStartMessage
+   */
+  test('PixelBufferDecoder task posts a compact transferred copy', () => {
+    const dec = new PixelBufferDecoder('rle');
+    const pool = lastPool();
+    // view on a bigger buffer, as a pixel data fragment on a file buffer
+    const fileBuffer = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7]);
+    const fragment = fileBuffer.subarray(2, 5);
+    const meta = {bitsAllocated: 8};
+
+    dec.decode(fragment, meta, {});
+
+    const task = pool.addWorkerTask.mock.calls[0][0];
+    const {message, transfer} = task.getStartMessage();
+    assert.notEqual(message.buffer, fragment, 'buffer is a copy');
+    assert.deepEqual(Array.from(message.buffer), [2, 3, 4], 'same values');
+    assert.equal(message.buffer.buffer.byteLength, 3,
+      'copy only holds the view data');
+    assert.equal(message.meta, meta, 'meta forwarded');
+    assert.equal(transfer.length, 1, 'one transferred object');
+    assert.equal(transfer[0], message.buffer.buffer,
+      'copy buffer transferred');
+    assert.equal(fragment.buffer.byteLength, 8, 'input left untouched');
+  });
+
   // -------------------------------------------------------------------------
   // decode() — unknown algorithm
   // -------------------------------------------------------------------------
