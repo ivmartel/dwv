@@ -113,6 +113,8 @@ describe('RtStructFactory', () => {
       'frame of reference UID from referenced sequence');
 
     // none
+    const warnSpy = vi.spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => {});
     const tags2 = structuredClone(tags1);
     delete tags2.ReferencedFrameOfReferenceSequence.value[0]
       .FrameOfReferenceUID;
@@ -120,6 +122,12 @@ describe('RtStructFactory', () => {
       getElementsFromSimpleTagValues(tags2), buildRefImage());
     assert.isUndefined(image2.getMeta().FrameOfReferenceUID,
       'no frame of reference UID');
+    assert.ok(
+      warnSpy.mock.calls.some(
+        ([msg]) => msg === 'Loaded RT STRUCT has no FrameOfReferenceUID.'
+      ),
+      'no frame of reference UID warning logged'
+    );
   });
 
   test(
