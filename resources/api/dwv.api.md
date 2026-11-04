@@ -1092,6 +1092,7 @@ export class PlaneHelper {
     getImageDeOrientedVector3D(vector: Vector3D): Vector3D;
     getImageOrientedPoint3D(planePoint: Point3D): Point3D;
     getImageOrientedVector3D(planeVector: Vector3D): Vector3D;
+    getLegacyCosines(): number[];
     getNativeScrollDimIndex(): number;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getPlaneOffsetFromOffset3D(offset3D: Scalar3D): Scalar2D;

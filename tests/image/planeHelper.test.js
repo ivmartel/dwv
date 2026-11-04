@@ -50,20 +50,23 @@ function makeGeometry(
  *
  * Terminology:
  *   T = getTargetOrientation(G, V) = G.asOneAndZeros() × V
- *   (with an abs() applied when G matches the canonical coronal orientation).
+ *   L = getLegacyTargetOrientation(G, T) = T, or abs(T) when G matches
+ *   the canonical coronal orientation (legacy annotation cosines).
  *
  * To add a new orientation case:
  *   1. Append a new object to CASES.
  *   2. Fill in geoValues, viewValues, and all expected fields.
  *
  * Field key:
- *   t_123      T  * [1,2,3]    target de-orient, cosines, offset
+ *   t_123      T  * [1,2,3]    target de-orient, offset
  *   tinv_123   T⁻¹ * [1,2,3]  target re-orient, getTargetOrientedPositiveXYZ
  *   t_230      T  * [2,3,0]    getOffset3DFromPlaneOffset({x:2,y:3})
  *   v_123      V  * [1,2,3]    image de-orient (getImageOriented*)
  *   vinv_123   V⁻¹ * [1,2,3]  image re-orient (getImageDeOriented*)
  *   plane_y_k0 getPositionFromPlanePoint(Point2D(0,1), 0)  (T + geo)
- *   world_001  getPlanePointFromPosition(Point([0,0,1]))    (geo + V).
+ *   world_001  getPlanePointFromPosition(Point([0,0,1]))    (geo + V)
+ *   cosines    first two columns of T
+ *   legacy_cosines first two columns of L.
  */
 const CASES = [
   {
@@ -82,6 +85,7 @@ const CASES = [
     plane_y_k0: [0, 1, 0], // I*[0,1,0] through identity geo
     world_001: [0, 0, 1], // identity geo, then I⁻¹*[0,0,1]
     cosines: [1, 0, 0, 0, 1, 0],
+    legacy_cosines: [1, 0, 0, 0, 1, 0],
   },
   {
     label: 'identity geo, coronal view',
@@ -100,27 +104,29 @@ const CASES = [
     plane_y_k0: [0, 0, 1], // V*[0,1,0]=[0,0,1] through identity geo
     world_001: [0, 1, 0], // identity geo, V⁻¹*[0,0,1]=[0,1,0]
     cosines: [1, 0, 0, 0, 0, 1],
+    legacy_cosines: [1, 0, 0, 0, 0, 1],
   },
   {
     label: 'coronal geo, identity view',
     // G = DWV coronal [1,0,0, 0,0,1, 0,-1,0],  V = I
-    // T = abs(G × I) = [1,0,0, 0,0,1, 0,1,0],  T*[x,y,z]=[x,z,y]
-    // T is symmetric so T⁻¹ = T
+    // T = G × I = G,  T*[x,y,z]=[x,z,-y],  T⁻¹*[x,y,z]=[x,-z,y]
+    // L = abs(T) = [1,0,0, 0,0,1, 0,1,0]
     geoValues: [1, 0, 0, 0, 0, 1, 0, -1, 0],
     viewValues: [1, 0, 0, 0, 1, 0, 0, 0, 1],
     isAcquisition: true, // isIdentityMat33(V = I)
     scrollDimIndex: 2, // V = I, col2 abs-max at row 2
     nativeScrollDimIndex: 1, // G col2=[0,1,0] → abs-max at row 1
-    t_123: [1, 3, 2],
-    tinv_123: [1, 3, 2], // T symmetric → T⁻¹ = T
-    t_230: [2, 0, 3],
+    t_123: [1, 3, -2],
+    tinv_123: [1, -3, 2],
+    t_230: [2, 0, -3],
     v_123: [1, 2, 3], // V = I, pass-through
     vinv_123: [1, 2, 3],
     // V=I → [0,1,0]; geo G*[0,1,0] = [0,0,-1]
     plane_y_k0: [0, 0, -1],
     // geo G⁻¹*[0,0,1] = [0,-1,0]; V=I → [0,-1,0]
     world_001: [0, -1, 0],
-    cosines: [1, 0, 0, 0, 0, 1],
+    cosines: [1, 0, 0, 0, 0, -1],
+    legacy_cosines: [1, 0, 0, 0, 0, 1],
   },
 ];
 
@@ -270,6 +276,13 @@ describe.each(CASES)('PlaneHelper $label', (c) => {
     const cosines = helper.getCosines();
     for (let i = 0; i < 6; ++i) {
       assert.equal(cosines[i], c.cosines[i], `cosines[${i}]`);
+    }
+  });
+
+  test('getLegacyCosines returns first two columns of L', () => {
+    const cosines = helper.getLegacyCosines();
+    for (let i = 0; i < 6; ++i) {
+      assert.equal(cosines[i], c.legacy_cosines[i], `cosines[${i}]`);
     }
   });
 

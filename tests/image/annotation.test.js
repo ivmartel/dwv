@@ -321,13 +321,26 @@ describe('image', () => {
         new Point3D(0, 1, 0) // cosine column-direction
       ];
 
-      const matchingHelper = {getCosines: () => [1, 0, 0, 0, 1, 0]};
+      const matchingHelper = {
+        getCosines: () => [1, 0, 0, 0, 1, 0],
+        getLegacyCosines: () => [1, 0, 0, 0, 1, 0]
+      };
       assert.isTrue(ann.isCompatibleView(matchingHelper),
         'matches when cosines are equal');
 
-      const nonMatchingHelper = {getCosines: () => [0, 1, 0, 0, 0, 1]};
+      const nonMatchingHelper = {
+        getCosines: () => [0, 1, 0, 0, 0, 1],
+        getLegacyCosines: () => [0, 1, 0, 0, 0, 1]
+      };
       assert.isFalse(ann.isCompatibleView(nonMatchingHelper),
         'does not match when cosines differ');
+
+      const legacyHelper = {
+        getCosines: () => [1, 0, 0, 0, -1, 0],
+        getLegacyCosines: () => [1, 0, 0, 0, 1, 0]
+      };
+      assert.isTrue(ann.isCompatibleView(legacyHelper),
+        'matches when legacy cosines are equal');
     }
   );
 
@@ -527,7 +540,10 @@ describe('image', () => {
       new Point3D(0, 1, 0)
     ];
 
-    const incompatibleHelper = {getCosines: () => [0, 1, 0, 0, 0, 1]};
+    const incompatibleHelper = {
+      getCosines: () => [0, 1, 0, 0, 0, 1],
+      getLegacyCosines: () => [0, 1, 0, 0, 0, 1]
+    };
     const vc = new MockViewController({
       uid: 'sop-001',
       planeHelper: incompatibleHelper
@@ -555,6 +571,39 @@ describe('image', () => {
       ann.setViewController(vc);
 
       assert.isTrue(ann.canView());
+    });
+
+  /**
+   * Tests that {@link Annotation#setViewController} replaces legacy
+   * plane cosines.
+   *
+   * @function module:tests/image~annotationSetVcLegacyCosines
+   */
+  test('Annotation setViewController replaces legacy plane cosines',
+    () => {
+      const ann = new Annotation();
+      ann.referencedSopInstanceUID = 'sop-001';
+      const origin = new Point3D(1, 2, 3);
+      ann.planePoints = [
+        origin,
+        new Point3D(1, 0, 0),
+        new Point3D(0, 0, 1)
+      ];
+      const vc = new MockViewController({
+        uid: 'sop-001',
+        planeHelper: {
+          getCosines: () => [1, 0, 0, 0, 0, -1],
+          getLegacyCosines: () => [1, 0, 0, 0, 0, 1]
+        }
+      });
+      ann.setViewController(vc);
+
+      assert.isTrue(ann.canView());
+      assert.equal(ann.planePoints[0], origin, 'same origin');
+      assert.isTrue(ann.planePoints[1].equals(new Point3D(1, 0, 0)),
+        'same first cosine');
+      assert.isTrue(ann.planePoints[2].equals(new Point3D(0, 0, -1)),
+        'replaced second cosine');
     });
 
   // -------------------------------------------------------------------------

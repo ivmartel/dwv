@@ -3,7 +3,8 @@ import {Point3D, Point2D} from '../math/point.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {
   getCosinesFromOrientation,
-  getTargetOrientation
+  getTargetOrientation,
+  getLegacyTargetOrientation
 } from '../math/orientation.js';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry.js';
 
@@ -308,6 +309,17 @@ export class PlaneHelper {
    */
   getCosines() {
     return getCosinesFromOrientation(this.#targetOrientation);
+  }
+
+  /**
+   * Get the cosines of this plane as saved in annotations by
+   *   previous versions, see getLegacyTargetOrientation.
+   *
+   * @returns {number[]} The 2 cosines vectors (3D).
+   */
+  getLegacyCosines() {
+    return getCosinesFromOrientation(getLegacyTargetOrientation(
+      this.#imageOrientation, this.#targetOrientation));
   }
 
   /**

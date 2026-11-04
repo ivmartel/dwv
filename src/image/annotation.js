@@ -258,17 +258,25 @@ export class Annotation {
         res = true;
       }
     } else {
-      // oriented view: compare cosines (independent of slice index)
-      const cosines = planeHelper.getCosines();
-      const cosine1 = new Point3D(cosines[0], cosines[1], cosines[2]);
-      const cosine2 = new Point3D(cosines[3], cosines[4], cosines[5]);
-
-      if (cosine1.equals(this.planePoints[1]) &&
-        cosine2.equals(this.planePoints[2])) {
-        res = true;
-      }
+      // oriented view: compare cosines (independent of slice index),
+      //   legacy ones for annotations saved by previous versions
+      res = this.#hasPlaneCosines(planeHelper.getCosines()) ||
+        this.#hasPlaneCosines(planeHelper.getLegacyCosines());
     }
     return res;
+  }
+
+  /**
+   * Check if the plane points have the input cosines.
+   *
+   * @param {number[]} cosines The 2 cosines vectors (3D).
+   * @returns {boolean} True if same cosines.
+   */
+  #hasPlaneCosines(cosines) {
+    const cosine1 = new Point3D(cosines[0], cosines[1], cosines[2]);
+    const cosine2 = new Point3D(cosines[3], cosines[4], cosines[5]);
+    return cosine1.equals(this.planePoints[1]) &&
+      cosine2.equals(this.planePoints[2]);
   }
 
   /**
@@ -284,10 +292,23 @@ export class Annotation {
       return;
     }
     // check if same view
-    if (!this.isCompatibleView(viewController.getPlaneHelper())) {
+    const planeHelper = viewController.getPlaneHelper();
+    if (!this.isCompatibleView(planeHelper)) {
       return;
     }
     this.#viewController = viewController;
+
+    // replace legacy plane cosines
+    if (typeof this.planePoints !== 'undefined') {
+      const cosines = planeHelper.getCosines();
+      if (!this.#hasPlaneCosines(cosines)) {
+        this.planePoints = [
+          this.planePoints[0],
+          new Point3D(cosines[0], cosines[1], cosines[2]),
+          new Point3D(cosines[3], cosines[4], cosines[5])
+        ];
+      }
+    }
 
     // set plane origin (not saved with file)
     this.planeOrigin =

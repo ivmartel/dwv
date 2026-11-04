@@ -12,6 +12,7 @@ import {
   getOrientationName,
   getViewOrientation,
   getTargetOrientation,
+  getLegacyTargetOrientation,
   getDisplayOrientation,
   getViewFlips
 } from '../../src/math/orientation.js';
@@ -258,7 +259,9 @@ describe('math', () => {
    */
   test('getViewFlips previous table', () => {
     // previous flip flags table: offset x, y and scale x, y, z flags
-    //   per view: undefined (u), axial (a), coronal (c), sagittal (s)
+    //   per view: undefined (u), axial (a), coronal (c), sagittal (s);
+    //   the scale flags are in the previous target space, the one
+    //   with abs for coronal acquisitions (see getLegacyTargetOrientation)
     const table = {
       LPS: {u: '', a: '', c: 'oy sz', s: 'oy sz'},
       LAI: {u: 'oy', a: 'oy', c: 'sz', s: 'ox sz'},
@@ -300,9 +303,11 @@ describe('math', () => {
           getTargetOrientation(imageOrientation, viewOrientation);
         const flips = getViewFlips(
           imageOrientation, displayOrientation, targetOrientation);
+        const previousTargetOrientation =
+          getLegacyTargetOrientation(imageOrientation, targetOrientation);
         assert.deepEqual(
           getCanvasFlips(flips, targetOrientation),
-          getCanvasFlips(expectedFlips, targetOrientation),
+          getCanvasFlips(expectedFlips, previousTargetOrientation),
           `${code} ${viewNames[v]} flips`);
       }
     }

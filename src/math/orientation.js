@@ -271,18 +271,28 @@ export function getTargetOrientation(imageOrientation, viewOrientation) {
   // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
   // -> Ot = Oi * Ov
   // note: asOneAndZeros as in getViewOrientation...
-  let targetOrientation =
-    imageOrientation.asOneAndZeros().multiply(viewOrientation);
+  return imageOrientation.asOneAndZeros().multiply(viewOrientation);
+}
 
-  // abs for coronal acquisitions: historical, the display does not
-  //   depend on it (see getViewFlips) but the plane offsets and the
-  //   annotation plane cosines (planePoints) do, keep for compatibility
+/**
+ * Get the legacy target orientation: the target orientation as it was
+ *   before v0.37, with an abs for coronal acquisitions. Only used to
+ *   recognise the plane cosines (planePoints) of annotations saved
+ *   with previous versions.
+ *
+ * @param {Matrix33} imageOrientation The image orientation.
+ * @param {Matrix33} targetOrientation The target orientation,
+ *   see getTargetOrientation.
+ * @returns {Matrix33} The legacy target orientation.
+ */
+export function getLegacyTargetOrientation(
+  imageOrientation, targetOrientation) {
+  let legacyOrientation = targetOrientation;
   const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
   if (simpleImageOrientation.isSimilar(getCoronalMat33().getAbs())) {
-    targetOrientation = targetOrientation.getAbs();
+    legacyOrientation = legacyOrientation.getAbs();
   }
-
-  return targetOrientation;
+  return legacyOrientation;
 }
 
 /**
