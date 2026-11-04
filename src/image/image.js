@@ -1362,7 +1362,7 @@ export class Image extends EventTarget {
     const size = this.getGeometry().getSize();
     let leni = size.getTotalSize();
     // max to 3D
-    if (size.length() === 3) {
+    if (size.length() >= 3) {
       leni = size.getDimSize(3);
     }
     for (let i = 0; i < leni; ++i) {
