@@ -18,6 +18,7 @@ export default merge(webpackCommon, {
     jpeg: './dev/visual/index-jpeg.js',
     jpeg2000: './dev/visual/index-jpeg2000.js',
     rle: './dev/visual/index-rle.js',
+    orientation: './dev/visual/orientation.js',
     anonymiser: './dev/dicom/pages/anonymiser.js',
     generator: './dev/dicom/pages/generator.js',
     synthetic: './dev/dicom/pages/synthetic-data.js',
@@ -124,6 +125,12 @@ export default merge(webpackCommon, {
       filename: 'dev/visual/index-rle.html',
       scriptLoading: 'module',
       chunks: ['rle']
+    }),
+    new HtmlWebpackPlugin({
+      template: './dev/visual/orientation.html',
+      filename: 'dev/visual/orientation.html',
+      scriptLoading: 'module',
+      chunks: ['orientation']
     }),
     new HtmlWebpackPlugin({
       title: 'DWV raw DICOM check',
