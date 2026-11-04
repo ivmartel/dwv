@@ -1093,8 +1093,9 @@ export class View extends EventTarget {
     if (typeof preset === 'undefined') {
       throw new Error(`Unknown window level preset: '${name}'`);
     }
-    // special min/max
-    if (name === 'minmax' && typeof preset.wl === 'undefined') {
+    // special min/max: not cached since the data range can change
+    // (for ex while loading)
+    if (name === 'minmax') {
       preset.wl = [this.getWindowLevelMinMax()];
     }
     // default to first

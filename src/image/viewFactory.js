@@ -55,7 +55,7 @@ export class ViewFactory {
     }
     // min/max
     // Not filled yet since it is stil too costly to calculate min/max
-    // for each slice... It will be filled at first use
+    // for each slice... It will be filled at each use
     // (see view.setWindowLevelPreset).
     // Order is important, if no wl from DICOM, this will be the default.
     windowPresets.minmax = new WindowPreset('minmax');
