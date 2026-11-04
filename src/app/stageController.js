@@ -2,9 +2,8 @@ import {viewEventNames} from '../image/view.js';
 import {ViewFactory} from '../image/viewFactory.js';
 import {MaskImage} from '../image/maskImage.js';
 import {
-  getMatrixFromName,
-  getOrientationStringLPS,
-  Orientation,
+  getDisplayOrientation,
+  getViewFlips,
   getViewOrientation
 } from '../math/orientation.js';
 import {DIRECTION_EPSILON} from '../image/geometry.js';
@@ -821,9 +820,13 @@ export class StageController extends EventTarget {
     // create and setup view
     const viewFactory = new ViewFactory();
     const view = viewFactory.create(data.meta, data.image);
+    const displayOrientation = getDisplayOrientation(
+      imageGeometry.getOrientation(),
+      viewConfig.orientation
+    );
     const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
-      getMatrixFromName(viewConfig.orientation)
+      displayOrientation
     );
     view.setOrientation(viewOrientation);
 
@@ -918,9 +921,10 @@ export class StageController extends EventTarget {
     viewLayer.setOffset(layerGroup.getOffset());
 
     // get and apply flip flags
-    const flipFlags = this.#getViewFlipFlags(
+    const flipFlags = getViewFlips(
       imageGeometry.getOrientation(),
-      viewConfig.orientation);
+      displayOrientation,
+      viewLayer.getViewController().getPlaneHelper().getTargetOrientation());
     this.#applyFlipFlags(flipFlags, viewLayer);
 
     // layer scale (done after possible flip)
@@ -1011,9 +1015,13 @@ export class StageController extends EventTarget {
     }
     const imageGeometry = refData.image.getGeometry();
 
+    const displayOrientation = getDisplayOrientation(
+      imageGeometry.getOrientation(),
+      viewConfig.orientation
+    );
     const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
-      getMatrixFromName(viewConfig.orientation)
+      displayOrientation
     );
     const size2D = imageGeometry.getSize(viewOrientation).get2D();
     const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
@@ -1048,9 +1056,10 @@ export class StageController extends EventTarget {
     drawLayer.setOffset(layerGroup.getOffset());
 
     // get and apply flip flags
-    const flipFlags = this.#getViewFlipFlags(
+    const flipFlags = getViewFlips(
       imageGeometry.getOrientation(),
-      viewConfig.orientation);
+      displayOrientation,
+      planeHelper.getTargetOrientation());
     this.#applyFlipFlags(flipFlags, drawLayer);
 
     // layer scale (done after possible flip)
@@ -1152,151 +1161,6 @@ export class StageController extends EventTarget {
     }
 
     return refViewLayer;
-  }
-
-  /**
-   * Get the view flip flags: offset (x, y) and scale (x, y, z) flags.
-   *
-   * @param {Matrix33} imageOrientation The image orientation.
-   * @param {string} viewConfigOrientation The view config orientation.
-   * @returns {object} Offset and scale flip flags.
-   */
-  #getViewFlipFlags(imageOrientation, viewConfigOrientation) {
-    // 'simple' orientation code (does not take into account angles)
-    const orientationCode =
-      getOrientationStringLPS(imageOrientation.asOneAndZeros());
-    if (typeof orientationCode === 'undefined') {
-      throw new Error('Unsupported undefined orientation code');
-    }
-
-    // view orientation flags
-    const isViewUndefined = typeof viewConfigOrientation === 'undefined';
-    const isViewAxial = !isViewUndefined &&
-      viewConfigOrientation === Orientation.Axial;
-    const isViewCoronal = !isViewUndefined &&
-      viewConfigOrientation === Orientation.Coronal;
-    const isViewSagittal = !isViewUndefined &&
-      viewConfigOrientation === Orientation.Sagittal;
-
-    // default flags
-    const flipOffset = {x: false, y: false};
-    const flipScale = {x: false, y: false, z: false};
-
-    if (orientationCode === 'LPS') {
-      // axial
-      if (isViewCoronal || isViewSagittal) {
-        flipScale.z = true;
-        flipOffset.y = true;
-      }
-    } else if (orientationCode === 'LAI') {
-      // axial
-      if (isViewUndefined || isViewAxial) {
-        flipOffset.y = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-      } else if (isViewSagittal) {
-        flipScale.z = true;
-        flipOffset.x = true;
-      }
-    } else if (orientationCode === 'RPI') {
-      // axial
-      if (isViewUndefined || isViewAxial) {
-        flipOffset.x = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-        flipOffset.x = true;
-      } else if (isViewSagittal) {
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'RAS') {
-      // axial
-      flipOffset.x = true;
-      flipOffset.y = true;
-      if (isViewCoronal || isViewSagittal) {
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'LSA') {
-      // coronal
-      flipOffset.y = true;
-      if (isViewUndefined || isViewCoronal) {
-        flipScale.z = true;
-      } else if (isViewAxial) {
-        flipScale.y = true;
-      } else if (isViewSagittal) {
-        flipOffset.x = true;
-        flipScale.y = true;
-        flipScale.z = true;
-      }
-    // } else if (orientationCode === 'LIP') { // nothing to do
-    } else if (orientationCode === 'RSP') {
-      // coronal
-      if (isViewUndefined || isViewCoronal) {
-        flipOffset.x = true;
-        flipOffset.y = true;
-        flipScale.x = true;
-        flipScale.z = true;
-      } else if (isViewAxial) {
-        flipOffset.x = true;
-        flipScale.x = true;
-      } else if (isViewSagittal) {
-        flipOffset.y = true;
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'RIA') {
-      // coronal
-      flipOffset.x = true;
-      if (isViewUndefined || isViewCoronal) {
-        flipScale.x = true;
-      } else if (isViewAxial) {
-        flipOffset.y = true;
-        flipScale.x = true;
-        flipScale.y = true;
-      } else if (isViewSagittal) {
-        flipScale.y = true;
-      }
-    } else if (orientationCode === 'PSL') {
-      // sagittal
-      flipScale.z = true;
-      if (isViewUndefined || isViewSagittal) {
-        flipOffset.y = true;
-      } else if (isViewCoronal) {
-        flipOffset.y = true;
-      }
-    } else if (orientationCode === 'PIR') {
-      // sagittal
-      flipScale.z = true;
-      if (isViewAxial || isViewCoronal) {
-        flipOffset.x = true;
-      }
-    } else if (orientationCode === 'ASR') {
-      // sagittal
-      flipOffset.x = true;
-      flipOffset.y = true;
-      if (isViewUndefined || isViewSagittal) {
-        flipScale.z = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'AIL') {
-      // sagittal
-      if (isViewUndefined || isViewSagittal) {
-        flipOffset.x = true;
-        flipScale.z = true;
-      } else if (isViewAxial) {
-        flipOffset.y = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-      }
-    } else if (orientationCode !== 'LIP') {
-      // LIP uses default scale and offset
-      logger.warn(`Unsupported orientation code: ${
-        orientationCode}, display could be incorrect`);
-    }
-
-    return {
-      scale: flipScale,
-      offset: flipOffset
-    };
   }
 
   /**

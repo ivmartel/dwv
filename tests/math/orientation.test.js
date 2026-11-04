@@ -9,7 +9,11 @@ import {
   Orientation,
   getOrientationFromCosines,
   getCosinesFromOrientation,
-  getOrientationName
+  getOrientationName,
+  getViewOrientation,
+  getTargetOrientation,
+  getDisplayOrientation,
+  getViewFlips
 } from '../../src/math/orientation.js';
 
 /**
@@ -148,6 +152,199 @@ describe('math', () => {
     assert.equal(getOrientationName(test20), 'sagittal', 'test sagittal #0');
     const test21 = [-0.01, 0.98, -0.20, 0.05, -0.19, -0.98];
     assert.equal(getOrientationName(test21), 'sagittal', 'test axial #1');
+  });
+
+  /**
+   * Get the image orientation cosines of an LPS code.
+   *
+   * @param {string} code The LPS code.
+   * @returns {number[]} The cosines (6 values).
+   */
+  function getCosinesFromCode(code) {
+    const directions = {
+      L: [1, 0, 0],
+      R: [-1, 0, 0],
+      P: [0, 1, 0],
+      A: [0, -1, 0],
+      S: [0, 0, 1],
+      I: [0, 0, -1]
+    };
+    return directions[code[0]].concat(directions[code[1]]);
+  }
+
+  /**
+   * All the axis aligned orientation codes.
+   */
+  /* eslint-disable @stylistic/js/array-element-newline */
+  const allCodes = [
+    'LPS', 'LAI', 'RPI', 'RAS', 'ALS', 'ARI', 'PLI', 'PRS',
+    'LSA', 'LIP', 'RSP', 'RIA', 'ILA', 'IRP', 'SLP', 'SRA',
+    'PSL', 'PIR', 'ASR', 'AIL', 'IAR', 'IPL', 'SAL', 'SPR'
+  ];
+  /* eslint-enable @stylistic/js/array-element-newline */
+
+  /**
+   * View target orientation names (undefined for none).
+   */
+  const viewNames = [
+    undefined,
+    Orientation.Axial,
+    Orientation.Coronal,
+    Orientation.Sagittal
+  ];
+
+  /**
+   * Get the flips that reach the canvas: the target oriented scale
+   *   flips (x and y) and the offset flips.
+   *
+   * @param {object} flips The scale and offset flips.
+   * @param {Matrix33} targetOrientation The target orientation.
+   * @returns {object} The canvas flips as {scale: [x, y],
+   *   offset: [x, y]}.
+   */
+  function getCanvasFlips(flips, targetOrientation) {
+    const flipScale = [
+      flips.scale.x ? -1 : 1,
+      flips.scale.y ? -1 : 1,
+      flips.scale.z ? -1 : 1
+    ];
+    const scale = targetOrientation.getInverse().multiplyArray3D(flipScale);
+    return {
+      scale: [scale[0], scale[1]],
+      offset: [flips.offset.x, flips.offset.y]
+    };
+  }
+
+  /**
+   * Tests for {@link getOrientationStringLPS}: all the 24 axis
+   *   aligned codes.
+   *
+   * @function module:tests/math~getorientationstringlpsall
+   */
+  test('getOrientationStringLPS all codes', () => {
+    for (const code of allCodes) {
+      const orientation =
+        getOrientationFromCosines(getCosinesFromCode(code));
+      assert.equal(getOrientationStringLPS(orientation), code, code);
+    }
+  });
+
+  /**
+   * Tests for {@link getDisplayOrientation}.
+   *
+   * @function module:tests/math~getdisplayorientation
+   */
+  test('getDisplayOrientation', () => {
+    const axial = getOrientationFromCosines(getCosinesFromCode('LAI'));
+    const coronal = getOrientationFromCosines(getCosinesFromCode('ILA'));
+    const sagittal = getOrientationFromCosines(getCosinesFromCode('SPR'));
+    // target name
+    assert.ok(getDisplayOrientation(axial, Orientation.Sagittal).equals(
+      getMatrixFromName(Orientation.Sagittal)), 'named target');
+    // undefined: acquisition plane
+    assert.ok(getDisplayOrientation(axial).equals(
+      getMatrixFromName(Orientation.Axial)), 'undefined axial');
+    assert.ok(getDisplayOrientation(coronal).equals(
+      getMatrixFromName(Orientation.Coronal)), 'undefined coronal');
+    assert.ok(getDisplayOrientation(sagittal, 'unknown').equals(
+      getMatrixFromName(Orientation.Sagittal)), 'unknown sagittal');
+  });
+
+  /**
+   * Tests for {@link getViewFlips}: same canvas flips as the
+   *   previous hard coded flip flags table.
+   *
+   * @function module:tests/math~getviewflipstable
+   */
+  test('getViewFlips previous table', () => {
+    // previous flip flags table: offset x, y and scale x, y, z flags
+    //   per view: undefined (u), axial (a), coronal (c), sagittal (s)
+    const table = {
+      LPS: {u: '', a: '', c: 'oy sz', s: 'oy sz'},
+      LAI: {u: 'oy', a: 'oy', c: 'sz', s: 'ox sz'},
+      RPI: {u: 'ox', a: 'ox', c: 'ox sz', s: 'sz'},
+      RAS: {u: 'ox oy', a: 'ox oy', c: 'ox oy sz', s: 'ox oy sz'},
+      LSA: {u: 'oy sz', a: 'oy sy', c: 'oy sz', s: 'ox oy sy sz'},
+      LIP: {u: '', a: '', c: '', s: ''},
+      RSP: {u: 'ox oy sx sz', a: 'ox sx', c: 'ox oy sx sz', s: 'oy sz'},
+      RIA: {u: 'ox sx', a: 'ox oy sx sy', c: 'ox sx', s: 'ox sy'},
+      PSL: {u: 'oy sz', a: 'sz', c: 'oy sz', s: 'oy sz'},
+      PIR: {u: 'sz', a: 'ox sz', c: 'ox sz', s: 'sz'},
+      ASR: {u: 'ox oy sz', a: 'ox oy', c: 'ox oy sz', s: 'ox oy sz'},
+      AIL: {u: 'ox sz', a: 'oy', c: 'sz', s: 'ox sz'}
+    };
+    const viewKeys = ['u', 'a', 'c', 's'];
+    for (const [code, flagsPerView] of Object.entries(table)) {
+      const imageOrientation =
+        getOrientationFromCosines(getCosinesFromCode(code));
+      for (let v = 0; v < viewNames.length; ++v) {
+        const flags = flagsPerView[viewKeys[v]].split(' ');
+        const expectedFlips = {
+          scale: {
+            x: flags.includes('sx'),
+            y: flags.includes('sy'),
+            z: flags.includes('sz')
+          },
+          offset: {x: flags.includes('ox'), y: flags.includes('oy')}
+        };
+        const displayOrientation =
+          getDisplayOrientation(imageOrientation, viewNames[v]);
+        const viewOrientation =
+          getViewOrientation(imageOrientation, displayOrientation);
+        // previous view orientation: identity if undefined
+        const previousViewOrientation = getViewOrientation(
+          imageOrientation, getMatrixFromName(viewNames[v]));
+        assert.ok(viewOrientation.equals(previousViewOrientation),
+          `${code} ${viewNames[v]} view orientation`);
+        const targetOrientation =
+          getTargetOrientation(imageOrientation, viewOrientation);
+        const flips = getViewFlips(
+          imageOrientation, displayOrientation, targetOrientation);
+        assert.deepEqual(
+          getCanvasFlips(flips, targetOrientation),
+          getCanvasFlips(expectedFlips, targetOrientation),
+          `${code} ${viewNames[v]} flips`);
+      }
+    }
+  });
+
+  /**
+   * Tests for {@link getViewFlips}: the displayed axes are the
+   *   display orientation ones for all codes and views.
+   *
+   * @function module:tests/math~getviewflipsall
+   */
+  test('getViewFlips all codes', () => {
+    for (const code of allCodes) {
+      const imageOrientation =
+        getOrientationFromCosines(getCosinesFromCode(code));
+      for (const viewName of viewNames) {
+        const displayOrientation =
+          getDisplayOrientation(imageOrientation, viewName);
+        const viewOrientation =
+          getViewOrientation(imageOrientation, displayOrientation);
+        const targetOrientation =
+          getTargetOrientation(imageOrientation, viewOrientation);
+        const flips = getViewFlips(
+          imageOrientation, displayOrientation, targetOrientation);
+        const canvasFlips = getCanvasFlips(flips, targetOrientation);
+        // view axes in real space
+        const signedTarget =
+          imageOrientation.asOneAndZeros().multiply(viewOrientation);
+        for (let j = 0; j < 2; ++j) {
+          // canvas flip and its offset go together
+          assert.equal(canvasFlips.scale[j] < 0, canvasFlips.offset[j],
+            `${code} ${viewName} offset ${j}`);
+          // displayed axis = view axis times canvas flip
+          for (let i = 0; i < 3; ++i) {
+            assert.equal(
+              signedTarget.get(i, j) * canvasFlips.scale[j],
+              displayOrientation.get(i, j),
+              `${code} ${viewName} axis ${j}`);
+          }
+        }
+      }
+    }
   });
 
 });

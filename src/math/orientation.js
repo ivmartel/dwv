@@ -249,7 +249,11 @@ export function getViewOrientation(imageOrientation, targetOrientation) {
     viewOrientation =
       imageOrientation.asOneAndZeros().getInverse().multiply(targetOrientation);
   }
-  // TODO: why abs???
+  // abs: the view orientation is only an axis permutation, the slice
+  //   is generated in image index order (see getSliceIterator) and
+  //   the index and plane conversions do not handle reversed axes.
+  //   Axis directions are handled at display by flipping the
+  //   layers, see getViewFlips.
   return viewOrientation.getAbs();
 }
 
@@ -270,11 +274,87 @@ export function getTargetOrientation(imageOrientation, viewOrientation) {
   let targetOrientation =
     imageOrientation.asOneAndZeros().multiply(viewOrientation);
 
-  // TODO: why abs???
+  // abs for coronal acquisitions: historical, the display does not
+  //   depend on it (see getViewFlips) but the plane offsets and the
+  //   annotation plane cosines (planePoints) do, keep for compatibility
   const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
   if (simpleImageOrientation.isSimilar(getCoronalMat33().getAbs())) {
     targetOrientation = targetOrientation.getAbs();
   }
 
   return targetOrientation;
+}
+
+/**
+ * Get the display orientation of a view: the orientation matrix of the
+ *   target orientation name or, if undefined or unknown, the one of the
+ *   image acquisition plane.
+ *
+ * @param {Matrix33} imageOrientation The image orientation.
+ * @param {string} [targetName] The target orientation name.
+ * @returns {Matrix33} The display orientation.
+ */
+export function getDisplayOrientation(imageOrientation, targetName) {
+  let displayOrientation = getMatrixFromName(targetName);
+  if (typeof displayOrientation === 'undefined') {
+    // acquisition plane from the image normal
+    const planeNames = [
+      Orientation.Sagittal,
+      Orientation.Coronal,
+      Orientation.Axial
+    ];
+    displayOrientation = getMatrixFromName(
+      planeNames[imageOrientation.getThirdColMajorDirection()]);
+  }
+  return displayOrientation;
+}
+
+/**
+ * Get the layer flips needed to show an image with its display
+ *   orientation: for each view axis, flip it if its direction is
+ *   opposite to the display one.
+ *
+ * The scale flips are in the target space, as expected by the layers
+ *   flipScale methods, and the offset ones in the view space.
+ *
+ * @param {Matrix33} imageOrientation The image orientation.
+ * @param {Matrix33} displayOrientation The display orientation,
+ *   see getDisplayOrientation.
+ * @param {Matrix33} targetOrientation The layers target orientation,
+ *   see getTargetOrientation.
+ * @returns {{scale: {x: boolean, y: boolean, z: boolean},
+ *   offset: {x: boolean, y: boolean}}} The scale and offset flips.
+ */
+export function getViewFlips(
+  imageOrientation, displayOrientation, targetOrientation) {
+  const viewOrientation =
+    getViewOrientation(imageOrientation, displayOrientation);
+  // view to real space with signs
+  const signedTarget =
+    imageOrientation.asOneAndZeros().multiply(viewOrientation);
+  // sign of each view axis compared to the display one
+  const signs = [];
+  for (let j = 0; j < 3; ++j) {
+    let dot = 0;
+    for (let i = 0; i < 3; ++i) {
+      dot += signedTarget.get(i, j) * displayOrientation.get(i, j);
+    }
+    signs.push(dot < 0 ? -1 : 1);
+  }
+  // no flip along the scroll axis
+  signs[2] = targetOrientation.getColAbsMax(2).value < 0 ? -1 : 1;
+  // the layers scale is the target oriented flip scale:
+  //   flipScale = target * signs
+  const flipScale = targetOrientation.multiplyArray3D(signs);
+  return {
+    scale: {
+      x: flipScale[0] < 0,
+      y: flipScale[1] < 0,
+      z: flipScale[2] < 0
+    },
+    offset: {
+      x: signs[0] < 0,
+      y: signs[1] < 0
+    }
+  };
 }
