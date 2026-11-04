@@ -10,7 +10,6 @@ usage() {
   echo "Usage: $0 -r releaseVersion"
   echo -e "  -r The release version, format 'm.n.p'"
   echo -e "  -s The step at which to start (optional, [1,5])"
-  echo -e "Warning: the command needs to be run from the root of the repository."
   echo -e "Example:"
   echo -e "> prep-release -r 0.28.0"
   echo ""
@@ -51,8 +50,21 @@ then
    error "Empty release version";
    usage
 fi
+if [[ ! "$releaseVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+then
+   error "Bad release version format: '$releaseVersion'";
+   usage
+fi
+if [[ ! "$step" =~ ^[1-5]$ ]]
+then
+   error "Bad step: '$step'";
+   usage
+fi
 
 info "Preparing release for '$releaseVersion'..."
+
+# run from the root of the repository
+cd "$(git rev-parse --show-toplevel)"
 
 # branch name
 releaseBranch="v${releaseVersion}"
@@ -80,9 +92,13 @@ then
   a1="  return '[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+';"
   b1="  return '${releaseVersion}';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
-  a2="[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+"
-  b2="${releaseVersion}"
-  sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
+  # check the replacements happened
+  if ! grep -qF "\"version\": \"${releaseVersion}\"," package.json ||
+    ! grep -qF "return '${releaseVersion}';" src/dicom/dicomParser.js
+  then
+    error "Version number not updated, expected a beta or rc version"
+    exit 1
+  fi
 
   ((step++))
 fi
@@ -92,7 +108,7 @@ if [ $step -eq 3 ]
 then
   info "(3/5) create build"
 
-  rm -r dist
+  rm -rf dist
   yarn run build-all
 
   ((step++))
@@ -103,15 +119,24 @@ if [ $step -eq 4 ]
 then
   info "(4/5) update changelog"
 
+  # do not add the release twice
+  if grep -qF "## [${releaseBranch}]" changelog.md
+  then
+    error "Changelog already contains '${releaseBranch}'"
+    exit 1
+  fi
   # new: release milestone issues
   node resources/scripts/changelog.js $releaseVersion > new.md
+  # title: changelog title
+  echo -en '# Changelog\n\n' > title.md
   # line: separator between releases
   echo -en '\n---\n' > line.md
   # old: changelog with no title
   tail -n +2 changelog.md > old.md
-  # concat new + line + old
-  cat new.md line.md old.md > changelog.md
+  # concat title + new + line + old
+  cat title.md new.md line.md old.md > changelog.md
   # clean up
+  rm title.md
   rm new.md
   rm line.md
   rm old.md
