@@ -245,8 +245,9 @@ function getUtfLabel(charSetTerm) {
   } else if (charSetTerm === 'ISO 2022 IR 87') {
     label = 'iso-2022-jp';
   } else if (charSetTerm === 'ISO 2022 IR 149') {
-    // not supported by TextDecoder when it says it should...
-    //label = "iso-2022-kr";
+    // not supported by TextDecoder as iso-2022-kr, use euc-kr
+    // after removing the escape sequences (see removeEscapeSequences)
+    label = 'euc-kr';
   } else if (charSetTerm === 'ISO 2022 IR 58') {
     // not supported by TextDecoder...
     //label = "iso-2022-cn";
@@ -260,6 +261,40 @@ function getUtfLabel(charSetTerm) {
     label = 'chinese';
   }
   return label;
+}
+
+/**
+ * Remove the ISO 2022 escape sequences from a buffer:
+ * ESC (0x1B), intermediate bytes (0x20-0x2F) and a final byte.
+ * Needed for ISO 2022 IR 149 (Korean), where the escape sequence
+ * only designates KS X 1001 to G1, so the rest decodes as EUC-KR.
+ *
+ * Ref: DICOM [Code Extensions]{@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_6.html#sect_6.1.2.5}.
+ *
+ * @param {Uint8Array} buffer The input buffer.
+ * @returns {Uint8Array} The buffer without escape sequences.
+ */
+function removeEscapeSequences(buffer) {
+  if (!buffer.includes(0x1b)) {
+    return buffer;
+  }
+  const result = [];
+  let i = 0;
+  while (i < buffer.length) {
+    if (buffer[i] === 0x1b) {
+      ++i;
+      // intermediate bytes
+      while (i < buffer.length && buffer[i] >= 0x20 && buffer[i] <= 0x2f) {
+        ++i;
+      }
+      // final byte
+      ++i;
+    } else {
+      result.push(buffer[i]);
+      ++i;
+    }
+  }
+  return new Uint8Array(result);
 }
 
 /**
@@ -668,6 +703,13 @@ export class DicomParser {
   #textDecoder = this.#defaultTextDecoder;
 
   /**
+   * Flag to remove escape sequences before decoding special strings.
+   *
+   * @type {boolean}
+   */
+  #removeEscapeSequences = false;
+
+  /**
    * Decode an input string buffer using the default text decoder.
    *
    * @param {Uint8Array} buffer The buffer to decode.
@@ -684,6 +726,9 @@ export class DicomParser {
    * @returns {string} The decoded string.
    */
   #decodeSpecialString(buffer) {
+    if (this.#removeEscapeSequences) {
+      buffer = removeEscapeSequences(buffer);
+    }
     return this.#textDecoder.decode(buffer);
   }
 
@@ -1427,10 +1472,13 @@ export class DicomParser {
         charSetTerm = dataElement.value[0];
       } else {
         charSetTerm = dataElement.value[1];
-        logger.warn(`Unsupported character set with code extensions: '${
-          charSetTerm }'.`);
+        if (charSetTerm !== 'ISO 2022 IR 149') {
+          logger.warn(`Unsupported character set with code extensions: '${
+            charSetTerm }'.`);
+        }
       }
       this.setDecoderCharacterSet(getUtfLabel(charSetTerm));
+      this.#removeEscapeSequences = charSetTerm === 'ISO 2022 IR 149';
     }
 
     // interpret the dicom elements
