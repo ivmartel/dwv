@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi} from 'vitest';
 import {safeGet} from '../../src/dicom/dataElement.js';
+import {logger} from '../../src/utils/logger.js';
 import {
   getDwvVersion,
   getDwvVersionUI,
@@ -348,6 +349,88 @@ describe('dicom', () => {
         'ReferencedVisitSequence - seq - length');
     }
   );
+
+  /**
+   * Concatenate strings (as ASCII codes) and byte arrays.
+   *
+   * @param {...(string|number[])} parts The parts to concatenate.
+   * @returns {number[]} The bytes.
+   */
+  const toBytes = (...parts) => parts.flatMap((part) =>
+    typeof part === 'string'
+      ? Array.from(part, (c) => c.charCodeAt(0))
+      : part
+  );
+
+  /**
+   * Get an explicit VR little endian DICOM element.
+   *
+   * @param {number} group The tag group.
+   * @param {number} element The tag element.
+   * @param {string} vr The VR (with a 16 bits VL).
+   * @param {number[]} value The value bytes.
+   * @returns {number[]} The element bytes.
+   */
+  const toElementBytes = (group, element, vr, value) => {
+    if (value.length % 2 !== 0) {
+      value = value.concat(0x20);
+    }
+    const tag = [group & 0xff, group >> 8, element & 0xff, element >> 8];
+    const vl = [value.length & 0xff, value.length >> 8];
+    return toBytes(tag, vr, vl, value);
+  };
+
+  /**
+   * Get an explicit VR little endian DICOM buffer with a
+   * SpecificCharacterSet and a PatientName.
+   *
+   * @param {string} charSet The SpecificCharacterSet value.
+   * @param {number[]} nameBytes The PatientName value bytes.
+   * @returns {ArrayBuffer} The DICOM buffer.
+   */
+  const getCharSetBuffer = (charSet, nameBytes) => {
+    const meta = toElementBytes(0x0002, 0x0010, 'UI',
+      toBytes('1.2.840.10008.1.2.1 '));
+    const bytes = toBytes(
+      new Array(128).fill(0),
+      'DICM',
+      toElementBytes(0x0002, 0x0000, 'UL', [meta.length, 0, 0, 0]),
+      meta,
+      toElementBytes(0x0008, 0x0005, 'CS', toBytes(charSet)),
+      toElementBytes(0x0010, 0x0010, 'PN', nameBytes)
+    );
+    return new Uint8Array(bytes).buffer;
+  };
+
+  /**
+   * Tests for SpecificCharacterSet ISO 2022 IR 149 (Korean) with
+   * code extensions.
+   *
+   * @function module:tests/dicom~charSetCodeExtensions
+   */
+  test('SpecificCharacterSet ISO 2022 IR 149 with code extensions', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+    // korean: ISO 2022 IR 149, G1 designated with ESC $ ) C
+    const escC = [0x1b, 0x24, 0x29, 0x43];
+    const koreanName = toBytes(
+      'Hong^Gildong=',
+      escC, [0xfb, 0xf3], '^',
+      escC, [0xd1, 0xce, 0xd4, 0xd7], '=',
+      escC, [0xc8, 0xab], '^',
+      escC, [0xb1, 0xe6, 0xb5, 0xbf]
+    );
+    const koreanParser = new DicomParser();
+    koreanParser.parse(getCharSetBuffer('ISO 2022 IR 149', koreanName));
+    assert.equal(
+      koreanParser.getDicomElements()['00100010'].value[0],
+      'Hong^Gildong=洪^吉洞=홍^길동',
+      'Korean PatientName'
+    );
+
+    assert.equal(warnSpy.mock.calls.length, 0, 'No warning');
+    warnSpy.mockRestore();
+  });
 
   /**
    * Tests for {@link cleanString}.
