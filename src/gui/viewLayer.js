@@ -426,6 +426,25 @@ export class ViewLayer {
         this.#needsDataUpdate = true;
         this.draw();
       }
+
+      if (sizeChanged) {
+        /**
+         * Base size change event: the layer world size changed,
+         *   the stage needs to be fitted to its container again.
+         *
+         * @event ViewLayer#basesizechange
+         * @type {CustomEvent}
+         * @property {object} detail The event detail.
+         * @property {string} detail.srclayerid The source layer id.
+         * @property {string} detail.dataid The data id.
+         * @property {Array} detail.value The new base size as [x, y].
+         */
+        this.#fireEvent(new CustomEvent('basesizechange', {
+          detail: {
+            value: [vcSize.x, vcSize.y]
+          }
+        }));
+      }
     }
   };
 

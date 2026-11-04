@@ -893,6 +893,7 @@ export class LayerGroup extends EventTarget {
     // propagate viewLayer events
     viewLayer.addEventListener('renderstart', this.#fireEvent);
     viewLayer.addEventListener('renderend', this.#fireEvent);
+    viewLayer.addEventListener('basesizechange', this.#fireEvent);
   }
 
   /**
@@ -911,6 +912,7 @@ export class LayerGroup extends EventTarget {
     // stop propagating viewLayer events
     viewLayer.removeEventListener('renderstart', this.#fireEvent);
     viewLayer.removeEventListener('renderend', this.#fireEvent);
+    viewLayer.removeEventListener('basesizechange', this.#fireEvent);
 
     // stop view layer - image binding
     // (binding is done in layer.setView)

@@ -138,4 +138,43 @@ describe('gui', () => {
     }
   });
 
+  /**
+   * Mock the canvas 2D context (not implemented in jsdom).
+   */
+  function mockCanvasContext() {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+      clearRect: () => {},
+      fillRect: () => {},
+      drawImage: () => {},
+      // opaque pixel: canCreateCanvas success
+      getImageData: () => ({data: [0, 0, 0, 255]}),
+      createImageData: (width, height) => ({
+        width,
+        height,
+        data: new Uint8ClampedArray(width * height * 4)
+      })
+    });
+  }
+
+  test('ViewLayer onimagegeometrychange fires basesizechange', () => {
+    mockCanvasContext();
+    const viewLayer = createViewLayer(false);
+    // base size smaller than the 2x2 image: as when the layer is
+    // created at first load item for a non acquisition orientation
+    viewLayer.initialise({x: 2, y: 1}, {x: 1, y: 1}, 1);
+    const listener = vi.fn();
+    viewLayer.addEventListener('basesizechange', listener);
+
+    viewLayer.onimagegeometrychange(new CustomEvent('imagegeometrychange'));
+    assert.equal(listener.mock.calls.length, 1);
+    const detail = listener.mock.calls[0][0].detail;
+    assert.deepEqual(detail.value, [2, 2]);
+    assert.equal(detail.dataid, 'data0');
+    assert.deepEqual(viewLayer.getBaseSize(), {x: 2, y: 2});
+
+    // same size: no event
+    viewLayer.onimagegeometrychange(new CustomEvent('imagegeometrychange'));
+    assert.equal(listener.mock.calls.length, 1);
+  });
+
 });

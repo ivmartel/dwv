@@ -711,6 +711,11 @@ export class StageController extends EventTarget {
     // propagate viewLayer events
     group.addEventListener('renderstart', this.#propagate);
     group.addEventListener('renderend', this.#propagate);
+    // the image size can change while loading (for ex a coronal
+    // view of axial data rendered at first load item): fit again
+    group.addEventListener('basesizechange', () => {
+      this.#stage.fitToContainer();
+    });
     // propagate view events
     for (const eventName of viewEventNames) {
       group.addEventListener(eventName, this.#propagate);
