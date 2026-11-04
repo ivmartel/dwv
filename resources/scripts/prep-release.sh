@@ -7,13 +7,12 @@ set -e
 # print usage information
 usage() {
   echo ""
-  echo "Usage: $0 -r releaseVersion -p previousVersion"
+  echo "Usage: $0 -r releaseVersion"
   echo -e "  -r The release version, format 'm.n.p'"
-  echo -e "  -p The previous version for issue gathering in changelog, format 'm.n.p'"
   echo -e "  -s The step at which to start (optional, [1,5])"
   echo -e "Warning: the command needs to be run from the root of the repository."
   echo -e "Example:"
-  echo -e "> prep-release -r 0.28.0 -p 0.27.0"
+  echo -e "> prep-release -r 0.28.0"
   echo ""
   exit 1 # Exit script after printing help
 }
@@ -36,11 +35,10 @@ info() {
 step=1
 
 # input options
-while getopts "r:p:s:h" opt
+while getopts "r:s:h" opt
 do
    case "$opt" in
       r ) releaseVersion="$OPTARG" ;;
-      p ) prevVersion="$OPTARG" ;;
       s ) step="$OPTARG" ;;
       h ) usage ;;
       ? ) usage ;; # Print usage in case parameter is non-existent
@@ -53,22 +51,8 @@ then
    error "Empty release version";
    usage
 fi
-if [ -z "$prevVersion" ]
-then
-   error "Empty previous version";
-   usage
-fi
 
-info "Preparing release for '$releaseVersion' with previous version '$prevVersion'..."
-
-# ask about gren token
-read -n 1 -p "$(info 'Did you setup the GREN Github token? (y: continue) ')" grenSetup
-if [ "$grenSetup" != "y" ]
-then
-  info 'Exiting'
-  exit
-fi
-echo -e ""
+info "Preparing release for '$releaseVersion'..."
 
 # branch name
 releaseBranch="v${releaseVersion}"
@@ -119,15 +103,8 @@ if [ $step -eq 4 ]
 then
   info "(4/5) update changelog"
 
-  # gren wants an existing tag...
-  git tag v$releaseVersion
-  git push origin --tags
-  # run gren
-  yarn run gren changelog --generate --override --changelog-filename=new.md \
-    --tags=v$prevVersion..v$releaseVersion --milestone-match=$releaseVersion
-  # delete tag
-  git tag -d v$releaseVersion
-  git push --delete origin v$releaseVersion
+  # new: release milestone issues
+  node resources/scripts/changelog.js $releaseVersion > new.md
   # line: separator between releases
   echo -en '\n---\n' > line.md
   # old: changelog with no title

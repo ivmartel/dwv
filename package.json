@@ -47,7 +47,6 @@
     "diff2html": "^3.4.56",
     "eslint": "^10.10.0",
     "eslint-plugin-jsdoc": "^65.0.2",
-    "github-release-notes": "0.17.3",
     "globals": "^17.12.0",
     "html-webpack-plugin": "^5.6.8",
     "jsdoc": "^4.0.5",
@@ -72,7 +71,6 @@
     "test": "vitest",
     "test-ci": "vitest --coverage --watch false --reporter default --reporter json",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
-    "gren": "gren",
     "types": "tsc -p resources/api/tsconfig.json",
     "api": "api-extractor run -c resources/api/api-extractor.json --local",
     "api-ci": "api-extractor run -c resources/api/api-extractor.json"

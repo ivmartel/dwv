@@ -35,7 +35,7 @@ For the application behaviour, check these tools:
 1.  Check [integrations](/tutorials/integrations) by launching dwv in some PACS
 1.  Check module integration
 1.  Create release:
-    1. run the `resources/scripts/prep-release` script with the release and previous version
+    1. run the `resources/scripts/prep-release` script with the release version
     1. review changes
     1. run the `resources/scripts/finish-release` script with the release and next version
 1.  Create release from [github releases](https://github.com/ivmartel/dwv/releases) (creates the tag)
