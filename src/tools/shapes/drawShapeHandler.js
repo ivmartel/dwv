@@ -81,6 +81,13 @@ export class DrawShapeHandler extends EventTarget {
   #originalCursor;
 
   /**
+   * Element whose cursor was changed: the shape stage container.
+   *
+   * @type {HTMLElement|undefined}
+   */
+  #cursorElement;
+
+  /**
    * Shape with mouse over.
    *
    * @type {Konva.Group}
@@ -205,8 +212,12 @@ export class DrawShapeHandler extends EventTarget {
    */
   #onMouseOverShapeGroup() {
     // mouse cursor
-    this.#originalCursor = document.body.style.cursor;
-    document.body.style.cursor = this.#mouseOverCursor;
+    const stage = this.#mouseOverShapeGroup.getStage();
+    if (stage) {
+      this.#cursorElement = stage.container();
+      this.#originalCursor = this.#cursorElement.style.cursor;
+      this.#cursorElement.style.cursor = this.#mouseOverCursor;
+    }
     // shape opacity
     this.#mouseOverShapeGroup.opacity(0.75);
   }
@@ -216,8 +227,9 @@ export class DrawShapeHandler extends EventTarget {
    */
   onMouseOutShapeGroup() {
     // mouse cursor
-    if (typeof this.#originalCursor !== 'undefined') {
-      document.body.style.cursor = this.#originalCursor;
+    if (typeof this.#cursorElement !== 'undefined') {
+      this.#cursorElement.style.cursor = this.#originalCursor;
+      this.#cursorElement = undefined;
       this.#originalCursor = undefined;
     }
     // shape opacity
