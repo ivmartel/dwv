@@ -7,6 +7,22 @@ import {InteractionEventNames} from '../gui/generic.js';
  */
 
 /**
+ * Check if an event target is an editable element (input, select,
+ *   text area or content editable): keys typed in it are not shortcuts.
+ *
+ * @param {EventTarget|null} target The event target.
+ * @returns {boolean} True if editable.
+ */
+function isEditable(target) {
+  if (target === null || typeof target !== 'object') {
+    return false;
+  }
+  const element = /** @type {HTMLElement} */ (target);
+  return element.isContentEditable === true ||
+    ['INPUT', 'SELECT', 'TEXTAREA'].includes(element.tagName);
+}
+
+/**
  * Toolbox controller.
  */
 export class ToolboxController {
@@ -56,10 +72,25 @@ export class ToolboxController {
   #pendingUnbindLayers = {};
 
   /**
-   * @param {object} toolList The list of tool objects.
+   * Root document, listened to for keyboard shortcuts.
+   * Undefined if there is no DOM.
+   *
+   * @type {EventTarget|undefined}
    */
-  constructor(toolList) {
+  #rootDocument;
+
+  /**
+   * @param {object} toolList The list of tool objects.
+   * @param {DocumentFragment} [rootDocument] Optional root document
+   *   to listen to for keyboard shortcuts, defaults to `document`.
+   */
+  constructor(toolList, rootDocument) {
     this.#toolList = toolList;
+    this.#rootDocument = rootDocument;
+    if (typeof this.#rootDocument === 'undefined' &&
+      typeof document !== 'undefined') {
+      this.#rootDocument = document;
+    }
   }
 
   /**
@@ -77,17 +108,38 @@ export class ToolboxController {
    * Enable or disable shortcuts. The 'init' methods enables shortcuts
    *  by default. Call this method after init to disable shortcuts.
    *
+   * Shortcuts are keydown events listened to on the root document
+   *   in the bubbling phase and passed to the selected tool. Events
+   *   with a prevented default or coming from editable elements
+   *   (input, select, text area, content editable) are ignored.
+   *
    * @param {boolean} flag True to enable shortcuts.
    */
   enableShortcuts(flag) {
+    if (typeof this.#rootDocument === 'undefined') {
+      return;
+    }
     if (flag) {
-      window.addEventListener('keydown',
-        this.#getCallback('window', 'keydown'), true);
+      this.#rootDocument.addEventListener('keydown', this.#onKeydown);
     } else {
-      window.removeEventListener('keydown',
-        this.#getCallback('window', 'keydown'), true);
+      this.#rootDocument.removeEventListener('keydown', this.#onKeydown);
     }
   }
+
+  /**
+   * Keydown handler: passes the event to the selected tool.
+   *
+   * @param {KeyboardEvent} event The keydown event.
+   */
+  #onKeydown = (event) => {
+    if (event.defaultPrevented || isEditable(event.target)) {
+      return;
+    }
+    const func = this.#selectedTool?.keydown;
+    if (func) {
+      func(event);
+    }
+  };
 
   /**
    * Get the tool list.

@@ -1,4 +1,4 @@
-import {describe, test, assert, vi, beforeEach, afterEach} from 'vitest';
+import {describe, test, assert, vi, afterEach} from 'vitest';
 import {ToolboxController} from '../../src/app/toolboxController.js';
 import {InteractionEventNames} from '../../src/gui/generic.js';
 
@@ -94,6 +94,21 @@ class TestLayer extends EventTarget {
 }
 
 /**
+ * Test element: an event target with a tag name.
+ */
+class TestElement extends EventTarget {
+  tagName;
+
+  /**
+   * @param {string} tagName The tag name.
+   */
+  constructor(tagName) {
+    super();
+    this.tagName = tagName;
+  }
+}
+
+/**
  * Test layer group: an event target with a div id.
  */
 class TestLayerGroup extends EventTarget {
@@ -145,32 +160,20 @@ function touchEvent(type, nTargetTouches = 0) {
 /**
  * Create a controller with two test tools.
  *
+ * @param {EventTarget} [rootDocument] Optional root document.
  * @returns {object} The controller and its tools.
  */
-function makeController() {
+function makeController(rootDocument) {
   const tool0 = new TestTool();
   const tool1 = new TestTool();
-  const controller = new ToolboxController({tool0, tool1});
+  const controller = new ToolboxController({tool0, tool1}, rootDocument);
   return {controller, tool0, tool1};
 }
 
 describe('app', () => {
 
-  const controllers = [];
-
-  beforeEach(() => {
-    // shortcuts listen to window keydown
-    vi.stubGlobal('window', new EventTarget());
-  });
-
   afterEach(() => {
-    // remove window listeners added by init
-    for (const controller of controllers) {
-      controller.enableShortcuts(false);
-    }
-    controllers.length = 0;
     vi.restoreAllMocks();
-    vi.unstubAllGlobals();
   });
 
   /**
@@ -189,7 +192,6 @@ describe('app', () => {
 
     test('init initialises all tools', () => {
       const {controller, tool0, tool1} = makeController();
-      controllers.push(controller);
       controller.init();
       assert.equal(tool0.initCalls, 1);
       assert.equal(tool1.initCalls, 1);
@@ -248,32 +250,111 @@ describe('app', () => {
    */
   describe('ToolboxController shortcuts', () => {
 
+    /**
+     * Create a keydown event.
+     *
+     * @param {EventTarget} [target] Optional event target.
+     * @returns {Event} The event.
+     */
+    function keydown(target) {
+      const event = new Event('keydown', {cancelable: true});
+      if (typeof target !== 'undefined') {
+        Object.defineProperty(event, 'target', {value: target});
+      }
+      return event;
+    }
+
     test('init enables keydown forwarding to the selected tool', () => {
-      const {controller, tool0} = makeController();
-      controllers.push(controller);
+      const root = new EventTarget();
+      const {controller, tool0} = makeController(root);
       controller.init();
 
       // no selected tool: nothing happens
-      window.dispatchEvent(new Event('keydown'));
+      root.dispatchEvent(keydown());
       controller.setSelectedTool('tool0');
-      window.dispatchEvent(new Event('keydown'));
+      root.dispatchEvent(keydown());
       assert.deepEqual(tool0.events, ['keydown']);
     });
 
+    test('no keydown forwarding before init', () => {
+      const root = new EventTarget();
+      const {controller, tool0} = makeController(root);
+      controller.setSelectedTool('tool0');
+      root.dispatchEvent(keydown());
+      assert.deepEqual(tool0.events, []);
+    });
+
+    test('default to document', () => {
+      const root = new EventTarget();
+      vi.stubGlobal('document', root);
+      try {
+        const {controller, tool0} = makeController();
+        controller.init();
+        controller.setSelectedTool('tool0');
+        root.dispatchEvent(keydown());
+        assert.deepEqual(tool0.events, ['keydown']);
+        controller.enableShortcuts(false);
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
+
+    test('no document: no shortcuts', () => {
+      const {controller} = makeController();
+      assert.doesNotThrow(() => {
+        controller.init();
+        controller.enableShortcuts(false);
+      });
+    });
+
+    test('keydown from editable elements is ignored', () => {
+      const root = new EventTarget();
+      const {controller, tool0} = makeController(root);
+      controller.init();
+      controller.setSelectedTool('tool0');
+      for (const tagName of ['INPUT', 'SELECT', 'TEXTAREA']) {
+        root.dispatchEvent(keydown(new TestElement(tagName)));
+      }
+      const editable = new TestElement('DIV');
+      editable.isContentEditable = true;
+      root.dispatchEvent(keydown(editable));
+      assert.deepEqual(tool0.events, []);
+      // non editable element
+      root.dispatchEvent(keydown(new TestElement('DIV')));
+      assert.deepEqual(tool0.events, ['keydown']);
+    });
+
+    test('default prevented keydown is ignored', () => {
+      const root = new EventTarget();
+      const {controller, tool0} = makeController(root);
+      controller.init();
+      controller.setSelectedTool('tool0');
+      // a listener on the way prevents the default
+      const event = keydown();
+      event.preventDefault();
+      root.dispatchEvent(event);
+      assert.deepEqual(tool0.events, []);
+    });
+
     test('enableShortcuts(false) stops keydown forwarding', () => {
-      const {controller, tool0} = makeController();
-      controllers.push(controller);
+      const root = new EventTarget();
+      const {controller, tool0} = makeController(root);
       controller.init();
       controller.setSelectedTool('tool0');
 
       controller.enableShortcuts(false);
-      window.dispatchEvent(new Event('keydown'));
+      root.dispatchEvent(keydown());
       assert.deepEqual(tool0.events, []);
 
       controller.enableShortcuts(true);
       // enabling twice does not double the forwarding
       controller.enableShortcuts(true);
-      window.dispatchEvent(new Event('keydown'));
+      root.dispatchEvent(keydown());
+      assert.deepEqual(tool0.events, ['keydown']);
+      // disabling twice is fine
+      controller.enableShortcuts(false);
+      controller.enableShortcuts(false);
+      root.dispatchEvent(keydown());
       assert.deepEqual(tool0.events, ['keydown']);
     });
 

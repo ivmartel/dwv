@@ -1462,7 +1462,7 @@ export class TagInfo {
 
 // @public
 export class ToolboxController {
-    constructor(toolList: object);
+    constructor(toolList: object, rootDocument?: DocumentFragment);
     bindLayerGroup(layerGroup: LayerGroup, layer: ViewLayer | DrawLayer): void;
     enableShortcuts(flag: boolean): void;
     getSelectedTool(): object;

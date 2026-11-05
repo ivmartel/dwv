@@ -875,7 +875,8 @@ export class App extends EventTarget {
         }
       }
       // add tools to the controller
-      this.#toolboxController = new ToolboxController(appToolList);
+      this.#toolboxController = new ToolboxController(
+        appToolList, this.#options.rootDocument);
 
       this.#stageController.setToolboxController(this.#toolboxController);
     }
