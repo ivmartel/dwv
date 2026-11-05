@@ -93,7 +93,8 @@ export function getViewFromDOMImage(domImage, origin, index) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext('2d');
+  // the canvas is only used to read back data with getImageData
+  const ctx = canvas.getContext('2d', {willReadFrequently: true});
   ctx.drawImage(domImage, 0, 0);
   // get the image data
   const imageData = ctx.getImageData(0, 0, width, height);
@@ -189,7 +190,8 @@ export function getViewFromDOMVideo(
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext('2d');
+  // the canvas is only used to read back data with getImageData
+  const ctx = canvas.getContext('2d', {willReadFrequently: true});
 
   // using seeked to loop through all video frames
   video.addEventListener('seeked', onseeked, false);
