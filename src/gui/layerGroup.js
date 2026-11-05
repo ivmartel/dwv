@@ -268,11 +268,12 @@ export class LayerGroup extends EventTarget {
   constructor(containerDiv, withInfoLayer) {
     super();
     this.#containerDiv = containerDiv;
+    const doc = containerDiv.ownerDocument;
 
     if (typeof withInfoLayer !== 'undefined' &&
       withInfoLayer === true
     ) {
-      const layerDiv = document.createElement('div');
+      const layerDiv = doc.createElement('div');
       layerDiv.id = getInfoLayerDivId(containerDiv.id);
       layerDiv.className = 'infoLayer';
       containerDiv.appendChild(layerDiv);
@@ -994,7 +995,8 @@ export class LayerGroup extends EventTarget {
    * @returns {HTMLDivElement} A DOM div.
    */
   #getNextLayerDiv() {
-    const div = document.createElement('div');
+    const doc = this.#containerDiv.ownerDocument;
+    const div = doc.createElement('div');
     div.id = getLayerDivId(this.getDivId(), this.#layers.length);
     div.className = 'layer';
     div.style.pointerEvents = 'none';
@@ -1106,10 +1108,11 @@ export class LayerGroup extends EventTarget {
     const position = vc.getCurrentPosition();
     const planePos = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(planePos);
+    const doc = this.#containerDiv.ownerDocument;
 
     // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
-      const lineH = document.createElement('hr');
+      const lineH = doc.createElement('hr');
       lineH.id = `${this.getDivId()}-scroll-crosshair-horizontal`;
       lineH.className = 'horizontal';
       lineH.style.width = `${this.#containerDiv.offsetWidth}px`;
@@ -1123,7 +1126,7 @@ export class LayerGroup extends EventTarget {
 
     // vertical line
     if (typeof displayPos.getX() !== 'undefined') {
-      const lineV = document.createElement('hr');
+      const lineV = doc.createElement('hr');
       lineV.id = `${this.getDivId()}-scroll-crosshair-vertical`;
       lineV.className = 'vertical';
       lineV.style.width = `${this.#containerDiv.offsetHeight}px`;
@@ -1155,6 +1158,7 @@ export class LayerGroup extends EventTarget {
   showTooltip(point) {
     // remove previous div
     this.removeTooltipDiv();
+    const doc = this.#containerDiv.ownerDocument;
 
     const viewLayer = this.getBaseViewLayer();
     const viewController = viewLayer.getViewController();
@@ -1164,7 +1168,7 @@ export class LayerGroup extends EventTarget {
 
     // create
     if (typeof value !== 'undefined') {
-      const span = document.createElement('span');
+      const span = doc.createElement('span');
       span.id = 'scroll-tooltip';
       // tooltip position
       span.style.left = `${point.getX() + 10}px`;
@@ -1173,7 +1177,7 @@ export class LayerGroup extends EventTarget {
       if (typeof viewController.getPixelUnit() !== 'undefined') {
         text += ` ${viewController.getPixelUnit()}`;
       }
-      span.appendChild(document.createTextNode(text));
+      span.appendChild(doc.createTextNode(text));
       // add to local var
       this.#tooltipHtmlElement = span;
       // add to html

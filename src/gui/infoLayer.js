@@ -92,6 +92,7 @@ export class InfoLayer {
    * @param {InfoDataItem[]} data The info data array.
    */
   #create(data) {
+    const doc = this.#containerDiv.ownerDocument;
     // possible info pos
     const posList = [];
     for (const item of data) {
@@ -103,22 +104,22 @@ export class InfoLayer {
 
     for (const pos of posList) {
       // create list element
-      const ul = document.createElement('ul');
+      const ul = doc.createElement('ul');
       // list items
       for (const item of data) {
         if (item.pos === pos) {
-          const li = document.createElement('li');
+          const li = doc.createElement('li');
           li.id = getLiId(item);
           // fill in tags
           if (typeof item.tags !== 'undefined') {
-            li.appendChild(document.createTextNode(item.value));
+            li.appendChild(doc.createTextNode(item.value));
           }
           // append to list
           ul.appendChild(li);
         }
       }
       // position element
-      const posElement = document.createElement('div');
+      const posElement = doc.createElement('div');
       posElement.id = getPosDivId(pos);
       posElement.className = `info-${pos} info`;
       posElement.appendChild(ul);
@@ -136,6 +137,7 @@ export class InfoLayer {
    * @param {InfoDataItem[]} data The info data array.
    */
   #update(data) {
+    const doc = this.#containerDiv.ownerDocument;
     // updates all the data
     for (const item of data) {
       const id = `#${getLiId(item)}`;
@@ -143,7 +145,7 @@ export class InfoLayer {
       const text = item.value;
       if (text && li) {
         // update li
-        li.replaceChildren(document.createTextNode(text));
+        li.replaceChildren(doc.createTextNode(text));
       }
     }
   };
