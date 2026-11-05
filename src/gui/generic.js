@@ -127,7 +127,8 @@ export function canCreateCanvas(width, height) {
   cropCvs.height = 1;
   // contexts
   const testCtx = testCvs.getContext('2d');
-  const cropCtx = cropCvs.getContext('2d');
+  // the crop canvas is read back with getImageData
+  const cropCtx = cropCvs.getContext('2d', {willReadFrequently: true});
   // set data
   if (testCtx) {
     testCtx.fillRect(width - 1, height - 1, 1, 1);

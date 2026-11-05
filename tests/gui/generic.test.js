@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi} from 'vitest';
 import {canCreateCanvas} from '../../src/gui/generic.js';
 
 /**
@@ -34,6 +34,37 @@ describe('gui', () => {
     // limit for most browsers (06/2021): 16384^2
     assert.equal(canCreateCanvas(16385, 16385), true,
       'Cannot create 16385*16385 canvas');
+  });
+
+  /**
+   * Tests that {@link canCreateCanvas} only asks for a read optimised
+   * context for the canvas it reads back.
+   *
+   * @function module:tests/gui~cancreatecanvasWillReadFrequently
+   */
+  test('canCreateCanvas uses willReadFrequently on crop canvas', () => {
+    const getContextArgs = [];
+    const createElement = document.createElement.bind(document);
+    const spy = vi.spyOn(document, 'createElement')
+      .mockImplementation((tag) => {
+        const element = createElement(tag);
+        if (tag === 'canvas') {
+          const getContext = element.getContext.bind(element);
+          element.getContext = (...args) => {
+            getContextArgs.push(args);
+            return getContext(...args);
+          };
+        }
+        return element;
+      });
+
+    canCreateCanvas(2, 2);
+    spy.mockRestore();
+
+    assert.deepEqual(getContextArgs, [
+      ['2d'],
+      ['2d', {willReadFrequently: true}]
+    ], 'test canvas: default, crop canvas: willReadFrequently');
   });
 
 });
