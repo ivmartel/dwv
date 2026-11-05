@@ -11,6 +11,16 @@ annotation, filters). Not certified for diagnostic use. Licensed GPL-3.0;
 contributions follow the guidelines and license terms in
 `.github/contributing.md`.
 
+DWV is an embeddable library, not an application: it runs inside a host page
+or framework it does not control, possibly inside a shadow DOM or an iframe,
+with several `App` instances on the same page, or under Node (see
+`pack-node`). Code in `src/` must not rely on or use global objects such as
+`window` (or the global `document`): no global event listeners, no lookups
+in the global document, no state kept on globals. Use the `rootDocument` app
+option (`AppOptions.rootDocument`, defaults to `document`) to find elements
+and register document-level events (for ex keyboard events in
+`ToolboxController`), and attach other listeners to the app's own elements.
+
 Package manager is `yarn` (yarn v4, `packageManager` pinned in package.json).
 `corepack enable` is enough to get the right yarn version; npm also works for
 all scripts. Node >= 18 required (CI uses Node 26). Module type is `"module"`
