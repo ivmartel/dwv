@@ -50,7 +50,7 @@ export class ViewController {
   /**
    * Third dimension player ID (created by setInterval).
    *
-   * @type {number|undefined}
+   * @type {ReturnType<typeof setInterval>|undefined}
    */
   #playerID;
 
