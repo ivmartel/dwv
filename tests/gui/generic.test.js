@@ -68,6 +68,34 @@ describe('gui', () => {
       'Cannot create 512*0 canvas');
   });
 
+  /**
+   * Tests that {@link canCreateCanvas} only asks for a read optimised
+   * context for the canvas it reads back.
+   *
+   * @function module:tests/gui~cancreatecanvasWillReadFrequently
+   */
+  test('canCreateCanvas uses willReadFrequently on crop canvas', () => {
+    const doc = createCanvasDocument(true);
+    const getContextArgs = [];
+    const createElement = doc.createElement;
+    doc.createElement = (tag) => {
+      const element = createElement(tag);
+      const getContext = element.getContext;
+      element.getContext = (...args) => {
+        getContextArgs.push(args);
+        return getContext(...args);
+      };
+      return element;
+    };
+
+    canCreateCanvas(2, 2, doc);
+
+    assert.deepEqual(getContextArgs, [
+      ['2d'],
+      ['2d', {willReadFrequently: true}]
+    ], 'test canvas: default, crop canvas: willReadFrequently');
+  });
+
 
   /**
    * Tests for {@link CanvasSizeChecker}.
