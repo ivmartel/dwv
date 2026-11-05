@@ -23,7 +23,7 @@ export class RawImageLoader extends LoaderBase {
     }
     // create uri
     const file = new Blob([response], {type: `image/${imageType}`});
-    return window.URL.createObjectURL(file);
+    return URL.createObjectURL(file);
   }
 
   /**

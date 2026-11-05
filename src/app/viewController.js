@@ -816,7 +816,7 @@ export class ViewController {
       const canScroll3D = size.canScroll3D();
       const helper = this.getPositionHelper();
 
-      this.#playerID = window.setInterval(() => {
+      this.#playerID = setInterval(() => {
         let canDoMore;
         if (canScroll3D) {
           canDoMore = helper.incrementPositionAlongScroll();

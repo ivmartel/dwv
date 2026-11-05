@@ -27,7 +27,7 @@ export class RawVideoLoader extends LoaderBase {
     }
     // create uri
     const uri = `data:video/${ dataType
-    };base64,${window.btoa(videoDataStr)}`;
+    };base64,${btoa(videoDataStr)}`;
     return uri;
   }
 
