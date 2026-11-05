@@ -8,7 +8,7 @@ import {ColourMap} from './luts.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
-  getPixelSpacing,
+  getLengthUnit,
   getTagPixelUnit,
   getPhotometricInterpretation,
   isMonochrome,
@@ -384,8 +384,6 @@ export class ImageFactory {
 
     // number of pixels
     const numberOfPixels = geometry.getSize().getTotalSize();
-    // needed for unit
-    const spacing2D = getPixelSpacing(dataElements);
 
     // SOP Instance UID
     const sopInstanceUid = safeGetLocal(TagKeys.SOPInstanceUID);
@@ -503,11 +501,7 @@ export class ImageFactory {
     }
 
     // length unit
-    if (typeof spacing2D === 'undefined') {
-      meta.lengthUnit = 'unit.pixel';
-    } else {
-      meta.lengthUnit = 'unit.mm';
-    }
+    meta.lengthUnit = getLengthUnit(dataElements);
 
     // window level presets
     const presets = getWindowPresets(dataElements, intensityFactor);
