@@ -1004,26 +1004,25 @@ export class ViewLayer {
     // set locals
     this.#baseSpacing = spacing;
     this.#opacity = Math.min(Math.max(alpha, 0), 1);
+    const doc = this.#containerDiv.ownerDocument;
 
     // create canvas
     // (canvas size is set in fitToContainer)
-    this.#canvas = document.createElement('canvas');
+    this.#canvas = doc.createElement('canvas');
     this.#containerDiv.appendChild(this.#canvas);
 
     // check that the getContext method exists
     if (!this.#canvas.getContext) {
-      alert('Error: no canvas.getContext method.');
-      return;
+      throw new Error('No canvas.getContext method.');
     }
     // get the 2D context
     this.#context = this.#canvas.getContext('2d');
     if (!this.#context) {
-      alert('Error: failed to get the 2D context.');
-      return;
+      throw new Error('Failed to get the canvas 2D context.');
     }
 
     // off screen canvas
-    this.#offscreenCanvas = document.createElement('canvas');
+    this.#offscreenCanvas = doc.createElement('canvas');
 
     // set base size: needs an existing context and off screen canvas
     this.#setBaseSize(size);
