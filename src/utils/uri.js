@@ -11,8 +11,9 @@ export function getUrlFromUri(uri) {
   // add base to allow for relative urls
   // (base is not used for absolute urls)
   let base;
-  if (window.location.origin !== 'null') {
-    base = window.location.origin;
+  if (typeof location !== 'undefined' &&
+    location.origin !== 'null') {
+    base = location.origin;
   }
   return new URL(uri, base);
 }
