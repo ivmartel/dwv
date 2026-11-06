@@ -48,6 +48,17 @@ function rgbaToRgb(rgba) {
   return rgb;
 }
 
+/**
+ * Make a mock DOM image.
+ *
+ * @param {number} w Image width in pixels.
+ * @param {number} h Image height in pixels.
+ * @returns {object} The mock image.
+ */
+function makeDomImage(w, h) {
+  return {width: w, height: h, ownerDocument: document};
+}
+
 // ---------------------------------------------------------------------------
 // Video mock helper
 // ---------------------------------------------------------------------------
@@ -61,6 +72,7 @@ class MockVideo {
   videoHeight;
   duration;
   currentTime = 0;
+  ownerDocument = document;
   #seekedHandlers = [];
 
   /**
@@ -159,7 +171,7 @@ describe('image', () => {
    */
   test('getViewFromDOMImage returns data and source', () => {
     const origin = 'http://example.com/img.png';
-    const result = getViewFromDOMImage({width: 2, height: 2}, origin, 0);
+    const result = getViewFromDOMImage(makeDomImage(2, 2), origin, 0);
 
     assert.ok(result.data, 'result has data');
     assert.equal(result.source, origin, 'source equals origin');
@@ -172,7 +184,7 @@ describe('image', () => {
    */
   test('getViewFromDOMImage with URL origin sets info fields', () => {
     const origin = 'http://example.com/img.png';
-    const {data} = getViewFromDOMImage({width: 3, height: 4}, origin, 1);
+    const {data} = getViewFromDOMImage(makeDomImage(3, 4), origin, 1);
     const info = data.meta;
 
     assert.deepEqual(info.origin.value, [origin], 'origin');
@@ -191,7 +203,7 @@ describe('image', () => {
    */
   test('getViewFromDOMImage with File origin sets info fields', () => {
     const file = new File(['x'], 'photo.png', {type: 'image/png'});
-    const {data} = getViewFromDOMImage({width: 2, height: 2}, file, 0);
+    const {data} = getViewFromDOMImage(makeDomImage(2, 2), file, 0);
     const info = data.meta;
 
     assert.deepEqual(info.fileName.value, ['photo.png'], 'fileName');
@@ -212,7 +224,7 @@ describe('image', () => {
    */
   test('getViewFromDOMImage defaults imageUid to 0 when index is falsy', () => {
     const {data} = getViewFromDOMImage(
-      {width: 2, height: 2}, 'http://x.com/a.png', undefined
+      makeDomImage(2, 2), 'http://x.com/a.png', undefined
     );
     assert.deepEqual(data.meta.imageUid.value, [0], 'imageUid defaults to 0');
   });
@@ -224,7 +236,7 @@ describe('image', () => {
    */
   test('getViewFromDOMImage creates RGB image', () => {
     const {data} = getViewFromDOMImage(
-      {width: 2, height: 2}, 'http://x.com/a.png', 0
+      makeDomImage(2, 2), 'http://x.com/a.png', 0
     );
     assert.equal(
       data.image.getPhotometricInterpretation(), 'RGB', 'photometric'
@@ -241,7 +253,7 @@ describe('image', () => {
     mockCtx.getImageData.mockReturnValue({data: rgbaData});
 
     const {data} = getViewFromDOMImage(
-      {width: 2, height: 2}, 'http://x.com/a.png', 0
+      makeDomImage(2, 2), 'http://x.com/a.png', 0
     );
     const expected = rgbaToRgb(rgbaData);
     const actual = data.image.getBuffer();
@@ -257,7 +269,7 @@ describe('image', () => {
    */
   test('getViewFromDOMImage sets SeriesInstanceUID in image meta', () => {
     const origin = 'http://x.com/img.png';
-    const {data} = getViewFromDOMImage({width: 2, height: 2}, origin, 0);
+    const {data} = getViewFromDOMImage(makeDomImage(2, 2), origin, 0);
 
     assert.equal(
       data.image.getMeta().SeriesInstanceUID,

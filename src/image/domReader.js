@@ -90,7 +90,7 @@ export function getViewFromDOMImage(domImage, origin, index) {
   const height = domImage.height;
 
   // draw the image in the canvas in order to get its data
-  const canvas = document.createElement('canvas');
+  const canvas = domImage.ownerDocument.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
@@ -186,7 +186,7 @@ export function getViewFromDOMVideo(
   info.seriesUid = {value: [seriesUID]};
 
   // draw the image in the canvas in order to get its data
-  const canvas = document.createElement('canvas');
+  const canvas = video.ownerDocument.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
