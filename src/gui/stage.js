@@ -1,4 +1,5 @@
 import {LayerGroup} from './layerGroup.js';
+import {CanvasSizeChecker} from './generic.js';
 import {logger} from '../utils/logger.js';
 
 /**
@@ -32,6 +33,13 @@ export class Stage {
    * @type {boolean}
    */
   #imageSmoothing = false;
+
+  /**
+   * Canvas size checker, shared by all the view layers.
+   *
+   * @type {CanvasSizeChecker}
+   */
+  #canvasSizeChecker = new CanvasSizeChecker();
 
   // layer group binders
   #binders = [];
@@ -154,7 +162,8 @@ export class Stage {
    */
   addLayerGroup(htmlElement, withInfoOverlay) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
-    const layerGroup = new LayerGroup(htmlElement, withInfoOverlay);
+    const layerGroup = new LayerGroup(
+      htmlElement, withInfoOverlay, this.#canvasSizeChecker);
     layerGroup.setImageSmoothing(this.#imageSmoothing);
     // add to storage
     const isBound = this.#callbackStore && this.#callbackStore.length !== 0;

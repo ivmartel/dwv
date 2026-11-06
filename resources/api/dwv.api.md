@@ -234,6 +234,11 @@ export class CADReport {
 }
 
 // @public
+export class CanvasSizeChecker {
+    canCreate(size: Scalar2D, doc: Document): boolean;
+}
+
+// @public
 export class ChangeSegmentColourCommand extends Command {
     constructor(mask: MaskImage, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
     isValid(): boolean;
@@ -859,7 +864,7 @@ export function labToUintLab(triplet: object): object;
 
 // @public
 export class LayerGroup extends EventTarget {
-    constructor(containerDiv: HTMLElement, withInfoLayer?: boolean);
+    constructor(containerDiv: HTMLElement, withInfoLayer?: boolean, canvasSizeChecker?: CanvasSizeChecker);
     addDrawLayer(): DrawLayer;
     addInfoData(data: InfoData, dataId: string): void;
     addScale(scaleStep: number, center: Point3D): void;
@@ -1663,7 +1668,7 @@ export class ViewController {
 
 // @public
 export class ViewLayer {
-    constructor(containerDiv: HTMLElement);
+    constructor(containerDiv: HTMLElement, canvasSizeChecker?: CanvasSizeChecker);
     addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;

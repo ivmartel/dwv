@@ -4,7 +4,7 @@ import {viewEventNames} from '../image/view.js';
 import {ViewController} from '../app/viewController.js';
 import {Point2D} from '../math/point.js';
 import {
-  canCreateCanvas,
+  CanvasSizeChecker,
   InteractionEventNames,
   getInteractionEventOptions
 } from './generic.js';
@@ -31,6 +31,13 @@ export class ViewLayer {
    * @type {HTMLElement}
    */
   #containerDiv;
+
+  /**
+   * Canvas size checker.
+   *
+   * @type {CanvasSizeChecker}
+   */
+  #canvasSizeChecker;
 
   /**
    * The view controller.
@@ -233,9 +240,15 @@ export class ViewLayer {
   /**
    * @param {HTMLElement} containerDiv The layer div, its id will be used
    *   as this layer id.
+   * @param {CanvasSizeChecker} [canvasSizeChecker] Optional canvas size
+   *   checker, to share with other layers; defaults to a new one.
    */
-  constructor(containerDiv) {
+  constructor(containerDiv, canvasSizeChecker) {
     this.#containerDiv = containerDiv;
+    if (typeof canvasSizeChecker === 'undefined') {
+      canvasSizeChecker = new CanvasSizeChecker();
+    }
+    this.#canvasSizeChecker = canvasSizeChecker;
     // specific css class name
     this.#containerDiv.className += ' viewLayer';
   }
@@ -1039,7 +1052,7 @@ export class ViewLayer {
   #setBaseSize(size) {
     // check canvas creation
     const doc = this.#containerDiv.ownerDocument;
-    if (!canCreateCanvas(size.x, size.y, doc)) {
+    if (!this.#canvasSizeChecker.canCreate(size, doc)) {
       throw new Error(`Cannot create canvas with size ${
         size.x }, ${size.y}`);
     }
@@ -1100,7 +1113,7 @@ export class ViewLayer {
     if (this.#canvas.width !== containerSize.x ||
       this.#canvas.height !== containerSize.y) {
       const doc = this.#containerDiv.ownerDocument;
-      if (!canCreateCanvas(containerSize.x, containerSize.y, doc)) {
+      if (!this.#canvasSizeChecker.canCreate(containerSize, doc)) {
         throw new Error(`Cannot resize canvas ${
           containerSize.x }, ${containerSize.y}`);
       }

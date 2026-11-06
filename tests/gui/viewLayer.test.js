@@ -10,6 +10,7 @@ import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import {getIdentityMat33} from '../../src/math/matrix.js';
 import {custom} from '../../src/app/custom.js';
+import {CanvasSizeChecker} from '../../src/gui/generic.js';
 
 /**
  * Tests for the 'gui/viewLayer.js' file.
@@ -19,9 +20,10 @@ import {custom} from '../../src/app/custom.js';
  * Create a view layer.
  *
  * @param {boolean} isMask True to create a mask view layer.
+ * @param {CanvasSizeChecker} [checker] Optional canvas size checker.
  * @returns {ViewLayer} The view layer.
  */
-function createViewLayer(isMask) {
+function createViewLayer(isMask, checker) {
   const size = new Size([2, 2, 1]);
   const geometry = new Geometry(
     [new Point3D(0, 0, 0)], size, new Spacing([1, 1, 1]));
@@ -34,7 +36,7 @@ function createViewLayer(isMask) {
   }
   const div = document.createElement('div');
   document.body.appendChild(div);
-  const viewLayer = new ViewLayer(div);
+  const viewLayer = new ViewLayer(div, checker);
   vi.spyOn(viewLayer, 'draw').mockImplementation(() => {});
   const view = new View(image);
   view.setOrientation(getIdentityMat33());
@@ -155,6 +157,30 @@ describe('gui', () => {
       })
     });
   }
+
+  test('ViewLayer shares canvas size checks', () => {
+    mockCanvasContext();
+    const checker = new CanvasSizeChecker();
+    const spy = vi.spyOn(checker, 'canCreate');
+    const viewLayer0 = createViewLayer(false, checker);
+    const viewLayer1 = createViewLayer(false, checker);
+    viewLayer0.initialise({x: 2, y: 2}, {x: 1, y: 1}, 1);
+    viewLayer1.initialise({x: 2, y: 2}, {x: 1, y: 1}, 1);
+    assert.equal(spy.mock.calls.length, 2, 'Both layers use the checker');
+
+    const createSpy = vi.spyOn(document, 'createElement');
+    const getNumberOfCanvases = () => createSpy.mock.calls.filter(
+      (args) => args[0] === 'canvas').length;
+    const offset = {x: 0, y: 0};
+    // first layer: tested
+    viewLayer0.fitToContainer({x: 20, y: 20}, 1, offset);
+    const count = getNumberOfCanvases();
+    assert.ok(count > 0, 'First layer size is tested');
+    // second layer, same size: cached
+    viewLayer1.fitToContainer({x: 20, y: 20}, 1, offset);
+    assert.equal(getNumberOfCanvases(), count,
+      'Second layer uses the shared cache');
+  });
 
   test('ViewLayer onimagegeometrychange fires basesizechange', () => {
     mockCanvasContext();

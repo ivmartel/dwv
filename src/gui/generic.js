@@ -1,6 +1,10 @@
 import {Point2D} from '../math/point.js';
 
 /**
+ * @import {Scalar2D} from '../math/scalar.js';
+ */
+
+/**
  * List of interaction event names.
  */
 export const InteractionEventNames = [
@@ -152,4 +156,76 @@ export function canCreateCanvas(width, height, doc) {
   cropCvs.width = 0;
   cropCvs.height = 0;
   return result;
+}
+
+/**
+ * Check if a size is smaller or equal to another one in both dimensions.
+ *
+ * @param {Scalar2D} size The size to check.
+ * @param {Scalar2D} other The size to compare to.
+ * @returns {boolean} True if size fits in other.
+ */
+function fitsIn(size, other) {
+  return size.x <= other.x && size.y <= other.y;
+}
+
+/**
+ * Canvas size checker: calls `canCreateCanvas` and caches its
+ * results. The browser canvas size limits do not change during a session,
+ * a size smaller than a valid one is valid and a size larger than
+ * an invalid one is invalid.
+ *
+ * Meant to be shared by the view layers of a stage.
+ */
+export class CanvasSizeChecker {
+  /**
+   * Sizes known to be valid: only the largest ones are kept.
+   *
+   * @type {Scalar2D[]}
+   */
+  #validSizes = [];
+
+  /**
+   * Sizes known to be invalid: only the smallest ones are kept.
+   *
+   * @type {Scalar2D[]}
+   */
+  #invalidSizes = [];
+
+  /**
+   * Test if a canvas with the input size can be created.
+   *
+   * @param {Scalar2D} size The canvas size as {x,y}.
+   * @param {Document} doc The document used to create the test canvases.
+   * @returns {boolean} True if the canvas can be created.
+   */
+  canCreate(size, doc) {
+    // zero sized canvases cannot be created
+    // (not cached: they would mark all sizes as invalid)
+    if (size.x < 1 || size.y < 1) {
+      return false;
+    }
+    // check cache
+    if (this.#validSizes.some((item) => fitsIn(size, item))) {
+      return true;
+    }
+    if (this.#invalidSizes.some((item) => fitsIn(item, size))) {
+      return false;
+    }
+    // test
+    const result = canCreateCanvas(size.x, size.y, doc);
+    // update cache, keeping only the entries not made redundant
+    // by the new one
+    const newSize = {x: size.x, y: size.y};
+    if (result) {
+      this.#validSizes = this.#validSizes.filter(
+        (item) => !fitsIn(item, newSize));
+      this.#validSizes.push(newSize);
+    } else {
+      this.#invalidSizes = this.#invalidSizes.filter(
+        (item) => !fitsIn(newSize, item));
+      this.#invalidSizes.push(newSize);
+    }
+    return result;
+  }
 }

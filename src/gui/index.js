@@ -10,7 +10,8 @@ import {
 import {ViewLayer} from './viewLayer.js';
 import {
   getMousePoint,
-  getTouchPoints
+  getTouchPoints,
+  CanvasSizeChecker
 } from './generic.js';
 
 export {
@@ -22,4 +23,5 @@ export {
   getLayerDetailsFromEvent,
   getMousePoint,
   getTouchPoints,
+  CanvasSizeChecker,
 };

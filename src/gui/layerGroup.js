@@ -8,6 +8,7 @@ import {ViewLayer} from './viewLayer.js';
 import {DrawLayer} from './drawLayer.js';
 import {SOPClassUIDs} from '../dicom/dictionary.js';
 import {InfoLayer} from './infoLayer.js';
+import {CanvasSizeChecker} from './generic.js';
 
 /**
  * @import {Point2D, Point3D} from '../math/point.js';
@@ -143,6 +144,13 @@ export class LayerGroup extends EventTarget {
    */
   #containerDiv;
 
+  /**
+   * Canvas size checker, shared with the view layers.
+   *
+   * @type {CanvasSizeChecker}
+   */
+  #canvasSizeChecker;
+
   // jsdoc does not like
   // @type {(ViewLayer|DrawLayer)[]}
 
@@ -264,10 +272,16 @@ export class LayerGroup extends EventTarget {
    * @param {HTMLElement} containerDiv The associated HTML div.
    * @param {boolean} [withInfoLayer] Optional with info layer flag,
    * default to false.
+   * @param {CanvasSizeChecker} [canvasSizeChecker] Optional canvas size
+   *   checker, shared with the view layers; defaults to a new one.
    */
-  constructor(containerDiv, withInfoLayer) {
+  constructor(containerDiv, withInfoLayer, canvasSizeChecker) {
     super();
     this.#containerDiv = containerDiv;
+    if (typeof canvasSizeChecker === 'undefined') {
+      canvasSizeChecker = new CanvasSizeChecker();
+    }
+    this.#canvasSizeChecker = canvasSizeChecker;
     const doc = containerDiv.ownerDocument;
 
     if (typeof withInfoLayer !== 'undefined' &&
@@ -838,7 +852,7 @@ export class LayerGroup extends EventTarget {
     // prepend to container
     this.#containerDiv.append(div);
     // view layer
-    const layer = new ViewLayer(div);
+    const layer = new ViewLayer(div, this.#canvasSizeChecker);
     layer.setImageSmoothing(this.#imageSmoothing);
     // add layer
     this.#layers.push(layer);
