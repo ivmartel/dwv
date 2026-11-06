@@ -23,8 +23,12 @@ If you have questions, please [open an issue](https://www.github.com/ivmartel/dw
 - `doc`: create documentation
 
 I'm using `yarn` as the main package manager. Best to use it to install since
-the lock file (that contains the exact dependency tree) is a yarn file. No need
-to install it, just run `corepack enable` should be enough.
+the lock file (that contains the exact dependency tree) is a yarn file. Run `corepack enable` to install `yarn` shims that read the
+`packageManager` field of `package.json` and download and run that exact yarn
+version. Without enabling it, `corepack yarn <script>` (for ex
+`corepack yarn start`) does the same for a single command.
+Corepack is bundled with Node up to v24 only; from Node 25, install it first
+with `npm install -g corepack`.
 All scripts also work with `npm`.
 
 ## Steps to run the viewer from scratch

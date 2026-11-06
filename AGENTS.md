@@ -22,8 +22,13 @@ and register document-level events (for ex keyboard events in
 `ToolboxController`), and attach other listeners to the app's own elements.
 
 Package manager is `yarn` (yarn v4, `packageManager` pinned in package.json).
-`corepack enable` is enough to get the right yarn version; npm also works for
-all scripts. Node >= 18 required (CI uses Node 26). Module type is `"module"`
+Run `corepack enable` to install `yarn`
+shims that read the `packageManager` field and download and run that exact
+yarn version. Without enabling it, `corepack yarn <script>` (for ex
+`corepack yarn test-ci`) does the same for a single command. Corepack is
+bundled with Node up to v24 only; from Node 25 install it first with
+`npm install -g corepack`. npm also works
+for all scripts. Node >= 18 required (CI uses Node 26). Module type is `"module"`
 (ESM throughout `src/`).
 
 ## DICOM standard
