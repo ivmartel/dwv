@@ -155,6 +155,13 @@ export class ViewerService extends EventTarget {
   #loadProgress = 0;
 
   /**
+   * The selected tool name.
+   *
+   * @type {string|undefined}
+   */
+  #toolName;
+
+  /**
    * Create the app with the viewer configuration.
    */
   constructor() {
@@ -455,6 +462,17 @@ export class ViewerService extends EventTarget {
    */
   setTool(tool) {
     this.#app.setTool(tool);
+    this.#toolName = tool;
+  }
+
+  /**
+   * Check if a tool is the selected one.
+   *
+   * @param {string} toolName The tool name.
+   * @returns {boolean} True if the tool is the selected one.
+   */
+  isSelectedTool(toolName) {
+    return this.#toolName === toolName;
   }
 
   /**

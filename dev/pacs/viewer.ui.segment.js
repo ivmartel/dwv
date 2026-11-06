@@ -11,7 +11,6 @@ import {
 } from '../../src/image/maskFactory.js';
 import {RtStructFactory} from '../../src/image/rtStructFactory.js';
 import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
-import {Brush} from '../../src/tools/brush.js';
 import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
 import {
   ChangeSegmentColourCommand
@@ -918,8 +917,7 @@ export class SegmentationUI {
    */
   #selectSegment(item, segment, segmentation) {
     this.#selectSegmentItems([item]);
-    const toolboxCtrl = this.#service.getToolboxController();
-    if (toolboxCtrl.getSelectedTool() instanceof Brush) {
+    if (this.#service.isSelectedTool('Brush')) {
       this.#appSelectSegment(segment.number, segmentation);
     }
   }
