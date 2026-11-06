@@ -883,6 +883,10 @@ describe('tools/layerGroupPointer', () => {
       });
 
       for (const name of generic.InteractionEventNames) {
+        // not all events are handled by the pointer
+        if (typeof pointer[name] === 'undefined') {
+          continue;
+        }
         let ev;
         if (name === 'wheel') {
           ev = wheelEvent(canvas, {wheelDeltaY: 120});

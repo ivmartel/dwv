@@ -10,6 +10,7 @@ export const InteractionEventNames = [
   'mouseout',
   'wheel',
   'dblclick',
+  'contextmenu',
   'touchstart',
   'touchmove',
   'touchend',
@@ -22,6 +23,7 @@ export const InteractionEventNames = [
  */
 export const NonPassiveInteractionEventNames = [
   'wheel',
+  'contextmenu',
   'touchstart'
 ];
 

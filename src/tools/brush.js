@@ -9,31 +9,6 @@ import {LayerGroupPointer} from './layerGroupPointer.js';
  */
 
 /**
- * Retrieves the unique div ids in the current data view configs.
- *
- * @param {object} dataViewConfigs The data view configs.
- * @returns {string[]} Array of unique div ids.
- */
-function getUniqueDataViewConfigsDivIds(dataViewConfigs) {
-  let allDivIds = [];
-  if (!dataViewConfigs) {
-    return [];
-  }
-  for (const key in dataViewConfigs) {
-    if (dataViewConfigs[key]) {
-      const viewConfigs = dataViewConfigs[key];
-      if (Array.isArray(viewConfigs)) {
-        const divIds = viewConfigs.map(function (config) {
-          return config.divId;
-        });
-        allDivIds = [...allDivIds, ...divIds];
-      }
-    }
-  }
-  return [...new Set(allDivIds)];
-}
-
-/**
  * Brush class.
  */
 export class Brush extends LayerGroupPointer {
@@ -47,23 +22,6 @@ export class Brush extends LayerGroupPointer {
    * @type {App}
    */
   #app;
-
-  /**
-   * Div ids whose context menu is currently deactivated.
-   *
-   * @type {string[]}
-   */
-  #contextMenuDivIds = [];
-
-  /**
-   * Context menu handler: prevents the browser menu so that
-   * the right button can be used by the tool.
-   *
-   * @param {Event} event The context menu event.
-   */
-  #preventContextMenu = (event) => {
-    event.preventDefault();
-  };
 
   /**
    * @param {App} app The associated application.
@@ -114,54 +72,24 @@ export class Brush extends LayerGroupPointer {
   };
 
   /**
-   * Activate the tool and activates/deactivates
-   * the context menu of all dwv div ids.
+   * Handle context menu event: prevents the browser menu so that
+   * the right button can be used by the tool.
+   *
+   * @param {MouseEvent} event The context menu event.
+   */
+  contextmenu = (event) => {
+    event.preventDefault();
+  };
+
+  /**
+   * Activate the tool.
    *
    * @param {boolean} bool The flag to activate or not.
    */
   activate(bool) {
-    if (bool) {
-      const stgCtrl = this.#app.getStageController();
-      const viewConfigs = stgCtrl.getDataViewConfigs();
-      this.#deactivateDivIdsContextMenu(
-        getUniqueDataViewConfigsDivIds(viewConfigs));
-      return;
+    if (!bool) {
+      this.cancel();
     }
-    this.cancel();
-    this.#reactivateDivIdsContextMenu();
-  }
-
-  /**
-   * Deactivates the context menu on all dwv div ids.
-   *
-   * @param {string[]} divIds The div ids whose context menu
-   *   should be deactivated.
-   */
-  #deactivateDivIdsContextMenu(divIds) {
-    // avoid leaving listeners on previously stored divs
-    this.#reactivateDivIdsContextMenu();
-    for (const divId of divIds) {
-      const element = document.getElementById(divId);
-      if (!element) {
-        continue;
-      }
-      element.addEventListener('contextmenu', this.#preventContextMenu);
-      this.#contextMenuDivIds.push(divId);
-    }
-  }
-
-  /**
-   * Reactivates the context menu on the previously deactivated div ids.
-   */
-  #reactivateDivIdsContextMenu() {
-    for (const divId of this.#contextMenuDivIds) {
-      const element = document.getElementById(divId);
-      if (!element) {
-        continue;
-      }
-      element.removeEventListener('contextmenu', this.#preventContextMenu);
-    }
-    this.#contextMenuDivIds = [];
   }
 
   /**

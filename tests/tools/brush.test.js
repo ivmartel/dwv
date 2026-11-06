@@ -86,50 +86,31 @@ describe('Brush', () => {
     assert.equal(setFeaturesSpy.mock.calls.length, callsBefore);
   });
 
-  test('activate(true) prevents default contextmenu on configured divs', () => {
-    const div = document.createElement('div');
-    div.id = 'brush-view-test';
-    document.body.appendChild(div);
-
+  test('contextmenu prevents the default browser menu', () => {
     const app = {
       onKeydown: vi.fn(),
-      getStageController: () => ({
-        getDataViewConfigs: () => ({
-          group0: [{divId: 'brush-view-test'}]
-        })
-      })
+      getStageController: () => ({})
     };
     const brush = new Brush(app);
-    brush.activate(true);
 
     const ev = new MouseEvent('contextmenu', {bubbles: true, cancelable: true});
-    div.dispatchEvent(ev);
+    brush.contextmenu(ev);
 
     assert.ok(ev.defaultPrevented);
   });
 
-  test('activate(false) restores default contextmenu', () => {
-    const div = document.createElement('div');
-    div.id = 'brush-view-test';
-    document.body.appendChild(div);
-
+  test('activate(false) cancels the current brush action', () => {
     const app = {
       onKeydown: vi.fn(),
-      getStageController: () => ({
-        getDataViewConfigs: () => ({
-          group0: [{divId: 'missing-div'}, {divId: 'brush-view-test'}]
-        })
-      })
+      getStageController: () => ({})
     };
     const brush = new Brush(app);
+    const cancelSpy = vi.spyOn(brush, 'cancel');
+
     brush.activate(true);
-    brush.activate(true);
+    assert.equal(cancelSpy.mock.calls.length, 0);
     brush.activate(false);
-
-    const ev = new MouseEvent('contextmenu', {bubbles: true, cancelable: true});
-    div.dispatchEvent(ev);
-
-    assert.equal(ev.defaultPrevented, false);
+    assert.equal(cancelSpy.mock.calls.length, 1);
   });
 
   test('setFeatures forwards to brush drag behavior', () => {
