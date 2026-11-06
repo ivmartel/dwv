@@ -117,9 +117,13 @@ export function getMousePoint(event) {
  * @param {number} width The canvas width.
  * @param {number} height The canvas height.
  * @param {Document} doc The document used to create the test canvases.
- * @returns {boolean} True is the canvas can be created.
+ * @returns {boolean} True if the canvas can be created.
  */
 export function canCreateCanvas(width, height, doc) {
+  // zero sized canvases cannot be drawn from
+  if (width < 1 || height < 1) {
+    return false;
+  }
   // test canvas with input size
   const testCvs = doc.createElement('canvas');
   testCvs.width = width;
@@ -131,14 +135,21 @@ export function canCreateCanvas(width, height, doc) {
   // contexts
   const testCtx = testCvs.getContext('2d');
   const cropCtx = cropCvs.getContext('2d');
-  // set data
-  if (testCtx) {
+  let result = false;
+  if (testCtx && cropCtx) {
     testCtx.fillRect(width - 1, height - 1, 1, 1);
     // Render the test pixel in the bottom-right corner of the
     // test canvas in the top-left of the 1x1 crop canvas. This
     // dramatically reducing the time for getImageData to complete.
     cropCtx.drawImage(testCvs, width - 1, height - 1, 1, 1, 0, 0, 1, 1);
+    // Verify image data (alpha component, Pass = 255, Fail = 0)
+    result = cropCtx.getImageData(0, 0, 1, 1).data[3] !== 0;
   }
-  // Verify image data (alpha component, Pass = 255, Fail = 0)
-  return cropCtx && cropCtx.getImageData(0, 0, 1, 1).data[3] !== 0;
+  // release the canvases memory without waiting for garbage collection
+  // (safari has a limit on the total canvas memory)
+  testCvs.width = 0;
+  testCvs.height = 0;
+  cropCvs.width = 0;
+  cropCvs.height = 0;
+  return result;
 }

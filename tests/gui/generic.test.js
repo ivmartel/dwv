@@ -32,8 +32,15 @@ describe('gui', () => {
     //   'Can create 11181*11181 canvas');
 
     // limit for most browsers (06/2021): 16384^2
+    // (node canvas used in tests does not have this limit)
     assert.equal(canCreateCanvas(16385, 16385, document), true,
-      'Cannot create 16385*16385 canvas');
+      'Can create 16385*16385 canvas in node');
+
+    // zero sizes
+    assert.equal(canCreateCanvas(0, 512, document), false,
+      'Cannot create 0*512 canvas');
+    assert.equal(canCreateCanvas(512, 0, document), false,
+      'Cannot create 512*0 canvas');
   });
 
 });
