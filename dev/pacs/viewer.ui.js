@@ -403,7 +403,7 @@ export class ViewerUI {
     });
 
     // filter shortcut
-    window.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', (event) => {
       if (this.#getSelectedToolName() === 'Filter' &&
         event.altKey && event.key === 'r') {
         // run the sharpen filter
@@ -1009,7 +1009,7 @@ export class ViewerUI {
 
       // keyboard shortcut
       const shortcut = key[0].toLowerCase();
-      window.addEventListener('keydown', getKeyCheck(shortcut, button));
+      document.addEventListener('keydown', getKeyCheck(shortcut, button));
     }
 
     // tool options

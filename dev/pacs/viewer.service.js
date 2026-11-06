@@ -213,6 +213,16 @@ export class ViewerService extends EventTarget {
   };
 
   /**
+   * Get the viewer container: the focusable div holding the layer
+   * groups, where the app keyboard shortcuts are listened to.
+   *
+   * @returns {HTMLElement} The container div.
+   */
+  #getContainer() {
+    return document.getElementById('dwv');
+  }
+
+  /**
    * Get the layer group div id.
    *
    * @returns {string} The div id.
@@ -263,7 +273,7 @@ export class ViewerService extends EventTarget {
       }
       ++this.#numberOfDataToLoad;
       // add abort shortcut
-      window.addEventListener('keydown', abortShortcut);
+      this.#getContainer().addEventListener('keydown', abortShortcut);
       this.#redispatch(event);
     });
     this.#app.addEventListener('loadprogress', (event) => {
@@ -289,7 +299,7 @@ export class ViewerService extends EventTarget {
       ++this.#numberOfLoadendData;
       console.timeEnd(`load-data-${event.detail.dataid}`);
       // remove abort shortcut
-      window.removeEventListener('keydown', abortShortcut);
+      this.#getContainer().removeEventListener('keydown', abortShortcut);
       this.#redispatch(event);
     });
     this.#app.addEventListener('load', (event) => {
@@ -334,8 +344,8 @@ export class ViewerService extends EventTarget {
       console.log('warn', event);
     });
 
-    // default keyboard shortcuts
-    window.addEventListener('keydown', (event) => {
+    // default keyboard shortcuts, only when the viewer has focus
+    this.#getContainer().addEventListener('keydown', (event) => {
       this.#app.defaultOnKeydown(event);
     });
     // default on resize
