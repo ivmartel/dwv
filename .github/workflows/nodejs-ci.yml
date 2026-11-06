@@ -19,8 +19,10 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "26"
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Install and enable Corepack
+        run: |
+          npm install -g corepack
+          corepack enable
       - name: Install dependencies
         run: yarn install --immutable
       - name: Run lint
