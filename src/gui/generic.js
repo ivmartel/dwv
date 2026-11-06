@@ -116,15 +116,16 @@ export function getMousePoint(event) {
  *
  * @param {number} width The canvas width.
  * @param {number} height The canvas height.
+ * @param {Document} doc The document used to create the test canvases.
  * @returns {boolean} True is the canvas can be created.
  */
-export function canCreateCanvas(width, height) {
+export function canCreateCanvas(width, height, doc) {
   // test canvas with input size
-  const testCvs = document.createElement('canvas');
+  const testCvs = doc.createElement('canvas');
   testCvs.width = width;
   testCvs.height = height;
   // crop canvas to speed up test
-  const cropCvs = document.createElement('canvas');
+  const cropCvs = doc.createElement('canvas');
   cropCvs.width = 1;
   cropCvs.height = 1;
   // contexts

@@ -1038,7 +1038,8 @@ export class ViewLayer {
    */
   #setBaseSize(size) {
     // check canvas creation
-    if (!canCreateCanvas(size.x, size.y)) {
+    const doc = this.#containerDiv.ownerDocument;
+    if (!canCreateCanvas(size.x, size.y, doc)) {
       throw new Error(`Cannot create canvas with size ${
         size.x }, ${size.y}`);
     }
@@ -1098,7 +1099,8 @@ export class ViewLayer {
     // set canvas size if different from previous
     if (this.#canvas.width !== containerSize.x ||
       this.#canvas.height !== containerSize.y) {
-      if (!canCreateCanvas(containerSize.x, containerSize.y)) {
+      const doc = this.#containerDiv.ownerDocument;
+      if (!canCreateCanvas(containerSize.x, containerSize.y, doc)) {
         throw new Error(`Cannot resize canvas ${
           containerSize.x }, ${containerSize.y}`);
       }
