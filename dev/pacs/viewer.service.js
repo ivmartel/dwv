@@ -7,6 +7,9 @@ import {getSRContent} from '../../src/dicom/dicomSRContent.js';
 import {custom} from '../../src/app/custom.js';
 import {logger} from '../../src/utils/logger.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
+import {DicomWriter} from '../../src/dicom/dicomWriter.js';
+import {MaskFactory} from '../../src/image/maskFactory.js';
+import {RtStructFactory} from '../../src/image/rtStructFactory.js';
 
 import {overlayConfig} from './overlays.js';
 
@@ -17,6 +20,7 @@ import {overlayConfig} from './overlays.js';
  * @import {ToolboxController} from '../../src/app/toolboxController.js';
  * @import {DicomData} from '../../src/app/dataController.js';
  * @import {Matrix33} from '../../src/math/matrix.js';
+ * @import {MaskImage} from '../../src/image/maskImage.js';
  */
 
 // load event types used by the UI: re-dispatched by the service
@@ -548,6 +552,69 @@ export class ViewerService extends EventTarget {
    */
   addAndRenderAnnotationData(data, divId, refDataId) {
     this.#app.addAndRenderAnnotationData(data, divId, refDataId);
+  }
+
+  // segmentation
+
+  /**
+   * Save a segmentation or RTSS.
+   *
+   * @param {MaskImage} maskImage The mask data.
+   * @param {string} fileName The file name.
+   * @param {boolean} asRtss Whether to save as RTSS.
+   */
+  saveMaskImage(maskImage, fileName, asRtss = false) {
+    const dataCtrl = this.#app.getDataController();
+    const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
+    if (typeof refSeriesUID === 'undefined') {
+      throw new Error('Cannot save without referenced UID');
+    }
+    const sourceId = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
+    if (typeof sourceId === 'undefined') {
+      throw new Error('Cannot save without referenced ID');
+    }
+    const sourceData = dataCtrl.get(sourceId);
+    if (typeof sourceData === 'undefined') {
+      throw new Error('Cannot save without source image');
+    }
+    // dicom elements
+    let fac;
+    if (asRtss) {
+      fac = new RtStructFactory();
+    } else {
+      fac = new MaskFactory();
+    }
+    const dicomElements = fac.toDicom(
+      maskImage,
+      maskImage.getMeta().custom.segments,
+      sourceData.image,
+      {
+        MediaStorageSOPInstanceUID: '1.2.3.4.5.6.1000',
+        SeriesInstanceUID: '1.2.3.4.5.6',
+        SeriesNumber: '1',
+        SOPInstanceUID: '1.2.3.4.5.6.1000',
+      }
+    );
+    // create writer with default rules
+    const writer = new DicomWriter();
+    let dicomBuffer;
+    try {
+      dicomBuffer = writer.getBuffer(dicomElements);
+    } catch (error) {
+      logger.error(error.message);
+      alert(error.message);
+      return;
+    }
+    // view as Blob to allow download
+    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+
+    // temporary link to download
+    const element = document.createElement('a');
+    element.href = window.URL.createObjectURL(blob);
+    element.download = `${fileName}.dcm`;
+    // trigger download
+    element.click();
+    URL.revokeObjectURL(element.href);
   }
 
   // logging

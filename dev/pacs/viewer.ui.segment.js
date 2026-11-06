@@ -1,15 +1,9 @@
-import {DicomWriter} from '../../src/dicom/dicomWriter.js';
 import {
   rgbToHex,
   hexToRgb,
 } from '../../src/utils/colour.js';
 import {logger} from '../../src/utils/logger.js';
 import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
-import {
-  MaskFactory,
-  mergeMaskImages
-} from '../../src/image/maskFactory.js';
-import {RtStructFactory} from '../../src/image/rtStructFactory.js';
 import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
 import {
@@ -164,13 +158,6 @@ export class SegmentationUI {
   #withRtss = true;
 
   /**
-   * With segmentation extra (overlap check and merge) flag.
-   *
-   * @type {boolean}
-   */
-  #withSegExtra = true;
-
-  /**
    * Colour array to pick from.
    *
    * @type {RGB[]}
@@ -241,12 +228,6 @@ export class SegmentationUI {
     this.#service.addEventListener('dataremove', this.#onDataRemove);
     this.#service.addEventListener('labelschanged', this.#onLabelsChanged);
     this.#service.addEventListener('tap', this.#onTap);
-
-    // seg extra html
-    // (note: not a listener...)
-    if (this.#withSegExtra) {
-      this.#setupSegExtraHtml();
-    }
   };
 
   /**
@@ -415,10 +396,6 @@ export class SegmentationUI {
     } else {
       segList.appendChild(item);
     }
-
-    if (this.#withSegExtra) {
-      this.#addOverlapCheckerSelection(this.#segmentations.length - 1);
-    }
   }
 
   /**
@@ -519,21 +496,6 @@ export class SegmentationUI {
     if (item) {
       item.remove();
     }
-
-    // remove from overlap checker
-    if (this.#withSegExtra) {
-      for (const selectId of [
-        'overlap-checker-select-list-0',
-        'overlap-checker-select-list-1'
-      ]) {
-        const select = this.#rootDoc.getElementById(selectId);
-        const option = select?.querySelector(`option[value="${index}"]`);
-        if (option) {
-          option.remove();
-        }
-      }
-      this.#updateSegExtraDisabled();
-    }
   };
 
   /**
@@ -575,45 +537,6 @@ export class SegmentationUI {
       return;
     }
     containerDiv.appendChild(segList);
-  }
-
-  /**
-   * Setup the html for the segmentation extra (overlap check and merge),
-   *   disabled until a segmentation is added.
-   */
-  #setupSegExtraHtml() {
-    // insert in the extra section, before the tests
-    const testsEl = this.#rootDoc.getElementById('tests');
-    if (!testsEl) {
-      logger.warn('Cannot find tests element');
-      return;
-    }
-    const overlapChecker = this.#getSegExtraHtml();
-    testsEl.parentElement.insertBefore(overlapChecker, testsEl);
-    this.#updateSegExtraDisabled();
-  }
-
-  /**
-   * Enable the segmentation extra controls if there are at least
-   *   two segmentations to compare, disable them otherwise.
-   */
-  #updateSegExtraDisabled() {
-    const overlapChecker = this.#rootDoc.getElementById('overlap-checker');
-    if (!overlapChecker) {
-      return;
-    }
-    const select0 = this.#rootDoc.getElementById(
-      'overlap-checker-select-list-0');
-    const select1 = this.#rootDoc.getElementById(
-      'overlap-checker-select-list-1');
-    const disabled = !select0 || select0.options.length < 2;
-    // when activating, select the second segmentation in the second list
-    if (!disabled && select1?.disabled) {
-      select1.selectedIndex = 1;
-    }
-    for (const element of overlapChecker.querySelectorAll('select, button')) {
-      element.disabled = disabled;
-    }
   }
 
   /**
@@ -1069,89 +992,8 @@ export class SegmentationUI {
       const format = asRtss ? 'RTSS' : 'SEG';
       throw new Error(`Cannot save ${format} without mask image`);
     }
-    this.#saveData(maskData.image, fileName, asRtss);
+    this.#service.saveMaskImage(maskData.image, fileName, asRtss);
   }
-
-  /**
-   * Merge two mask images and save the result.
-   *
-   * @param {MaskImage} maskImage0 The first mask image.
-   * @param {MaskImage} maskImage1 The second mask image.
-   * @param {boolean} asRtss Whether to save as RTSS.
-   */
-  #mergeSave(maskImage0, maskImage1, asRtss) {
-    const mergedImage = mergeMaskImages(maskImage0, maskImage1);
-
-    // save
-    let fileName;
-    if (asRtss) {
-      fileName = 'merged-segmentation-rtss';
-    } else {
-      fileName = 'merged-segmentation-seg';
-    }
-    this.#saveData(mergedImage, fileName, asRtss);
-  }
-
-  /**
-   * Save a segmentation or RTSS.
-   *
-   * @param {MaskImage} maskImage The mask data.
-   * @param {string} fileName The file name.
-   * @param {boolean} asRtss Whether to save as RTSS.
-   */
-  #saveData(maskImage, fileName, asRtss = false) {
-    const dataCtrl = this.#service.getDataController();
-    const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
-    if (typeof refSeriesUID === 'undefined') {
-      throw new Error('Cannot save without referenced UID');
-    }
-    const sourceId = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
-    if (typeof sourceId === 'undefined') {
-      throw new Error('Cannot save without referenced ID');
-    }
-    const sourceData = dataCtrl.get(sourceId);
-    if (typeof sourceData === 'undefined') {
-      throw new Error('Cannot save without source image');
-    }
-    // dicom elements
-    let fac;
-    if (asRtss) {
-      fac = new RtStructFactory();
-    } else {
-      fac = new MaskFactory();
-    }
-    const dicomElements = fac.toDicom(
-      maskImage,
-      maskImage.getMeta().custom.segments,
-      sourceData.image,
-      {
-        MediaStorageSOPInstanceUID: '1.2.3.4.5.6.1000',
-        SeriesInstanceUID: '1.2.3.4.5.6',
-        SeriesNumber: '1',
-        SOPInstanceUID: '1.2.3.4.5.6.1000',
-      }
-    );
-    // create writer with default rules
-    const writer = new DicomWriter();
-    let dicomBuffer;
-    try {
-      dicomBuffer = writer.getBuffer(dicomElements);
-    } catch (error) {
-      logger.error(error.message);
-      alert(error.message);
-      return;
-    }
-    // view as Blob to allow download
-    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-
-    // temporary link to download
-    const element = document.createElement('a');
-    element.href = window.URL.createObjectURL(blob);
-    element.download = `${fileName}.dcm`;
-    // trigger download
-    element.click();
-    URL.revokeObjectURL(element.href);
-  };
 
   /**
    * Get the per volume histogram statistics of the reference image
@@ -1335,153 +1177,6 @@ export class SegmentationUI {
     segmentationItem.appendChild(contentDiv);
 
     return segmentationItem;
-  }
-
-  /**
-   * Add to the list of segmentations on the overlap checker.
-   *
-   * @param {number} segmentationIndex The segmentation index.
-   */
-  #addOverlapCheckerSelection(segmentationIndex) {
-    const overlapSelect0 =
-      this.#rootDoc.getElementById('overlap-checker-select-list-0');
-    const overlapSelect1 =
-      this.#rootDoc.getElementById('overlap-checker-select-list-1');
-    if (!overlapSelect0 || !overlapSelect1) {
-      logger.warn('Cannot find overlap checker select elements');
-      return;
-    }
-
-    // use the segmentation index as value: the data id can be
-    // undefined at this point (segmentation without mask yet)
-    const newOption0 = document.createElement('option');
-    newOption0.innerHTML = getSegmentationHtmlId(segmentationIndex);
-    newOption0.value = segmentationIndex.toString();
-
-    const newOption1 = document.createElement('option');
-    newOption1.innerHTML = getSegmentationHtmlId(segmentationIndex);
-    newOption1.value = segmentationIndex.toString();
-
-    overlapSelect0.appendChild(newOption0);
-    overlapSelect1.appendChild(newOption1);
-
-    this.#updateSegExtraDisabled();
-  }
-
-  /**
-   * Get the HTML for the segmentation extra (overlap check and merge).
-   *
-   * @returns {HTMLDivElement} The HTML element.
-   */
-  #getSegExtraHtml() {
-    // create overlap checker
-    const overlapChecker = document.createElement('div');
-    overlapChecker.id = 'overlap-checker';
-    overlapChecker.className = 'line';
-
-    // dropdowns
-    const overlapSelect0 = document.createElement('select');
-    const overlapSelect1 = document.createElement('select');
-    overlapSelect0.id = 'overlap-checker-select-list-0';
-    overlapSelect1.id = 'overlap-checker-select-list-1';
-
-    // label
-    const overlapLabel = document.createElement('label');
-    overlapLabel.htmlFor = overlapSelect0.id;
-    overlapLabel.textContent = 'Segmentations:';
-    overlapChecker.appendChild(overlapLabel);
-
-    overlapChecker.appendChild(overlapSelect0);
-    overlapChecker.appendChild(overlapSelect1);
-
-    // button
-    const overlapButton = document.createElement('button');
-    overlapButton.innerHTML = 'Check Overlap';
-    overlapChecker.appendChild(overlapButton);
-
-    // result holder
-    const overlapResult = document.createElement('div');
-
-    /**
-     * Get the mask images of the selected segmentations.
-     *
-     * @param {string} action The action name, for the error message.
-     * @returns {MaskImage[]|undefined} The two mask images or undefined
-     *   if one is missing.
-     */
-    const getSelectedMaskImages = (action) => {
-      const segmentation0 =
-        this.#segmentations[parseInt(overlapSelect0.value, 10)];
-      const segmentation1 =
-        this.#segmentations[parseInt(overlapSelect1.value, 10)];
-      const dataCtrl = this.#service.getDataController();
-      const maskData0 = dataCtrl.get(segmentation0?.dataId);
-      const maskData1 = dataCtrl.get(segmentation1?.dataId);
-      if (typeof maskData0 === 'undefined' ||
-        typeof maskData1 === 'undefined') {
-        overlapResult.textContent = `Cannot ${action}: missing mask data.`;
-        return;
-      }
-      return [maskData0.image, maskData1.image];
-    };
-
-    const saveSegButton = getButton('Save');
-    saveSegButton.title = 'Merge and Save SEG';
-    saveSegButton.onclick = () => {
-      const maskImages = getSelectedMaskImages('merge');
-      if (typeof maskImages !== 'undefined') {
-        this.#mergeSave(maskImages[0], maskImages[1], false);
-      }
-    };
-    overlapChecker.appendChild(saveSegButton);
-
-    if (this.#withRtss) {
-      const saveRtssButton = getButton('Save');
-      saveRtssButton.title = 'Merge and Save RTSS';
-      saveRtssButton.onclick = () => {
-        const maskImages = getSelectedMaskImages('merge');
-        if (typeof maskImages !== 'undefined') {
-          this.#mergeSave(maskImages[0], maskImages[1], true);
-        }
-      };
-      overlapChecker.appendChild(saveRtssButton);
-    }
-
-    overlapChecker.appendChild(overlapResult);
-
-    overlapButton.onclick = (/*event*/) => {
-      const maskImages = getSelectedMaskImages('check overlap');
-      if (typeof maskImages === 'undefined') {
-        return;
-      }
-      const [maskImage0, maskImage1] = maskImages;
-      const segHelper0 = new MaskSegmentHelper(maskImage0);
-      const segHelper1 = new MaskSegmentHelper(maskImage1);
-      const overlap = segHelper0.findOverlap(segHelper1);
-
-      overlapResult.replaceChildren(); // clear old results
-      const overlapList = document.createElement('ul');
-      for (
-        const [/*segmentNumber0*/, segmentOverlap] of
-        Object.entries(overlap)
-      ) {
-        // title (segment that these overlaps are for)
-        // (use textContent: labels come from loaded data)
-        const segmentLi = document.createElement('li');
-        const overlapStrings = Object.values(segmentOverlap.overlap).map(
-          (count) => `${count.label} (${
-            count.count } voxels, ${
-            (count.percentage).toPrecision(4) }%)`
-        );
-        segmentLi.textContent = `${ segmentOverlap.label
-        } (${segmentOverlap.count} voxels): ${overlapStrings.join(', ')}`;
-
-        overlapList.appendChild(segmentLi);
-      }
-      overlapResult.appendChild(overlapList);
-    };
-
-    return overlapChecker;
   }
 
 }; // SegmentationUI
