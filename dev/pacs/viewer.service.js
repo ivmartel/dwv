@@ -273,7 +273,7 @@ export class ViewerService extends EventTarget {
       }
       ++this.#numberOfDataToLoad;
       // add abort shortcut
-      this.#getContainer().addEventListener('keydown', abortShortcut);
+      document.addEventListener('keydown', abortShortcut);
       this.#redispatch(event);
     });
     this.#app.addEventListener('loadprogress', (event) => {
@@ -299,7 +299,7 @@ export class ViewerService extends EventTarget {
       ++this.#numberOfLoadendData;
       console.timeEnd(`load-data-${event.detail.dataid}`);
       // remove abort shortcut
-      this.#getContainer().removeEventListener('keydown', abortShortcut);
+      document.removeEventListener('keydown', abortShortcut);
       this.#redispatch(event);
     });
     this.#app.addEventListener('load', (event) => {
