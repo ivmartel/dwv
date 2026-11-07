@@ -534,4 +534,29 @@ describe('ImageFactory', () => {
     warnSpy.mockRestore();
   });
 
+  // projection data: Imager Pixel Spacing without Pixel Spacing
+  test('create: length unit with ImagerPixelSpacing', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const config = syntheticData[0];
+    const elements = getStructureElementsList(
+      config, '1.2.840.10008.1.2.1', singleSliceStructure)[0];
+    const buffer = getAnyPixelDataElement(elements).value;
+    const spacing = elements['00280030'];
+    delete elements['00280030'];
+    elements['00181164'] = {value: spacing.value, vr: 'DS'};
+
+    // raw imager spacing: size at the detector
+    const image0 = new ImageFactory().create(elements, buffer, 1);
+    assert.equal(image0.getMeta().lengthUnit, 'unit.mmDetector',
+      'raw ImagerPixelSpacing gives mm at detector');
+
+    // corrected imager spacing: estimated size in the patient
+    elements['00181114'] = {value: [2], vr: 'DS'};
+    const image1 = new ImageFactory().create(elements, buffer, 1);
+    assert.equal(image1.getMeta().lengthUnit, 'unit.mm',
+      'corrected ImagerPixelSpacing gives mm');
+
+    warnSpy.mockRestore();
+  });
+
 });

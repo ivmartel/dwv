@@ -1,4 +1,5 @@
 import {getStats} from './stats.js';
+import {getSurfaceValue} from './units.js';
 
 /**
  * @import {Index} from './index.js';
@@ -188,17 +189,7 @@ export class Circle {
     const worldSurface = this.getWorldSurface(spacing2D);
     let surface;
     if (worldSurface !== null) {
-      if (lengthUnit === 'unit.mm') {
-        surface = {
-          value: worldSurface / 100,
-          unit: 'unit.cm2'
-        };
-      } else {
-        surface = {
-          value: worldSurface,
-          unit: lengthUnit
-        };
-      }
+      surface = getSurfaceValue(worldSurface, lengthUnit);
     }
 
     // shape quantification

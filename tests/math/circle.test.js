@@ -86,6 +86,32 @@ describe('math', () => {
     }
   );
 
+  /**
+   * Tests for {@link Circle} quantification with a detector length unit.
+   *
+   * @function module:tests/math~circleQuantificationDetector
+   */
+  test('Circle quantification detector unit', () => {
+    const c0 = new Circle(new Point2D(2, 2), 2);
+    const mockVc0 = {
+      canQuantifyImage() {
+        return false;
+      },
+      get2DSpacing() {
+        return {x: 1, y: 1};
+      },
+      getLengthUnit() {
+        return 'unit.mmDetector';
+      }
+    };
+    const resQuant0 = c0.quantify(mockVc0, new Index([0, 0, 0]));
+    assert.equal(resQuant0.radius.unit, 'unit.mmDetector', 'radius unit');
+    assert.equal(
+      resQuant0.surface.unit, 'unit.cm2Detector', 'surface unit');
+    assert.equal(
+      resQuant0.surface.value, 0.12566370614359174, 'surface value');
+  });
+
 });
 
 describe('math circle contains', () => {
