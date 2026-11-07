@@ -433,6 +433,117 @@ describe('dicom', () => {
   });
 
   /**
+   * Get the little endian bytes of a 32 bits unsigned integer.
+   *
+   * @param {number} value The value.
+   * @returns {number[]} The bytes.
+   */
+  const toUint32Bytes = (value) => [
+    value & 0xff,
+    (value >> 8) & 0xff,
+    (value >> 16) & 0xff,
+    (value >>> 24) & 0xff
+  ];
+
+  /**
+   * Get a sequence item, with an explicit length or with an undefined
+   *   length and an item delimitation item.
+   * Ref: [Item encoding]{@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_7.5.html#sect_7.5.1}.
+   *
+   * @param {string} uid The item ReferencedSOPInstanceUID.
+   * @param {boolean} undefinedLength True for an undefined length item.
+   * @returns {number[]} The item bytes.
+   */
+  const toItemBytes = (uid, undefinedLength) => {
+    const value = toElementBytes(0x0008, 0x1155, 'UI', toBytes(uid));
+    const itemTag = [0xfe, 0xff, 0x00, 0xe0];
+    if (undefinedLength) {
+      const itemDelim = [0xfe, 0xff, 0x0d, 0xe0, 0, 0, 0, 0];
+      return toBytes(itemTag, toUint32Bytes(0xffffffff), value, itemDelim);
+    }
+    return toBytes(itemTag, toUint32Bytes(value.length), value);
+  };
+
+  /**
+   * Get an explicit VR little endian DICOM buffer with a
+   * ReferencedImageSequence followed by a PatientName.
+   *
+   * @param {number[]} items The sequence items bytes.
+   * @param {boolean} undefinedLength True for an undefined length sequence.
+   * @returns {ArrayBuffer} The DICOM buffer.
+   */
+  const getSequenceBuffer = (items, undefinedLength) => {
+    const meta = toElementBytes(0x0002, 0x0010, 'UI',
+      toBytes('1.2.840.10008.1.2.1 '));
+    let sequence;
+    if (undefinedLength) {
+      const seqDelim = [0xfe, 0xff, 0xdd, 0xe0, 0, 0, 0, 0];
+      sequence = toBytes([0x08, 0x00, 0x40, 0x11], 'SQ', [0, 0],
+        toUint32Bytes(0xffffffff), items, seqDelim);
+    } else {
+      sequence = toBytes([0x08, 0x00, 0x40, 0x11], 'SQ', [0, 0],
+        toUint32Bytes(items.length), items);
+    }
+    const bytes = toBytes(
+      new Array(128).fill(0),
+      'DICM',
+      toElementBytes(0x0002, 0x0000, 'UL', [meta.length, 0, 0, 0]),
+      meta,
+      sequence,
+      toElementBytes(0x0010, 0x0010, 'PN', toBytes('Doe^John'))
+    );
+    return new Uint8Array(bytes).buffer;
+  };
+
+  /**
+   * Tests for {@link DicomParser} with sequences mixing explicit and
+   *   undefined length items.
+   * Ref: [Sequence delimitation]{@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_7.5.2.html}.
+   *
+   * @function module:tests/dicom~mixedLengthSequenceItems
+   */
+  test('DICOM sequence parsing with mixed length items', () => {
+    const uids = ['1.2.3.1', '1.2.3.22', '1.2.3.333', '1.2.3.4444'];
+    const items = toBytes(
+      toItemBytes(uids[0], false),
+      toItemBytes(uids[1], true),
+      toItemBytes(uids[2], false),
+      toItemBytes(uids[3], true)
+    );
+    for (const undefinedLength of [true, false]) {
+      const parser = new DicomParser();
+      parser.parse(getSequenceBuffer(items, undefinedLength));
+      const elements = parser.getDicomElements();
+      const name = undefinedLength ? 'undefined' : 'explicit';
+
+      const seq = elements['00081140'].value;
+      assert.equal(seq.length, uids.length, `${name} sequence length`);
+      for (let i = 0; i < uids.length; ++i) {
+        assert.equal(seq[i]['00081155'].value[0], uids[i],
+          `${name} sequence item${i} ReferencedSOPInstanceUID`);
+        assert.equal(seq[i].FFFEE000.undefinedLength === true, i % 2 === 1,
+          `${name} sequence item${i} undefined length`);
+      }
+      // the element after the sequence is read correctly
+      assert.equal(elements['00100010'].value[0], 'Doe^John',
+        `${name} sequence following PatientName`);
+
+      // write and parse again
+      const writer = new DicomWriter();
+      const roundTripParser = new DicomParser();
+      roundTripParser.parse(writer.getBuffer(elements));
+      const roundTripSeq =
+        roundTripParser.getDicomElements()['00081140'].value;
+      assert.equal(roundTripSeq.length, uids.length,
+        `${name} round trip sequence length`);
+      for (let i = 0; i < uids.length; ++i) {
+        assert.equal(roundTripSeq[i]['00081155'].value[0], uids[i],
+          `${name} round trip item${i} ReferencedSOPInstanceUID`);
+      }
+    }
+  });
+
+  /**
    * Tests for {@link cleanString}.
    *
    * @function module:tests/dicom~cleanstring
