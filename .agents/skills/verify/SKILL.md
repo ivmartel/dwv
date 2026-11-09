@@ -123,7 +123,7 @@ Read `git diff HEAD` and look for:
   so that it reaches `src/index.js` and therefore the API report.
 - **Tests**: new `src/<area>/x.js` logic gets tests in `tests/<area>/`, using
   fixtures from `tests/data` rather than new large binaries where possible.
-- **No stray changes**: `tmp/`, `build/`, `coverage/` and debug `console.log`
+- **No stray changes**: `tmp/`, `build/` and debug `console.log`
   calls stay out of the change.
 
 ## 4. Optional: see it running

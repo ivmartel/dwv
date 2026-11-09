@@ -10,6 +10,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text-summary', 'html'],
+      reportsDirectory: './build/coverage',
       exclude: ['tests/**'],
       thresholds: {
         statements: 50,
