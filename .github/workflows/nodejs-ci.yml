@@ -20,9 +20,7 @@ jobs:
         with:
           node-version: "26"
       - name: Install and enable Corepack
-        run: |
-          npm install -g corepack
-          corepack enable
+        run: npm install -g corepack && corepack enable
       - name: Install dependencies
         run: yarn install --immutable
       - name: Run lint
