@@ -57,6 +57,7 @@ import {
   getElementsFromSimpleTagValues,
   mergeTagValues
 } from './simpleTagValues.js';
+import {dcmdump} from './dicomElementsWrapper.js';
 
 // also export typedefs
 export * from './types.js';
@@ -99,4 +100,5 @@ export {
   getAsSimpleTagValues,
   getElementsFromSimpleTagValues,
   mergeTagValues,
+  dcmdump,
 };

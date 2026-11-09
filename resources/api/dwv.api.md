@@ -334,6 +334,9 @@ export class DataElement {
 }
 
 // @public
+export function dcmdump(dicomElements: Record<string, DataElement>): string;
+
+// @public
 export const defaultPrivateBValueRules: PrivateBValueRule[];
 
 // @public
