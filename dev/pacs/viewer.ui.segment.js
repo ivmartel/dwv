@@ -30,7 +30,6 @@ import {
  * @import {RGB} from '../../src/utils/colour.js';
  * @import {Statistics} from '../../src/math/stats.js';
  * @import {Label} from '../../src/image/label.js';
- * @import {MaskImage} from '../../src/image/maskImage.js';
  * @import {QuantificationGroup} from './viewer.ui.quantification.js';
  */
 
