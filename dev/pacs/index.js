@@ -8,10 +8,6 @@ function onDOMContentLoaded() {
   createAndPutHtml(_dataDicom, 'datadicom');
   createAndPutHtml(_dataImg, 'dataimg');
 
-  // checkbox local data
-  const localChk = document.getElementById('islocal');
-  localChk.addEventListener('change', onLocalChkChange);
-
   // view button for github hosted
   const viewGithubHosted = document.getElementById('viewGithubHosted');
   viewGithubHosted.addEventListener('click', onViewGithubHosted);
@@ -27,7 +23,11 @@ function onDOMContentLoaded() {
   });
 }
 
-const _githubRaw = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/';
+// test data root: local in development (served by the dev server),
+// github in production
+const _testDataRoot = process.env.NODE_ENV === 'production'
+  ? 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/'
+  : '/tests/';
 const _dataDicom = [
   {
     title: 'Baby MRI',
@@ -155,15 +155,7 @@ function getDwvUrl(uri) {
   if (typeof uri.type !== 'undefined') {
     uricomp = uri.file;
     if (uri.type === 'dwvtest') {
-      const localChk = document.getElementById('islocal');
-      const islocal = localChk ? localChk.checked : true;
-      let uriroot;
-      if (islocal) {
-        uriroot = '/tests/';
-      } else {
-        uriroot = _githubRaw;
-      }
-      uricomp = `${uriroot}data/${uri.file}`;
+      uricomp = `${_testDataRoot}data/${uri.file}`;
     }
   } else {
     uricomp = uri;
@@ -218,16 +210,6 @@ function createAndPutHtml(data, id) {
     li.appendChild(desc);
     const ul = document.getElementById(`ul_${id}`);
     ul.appendChild(li);
-  }
-}
-
-/**
- * Update dicom links on checkbox change.
- */
-function onLocalChkChange() {
-  const links = document.getElementsByClassName('datadicom');
-  for (let i = 0; i < links.length; ++i) {
-    links[i].href = getDwvUrl(_dataDicom[links[i].id].uri);
   }
 }
 

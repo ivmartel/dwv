@@ -13,6 +13,7 @@ export default merge(webpackCommon, {
   },
   entry: {
     viewer: './dev/pacs/viewer.js',
+    pacs: './dev/pacs/index.js',
     dcmweb: './dev/pacs/dcmweb.js',
     raw: './dev/visual/index.js',
     jpeg: './dev/visual/index-jpeg.js',
@@ -98,6 +99,12 @@ export default merge(webpackCommon, {
       filename: 'dev/pacs/dcmweb.html',
       scriptLoading: 'module',
       chunks: ['dcmweb']
+    }),
+    new HtmlWebpackPlugin({
+      template: './dev/pacs/index.html',
+      filename: 'dev/pacs/index.html',
+      scriptLoading: 'module',
+      chunks: ['pacs'],
     }),
     new HtmlWebpackPlugin({
       template: './dev/pacs/viewer.html',
