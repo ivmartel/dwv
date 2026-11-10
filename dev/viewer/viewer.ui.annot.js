@@ -1,17 +1,8 @@
-import {DrawController} from '../../src/app/drawController.js';
-import {
-  AnnotationGroupFactory
-} from '../../src/image/annotationGroupFactory.js';
-import {
-  getUID,
-  DicomWriter
-} from '../../src/dicom/dicomWriter.js';
 import {logger} from '../../src/utils/logger.js';
 import {
   getIconElement,
   getButton,
-  setButtonPressed,
-  isButtonPressed
+  setButtonPressed
 } from './viewer.ui.icons.js';
 import {
   getQuantificationGroups,
@@ -19,9 +10,13 @@ import {
 } from './viewer.ui.quantification.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
- * @import {Annotation} from '../../src/image/annotation.js';
- * @import {AnnotationGroup} from '../../src/image/annotationGroup.js';
+ * @import {
+ *   AnnotationService,
+ *   AnnotationState,
+ *   AnnotationGroupState,
+ *   AnnotationItemState,
+ *   AnnotationSelection
+ * } from './annot.service.js';
  */
 
 /**
@@ -35,39 +30,32 @@ function getAnnotationGroupDivId(dataId) {
 }
 
 /**
- * Get the annotation divId.
- *
- * @param {Annotation} annotation The annotation.
- * @param {string} dataId The data ID.
- * @returns {string} The divId.
- */
-function getAnnotationDivId(annotation, dataId) {
-  return getAnnotationIdDivId(annotation.trackingUid, dataId);
-}
-
-/**
  * Get the annotation divId from its id.
  *
  * @param {string} annotationId The annotation tracking UID.
  * @param {string} dataId The data ID.
  * @returns {string} The divId.
  */
-function getAnnotationIdDivId(annotationId, dataId) {
+function getAnnotationDivId(annotationId, dataId) {
   const prefix = getAnnotationGroupDivId(dataId);
   return `${prefix}-annotation${annotationId}`;
 }
 
 /**
- * Annotation UI.
+ * Annotation component: vanilla renderer of the annotation service
+ *   state. Reference implementation for framework components.
+ *
+ * Rendering reuses the elements of unchanged groups and annotations
+ *   (the state keeps the identity of unchanged parts).
  */
-export class AnnotationUI {
+export class AnnotationComponent {
 
   /**
-   * The dwv service.
+   * The annotation service.
    *
-   * @type {ViewerService}
+   * @type {AnnotationService}
    */
-  #dwvService;
+  #annotService;
 
   /**
    * The root document.
@@ -77,38 +65,74 @@ export class AnnotationUI {
   #rootDoc = document;
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * The unsubscribe function.
+   *
+   * @type {Function|undefined}
+   */
+  #unsubscribe;
+
+  /**
+   * The last rendered state.
+   *
+   * @type {AnnotationState|undefined}
+   */
+  #renderedState;
+
+  /**
+   * The rendered annotation states indexed by annotation divId.
+   *
+   * @type {Map<string, AnnotationItemState>}
+   */
+  #renderedAnnotations = new Map();
+
+  /**
+   * The divIds of the annotations with open quantification details
+   *   (view only state).
+   *
+   * @type {Set<string>}
+   */
+  #openDetails = new Set();
+
+  /**
+   * @param {AnnotationService} annotService The annotation service.
    * @param {Document} [rootDoc] Optional root document,
    *   defaults to `window.document`.
    */
-  constructor(service, rootDoc) {
-    this.#dwvService = service;
+  constructor(annotService, rootDoc) {
+    this.#annotService = annotService;
     if (typeof rootDoc !== 'undefined') {
       this.#rootDoc = rootDoc;
     }
   }
 
   /**
-   * Bind app to ui.
+   * Subscribe to the annotation service and render.
    */
   registerListeners() {
-    this.#dwvService.addEventListener('dataadd',
-      this.#onDataAdd);
-    this.#dwvService.addEventListener('dataremove',
-      this.#onDataRemove);
-    this.#dwvService.addEventListener('drawlayeradd',
-      this.#onDrawLayerAdd);
-    this.#dwvService.addEventListener('annotationadd',
-      this.#onAnnotationAdd);
-    this.#dwvService.addEventListener('annotationupdate',
-      this.#onAnnotationUpdate);
-    this.#dwvService.addEventListener('annotationremove',
-      this.#onAnnotationRemove);
-    this.#dwvService.addEventListener('annotationselect',
-      this.#onAnnotationSelect);
-    this.#dwvService.addEventListener('tap',
-      this.#onTap);
-  };
+    this.#unsubscribe = this.#annotService.subscribe(this.#render);
+    this.#render();
+  }
+
+  /**
+   * Unsubscribe from the annotation service.
+   */
+  dispose() {
+    if (typeof this.#unsubscribe !== 'undefined') {
+      this.#unsubscribe();
+      this.#unsubscribe = undefined;
+    }
+  }
+
+  /**
+   * Get a group state from the last rendered state.
+   *
+   * @param {string} dataId The annotation group data id.
+   * @returns {AnnotationGroupState|undefined} The group state.
+   */
+  #getGroupState(dataId) {
+    return this.#renderedState?.groups.find(
+      (group) => group.dataId === dataId);
+  }
 
   /**
    * Setup the container div.
@@ -138,15 +162,6 @@ export class AnnotationUI {
   }
 
   /**
-   * Get the container div.
-   *
-   * @returns {HTMLDivElement} The element.
-   */
-  #getContainerDiv() {
-    return this.#rootDoc.getElementById('annotationgroups-fieldset');
-  }
-
-  /**
    * Setup the html for the annotation list.
    */
   #setupHtml() {
@@ -157,7 +172,8 @@ export class AnnotationUI {
     addAnnotationGroupButton.appendChild(
       document.createTextNode('Add annotation group'));
     addAnnotationGroupButton.onclick = () => {
-      this.#addAnnotationGroup();
+      // the group is rendered on the next state change
+      this.#annotService.addAnnotationGroup();
     };
     addItem.appendChild(addAnnotationGroupButton);
 
@@ -169,33 +185,149 @@ export class AnnotationUI {
 
     // setup and append
     this.#setupContainerDiv();
-    const containerDiv = this.#getContainerDiv();
+    const containerDiv =
+      this.#rootDoc.getElementById('annotationgroups-fieldset');
     if (containerDiv) {
       containerDiv.appendChild(annotList);
     }
   }
 
   /**
-   * Add an annotation group to the active view layer.
+   * Render the annotation service state.
    */
-  #addAnnotationGroup() {
-    // get the reference data id from the main layer group
-    const divId = this.#dwvService.getMainLayerGroupDivId();
-    const stgCtrl = this.#dwvService.getStageController();
-    const layerGroup = stgCtrl.getLayerGroupByDivId(divId);
-    // add annotation group
-    const viewLayer = layerGroup.getActiveViewLayer();
-    if (typeof viewLayer === 'undefined') {
-      logger.warn(
-        'No active view layer, please select one in the data table'
-      );
+  #render = () => {
+    const state = this.#annotService.getSnapshot();
+    if (state === this.#renderedState) {
       return;
     }
-    const refDataId = viewLayer.getDataId();
-    const data = this.#dwvService.createAnnotationData(refDataId);
-    // render (will create draw layer)
-    this.#dwvService.addAndRenderAnnotationData(data, divId, refDataId);
-    // item is added to the UI by the 'dataadd' listener
+    const previous = this.#renderedState;
+    this.#renderedState = state;
+
+    let annotList = this.#rootDoc.getElementById('annotationgroup-list');
+    if (!annotList) {
+      // setup html on first group
+      if (state.groups.length === 0) {
+        return;
+      }
+      this.#setupHtml();
+      annotList = this.#rootDoc.getElementById('annotationgroup-list');
+      if (!annotList) {
+        logger.warn('Cannot find annotation group list element');
+        return;
+      }
+    }
+    // the add item stays last
+    const addItem = this.#rootDoc.getElementById('addannotationgroupitem');
+
+    // groups
+    const previousGroups = previous?.groups ?? [];
+    for (const group of state.groups) {
+      const previousGroup = previousGroups.find(
+        (item) => item.dataId === group.dataId);
+      if (group !== previousGroup) {
+        this.#renderGroup(annotList, addItem, group);
+      }
+    }
+    // remove groups not in state
+    for (const group of previousGroups) {
+      if (!state.groups.some((item) => item.dataId === group.dataId)) {
+        this.#rootDoc.getElementById(
+          getAnnotationGroupDivId(group.dataId))?.remove();
+        for (const annotation of group.annotations) {
+          const divId = getAnnotationDivId(annotation.id, group.dataId);
+          this.#renderedAnnotations.delete(divId);
+          this.#openDetails.delete(divId);
+        }
+      }
+    }
+
+    // selection (rows may have been rebuilt)
+    this.#renderSelection(annotList, state.selected,
+      state.selected !== previous?.selected);
+  };
+
+  /**
+   * Render an annotation group.
+   *
+   * @param {HTMLElement} annotList The annotation group list element.
+   * @param {HTMLElement|null} addItem The add group item.
+   * @param {AnnotationGroupState} group The group state.
+   */
+  #renderGroup(annotList, addItem, group) {
+    const dataId = group.dataId;
+    const groupDivId = getAnnotationGroupDivId(dataId);
+    let item = this.#rootDoc.getElementById(groupDivId);
+    if (!item) {
+      item = this.#getAnnotationGroupHtml(dataId);
+      annotList.insertBefore(item, addItem);
+    }
+
+    // header buttons: pressed means locked / hidden
+    setButtonPressed(
+      this.#rootDoc.getElementById(`lockb-${groupDivId}`),
+      !group.editable);
+    setButtonPressed(
+      this.#rootDoc.getElementById(`hidelabelsb-${groupDivId}`),
+      !group.labelsVisible);
+
+    // annotations
+    const listDiv = this.#rootDoc.getElementById(`${groupDivId}-list`);
+    const divIds = new Set();
+    group.annotations.forEach((annotation, index) => {
+      const divId = getAnnotationDivId(annotation.id, dataId);
+      divIds.add(divId);
+      let annotItem = this.#rootDoc.getElementById(divId);
+      if (!annotItem ||
+        this.#renderedAnnotations.get(divId) !== annotation) {
+        const newItem = this.#getAnnotationHtml(annotation, dataId);
+        if (annotItem) {
+          annotItem.replaceWith(newItem);
+        }
+        annotItem = newItem;
+        this.#renderedAnnotations.set(divId, annotation);
+      }
+      const current = listDiv.children[index];
+      if (current !== annotItem) {
+        listDiv.insertBefore(annotItem, current ?? null);
+      }
+    });
+    // remove annotations not in state
+    for (const child of Array.from(listDiv.children)) {
+      if (!divIds.has(child.id)) {
+        child.remove();
+        this.#renderedAnnotations.delete(child.id);
+        this.#openDetails.delete(child.id);
+      }
+    }
+
+    // disable annotation edit buttons if the group is not editable
+    const elements = listDiv.querySelectorAll('[id^="cb-"], [id^="db-"]');
+    for (const element of elements) {
+      element.disabled = !group.editable;
+    }
+  }
+
+  /**
+   * Render the selection.
+   *
+   * @param {HTMLElement} annotList The annotation group list element.
+   * @param {AnnotationSelection|undefined} selected The selection.
+   * @param {boolean} changed True if the selection changed.
+   */
+  #renderSelection(annotList, selected, changed) {
+    const items = annotList.querySelectorAll('.data-item-list-item');
+    items.forEach(item => item.classList.remove('selected'));
+    if (typeof selected === 'undefined') {
+      return;
+    }
+    const item = this.#rootDoc.getElementById(
+      getAnnotationDivId(selected.annotationId, selected.dataId));
+    if (item) {
+      item.classList.add('selected');
+      if (changed) {
+        item.scrollIntoView({block: 'nearest'});
+      }
+    }
   }
 
   /**
@@ -203,15 +335,29 @@ export class AnnotationUI {
    *
    * @param {HTMLButtonElement} infoButton The info button.
    * @param {HTMLDivElement} detailsDiv The details element.
-   * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {string} annotationId The annotation tracking UID.
+   * @param {AnnotationItemState} annotation The annotation state.
+   * @param {string} divId The annotation divId.
    */
-  #toggleAnnotationInfo(infoButton, detailsDiv, annotationGroup,
-    annotationId) {
+  #toggleAnnotationInfo(infoButton, detailsDiv, annotation, divId) {
     const open = detailsDiv.hidden;
     if (open) {
-      // get annotation (the group can replace it on update)
-      const annotation = annotationGroup.find(annotationId);
+      this.#openDetails.add(divId);
+    } else {
+      this.#openDetails.delete(divId);
+    }
+    this.#setDetailsOpen(infoButton, detailsDiv, annotation, open);
+  }
+
+  /**
+   * Set the quantification details open state.
+   *
+   * @param {HTMLButtonElement} infoButton The info button.
+   * @param {HTMLDivElement} detailsDiv The details element.
+   * @param {AnnotationItemState} annotation The annotation state.
+   * @param {boolean} open True to open the details.
+   */
+  #setDetailsOpen(infoButton, detailsDiv, annotation, open) {
+    if (open) {
       renderQuantification(
         detailsDiv, getQuantificationGroups(annotation.quantification));
     }
@@ -221,98 +367,39 @@ export class AnnotationUI {
   }
 
   /**
-   * Change an annotation colour.
+   * Save an annotation group as DICOM SR.
    *
-   * @param {HTMLInputElement} inputColour The colour input.
-   * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {string} annotationId The annotation tracking UID.
+   * @param {string} dataId The annotation group data id.
    */
-  #changeAnnotationColour(inputColour, annotationGroup, annotationId) {
-    const newColour = inputColour.value;
-    // get annotation (the group can replace it on update)
-    const annotation = annotationGroup.find(annotationId);
-    // update
-    if (newColour !== annotation.colour) {
-      const drawController = new DrawController(annotationGroup);
-      const undoCtrl = this.#dwvService.getUndoController();
-      drawController.updateAnnotationWithCommand(
-        annotationId,
-        {colour: annotation.colour},
-        {colour: newColour},
-        undoCtrl.addToUndoStack
-      );
+  #saveAnnotationGroup(dataId) {
+    let blob;
+    try {
+      blob = this.#annotService.getAnnotationGroupAsDicom(dataId);
+    } catch (error) {
+      logger.error(error.message);
+      alert(error.message);
+      return;
     }
-  }
 
-  /**
-   * Toggle an annotation visibility.
-   *
-   * @param {HTMLButtonElement} viewButton The view button.
-   * @param {string} annotationId The annotation tracking UID.
-   * @param {string} dataId The annotation group dataId.
-   */
-  #toggleAnnotationView(viewButton, annotationId, dataId) {
-    const drawLayers = this.#dwvService.getStageController()
-      .getDrawLayersByDataId(dataId);
-    // toggle view
-    const isPressed = isButtonPressed(viewButton);
-    setButtonPressed(viewButton, !isPressed);
-    for (const layer of drawLayers) {
-      layer.setAnnotationVisibility(annotationId, isPressed);
-    }
-  }
-
-  /**
-   * Delete an annotation.
-   *
-   * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {string} annotationId The annotation tracking UID.
-   */
-  #deleteAnnotation(annotationGroup, annotationId) {
-    const drawController = new DrawController(annotationGroup);
-    const undoCtrl = this.#dwvService.getUndoController();
-    // TODO reposition div at same position after delete undo?
-    drawController.removeAnnotationWithCommand(
-      annotationId,
-      undoCtrl.addToUndoStack
-    );
-  }
-
-  /**
-   * Go to an annotation: set the view position to its centroid.
-   *
-   * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {string} annotationId The annotation tracking UID.
-   * @param {string} dataId The annotation group dataId.
-   */
-  #gotoAnnotation(annotationGroup, annotationId, dataId) {
-    // get annotation (the group can replace it on update)
-    const annotation = annotationGroup.find(annotationId);
-    const annotCentroid = annotation.getCentroid();
-    if (typeof annotCentroid !== 'undefined') {
-      const drawLayers = this.#dwvService.getStageController()
-        .getDrawLayersByDataId(dataId);
-      for (const layer of drawLayers) {
-        layer.setCurrentPosition(annotCentroid);
-        layer.highlightAnnotation(annotationId);
-      }
-    } else {
-      logger.warn('No centroid for annotation');
-    }
+    // temporary link to download
+    const element = document.createElement('a');
+    element.href = URL.createObjectURL(blob);
+    element.download = `dicom-sr-${dataId}.dcm`;
+    // trigger download
+    element.click();
+    URL.revokeObjectURL(element.href);
   }
 
   /**
    * Get the annotation html.
    *
-   * @param {Annotation} annotation The annotation.
-   * @param {string} dataId The annotation group dataId.
+   * @param {AnnotationItemState} annotation The annotation state.
+   * @param {string} dataId The annotation group data id.
    * @returns {HTMLLIElement} The HTMl element.
    */
   #getAnnotationHtml(annotation, dataId) {
-    const annotationDivId = getAnnotationDivId(annotation, dataId);
-    const annotationId = annotation.trackingUid;
-    const dataCtrl = this.#dwvService.getDataController();
-    const annotationGroup = dataCtrl.get(dataId).annotationGroup;
+    const annotationDivId = getAnnotationDivId(annotation.id, dataId);
+    const annotationId = annotation.id;
 
     // quantification details (folded by default)
     const detailsDiv = document.createElement('div');
@@ -325,16 +412,16 @@ export class AnnotationUI {
     };
 
     const infoButton = getButton('Info');
-    setButtonPressed(infoButton, false);
     infoButton.id = `ib-${annotationDivId}`;
     infoButton.title = 'Show/hide quantification';
-    infoButton.setAttribute('aria-expanded', 'false');
     infoButton.setAttribute('aria-controls', detailsDiv.id);
+    this.#setDetailsOpen(infoButton, detailsDiv, annotation,
+      this.#openDetails.has(annotationDivId));
     infoButton.onclick = (event) => {
       // do not propagate to parent (triggers goto)
       event.stopPropagation();
       this.#toggleAnnotationInfo(
-        infoButton, detailsDiv, annotationGroup, annotationId);
+        infoButton, detailsDiv, annotation, annotationDivId);
     };
 
     const inputColour = document.createElement('input');
@@ -347,17 +434,20 @@ export class AnnotationUI {
       event.stopPropagation();
     };
     inputColour.onchange = () => {
-      this.#changeAnnotationColour(inputColour, annotationGroup, annotationId);
+      this.#annotService.changeAnnotationColour(
+        dataId, annotationId, inputColour.value);
     };
 
+    // pressed means hidden
     const viewButton = getButton('View');
-    setButtonPressed(viewButton, false);
+    setButtonPressed(viewButton, !annotation.visible);
     viewButton.id = `vb-${annotationDivId}`;
     viewButton.title = 'Show/hide annotation';
     viewButton.onclick = (event) => {
       // do not propagate to parent (triggers goto)
       event.stopPropagation();
-      this.#toggleAnnotationView(viewButton, annotationId, dataId);
+      this.#annotService.setAnnotationVisibility(
+        dataId, annotationId, !annotation.visible);
     };
 
     const deleteButton = getButton('Delete');
@@ -366,25 +456,15 @@ export class AnnotationUI {
     deleteButton.onclick = (event) => {
       // do not propagate to parent (triggers goto)
       event.stopPropagation();
-      this.#deleteAnnotation(annotationGroup, annotationId);
+      this.#annotService.deleteAnnotation(dataId, annotationId);
     };
-
-    // disable buttons if group is not editable
-    // (updated by the group 'annotationgroupeditablechange' listener)
-    const disabled = !annotationGroup.isEditable();
-    inputColour.disabled = disabled;
-    deleteButton.disabled = disabled;
+    // colour and delete disabled state is set by the group rendering
 
     // content
     const contentDiv = document.createElement('div');
     contentDiv.className = 'data-item-list-item-content';
-    let factoryName = 'unknown';
-    if (typeof annotation.getFactory() !== 'undefined') {
-      factoryName = annotation.getFactory().getName();
-    }
-    contentDiv.appendChild(getIconElement(factoryName));
-    contentDiv.appendChild(document.createTextNode(
-      ` ${annotation.trackingId}`));
+    contentDiv.appendChild(getIconElement(annotation.factoryName));
+    contentDiv.appendChild(document.createTextNode(` ${annotation.label}`));
 
     // actions
     const actionsDiv = document.createElement('div');
@@ -402,193 +482,94 @@ export class AnnotationUI {
     item.appendChild(actionsDiv);
     item.appendChild(detailsDiv);
     item.title = 'Go to annotation';
+    // strike through non viewable annotations
+    if (!annotation.canView) {
+      item.style['text-decoration-line'] = 'line-through';
+    }
 
     // click on li to go to annotation
     item.onclick = () => {
-      this.#selectAnnotationItem(item);
-      this.#gotoAnnotation(annotationGroup, annotationId, dataId);
+      this.#annotService.selectAnnotation(dataId, annotationId);
+      this.#annotService.gotoAnnotation(dataId, annotationId);
     };
 
     return item;
   }
 
   /**
-   * Mark an annotation list item as selected, unselecting the others.
+   * Get an annotation group html, without its annotations.
    *
-   * @param {HTMLElement} item The annotation list item.
+   * @param {string} dataId The annotation group data id.
+   * @returns {HTMLLIElement} The annotation group element.
    */
-  #selectAnnotationItem(item) {
-    this.#clearAnnotationSelection();
-    // mark this row as selected
-    item.classList.add('selected');
-  }
+  #getAnnotationGroupHtml(dataId) {
+    const groupDivId = getAnnotationGroupDivId(dataId);
 
-  /**
-   * Unselect all annotation list items.
-   */
-  #clearAnnotationSelection() {
-    const mainlist = this.#rootDoc.getElementById('annotationgroup-list');
-    if (mainlist) {
-      const items = mainlist.querySelectorAll('.data-item-list-item');
-      items.forEach(item => item.classList.remove('selected'));
-    }
-  }
-
-  /**
-   * Toggle an annotation group editability.
-   *
-   * @param {HTMLButtonElement} lockButton The lock button.
-   * @param {AnnotationGroup} annotationGroup The annotation group.
-   */
-  #toggleAnnotationGroupLock(lockButton, annotationGroup) {
-    // toggle hidden
-    const isPressed = isButtonPressed(lockButton);
-    setButtonPressed(lockButton, !isPressed);
-    if (typeof annotationGroup !== 'undefined') {
-      annotationGroup.setEditable(isPressed);
-    }
-  }
-
-  /**
-   * Save an annotation group as DICOM SR.
-   *
-   * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {string} dataId The annotation group dataId.
-   */
-  #saveAnnotationGroup(annotationGroup, dataId) {
-    const factory = new AnnotationGroupFactory();
-    const sopUID = getUID('SOPInstanceUID');
-    const extraTags = {
-      MediaStorageSOPInstanceUID: sopUID,
-      SOPInstanceUID: sopUID,
-      InstanceNumber: 123,
-      SeriesInstanceUID: getUID('SeriesInstanceUID'),
-      SeriesNumber: 123,
-      SeriesDescription: 'Annnotation made with dwv',
-    };
-    const dicomElements = factory.toDicom(annotationGroup, extraTags);
-    // write
-    const writer = new DicomWriter();
-    let dicomBuffer;
-    try {
-      dicomBuffer = writer.getBuffer(dicomElements);
-    } catch (error) {
-      logger.error(error.message);
-      alert(error.message);
-      return;
-    }
-    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-
-    // temporary link to download
-    const element = document.createElement('a');
-    element.href = window.URL.createObjectURL(blob);
-    element.download = `dicom-sr-${dataId}.dcm`;
-    // trigger download
-    element.click();
-    URL.revokeObjectURL(element.href);
-  }
-
-  /**
-   * Toggle an annotation group labels visibility.
-   *
-   * @param {HTMLButtonElement} hideLabelsButton The hide labels button.
-   * @param {string} dataId The annotation group dataId.
-   */
-  #toggleLabelsVisibility(hideLabelsButton, dataId) {
-    const drawLayer = this.#dwvService.getStageController()
-      .getDrawLayersByDataId(dataId)[0];
-    if (typeof drawLayer === 'undefined') {
-      logger.warn(`Cannot find draw layer with id ${dataId}`);
-      return;
-    }
-    // toggle hide
-    const isPressed = isButtonPressed(hideLabelsButton);
-    setButtonPressed(hideLabelsButton, !isPressed);
-    drawLayer.setLabelsVisibility(isPressed);
-  }
-
-  /**
-   * Get an annotation group html.
-   *
-   * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {string} dataId The annotation group dataId.
-   * @returns {HTMLIement} The annotation list element.
-   */
-  #getAnnotationGroupHtml(annotationGroup, dataId) {
     // name
     const nameDiv = document.createElement('span');
-    nameDiv.id = `${getAnnotationGroupDivId(dataId)}-name`;
+    nameDiv.id = `${groupDivId}-name`;
     nameDiv.className = 'data-item-name';
     nameDiv.appendChild(document.createTextNode(`group #${dataId}`));
 
-    // lock button
+    // lock button (pressed state set by the group rendering)
     const lockButton = getButton('Lock');
-    setButtonPressed(lockButton, false);
-    lockButton.id = `lockb-${getAnnotationGroupDivId(dataId)}`;
+    lockButton.id = `lockb-${groupDivId}`;
     lockButton.onclick = () => {
-      this.#toggleAnnotationGroupLock(lockButton, annotationGroup);
+      const group = this.#getGroupState(dataId);
+      if (typeof group !== 'undefined') {
+        this.#annotService.setAnnotationGroupEditable(
+          dataId, !group.editable);
+      }
     };
 
     // save button
     const saveButton = getButton('Save');
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = () => {
-      this.#saveAnnotationGroup(annotationGroup, dataId);
+      this.#saveAnnotationGroup(dataId);
     };
 
-    // hide button
+    // hide labels button (pressed state set by the group rendering)
     const hideLabelsButton = getButton('Label');
-    setButtonPressed(hideLabelsButton, false);
-    hideLabelsButton.id = `hidelabelsb-${getAnnotationGroupDivId(dataId)}`;
+    hideLabelsButton.id = `hidelabelsb-${groupDivId}`;
     hideLabelsButton.title = 'Show/hide annotation labels';
     hideLabelsButton.onclick = () => {
-      this.#toggleLabelsVisibility(hideLabelsButton, dataId);
+      const group = this.#getGroupState(dataId);
+      if (typeof group !== 'undefined') {
+        this.#annotService.setLabelsVisibility(
+          dataId, !group.labelsVisible);
+      }
     };
 
     // actions
     const actionGroupDiv = document.createElement('div');
-    actionGroupDiv.id = `${getAnnotationGroupDivId(dataId)}-actions`;
+    actionGroupDiv.id = `${groupDivId}-actions`;
     actionGroupDiv.className = 'data-item-actions';
     actionGroupDiv.appendChild(lockButton);
     actionGroupDiv.appendChild(saveButton);
     actionGroupDiv.appendChild(hideLabelsButton);
 
-    // annotation list
+    // annotation list (filled by the group rendering)
     const listDiv = document.createElement('ul');
-    listDiv.id = `${getAnnotationGroupDivId(dataId)}-list`;
+    listDiv.id = `${groupDivId}-list`;
     listDiv.className = 'data-item-list';
-    for (const annotation of annotationGroup.getList()) {
-      listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
-    }
-
-    // disable/enable annotation buttons if group is editable or not
-    // (one listener per group, covers annotations added later)
-    annotationGroup.addEventListener(
-      'annotationgroupeditablechange', function (event) {
-        const disabled = !event.detail.data;
-        const elements = listDiv.querySelectorAll('[id^="cb-"], [id^="db-"]');
-        for (const element of elements) {
-          element.disabled = disabled;
-        }
-      }
-    );
 
     // data-item-header
     const headerDiv = document.createElement('div');
-    headerDiv.id = `${getAnnotationGroupDivId(dataId)}-header`;
+    headerDiv.id = `${groupDivId}-header`;
     headerDiv.className = 'data-item-header';
     headerDiv.appendChild(nameDiv);
     headerDiv.appendChild(actionGroupDiv);
 
     // data-item-content
     const contentDiv = document.createElement('div');
-    contentDiv.id = `${getAnnotationGroupDivId(dataId)}-content`;
+    contentDiv.id = `${groupDivId}-content`;
     contentDiv.className = 'data-item-content';
     contentDiv.appendChild(listDiv);
 
     // data-item
     const item = document.createElement('li');
-    item.id = getAnnotationGroupDivId(dataId);
+    item.id = groupDivId;
     item.className = 'data-item';
     item.appendChild(headerDiv);
     item.appendChild(contentDiv);
@@ -596,179 +577,4 @@ export class AnnotationUI {
     return item;
   };
 
-  /**
-   * Handle 'dataadd' event.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onDataAdd = (event) => {
-    const dataId = event.detail.dataid;
-    const dataCtrl = this.#dwvService.getDataController();
-    const data = dataCtrl.get(dataId);
-    const ag = data.annotationGroup;
-    if (typeof ag !== 'undefined') {
-      // setup html if needed
-      if (!this.#rootDoc.getElementById('annotationgroup-list')) {
-        this.#setupHtml();
-      }
-      const annotList = this.#rootDoc.getElementById('annotationgroup-list');
-      if (!annotList) {
-        logger.warn('Cannot find annotation group list element');
-        return;
-      }
-      // annotation group as html
-      const item = this.#getAnnotationGroupHtml(ag, dataId);
-      // add annotation group item
-      const addItem = this.#rootDoc.getElementById('addannotationgroupitem');
-      if (addItem) {
-        // remove and add after to make it last item
-        addItem.remove();
-        annotList.appendChild(item);
-        annotList.appendChild(addItem);
-      } else {
-        annotList.appendChild(item);
-      }
-    }
-  };
-
-  /**
-   * Handle 'dataremove' event.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onDataRemove = (event) => {
-    const dataId = event.detail.dataid;
-    // remove annotation group item if present
-    // (data is already removed from the data controller)
-    const item = this.#rootDoc.getElementById(
-      getAnnotationGroupDivId(dataId));
-    if (item) {
-      item.remove();
-    }
-  };
-
-  /**
-   * Handle 'drawlayeradd' event.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onDrawLayerAdd = (event) => {
-    const dataId = event.detail.dataid;
-    const dataCtrl = this.#dwvService.getDataController();
-    const annotationGroup = dataCtrl.get(dataId).annotationGroup;
-    // strike through non viewable annotations
-    for (const annotation of annotationGroup.getList()) {
-      let textDecoration = '';
-      if (!annotation.canView()) {
-        textDecoration = 'line-through';
-      }
-      const annotationDivId = getAnnotationDivId(annotation, dataId);
-      const item = this.#rootDoc.getElementById(annotationDivId);
-      if (item) {
-        item.style['text-decoration-line'] = textDecoration;
-      }
-    }
-  };
-
-  /**
-   * Handle 'annotationadd' event.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onAnnotationAdd = (event) => {
-    const annotation = event.detail.data;
-    const dataId = event.detail.dataid;
-    // reset selection
-    this.#clearAnnotationSelection();
-    // add item to list
-    const listDivId = `${getAnnotationGroupDivId(dataId)}-list`;
-    const listDiv = this.#rootDoc.getElementById(listDivId);
-    if (listDiv) {
-      listDiv.appendChild(this.#getAnnotationHtml(annotation, dataId));
-    }
-  };
-
-  /**
-   * Handle 'annotationupdate' event.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onAnnotationUpdate = (event) => {
-    const annotation = event.detail.data;
-    const dataId = event.detail.dataid;
-    const keys = event.detail.keys;
-
-    const annotationDivId = getAnnotationDivId(annotation, dataId);
-
-    // update quantification if shown
-    const detailsDiv = this.#rootDoc.getElementById(`qd-${annotationDivId}`);
-    if (detailsDiv && !detailsDiv.hidden) {
-      renderQuantification(
-        detailsDiv, getQuantificationGroups(annotation.quantification));
-    }
-
-    if (typeof keys !== 'undefined') {
-      // update colour input
-      if (keys.includes('colour')) {
-        const inputColour = this.#rootDoc.getElementById(
-          `cb-${annotationDivId}`);
-        if (inputColour) {
-          inputColour.value = annotation.colour;
-        }
-      }
-    }
-  };
-
-  /**
-   * Handle 'annotationremove' event.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onAnnotationRemove = (event) => {
-    const annotation = event.detail.data;
-    const dataId = event.detail.dataid;
-    // remove annotation from list
-    const annotationDivId = getAnnotationDivId(annotation, dataId);
-    const item = this.#rootDoc.getElementById(annotationDivId);
-    if (item) {
-      item.remove();
-    }
-  };
-
-  /**
-   * Handle 'annotationselect' event.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onAnnotationSelect = (event) => {
-    const annotationDivId = getAnnotationIdDivId(
-      event.detail.annotationid, event.detail.dataid);
-    const item = this.#rootDoc.getElementById(annotationDivId);
-    if (item) {
-      this.#selectAnnotationItem(item);
-      item.scrollIntoView({block: 'nearest'});
-    }
-  };
-
-  /**
-   * Handle 'tap' event: select the tapped annotation row,
-   *   or clear the selection if no annotation was tapped.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onTap = (event) => {
-    let item;
-    const hit = event.detail.annotations[0];
-    if (typeof hit !== 'undefined') {
-      item = this.#rootDoc.getElementById(
-        getAnnotationIdDivId(hit.annotationid, hit.dataid));
-    }
-    if (item) {
-      this.#selectAnnotationItem(item);
-      item.scrollIntoView({block: 'nearest'});
-    } else {
-      this.#clearAnnotationSelection();
-    }
-  };
-
-}; // AnnotationUI
+}; // AnnotationComponent

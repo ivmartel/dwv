@@ -557,13 +557,41 @@ export class ViewerService extends EventTarget {
   // segmentation
 
   /**
-   * Save a segmentation or RTSS.
+   * Save a segmentation or RTSS: trigger a file download.
    *
    * @param {MaskImage} maskImage The mask data.
    * @param {string} fileName The file name.
    * @param {boolean} asRtss Whether to save as RTSS.
    */
   saveMaskImage(maskImage, fileName, asRtss = false) {
+    let blob;
+    try {
+      blob = this.getMaskImageAsDicom(maskImage, asRtss);
+    } catch (error) {
+      logger.error(error.message);
+      alert(error.message);
+      return;
+    }
+
+    // temporary link to download
+    const element = document.createElement('a');
+    element.href = URL.createObjectURL(blob);
+    element.download = `${fileName}.dcm`;
+    // trigger download
+    element.click();
+    URL.revokeObjectURL(element.href);
+  }
+
+  /**
+   * Get a mask image as a DICOM SEG or RTSS blob.
+   *
+   * @param {MaskImage} maskImage The mask data.
+   * @param {boolean} asRtss Whether to save as RTSS.
+   * @returns {Blob} The DICOM blob.
+   * @throws {Error} If the referenced image is not found
+   *   or the writing fails.
+   */
+  getMaskImageAsDicom(maskImage, asRtss = false) {
     const dataCtrl = this.#app.getDataController();
     const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
     if (typeof refSeriesUID === 'undefined') {
@@ -597,24 +625,8 @@ export class ViewerService extends EventTarget {
     );
     // create writer with default rules
     const writer = new DicomWriter();
-    let dicomBuffer;
-    try {
-      dicomBuffer = writer.getBuffer(dicomElements);
-    } catch (error) {
-      logger.error(error.message);
-      alert(error.message);
-      return;
-    }
-    // view as Blob to allow download
-    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-
-    // temporary link to download
-    const element = document.createElement('a');
-    element.href = window.URL.createObjectURL(blob);
-    element.download = `${fileName}.dcm`;
-    // trigger download
-    element.click();
-    URL.revokeObjectURL(element.href);
+    const dicomBuffer = writer.getBuffer(dicomElements);
+    return new Blob([dicomBuffer], {type: 'application/dicom'});
   }
 
   // logging

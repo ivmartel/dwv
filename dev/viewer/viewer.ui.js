@@ -6,8 +6,10 @@ import {Matrix33} from '../../src/math/matrix.js';
 import {i18n} from '../../src/utils/i18n.js';
 
 import {DataTableUI} from './viewer.ui.datatable.js';
-import {AnnotationUI} from './viewer.ui.annot.js';
-import {SegmentationUI} from './viewer.ui.segment.js';
+import {AnnotationService} from './annot.service.js';
+import {AnnotationComponent} from './viewer.ui.annot.js';
+import {SegmentationService} from './segment.service.js';
+import {SegmentationComponent} from './viewer.ui.segment.js';
 import {SegmentationExtraUI} from './viewer.ui.segmentExtra.js';
 import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
@@ -332,15 +334,17 @@ export class ViewerUI {
       }
     }
 
-    // data model UI
-    const dataModelUI = {
-      annotation: AnnotationUI,
-      segmentation: SegmentationUI
-    };
-    for (const dmName in dataModelUI) {
-      const dmUI = new dataModelUI[dmName](this.#service);
-      dmUI.registerListeners();
-    }
+    // annotation
+    const annotService = new AnnotationService(this.#service);
+    annotService.connect();
+    const annotUI = new AnnotationComponent(annotService);
+    annotUI.registerListeners();
+
+    // segmentation
+    const segService = new SegmentationService(this.#service);
+    segService.connect();
+    const segUI = new SegmentationComponent(segService);
+    segUI.registerListeners();
 
     // segmentation extra (overlap check and merge)
     const segExtra = new SegmentationExtraUI(this.#service);

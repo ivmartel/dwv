@@ -1,92 +1,21 @@
-import {
-  rgbToHex,
-  hexToRgb,
-} from '../../src/utils/colour.js';
 import {logger} from '../../src/utils/logger.js';
-import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
-import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
-import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
-import {
-  ChangeSegmentColourCommand
-} from '../../src/command/changeSegmentColourCommand.js';
-import {
-  DeleteSegmentCommand
-} from '../../src/command/deleteSegmentCommand.js';
 
 import {getHtmlId} from './viewer.utils.js';
 import {
   getButton,
-  setButtonPressed,
-  isButtonPressed
+  setButtonPressed
 } from './viewer.ui.icons.js';
-import {
-  getQuantificationGroups,
-  renderQuantification
-} from './viewer.ui.quantification.js';
+import {renderQuantification} from './viewer.ui.quantification.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
- * @import {MaskSegment} from '../../src/dicom/dicomSegment.js';
- * @import {RGB} from '../../src/utils/colour.js';
- * @import {Statistics} from '../../src/math/stats.js';
- * @import {Label} from '../../src/image/label.js';
- * @import {QuantificationGroup} from './viewer.ui.quantification.js';
+ * @import {
+ *   SegmentationService,
+ *   SegmentationState,
+ *   SegmentationItemState,
+ *   SegmentItemState,
+ *   SegmentRef
+ * } from './segment.service.js';
  */
-
-/**
- * Segmentation type.
- *
- * @typedef Segmentation
- * @property {string|undefined} dataId The segmentation data ID,
- *   undefined until the mask is created.
- * @property {Label[]} labels The segmentation labels.
- * @property {MaskSegment[]} segments The segmentation segments.
- * @property {MaskSegmentViewHelper} viewHelper A view helper.
- * @property {number} [selectedSegmentNumber] The number of the segment
- *   selected for the brush, undefined if none.
- */
-
-/**
- * List of possible colours.
- *
- * @type {RGB[]}
- */
-const defaultColours = [
-  {r: 255, g: 0, b: 0},
-  {r: 0, g: 255, b: 0},
-  {r: 0, g: 0, b: 255},
-  {r: 0, g: 255, b: 255},
-  {r: 255, g: 0, b: 255},
-  {r: 255, g: 255, b: 0},
-  {r: 255, g: 255, b: 255},
-  {r: 255, g: 128, b: 128},
-  {r: 128, g: 255, b: 128},
-  {r: 128, g: 128, b: 255},
-  {r: 128, g: 255, b: 255},
-  {r: 255, g: 128, b: 255},
-  {r: 255, g: 255, b: 128},
-  {r: 128, g: 128, b: 128},
-  {r: 255, g: 64, b: 64},
-  {r: 64, g: 255, b: 64},
-  {r: 64, g: 64, b: 255},
-  {r: 64, g: 255, b: 255},
-  {r: 255, g: 64, b: 255},
-  {r: 255, g: 255, b: 64},
-  {r: 64, g: 64, b: 64},
-];
-
-/**
- * Get a segment from a segment list.
- *
- * @param {number} segmentNumber The segment number.
- * @param {MaskSegment[]} segments The list to search.
- * @returns {MaskSegment|undefined} The found segment.
- */
-function getSegment(segmentNumber, segments) {
-  return segments.find(function (item) {
-    return item.number === segmentNumber;
-  });
-}
 
 /**
  * HTML element id prefixes.
@@ -94,14 +23,12 @@ function getSegment(segmentNumber, segments) {
 const prefixes = {
   segmentation: 'segmentation',
   segment: 'segment',
-  span: 'span-',
   colour: 'colour-',
   view: 'view-',
   delete: 'delete-',
   addSegment: 'add-segment-',
   saveSeg: 'save-seg-',
   saveRtss: 'save-rtss-',
-  volumes: 'span-volumes-',
   info: 'info-',
   details: 'details-',
   li: 'li-'
@@ -110,37 +37,52 @@ const prefixes = {
 /**
  * Get the HTML id of a segmentation.
  *
- * @param {number} segmentationIndex The segmentation index.
+ * @param {number} segmentationId The segmentation id.
  * @returns {string} The segmentation HTML id.
  */
-function getSegmentationHtmlId(segmentationIndex) {
-  return getHtmlId(prefixes.segmentation, segmentationIndex);
+function getSegmentationHtmlId(segmentationId) {
+  return getHtmlId(prefixes.segmentation, segmentationId);
 }
 
 /**
  * Get the HTML id of a segment.
  *
  * @param {number} segmentNumber The segment number.
- * @param {number} segmentationIndex The segmentation index.
+ * @param {number} segmentationId The segmentation id.
  * @returns {string} The segment HTML id.
  */
-function getSegmentHtmlId(segmentNumber, segmentationIndex) {
+function getSegmentHtmlId(segmentNumber, segmentationId) {
   const segmentName = getHtmlId(prefixes.segment, segmentNumber);
-  const segmentationName = getSegmentationHtmlId(segmentationIndex);
+  const segmentationName = getSegmentationHtmlId(segmentationId);
   return `${segmentName}-${segmentationName}`;
 }
 
 /**
- * Segmentation UI.
+ * Get the HTML id of a segment list item.
+ *
+ * @param {SegmentRef} ref The segment reference.
+ * @returns {string} The list item HTML id.
  */
-export class SegmentationUI {
+function getSegmentItemHtmlId(ref) {
+  return getHtmlId(prefixes.li,
+    getSegmentHtmlId(ref.segmentNumber, ref.segmentationId));
+}
+
+/**
+ * Segmentation component: vanilla renderer of the segmentation
+ *   service state. Reference implementation for framework components.
+ *
+ * Rendering reuses the elements of unchanged segmentations and segments
+ *   (the state keeps the identity of unchanged parts).
+ */
+export class SegmentationComponent {
 
   /**
-   * The associated viewer service.
+   * The segmentation service.
    *
-   * @type {ViewerService}
+   * @type {SegmentationService}
    */
-  #service;
+  #segService;
 
   /**
    * The root document.
@@ -157,134 +99,63 @@ export class SegmentationUI {
   #withRtss = true;
 
   /**
-   * Colour array to pick from.
+   * The unsubscribe function.
    *
-   * @type {RGB[]}
+   * @type {Function|undefined}
    */
-  #coloursPick = defaultColours.slice();
+  #unsubscribe;
 
   /**
-   * List of segmentations.
+   * The last rendered state.
    *
-   * @type {Segmentation[]}
+   * @type {SegmentationState|undefined}
    */
-  #segmentations = [];
-
+  #renderedState;
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * The rendered segment states indexed by list item HTML id.
+   *
+   * @type {Map<string, SegmentItemState>}
+   */
+  #renderedSegments = new Map();
+
+  /**
+   * The list item HTML ids of the segments with open quantification
+   *   details (view only state).
+   *
+   * @type {Set<string>}
+   */
+  #openDetails = new Set();
+
+  /**
+   * @param {SegmentationService} segService The segmentation service.
    * @param {Document} [rootDoc] Optional root document,
    *   defaults to `window.document`.
    */
-  constructor(service, rootDoc) {
-    this.#service = service;
+  constructor(segService, rootDoc) {
+    this.#segService = segService;
     if (typeof rootDoc !== 'undefined') {
       this.#rootDoc = rootDoc;
     }
   }
 
   /**
-   * Get the next available colour from the colour list.
-   *
-   * @returns {RGB} The colour as {r,g,b}.
-   */
-  #nextColour() {
-    // recreate if empty
-    if (this.#coloursPick.length === 0) {
-      logger.debug('Regenerating colours...');
-      this.#coloursPick = defaultColours.slice();
-    }
-    // pick and remove first in list, return a copy
-    return {...this.#coloursPick.shift()};
-  }
-
-  /**
-   * Get a new segment.
-   *
-   * @param {number} number The segment number.
-   * @returns {MaskSegment} The new segment.
-   */
-  #getNewSegment(number) {
-    return {
-      number,
-      algorithmType: 'MANUAL',
-      algorithmName: undefined,
-      label: `s${number}`,
-      displayRGBValue: this.#nextColour(),
-      displayValue: undefined,
-      propertyCategoryCode: getSegmentationCode(),
-      propertyTypeCode: getSegmentationCode(),
-      trackingId: undefined,
-      trackingUid: undefined
-    };
-  }
-
-  /**
-   * Bind app to ui.
+   * Subscribe to the segmentation service and render.
    */
   registerListeners() {
-    this.#service.addEventListener('dataadd', this.#onDataAdd);
-    this.#service.addEventListener('dataremove', this.#onDataRemove);
-    this.#service.addEventListener('labelschanged', this.#onLabelsChanged);
-    this.#service.addEventListener('tap', this.#onTap);
-  };
-
-  /**
-   * Get the segmentation of the current brush selection.
-   *
-   * @returns {Segmentation|undefined} The segmentation.
-   */
-  #getSelectedSegmentation() {
-    return this.#segmentations.find(
-      (seg) => typeof seg.selectedSegmentNumber !== 'undefined');
+    this.#unsubscribe = this.#segService.subscribe(this.#render);
+    this.#render();
   }
 
   /**
-   * Mark segment list items as selected, unselecting the others.
-   *
-   * @param {HTMLElement[]} items The segment list items.
+   * Unsubscribe from the segmentation service.
    */
-  #selectSegmentItems(items) {
-    // remove selected class from other rows
-    const mainlist = this.#rootDoc.getElementById('segmentation-list');
-    if (mainlist) {
-      const allItems = mainlist.querySelectorAll('.data-item-list-item');
-      allItems.forEach(item => item.classList.remove('selected'));
+  dispose() {
+    if (typeof this.#unsubscribe !== 'undefined') {
+      this.#unsubscribe();
+      this.#unsubscribe = undefined;
     }
-    // mark these rows as selected
-    items.forEach(item => item.classList.add('selected'));
   }
-
-  /**
-   * Handle 'tap' event: select the tapped segments rows,
-   *   or clear the selection if no segment was tapped.
-   *
-   * @param {CustomEvent} event The event.
-   */
-  #onTap = (event) => {
-    const items = [];
-    for (const hit of event.detail.segments) {
-      const segmentationIndex = this.#segmentations.findIndex((seg) => {
-        return seg.dataId === hit.dataid;
-      });
-      if (segmentationIndex === -1) {
-        continue;
-      }
-      for (const segmentNumber of hit.segmentnumbers) {
-        const segmentId = getSegmentHtmlId(segmentNumber, segmentationIndex);
-        const item = this.#rootDoc.getElementById(
-          getHtmlId(prefixes.li, segmentId));
-        if (item) {
-          items.push(item);
-        }
-      }
-    }
-    // an empty list clears the selection
-    this.#selectSegmentItems(items);
-    if (items.length !== 0) {
-      items[0].scrollIntoView({block: 'nearest'});
-    }
-  };
 
   /**
    * Setup the container div.
@@ -314,190 +185,6 @@ export class SegmentationUI {
   }
 
   /**
-   * Get the container div.
-   *
-   * @returns {HTMLDivElement} The element.
-   */
-  #getContainerDiv() {
-    return this.#rootDoc.getElementById('segmentations-fieldset');
-  }
-
-  /**
-   * Calculate mask labels.
-   *
-   * @param {string} dataId The data id.
-   */
-  #calculateLabels(dataId) {
-    const dataCtrl = this.#service.getDataController();
-    const maskData = dataCtrl.get(dataId);
-    if (!maskData) {
-      throw new Error(
-        `No data to calculate labels for dataId: ${dataId}`
-      );
-    }
-    const image = maskData.image;
-    image.recalculateLabels();
-  }
-
-  /**
-   * Handle a labels changed event.
-   *
-   * @param {CustomEvent} event The change event.
-   */
-  #onLabelsChanged = (event) => {
-    const segmentation =
-      this.#segmentations.find(
-        (seg) => {
-          return seg.dataId === event.detail.dataid;
-        }
-      );
-
-    if (typeof segmentation !== 'undefined') {
-      segmentation.labels = event.detail.labels;
-      // update quantification if shown
-      const segmentationIndex = this.#segmentations.indexOf(segmentation);
-      for (const segment of segmentation.segments) {
-        const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
-        const detailsDiv = this.#rootDoc.getElementById(
-          getHtmlId(prefixes.details, segmentId));
-        if (detailsDiv && !detailsDiv.hidden) {
-          renderQuantification(detailsDiv,
-            this.#getSegmentQuantificationGroups(segment, segmentation));
-        }
-      }
-    }
-  };
-
-  /**
-   * Add a segment HTML to the main HTML.
-   *
-   * @param {Segmentation} segmentation The segmentation.
-   * @param {boolean} [selectFirst] Optional flag to select the first
-   *   segment (and pass it to the brush).
-   */
-  #addSegmentationHtml(segmentation, selectFirst = false) {
-    // segmentation as html
-    const item = this.#getSegmentationHtml(
-      segmentation, this.#segmentations.length - 1, selectFirst);
-
-    const segList = this.#rootDoc.getElementById('segmentation-list');
-    if (!segList) {
-      logger.warn('Cannot find segmentation list element');
-      return;
-    }
-    // add segmentation item
-    const addItem = this.#rootDoc.getElementById('addsegmentationitem');
-    if (addItem) {
-      // remove and add after to make it last item
-      addItem.remove();
-      segList.appendChild(item);
-      segList.appendChild(addItem);
-    } else {
-      segList.appendChild(item);
-    }
-  }
-
-  /**
-   * Handle a dataadd event.
-   *
-   * @param {CustomEvent} event The dataadd event.
-   */
-  #onDataAdd = (event) => {
-    const dataId = event.detail.dataid;
-    const dataCtrl = this.#service.getDataController();
-    const maskImage = dataCtrl.get(dataId).image;
-
-    if (typeof maskImage !== 'undefined' && maskImage.isMask()) {
-      // setup html if needed
-      if (!this.#rootDoc.getElementById('segmentation-list')) {
-        this.#setupHtml();
-      }
-
-      const segHelper = new MaskSegmentHelper(maskImage);
-      if (segHelper.getNumberOfSegments() === 0) {
-        // manually created segmentation with no segments
-        const segmentation = this.#getSelectedSegmentation();
-        if (typeof segmentation === 'undefined') {
-          // default segment created at first brush
-          const segmentNumber = 1;
-          const segment = this.#getNewSegment(segmentNumber);
-          // default segmentation
-          const defaultSegmentation = {
-            dataId,
-            labels: [],
-            segments: [segment],
-            viewHelper: new MaskSegmentViewHelper()
-          };
-          // add to list
-          this.#segmentations.push(defaultSegmentation);
-          // add to html, select segment to pass the mask id to the brush
-          this.#addSegmentationHtml(defaultSegmentation, true);
-        } else if (typeof segmentation.dataId === 'undefined') {
-          // segmentation created with add segmentation
-          segmentation.dataId = dataId;
-          for (const segment of segmentation.segments) {
-            segHelper.addSegment(segment);
-          }
-        }
-      } else {
-        // segmentation from loaded file, pass segments to ui
-        const imgMeta = maskImage.getMeta();
-        if (typeof imgMeta !== 'undefined') {
-          // loaded segmentation
-          const segmentation = {
-            dataId,
-            labels: [],
-            segments: imgMeta.custom.segments.slice(),
-            viewHelper: new MaskSegmentViewHelper()
-          };
-          // add to list
-          this.#segmentations.push(segmentation);
-          // calculate labels
-          this.#calculateLabels(dataId);
-          // add to html
-          this.#addSegmentationHtml(segmentation);
-
-          // remove colour from colour pick
-          for (const segment of imgMeta.custom.segments) {
-            const index = this.#coloursPick.findIndex((item) =>
-              item.r === segment.displayRGBValue.r &&
-              item.g === segment.displayRGBValue.g &&
-              item.b === segment.displayRGBValue.b);
-            if (index !== -1) {
-              this.#coloursPick.splice(index, 1);
-            }
-          }
-        }
-      }
-    }
-  };
-
-  /**
-   * Handle a dataremove event.
-   *
-   * @param {CustomEvent} event The dataremove event.
-   */
-  #onDataRemove = (event) => {
-    const dataId = event.detail.dataid;
-    const index = this.#segmentations.findIndex(
-      (seg) => seg.dataId === dataId);
-    if (index === -1) {
-      return;
-    }
-    const segmentation = this.#segmentations[index];
-    // keep the entry in the list: html ids and handlers use the
-    // segmentation index, clear its data id to mark it as removed
-    segmentation.dataId = undefined;
-    segmentation.selectedSegmentNumber = undefined;
-
-    // remove segmentation item
-    const item = this.#rootDoc.getElementById(getSegmentationHtmlId(index));
-    if (item) {
-      item.remove();
-    }
-  };
-
-  /**
    * Setup the html for the segmentation list.
    */
   #setupHtml() {
@@ -512,317 +199,178 @@ export class SegmentationUI {
     const addSegmentationButton = document.createElement('button');
     addSegmentationButton.appendChild(
       document.createTextNode('Add segmentation'));
-    addSegmentationButton.onclick = (/*event*/) => {
-      // new segmentation
-      const segmentation = {
-        dataId: undefined,
-        labels: [],
-        segments: [this.#getNewSegment(1)],
-        viewHelper: new MaskSegmentViewHelper()
-      };
-      // add to list
-      this.#segmentations.push(segmentation);
-      // add to html, select segment to start drawing
-      this.#addSegmentationHtml(segmentation, true);
+    addSegmentationButton.onclick = () => {
+      // the segmentation is rendered on the next state change
+      this.#segService.addSegmentation();
     };
     addItem.appendChild(addSegmentationButton);
     segList.appendChild(addItem);
 
-
     // setup and append
     this.#setupContainerDiv();
-    const containerDiv = this.#getContainerDiv();
-    if (!containerDiv) {
+    const containerDiv =
+      this.#rootDoc.getElementById('segmentations-fieldset');
+    if (containerDiv) {
+      containerDiv.appendChild(segList);
+    }
+  }
+
+  /**
+   * Render the segmentation service state.
+   */
+  #render = () => {
+    const state = this.#segService.getSnapshot();
+    if (state === this.#renderedState) {
       return;
     }
-    containerDiv.appendChild(segList);
-  }
+    const previous = this.#renderedState;
+    this.#renderedState = state;
 
-  /**
-   * Select a segment in the brush tool.
-   *
-   * @param {number} segmentNumber The segment number.
-   * @param {Segmentation} segmentation The segmentation.
-   */
-  #appSelectSegment(segmentNumber, segmentation) {
-    // store selection: only one selected segment for all segmentations
-    for (const seg of this.#segmentations) {
-      seg.selectedSegmentNumber = undefined;
-    }
-    segmentation.selectedSegmentNumber = segmentNumber;
-    const dataCtrl = this.#service.getDataController();
-
-    // add segment if not present
-    const data = dataCtrl.get(segmentation.dataId);
-    if (typeof data !== 'undefined') {
-      const maskImage = data.image;
-      const segHelper = new MaskSegmentHelper(maskImage);
-      // add segment to mask
-      if (!segHelper.hasSegment(segmentNumber)) {
-        logger.debug(`Add segment ${segmentNumber}`);
-        segHelper.addSegment(getSegment(
-          segmentNumber, segmentation.segments
-        ));
+    let segList = this.#rootDoc.getElementById('segmentation-list');
+    if (!segList) {
+      // setup html on first segmentation
+      if (state.segmentations.length === 0) {
+        return;
+      }
+      this.#setupHtml();
+      segList = this.#rootDoc.getElementById('segmentation-list');
+      if (!segList) {
+        logger.warn('Cannot find segmentation list element');
+        return;
       }
     }
+    // the add item stays last
+    const addItem = this.#rootDoc.getElementById('addsegmentationitem');
 
-    // app features
-    const features = {
-      selectedSegmentNumber: segmentNumber,
-      maskDataId: undefined,
-      createMask: false
-    };
-    if (typeof segmentation.dataId !== 'undefined') {
-      features.maskDataId = segmentation.dataId;
-    } else {
-      features.createMask = true;
-    }
-    logger.debug(
-      `set tool features [select] ${JSON.stringify(features)}`);
-    this.#service.setToolFeatures(features);
-  }
-
-  /**
-   * Change a segment colour.
-   *
-   * @param {HTMLInputElement} colourInput The colour input.
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
-   */
-  #changeSegmentColour(colourInput, segment, segmentation) {
-    const newHexColour = colourInput.value;
-    const segmentHexColour = rgbToHex(segment.displayRGBValue);
-
-    if (newHexColour !== segmentHexColour) {
-      // update colours
-      const newRgbColour = hexToRgb(newHexColour);
-      // get mask
-      const dataCtrl = this.#service.getDataController();
-      const maskData = dataCtrl.get(segmentation.dataId);
-      // change if possible
-      if (typeof maskData !== 'undefined') {
-        // create change colour command
-        const previousColour = segment.displayRGBValue;
-        const chgCmd = new ChangeSegmentColourCommand(
-          maskData.image, segment, newRgbColour);
-        chgCmd.onExecute = function (/*event*/) {
-          // not needed the first time but on undo/redo
-          colourInput.value = newHexColour;
-        };
-        chgCmd.onUndo = function () {
-          // not needed the first time but on undo/redo
-          colourInput.value = rgbToHex(previousColour);
-        };
-        // execute command
-        if (chgCmd.isValid()) {
-          chgCmd.execute();
-          const undoCtrl = this.#service.getUndoController();
-          undoCtrl.addToUndoStack(chgCmd);
-        }
-      } else {
-        // no mask yet: only update segment, its colour will be
-        // passed to the mask palette when the segment is added to it
-        segment.displayRGBValue = newRgbColour;
+    // segmentations
+    const previousList = previous?.segmentations ?? [];
+    for (const segmentation of state.segmentations) {
+      const previousItem = previousList.find(
+        (item) => item.id === segmentation.id);
+      if (segmentation !== previousItem) {
+        this.#renderSegmentation(segList, addItem, segmentation,
+          previousItem);
       }
     }
-  }
-
-  /**
-   * Go to a segment: set the view position to its first label centroid.
-   *
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
-   */
-  #gotoSegment(segment, segmentation) {
-    // Find the first label for this segment
-    const label =
-      segmentation.labels.find((item) => {
-        return item.id === segment.number;
-      });
-
-    if (typeof label !== 'undefined') {
-      const dataId = segmentation.dataId;
-      const stgCtrl = this.#service.getStageController();
-      const layers = stgCtrl.getViewLayersByDataId(dataId);
-      for (const layer of layers) {
-        layer.setCurrentPosition(label.centroid);
-        layer.highlightSegment(segment.number);
-      }
-    } else {
-      logger.warn('No label for this segment');
-    }
-  }
-
-  /**
-   * Toggle a segment visibility.
-   *
-   * @param {HTMLButtonElement} viewButton The view button.
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
-   */
-  #toggleSegmentView(viewButton, segment, segmentation) {
-    // toggle hidden
-    const segViewHelper = segmentation.viewHelper;
-    if (isButtonPressed(viewButton)) {
-      setButtonPressed(viewButton, false);
-      segViewHelper.removeFromHidden(segment.number);
-    } else {
-      setButtonPressed(viewButton, true);
-      segViewHelper.addToHidden(segment.number);
-    }
-    // apply hidden
-    const stageCtrl = this.#service.getStageController();
-    const vls = stageCtrl.getViewLayersByDataId(segmentation.dataId);
-    if (vls.length === 0) {
-      logger.warn('No layers to show/hide seg');
-    }
-    for (const vl of vls) {
-      const vc = vl.getViewController();
-      vc.setMaskViewHelper(segViewHelper);
-    }
-  }
-
-  /**
-   * Delete a segment.
-   *
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
-   * @param {HTMLLIElement} listItem The segment list item.
-   * @param {HTMLButtonElement} viewButton The segment view button.
-   */
-  #deleteSegment(segment, segmentation, listItem, viewButton) {
-    const parent = listItem.parentNode;
-    if (!parent) {
-      throw new Error('No segment item parent');
-    }
-    const nextItem = listItem.nextSibling;
-    // store selected state before removal
-    const wasSelected =
-      segmentation.selectedSegmentNumber === segment.number;
-
-    // get mask
-    const dataCtrl = this.#service.getDataController();
-    const data = dataCtrl.get(segmentation.dataId);
-    // delete if possible
-    if (typeof data !== 'undefined') {
-      // create delete command
-      const delCmd = new DeleteSegmentCommand(data.image, segment);
-      delCmd.onExecute = function () {
-        listItem.remove();
-        if (segmentation.viewHelper.isHidden(segment.number)) {
-          segmentation.viewHelper.removeFromHidden(segment.number);
-          // undo brings the segment back visible
-          setButtonPressed(viewButton, false);
-        }
-      };
-      delCmd.onUndo = function () {
-        parent.insertBefore(listItem, nextItem);
-      };
-      // execute command
-      if (delCmd.isValid()) {
-        delCmd.execute();
-        const undoCtrl = this.#service.getUndoController();
-        undoCtrl.addToUndoStack(delCmd);
-      }
-      // update labels
-      this.#calculateLabels(segmentation.dataId);
-    } else {
-      // no mask yet: remove from the segmentation segments so that
-      // it is not added to the mask when it gets created
-      const index = segmentation.segments.indexOf(segment);
-      if (index !== -1) {
-        segmentation.segments.splice(index, 1);
-      }
-      listItem.remove();
-    }
-
-    // select first remaining segment if the deleted one was selected
-    if (wasSelected) {
-      segmentation.selectedSegmentNumber = undefined;
-      const segmentationIndex = this.#segmentations.indexOf(segmentation);
-      for (const remaining of segmentation.segments) {
-        const segmentId =
-          getSegmentHtmlId(remaining.number, segmentationIndex);
-        const item = parent.querySelector(
-          `#${getHtmlId(prefixes.li, segmentId)}`);
-        if (item instanceof HTMLElement) {
-          this.#selectSegment(item, remaining, segmentation);
-          break;
+    // remove segmentations not in state
+    for (const segmentation of previousList) {
+      if (!state.segmentations.some((item) => item.id === segmentation.id)) {
+        this.#rootDoc.getElementById(
+          getSegmentationHtmlId(segmentation.id))?.remove();
+        for (const segment of segmentation.segments) {
+          const itemId = getSegmentItemHtmlId({
+            segmentationId: segmentation.id,
+            segmentNumber: segment.number
+          });
+          this.#renderedSegments.delete(itemId);
+          this.#openDetails.delete(itemId);
         }
       }
     }
-  }
+
+    // selection (rows may have been rebuilt)
+    this.#renderSelection(segList, state.selected,
+      state.selected !== previous?.selected);
+  };
 
   /**
-   * Get a segment quantification groups.
+   * Render a segmentation.
    *
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
-   * @returns {QuantificationGroup[]} The quantification groups.
+   * @param {HTMLElement} segList The segmentation list element.
+   * @param {HTMLElement|null} addItem The add segmentation item.
+   * @param {SegmentationItemState} segmentation The segmentation state.
+   * @param {SegmentationItemState} [previous] The previously
+   *   rendered segmentation state.
    */
-  #getSegmentQuantificationGroups(segment, segmentation) {
-    const labelsInfo = this.#getLabelsInfo(segment, segmentation);
-    const statsList = this.#getHistogramStats(segment, segmentation);
-    // only show the volume index for multi volume data
-    const volumeSuffix = (volume) => {
-      return statsList.length > 1 ? ` (#${volume})` : '';
-    };
-    // statistics as quantification
-    const statsToQuantification = (stats, unit) => {
-      const res = {};
-      for (const key of Object.keys(stats)) {
-        res[key] = {value: stats[key], unit};
-      }
-      return res;
-    };
-    // same label order as labels info
-    const segmentLabels = segmentation.labels.filter(
-      (label) => label.id === segment.number);
+  #renderSegmentation(segList, addItem, segmentation, previous) {
+    const segmentationId = segmentation.id;
+    const segmentationHtmlId = getSegmentationHtmlId(segmentationId);
+    if (!this.#rootDoc.getElementById(segmentationHtmlId)) {
+      segList.insertBefore(
+        this.#getSegmentationHtml(segmentationId), addItem);
+    }
 
-    const groups = [];
-    const nLabels = labelsInfo.length;
-    for (let i = 0; i < nLabels; ++i) {
-      const prefix = nLabels > 1 ? `Label #${i} ` : '';
-      groups.push(...getQuantificationGroups(labelsInfo[i], {
-        geometry: prefix === '' ? 'Geometry' : `${prefix}geometry`
-      }));
-      // label histogram stats, if available
-      for (const item of statsList) {
-        const labelItem = item.labelStats?.find(
-          (element) => element.label === segmentLabels[i]);
-        if (typeof labelItem !== 'undefined') {
-          const title = prefix === ''
-            ? 'Pixel values' : `${prefix}pixel values`;
-          groups.push(...getQuantificationGroups(
-            statsToQuantification(labelItem.stats, labelItem.unit),
-            {pixelValues: title + volumeSuffix(item.volume)}));
+    const quantificationChanged = typeof previous !== 'undefined' &&
+      previous.quantificationVersion !== segmentation.quantificationVersion;
+
+    // segments
+    const listDiv = this.#rootDoc.getElementById(
+      `${segmentationHtmlId}-list`);
+    const itemIds = new Set();
+    segmentation.segments.forEach((segment, index) => {
+      const itemId = getSegmentItemHtmlId(
+        {segmentationId, segmentNumber: segment.number});
+      itemIds.add(itemId);
+      let item = this.#rootDoc.getElementById(itemId);
+      if (!item || this.#renderedSegments.get(itemId) !== segment) {
+        const newItem = this.#getSegmentHtml(segment, segmentationId);
+        if (item) {
+          item.replaceWith(newItem);
         }
+        item = newItem;
+        this.#renderedSegments.set(itemId, segment);
+      } else if (quantificationChanged && this.#openDetails.has(itemId)) {
+        // kept item: refresh open quantification
+        renderQuantification(
+          this.#rootDoc.getElementById(
+            getHtmlId(prefixes.details,
+              getSegmentHtmlId(segment.number, segmentationId))),
+          this.#segService.getSegmentQuantification(
+            segmentationId, segment.number));
+      }
+      const current = listDiv.children[index];
+      if (current !== item) {
+        listDiv.insertBefore(item, current ?? null);
+      }
+    });
+    // remove segments not in state
+    for (const child of Array.from(listDiv.children)) {
+      if (!itemIds.has(child.id)) {
+        child.remove();
+        this.#renderedSegments.delete(child.id);
+        this.#openDetails.delete(child.id);
       }
     }
-    // global histogram stats
-    if (nLabels > 1) {
-      for (const item of statsList) {
-        groups.push(...getQuantificationGroups(
-          statsToQuantification(item.stats, item.unit),
-          {pixelValues: `All pixel values${volumeSuffix(item.volume)}`}));
-      }
-    }
-    return groups;
   }
 
   /**
-   * Toggle a segment information section.
+   * Render the selection.
+   *
+   * @param {HTMLElement} segList The segmentation list element.
+   * @param {SegmentRef[]} selected The selected segments.
+   * @param {boolean} changed True if the selection changed.
+   */
+  #renderSelection(segList, selected, changed) {
+    const items = segList.querySelectorAll('.data-item-list-item');
+    items.forEach(item => item.classList.remove('selected'));
+    const selectedItems = [];
+    for (const ref of selected) {
+      const item = this.#rootDoc.getElementById(getSegmentItemHtmlId(ref));
+      if (item) {
+        item.classList.add('selected');
+        selectedItems.push(item);
+      }
+    }
+    if (changed && selectedItems.length !== 0) {
+      selectedItems[0].scrollIntoView({block: 'nearest'});
+    }
+  }
+
+  /**
+   * Set the quantification details open state.
    *
    * @param {HTMLButtonElement} infoButton The info button.
    * @param {HTMLDivElement} detailsDiv The details element.
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
+   * @param {number} segmentationId The segmentation id.
+   * @param {number} segmentNumber The segment number.
+   * @param {boolean} open True to open the details.
    */
-  #toggleSegmentInfo(infoButton, detailsDiv, segment, segmentation) {
-    const open = detailsDiv.hidden;
+  #setDetailsOpen(infoButton, detailsDiv, segmentationId, segmentNumber,
+    open) {
     if (open) {
       renderQuantification(detailsDiv,
-        this.#getSegmentQuantificationGroups(segment, segmentation));
+        this.#segService.getSegmentQuantification(
+          segmentationId, segmentNumber));
     }
     detailsDiv.hidden = !open;
     setButtonPressed(infoButton, open);
@@ -830,31 +378,43 @@ export class SegmentationUI {
   }
 
   /**
-   * Select a segment: mark its row as selected and pass it to the brush
-   * if it is the selected tool.
+   * Save a segmentation as SEG or RTSS.
    *
-   * @param {HTMLElement} item The segment list item.
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
+   * @param {number} segmentationId The segmentation id.
+   * @param {boolean} asRtss Whether to save as RTSS.
    */
-  #selectSegment(item, segment, segmentation) {
-    this.#selectSegmentItems([item]);
-    if (this.#service.isSelectedTool('Brush')) {
-      this.#appSelectSegment(segment.number, segmentation);
+  #saveSegmentation(segmentationId, asRtss) {
+    let blob;
+    try {
+      blob = this.#segService.getSegmentationAsDicom(segmentationId, asRtss);
+    } catch (error) {
+      logger.error(error.message);
+      alert(error.message);
+      return;
     }
+    const suffix = asRtss ? 'rtss' : 'seg';
+
+    // temporary link to download
+    const element = document.createElement('a');
+    element.href = URL.createObjectURL(blob);
+    element.download =
+      `${getSegmentationHtmlId(segmentationId)}-${suffix}.dcm`;
+    // trigger download
+    element.click();
+    URL.revokeObjectURL(element.href);
   }
 
   /**
-   * Get the HTML span element for a segment.
+   * Get the HTML list item for a segment.
    *
-   * @param {MaskSegment} segment The segment.
-   * @param {number} segmentationIndex The segmentation index.
-   * @param {boolean} [selectSegment] Optional flag to select segment.
+   * @param {SegmentItemState} segment The segment state.
+   * @param {number} segmentationId The segmentation id.
    * @returns {HTMLLIElement} The HTML element.
    */
-  #getSegmentHtml(segment, segmentationIndex, selectSegment = false) {
-    const segmentation = this.#segmentations[segmentationIndex];
-    const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
+  #getSegmentHtml(segment, segmentationId) {
+    const segmentNumber = segment.number;
+    const segmentId = getSegmentHtmlId(segmentNumber, segmentationId);
+    const itemId = getHtmlId(prefixes.li, segmentId);
 
     // segment label
     const labelSpan = document.createElement('span');
@@ -872,15 +432,22 @@ export class SegmentationUI {
     };
 
     const infoButton = getButton('Info');
-    setButtonPressed(infoButton, false);
     infoButton.id = getHtmlId(prefixes.info, segmentId);
     infoButton.title = 'Show/hide quantification';
-    infoButton.setAttribute('aria-expanded', 'false');
     infoButton.setAttribute('aria-controls', detailsDiv.id);
+    this.#setDetailsOpen(infoButton, detailsDiv, segmentationId,
+      segmentNumber, this.#openDetails.has(itemId));
     infoButton.onclick = (event) => {
       // do not propagate to parent that triggers goto
       event.stopPropagation();
-      this.#toggleSegmentInfo(infoButton, detailsDiv, segment, segmentation);
+      const open = detailsDiv.hidden;
+      if (open) {
+        this.#openDetails.add(itemId);
+      } else {
+        this.#openDetails.delete(itemId);
+      }
+      this.#setDetailsOpen(infoButton, detailsDiv, segmentationId,
+        segmentNumber, open);
     };
 
     // segment colour
@@ -888,28 +455,27 @@ export class SegmentationUI {
     colourInput.type = 'color';
     colourInput.title = 'Change segment colour';
     colourInput.id = getHtmlId(prefixes.colour, segmentId);
-    colourInput.value = rgbToHex(segment.displayRGBValue);
+    colourInput.value = segment.colour;
     colourInput.onchange = () => {
-      this.#changeSegmentColour(colourInput, segment, segmentation);
+      this.#segService.changeSegmentColour(
+        segmentationId, segmentNumber, colourInput.value);
     };
     colourInput.onclick = (event) => {
       // do not propagate to parent that triggers goto
       event.stopPropagation();
     };
 
-    // segment view
+    // segment view: pressed means hidden
     const viewButton = getButton('View');
-    setButtonPressed(viewButton, false);
+    setButtonPressed(viewButton, !segment.visible);
     viewButton.id = getHtmlId(prefixes.view, segmentId);
     viewButton.title = 'Show/hide segment';
     viewButton.onclick = (event) => {
       // do not propagate to parent that triggers goto
       event.stopPropagation();
-      this.#toggleSegmentView(viewButton, segment, segmentation);
+      this.#segService.setSegmentVisibility(
+        segmentationId, segmentNumber, !segment.visible);
     };
-
-    // list item
-    const item = document.createElement('li');
 
     // segment delete
     const deleteButton = getButton('Delete');
@@ -918,7 +484,7 @@ export class SegmentationUI {
     deleteButton.onclick = (event) => {
       // do not propagate to parent that triggers goto
       event.stopPropagation();
-      this.#deleteSegment(segment, segmentation, item, viewButton);
+      this.#segService.deleteSegment(segmentationId, segmentNumber);
     };
 
     // content
@@ -935,7 +501,8 @@ export class SegmentationUI {
     actionsDiv.appendChild(deleteButton);
 
     // list item
-    item.id = getHtmlId(prefixes.li, segmentId);
+    const item = document.createElement('li');
+    item.id = itemId;
     item.className = 'data-item-list-item';
     item.title = 'Select and go to segment';
     item.appendChild(contentDiv);
@@ -944,168 +511,21 @@ export class SegmentationUI {
 
     // click on li to select and go to segment
     item.onclick = () => {
-      this.#selectSegment(item, segment, segmentation);
-      this.#gotoSegment(segment, segmentation);
+      this.#segService.selectSegment(segmentationId, segmentNumber);
+      this.#segService.gotoSegment(segmentationId, segmentNumber);
     };
-
-    if (selectSegment) {
-      this.#selectSegment(item, segment, segmentation);
-    }
 
     return item;
   }
 
   /**
-   * Add a new segment to a segmentation.
+   * Get the HTML list element for a segmentation, without its segments.
    *
-   * @param {number} segmentationIndex The segmentation index.
-   * @param {HTMLUListElement} listDiv The segment list element.
-   */
-  #addSegment(segmentationIndex, listDiv) {
-    const segments = this.#segmentations[segmentationIndex].segments;
-
-    // create new segment: numbers are not necessarily contiguous
-    const maxNumber = segments.reduce(
-      (max, segment) => Math.max(max, segment.number), 0);
-    const newSegment = this.#getNewSegment(maxNumber + 1);
-    // add to list
-    segments.push(newSegment);
-
-    // add item to list
-    listDiv.appendChild(
-      this.#getSegmentHtml(newSegment, segmentationIndex, true)
-    );
-  }
-
-  /**
-   * Save a segmentation as SEG or RTSS.
-   *
-   * @param {Segmentation} segmentation The segmentation.
-   * @param {string} fileName The file name.
-   * @param {boolean} asRtss Whether to save as RTSS.
-   */
-  #saveSegmentation(segmentation, fileName, asRtss) {
-    const dataCtrl = this.#service.getDataController();
-    const maskData = dataCtrl.get(segmentation.dataId);
-    if (typeof maskData === 'undefined') {
-      const format = asRtss ? 'RTSS' : 'SEG';
-      throw new Error(`Cannot save ${format} without mask image`);
-    }
-    this.#service.saveMaskImage(maskData.image, fileName, asRtss);
-  }
-
-  /**
-   * Get the per volume histogram statistics of the reference image
-   * values inside a segment.
-   *
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
-   * @returns {{volume: number, stats: Statistics, unit?: string,
-   *   labelStats?: {label: Label, stats: Statistics, unit?: string}[]}[]}
-   *   The statistics with their histogram unit, with per label
-   *   statistics if available, empty if the reference image is
-   *   not available.
-   */
-  #getHistogramStats(segment, segmentation) {
-    const dataCtrl = this.#service.getDataController();
-    const maskData = dataCtrl.get(segmentation.dataId);
-    if (typeof maskData === 'undefined') {
-      return [];
-    }
-    const maskImage = maskData.image;
-    const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
-    if (typeof refSeriesUID === 'undefined') {
-      return [];
-    }
-    const refDataId = dataCtrl.getDataIdFromSeriesUid(refSeriesUID);
-    if (typeof refDataId === 'undefined') {
-      return [];
-    }
-    const refImage = dataCtrl.get(refDataId).image;
-
-    let volumeHistograms;
-    try {
-      volumeHistograms = maskImage.getHistogramBySegment(
-        refImage, segment.number.toString());
-    } catch (error) {
-      logger.warn(
-        `Cannot calculate segment histogram: ${error.message}`);
-      return [];
-    }
-
-    const res = [];
-    for (const item of volumeHistograms) {
-      const stats = item.histogram.getStats();
-      if (typeof stats === 'undefined') {
-        continue;
-      }
-      const resItem = {
-        volume: item.volume,
-        stats,
-        unit: item.histogram.getUnit()
-      };
-      if (typeof item.labelHistograms !== 'undefined') {
-        resItem.labelStats = [];
-        for (const labelItem of item.labelHistograms) {
-          const labelStats = labelItem.histogram.getStats();
-          if (typeof labelStats !== 'undefined') {
-            resItem.labelStats.push({
-              label: labelItem.label,
-              stats: labelStats,
-              unit: labelItem.histogram.getUnit()
-            });
-          }
-        }
-      }
-      res.push(resItem);
-    }
-    return res;
-  }
-
-  /**
-   * Get labels info.
-   *
-   * @param {MaskSegment} segment The segment.
-   * @param {Segmentation} segmentation The segmentation.
-   * @returns {object[]} The labels info.
-   */
-  #getLabelsInfo(segment, segmentation) {
-    // get the labels info strings
-    const labelsInfo = [];
-    for (const label of segmentation.labels) {
-      if (label.id === segment.number) {
-        const labelInfo = {};
-        labelInfo.volume = label.volume;
-
-        if (typeof label.diameters !== 'undefined') {
-          if (typeof label.diameters.major.diameter.value !== 'undefined') {
-            labelInfo.majorDiameter = label.diameters.major.diameter;
-          }
-          if (typeof label.diameters.minor.diameter.value !== 'undefined') {
-            labelInfo.minorDiameter = label.diameters.minor.diameter;
-          }
-          if (typeof label.height !== 'undefined') {
-            labelInfo.height = label.height;
-          }
-        }
-
-        labelsInfo.push(labelInfo);
-      }
-    }
-    return labelsInfo;
-  }
-
-  /**
-   * Get the HTML list element for a segmentation.
-   *
-   * @param {Segmentation} segmentation The segmentation.
-   * @param {number} segmentationIndex The segmentation index.
-   * @param {boolean} [selectFirst] Optional flag to select the first
-   *   segment.
+   * @param {number} segmentationId The segmentation id.
    * @returns {HTMLLIElement} The HTML element.
    */
-  #getSegmentationHtml(segmentation, segmentationIndex, selectFirst = false) {
-    const segmentationName = getSegmentationHtmlId(segmentationIndex);
+  #getSegmentationHtml(segmentationId) {
+    const segmentationName = getSegmentationHtmlId(segmentationId);
 
     // name
     const nameDiv = document.createElement('span');
@@ -1113,19 +533,19 @@ export class SegmentationUI {
     nameDiv.className = 'data-item-name';
     nameDiv.appendChild(document.createTextNode(segmentationName));
 
-    // save button
+    // save buttons
     const saveSegButton = getButton('Save');
     saveSegButton.title = 'Save SEG';
     saveSegButton.id = getHtmlId(prefixes.saveSeg, segmentationName);
     saveSegButton.onclick = () => {
-      this.#saveSegmentation(segmentation, `${segmentationName}-seg`, false);
+      this.#saveSegmentation(segmentationId, false);
     };
 
     const saveRtssButton = getButton('Save');
     saveRtssButton.title = 'Save RTSS';
     saveRtssButton.id = getHtmlId(prefixes.saveRtss, segmentationName);
     saveRtssButton.onclick = () => {
-      this.#saveSegmentation(segmentation, `${segmentationName}-rtss`, true);
+      this.#saveSegmentation(segmentationId, true);
     };
 
     // add button
@@ -1133,7 +553,7 @@ export class SegmentationUI {
     addButton.title = 'Add segment';
     addButton.id = getHtmlId(prefixes.addSegment, segmentationName);
     addButton.onclick = () => {
-      this.#addSegment(segmentationIndex, listDiv);
+      this.#segService.addSegment(segmentationId);
     };
 
     // actions
@@ -1146,14 +566,10 @@ export class SegmentationUI {
     }
     actionGroupDiv.appendChild(addButton);
 
-    // segment list
+    // segment list (filled by the segmentation rendering)
     const listDiv = document.createElement('ul');
     listDiv.id = `${segmentationName}-list`;
     listDiv.className = 'data-item-list';
-    for (let i = 0; i < segmentation.segments.length; ++i) {
-      listDiv.appendChild(this.#getSegmentHtml(
-        segmentation.segments[i], segmentationIndex, selectFirst && i === 0));
-    }
 
     // data-item-header
     const headerDiv = document.createElement('div');
@@ -1178,4 +594,4 @@ export class SegmentationUI {
     return segmentationItem;
   }
 
-}; // SegmentationUI
+}; // SegmentationComponent
