@@ -16,7 +16,7 @@ import {BrushToolUI} from './viewer.ui.brush.js';
 import {formatQuantificationValue} from '../services/quantification.js';
 
 /**
- * @import {ViewerService} from '../services/viewer.service.js';
+ * @import {DwvAppService} from '../services/dwvApp.service.js';
  */
 
 /**
@@ -153,11 +153,11 @@ function selectOdd(id) {
 /**
  * Get the viewer layouts.
  *
- * @param {ViewerService} _service The associated viewer service
+ * @param {DwvAppService} _dwvAppService The associated dwv app service
  *   (used by the commented modality selectors).
  * @returns {LayoutProtocol[]} The layouts.
  */
-function getLayouts(_service) {
+function getLayouts(_dwvAppService) {
   /**
    * Select CT modality data.
    *
@@ -165,7 +165,7 @@ function getLayouts(_service) {
    * @returns {boolean} True if selected.
    */
   // function selectCT(id) {
-  //   const dataCtrl = _service.getDataController();
+  //   const dataCtrl = _dwvAppService.getDataController();
   //   const modality = dataCtrl.get(id).meta['00080060'].value[0];
   //   return modality === 'CT';
   // }
@@ -176,7 +176,7 @@ function getLayouts(_service) {
    * @returns {boolean} True if selected.
    */
   // function selectPET(id) {
-  //   const dataCtrl = _service.getDataController();
+  //   const dataCtrl = _dwvAppService.getDataController();
   //   const modality = dataCtrl.get(id).meta['00080060'].value[0];
   //   return modality === 'PT';
   // }
@@ -241,11 +241,11 @@ function getLayouts(_service) {
 export class ViewerUI {
 
   /**
-   * The associated viewer service.
+   * The associated viewer dwvAppService.
    *
-   * @type {ViewerService}
+   * @type {DwvAppService}
    */
-  #service;
+  #dwvAppService;
 
   /**
    * The available layouts.
@@ -291,12 +291,12 @@ export class ViewerUI {
   #dataTable;
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
    */
-  constructor(service) {
-    this.#service = service;
-    this.#layouts = getLayouts(service);
-    this.#tools = service.getTools();
+  constructor(dwvAppService) {
+    this.#dwvAppService = dwvAppService;
+    this.#layouts = getLayouts(dwvAppService);
+    this.#tools = dwvAppService.getTools();
   }
 
   /**
@@ -316,7 +316,7 @@ export class ViewerUI {
     this.#addLayerGroupsDivs(this.#getSelectedLayout());
 
     // data table
-    this.#dataTable = new DataTableUI(this.#service);
+    this.#dataTable = new DataTableUI(this.#dwvAppService);
     this.#dataTable.registerListeners();
     this.#dataTable.registerLayerAddListeners(this.#getSelectedLayout());
 
@@ -328,26 +328,26 @@ export class ViewerUI {
     for (const toolName in this.#tools) {
       if (typeof toolsUI[toolName] !== 'undefined') {
         const toolUI =
-          new toolsUI[toolName](this.#service, this.#tools[toolName]);
+          new toolsUI[toolName](this.#dwvAppService, this.#tools[toolName]);
         toolUI.registerListeners();
         this.#toolFeaturesUI[toolName] = toolUI;
       }
     }
 
     // annotation
-    const annotService = new AnnotationService(this.#service);
+    const annotService = new AnnotationService(this.#dwvAppService);
     annotService.connect();
     const annotUI = new AnnotationComponent(annotService);
     annotUI.registerListeners();
 
     // segmentation
-    const segService = new SegmentationService(this.#service);
+    const segService = new SegmentationService(this.#dwvAppService);
     segService.connect();
     const segUI = new SegmentationComponent(segService);
     segUI.registerListeners();
 
     // segmentation extra (overlap check and merge)
-    const segExtra = new SegmentationExtraUI(this.#service);
+    const segExtra = new SegmentationExtraUI(this.#dwvAppService);
     segExtra.registerListeners();
 
     // lines
@@ -396,12 +396,12 @@ export class ViewerUI {
         }
       }
       // remove handler
-      this.#service.removeEventListener('renderend', onRenderEnd);
+      this.#dwvAppService.removeEventListener('renderend', onRenderEnd);
     };
     // add handler (will be removed at first success)
-    this.#service.addEventListener('renderend', onRenderEnd);
+    this.#dwvAppService.addEventListener('renderend', onRenderEnd);
 
-    this.#service.addEventListener('positionchange', (event) => {
+    this.#dwvAppService.addEventListener('positionchange', (event) => {
       const input = document.getElementById('position');
       input.value = event.detail.value[1].map(getPrecisionRound(2));
       // index and values as small text
@@ -416,8 +416,8 @@ export class ViewerUI {
       if (this.#getSelectedToolName() === 'Filter' &&
         event.altKey && event.key === 'r') {
         // run the sharpen filter
-        const dataCtrl = this.#service.getDataController();
-        this.#service.setToolFeatures({
+        const dataCtrl = this.#dwvAppService.getDataController();
+        this.#dwvAppService.setToolFeatures({
           filterName: 'Sharpen',
           runArgs: {
             dataId: dataCtrl.getDataIds()[0]
@@ -433,20 +433,20 @@ export class ViewerUI {
    * data view config and post-load listeners.
    */
   #registerLoadListeners() {
-    this.#service.addEventListener('loadstart', (event) => {
+    this.#dwvAppService.addEventListener('loadstart', (event) => {
       // remove post-load listeners
-      const dataCtrl = this.#service.getDataController();
+      const dataCtrl = this.#dwvAppService.getDataController();
       if (dataCtrl.getDataIds().length !== 0) {
         this.#removePostLoadListeners();
       }
       // add new data view config for new data
       this.#addNewDataViewConfig(event.detail.dataid);
     });
-    this.#service.addEventListener('loadprogress', () => {
+    this.#dwvAppService.addEventListener('loadprogress', () => {
       const progressElement = document.getElementById('loadprogress');
-      progressElement.value = this.#service.getLoadProgress();
+      progressElement.value = this.#dwvAppService.getLoadProgress();
     });
-    this.#service.addEventListener('load', () => {
+    this.#dwvAppService.addEventListener('load', () => {
       // update sliders with new data info
       // (has to be after full load)
       this.#initSliders(this.#getSelectedLayout());
@@ -474,18 +474,24 @@ export class ViewerUI {
    */
   #addPostLoadListeners() {
     // post-load since sliders need the full geometry
-    this.#service.addEventListener('viewlayeradd', this.#initSliderOnEvent);
-    this.#service.addEventListener('drawlayeradd', this.#initSliderOnEvent);
-    this.#service.addEventListener('layerremove', this.#initSliderOnEvent);
+    this.#dwvAppService.addEventListener(
+      'viewlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.addEventListener(
+      'drawlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.addEventListener(
+      'layerremove', this.#initSliderOnEvent);
   }
 
   /**
    * Remove post-load event listeners.
    */
   #removePostLoadListeners() {
-    this.#service.removeEventListener('viewlayeradd', this.#initSliderOnEvent);
-    this.#service.removeEventListener('drawlayeradd', this.#initSliderOnEvent);
-    this.#service.removeEventListener('layerremove', this.#initSliderOnEvent);
+    this.#dwvAppService.removeEventListener(
+      'viewlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.removeEventListener(
+      'drawlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.removeEventListener(
+      'layerremove', this.#initSliderOnEvent);
   }
 
   /**
@@ -495,7 +501,7 @@ export class ViewerUI {
    *   of data view configs.
    */
   #mergeAppConfig(dataViewConfigs) {
-    const stgCtrl = this.#service.getStageController();
+    const stgCtrl = this.#dwvAppService.getStageController();
     for (const dataId in dataViewConfigs) {
       const configs = dataViewConfigs[dataId];
       const appConfigs = stgCtrl.getViewConfigs(dataId);
@@ -515,7 +521,7 @@ export class ViewerUI {
    * @param {string} value The slider value.
    */
   #onSliderInput(layerGroupDivId, value) {
-    const stgCtrl = this.#service.getStageController();
+    const stgCtrl = this.#dwvAppService.getStageController();
     const lg = stgCtrl.getLayerGroupByDivId(layerGroupDivId);
     const ph = lg.getPositionHelper();
     const pos = ph.getCurrentPositionAtScrollValue(value);
@@ -545,7 +551,7 @@ export class ViewerUI {
       // disabled by default
       slider.disabled = true;
       // init if possible
-      const stgCtrl = this.#service.getStageController();
+      const stgCtrl = this.#dwvAppService.getStageController();
       const lg = stgCtrl.getLayerGroupByDivId(layerGroupId);
       if (typeof lg !== 'undefined') {
         const ph = lg.getPositionHelper();
@@ -570,7 +576,7 @@ export class ViewerUI {
     for (const divId of layout.getLayerGroupDivIds()) {
       const slider = document.getElementById(`${divId}-slider`);
       if (slider) {
-        const stgCtrl = this.#service.getStageController();
+        const stgCtrl = this.#dwvAppService.getStageController();
         const lg = stgCtrl.getLayerGroupByDivId(divId);
         if (typeof lg !== 'undefined') {
           const ph = lg.getPositionHelper();
@@ -629,7 +635,7 @@ export class ViewerUI {
    */
   #addNewDataViewConfig(dataId) {
     const configs = this.#getSelectedLayout().getViewConfigsByDataId(dataId);
-    const stgCtrl = this.#service.getStageController();
+    const stgCtrl = this.#dwvAppService.getStageController();
     for (const config of configs) {
       stgCtrl.addDataViewConfig(dataId, config, false);
     }
@@ -644,7 +650,7 @@ export class ViewerUI {
     fileinput.addEventListener('change', (event) => {
       const files = event.target.files;
       if (files.length !== 0) {
-        this.#service.loadFiles(files);
+        this.#dwvAppService.loadFiles(files);
       } else {
         throw new Error('No files to load');
       }
@@ -684,7 +690,7 @@ export class ViewerUI {
    *   is not complete or does not have several volumes.
    */
   #getPerVolumeText(dataId, positionValues) {
-    const dataCtrl = this.#service.getDataController();
+    const dataCtrl = this.#dwvAppService.getDataController();
     const data = dataCtrl.get(dataId ?? dataCtrl.getDataIds()[0]);
     // skip while loading: the volumes of a partially loaded image
     //   are not at their final buffer offsets
@@ -727,7 +733,8 @@ export class ViewerUI {
   #setupPositionLine() {
     const positionInput = document.getElementById('position');
     positionInput.addEventListener('change', (event) => {
-      const vls = this.#service.getStageController().getViewLayersByDataId('0');
+      const vls = this.#dwvAppService.getStageController()
+        .getViewLayersByDataId('0');
       const vc = vls[0].getViewController();
       const element = event.target;
       const values = element.value.split(',');
@@ -743,7 +750,7 @@ export class ViewerUI {
     const resetViewsButton = document.getElementById('resetviews');
     resetViewsButton.disabled = true;
     resetViewsButton.addEventListener('click', () => {
-      this.#service.getStageController().resetZoomPan();
+      this.#dwvAppService.getStageController().resetZoomPan();
     });
 
     const changeLayoutSelect = document.getElementById('changelayout');
@@ -775,7 +782,7 @@ export class ViewerUI {
       this.#addLayerGroupsDivs(selectedLayout);
 
       // get configs
-      const dataCtrl = this.#service.getDataController();
+      const dataCtrl = this.#dwvAppService.getDataController();
       const dataIds = dataCtrl.getDataIds();
       const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
 
@@ -791,7 +798,7 @@ export class ViewerUI {
       this.#dataTable.registerLayerAddListeners(selectedLayout);
 
       // set config (deletes previous layers)
-      const stgCtrl = this.#service.getStageController();
+      const stgCtrl = this.#dwvAppService.getStageController();
       stgCtrl.setDataViewConfigs(dataViewConfigs);
 
       // render data (creates layers)
@@ -811,7 +818,7 @@ export class ViewerUI {
     smoothingChk.disabled = true;
     smoothingChk.addEventListener('change', (event) => {
       const inputElement = event.target;
-      this.#service.getStageController().setImageSmoothing(
+      this.#dwvAppService.getStageController().setImageSmoothing(
         inputElement.checked);
     });
   }
@@ -822,21 +829,21 @@ export class ViewerUI {
    * @param {Matrix33} rotation The rotation matrix.
    */
   #rotateFirstData(rotation) {
-    const lg = this.#service.getStageController().getLayerGroupByDivId(
+    const lg = this.#dwvAppService.getStageController().getLayerGroupByDivId(
       'layerGroup0');
     const dataId = lg.getBaseViewLayer().getDataId();
-    const image = this.#service.getDataController().get(dataId).image;
+    const image = this.#dwvAppService.getDataController().get(dataId).image;
     const geometry = image.getGeometry();
     const newOrientation = rotation.multiply(geometry.getOrientation());
-    this.#service.resample(dataId, newOrientation);
+    this.#dwvAppService.resample(dataId, newOrientation);
   }
 
   /**
    * Setup rotate line.
    */
   #setupRotateLine() {
-    const dataCtrl = this.#service.getDataController();
-    const stgCtrl = this.#service.getStageController();
+    const dataCtrl = this.#dwvAppService.getDataController();
+    const stgCtrl = this.#dwvAppService.getStageController();
 
     const angle = (Math.PI / 180) * 20;
     const cos = Math.cos(angle);
@@ -886,7 +893,7 @@ export class ViewerUI {
         console.log('geometry1', geometry1.toString());
       }
       // resample match data 0 and 1
-      this.#service.resampleMatch(dataIds[0], dataIds[1]);
+      this.#dwvAppService.resampleMatch(dataIds[0], dataIds[1]);
     });
 
     const rotateResetButton = document.getElementById('rotate-reset');
@@ -896,7 +903,7 @@ export class ViewerUI {
       const vl = lg.getBaseViewLayer();
       const dataId = vl.getDataId();
 
-      this.#service.revertResample(dataId);
+      this.#dwvAppService.revertResample(dataId);
     });
   }
 
@@ -918,7 +925,7 @@ export class ViewerUI {
     for (let b = 0; b < propList.length; ++b) {
       binders.push(`${propList[b]}Binder`);
     }
-    this.#service.setLayerGroupsBinders(binders);
+    this.#dwvAppService.setLayerGroupsBinders(binders);
 
     const onBinderChange = (propName, checked) => {
       const binderName = `${propName}Binder`;
@@ -930,7 +937,7 @@ export class ViewerUI {
           binders.splice(index, 1);
         }
       }
-      this.#service.setLayerGroupsBinders(binders);
+      this.#dwvAppService.setLayerGroupsBinders(binders);
     };
 
     const fieldset = document.getElementById('binders');
@@ -1059,11 +1066,11 @@ export class ViewerUI {
     }
 
     // set tool for app
-    this.#service.setTool(toolName);
+    this.#dwvAppService.setTool(toolName);
 
     // force window level non strict mode
     if (toolName === 'WindowLevel') {
-      this.#service.setToolFeatures({
+      this.#dwvAppService.setToolFeatures({
         activeViewLayerOnly: false
       });
     }
@@ -1085,7 +1092,7 @@ export class ViewerUI {
       // pass value to app
       const features = featuresUI.getValue();
       if (typeof features !== 'undefined') {
-        this.#service.setToolFeatures(features);
+        this.#dwvAppService.setToolFeatures(features);
       }
     }
   }

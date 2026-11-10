@@ -2,7 +2,7 @@ import {DicomCode} from '../../../src/dicom/dicomCode.js';
 import {getSplitButton} from './viewer.utils.js';
 
 /**
- * @import {ViewerService} from '../services/viewer.service.js';
+ * @import {DwvAppService} from '../services/dwvApp.service.js';
  */
 
 /**
@@ -11,11 +11,11 @@ import {getSplitButton} from './viewer.utils.js';
 export class DrawToolUI {
 
   /**
-   * The associated viewer service.
+   * The associated viewer dwvAppService.
    *
-   * @type {ViewerService}
+   * @type {DwvAppService}
    */
-  #service;
+  #dwvAppService;
 
   /**
    * The tool configuration.
@@ -32,11 +32,11 @@ export class DrawToolUI {
   #shapeName;
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
    * @param {object} toolConfig The tool configuration.
    */
-  constructor(service, toolConfig) {
-    this.#service = service;
+  constructor(dwvAppService, toolConfig) {
+    this.#dwvAppService = dwvAppService;
     this.#toolConfig = toolConfig;
     // default to rectangle if available
     const shapeNames = this.#toolConfig.options;
@@ -132,13 +132,13 @@ export class DrawToolUI {
 
     autoColourInput.onchange = (event) => {
       const element = event.target;
-      this.#service.setToolFeatures({autoShapeColour: element.checked});
+      this.#dwvAppService.setToolFeatures({autoShapeColour: element.checked});
       colourInput.disabled = element.checked;
     };
 
     colourInput.onchange = (event) => {
       const element = event.target;
-      this.#service.setToolFeatures({shapeColour: element.value});
+      this.#dwvAppService.setToolFeatures({shapeColour: element.value});
     };
 
     const res = document.createElement('span');

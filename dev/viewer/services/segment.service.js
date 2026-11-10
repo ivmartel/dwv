@@ -5,7 +5,9 @@ import {
 import {logger} from '../../../src/utils/logger.js';
 import {getSegmentationCode} from '../../../src/dicom/dicomCode.js';
 import {MaskSegmentHelper} from '../../../src/image/maskSegmentHelper.js';
-import {MaskSegmentViewHelper} from '../../../src/image/maskSegmentViewHelper.js';
+import {
+  MaskSegmentViewHelper
+} from '../../../src/image/maskSegmentViewHelper.js';
 import {
   ChangeSegmentColourCommand
 } from '../../../src/command/changeSegmentColourCommand.js';
@@ -16,7 +18,7 @@ import {
 import {getQuantificationGroups} from './quantification.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
+ * @import {DwvAppService} from './dwvApp.service.js';
  * @import {MaskSegment} from '../../../src/dicom/dicomSegment.js';
  * @import {MaskImage} from '../../../src/image/maskImage.js';
  * @import {RGB} from '../../../src/utils/colour.js';
@@ -129,7 +131,7 @@ function isRefTo(ref, segmentationId, segmentNumber) {
 
 /**
  * Segmentation service: framework agnostic segmentation logic and
- *   state on top of the viewer service, no DOM access.
+ *   state on top of the dwv app service, no DOM access.
  *
  * The state follows the external store contract
  *   (`subscribe` / `getSnapshot`). Actions are methods keyed by
@@ -140,11 +142,11 @@ function isRefTo(ref, segmentationId, segmentNumber) {
 export class SegmentationService {
 
   /**
-   * The dwv service.
+   * The dwv app service.
    *
-   * @type {ViewerService}
+   * @type {DwvAppService}
    */
-  #dwvService;
+  #dwvAppService;
 
   /**
    * The segmentations (in order of addition).
@@ -212,7 +214,7 @@ export class SegmentationService {
   #listeners = new Set();
 
   /**
-   * The viewer service event handlers.
+   * The dwv app service event handlers.
    *
    * @type {Record<string, Function>}
    */
@@ -224,10 +226,10 @@ export class SegmentationService {
   };
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * @param {DwvAppService} dwvAppService The associated dwv app service.
    */
-  constructor(service) {
-    this.#dwvService = service;
+  constructor(dwvAppService) {
+    this.#dwvAppService = dwvAppService;
   }
 
   // store contract
@@ -259,20 +261,20 @@ export class SegmentationService {
   // lifecycle
 
   /**
-   * Listen to the viewer service events.
+   * Listen to the dwv app service events.
    */
   connect() {
     for (const [type, handler] of Object.entries(this.#handlers)) {
-      this.#dwvService.addEventListener(type, handler);
+      this.#dwvAppService.addEventListener(type, handler);
     }
   }
 
   /**
-   * Stop listening to the viewer service events, remove the subscribers.
+   * Stop listening to the dwv app service events, remove the subscribers.
    */
   dispose() {
     for (const [type, handler] of Object.entries(this.#handlers)) {
-      this.#dwvService.removeEventListener(type, handler);
+      this.#dwvAppService.removeEventListener(type, handler);
     }
     this.#listeners.clear();
   }
@@ -398,7 +400,7 @@ export class SegmentationService {
       return;
     }
     this.#selected = [{segmentationId, segmentNumber}];
-    if (this.#dwvService.isSelectedTool('Brush')) {
+    if (this.#dwvAppService.isSelectedTool('Brush')) {
       this.#setBrushSegment(segmentation, segmentNumber);
     }
     this.#emit();
@@ -450,7 +452,7 @@ export class SegmentationService {
     chgCmd.onUndo = onChange;
     if (chgCmd.isValid()) {
       chgCmd.execute();
-      this.#dwvService.getUndoController().addToUndoStack(chgCmd);
+      this.#dwvAppService.getUndoController().addToUndoStack(chgCmd);
     }
   }
 
@@ -515,7 +517,7 @@ export class SegmentationService {
       };
       if (delCmd.isValid()) {
         delCmd.execute();
-        this.#dwvService.getUndoController().addToUndoStack(delCmd);
+        this.#dwvAppService.getUndoController().addToUndoStack(delCmd);
       }
       // update labels
       maskImage.recalculateLabels();
@@ -553,7 +555,7 @@ export class SegmentationService {
       logger.warn('No label for this segment');
       return;
     }
-    const layers = this.#dwvService.getStageController()
+    const layers = this.#dwvAppService.getStageController()
       .getViewLayersByDataId(segmentation.dataId);
     for (const layer of layers) {
       layer.setCurrentPosition(label.centroid);
@@ -576,7 +578,7 @@ export class SegmentationService {
       const format = asRtss ? 'RTSS' : 'SEG';
       throw new Error(`Cannot save ${format} without mask image`);
     }
-    return this.#dwvService.getMaskImageAsDicom(maskImage, asRtss);
+    return this.#dwvAppService.getMaskImageAsDicom(maskImage, asRtss);
   }
 
   // internals
@@ -602,7 +604,7 @@ export class SegmentationService {
     if (typeof segmentation?.dataId === 'undefined') {
       return undefined;
     }
-    return this.#dwvService.getDataController()
+    return this.#dwvAppService.getDataController()
       .get(segmentation.dataId)?.image;
   }
 
@@ -707,7 +709,7 @@ export class SegmentationService {
     };
     logger.debug(
       `set tool features [select] ${JSON.stringify(features)}`);
-    this.#dwvService.setToolFeatures(features);
+    this.#dwvAppService.setToolFeatures(features);
   }
 
   /**
@@ -717,7 +719,7 @@ export class SegmentationService {
    * @param {Segmentation} segmentation The segmentation.
    */
   #applyViewHelper(segmentation) {
-    const vls = this.#dwvService.getStageController()
+    const vls = this.#dwvAppService.getStageController()
       .getViewLayersByDataId(segmentation.dataId);
     if (vls.length === 0) {
       logger.warn('No layers to show/hide seg');
@@ -807,7 +809,8 @@ export class SegmentationService {
    */
   #onDataAdd(event) {
     const dataId = event.detail.dataid;
-    const maskImage = this.#dwvService.getDataController().get(dataId)?.image;
+    const maskImage =
+      this.#dwvAppService.getDataController().get(dataId)?.image;
     if (typeof maskImage === 'undefined' || !maskImage.isMask()) {
       return;
     }
@@ -979,7 +982,7 @@ export class SegmentationService {
     if (typeof maskImage === 'undefined') {
       return [];
     }
-    const dataCtrl = this.#dwvService.getDataController();
+    const dataCtrl = this.#dwvAppService.getDataController();
     const refSeriesUID = maskImage.getMaskReferencedSeriesUID();
     if (typeof refSeriesUID === 'undefined') {
       return [];

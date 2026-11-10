@@ -9,7 +9,7 @@ import {
 import {logger} from '../../../src/utils/logger.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
+ * @import {DwvAppService} from './dwvApp.service.js';
  * @import {Annotation} from '../../../src/image/annotation.js';
  * @import {AnnotationGroup} from '../../../src/image/annotationGroup.js';
  */
@@ -80,7 +80,7 @@ function getAnnotationItemState(annotation, visible) {
 
 /**
  * Annotation service: framework agnostic annotation logic and state
- *   on top of the viewer service, no DOM access.
+ *   on top of the dwv app service, no DOM access.
  *
  * The state follows the external store contract
  *   (`subscribe` / `getSnapshot`). Actions are methods keyed by
@@ -91,11 +91,11 @@ function getAnnotationItemState(annotation, visible) {
 export class AnnotationService {
 
   /**
-   * The dwv service.
+   * The dwv app service.
    *
-   * @type {ViewerService}
+   * @type {DwvAppService}
    */
-  #dwvService;
+  #dwvAppService;
 
   /**
    * The group states indexed by data id (in order of addition).
@@ -133,7 +133,7 @@ export class AnnotationService {
   #listeners = new Set();
 
   /**
-   * The viewer service event handlers.
+   * The dwv app service event handlers.
    *
    * @type {Record<string, Function>}
    */
@@ -149,10 +149,10 @@ export class AnnotationService {
   };
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * @param {DwvAppService} dwvAppService The associated dwv app service.
    */
-  constructor(service) {
-    this.#dwvService = service;
+  constructor(dwvAppService) {
+    this.#dwvAppService = dwvAppService;
   }
 
   // store contract
@@ -184,21 +184,21 @@ export class AnnotationService {
   // lifecycle
 
   /**
-   * Listen to the viewer service events.
+   * Listen to the dwv app service events.
    */
   connect() {
     for (const [type, handler] of Object.entries(this.#handlers)) {
-      this.#dwvService.addEventListener(type, handler);
+      this.#dwvAppService.addEventListener(type, handler);
     }
   }
 
   /**
-   * Stop listening to the viewer service and annotation groups events,
+   * Stop listening to the dwv app service and annotation groups events,
    *   remove the subscribers.
    */
   dispose() {
     for (const [type, handler] of Object.entries(this.#handlers)) {
-      this.#dwvService.removeEventListener(type, handler);
+      this.#dwvAppService.removeEventListener(type, handler);
     }
     for (const dataId of this.#editableListeners.keys()) {
       this.#removeEditableListener(dataId);
@@ -217,8 +217,8 @@ export class AnnotationService {
    *   if there is no active view layer.
    */
   getDefaultGroupReference() {
-    const divId = this.#dwvService.getMainLayerGroupDivId();
-    const layerGroup = this.#dwvService.getStageController()
+    const divId = this.#dwvAppService.getMainLayerGroupDivId();
+    const layerGroup = this.#dwvAppService.getStageController()
       .getLayerGroupByDivId(divId);
     const viewLayer = layerGroup?.getActiveViewLayer();
     if (typeof viewLayer === 'undefined') {
@@ -251,9 +251,9 @@ export class AnnotationService {
       refDataId ??= ref.refDataId;
       divId ??= ref.divId;
     }
-    const data = this.#dwvService.createAnnotationData(refDataId);
+    const data = this.#dwvAppService.createAnnotationData(refDataId);
     // render (will create draw layer and trigger 'dataadd')
-    this.#dwvService.addAndRenderAnnotationData(data, divId, refDataId);
+    this.#dwvAppService.addAndRenderAnnotationData(data, divId, refDataId);
     return true;
   }
 
@@ -273,7 +273,7 @@ export class AnnotationService {
       return;
     }
     const drawController = new DrawController(annotationGroup);
-    const undoCtrl = this.#dwvService.getUndoController();
+    const undoCtrl = this.#dwvAppService.getUndoController();
     drawController.updateAnnotationWithCommand(
       annotationId,
       {colour: annotation.colour},
@@ -294,7 +294,7 @@ export class AnnotationService {
       return;
     }
     const drawController = new DrawController(annotationGroup);
-    const undoCtrl = this.#dwvService.getUndoController();
+    const undoCtrl = this.#dwvAppService.getUndoController();
     drawController.removeAnnotationWithCommand(
       annotationId,
       undoCtrl.addToUndoStack
@@ -309,7 +309,7 @@ export class AnnotationService {
    * @param {boolean} visible True to show the annotation.
    */
   setAnnotationVisibility(dataId, annotationId, visible) {
-    const drawLayers = this.#dwvService.getStageController()
+    const drawLayers = this.#dwvAppService.getStageController()
       .getDrawLayersByDataId(dataId);
     for (const layer of drawLayers) {
       layer.setAnnotationVisibility(annotationId, visible);
@@ -326,7 +326,7 @@ export class AnnotationService {
    * @returns {boolean} False if no draw layer was found.
    */
   setLabelsVisibility(dataId, visible) {
-    const drawLayer = this.#dwvService.getStageController()
+    const drawLayer = this.#dwvAppService.getStageController()
       .getDrawLayersByDataId(dataId)[0];
     if (typeof drawLayer === 'undefined') {
       logger.warn(`Cannot find draw layer with id ${dataId}`);
@@ -362,7 +362,7 @@ export class AnnotationService {
       logger.warn('No centroid for annotation');
       return;
     }
-    const drawLayers = this.#dwvService.getStageController()
+    const drawLayers = this.#dwvAppService.getStageController()
       .getDrawLayersByDataId(dataId);
     for (const layer of drawLayers) {
       layer.setCurrentPosition(annotCentroid);
@@ -438,7 +438,7 @@ export class AnnotationService {
    * @returns {AnnotationGroup|undefined} The annotation group.
    */
   #getAnnotationGroup(dataId) {
-    return this.#dwvService.getDataController().get(dataId)?.annotationGroup;
+    return this.#dwvAppService.getDataController().get(dataId)?.annotationGroup;
   }
 
   /**

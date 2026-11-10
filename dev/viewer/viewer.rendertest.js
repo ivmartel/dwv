@@ -1,15 +1,15 @@
 /**
- * @import {ViewerService} from './services/viewer.service.js';
+ * @import {DwvAppService} from './services/dwvApp.service.js';
  */
 
 /**
  * Setup test line.
  *
- * @param {ViewerService} service The associated viewer service.
+ * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
  */
-export function setupRenderTests(service) {
+export function setupRenderTests(dwvAppService) {
   const renderTestButton = document.createElement('button');
-  renderTestButton.onclick = getRunRenderTest(service);
+  renderTestButton.onclick = getRunRenderTest(dwvAppService);
   renderTestButton.appendChild(document.createTextNode('render test'));
 
   const testsDiv = document.getElementById('tests');
@@ -19,13 +19,13 @@ export function setupRenderTests(service) {
 /**
  * Run render tests.
  *
- * @param {ViewerService} service The associated viewer service.
+ * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
  * @returns {Function} The run render text function.
  */
-function getRunRenderTest(service) {
+function getRunRenderTest(dwvAppService) {
   return function () {
     const numberOfRun = 20;
-    const stgCtrl = service.getStageController();
+    const stgCtrl = dwvAppService.getStageController();
     // default to first layer group
     stgCtrl.setActiveLayerGroup(0);
 
@@ -54,14 +54,14 @@ function getRunRenderTest(service) {
       } else {
         console.log('Stats:', getBasicStats(timings));
         // clean up
-        service.removeEventListener('renderstart', onRenderStart);
-        service.removeEventListener('renderend', onRenderEnd);
+        dwvAppService.removeEventListener('renderstart', onRenderStart);
+        dwvAppService.removeEventListener('renderend', onRenderEnd);
       }
     };
 
     // setup
-    service.addEventListener('renderstart', onRenderStart);
-    service.addEventListener('renderend', onRenderEnd);
+    dwvAppService.addEventListener('renderstart', onRenderStart);
+    dwvAppService.addEventListener('renderend', onRenderEnd);
 
     // start
     runner();

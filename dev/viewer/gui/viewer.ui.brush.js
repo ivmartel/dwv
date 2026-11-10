@@ -1,7 +1,7 @@
 import {getControlDiv, getSplitButton} from './viewer.utils.js';
 
 /**
- * @import {ViewerService} from '../services/viewer.service.js';
+ * @import {DwvAppService} from '../services/dwvApp.service.js';
  */
 
 /**
@@ -10,11 +10,11 @@ import {getControlDiv, getSplitButton} from './viewer.utils.js';
 export class BrushToolUI {
 
   /**
-   * The associated viewer service.
+   * The associated viewer dwvAppService.
    *
-   * @type {ViewerService}
+   * @type {DwvAppService}
    */
-  #service;
+  #dwvAppService;
 
   /**
    * The brush mode: 'add' for brush, 'del' for eraser.
@@ -24,10 +24,10 @@ export class BrushToolUI {
   #brushMode = 'add';
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
    */
-  constructor(service, /*toolConfig*/) {
-    this.#service = service;
+  constructor(dwvAppService, /*toolConfig*/) {
+    this.#dwvAppService = dwvAppService;
   }
 
   /**
@@ -35,7 +35,8 @@ export class BrushToolUI {
    */
   registerListeners() {
     // listen to brush size event (via shortcut)
-    this.#service.addEventListener('brushsizechange', this.#onBrushSizeChange);
+    this.#dwvAppService.addEventListener(
+      'brushsizechange', this.#onBrushSizeChange);
   };
 
   /**
@@ -81,12 +82,12 @@ export class BrushToolUI {
 
     // brush size input
     const sizeCallback = (size) => {
-      this.#service.setToolFeatures({brushSize: size});
+      this.#dwvAppService.setToolFeatures({brushSize: size});
       //this.updateBrushCursorSize(size);
     };
     // set default size
     const defaultCursorSize = 10;
-    this.#service.setToolFeatures({brushSize: defaultCursorSize});
+    this.#dwvAppService.setToolFeatures({brushSize: defaultCursorSize});
     // append range
     const controlDiv = getControlDiv(
       'brush-size',
@@ -107,7 +108,7 @@ export class BrushToolUI {
         createMask: true
       };
       console.log('set tool features [add-default]', features);
-      this.#service.setToolFeatures(features);
+      this.#dwvAppService.setToolFeatures(features);
     }
 
     return res;
@@ -134,7 +135,7 @@ export class BrushToolUI {
    * @param {number} _brushSize The new size.
    */
   // #updateBrushCursorSize(_brushSize) {
-  //   const stgCtrl = this.#service.getStageController();
+  //   const stgCtrl = this.#dwvAppService.getStageController();
   //   const lg = stgCtrl.getActiveLayerGroup();
   //   if (typeof lg === 'undefined') {
   //     throw new Error('No active layer group for brush cursor');

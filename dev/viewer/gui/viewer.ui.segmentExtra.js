@@ -5,7 +5,7 @@ import {MaskSegmentHelper} from '../../../src/image/maskSegmentHelper.js';
 import {getButton} from './viewer.ui.icons.js';
 
 /**
- * @import {ViewerService} from '../services/viewer.service.js';
+ * @import {DwvAppService} from '../services/dwvApp.service.js';
  * @import {MaskImage} from '../../../src/image/maskImage.js';
  */
 
@@ -23,11 +23,11 @@ const selectIds = [
 export class SegmentationExtraUI {
 
   /**
-   * The associated viewer service.
+   * The associated viewer dwvAppService.
    *
-   * @type {ViewerService}
+   * @type {DwvAppService}
    */
-  #service;
+  #dwvAppService;
 
   /**
    * The root document.
@@ -44,12 +44,12 @@ export class SegmentationExtraUI {
   #withRtss = true;
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
    * @param {Document} [rootDoc] Optional root document,
    *   defaults to `window.document`.
    */
-  constructor(service, rootDoc) {
-    this.#service = service;
+  constructor(dwvAppService, rootDoc) {
+    this.#dwvAppService = dwvAppService;
     if (typeof rootDoc !== 'undefined') {
       this.#rootDoc = rootDoc;
     }
@@ -60,8 +60,8 @@ export class SegmentationExtraUI {
    */
   registerListeners() {
     this.#setupHtml();
-    this.#service.addEventListener('dataadd', this.#onDataAdd);
-    this.#service.addEventListener('dataremove', this.#onDataRemove);
+    this.#dwvAppService.addEventListener('dataadd', this.#onDataAdd);
+    this.#dwvAppService.addEventListener('dataremove', this.#onDataRemove);
   }
 
   /**
@@ -71,7 +71,7 @@ export class SegmentationExtraUI {
    */
   #onDataAdd = (event) => {
     const dataId = event.detail.dataid;
-    const image = this.#service.getDataController().get(dataId)?.image;
+    const image = this.#dwvAppService.getDataController().get(dataId)?.image;
     if (typeof image !== 'undefined' && image.isMask()) {
       this.#addSegmentation(dataId);
     }
@@ -192,7 +192,7 @@ export class SegmentationExtraUI {
     } else {
       fileName = 'merged-segmentation-seg';
     }
-    this.#service.saveMaskImage(mergedImage, fileName, asRtss);
+    this.#dwvAppService.saveMaskImage(mergedImage, fileName, asRtss);
   }
 
   /**
@@ -237,7 +237,7 @@ export class SegmentationExtraUI {
      *   if one is missing.
      */
     const getSelectedMaskImages = (action) => {
-      const dataCtrl = this.#service.getDataController();
+      const dataCtrl = this.#dwvAppService.getDataController();
       const maskData0 = dataCtrl.get(overlapSelect0.value);
       const maskData1 = dataCtrl.get(overlapSelect1.value);
       if (typeof maskData0 === 'undefined' ||

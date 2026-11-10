@@ -1,6 +1,6 @@
 import {getURLsFromKeyValueUri} from '../../src/utils/uri.js';
 
-import {ViewerService} from './services/viewer.service.js';
+import {DwvAppService} from './services/dwvApp.service.js';
 import {ViewerUI} from './gui/viewer.ui.js';
 import {setupRenderTests} from './viewer.rendertest.js';
 
@@ -8,12 +8,12 @@ import {setupRenderTests} from './viewer.rendertest.js';
  * Setup viewer.
  */
 function viewerSetup() {
-  // viewer service: creates the app
-  const service = new ViewerService();
-  service.registerListeners();
+  // dwv app service: creates the app
+  const dwvAppService = new DwvAppService();
+  dwvAppService.registerListeners();
 
-  // viewer UI (load events come from the service, after its handling)
-  const viewerUI = new ViewerUI(service);
+  // viewer UI (load events come from the dwvAppService, after its handling)
+  const viewerUI = new ViewerUI(dwvAppService);
   viewerUI.setup();
   viewerUI.registerListeners();
 
@@ -57,11 +57,11 @@ function viewerSetup() {
   // optional load from window location
   const urls = getURLsFromKeyValueUri(window.location.href);
   if (typeof urls !== 'undefined') {
-    service.loadURLs(urls, uriOptions);
+    dwvAppService.loadURLs(urls, uriOptions);
   }
 
   // render tests
-  setupRenderTests(service);
+  setupRenderTests(dwvAppService);
 }
 
 // ---------------------------------------------

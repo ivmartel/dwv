@@ -5,7 +5,7 @@ import {luts} from '../../../src/image/luts.js';
 import {getControlDiv} from './viewer.utils.js';
 
 /**
- * @import {ViewerService} from '../services/viewer.service.js';
+ * @import {DwvAppService} from '../services/dwvApp.service.js';
  * @import {LayoutProtocol} from './viewer.ui.js';
  */
 
@@ -29,9 +29,9 @@ function getDivIds(dataViewConfig) {
 export class DataTableUI {
 
   /**
-   * @type {ViewerService}
+   * @type {DwvAppService}
    */
-  #service;
+  #dwvAppService;
 
   /**
    * @type {boolean}
@@ -44,10 +44,10 @@ export class DataTableUI {
   #layerAddListener;
 
   /**
-   * @param {ViewerService} service The associated viewer service.
+   * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
    */
-  constructor(service) {
-    this.#service = service;
+  constructor(dwvAppService) {
+    this.#dwvAppService = dwvAppService;
   }
 
   /**
@@ -55,8 +55,9 @@ export class DataTableUI {
    */
   registerViewListeners() {
     if (!this.#registeredViewListeners) {
-      this.#service.addEventListener('wlchange', this.#onWLChange);
-      this.#service.addEventListener('opacitychange', this.#onOpacityChange);
+      this.#dwvAppService.addEventListener('wlchange', this.#onWLChange);
+      this.#dwvAppService.addEventListener(
+        'opacitychange', this.#onOpacityChange);
       this.#registeredViewListeners = true;
     }
   }
@@ -66,8 +67,9 @@ export class DataTableUI {
    */
   unRegisterViewListeners() {
     if (this.#registeredViewListeners) {
-      this.#service.removeEventListener('wlchange', this.#onWLChange);
-      this.#service.removeEventListener('opacitychange', this.#onOpacityChange);
+      this.#dwvAppService.removeEventListener('wlchange', this.#onWLChange);
+      this.#dwvAppService.removeEventListener(
+        'opacitychange', this.#onOpacityChange);
       this.#registeredViewListeners = false;
     }
   }
@@ -84,16 +86,20 @@ export class DataTableUI {
       this.#addDataRow(event.detail?.dataid, layout);
     };
 
-    this.#service.addEventListener('viewlayeradd', this.#layerAddListener);
-    this.#service.addEventListener('drawlayeradd', this.#layerAddListener);
+    this.#dwvAppService.addEventListener(
+      'viewlayeradd', this.#layerAddListener);
+    this.#dwvAppService.addEventListener(
+      'drawlayeradd', this.#layerAddListener);
   }
 
   /**
    * Unbind layer add from ui.
    */
   unRegisterLayerAddListeners() {
-    this.#service.removeEventListener('viewlayeradd', this.#layerAddListener);
-    this.#service.removeEventListener('drawlayeradd', this.#layerAddListener);
+    this.#dwvAppService.removeEventListener(
+      'viewlayeradd', this.#layerAddListener);
+    this.#dwvAppService.removeEventListener(
+      'drawlayeradd', this.#layerAddListener);
     this.#layerAddListener = undefined;
   }
 
@@ -102,10 +108,10 @@ export class DataTableUI {
    */
   registerListeners() {
     // control listeners (pause during load)
-    this.#service.addEventListener('loadstart', (/*event*/) => {
+    this.#dwvAppService.addEventListener('loadstart', (/*event*/) => {
       this.unRegisterViewListeners();
     });
-    this.#service.addEventListener('loadend', (/*event*/) => {
+    this.#dwvAppService.addEventListener('loadend', (/*event*/) => {
       this.registerViewListeners();
     });
   };
@@ -147,7 +153,7 @@ export class DataTableUI {
     const selectElem = document.getElementById(elemId);
     if (selectElem) {
       const ids = this.#getDataLayerGroupDivIds(event.detail.dataid);
-      const stgCtrl = this.#service.getStageController();
+      const stgCtrl = this.#dwvAppService.getStageController();
       const lg = stgCtrl.getLayerGroupByDivId(ids[0]);
       const vls = lg.getViewLayersByDataId(event.dataid);
       if (typeof vls !== 'undefined' && vls.length !== 0) {
@@ -203,7 +209,7 @@ export class DataTableUI {
    */
   #getDataLayerGroupDivIds(dataId) {
     const dataViewConfigs =
-      this.#service.getStageController().getDataViewConfigs();
+      this.#dwvAppService.getStageController().getDataViewConfigs();
     let viewConfig = dataViewConfigs[dataId];
     if (typeof viewConfig === 'undefined') {
       viewConfig = dataViewConfigs['*'];
@@ -274,13 +280,13 @@ export class DataTableUI {
    * @param {LayoutProtocol} layout The layout.
    */
   #addDataRow(dataId, layout) {
-    const dataCtrl = this.#service.getDataController();
+    const dataCtrl = this.#dwvAppService.getDataController();
     const image = dataCtrl.get(dataId).image;
     const dataIsImage = typeof image !== 'undefined';
     const canAlpha = dataIsImage;
     const isMonochrome = dataIsImage && image.isMonochrome();
 
-    const stgCtrl = this.#service.getStageController();
+    const stgCtrl = this.#dwvAppService.getStageController();
     const dataViewConfigs = stgCtrl.getDataViewConfigs();
     const allLayerGroupDivIds = layout.getLayerGroupDivIds();
 

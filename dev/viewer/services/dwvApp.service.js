@@ -116,12 +116,12 @@ function setupCustom() {
 }
 
 /**
- * Viewer service: facade to the dwv App, the viewer UI
+ * Dwv app service: facade to the dwv App, the viewer UI
  * should not access the App directly.
  * Load events are re-dispatched by the service after its own handling,
  * other events are directly the App ones.
  */
-export class ViewerService extends EventTarget {
+export class DwvAppService extends EventTarget {
 
   /**
    * The associated application.
@@ -663,7 +663,7 @@ export class ViewerService extends EventTarget {
     }
   }
 
-} // class ViewerService
+} // class DwvAppService
 
 /**
  * Compare two pos pat keys.
