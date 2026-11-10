@@ -412,7 +412,7 @@ function getCommonPrefix(values) {
  * Show the QIDO response as a table.
  */
 function qidoResponseToTable() {
-  const viewerUrl = './viewer.html?input=';
+  const viewerUrl = '../viewer/viewer.html?input=';
 
   const table = document.createElement('table');
   table.id = 'series-table';

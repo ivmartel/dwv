@@ -129,7 +129,7 @@ Read `git diff HEAD` and look for:
 ## 4. Optional: see it running
 
 For rendering, tool or loading changes that unit tests can't show, run
-`yarn start` (webpack-dev-server) and load data in `dev/pacs/viewer.html` or
+`yarn start` (webpack-dev-server) and load data in `dev/viewer/viewer.html` or
 the example pages under `dev/`. Say in the report whether this was done; if
 not, say that visual behaviour was not checked.
 

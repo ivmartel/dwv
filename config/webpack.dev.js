@@ -12,7 +12,7 @@ export default merge(webpackCommon, {
     workerPublicPath: '/'
   },
   entry: {
-    viewer: './dev/pacs/viewer.js',
+    viewer: './dev/viewer/viewer.js',
     pacs: './dev/pacs/index.js',
     dcmweb: './dev/pacs/dcmweb.js',
     raw: './dev/visual/index.js',
@@ -107,8 +107,8 @@ export default merge(webpackCommon, {
       chunks: ['pacs'],
     }),
     new HtmlWebpackPlugin({
-      template: './dev/pacs/viewer.html',
-      filename: 'dev/pacs/viewer.html',
+      template: './dev/viewer/viewer.html',
+      filename: 'dev/viewer/viewer.html',
       favicon: './dev/favicon.ico',
       scriptLoading: 'module',
       chunks: ['viewer'],

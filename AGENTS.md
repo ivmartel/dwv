@@ -57,7 +57,7 @@ When upgrading to a newer edition, update together:
 
 - `yarn install` — install dependencies.
 - `yarn start` — webpack-dev-server (`config/webpack.dev.js`), opens example
-  pages, including the `dev/pacs/viewer.html` test viewer.
+  pages, including the `dev/viewer/viewer.html` test viewer.
 - `yarn test` — run tests with vitest in watch mode.
 - `yarn test-ci` — one-shot vitest run with coverage (v8 provider, thresholds
   50% statements/branches/functions/lines); this is what CI runs.

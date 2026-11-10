@@ -8,7 +8,7 @@ export default {
   mode: 'production',
   devtool: 'source-map',
   entry: {
-    viewer: './dev/pacs/viewer.js',
+    viewer: './dev/viewer/viewer.js',
   },
   output: {
     filename: '[name].min.js',
@@ -17,7 +17,7 @@ export default {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './dev/pacs/viewer.html',
+      template: './dev/viewer/viewer.html',
       filename: 'viewer.html',
       favicon: './dev/favicon.ico',
       chunks: ['viewer'],

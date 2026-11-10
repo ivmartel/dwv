@@ -166,7 +166,7 @@ function getDwvUrl(uri) {
     uriargs = uri.args;
   }
 
-  let url = 'viewer.html';
+  let url = '../viewer/viewer.html';
   if (typeof uri !== 'undefined') {
     url += `?input=${encodeURIComponent(uricomp)}${uriargs}`;
   }
