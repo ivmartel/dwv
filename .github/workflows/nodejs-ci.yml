@@ -2,19 +2,18 @@
 
 name: Node.js CI
 
-on: [push, pull_request, merge_group]
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      IS_PUSH_MASTER: ${{ github.ref == 'refs/heads/master' }}
-      IS_PUSH_DEVELOP: ${{ github.ref == 'refs/heads/develop' }}
+    permissions:
+      contents: read
+    outputs:
+      deploy-dir: ${{ steps.target.outputs.dir }}
     steps:
       - name: Check out code
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
@@ -28,28 +27,61 @@ jobs:
       - name: Run tests
         run: yarn run test-ci
       - name: Build
+        run: yarn run build-ci
+      - name: Build demo
+        run: yarn run build-demo
+      - name: Get deploy target
+        id: target
+        # develop branch: trunk, release tag (v1.2.3): stable,
+        # anything else (other branches, pre-release tags, PRs): no deploy
         run: |
-          rm -Rf ./build
-          yarn run build-ci
-      - name: Prepare for deploy (if master or develop branch)
-        if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
-        run: |
-          yarn run build-demo
-      - name: Push to gh-pages (if master or develop branch)
-        if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
-        run: |
-          DEPLOY_DIR=./demo/trunk
-          if ${{ env.IS_PUSH_MASTER }}; then
-            DEPLOY_DIR=./demo/stable
+          if [[ "$GITHUB_REF" == refs/heads/develop ]]; then
+            echo "dir=./demo/trunk" >> "$GITHUB_OUTPUT"
+          elif [[ "$GITHUB_REF" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "dir=./demo/stable" >> "$GITHUB_OUTPUT"
           fi
-          ALL=/*
+      - name: Upload demo
+        if: steps.target.outputs.dir != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: demo
+          path: build/demo/
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.deploy-dir != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # deploys (develop, version tags) share a group so that they
+    # push to gh-pages one after the other
+    concurrency:
+      group: ${{ github.workflow }}-gh-pages
+      cancel-in-progress: false
+    steps:
+      - name: Check out gh-pages
+        uses: actions/checkout@v7
+        with:
+          ref: gh-pages
+      - name: Download demo
+        uses: actions/download-artifact@v8
+        with:
+          name: demo
+          path: ${{ runner.temp }}/demo
+      - name: Push to gh-pages
+        env:
+          DEPLOY_DIR: ${{ needs.build.outputs.deploy-dir }}
+          DEMO_DIR: ${{ runner.temp }}/demo
+        run: |
           git config user.email github-actions@github.com
           git config user.name github-actions
-          git checkout .
-          git checkout gh-pages
-          rm -Rf $DEPLOY_DIR$ALL
-          cp -Rf ./build/demo/* $DEPLOY_DIR
-          git add -A $DEPLOY_DIR
+          mkdir -p "$DEPLOY_DIR"
+          # ':?' aborts if DEPLOY_DIR is empty or unset (avoids 'rm -Rf /*')
+          rm -Rf "${DEPLOY_DIR:?}"/*
+          cp -Rf "$DEMO_DIR"/* "$DEPLOY_DIR"
+          git add -A "$DEPLOY_DIR"
           git diff-index --quiet HEAD ||
-            git commit -m "CI run ${{ github.run_number }} pushed to gh-pages"
-          git push -fq origin gh-pages
+            git commit -m "CI run ${{ github.run_number }} pushed to $DEPLOY_DIR"
+          git push origin gh-pages
