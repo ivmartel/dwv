@@ -2,11 +2,11 @@ import {Orientation} from '../../../src/math/orientation.js';
 import {WindowLevel} from '../../../src/image/windowLevel.js';
 import {luts} from '../../../src/image/luts.js';
 
-import {getControlDiv} from './viewer.utils.js';
+import {getControlDiv} from './utils.js';
 
 /**
  * @import {DwvAppService} from '../services/dwvApp.service.js';
- * @import {LayoutProtocol} from './viewer.ui.js';
+ * @import {LayoutProtocol} from './viewerUI.js';
  */
 
 /**

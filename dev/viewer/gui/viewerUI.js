@@ -5,14 +5,14 @@ import {Point} from '../../../src/math/point.js';
 import {Matrix33} from '../../../src/math/matrix.js';
 import {i18n} from '../../../src/utils/i18n.js';
 
-import {DataTableUI} from './viewer.ui.datatable.js';
+import {DataTableUI} from './datatable.js';
 import {AnnotationService} from '../services/annot.service.js';
-import {AnnotationComponent} from './viewer.ui.annot.js';
+import {AnnotationComponent} from './annot.js';
 import {SegmentationService} from '../services/segment.service.js';
-import {SegmentationComponent} from './viewer.ui.segment.js';
-import {SegmentationExtraUI} from './viewer.ui.segmentExtra.js';
-import {DrawToolUI} from './viewer.ui.draw.js';
-import {BrushToolUI} from './viewer.ui.brush.js';
+import {SegmentationComponent} from './segment.js';
+import {SegmentationExtraUI} from './segmentExtra.js';
+import {DrawToolUI} from './draw.js';
+import {BrushToolUI} from './brush.js';
 import {formatQuantificationValue} from '../services/quantification.js';
 
 /**

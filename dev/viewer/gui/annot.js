@@ -3,9 +3,9 @@ import {
   getIconElement,
   getButton,
   setButtonPressed
-} from './viewer.ui.icons.js';
+} from './icons.js';
 import {getQuantificationGroups} from '../services/quantification.js';
-import {renderQuantification} from './viewer.ui.quantification.js';
+import {renderQuantification} from './quantification.js';
 
 /**
  * @import {

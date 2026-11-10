@@ -1,4 +1,4 @@
-import {getControlDiv, getSplitButton} from './viewer.utils.js';
+import {getControlDiv, getSplitButton} from './utils.js';
 
 /**
  * @import {DwvAppService} from '../services/dwvApp.service.js';

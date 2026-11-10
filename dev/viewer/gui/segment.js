@@ -1,11 +1,11 @@
 import {logger} from '../../../src/utils/logger.js';
 
-import {getHtmlId} from './viewer.utils.js';
+import {getHtmlId} from './utils.js';
 import {
   getButton,
   setButtonPressed
-} from './viewer.ui.icons.js';
-import {renderQuantification} from './viewer.ui.quantification.js';
+} from './icons.js';
+import {renderQuantification} from './quantification.js';
 
 /**
  * @import {

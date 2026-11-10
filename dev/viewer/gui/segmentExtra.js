@@ -2,7 +2,7 @@ import {logger} from '../../../src/utils/logger.js';
 import {mergeMaskImages} from '../../../src/image/maskFactory.js';
 import {MaskSegmentHelper} from '../../../src/image/maskSegmentHelper.js';
 
-import {getButton} from './viewer.ui.icons.js';
+import {getButton} from './icons.js';
 
 /**
  * @import {DwvAppService} from '../services/dwvApp.service.js';
