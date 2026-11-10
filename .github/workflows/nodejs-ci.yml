@@ -35,9 +35,6 @@ jobs:
         if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
         run: |
           yarn run build-demo
-          cp -Rf dev/pacs/viewer.html ./build/demo
-          cp dev/favicon.ico ./build/demo
-          ./resources/scripts/prep-deploy.sh -f build/demo/viewer.html
       - name: Push to gh-pages (if master or develop branch)
         if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
         run: |

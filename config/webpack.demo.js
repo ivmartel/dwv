@@ -1,5 +1,6 @@
 import path from 'path';
 import {fileURLToPath} from 'url';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,4 +15,12 @@ export default {
     path: path.resolve(__dirname, '../build/demo'),
     clean: true,
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './dev/pacs/viewer.html',
+      filename: 'viewer.html',
+      favicon: './dev/favicon.ico',
+      chunks: ['viewer'],
+    }),
+  ],
 };

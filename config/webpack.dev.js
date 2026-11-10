@@ -109,6 +109,7 @@ export default merge(webpackCommon, {
     new HtmlWebpackPlugin({
       template: './dev/pacs/viewer.html',
       filename: 'dev/pacs/viewer.html',
+      favicon: './dev/favicon.ico',
       scriptLoading: 'module',
       chunks: ['viewer'],
     }),
