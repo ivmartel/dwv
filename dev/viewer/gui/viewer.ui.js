@@ -1,22 +1,22 @@
-import {ViewConfig} from '../../src/app/application.js';
-import {precisionRound} from '../../src/math/number.js';
-import {getDwvVersion} from '../../src/dicom/dicomParser.js';
-import {Point} from '../../src/math/point.js';
-import {Matrix33} from '../../src/math/matrix.js';
-import {i18n} from '../../src/utils/i18n.js';
+import {ViewConfig} from '../../../src/app/application.js';
+import {precisionRound} from '../../../src/math/number.js';
+import {getDwvVersion} from '../../../src/dicom/dicomParser.js';
+import {Point} from '../../../src/math/point.js';
+import {Matrix33} from '../../../src/math/matrix.js';
+import {i18n} from '../../../src/utils/i18n.js';
 
 import {DataTableUI} from './viewer.ui.datatable.js';
-import {AnnotationService} from './annot.service.js';
+import {AnnotationService} from '../services/annot.service.js';
 import {AnnotationComponent} from './viewer.ui.annot.js';
-import {SegmentationService} from './segment.service.js';
+import {SegmentationService} from '../services/segment.service.js';
 import {SegmentationComponent} from './viewer.ui.segment.js';
 import {SegmentationExtraUI} from './viewer.ui.segmentExtra.js';
 import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
-import {formatQuantificationValue} from './viewer.ui.quantification.js';
+import {formatQuantificationValue} from '../services/quantification.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
+ * @import {ViewerService} from '../services/viewer.service.js';
  */
 
 /**

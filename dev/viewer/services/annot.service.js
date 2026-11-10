@@ -1,17 +1,17 @@
-import {DrawController} from '../../src/app/drawController.js';
+import {DrawController} from '../../../src/app/drawController.js';
 import {
   AnnotationGroupFactory
-} from '../../src/image/annotationGroupFactory.js';
+} from '../../../src/image/annotationGroupFactory.js';
 import {
   getUID,
   DicomWriter
-} from '../../src/dicom/dicomWriter.js';
-import {logger} from '../../src/utils/logger.js';
+} from '../../../src/dicom/dicomWriter.js';
+import {logger} from '../../../src/utils/logger.js';
 
 /**
  * @import {ViewerService} from './viewer.service.js';
- * @import {Annotation} from '../../src/image/annotation.js';
- * @import {AnnotationGroup} from '../../src/image/annotationGroup.js';
+ * @import {Annotation} from '../../../src/image/annotation.js';
+ * @import {AnnotationGroup} from '../../../src/image/annotationGroup.js';
  */
 
 /**

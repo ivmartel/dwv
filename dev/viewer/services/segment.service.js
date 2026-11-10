@@ -1,28 +1,28 @@
 import {
   rgbToHex,
   hexToRgb,
-} from '../../src/utils/colour.js';
-import {logger} from '../../src/utils/logger.js';
-import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
-import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
-import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
+} from '../../../src/utils/colour.js';
+import {logger} from '../../../src/utils/logger.js';
+import {getSegmentationCode} from '../../../src/dicom/dicomCode.js';
+import {MaskSegmentHelper} from '../../../src/image/maskSegmentHelper.js';
+import {MaskSegmentViewHelper} from '../../../src/image/maskSegmentViewHelper.js';
 import {
   ChangeSegmentColourCommand
-} from '../../src/command/changeSegmentColourCommand.js';
+} from '../../../src/command/changeSegmentColourCommand.js';
 import {
   DeleteSegmentCommand
-} from '../../src/command/deleteSegmentCommand.js';
+} from '../../../src/command/deleteSegmentCommand.js';
 
-import {getQuantificationGroups} from './viewer.ui.quantification.js';
+import {getQuantificationGroups} from './quantification.js';
 
 /**
  * @import {ViewerService} from './viewer.service.js';
- * @import {MaskSegment} from '../../src/dicom/dicomSegment.js';
- * @import {MaskImage} from '../../src/image/maskImage.js';
- * @import {RGB} from '../../src/utils/colour.js';
- * @import {Statistics} from '../../src/math/stats.js';
- * @import {Label} from '../../src/image/label.js';
- * @import {QuantificationGroup} from './viewer.ui.quantification.js';
+ * @import {MaskSegment} from '../../../src/dicom/dicomSegment.js';
+ * @import {MaskImage} from '../../../src/image/maskImage.js';
+ * @import {RGB} from '../../../src/utils/colour.js';
+ * @import {Statistics} from '../../../src/math/stats.js';
+ * @import {Label} from '../../../src/image/label.js';
+ * @import {QuantificationGroup} from './quantification.js';
  */
 
 /**

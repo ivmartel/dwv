@@ -1,12 +1,12 @@
-import {logger} from '../../src/utils/logger.js';
-import {mergeMaskImages} from '../../src/image/maskFactory.js';
-import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
+import {logger} from '../../../src/utils/logger.js';
+import {mergeMaskImages} from '../../../src/image/maskFactory.js';
+import {MaskSegmentHelper} from '../../../src/image/maskSegmentHelper.js';
 
 import {getButton} from './viewer.ui.icons.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
- * @import {MaskImage} from '../../src/image/maskImage.js';
+ * @import {ViewerService} from '../services/viewer.service.js';
+ * @import {MaskImage} from '../../../src/image/maskImage.js';
  */
 
 // overlap checker select ids

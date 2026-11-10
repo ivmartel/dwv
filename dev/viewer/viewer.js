@@ -1,7 +1,7 @@
 import {getURLsFromKeyValueUri} from '../../src/utils/uri.js';
 
-import {ViewerService} from './viewer.service.js';
-import {ViewerUI} from './viewer.ui.js';
+import {ViewerService} from './services/viewer.service.js';
+import {ViewerUI} from './gui/viewer.ui.js';
 import {setupRenderTests} from './viewer.rendertest.js';
 
 /**

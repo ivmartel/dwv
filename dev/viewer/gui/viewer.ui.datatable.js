@@ -1,11 +1,11 @@
-import {Orientation} from '../../src/math/orientation.js';
-import {WindowLevel} from '../../src/image/windowLevel.js';
-import {luts} from '../../src/image/luts.js';
+import {Orientation} from '../../../src/math/orientation.js';
+import {WindowLevel} from '../../../src/image/windowLevel.js';
+import {luts} from '../../../src/image/luts.js';
 
 import {getControlDiv} from './viewer.utils.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
+ * @import {ViewerService} from '../services/viewer.service.js';
  * @import {LayoutProtocol} from './viewer.ui.js';
  */
 

@@ -1,4 +1,4 @@
-import {logger} from '../../src/utils/logger.js';
+import {logger} from '../../../src/utils/logger.js';
 
 import {getHtmlId} from './viewer.utils.js';
 import {
@@ -14,7 +14,7 @@ import {renderQuantification} from './viewer.ui.quantification.js';
  *   SegmentationItemState,
  *   SegmentItemState,
  *   SegmentRef
- * } from './segment.service.js';
+ * } from '../services/segment.service.js';
  */
 
 /**

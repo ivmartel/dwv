@@ -1,7 +1,7 @@
 import {getControlDiv, getSplitButton} from './viewer.utils.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
+ * @import {ViewerService} from '../services/viewer.service.js';
  */
 
 /**

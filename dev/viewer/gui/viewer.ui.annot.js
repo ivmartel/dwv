@@ -1,13 +1,11 @@
-import {logger} from '../../src/utils/logger.js';
+import {logger} from '../../../src/utils/logger.js';
 import {
   getIconElement,
   getButton,
   setButtonPressed
 } from './viewer.ui.icons.js';
-import {
-  getQuantificationGroups,
-  renderQuantification
-} from './viewer.ui.quantification.js';
+import {getQuantificationGroups} from '../services/quantification.js';
+import {renderQuantification} from './viewer.ui.quantification.js';
 
 /**
  * @import {
@@ -16,7 +14,7 @@ import {
  *   AnnotationGroupState,
  *   AnnotationItemState,
  *   AnnotationSelection
- * } from './annot.service.js';
+ * } from '../services/annot.service.js';
  */
 
 /**

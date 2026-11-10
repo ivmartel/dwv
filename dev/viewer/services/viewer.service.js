@@ -1,26 +1,26 @@
 import {
   AppOptions,
   App
-} from '../../src/app/application.js';
-import {getAsSimpleTagValues} from '../../src/dicom/simpleTagValues.js';
-import {getSRContent} from '../../src/dicom/dicomSRContent.js';
-import {custom} from '../../src/app/custom.js';
-import {logger} from '../../src/utils/logger.js';
-import {WindowLevel} from '../../src/image/windowLevel.js';
-import {DicomWriter} from '../../src/dicom/dicomWriter.js';
-import {MaskFactory} from '../../src/image/maskFactory.js';
-import {RtStructFactory} from '../../src/image/rtStructFactory.js';
+} from '../../../src/app/application.js';
+import {getAsSimpleTagValues} from '../../../src/dicom/simpleTagValues.js';
+import {getSRContent} from '../../../src/dicom/dicomSRContent.js';
+import {custom} from '../../../src/app/custom.js';
+import {logger} from '../../../src/utils/logger.js';
+import {WindowLevel} from '../../../src/image/windowLevel.js';
+import {DicomWriter} from '../../../src/dicom/dicomWriter.js';
+import {MaskFactory} from '../../../src/image/maskFactory.js';
+import {RtStructFactory} from '../../../src/image/rtStructFactory.js';
 
 import {overlayConfig} from './overlays.js';
 
 /**
- * @import {DataController} from '../../src/app/dataController.js';
- * @import {StageController} from '../../src/app/stageController.js';
- * @import {UndoController} from '../../src/app/undoController.js';
- * @import {ToolboxController} from '../../src/app/toolboxController.js';
- * @import {DicomData} from '../../src/app/dataController.js';
- * @import {Matrix33} from '../../src/math/matrix.js';
- * @import {MaskImage} from '../../src/image/maskImage.js';
+ * @import {DataController} from '../../../src/app/dataController.js';
+ * @import {StageController} from '../../../src/app/stageController.js';
+ * @import {UndoController} from '../../../src/app/undoController.js';
+ * @import {ToolboxController} from '../../../src/app/toolboxController.js';
+ * @import {DicomData} from '../../../src/app/dataController.js';
+ * @import {Matrix33} from '../../../src/math/matrix.js';
+ * @import {MaskImage} from '../../../src/image/maskImage.js';
  */
 
 // load event types used by the UI: re-dispatched by the service
@@ -92,7 +92,7 @@ function setupCustom() {
   // // example private logic for volume id value retrieval:
   // // tried first, before the default candidates
   // // (import {defaultVolumeIdCandidates}
-  // //   from '../../src/dicom/dicomVolume.js')
+  // //   from '../../../src/dicom/dicomVolume.js')
   // custom.volumeIdCandidates = [
   //   {
   //     name: 'ABCD0123',

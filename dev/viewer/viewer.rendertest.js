@@ -1,5 +1,5 @@
 /**
- * @import {ViewerService} from './viewer.service.js';
+ * @import {ViewerService} from './services/viewer.service.js';
  */
 
 /**

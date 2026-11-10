@@ -1,8 +1,8 @@
-import {DicomCode} from '../../src/dicom/dicomCode.js';
+import {DicomCode} from '../../../src/dicom/dicomCode.js';
 import {getSplitButton} from './viewer.utils.js';
 
 /**
- * @import {ViewerService} from './viewer.service.js';
+ * @import {ViewerService} from '../services/viewer.service.js';
  */
 
 /**
