@@ -1,5 +1,5 @@
 /**
- * @import {QuantificationGroup} from '../services/quantification.js';
+ * @import {QuantificationGroup} from './quantification.js';
  */
 
 /**

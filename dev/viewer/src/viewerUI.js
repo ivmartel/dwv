@@ -6,17 +6,17 @@ import {Matrix33} from '../../../src/math/matrix.js';
 import {i18n} from '../../../src/utils/i18n.js';
 
 import {DataTableUI} from './dataTableUI.js';
-import {AnnotationService} from '../services/annotationService.js';
+import {AnnotationService} from './annotationService.js';
 import {AnnotationComponent} from './annotationComponent.js';
-import {SegmentationService} from '../services/segmentationService.js';
+import {SegmentationService} from './segmentationService.js';
 import {SegmentationComponent} from './segmentationComponent.js';
 import {SegmentationExtraUI} from './segmentExtra.js';
 import {DrawToolUI} from './drawToolUI.js';
 import {BrushToolUI} from './brushToolUI.js';
-import {formatQuantificationValue} from '../services/quantification.js';
+import {formatQuantificationValue} from './quantification.js';
 
 /**
- * @import {DwvAppService} from '../services/dwvAppService.js';
+ * @import {DwvAppService} from './dwvAppService.js';
  */
 
 /**

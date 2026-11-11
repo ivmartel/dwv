@@ -2,7 +2,7 @@ import {DicomCode} from '../../../src/dicom/dicomCode.js';
 import {getSplitButton} from './utils.js';
 
 /**
- * @import {DwvAppService} from '../services/dwvAppService.js';
+ * @import {DwvAppService} from './dwvAppService.js';
  */
 
 /**

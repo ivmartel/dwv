@@ -5,7 +5,7 @@ import {luts} from '../../../src/image/luts.js';
 import {getControlDiv} from './utils.js';
 
 /**
- * @import {DwvAppService} from '../services/dwvAppService.js';
+ * @import {DwvAppService} from './dwvAppService.js';
  * @import {LayoutProtocol} from './viewerUI.js';
  */
 

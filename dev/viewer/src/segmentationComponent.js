@@ -5,7 +5,7 @@ import {
   getButton,
   setButtonPressed
 } from './icons.js';
-import {renderQuantification} from './quantification.js';
+import {renderQuantification} from './quantificationUI.js';
 
 /**
  * @import {
@@ -14,7 +14,7 @@ import {renderQuantification} from './quantification.js';
  *   SegmentationItemState,
  *   SegmentItemState,
  *   SegmentRef
- * } from '../services/segmentationService.js';
+ * } from './segmentationService.js';
  */
 
 /**

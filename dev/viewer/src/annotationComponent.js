@@ -4,8 +4,8 @@ import {
   getButton,
   setButtonPressed
 } from './icons.js';
-import {getQuantificationGroups} from '../services/quantification.js';
-import {renderQuantification} from './quantification.js';
+import {getQuantificationGroups} from './quantification.js';
+import {renderQuantification} from './quantificationUI.js';
 
 /**
  * @import {
@@ -14,7 +14,7 @@ import {renderQuantification} from './quantification.js';
  *   AnnotationGroupState,
  *   AnnotationItemState,
  *   AnnotationSelection
- * } from '../services/annotationService.js';
+ * } from './annotationService.js';
  */
 
 /**
