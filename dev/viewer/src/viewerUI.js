@@ -733,9 +733,14 @@ export class ViewerUI {
   #setupPositionLine() {
     const positionInput = document.getElementById('position');
     positionInput.addEventListener('change', (event) => {
-      const vls = this.#dwvAppService.getStageController()
-        .getViewLayersByDataId('0');
-      const vc = vls[0].getViewController();
+      // active view layer of the active layer group
+      const vl = this.#dwvAppService.getStageController()
+        .getActiveLayerGroup()?.getActiveViewLayer();
+      if (typeof vl === 'undefined') {
+        console.warn('No active view layer to set the position of');
+        return;
+      }
+      const vc = vl.getViewController();
       const element = event.target;
       const values = element.value.split(',');
       const point = new Point(values.map(parseFloat));
@@ -883,6 +888,7 @@ export class ViewerUI {
       const dataIds = dataCtrl.getDataIds();
       if (dataIds.length < 2) {
         console.log('Not enough datas to match geometries');
+        return;
       }
       // log geometries if resample is needed
       const geometry0 = dataCtrl.get(dataIds[0]).image.getGeometry();
@@ -968,8 +974,12 @@ export class ViewerUI {
     allInput.type = 'checkbox';
     allInput.checked = true;
     allInput.onchange = function () {
+      // align the individual binders on 'all' (click updates the app)
       for (let j = 0; j < propList.length; ++j) {
-        document.getElementById(`binder-${j}`).click();
+        const input = document.getElementById(`binder-${j}`);
+        if (input.checked !== allInput.checked) {
+          input.click();
+        }
       }
     };
     const allLabel = document.createElement('label');
@@ -986,6 +996,14 @@ export class ViewerUI {
   #setupToolsCheckboxes() {
     const getKeyCheck = function (char, button) {
       return function (event) {
+        // do not trigger while typing in a form field
+        const target = event.target;
+        const isFormField = target instanceof HTMLElement &&
+          (target.isContentEditable ||
+            ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+        if (isFormField) {
+          return;
+        }
         if (!event.ctrlKey &&
           !event.altKey &&
           !event.shiftKey &&
@@ -993,6 +1011,26 @@ export class ViewerUI {
           button.click();
         }
       };
+    };
+
+    // shortcuts already in use ('a' aborts loads, see dwvAppService)
+    const usedShortcuts = ['a'];
+    /**
+     * Get the shortcut of a tool: the first letter of its name
+     *   that is not already used.
+     *
+     * @param {string} name The tool name.
+     * @returns {string|undefined} The shortcut, undefined if none
+     *   is available.
+     */
+    const getShortcut = function (name) {
+      const shortcut = Array.from(name.toLowerCase()).find(
+        (char) => char >= 'a' && char <= 'z' &&
+          !usedShortcuts.includes(char));
+      if (typeof shortcut !== 'undefined') {
+        usedShortcuts.push(shortcut);
+      }
+      return shortcut;
     };
 
     const fieldset = document.getElementById('tools');
@@ -1023,9 +1061,13 @@ export class ViewerUI {
         fieldset.appendChild(button);
       }
 
-      // keyboard shortcut
-      const shortcut = key[0].toLowerCase();
-      document.addEventListener('keydown', getKeyCheck(shortcut, button));
+      // keyboard shortcut (the title is the tool name, see
+      //   #getSelectedToolName)
+      const shortcut = getShortcut(key);
+      if (typeof shortcut !== 'undefined') {
+        button.setAttribute('aria-keyshortcuts', shortcut);
+        document.addEventListener('keydown', getKeyCheck(shortcut, button));
+      }
     }
 
     // tool options

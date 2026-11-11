@@ -155,7 +155,7 @@ export class DataTableUI {
       const ids = this.#getDataLayerGroupDivIds(event.detail.dataid);
       const stgCtrl = this.#dwvAppService.getStageController();
       const lg = stgCtrl.getLayerGroupByDivId(ids[0]);
-      const vls = lg.getViewLayersByDataId(event.dataid);
+      const vls = lg.getViewLayersByDataId(event.detail.dataid);
       if (typeof vls !== 'undefined' && vls.length !== 0) {
         const vl = vls[0];
         const vc = vl.getViewController();
