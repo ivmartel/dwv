@@ -30,13 +30,6 @@ export class SegmentationExtraUI {
   #dwvAppService;
 
   /**
-   * The root document.
-   *
-   * @type {Document}
-   */
-  #rootDoc = document;
-
-  /**
    * With RTSS flag.
    *
    * @type {boolean}
@@ -45,14 +38,9 @@ export class SegmentationExtraUI {
 
   /**
    * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
-   * @param {Document} [rootDoc] Optional root document,
-   *   defaults to `window.document`.
    */
-  constructor(dwvAppService, rootDoc) {
+  constructor(dwvAppService) {
     this.#dwvAppService = dwvAppService;
-    if (typeof rootDoc !== 'undefined') {
-      this.#rootDoc = rootDoc;
-    }
   }
 
   /**
@@ -91,7 +79,7 @@ export class SegmentationExtraUI {
    */
   #setupHtml() {
     // insert in the extra section, before the tests
-    const testsEl = this.#rootDoc.getElementById('tests');
+    const testsEl = document.getElementById('tests');
     if (!testsEl) {
       logger.warn('Cannot find tests element');
       return;
@@ -149,7 +137,7 @@ export class SegmentationExtraUI {
    */
   #getSelects() {
     const selects = selectIds.map(
-      (id) => this.#rootDoc.getElementById(id));
+      (id) => document.getElementById(id));
     if (selects.some((select) => !select)) {
       return;
     }
@@ -161,7 +149,7 @@ export class SegmentationExtraUI {
    *   two segmentations to compare, disable them otherwise.
    */
   #updateDisabled() {
-    const overlapChecker = this.#rootDoc.getElementById('overlap-checker');
+    const overlapChecker = document.getElementById('overlap-checker');
     if (!overlapChecker) {
       return;
     }
