@@ -106,15 +106,31 @@ function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
 }
 
 /**
+ * Pixel spacing values and their length unit.
+ *
+ * @typedef {object} SpacingAndUnit
+ * @property {number[]} values The spacing as [columnSpacing, rowSpacing].
+ * @property {string} unit The length unit i18n key.
+ */
+
+/**
  * Get the pixel spacing for projection data.
  *
+ * Imager Pixel Spacing is measured at the front plane of the detector
+ * housing, see {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.11.4.html}.
+ * When a magnification factor is available, the values are corrected
+ * to give an estimated size in the patient, see {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.11.5.html}.
+ * Otherwise the length unit is 'unit.mmDetector'.
+ *
  * @param {Record<string, DataElement>} elements The DICOM elements.
- * @returns {number[]|undefined} The values if present.
+ * @returns {SpacingAndUnit|undefined} The values and unit if present.
  */
 function getProjection2DSpacingValues(elements) {
   // ImagerPixelSpacing
-  let res = get2DSpacingValues(elements, TagKeys.ImagerPixelSpacing);
-  if (typeof res !== 'undefined') {
+  const values = get2DSpacingValues(elements, TagKeys.ImagerPixelSpacing);
+  let res;
+  if (typeof values !== 'undefined') {
+    res = {values, unit: 'unit.mmDetector'};
     let factor;
     const magnification = parseFloat(
       safeGet(elements, TagKeys.EstimatedRadiographicMagnificationFactor));
@@ -130,7 +146,10 @@ function getProjection2DSpacingValues(elements) {
       }
     }
     if (typeof factor !== 'undefined') {
-      res = res.map((value) => value / factor);
+      res = {
+        values: values.map((value) => value / factor),
+        unit: 'unit.mm'
+      };
       logger.warn('Got pixel spacing from corrected ImagerPixelSpacing tag');
     } else {
       logger.warn('Got pixel spacing from raw ImagerPixelSpacing tag');
@@ -195,22 +214,59 @@ function getMultiFrame2DSpacingValues(elements) {
  *   undefined if not present.
  */
 export function getPixelSpacing(elements) {
+  return getPixelSpacingAndUnit(elements)?.values;
+}
+
+/**
+ * Get the length unit of the pixel spacing.
+ *
+ * Returns 'unit.mmDetector' when the spacing comes from an uncorrected
+ * Imager Pixel Spacing (size at the detector), 'unit.mm' for other
+ * spacings and 'unit.pixel' when there is no spacing.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {string} The length unit i18n key.
+ */
+export function getLengthUnit(elements) {
+  const res = getPixelSpacingAndUnit(elements);
+  if (typeof res === 'undefined') {
+    return 'unit.pixel';
+  }
+  return res.unit;
+}
+
+/**
+ * Get the pixel spacing and its length unit from the different
+ *   spacing tags.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {SpacingAndUnit|undefined} The spacing and unit or
+ *   undefined if not present.
+ */
+function getPixelSpacingAndUnit(elements) {
   // main tag
-  let res = get2DSpacingValues(elements, TagKeys.PixelSpacing);
+  let values = get2DSpacingValues(elements, TagKeys.PixelSpacing);
   // projection related
   // TODO: use SOPClassUID filter?
-  if (typeof res === 'undefined') {
-    res = getProjection2DSpacingValues(elements);
+  if (typeof values === 'undefined') {
+    const projection = getProjection2DSpacingValues(elements);
+    if (typeof projection !== 'undefined') {
+      return projection;
+    }
   }
   // secondary capture (before multi-frame case)
-  if (typeof res === 'undefined') {
-    res = getSecondaryCapture2DSpacingValues(elements);
+  if (typeof values === 'undefined') {
+    values = getSecondaryCapture2DSpacingValues(elements);
   }
   // multi-frame case (spacing in functional group)
-  if (typeof res === 'undefined') {
-    res = getMultiFrame2DSpacingValues(elements);
+  if (typeof values === 'undefined') {
+    values = getMultiFrame2DSpacingValues(elements);
   }
   // return
+  let res;
+  if (typeof values !== 'undefined') {
+    res = {values, unit: 'unit.mm'};
+  }
   return res;
 }
 

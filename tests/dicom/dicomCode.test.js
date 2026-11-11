@@ -7,7 +7,8 @@ import {
   getDicomCodeItem,
   getSegmentationCode,
   getConceptNameCode,
-  getMeasurementUnitsCode
+  getMeasurementUnitsCode,
+  getQuantificationUnit
 } from '../../src/dicom/dicomCode.js';
 import {
   getElementsFromSimpleTagValues
@@ -168,6 +169,20 @@ describe('dicom', () => {
     theoCode1.value = 'mm';
     theoCode1.schemeDesignator = 'UCUM';
     assert.ok(isEqualCode(code1, theoCode1), 'getMeasurementUnitsCode #1');
+
+    // detector units are still millimetres for UCUM
+    const code2 = getMeasurementUnitsCode('unit.mmDetector');
+    assert.ok(isEqualCode(code2, theoCode1), 'getMeasurementUnitsCode #2');
+    const code3 = getMeasurementUnitsCode('unit.cm2Detector');
+    assert.equal(code3.value, 'cm2', 'getMeasurementUnitsCode #3 value');
+    assert.equal(code3.schemeDesignator, 'UCUM',
+      'getMeasurementUnitsCode #3 scheme');
+
+    // reading back a UCUM mm code gives the plain mm unit
+    assert.equal(getQuantificationUnit(code2), 'unit.mm',
+      'getQuantificationUnit mm');
+    assert.equal(getQuantificationUnit(code3), 'unit.cm2',
+      'getQuantificationUnit cm2');
   });
 
 });
