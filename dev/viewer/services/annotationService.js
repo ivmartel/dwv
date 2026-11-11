@@ -9,7 +9,7 @@ import {
 import {logger} from '../../../src/utils/logger.js';
 
 /**
- * @import {DwvAppService} from './dwvApp.service.js';
+ * @import {DwvAppService} from './dwvAppService.js';
  * @import {Annotation} from '../../../src/image/annotation.js';
  * @import {AnnotationGroup} from '../../../src/image/annotationGroup.js';
  */

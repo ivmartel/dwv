@@ -14,7 +14,7 @@ import {renderQuantification} from './quantification.js';
  *   SegmentationItemState,
  *   SegmentItemState,
  *   SegmentRef
- * } from '../services/segment.service.js';
+ * } from '../services/segmentationService.js';
  */
 
 /**

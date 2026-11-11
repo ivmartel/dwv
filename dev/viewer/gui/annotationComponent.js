@@ -14,7 +14,7 @@ import {renderQuantification} from './quantification.js';
  *   AnnotationGroupState,
  *   AnnotationItemState,
  *   AnnotationSelection
- * } from '../services/annot.service.js';
+ * } from '../services/annotationService.js';
  */
 
 /**

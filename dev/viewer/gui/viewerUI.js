@@ -5,18 +5,18 @@ import {Point} from '../../../src/math/point.js';
 import {Matrix33} from '../../../src/math/matrix.js';
 import {i18n} from '../../../src/utils/i18n.js';
 
-import {DataTableUI} from './datatable.js';
-import {AnnotationService} from '../services/annot.service.js';
-import {AnnotationComponent} from './annot.js';
-import {SegmentationService} from '../services/segment.service.js';
-import {SegmentationComponent} from './segment.js';
+import {DataTableUI} from './dataTableUI.js';
+import {AnnotationService} from '../services/annotationService.js';
+import {AnnotationComponent} from './annotationComponent.js';
+import {SegmentationService} from '../services/segmentationService.js';
+import {SegmentationComponent} from './segmentationComponent.js';
 import {SegmentationExtraUI} from './segmentExtra.js';
-import {DrawToolUI} from './draw.js';
-import {BrushToolUI} from './brush.js';
+import {DrawToolUI} from './drawToolUI.js';
+import {BrushToolUI} from './brushToolUI.js';
 import {formatQuantificationValue} from '../services/quantification.js';
 
 /**
- * @import {DwvAppService} from '../services/dwvApp.service.js';
+ * @import {DwvAppService} from '../services/dwvAppService.js';
  */
 
 /**

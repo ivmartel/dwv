@@ -18,7 +18,7 @@ import {
 import {getQuantificationGroups} from './quantification.js';
 
 /**
- * @import {DwvAppService} from './dwvApp.service.js';
+ * @import {DwvAppService} from './dwvAppService.js';
  * @import {MaskSegment} from '../../../src/dicom/dicomSegment.js';
  * @import {MaskImage} from '../../../src/image/maskImage.js';
  * @import {RGB} from '../../../src/utils/colour.js';

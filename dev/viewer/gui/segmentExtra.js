@@ -5,7 +5,7 @@ import {MaskSegmentHelper} from '../../../src/image/maskSegmentHelper.js';
 import {getButton} from './icons.js';
 
 /**
- * @import {DwvAppService} from '../services/dwvApp.service.js';
+ * @import {DwvAppService} from '../services/dwvAppService.js';
  * @import {MaskImage} from '../../../src/image/maskImage.js';
  */
 

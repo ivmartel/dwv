@@ -1,6 +1,6 @@
 import {getURLsFromKeyValueUri} from '../../src/utils/uri.js';
 
-import {DwvAppService} from './services/dwvApp.service.js';
+import {DwvAppService} from './services/dwvAppService.js';
 import {ViewerUI} from './gui/viewerUI.js';
 import {setupRenderTests} from './renderTest.js';
 

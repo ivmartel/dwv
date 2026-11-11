@@ -1,5 +1,5 @@
 /**
- * @import {DwvAppService} from './services/dwvApp.service.js';
+ * @import {DwvAppService} from './services/dwvAppService.js';
  */
 
 /**
