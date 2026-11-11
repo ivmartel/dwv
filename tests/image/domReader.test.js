@@ -178,6 +178,21 @@ describe('image', () => {
   });
 
   /**
+   * Tests that getViewFromDOMImage asks for a read optimised context.
+   *
+   * @function module:tests/image~domReaderImageWillReadFrequently
+   */
+  test('getViewFromDOMImage uses willReadFrequently', () => {
+    getViewFromDOMImage(makeDomImage(2, 2), 'http://x.com/img.png', 0);
+
+    assert.deepEqual(
+      mockCanvas.getContext.mock.calls,
+      [['2d', {willReadFrequently: true}]],
+      'getContext called with willReadFrequently'
+    );
+  });
+
+  /**
    * Tests that meta info fields are populated correctly for a URL origin.
    *
    * @function module:tests/image~domReaderImageUrlInfo
@@ -334,6 +349,26 @@ describe('image', () => {
       assert.deepEqual(info.fileType.value, ['video/mp4'], 'fileType');
     }
   );
+
+  /**
+   * Tests that getViewFromDOMVideo asks for a read optimised context.
+   *
+   * @function module:tests/image~domReaderVideoWillReadFrequently
+   */
+  test('getViewFromDOMVideo uses willReadFrequently', () => {
+    const video = new MockVideo(2, 2, 0.01); // 1 frame
+
+    getViewFromDOMVideo(
+      video, vi.fn(), vi.fn(), vi.fn(), vi.fn(), 'http://x.com/clip.mp4', 0
+    );
+    video.fireSeeked();
+
+    assert.deepEqual(
+      mockCanvas.getContext.mock.calls,
+      [['2d', {willReadFrequently: true}]],
+      'getContext called with willReadFrequently'
+    );
+  });
 
   /**
    * Tests that onprogress fires for every frame.
