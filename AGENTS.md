@@ -77,7 +77,8 @@ When upgrading to a newer edition, update together:
 
 Tests live in `tests/<area>/*.test.js` mirroring `src/<area>/`, using vitest
 with `environment: 'node'` (jsdom pulled in as needed) and DICOM/zip/DICOMDIR
-fixtures under `tests/data`.
+fixtures under `tests/data`. Tests must run without printing logs: silence
+expected console or `logger` output with a spy.
 
 ### What CI checks
 
@@ -108,9 +109,9 @@ publishes the demo to `gh-pages` (`demo/trunk` or `demo/stable`). To
 reproduce CI locally, run `yarn lint && yarn test-ci && yarn build-ci`.
 
 The `verify` skill (`.agents/skills/verify/SKILL.md`) wraps these steps with
-the repo-specific checks CI does not do: reporting `dwv.api.md` changes and
-reviewing the diff against the conventions below. Use it before reporting a
-change as done.
+the repo-specific checks CI does not do: clean test output (no logs),
+reporting `dwv.api.md` changes and reviewing the diff against the
+conventions below. Use it before reporting a change as done.
 
 ## Requirements traceability
 
