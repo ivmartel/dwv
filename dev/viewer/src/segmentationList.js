@@ -69,13 +69,13 @@ function getSegmentItemHtmlId(ref) {
 }
 
 /**
- * Segmentation component: vanilla renderer of the segmentation
+ * Segmentation list: vanilla renderer of the segmentation
  *   service state. Reference implementation for framework components.
  *
  * Rendering reuses the elements of unchanged segmentations and segments
  *   (the state keeps the identity of unchanged parts).
  */
-export class SegmentationComponent {
+export class SegmentationList {
 
   /**
    * The segmentation service.
@@ -594,4 +594,4 @@ export class SegmentationComponent {
     return segmentationItem;
   }
 
-}; // SegmentationComponent
+}; // SegmentationList
