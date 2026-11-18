@@ -12,13 +12,13 @@ Summary:
 
 ## View config
 
-The library uses a `dataId` indexed list of view configurations ([ViewConfig](../viewconfig/)) mainly to provide the `divId` of the HTML element where to generate the canvas associated to dicom data. It also allows to set window/level, colour map, orientation and opacity. The `*` allows to use the same configuration for all data. The `App` class provides various methods to manipulate the 'DataViewConfig'.
+The library uses a `dataId` indexed list of view configurations ([ViewConfig](/viewconfig)) mainly to provide the `divId` of the HTML element where to generate the canvas associated to dicom data. It also allows to set window/level, colour map, orientation and opacity. The `*` allows to use the same configuration for all data. The `App` class provides various methods to manipulate the 'DataViewConfig'.
 
 ## Layers
 
 ![classes-layers](/_assets/classes-layers.1e1e8c91.png)
 
-The first level is the [Stage](../stage/), this class handles a list of [LayerGroup](../layergroup/) for optional synchronisation. A layerGroup is a group of layers associated to an HTML element, for now of type `View` ([ViewLayer](../viewlayer/)) or `Draw` ([DrawLayer](../drawlayer/)). The configuration of the stage is done at the creation of the app. See [app::init](../app/#init) method for details. Each layer class will create its own HTML div with an id created by [getLayerDivId](../global/#getlayerdivid). Layers will typically contain a HTML canvas to display its content. Use the [getLayerDetailsFromEvent](../global/#getlayerdetailsfromevent) method to extract the layer details from an event generated from a layer canvas. You can then access the layer group object via the app `getLayerGroupByDivId` method.
+The first level is the [Stage](/stage), this class handles a list of [LayerGroup](/layergroup) for optional synchronisation. A layerGroup is a group of layers associated to an HTML element, for now of type `View` ([ViewLayer](/viewlayer)) or `Draw` ([DrawLayer](/drawlayer)). The configuration of the stage is done at the creation of the app. See [app::init](/app#init) method for details. Each layer class will create its own HTML div with an id created by [getLayerDivId](/global#getlayerdivid). Layers will typically contain a HTML canvas to display its content. Use the [getLayerDetailsFromEvent](/global#getlayerdetailsfromevent) method to extract the layer details from an event generated from a layer canvas. You can then access the layer group object via the app `getLayerGroupByDivId` method.
 
 ![classes-layers-view](/_assets/classes-layers-view.2389e07a.png)
 
@@ -26,4 +26,4 @@ The View class contains a 2D view of the image that could be 3D + t. Layers foll
 
 ![classes-layers-draw](/_assets/classes-layers-draw.5e013b5d.png)
 
-In the case of the draw, the model is the [AnnotationGroup](../annotationgroup/), the view is the DrawLayer and the controller is the DrawController. The shape will use the ViewController for quantification when it needs to access the underlying pixel values.
+In the case of the draw, the model is the [AnnotationGroup](/annotationgroup), the view is the DrawLayer and the controller is the DrawController. The shape will use the ViewController for quantification when it needs to access the underlying pixel values.

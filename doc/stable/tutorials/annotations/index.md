@@ -15,20 +15,20 @@ The DICOM SR strucutre used to store annotations is based on the 'DICOM SR for c
 
 SCOORD items are translated according to their `Graphic Type` ((0070,0023) see [part03/sect\_C.18.6](https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2)):
 
-- Point -> [Point2D](../point2d/)
+- Point -> [Point2D](/point2d)
 
 - Multipoint: not used
 
 - Polyline ->
 
-  - [Line](../line/): if open shape and 2 points
-  - [Protractor](../protractor/): if open shape and 3 points
-  - [Rectangle](../rectangle/): if closed shape with 5 points that form 4 perpendicular lines
-  - [ROI](../roi/): if closed shape and not rectangle
+  - [Line](/line): if open shape and 2 points
+  - [Protractor](/protractor): if open shape and 3 points
+  - [Rectangle](/rectangle): if closed shape with 5 points that form 4 perpendicular lines
+  - [ROI](/roi): if closed shape and not rectangle
 
-- Circle -> [Circle](../circle/)
+- Circle -> [Circle](/circle)
 
-- Ellipse -> [Ellipse](../ellipse/)
+- Ellipse -> [Ellipse](/ellipse)
 
 Closed shapes are polylines that have the same point as first and last item in their point list.
 
