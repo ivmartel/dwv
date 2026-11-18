@@ -1,0 +1,616 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/tools/shapes/drawShapeHandler.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/dwv/doc/stable/_assets/styles.mwmcznlk-8710cd19.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/dwv/doc/stable" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/tools/shapes/drawShapeHandler.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">import {custom} from '../../app/custom.js';
+import {
+  getMousePoint,
+} from '../../gui/generic.js';
+import {
+  RemoveAnnotationCommand,
+  UpdateAnnotationCommand
+} from '../../command/drawCommands.js';
+import {
+  isNodeNameShape,
+  isNodeNameLabel,
+  getShapePositionRange,
+  isShapeInRange
+} from './drawBounds.js';
+import {DrawShapeEditor} from './drawShapeEditor.js';
+import {DrawTrash} from './drawTrash.js';
+import {Point2D} from '../../math/point.js';
+
+// external
+import Konva from 'konva';
+
+/**
+ * @import {App} from '../../app/application.js';
+ * @import {Scalar2D} from '../../math/scalar.js';
+ * @import {DrawLayer} from '../../gui/drawLayer.js';
+ * @import {Annotation} from '../../image/annotation.js';
+ */
+
+/**
+ * Open a dialogue to edit roi data. Defaults to window.prompt.
+ *
+ * @param {Annotation} annotation The roi data.
+ * @param {Function} callback The callback to launch on dialogue exit.
+ */
+function defaultOpenRoiDialog(annotation, callback) {
+  const textExpr = prompt('Label', annotation.textExpr);
+  if (textExpr !== null) {
+    annotation.textExpr = textExpr;
+    callback(annotation);
+  }
+}
+
+/**
+ * Draw shape handler: handle action on existing shapes.
+ */
+export class DrawShapeHandler extends EventTarget {
+
+  /**
+   * Associated app.
+   *
+   * @type {App}
+   */
+  #app;
+
+  /**
+   * Shape editor.
+   *
+   * @type {DrawShapeEditor}
+   */
+  #shapeEditor;
+
+  /**
+   * Trash draw: a cross.
+   *
+   * @type {DrawTrash}
+   */
+  #trash;
+
+  /**
+   * Mouse cursor.
+   *
+   * @type {string}
+   */
+  #mouseOverCursor = 'pointer';
+
+  /**
+   * Original mouse cursor.
+   *
+   * @type {string}
+   */
+  #originalCursor;
+
+  /**
+   * Element whose cursor was changed: the shape stage container.
+   *
+   * @type {HTMLElement|undefined}
+   */
+  #cursorElement;
+
+  /**
+   * Shape with mouse over.
+   *
+   * @type {Konva.Group}
+   */
+  #mouseOverShapeGroup;
+
+  /**
+   * Emit shape-edit events for Draw tool forwarding.
+   *
+   * @param {object} data The event detail payload.
+   */
+  #emitEvent = (data) => {
+    this.dispatchEvent(new CustomEvent(data.type, {detail: data}));
+  };
+
+  /**
+   * @param {App} app The associated application.
+   */
+  constructor(app) {
+    super();
+    this.#app = app;
+    this.#shapeEditor = new DrawShapeEditor(app, this.#emitEvent);
+    this.#trash = new DrawTrash();
+  }
+
+  /**
+   * Set the draw editor shape.
+   *
+   * @param {Konva.Shape} shape The shape to edit.
+   * @param {DrawLayer} drawLayer The layer the shape belongs to.
+   */
+  setEditorShape(shape, drawLayer) {
+    const drawController = drawLayer.getDrawController();
+    if (shape &amp;&amp;
+      shape instanceof Konva.Shape &amp;&amp;
+      shape !== this.#shapeEditor.getShape() &amp;&amp;
+      drawController.isAnnotationGroupEditable()) {
+      // disable
+      this.#shapeEditor.disable();
+      // set shape
+      const annotationId = shape.getParent().id();
+      this.#shapeEditor.setShape(
+        shape,
+        drawLayer,
+        drawController.getAnnotation(annotationId)
+      );
+      // emit
+      this.#emitEvent({
+        type: 'annotationselect',
+        annotationid: annotationId,
+        dataid: drawLayer.getDataId()
+      });
+      // enable
+      this.#shapeEditor.enable();
+    }
+  }
+
+  /**
+   * Get the currently edited shape group.
+   *
+   * @returns {Konva.Group|undefined} The edited group.
+   */
+  getEditorShapeGroup() {
+    let res;
+    if (this.#shapeEditor.isActive()) {
+      res = this.#shapeEditor.getShape().getParent();
+      if (!(res instanceof Konva.Group)) {
+        return;
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Get the currently edited annotation.
+   *
+   * @returns {Annotation|undefined} The edited annotation.
+   */
+  getEditorAnnotation() {
+    let res;
+    if (this.#shapeEditor.isActive()) {
+      res = this.#shapeEditor.getAnnotation();
+    }
+    return res;
+  }
+
+  /**
+   * Disable and reset the shape editor.
+   */
+  disableAndResetEditor() {
+    this.#shapeEditor.disable();
+    this.#shapeEditor.reset();
+  }
+
+  /**
+   * Get the real position from an event.
+   * TODO: use layer method?
+   *
+   * @param {Scalar2D} index The input index as {x,y}.
+   * @param {DrawLayer} drawLayer The origin draw layer.
+   * @returns {Scalar2D} The real position in the image as {x,y}.
+   */
+  #getRealPosition(index, drawLayer) {
+    const stage = drawLayer.getKonvaStage();
+    return {
+      x: stage.offset().x + index.x / stage.scale().x,
+      y: stage.offset().y + index.y / stage.scale().y
+    };
+  }
+
+  /**
+   * Store specific mouse over cursor.
+   *
+   * @param {string} cursor The cursor name.
+   */
+  storeMouseOverCursor(cursor) {
+    this.#mouseOverCursor = cursor;
+  }
+
+  /**
+   * Handle shape group mouseover.
+   */
+  #onMouseOverShapeGroup() {
+    // mouse cursor
+    const stage = this.#mouseOverShapeGroup.getStage();
+    if (stage) {
+      this.#cursorElement = stage.container();
+      this.#originalCursor = this.#cursorElement.style.cursor;
+      this.#cursorElement.style.cursor = this.#mouseOverCursor;
+    }
+    // shape opacity
+    this.#mouseOverShapeGroup.opacity(0.75);
+  }
+
+  /**
+   * Handle shape group mouseout.
+   */
+  onMouseOutShapeGroup() {
+    // mouse cursor
+    if (typeof this.#cursorElement !== 'undefined') {
+      this.#cursorElement.style.cursor = this.#originalCursor;
+      this.#cursorElement = undefined;
+      this.#originalCursor = undefined;
+    }
+    // shape opacity
+    if (typeof this.#mouseOverShapeGroup !== 'undefined') {
+      this.#mouseOverShapeGroup.opacity(1);
+    }
+  }
+
+  /**
+   * Add shape group mouse over and out listeners: updates
+   *   shape group opacity and cursor.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  #addShapeOverListeners(shapeGroup) {
+    // handle mouse over
+    shapeGroup.on('mouseover', () => {
+      this.#mouseOverShapeGroup = shapeGroup;
+      this.#onMouseOverShapeGroup();
+    });
+
+    // handle mouse out
+    shapeGroup.on('mouseout', () => {
+      this.onMouseOutShapeGroup();
+      this.#mouseOverShapeGroup = undefined;
+    });
+  }
+
+  /**
+   * Remove shape group mouse over and out listeners.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  #removeShapeOverListeners(shapeGroup) {
+    shapeGroup.off('mouseover');
+    shapeGroup.off('mouseout');
+  }
+
+  /**
+   * Add shape group listeners.
+   *
+   * @param {Konva.Group} shapeGroup The shape group to set on.
+   * @param {Annotation} annotation The associated annotation.
+   * @param {DrawLayer} drawLayer The origin draw layer.
+   */
+  addShapeGroupListeners(shapeGroup, annotation, drawLayer) {
+    // shape mouse over
+    this.#addShapeOverListeners(shapeGroup);
+
+    // make shape draggable
+    this.#addShapeListeners(shapeGroup, annotation, drawLayer);
+
+    // make label draggable
+    this.#addLabelListeners(shapeGroup, annotation, drawLayer);
+
+    // double click handling: update annotation text
+    shapeGroup.on('dblclick', () => {
+      // original text expr
+      const originalTextExpr = annotation.textExpr;
+
+      const onSaveCallback = (newAnnotation) => {
+        // new text expr
+        const newTextExpr = newAnnotation.textExpr;
+        // create annotation update command
+        const command = new UpdateAnnotationCommand(
+          newAnnotation,
+          {textExpr: originalTextExpr},
+          {textExpr: newTextExpr},
+          drawLayer.getDrawController()
+        );
+        // add command to undo stack
+        const undoCtrl = this.#app.getUndoController();
+        undoCtrl.addToUndoStack(command);
+        // execute command
+        command.execute();
+      };
+
+      // call roi dialog
+      if (typeof custom.openRoiDialog !== 'undefined') {
+        custom.openRoiDialog(annotation, onSaveCallback);
+      } else {
+        defaultOpenRoiDialog(annotation, onSaveCallback);
+      }
+    });
+  }
+
+  /**
+   * Add shape listeners.
+   *
+   * @param {Konva.Group} shapeGroup The shape group to get the shape from.
+   * @param {Annotation} annotation The associated annotation.
+   * @param {DrawLayer} drawLayer The origin draw layer.
+   */
+  #addShapeListeners(shapeGroup, annotation, drawLayer) {
+    const konvaLayer = drawLayer.getKonvaLayer();
+
+    const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+    if (!(shape instanceof Konva.Shape)) {
+      return;
+    }
+    shape.draggable(true);
+
+    // cache vars
+    let dragStartPos;
+    let previousPos;
+    let originalProps;
+    let colour;
+
+    // drag start event handling
+    shape.on('dragstart.draw', (event) => {
+      // store colour
+      colour = shape.stroke();
+      // store pos
+      dragStartPos = {
+        x: shape.x(),
+        y: shape.y()
+      };
+      previousPos = {
+        x: event.target.x(),
+        y: event.target.y()
+      };
+      // store original properties
+      originalProps = {
+        mathShape: annotation.mathShape,
+        referencePoints: annotation.referencePoints
+      };
+
+      // display trash
+      this.#trash.activate(drawLayer);
+      // deactivate anchors to avoid events on undefined shape
+      this.#shapeEditor.setAnchorsActive(false);
+      // draw
+      konvaLayer.draw();
+    });
+
+    // drag move event handling
+    shape.on('dragmove.draw', (event) => {
+      // if out of range, reset shape position and exit
+      const range = getShapePositionRange(drawLayer.getBaseSize(), shape);
+      if (range &amp;&amp; !isShapeInRange(shape, range.min, range.max)) {
+        shape.x(previousPos.x);
+        shape.y(previousPos.y);
+        return;
+      }
+
+      // move associated shapes (but not label)
+      const diff = {
+        x: event.target.x() - previousPos.x,
+        y: event.target.y() - previousPos.y
+      };
+      const children = shapeGroup.getChildren();
+      const labelWithDefaultPosition =
+        typeof annotation.labelPosition === 'undefined';
+      for (const child of children) {
+        // skip shape and label with defined position
+        if (child === event.target ||
+          (child.name() === 'label' &amp;&amp; !labelWithDefaultPosition) ||
+          child.name() === 'connector'
+        ) {
+          continue;
+        }
+        // move other nodes
+        child.move(diff);
+      }
+
+      // store pos
+      previousPos = {
+        x: event.target.x(),
+        y: event.target.y()
+      };
+
+      // get appropriate factory
+      const factory = annotation.getFactory();
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot follow drag move without factory');
+      }
+      // update annotation
+      factory.updateAnnotationOnTranslation(annotation, diff);
+      // update label
+      factory.updateLabelContent(annotation, shapeGroup, this.#app.getStyle());
+      // update connector
+      factory.updateConnector(annotation, shapeGroup);
+      // highlight trash when on it
+      const mousePoint = getMousePoint(event.evt);
+      const offset = {
+        x: mousePoint.getX(),
+        y: mousePoint.getY()
+      };
+      const eventPos = this.#getRealPosition(offset, drawLayer);
+      this.#trash.changeChildrenColourOnTrashHover(eventPos,
+        shapeGroup, colour);
+      // draw
+      konvaLayer.draw();
+    });
+
+    // drag end event handling
+    shape.on('dragend.draw', (event) => {
+      const undoCtrl = this.#app.getUndoController();
+      // remove trash
+      this.#trash.remove();
+      // activate(false) will also trigger a dragend.draw
+      if (typeof event === 'undefined' ||
+        typeof event.evt === 'undefined') {
+        return;
+      }
+      const pos = {x: shape.x(), y: shape.y()};
+      // delete case
+      const mousePoint = getMousePoint(event.evt);
+      const offset = {
+        x: mousePoint.getX(),
+        y: mousePoint.getY()
+      };
+      const eventPos = this.#getRealPosition(offset, drawLayer);
+      if (this.#trash.isOverTrash(eventPos)) {
+        // compensate for the drag translation
+        shapeGroup.x(dragStartPos.x);
+        shapeGroup.y(dragStartPos.y);
+        // disable editor
+        this.#shapeEditor.disable();
+        this.#shapeEditor.reset();
+        this.#trash.changeGroupChildrenColour(shapeGroup, colour);
+        // reset math shape (for undo)
+        annotation.mathShape = originalProps.mathShape;
+        annotation.referencePoints = originalProps.referencePoints;
+
+        // create remove annotation command
+        const command = new RemoveAnnotationCommand(
+          annotation,
+          drawLayer.getDrawController()
+        );
+        // add command to undo stack
+        undoCtrl.addToUndoStack(command);
+        // execute command: triggers draw remove
+        command.execute();
+
+        // reset cursor
+        this.onMouseOutShapeGroup();
+      } else {
+        const translation = {
+          x: pos.x - dragStartPos.x,
+          y: pos.y - dragStartPos.y
+        };
+        if (translation.x !== 0 || translation.y !== 0) {
+          // update annotation command
+          const newProps = {
+            mathShape: annotation.mathShape,
+            referencePoints: annotation.referencePoints
+          };
+          const command = new UpdateAnnotationCommand(
+            annotation,
+            originalProps,
+            newProps,
+            drawLayer.getDrawController()
+          );
+          // add command to undo stack
+          undoCtrl.addToUndoStack(command);
+          // fire event manually since command is not executed
+          this.#emitEvent({
+            type: 'annotationupdate',
+            data: annotation,
+            dataid: drawLayer.getDataId(),
+            keys: Object.keys(newProps)
+          });
+          // update original shape
+          originalProps = {
+            mathShape: newProps.mathShape,
+            referencePoints: newProps.referencePoints
+          };
+        }
+        // reset anchors
+        this.#shapeEditor.setAnchorsActive(true);
+        this.#shapeEditor.resetAnchors();
+      }
+      // draw
+      konvaLayer.draw();
+      // reset start position
+      dragStartPos = {
+        x: shape.x(),
+        y: shape.y()
+      };
+    });
+  }
+
+  /**
+   * Add label listeners.
+   *
+   * @param {Konva.Group} shapeGroup The shape group to get the label from.
+   * @param {Annotation} annotation The associated annotation.
+   * @param {DrawLayer} drawLayer The origin draw layer.
+   */
+  #addLabelListeners(shapeGroup, annotation, drawLayer) {
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(label instanceof Konva.Label)) {
+      return;
+    }
+    label.draggable(true);
+
+    // cache vars
+    let dragStartPos;
+    let originalLabelPosition;
+
+    // drag start event handling
+    label.on('dragstart.draw', (/*event*/) => {
+      // store pos
+      dragStartPos = {
+        x: label.x(),
+        y: label.y()
+      };
+      // store original position
+      originalLabelPosition = annotation.labelPosition;
+    });
+
+    // drag move event handling
+    label.on('dragmove.draw', (/*event*/) => {
+      // get factory
+      const factory = annotation.getFactory();
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot udpate connector without factory');
+      }
+      // update label
+      factory.updateConnector(annotation, shapeGroup);
+    });
+
+    // drag end event handling
+    label.on('dragend.draw', (/*event*/) => {
+      const undoCtrl = this.#app.getUndoController();
+      const translation = {
+        x: label.x() - dragStartPos.x,
+        y: label.y() - dragStartPos.y
+      };
+      if (translation.x !== 0 || translation.y !== 0) {
+        const newLabelPosition = new Point2D(label.x(), label.y());
+        // set label position
+        annotation.labelPosition = newLabelPosition;
+        // update annotation command
+        const command = new UpdateAnnotationCommand(
+          annotation,
+          {labelPosition: originalLabelPosition},
+          {labelPosition: newLabelPosition},
+          drawLayer.getDrawController()
+        );
+        // add command to undo stack
+        undoCtrl.addToUndoStack(command);
+        // fire event manually since command is not executed
+        this.#emitEvent({
+          type: 'annotationupdate',
+          data: annotation,
+          dataid: drawLayer.getDataId(),
+          keys: ['labelPosition']
+        });
+        // update original position
+        originalLabelPosition = newLabelPosition;
+      }
+      dragStartPos = {x: label.x(), y: label.y()};
+    });
+  }
+
+  /**
+   * Remove shape group listeners.
+   *
+   * @param {Konva.Group} shapeGroup The shape group to set off.
+   */
+  removeShapeListeners(shapeGroup) {
+    // mouse over
+    this.#removeShapeOverListeners(shapeGroup);
+    // double click
+    shapeGroup.off('dblclick');
+    // remove listeners from shape
+    const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+    if (shape instanceof Konva.Shape) {
+      shape.draggable(false);
+      shape.off('dragstart.draw');
+      shape.off('dragmove.draw');
+      shape.off('dragend.draw');
+    }
+    // remove listeners from label
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (label instanceof Konva.Label) {
+      label.draggable(false);
+      label.off('dragstart.draw');
+      label.off('dragend.draw');
+    }
+  }
+} // DrawShapeHandler class</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/tools/shapes/drawShapeHandler.js"},"i1":{"basePath":"/dwv/doc/stable","searchIndexUrl":"/dwv/doc/stable/_assets/search-index.mwmcznlk-8710cd19.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/tools/shapes/drawshapehandler-js","siteName":"DWV","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/tools/shapes/drawshapehandler-js","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/dwv/doc/stable/_islands/theme-toggle-2OFR67FU.js","settings":"/dwv/doc/stable/_islands/settings-HUVOQWPC.js","code-viewer":"/dwv/doc/stable/_islands/code-viewer-J4JM56PM.js","embed":"/dwv/doc/stable/_islands/embed-S4IPJ47N.js","playground":"/dwv/doc/stable/_islands/playground-GHNL23CG.js","tabs":"/dwv/doc/stable/_islands/tabs-NRSQKCSU.js","sidebar":"/dwv/doc/stable/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/dwv/doc/stable/_islands/mobile-nav-ITUCHCYZ.js","toc":"/dwv/doc/stable/_islands/toc-YFAY7IHK.js","toc-mobile":"/dwv/doc/stable/_islands/toc-mobile-6DGE76YF.js","cmdk":"/dwv/doc/stable/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/dwv/doc/stable/_islands/code-tabs-C6ACVICP.js","copy-btn":"/dwv/doc/stable/_islands/copy-btn-5QCTJLYG.js","copy-page":"/dwv/doc/stable/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>

@@ -1,0 +1,1674 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/gui/layerGroup.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/dwv/doc/stable/_assets/styles.mwmcznlk-8710cd19.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/dwv/doc/stable" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/gui/layerGroup.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">import {Index} from '../math/index.js';
+import {Point} from '../math/point.js';
+import {Vector3D} from '../math/vector.js';
+import {viewEventNames} from '../image/view.js';
+import {logger} from '../utils/logger.js';
+import {precisionRound} from '../math/number.js';
+import {ViewLayer} from './viewLayer.js';
+import {DrawLayer} from './drawLayer.js';
+import {SOPClassUIDs} from '../dicom/dictionary.js';
+import {InfoLayer} from './infoLayer.js';
+import {CanvasSizeChecker} from './generic.js';
+
+/**
+ * @import {Point2D, Point3D} from '../math/point.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ * @import {PositionHelper} from '../image/positionHelper.js';
+ * @import {InfoData} from './infoData.js';
+ */
+
+/**
+ * Get the layer div id.
+ * For example: 'layerGroup0-layer-0'.
+ *
+ * @param {string} groupDivId The layer group div id.
+ * @param {number} layerIndex The layer index.
+ * @returns {string} A string id.
+ */
+export function getLayerDivId(groupDivId, layerIndex) {
+  return `${groupDivId}-layer-${layerIndex}`;
+}
+
+/**
+ * Get the layer details from a div id
+ * created by getLayerDivId.
+ *
+ * @param {string} idString The layer div id.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
+ */
+export function getLayerDetailsFromLayerDivId(idString) {
+  const split = idString.split('-layer-');
+  if (split.length !== 2) {
+    logger.warn('Not the expected layer div id format...');
+  }
+  return {
+    groupDivId: split[0],
+    layerIndex: split[1],
+    layerId: idString,
+  };
+}
+
+/**
+ * Get the layer details from a mouse event.
+ *
+ * @param {object} event The event to get the layer div id from. Expecting
+ * an event origininating from a canvas inside a layer HTML div
+ * with the 'layer' class and id generated with `getLayerDivId`.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
+ */
+export function getLayerDetailsFromEvent(event) {
+  let res = null;
+  // get the closest element from the event target and with the 'layer' class
+  const layerDiv = event.target.closest('.layer');
+  if (layerDiv &amp;&amp; typeof layerDiv.id !== 'undefined') {
+    res = getLayerDetailsFromLayerDivId(layerDiv.id);
+  }
+  return res;
+}
+
+/**
+ * Get a scaled offset to adapt to new scale and such as the input center
+ * stays at the same position.
+ *
+ * @param {Scalar2D} offset The previous offset as {x,y}.
+ * @param {Scalar2D} scale The previous scale as {x,y}.
+ * @param {Scalar2D} newScale The new scale as {x,y}.
+ * @param {Scalar2D} center The scale center as {x,y}.
+ * @returns {Scalar2D} The scaled offset as {x,y}.
+ */
+export function getScaledOffset(offset, scale, newScale, center) {
+  // worldPoint = indexPoint / scale + offset
+  //=> indexPoint = (worldPoint - offset ) * scale
+
+  // plane center should stay the same:
+  // indexCenter / newScale + newOffset =
+  //   indexCenter / oldScale + oldOffset
+  //=> newOffset = indexCenter / oldScale + oldOffset -
+  //     indexCenter / newScale
+  //=> newOffset = worldCenter - indexCenter / newScale
+  const indexCenter = {
+    x: (center.x - offset.x) * scale.x,
+    y: (center.y - offset.y) * scale.y
+  };
+  return {
+    x: center.x - (indexCenter.x / newScale.x),
+    y: center.y - (indexCenter.y / newScale.y)
+  };
+}
+
+/**
+ * Layer group.
+ *
+ * - Display position: {x,y},
+ * - Plane position: Index (access: get(i)),
+ * - (world) Position: Point3D (access: getX, getY, getZ).
+ *
+ * Display -> World:
+ * - planePos = viewLayer.displayToPlanePos(displayPos)
+ *   -> compensate for layer scale and offset,
+ * - pos = viewController.getPositionFromPlanePoint(planePos).
+ *
+ * World -> Display:
+ * - planePos = viewController.getOffset3DFromPlaneOffset(pos)
+ *   no need yet for a planePos to displayPos...
+ */
+export class LayerGroup extends EventTarget {
+
+  /**
+   * The container div.
+   *
+   * @type {HTMLElement}
+   */
+  #containerDiv;
+
+  /**
+   * Canvas size checker, shared with the view layers.
+   *
+   * @type {CanvasSizeChecker}
+   */
+  #canvasSizeChecker;
+
+  // jsdoc does not like
+  // @type {(ViewLayer|DrawLayer)[]}
+
+  /**
+   * List of layers.
+   *
+   * @type {Array&lt;ViewLayer|DrawLayer>}
+   */
+  #layers = [];
+
+  /**
+   * The layer scale as {x,y,z}.
+   *
+   * @type {Scalar3D}
+   */
+  #scale = {x: 1, y: 1, z: 1};
+
+  /**
+   * The base scale as {x,y,z}: all posterior scale will be on top of this one.
+   *
+   * @type {Scalar3D}
+   */
+  #baseScale = {x: 1, y: 1, z: 1};
+
+  /**
+   * The layer offset as {x,y,z}.
+   *
+   * @type {Scalar3D}
+   */
+  #offset = {x: 0, y: 0, z: 0};
+
+  /**
+   * Active layer index.
+   *
+   * @type {number}
+   */
+  #activeLayerIndex = undefined;
+
+  /**
+   * Flag to activate crosshair or not.
+   *
+   * @type {boolean}
+   */
+  #showCrosshair = false;
+
+  /**
+   * Crosshair HTML elements.
+   *
+   * @type {HTMLElement[]}
+   */
+  #crosshairHtmlElements = [];
+
+  /**
+   * Tooltip HTML element.
+   *
+   * @type {HTMLElement}
+   */
+  #tooltipHtmlElement;
+
+  /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  #imageSmoothing = false;
+
+  /**
+   * Position helper.
+   *
+   * @type {PositionHelper}
+   */
+  #positionHelper;
+
+  /**
+   * Info layer.
+   *
+   * @type {InfoLayer}
+   */
+  #infoLayer;
+
+  /**
+   * List of info data.
+   *
+   * @type {InfoData[]}
+   */
+  #infoDatas = [];
+
+  /**
+   * Dataid of the info source data.
+   *
+   * @type {string}
+   */
+  #infoDataId;
+
+  /**
+   * Get the position helper.
+   *
+   * @returns {PositionHelper|undefined} The position helper or
+   * undefined if no layers.
+   */
+  getPositionHelper() {
+    if (typeof this.#positionHelper === 'undefined') {
+      for (const layer of this.#layers) {
+        if (layer instanceof ViewLayer) {
+          const controller = layer.getViewController();
+          const helper = controller.getPositionHelper();
+          if (typeof this.#positionHelper === 'undefined') {
+            this.#positionHelper = helper;
+          } else {
+            this.#positionHelper.merge(helper);
+          }
+        }
+      }
+    }
+    return this.#positionHelper;
+  }
+
+  /**
+   * @param {HTMLElement} containerDiv The associated HTML div.
+   * @param {boolean} [withInfoLayer] Optional with info layer flag,
+   * default to false.
+   * @param {CanvasSizeChecker} [canvasSizeChecker] Optional canvas size
+   *   checker, shared with the view layers; defaults to a new one.
+   */
+  constructor(containerDiv, withInfoLayer, canvasSizeChecker) {
+    super();
+    this.#containerDiv = containerDiv;
+    if (typeof canvasSizeChecker === 'undefined') {
+      canvasSizeChecker = new CanvasSizeChecker();
+    }
+    this.#canvasSizeChecker = canvasSizeChecker;
+    const doc = containerDiv.ownerDocument;
+
+    if (typeof withInfoLayer !== 'undefined' &amp;&amp;
+      withInfoLayer === true
+    ) {
+      const layerDiv = doc.createElement('div');
+      layerDiv.className = 'infoLayer';
+      containerDiv.appendChild(layerDiv);
+      this.#infoLayer = new InfoLayer(layerDiv, containerDiv.id);
+    }
+  }
+
+  /**
+   * Get the showCrosshair flag.
+   *
+   * @returns {boolean} True to display the crosshair.
+   */
+  getShowCrosshair() {
+    return this.#showCrosshair;
+  }
+
+  /**
+   * Set the showCrosshair flag.
+   *
+   * @param {boolean} flag True to display the crosshair.
+   */
+  setShowCrosshair(flag) {
+    this.#showCrosshair = flag;
+    if (flag) {
+      // listen to offset and zoom change
+      this.addEventListener('offsetchange', this.#updateCrosshairOnChange);
+      this.addEventListener('zoomchange', this.#updateCrosshairOnChange);
+      // show crosshair div
+      this.#showCrosshairDiv();
+    } else {
+      // listen to offset and zoom change
+      this.removeEventListener('offsetchange', this.#updateCrosshairOnChange);
+      this.removeEventListener('zoomchange', this.#updateCrosshairOnChange);
+      // remove crosshair div
+      this.#removeCrosshairDiv();
+    }
+  }
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
+    // set for existing layers
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        layer.setImageSmoothing(flag);
+      }
+    }
+  }
+
+  /**
+   * Update crosshair on offset or zoom change.
+   *
+   * @param {object} _event The change event.
+   */
+  #updateCrosshairOnChange = (_event) => {
+    this.#showCrosshairDiv();
+  };
+
+  /**
+   * Get the Id of the container div.
+   *
+   * @returns {string|undefined} The id of the div.
+   */
+  getDivId() {
+    let divId;
+    // could be null if html changed
+    if (this.#containerDiv !== null) {
+      divId = this.#containerDiv.id;
+    }
+    return divId;
+  }
+
+  /**
+   * Get the layer scale.
+   *
+   * @returns {Scalar3D} The scale as {x,y,z}.
+   */
+  getScale() {
+    return this.#scale;
+  }
+
+  /**
+   * Get the base scale.
+   *
+   * @returns {Scalar3D} The scale as {x,y,z}.
+   */
+  getBaseScale() {
+    return this.#baseScale;
+  }
+
+
+  /**
+   * Get the added scale: the scale added to the base scale.
+   *
+   * @returns {Scalar3D} The scale as {x,y,z}.
+   */
+  getAddedScale() {
+    return {
+      x: this.#scale.x / this.#baseScale.x,
+      y: this.#scale.y / this.#baseScale.y,
+      z: this.#scale.z / this.#baseScale.z
+    };
+  }
+
+  /**
+   * Get the layer offset.
+   *
+   * @returns {Scalar3D} The offset as {x,y,z}.
+   */
+  getOffset() {
+    return this.#offset;
+  }
+
+  /**
+   * Get the number of layers handled by this class.
+   *
+   * @returns {number} The number of layers.
+   */
+  getNumberOfLayers() {
+    let count = 0;
+    this.#layers.forEach(item => {
+      if (typeof item !== 'undefined') {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  /**
+   * Check if this layerGroup contains a layer with the input id.
+   *
+   * @param {string} id The layer id to look for.
+   * @returns {boolean} True if this group contains
+   *   a layer with the input id.
+   */
+  includes(id) {
+    if (typeof id === 'undefined') {
+      return false;
+    }
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &amp;&amp;
+        layer.getId() === id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get the view layers that satisfy the input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayers(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+    const res = [];
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &amp;&amp;
+        callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Get the view layers that satisfy the input callback function
+   * starting from the active layer.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayersFromActive(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+
+    let activeIndex = 0;
+    if (typeof this.#activeLayerIndex !== 'undefined') {
+      activeIndex = this.#activeLayerIndex;
+    }
+
+    const indices = [];
+    // from active index to 0
+    for (let i = activeIndex; i >= 0; i--) {
+      indices.push(i);
+    }
+    // from number of layers to active
+    for (let i = this.#layers.length - 1; i > activeIndex; i--) {
+      indices.push(i);
+    }
+
+    const res = [];
+
+    for (const index of indices) {
+      const layer = this.#layers[index];
+      if (layer instanceof ViewLayer &amp;&amp; callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+
+    return res;
+  }
+
+  /**
+   * Test if one of the view layers satisfies an input callbackFn.
+   *
+   * @param {Function} callbackFn A function that takes
+   *   a ViewLayer as input and returns a boolean.
+   * @returns {boolean} True if one of the ViewLayers
+   *   satisfies the callbackFn.
+   */
+  someViewLayer(callbackFn) {
+    let hasOne = false;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &amp;&amp;
+        callbackFn(layer)) {
+        hasOne = true;
+        break;
+      }
+    }
+    return hasOne;
+  }
+
+  /**
+   * Get a list of draw layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a DrawLayer as input and returns a boolean. If undefined,
+   *   returns all draw layers.
+   * @returns {DrawLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getDrawLayers(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+    const res = [];
+    for (const layer of this.#layers) {
+      if (layer instanceof DrawLayer &amp;&amp;
+        callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Get the number of view layers handled by this class.
+   *
+   * @returns {number} The number of layers.
+   */
+  getNumberOfViewLayers() {
+    let count = 0;
+    this.#layers.forEach(item => {
+      if (typeof item !== 'undefined' &amp;&amp;
+        item instanceof ViewLayer) {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  /**
+   * Get the active image layer.
+   *
+   * @returns {ViewLayer|DrawLayer|undefined} The layer.
+   */
+  getActiveLayer() {
+    let layer;
+    if (typeof this.#activeLayerIndex !== 'undefined') {
+      layer = this.#layers[this.#activeLayerIndex];
+    }
+    return layer;
+  }
+
+  /**
+   * Get the active image layer.
+   *
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  getActiveViewLayer() {
+    let layer;
+    const activeLayer = this.getActiveLayer();
+    if (typeof activeLayer !== 'undefined' &amp;&amp;
+      activeLayer instanceof ViewLayer) {
+      layer = activeLayer;
+    }
+    return layer;
+  }
+
+  /**
+   * Get the base view layer.
+   *
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  getBaseViewLayer() {
+    // use first layer as base for calculating position and
+    // line sizes
+    let baseLayer;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        baseLayer = layer;
+        break;
+      }
+    }
+    return baseLayer;
+  }
+
+  /**
+   * Get a view layer associated to a data id.
+   *
+   * @param {string} id The layer id.
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  getViewLayerById(id) {
+    const callbackFn = function (layer) {
+      return layer.getId() === id;
+    };
+    const layers = this.getViewLayers(callbackFn);
+    let layer;
+    if (layers.length === 1) {
+      layer = layers[0];
+    }
+    return layer;
+  }
+
+  /**
+   * Get the view layers associated to a data id.
+   *
+   * @param {string} dataId The data id.
+   * @returns {ViewLayer[]} The layers.
+   */
+  getViewLayersByDataId(dataId) {
+    const callbackFn = function (layer) {
+      return layer.getDataId() === dataId;
+    };
+    return this.getViewLayers(callbackFn);
+  }
+
+  /**
+   * Search view layers for equal image meta data.
+   *
+   * @param {object} meta The meta data to find.
+   * @returns {ViewLayer[]} The list of view layers that contain matched data.
+   */
+  searchViewLayers(meta) {
+    const metaClone = structuredClone(meta);
+    // extract sop instance
+    let sopInstanceUid;
+    if (typeof metaClone.SOPInstanceUID !== 'undefined') {
+      sopInstanceUid = metaClone.SOPInstanceUID;
+      delete metaClone.SOPInstanceUID;
+    }
+    const hasSopInstance = typeof sopInstanceUid !== 'undefined';
+    const hasMeta = Object.keys(metaClone).length !== 0;
+
+    const res = [];
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        let equalMeta = false;
+        if (hasMeta) {
+          equalMeta = layer.getViewController().equalImageMeta(metaClone);
+        }
+        let includesSopInstance = false;
+        if (hasSopInstance) {
+          includesSopInstance =
+            layer.getViewController().includesImageUid(sopInstanceUid);
+        }
+
+        let check = false;
+        if (hasMeta &amp;&amp; hasSopInstance) {
+          check = equalMeta &amp;&amp; includesSopInstance;
+        } else if (hasMeta) {
+          check = equalMeta;
+        } else if (hasSopInstance) {
+          check = includesSopInstance;
+        }
+
+        if (check) {
+          res.push(layer);
+        }
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Get the view layers data indices.
+   *
+   * @returns {string[]} The list of indices.
+   */
+  getViewDataIndices() {
+    const res = [];
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        res.push(layer.getDataId());
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Get the active draw layer.
+   *
+   * @returns {DrawLayer|undefined} The layer.
+   */
+  getActiveDrawLayer() {
+    let layer;
+    const activeLayer = this.getActiveLayer();
+    if (typeof activeLayer !== 'undefined' &amp;&amp;
+      activeLayer instanceof DrawLayer) {
+      layer = activeLayer;
+    }
+    return layer;
+  }
+
+  /**
+   * Get a draw layer associated to a data id.
+   *
+   * @param {string} id The layer id.
+   * @returns {DrawLayer|undefined} The layer.
+   */
+  getDrawLayerById(id) {
+    const callbackFn = function (layer) {
+      return layer.getId() === id;
+    };
+    const layers = this.getDrawLayers(callbackFn);
+    let layer;
+    if (layers.length === 1) {
+      layer = layers[0];
+    }
+    return layer;
+  }
+
+  /**
+   * Get the draw layers associated to a data id.
+   *
+   * @param {string} dataId The data id.
+   * @returns {DrawLayer[]} The layers.
+   */
+  getDrawLayersByDataId(dataId) {
+    const callbackFn = function (layer) {
+      return layer.getDataId() === dataId;
+    };
+    return this.getDrawLayers(callbackFn);
+  }
+
+  /**
+   * Set the active layer.
+   *
+   * @param {number} index The index of the layer to set as active.
+   */
+  setActiveLayer(index) {
+    this.#activeLayerIndex = index;
+
+    const layer = this.#layers[index];
+    if (typeof this.#infoLayer !== 'undefined') {
+      // a draw layer has no info data: use its reference view layer one
+      let infoLayer = layer;
+      if (layer instanceof DrawLayer) {
+        infoLayer = this.getViewLayerById(layer.getReferenceLayerId());
+      }
+      const dataId = infoLayer?.getDataId();
+      // only switch binding if there is info data for the new data
+      if (typeof this.#infoDatas[dataId] !== 'undefined' &amp;&amp;
+        dataId !== this.#infoDataId) {
+        this.unbindInfoData();
+        this.bindInfoData(dataId);
+      }
+    }
+
+    /**
+     * Active layer change event.
+     *
+     * @event LayerGroup#activelayerchange
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
+     */
+    this.dispatchEvent(new CustomEvent('activelayerchange', {
+      detail: {value: [this.#layers[index]]}
+    }));
+  }
+
+  /**
+   * Set the active layer with a layer id.
+   *
+   * @param {string} id The layer id.
+   */
+  setActiveLayerById(id) {
+    let index;
+    for (let i = 0; i &lt; this.#layers.length; ++i) {
+      if (typeof this.#layers[i] !== 'undefined' &amp;&amp;
+        this.#layers[i].getId() === id) {
+        // stop at first one
+        index = i;
+        break;
+      }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveLayer(index);
+    } else {
+      logger.warn(`No layer to set as active with id: ${id}`);
+    }
+  }
+
+  /**
+   * Set the active layer with a data id.
+   *
+   * @param {string} dataId The data id.
+   */
+  setActiveLayerByDataId(dataId) {
+    let index;
+    for (let i = 0; i &lt; this.#layers.length; ++i) {
+      if (typeof this.#layers[i] !== 'undefined' &amp;&amp;
+        this.#layers[i].getDataId() === dataId) {
+        // stop at first one
+        index = i;
+        break;
+      }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveLayer(index);
+    } else {
+      logger.warn(`No layer to set as active with dataId: ${
+        dataId }`);
+    }
+  }
+
+  /**
+   * Add a view layer.
+   *
+   * The new layer will be marked as the active view layer.
+   *
+   * @returns {ViewLayer} The created layer.
+   */
+  addViewLayer() {
+    // layer index
+    const viewLayerIndex = this.#layers.length;
+    // create div
+    const div = this.#getNextLayerDiv();
+    // prepend to container
+    this.#containerDiv.append(div);
+    // view layer
+    const layer = new ViewLayer(div, this.#canvasSizeChecker);
+    layer.setImageSmoothing(this.#imageSmoothing);
+    // add layer
+    this.#layers.push(layer);
+    // mark it as active
+    this.setActiveLayer(viewLayerIndex);
+    // bind view layer events
+    this.#bindViewLayer(layer);
+
+    // force helper update
+    this.#positionHelper = undefined;
+
+    // return
+    return layer;
+  }
+
+  /**
+   * Add a draw layer.
+   *
+   * The new layer will be marked as the active draw layer.
+   *
+   * @returns {DrawLayer} The created layer.
+   */
+  addDrawLayer() {
+    // store active index
+    this.#activeLayerIndex = this.#layers.length;
+    // create div
+    const div = this.#getNextLayerDiv();
+    // prepend to container
+    this.#containerDiv.append(div);
+    // draw layer
+    const layer = new DrawLayer(div);
+    // add layer
+    this.#layers.push(layer);
+    // bind draw layer events
+    this.#bindDrawLayer(layer);
+    // return
+    return layer;
+  }
+
+  /**
+   * Bind view layer events to this.
+   *
+   * @param {ViewLayer} viewLayer The view layer to bind.
+   */
+  #bindViewLayer(viewLayer) {
+    // listen to position change to update other group layers
+    viewLayer.addEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    // propagate view viewLayer-layer events
+    for (const eventName of viewEventNames) {
+      viewLayer.addEventListener(eventName, this.#fireEvent);
+    }
+    // propagate viewLayer events
+    viewLayer.addEventListener('renderstart', this.#fireEvent);
+    viewLayer.addEventListener('renderend', this.#fireEvent);
+    viewLayer.addEventListener('basesizechange', this.#fireEvent);
+  }
+
+  /**
+   * Un-bind a view layer events to this.
+   *
+   * @param {ViewLayer} viewLayer The view layer to unbind.
+   */
+  #unbindViewLayer(viewLayer) {
+    // stop listening to position change to update other group layers
+    viewLayer.removeEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    // stop propagating view viewLayer-layer events
+    for (const eventName of viewEventNames) {
+      viewLayer.removeEventListener(eventName, this.#fireEvent);
+    }
+    // stop propagating viewLayer events
+    viewLayer.removeEventListener('renderstart', this.#fireEvent);
+    viewLayer.removeEventListener('renderend', this.#fireEvent);
+    viewLayer.removeEventListener('basesizechange', this.#fireEvent);
+
+    // stop view layer - image binding
+    // (binding is done in layer.setView)
+    viewLayer.unbindImage();
+  }
+
+  /**
+   * Bind draw layer events to this.
+   *
+   * @param {DrawLayer} drawLayer The draw layer to bind.
+   */
+  #bindDrawLayer(drawLayer) {
+    // listen to position change to update other group layers
+    drawLayer.addEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.addEventListener(
+      'positionchange', this.#fireEvent);
+    // propagate opacity change
+    drawLayer.addEventListener('opacitychange', this.#fireEvent);
+  }
+
+  /**
+   * Un-bind a draw layer events to this.
+   *
+   * @param {DrawLayer} drawLayer The draw layer to unbind.
+   */
+  #unbindDrawLayer(drawLayer) {
+    // stop listening to position change to update other group layers
+    drawLayer.removeEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.removeEventListener(
+      'positionchange', this.#fireEvent);
+    drawLayer.removeEventListener('opacitychange', this.#fireEvent);
+  }
+
+  /**
+   * Add info data.
+   *
+   * @param {InfoData} data The data to add.
+   * @param {string} dataId The associated data ID.
+   */
+  addInfoData(data, dataId) {
+    this.#infoDatas[dataId] = data;
+  }
+
+  /**
+   * Bind info data.
+   *
+   * @param {string} dataId The associated data ID.
+   */
+  bindInfoData(dataId) {
+    // just bind one data id
+    if (typeof this.#infoDataId !== 'undefined') {
+      return;
+    }
+    const infoData = this.#infoDatas[dataId];
+    if (typeof infoData !== 'undefined') {
+      infoData.addEventListener('valuechange',
+        this.#infoLayer.onDataChange);
+    }
+    this.#infoDataId = dataId;
+  }
+
+  /**
+   * Unbind info data.
+   */
+  unbindInfoData() {
+    const infoData = this.#infoDatas[this.#infoDataId];
+    if (typeof infoData !== 'undefined') {
+      infoData.removeEventListener('valuechange',
+        this.#infoLayer.onDataChange);
+    }
+    this.#infoDataId = undefined;
+  }
+
+  /**
+   * Get the next layer DOM div.
+   *
+   * @returns {HTMLDivElement} A DOM div.
+   */
+  #getNextLayerDiv() {
+    const doc = this.#containerDiv.ownerDocument;
+    const div = doc.createElement('div');
+    div.id = getLayerDivId(this.getDivId(), this.#layers.length);
+    div.className = 'layer';
+    div.style.pointerEvents = 'none';
+    return div;
+  }
+
+  /**
+   * Empty the layer list.
+   */
+  empty() {
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        this.removeLayer(layer);
+      }
+    }
+    this.#layers = [];
+    // remove possible crosshair
+    this.#removeCrosshairDiv();
+  }
+
+  /**
+   * Remove all layers for a specific data.
+   *
+   * @param {string} dataId The data to remove its layers.
+   */
+  removeLayersByDataId(dataId) {
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &amp;&amp;
+        layer.getDataId() === dataId) {
+        this.removeLayer(layer);
+      }
+    }
+  }
+
+  /**
+   * Remove a layer from this layer group.
+   * Warning: if current active layer, the index will
+   *   be set to `undefined`. Call one of the setActive
+   *   methods to define the active index.
+   *
+   * @param {ViewLayer | DrawLayer} layer The layer to remove.
+   * @fires LayerGroup#removelayer
+   */
+  removeLayer(layer) {
+    // find layer
+    const index = this.#layers.findIndex((item) => item === layer);
+    if (index === -1) {
+      throw new Error('Cannot find layer to remove');
+    }
+    // update active index
+    if (this.#activeLayerIndex === index) {
+      this.#activeLayerIndex = undefined;
+    }
+    // unbind and update active index
+    if (layer instanceof ViewLayer) {
+      this.#unbindViewLayer(layer);
+    } else {
+      this.#unbindDrawLayer(layer);
+    }
+    // reset in storage
+    this.#layers[index] = undefined;
+    // force helper update
+    this.#positionHelper = undefined;
+    // update html
+    layer.removeFromDOM();
+
+    /**
+     * Remove layer event.
+     *
+     * @event LayerGroup#removelayer
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.layerid The layer id.
+     * @property {string} detail.layergroupid The layer group id.
+     */
+    this.dispatchEvent(new CustomEvent('layerremove', {
+      detail: {layerid: layer.getId(), layergroupid: this.getDivId()}
+    }));
+  }
+
+  /**
+   * Show a crosshair at the current position.
+   */
+  #showCrosshairDiv() {
+    // remove previous
+    this.#removeCrosshairDiv();
+
+    // use first layer as base for calculating position and
+    // line sizes
+    let baseLayer;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        baseLayer = layer;
+        break;
+      }
+    }
+    if (typeof baseLayer === 'undefined') {
+      logger.warn('No layer to show crosshair');
+      return;
+    }
+
+    // no crosshair for secondary capture
+    if (this.#isViewLayerSecondaryCapture(baseLayer)) {
+      logger.warn('Not enabling crosshair for secondary capture');
+      return;
+    }
+
+    const vc = baseLayer.getViewController();
+    const position = vc.getCurrentPosition();
+    const planePos = vc.getPlanePositionFromPosition(position);
+    const displayPos = baseLayer.planePosToDisplay(planePos);
+    const doc = this.#containerDiv.ownerDocument;
+
+    // horizontal line
+    if (typeof displayPos.getY() !== 'undefined') {
+      const lineH = doc.createElement('hr');
+      lineH.className = 'horizontal';
+      lineH.style.width = `${this.#containerDiv.offsetWidth}px`;
+      lineH.style.left = '0px';
+      lineH.style.top = `${displayPos.getY()}px`;
+      // add to local array
+      this.#crosshairHtmlElements.push(lineH);
+      // add to html
+      this.#containerDiv.appendChild(lineH);
+    }
+
+    // vertical line
+    if (typeof displayPos.getX() !== 'undefined') {
+      const lineV = doc.createElement('hr');
+      lineV.className = 'vertical';
+      lineV.style.width = `${this.#containerDiv.offsetHeight}px`;
+      lineV.style.left = `${displayPos.getX()}px`;
+      lineV.style.top = '0px';
+      // add to local array
+      this.#crosshairHtmlElements.push(lineV);
+      // add to html
+      this.#containerDiv.appendChild(lineV);
+    }
+  }
+
+  /**
+   * Remove crosshair divs.
+   */
+  #removeCrosshairDiv() {
+    for (const element of this.#crosshairHtmlElements) {
+      element.remove();
+    }
+    this.#crosshairHtmlElements = [];
+  }
+
+  /**
+   * Displays a tooltip in a temporary `span`.
+   * Works with css to hide/show the span only on mouse hover.
+   *
+   * @param {Point2D} point The update point.
+   */
+  showTooltip(point) {
+    // remove previous div
+    this.removeTooltipDiv();
+    const doc = this.#containerDiv.ownerDocument;
+
+    const viewLayer = this.getBaseViewLayer();
+    const viewController = viewLayer.getViewController();
+    const planePos = viewLayer.displayToPlanePos(point);
+    const position = viewController.getPositionFromPlanePoint(planePos);
+    const value = viewController.getRescaledImageValue(position);
+
+    // create
+    if (typeof value !== 'undefined') {
+      const span = doc.createElement('span');
+      span.className = 'scroll-tooltip';
+      // tooltip position
+      span.style.left = `${point.getX() + 10}px`;
+      span.style.top = `${point.getY() + 10}px`;
+      let text = precisionRound(value, 3).toString();
+      if (typeof viewController.getPixelUnit() !== 'undefined') {
+        text += ` ${viewController.getPixelUnit()}`;
+      }
+      span.appendChild(doc.createTextNode(text));
+      // add to local var
+      this.#tooltipHtmlElement = span;
+      // add to html
+      this.#containerDiv.appendChild(span);
+    }
+  }
+
+  /**
+   * Remove the tooltip html div.
+   */
+  removeTooltipDiv() {
+    if (typeof this.#tooltipHtmlElement !== 'undefined') {
+      this.#tooltipHtmlElement.remove();
+      this.#tooltipHtmlElement = undefined;
+    }
+  }
+
+  /**
+   * Can the input position be set on one of the view layers.
+   *
+   * @param {Point} position The input position.
+   * @returns {boolean} True if one view layer accepts the input position.
+   */
+  isPositionInBounds(position) {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().isPositionInBounds(position);
+    });
+  }
+
+  /**
+   * Can one of the view layers be scrolled.
+   *
+   * @returns {boolean} True if one view layer can be scrolled.
+   */
+  canScroll() {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().canScroll();
+    });
+  }
+
+  /**
+   * Check if the SOP class UID of the data of a view layer is
+   * secondary capture.
+   *
+   * @param {ViewLayer} layer The layer to check.
+   * @returns {boolean} True if secondary capture.
+   */
+  #isViewLayerSecondaryCapture(layer) {
+    let res = false;
+    const sopClassUID = layer.getViewController().getSopClassUid();
+    if (typeof sopClassUID !== 'undefined') {
+      res = sopClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
+    }
+    return res;
+  }
+
+  /**
+   * Returns whether or not a layer group should have its zoom/pan/etc
+   * synced to other views. Used for things like Secondary Capture where
+   * there is no meaningful real-world scale.
+   *
+   * @returns {boolean} Whether to sync the zoom/pan.
+   */
+  shouldBind() {
+    const baseLayer = this.getBaseViewLayer();
+    if (typeof baseLayer === 'undefined') {
+      return false;
+    }
+    const isSC = this.#isViewLayerSecondaryCapture(baseLayer);
+    return !isSC;
+  }
+
+  /**
+   * Does one of the view layer have more than one slice in the
+   *   given dimension.
+   *
+   * @param {number} dim The input dimension.
+   * @returns {boolean} True if one view layer has more than one slice.
+   */
+  moreThanOne(dim) {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().moreThanOne(dim);
+    });
+  }
+
+  /**
+   * Check if any layer has a valid position.
+   *
+   * @returns {boolean} True if any layer has a valid position.
+   */
+  hasAnyLayerWithValidPosition() {
+    return this.someViewLayer(function (layer) {
+      return layer.isValidPosition();
+    });
+  }
+
+  /**
+   * Update info data on position change.
+   *
+   * @param {CustomEvent} event The position change event.
+   */
+  #updateInfoData = (event) => {
+    const dataid = event.detail?.dataid;
+    const infoData = this.#infoDatas[dataid];
+    if (typeof infoData !== 'undefined') {
+      infoData.onPositionChange(event);
+    }
+  };
+
+  /**
+   * Update layers (but not the event source layer) to a position change.
+   *
+   * @param {CustomEvent} event The position change event.
+   * @function
+   */
+  updateLayersToPositionChange = (event) => {
+    // pause positionchange listeners
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.removeEventListener(
+          'positionchange', this.updateLayersToPositionChange);
+        layer.removeEventListener('positionchange', this.#fireEvent);
+
+        layer.addEventListener('positionchange', this.#updateInfoData);
+      }
+    }
+
+    const value = event.detail?.value;
+    const index = new Index(value[0]);
+    const position = new Point(value[1]);
+
+    // origin of the first view layer
+    const viewLayerOffsets = {};
+    let baseViewLayerOrigin0;
+    let baseViewLayerOrigin;
+    // update position for all layers except the source one
+    for (const layer of this.#layers) {
+      if (typeof layer === 'undefined') {
+        continue;
+      }
+      let hasSetOffset = false;
+
+      // view layer case: define and set offsets
+      if (layer instanceof ViewLayer) {
+        const vc = layer.getViewController();
+        // origin0 should always be there
+        const origin0 = vc.getOrigin();
+        // depending on position, origin could be undefined
+        const origin = vc.getOrigin(position);
+
+        let scrollOffset;
+        let planeOffset;
+
+        if (typeof baseViewLayerOrigin === 'undefined') {
+          // first view layer, store origins
+          baseViewLayerOrigin0 = origin0;
+          baseViewLayerOrigin = origin;
+          // no offset
+          scrollOffset = new Vector3D(0, 0, 0);
+          planeOffset = new Vector3D(0, 0, 0);
+        } else if (vc.isPositionInBounds(position) &amp;&amp;
+          typeof origin !== 'undefined') {
+          // TODO: compensate for possible different orientation between views
+          const scrollDiff = baseViewLayerOrigin0.minus(origin0);
+          scrollOffset = new Vector3D(
+            scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
+          const planeDiff = baseViewLayerOrigin.minus(origin);
+          planeOffset = new Vector3D(
+            planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
+        }
+
+        // set and store offsets
+        if (typeof scrollOffset !== 'undefined' &amp;&amp;
+          typeof planeOffset !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(
+              scrollOffset, planeOffset,
+              baseViewLayerOrigin, baseViewLayerOrigin0
+            );
+          // store
+          viewLayerOffsets[layer.getId()] = {
+            scroll: scrollOffset,
+            plane: planeOffset
+          };
+        }
+      }
+
+      // draw layer case: use associated view layer offsets
+      if (layer instanceof DrawLayer) {
+        const refOffsets = viewLayerOffsets[layer.getReferenceLayerId()];
+        if (typeof refOffsets !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(refOffsets.scroll, refOffsets.plane);
+        }
+      }
+
+      // update position (triggers redraw)
+      let hasSetPos = false;
+      const srclayerid = event.detail?.srclayerid;
+      if (layer.getId() !== srclayerid) {
+        hasSetPos = layer.setCurrentPosition(position, index);
+      }
+
+      // force redraw if needed
+      if (!hasSetPos &amp;&amp; hasSetOffset) {
+        layer.draw();
+      }
+    }
+
+    const hasValidPosition = this.hasAnyLayerWithValidPosition();
+    this.dispatchEvent(new CustomEvent('outofrange', {
+      detail: {layergroupid: this.getDivId(), value: [!hasValidPosition]}
+    }));
+
+    // show crosshair after position update
+    if (this.#showCrosshair) {
+      this.#showCrosshairDiv();
+    }
+
+    // re-start positionchange listeners
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.addEventListener(
+          'positionchange', this.updateLayersToPositionChange);
+        layer.addEventListener('positionchange', this.#fireEvent);
+
+        layer.removeEventListener('positionchange', this.#updateInfoData);
+      }
+    }
+  };
+
+  /**
+   * Calculate the div to world size ratio needed to fit
+   *   the largest data.
+   *
+   * @returns {number|undefined} The ratio.
+   */
+  getDivToWorldSizeRatio() {
+    // check container
+    if (this.#containerDiv.offsetWidth === 0 &amp;&amp;
+      this.#containerDiv.offsetHeight === 0) {
+      throw new Error(`Cannot fit to zero sized container with id '${
+        this.#containerDiv.id }'.`
+      );
+    }
+    // get max world size
+    const maxWorldSize = this.getMaxWorldSize();
+    if (typeof maxWorldSize === 'undefined') {
+      return undefined;
+    }
+    // if the container has a width but no height,
+    // resize it to follow the same ratio to completely
+    // fill the div with the image
+    if (this.#containerDiv.offsetHeight === 0) {
+      const ratioX = this.#containerDiv.offsetWidth / maxWorldSize.x;
+      const height = maxWorldSize.y * ratioX;
+      this.#containerDiv.style.height = `${height}px`;
+    }
+    // return best fit
+    return Math.min(
+      this.#containerDiv.offsetWidth / maxWorldSize.x,
+      this.#containerDiv.offsetHeight / maxWorldSize.y
+    );
+  }
+
+  /**
+   * Fit to container: set the layers div to world size ratio.
+   *
+   * @param {number} divToWorldSizeRatio The ratio.
+   */
+  fitToContainer(divToWorldSizeRatio) {
+    // get maximum world size
+    const maxWorldSize = this.getMaxWorldSize();
+    // exit if none
+    if (typeof maxWorldSize === 'undefined') {
+      return;
+    }
+
+    const containerSize = {
+      x: this.#containerDiv.offsetWidth,
+      y: this.#containerDiv.offsetHeight
+    };
+    // offset to keep data centered
+    const fitOffset = {
+      x: -0.5 *
+        (containerSize.x - Math.floor(maxWorldSize.x * divToWorldSizeRatio)),
+      y: -0.5 *
+        (containerSize.y - Math.floor(maxWorldSize.y * divToWorldSizeRatio))
+    };
+
+    // apply to layers
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.fitToContainer(containerSize, divToWorldSizeRatio, fitOffset);
+      }
+    }
+
+    // update crosshair
+    if (this.#showCrosshair) {
+      this.#showCrosshairDiv();
+    }
+  }
+
+  /**
+   * Get the largest data world (mm) size.
+   *
+   * @returns {Scalar2D|undefined} The largest size as {x,y}.
+   */
+  getMaxWorldSize() {
+    let maxSize = {x: 0, y: 0};
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        const size = layer.getImageWorldSize();
+        if (size.x > maxSize.x) {
+          maxSize.x = size.x;
+        }
+        if (size.y > maxSize.y) {
+          maxSize.y = size.y;
+        }
+      }
+    }
+    if (maxSize.x === 0 &amp;&amp; maxSize.y === 0) {
+      maxSize = undefined;
+    }
+    return maxSize;
+  }
+
+  /**
+   * Flip all layers along the Z axis without offset compensation.
+   */
+  flipScaleZ() {
+    this.#baseScale.z *= -1;
+    this.setScale(this.#baseScale);
+  }
+
+  /**
+   * Add scale to the layers. Scale cannot go lower than 0.1.
+   *
+   * @param {number} scaleStep The scale to add.
+   * @param {Point3D} center The scale center Point3D.
+   */
+  addScale(scaleStep, center) {
+    const newScale = {
+      x: this.#scale.x * (1 + scaleStep),
+      y: this.#scale.y * (1 + scaleStep),
+      z: this.#scale.z * (1 + scaleStep)
+    };
+    this.setScale(newScale, center);
+  }
+
+  /**
+   * Set the layers' scale.
+   *
+   * @param {Scalar3D} newScale The scale to apply as {x,y,z}.
+   * @param {Point3D} [center] The scale center Point3D.
+   * @fires LayerGroup#zoomchange
+   */
+  setScale(newScale, center) {
+    this.#scale = newScale;
+    // apply to layers
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.setScale(this.#scale, center);
+      }
+    }
+
+    // event value
+    const value = [
+      newScale.x,
+      newScale.y,
+      newScale.z
+    ];
+    if (typeof center !== 'undefined') {
+      value.push(center.getX());
+      value.push(center.getY());
+      value.push(center.getZ());
+    }
+
+    /**
+     * Zoom change event.
+     *
+     * @event LayerGroup#zoomchange
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
+     */
+    this.dispatchEvent(new CustomEvent('zoomchange', {detail: {value}}));
+  }
+
+  /**
+   * Add translation to the layers.
+   *
+   * @param {Scalar3D} translation The translation as {x,y,z}.
+   */
+  addTranslation(translation) {
+    this.setOffset({
+      x: this.#offset.x - translation.x,
+      y: this.#offset.y - translation.y,
+      z: this.#offset.z - translation.z
+    });
+  }
+
+  /**
+   * Set the layers' offset.
+   *
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
+   * @fires LayerGroup#offsetchange
+   */
+  setOffset(newOffset) {
+    // store
+    this.#offset = newOffset;
+    // apply to layers
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.setOffset(this.#offset);
+      }
+    }
+
+    /**
+     * Offset change event.
+     *
+     * @event LayerGroup#offsetchange
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
+     */
+    this.dispatchEvent(new CustomEvent('offsetchange', {
+      detail: {value: [this.#offset.x, this.#offset.y, this.#offset.z]}
+    }));
+  }
+
+  /**
+   * Reset the stage to its initial scale and no offset.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
+   */
+  reset() {
+    this.setScale(this.#baseScale);
+    this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the zoom and pan of all layers.
+   */
+  resetZoomPan() {
+    this.setScale(this.#baseScale);
+    this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the position and window level of all view layers.
+   */
+  resetViews() {
+    let isFirstViewLayer = true;
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &amp;&amp;
+        layer instanceof ViewLayer
+      ) {
+        const vc = layer.getViewController();
+        if (isFirstViewLayer) {
+          // will be propagated to all layers
+          vc.resetPosition();
+          isFirstViewLayer = false;
+        }
+        vc.resetWindowLevel();
+      }
+    }
+  }
+
+  /**
+   * Draw the layer.
+   */
+  draw() {
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.draw();
+      }
+    }
+  }
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  display(flag) {
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.display(flag);
+      }
+    }
+  }
+
+  /**
+   * Re-dispatch an event from a sub-layer as a new CustomEvent on this group.
+   *
+   * @param {CustomEvent} event The event to re-dispatch.
+   */
+  #fireEvent = (event) => {
+    const detail = event.detail !== null &amp;&amp; typeof event.detail === 'object'
+      ? Object.assign({}, event.detail) : {};
+    this.dispatchEvent(new CustomEvent(event.type, {detail}));
+  };
+
+} // LayerGroup class
+</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/gui/layerGroup.js"},"i1":{"basePath":"/dwv/doc/stable","searchIndexUrl":"/dwv/doc/stable/_assets/search-index.mwmcznlk-8710cd19.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/gui/layergroup-js","siteName":"DWV","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/gui/layergroup-js","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/dwv/doc/stable/_islands/theme-toggle-2OFR67FU.js","settings":"/dwv/doc/stable/_islands/settings-HUVOQWPC.js","code-viewer":"/dwv/doc/stable/_islands/code-viewer-J4JM56PM.js","embed":"/dwv/doc/stable/_islands/embed-S4IPJ47N.js","playground":"/dwv/doc/stable/_islands/playground-GHNL23CG.js","tabs":"/dwv/doc/stable/_islands/tabs-NRSQKCSU.js","sidebar":"/dwv/doc/stable/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/dwv/doc/stable/_islands/mobile-nav-ITUCHCYZ.js","toc":"/dwv/doc/stable/_islands/toc-YFAY7IHK.js","toc-mobile":"/dwv/doc/stable/_islands/toc-mobile-6DGE76YF.js","cmdk":"/dwv/doc/stable/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/dwv/doc/stable/_islands/code-tabs-C6ACVICP.js","copy-btn":"/dwv/doc/stable/_islands/copy-btn-5QCTJLYG.js","copy-page":"/dwv/doc/stable/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>

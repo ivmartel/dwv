@@ -1,0 +1,563 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/tools/layerGroupPointer.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/dwv/doc/stable/_assets/styles.mwmcznlk-8710cd19.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/dwv/doc/stable" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/tools/layerGroupPointer.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {WheelTick} from './behaviors/wheelTick.js';
+
+// Avoid mouse events. To use with browser mobile simulation.
+const TOUCH_EVENTS_DEBUG = false;
+
+// Max display-pixel distance from the down point still considered a tap
+// (mouse/finger jitter tolerance), not a move.
+const MOVE_TOLERANCE = 5;
+
+/**
+ * `MouseEvent#button` values (left through fifth / forward).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+ *
+ * @type {Readonly&lt;{
+ *   left: 0,
+ *   middle: 1,
+ *   right: 2,
+ *   back: 3,
+ *   forward: 4
+ * }>}
+ */
+export const MouseEventButtons = {
+  left: 0,
+  middle: 1,
+  right: 2,
+  back: 3,
+  forward: 4
+};
+
+/**
+ * @import {App} from '../app/application.js';
+ * @import {DragBehavior} from './behaviors/dragBehavior.js';
+ * @import {HoverBehavior} from './behaviors/hoverBehavior.js';
+ * @import {Point2D} from '../math/point.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {WheelBehavior} from './behaviors/wheelBehavior.js';
+ * @import {DoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
+ * @import {TapBehavior} from './behaviors/tapBehavior.js';
+ * @import {TwoTouchBehavior} from './behaviors/twoTouchBehavior.js';
+ * @import {StageController} from '../app/stageController.js';
+ */
+
+/**
+ * @typedef {object} LayerGroupPointerOptions
+ * @property {StageController} stageController The stage controller.
+ * @property {DragBehavior} [dragBehavior] Drag behaviour:
+ *   mouse down / touch start + move + end (mouse or touch).
+ * @property {HoverBehavior} [hoverBehavior] Hover behaviour:
+ *   mouse move without click (only mouse).
+ * @property {WheelBehavior} [wheelBehavior] Mouse wheel handling
+ *   (only mouse).
+ * @property {DoubleClickBehavior} [doubleClickBehavior] Double-click
+ *   behaviour, also triggered by long touch.
+ * @property {TwoTouchBehavior} [twoTouchBehavior] Two-finger behaviour
+ *   (only touch).
+ * @property {TapBehavior} [tapBehavior] Tap behaviour: can be one tap
+ *   or sticky tap for multiple taps (finite or finished with double click).
+ *   For mouse or touch.
+ * @property {number|null} [longTouchToDblClickMs] After a touchstart on the
+ *   single-touch path, schedule {@link LayerGroupPointer#dblclick} after this
+ *   many milliseconds (defaults to 500).
+ */
+
+/**
+ * Normalises layer mouse/touch input into a single-pointer drag lifecycle.
+ * Per-move deltas are computed inside {@link DragBehavior#onUpdate}.
+ * Hover ({@link HoverBehavior}) is driven from mouse events only, not touch.
+ *
+ * Extends {@link EventTarget} so subclasses (tools) can use
+ * `addEventListener` / `dispatchEvent` like other UI tools.
+ *
+ * Event entry points use the same names as tools (`mousedown`, `mousemove`,
+ * `wheel`, `dblclick`, …). Those handlers are arrow functions so they stay
+ * bound when the toolbox invokes them as bare callbacks (`func(event)`).
+ *
+ * `preventDefault` is only called on the `NonPassiveInteractionEventNames`
+ * (from `gui/generic.js`), the events the layers listen to as not passive.
+ */
+export class LayerGroupPointer extends EventTarget {
+
+  /**
+   * @type {StageController}
+   */
+  #stageController;
+
+  /**
+   * @type {DragBehavior|undefined}
+   */
+  #dragBehavior;
+
+  /**
+   * @type {HoverBehavior|undefined}
+   */
+  #hoverBehavior;
+
+  /**
+   * @type {WheelBehavior|undefined}
+   */
+  #wheelBehavior;
+
+  /**
+   * @type {WheelTick}
+   */
+  #wheelTick = new WheelTick();
+
+  /**
+   * @type {DoubleClickBehavior|undefined}
+   */
+  #doubleClickBehavior;
+
+  /**
+   * @type {TwoTouchBehavior|undefined}
+   */
+  #twoTouchBehavior;
+
+  /**
+   * @type {TapBehavior|undefined}
+   */
+  #tapBehavior;
+
+  /**
+   * @type {number|null}
+   */
+  #longTouchToDblClickMs;
+
+  /**
+   * @type {number|undefined}
+   */
+  #longTouchTimerId;
+
+  /**
+   * True after a mouse down, reset at mouseup or mouseout.
+   *
+   * @type {boolean}
+   */
+  #downed = false;
+
+  /**
+   * Pointer position at mousedown or touchstart, used to measure
+   * {@link MOVE_TOLERANCE}.
+   *
+   * @type {Point2D|undefined}
+   */
+  #downPoint;
+
+  /**
+   * @param {LayerGroupPointerOptions} options Constructor options.
+   */
+  constructor({
+    stageController,
+    dragBehavior,
+    hoverBehavior,
+    wheelBehavior,
+    doubleClickBehavior,
+    twoTouchBehavior,
+    tapBehavior,
+    longTouchToDblClickMs = 500
+  }) {
+    super();
+    this.#stageController = stageController;
+    this.#dragBehavior = dragBehavior;
+    this.#hoverBehavior = hoverBehavior;
+    this.#wheelBehavior = wheelBehavior;
+    this.#doubleClickBehavior = doubleClickBehavior;
+    this.#twoTouchBehavior = twoTouchBehavior;
+    this.#tapBehavior = tapBehavior;
+    this.#longTouchToDblClickMs = longTouchToDblClickMs;
+  }
+
+  /**
+   * Get the layer group associated with a div id.
+   *
+   * @param {string} divId The div id.
+   * @returns {LayerGroup|undefined} The layer group,
+   *   or undefined if not found.
+   */
+  #getLayerGroupByDivId(divId) {
+    return this.#stageController.getLayerGroupByDivId(divId);
+  }
+
+  /**
+   * Mouse position and layer group from a DOM event targeting a view layer.
+   *
+   * @param {MouseEvent} event The mouse or touch event.
+   * @returns {{point: Point2D, layerGroup: LayerGroup}}
+   *   Pointer position and layer group.
+   */
+  #getMouseLayerContext(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#getLayerGroupByDivId(layerDetails.groupDivId);
+    return {
+      point: getMousePoint(event),
+      layerGroup
+    };
+  }
+
+  /**
+   * Live check of a pointer position against {@link #downPoint}: false
+   * (tap jitter, not a move) while within {@link MOVE_TOLERANCE}.
+   *
+   * @param {Point2D} point Pointer position to check, typically at
+   *   mouseup/touchend.
+   * @returns {boolean} True when the point is more than
+   *   {@link MOVE_TOLERANCE} display pixels away from the down point.
+   */
+  #isMoved(point) {
+    return typeof this.#downPoint === 'undefined' ||
+      this.#downPoint.getDistance(point) > MOVE_TOLERANCE;
+  }
+
+  /**
+   * First touch position and layer group from a touch event.
+   *
+   * @param {TouchEvent} event The touch event.
+   * @returns {{point: Point2D, layerGroup: LayerGroup}}
+   *   Primary touch point and layer group.
+   */
+  #getPrimaryTouchLayerContext(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#getLayerGroupByDivId(layerDetails.groupDivId);
+    return {
+      point: getTouchPoints(event)[0],
+      layerGroup
+    };
+  }
+
+  /**
+   * Get the list of event names that this tool can fire.
+   * Default implementation returns an empty array.
+   *
+   * @returns {string[]} The list of event names.
+   */
+  getEventNames() {
+    return [];
+  }
+
+  /**
+   * Handle mouse wheel. Prevents the default (page scroll) only
+   * when the tool has a wheel behaviour.
+   *
+   * @param {WheelEvent} event The mouse wheel event.
+   */
+  wheel = (event) => {
+    if (typeof this.#wheelBehavior === 'undefined') {
+      return;
+    }
+    event.preventDefault();
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#getLayerGroupByDivId(layerDetails.groupDivId);
+    this.#wheelBehavior.onWheel(event, layerGroup);
+
+    this.#wheelTick.add(event);
+    const up = this.#wheelTick.getSum() >= 0;
+    if (!this.#wheelTick.isTick()) {
+      return;
+    }
+    this.#wheelTick.clear();
+
+    this.#wheelBehavior.onWheelTick(up, layerGroup);
+  };
+
+  /**
+   * @param {MouseEvent} event The double click event.
+   */
+  dblclick = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+    if (typeof this.#doubleClickBehavior !== 'undefined') {
+      this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
+    } else if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.onEnd();
+    }
+  };
+
+  /**
+   * @param {Point2D} point Display point.
+   * @param {LayerGroup} layerGroup Layer group.
+   */
+  #longTouch(point, layerGroup) {
+    // similar to this.dblclick
+    if (typeof this.#doubleClickBehavior !== 'undefined') {
+      this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
+    } else if (this.#tapBehavior?.isActive()) {
+      // add last point
+      this.#tapBehavior.onTap(point, layerGroup);
+      this.#tapBehavior.onEnd();
+    }
+    // avoid tap on touchend
+    this.#downed = false;
+    // reset timer
+    this.#longTouchTimerId = undefined;
+  };
+
+  /**
+   * End behaviors that have end method.
+   */
+  cancel() {
+    this.#downed = false;
+    this.#downPoint = undefined;
+    this.#clearLongTouchTimer();
+
+    // reset drag
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+    // reset sticky tap
+    if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.reset();
+    }
+    // reset two touch
+    if (this.#twoTouchBehavior?.isActive()) {
+      this.#twoTouchBehavior?.reset();
+    }
+    // reset hover
+    this.#hoverBehavior?.reset();
+  }
+
+  /**
+   * Handle mouse down.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   */
+  mousedown = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+    // reset
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+    // context
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+    // set flags
+    this.#downed = true;
+    this.#downPoint = point;
+
+    if (!this.#tapBehavior?.isActive() &amp;&amp;
+      this.#dragBehavior?.canStart(point, layerGroup)) {
+      this.#dragBehavior.onStart(point, layerGroup, {
+        mouseDownButton: event.button
+      });
+    }
+  };
+
+  /**
+   * Handle mouse move.
+   *
+   * @param {MouseEvent} event The mouse move event.
+   */
+  mousemove = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+    // context
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+
+    if (this.#downed) {
+      // remove hover for down+move
+      this.#hoverBehavior?.onEnd();
+      // update drag
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.onUpdate(point, layerGroup);
+      }
+    } else {
+      // update sticky tap
+      if (this.#tapBehavior?.isActive()) {
+        this.#tapBehavior.onUpdate(point, layerGroup);
+      }
+      // update hover
+      this.#hoverBehavior?.onUpdate(point, layerGroup);
+    }
+  };
+
+  /**
+   * Handle mouse up.
+   *
+   * @param {MouseEvent} event The mouse up event.
+   */
+  mouseup = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+    // context
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+    const moved = this.#isMoved(point);
+
+    if (this.#dragBehavior?.isActive()) {
+      if (moved) {
+        // up+move -> end drag
+        this.#dragBehavior.onEnd();
+      } else {
+        // up and no move -> reset drag
+        this.#dragBehavior.reset();
+      }
+    }
+
+    if (this.#tapBehavior &amp;&amp;
+      (this.#tapBehavior.isActive() || (this.#downed &amp;&amp; !moved))) {
+      // active tap -> sticky tap
+      // down + no move -> discrete tap
+      this.#tapBehavior.onTap(point, layerGroup);
+    }
+
+    // reset flag
+    this.#downed = false;
+  };
+
+  /**
+   * @param {MouseEvent} _event The mouse out event.
+   */
+  mouseout = (_event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+
+    // end drag
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.onEnd();
+    }
+    // end sticky tap
+    if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.onEnd();
+    }
+    // end hover
+    this.#hoverBehavior?.onEnd();
+    // reset flags
+    this.#downed = false;
+    this.#downPoint = undefined;
+  };
+
+  /**
+   * Handle touch start. Always prevents the default to stop the browser
+   * from scrolling or zooming the page and from emulating mouse events
+   * (which would be handled a second time by the mouse handlers).
+   *
+   * @param {TouchEvent} event The touch start event.
+   */
+  touchstart = (event) => {
+    event.preventDefault();
+    // reset
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+    this.#clearLongTouchTimer();
+    // get touch points
+    const touchPoints = getTouchPoints(event);
+    // set flags
+    this.#downed = true;
+    this.#downPoint = touchPoints[0];
+
+    if (touchPoints.length === 1) {
+      // one touch drag
+      const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
+      if (this.#dragBehavior?.canStart(point, layerGroup)) {
+        this.#dragBehavior.onStart(point, layerGroup, {});
+      }
+      // long single touch to dblclick
+      const delay = this.#longTouchToDblClickMs;
+      if (delay !== null &amp;&amp; delay !== undefined &amp;&amp; delay > 0) {
+        // @ts-expect-error -- recommended type is ReturnType&lt;typeof
+        //   setTimeout> but lint does not like it
+        this.#longTouchTimerId = setTimeout(() => {
+          this.#longTouch(point, layerGroup);
+        }, delay);
+      }
+    } else if (touchPoints.length === 2) {
+      this.#twoTouchBehavior?.onStart(touchPoints);
+    }
+  };
+
+  /**
+   * @param {TouchEvent} event The touch move event.
+   */
+  touchmove = (event) => {
+    // reset
+    this.#clearLongTouchTimer();
+
+    // context
+    const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
+
+    const touchPoints = getTouchPoints(event);
+    if (touchPoints.length === 1) {
+      // one touch drag
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.onUpdate(point, layerGroup);
+      }
+    } else if (touchPoints.length === 2) {
+      // Transition frames may have two touches before two-touch is active.
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.reset();
+      }
+      if (this.#twoTouchBehavior?.isActive()) {
+        this.#twoTouchBehavior.onUpdate(touchPoints, layerGroup);
+      }
+    }
+  };
+
+  /**
+   * @param {TouchEvent} event The touch end event.
+   */
+  touchend = (event) => {
+    // reset
+    this.#clearLongTouchTimer();
+
+    if (this.#twoTouchBehavior?.isActive()) {
+      this.#twoTouchBehavior.onEnd();
+      return;
+    }
+
+    // context
+    const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
+    const moved = this.#isMoved(point);
+
+    if (this.#dragBehavior?.isActive()) {
+      if (moved) {
+        // up+move -> end drag
+        this.#dragBehavior.onEnd();
+      } else {
+        // up and no move -> reset drag
+        this.#dragBehavior.reset();
+      }
+    }
+
+    if (this.#tapBehavior &amp;&amp;
+      (this.#tapBehavior.isActive() || (this.#downed &amp;&amp; !moved))) {
+      // active tap -> sticky tap
+      // down + no move -> discrete tap
+      this.#tapBehavior.onTap(point, layerGroup);
+    }
+
+    // reset flag
+    this.#downed = false;
+  };
+
+  /**
+   * Handle touch cancel: the browser or the system interrupted the touch
+   * (for example an incoming call or an OS gesture), end it with
+   * {@link LayerGroupPointer#cancel}.
+   *
+   * @param {TouchEvent} _event The touch cancel event.
+   */
+  touchcancel = (_event) => {
+    this.cancel();
+  };
+
+  #clearLongTouchTimer() {
+    if (typeof this.#longTouchTimerId !== 'undefined') {
+      clearTimeout(this.#longTouchTimerId);
+      this.#longTouchTimerId = undefined;
+    }
+  }
+
+}
+</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/tools/layerGroupPointer.js"},"i1":{"basePath":"/dwv/doc/stable","searchIndexUrl":"/dwv/doc/stable/_assets/search-index.mwmcznlk-8710cd19.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/tools/layergrouppointer-js","siteName":"DWV","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/tools/layergrouppointer-js","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/dwv/doc/stable/_islands/theme-toggle-2OFR67FU.js","settings":"/dwv/doc/stable/_islands/settings-HUVOQWPC.js","code-viewer":"/dwv/doc/stable/_islands/code-viewer-J4JM56PM.js","embed":"/dwv/doc/stable/_islands/embed-S4IPJ47N.js","playground":"/dwv/doc/stable/_islands/playground-GHNL23CG.js","tabs":"/dwv/doc/stable/_islands/tabs-NRSQKCSU.js","sidebar":"/dwv/doc/stable/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/dwv/doc/stable/_islands/mobile-nav-ITUCHCYZ.js","toc":"/dwv/doc/stable/_islands/toc-YFAY7IHK.js","toc-mobile":"/dwv/doc/stable/_islands/toc-mobile-6DGE76YF.js","cmdk":"/dwv/doc/stable/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/dwv/doc/stable/_islands/code-tabs-C6ACVICP.js","copy-btn":"/dwv/doc/stable/_islands/copy-btn-5QCTJLYG.js","copy-page":"/dwv/doc/stable/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>

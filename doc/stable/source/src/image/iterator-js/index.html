@@ -1,0 +1,660 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/image/iterator.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/dwv/doc/stable/_assets/styles.mwmcznlk-8710cd19.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/dwv/doc/stable" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/dwv/doc/stable/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/image/iterator.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">import {Index} from '../math/index.js';
+import {Point2D} from '../math/point.js';
+
+/**
+ * @import {Image} from './image.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ */
+
+/**
+ * Get an simple iterator for a given range for a one component data.
+ *
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} [increment] The increment between indicies (default=1).
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+export function simpleRange(dataAccessor, start, end, increment) {
+  if (typeof increment === 'undefined') {
+    increment = 1;
+  }
+  let nextIndex = start;
+  // result
+  return {
+    next() {
+      if (nextIndex &lt; end) {
+        const result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        nextIndex += increment;
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+}
+
+/**
+ * Get an iterator for a given range for a one component data.
+ *
+ * Using 'maxIter' and not an 'end' index since it fails in some edge cases
+ * (for ex coronal2, ie zxy).
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} maxIter The maximum number of iterations.
+ * @param {number} increment Increment between indicies.
+ * @param {number} blockMaxIter Number of applied increment after which
+ *   blockIncrement is applied.
+ * @param {number} blockIncrement Increment after blockMaxIter is reached,
+ *   the value is from block start to the next block start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ *   WARN: don't forget to set the value of start as the last index!
+ * @param {boolean} reverse2 If true, loop from block end to block start.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+export function range(dataAccessor, start, maxIter, increment,
+  blockMaxIter, blockIncrement, reverse1, reverse2) {
+  if (typeof reverse1 === 'undefined') {
+    reverse1 = false;
+  }
+  if (typeof reverse2 === 'undefined') {
+    reverse2 = false;
+  }
+
+  // first index of the iteration
+  let nextIndex = start;
+  // adapt first index and increments to reverse values
+  if (reverse1) {
+    blockIncrement *= -1;
+    if (reverse2) {
+      // start at end of line
+      nextIndex -= (blockMaxIter - 1) * increment;
+    } else {
+      increment *= -1;
+    }
+  } else if (reverse2) {
+    // start at end of line
+    nextIndex += (blockMaxIter - 1) * increment;
+    increment *= -1;
+  }
+  const finalBlockIncrement = blockIncrement - blockMaxIter * increment;
+
+  // counters
+  let mainCount = 0;
+  let blockCount = 0;
+  // result
+  return {
+    next() {
+      if (mainCount &lt; maxIter) {
+        const result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        nextIndex += increment;
+        ++mainCount;
+        ++blockCount;
+        if (blockCount === blockMaxIter) {
+          blockCount = 0;
+          nextIndex += finalBlockIncrement;
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: nextIndex
+      };
+    }
+  };
+}
+
+/**
+ * Get an iterator for a given range with bounds (for a one component data).
+ *
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {number} regionSize The size of the region to iterate through.
+ * @param {number} regionOffset The offset between regions.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+export function rangeRegion(
+  dataAccessor, start, end, increment, regionSize, regionOffset) {
+  let nextIndex = start;
+  let regionElementCount = 0;
+  // result
+  return {
+    next() {
+      if (nextIndex &lt; end) {
+        const result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        regionElementCount += 1;
+        nextIndex += increment;
+        if (regionElementCount === regionSize) {
+          regionElementCount = 0;
+          nextIndex += regionOffset;
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+}
+
+/**
+ * Get an iterator for a given range with bounds (for a one component data).
+ *
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {number[][]} regions An array of regions: [off0, size, off1].
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+export function rangeRegions(
+  dataAccessor, start, end, increment, regions) {
+  let nextIndex = start;
+  let regionCount = 0;
+  let regionElementCount = 0;
+  // result
+  return {
+    next() {
+      if (nextIndex &lt; end) {
+        const result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        regionElementCount += 1;
+        nextIndex += increment;
+        if (regionElementCount === regions[regionCount][1]) {
+          regionElementCount = 0;
+          // off1 of current group
+          nextIndex += regions[regionCount][2];
+          regionCount += 1;
+          // off0 of next group
+          if (regionCount &lt; regions.length) {
+            nextIndex += regions[regionCount][0];
+          }
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+}
+
+/**
+ * Get an iterator for a given range for a 3 components data.
+ *
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ *   (end - start) needs to be a multiple of 3...
+ * @param {number} increment The increment between indicies (default=1).
+ * @param {boolean} isPlanar A flag to know if the data is planar
+ *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
+ * @returns {object} A 3 components iterator folowing the iterator and iterable
+ *   protocol, the value is an array of size 3 with each component.
+ */
+export function simpleRange3d(
+  dataAccessor, start, end, increment, isPlanar) {
+  if (typeof increment === 'undefined') {
+    increment = 1;
+  }
+  if (typeof isPlanar === 'undefined') {
+    isPlanar = false;
+  }
+  let nextIndex = start;
+  let componentIncrement = 1;
+  if (isPlanar) {
+    componentIncrement = (end - start) / 3;
+  } else {
+    increment *= 3;
+  }
+  let nextIndex1 = nextIndex + componentIncrement;
+  let nextIndex2 = nextIndex + 2 * componentIncrement;
+
+  // result
+  return {
+    next() {
+      if (nextIndex &lt; end) {
+        const result = {
+          value: [
+            dataAccessor(nextIndex),
+            dataAccessor(nextIndex1),
+            dataAccessor(nextIndex2)
+          ],
+          done: false,
+          index: [nextIndex, nextIndex1, nextIndex2]
+        };
+        nextIndex += increment;
+        nextIndex1 += increment;
+        nextIndex2 += increment;
+        return result;
+      }
+      return {
+        done: true,
+        index: [end]
+      };
+    }
+  };
+}
+
+/**
+ * Get an iterator for a given range for a 3 components data.
+ *
+ * Using 'maxIter' and not an 'end' index since it fails in some edge cases
+ * (for ex coronal2, ie zxy).
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} maxIter The maximum number of iterations.
+ * @param {number} increment Increment between indicies.
+ * @param {number} blockMaxIter Number of applied increment after which
+ *   blockIncrement is applied.
+ * @param {number} blockIncrement Increment after blockMaxIter is reached,
+ *   the value is from block start to the next block start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ *   WARN: don't forget to set the value of start as the last index!
+ * @param {boolean} reverse2 If true, loop from block end to block start.
+ * @param {boolean} isPlanar A flag to know if the data is planar
+ *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+export function range3d(dataAccessor, start, maxIter, increment,
+  blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar) {
+  const iters = [];
+  if (isPlanar) {
+    iters.push(range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(range(
+      dataAccessor, start + maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(range(
+      dataAccessor, start + 2 * maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  } else {
+    increment *= 3;
+    blockIncrement *= 3;
+    iters.push(range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(range(
+      dataAccessor, start + 1, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(range(
+      dataAccessor, start + 2, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  }
+
+  // result
+  return {
+    next() {
+      const r0 = iters[0].next();
+      const r1 = iters[1].next();
+      const r2 = iters[2].next();
+      if (!r0.done) {
+        return {
+          value: [
+            r0.value,
+            r1.value,
+            r2.value
+          ],
+          done: false,
+          index: [
+            r0.index,
+            r1.index,
+            r2.index
+          ]
+        };
+      }
+      return {
+        done: true,
+        index: r2.index
+      };
+    }
+  };
+}
+
+/**
+ * Get a list of values for a given iterator.
+ *
+ * @param {object} iterator The iterator to use to loop through data.
+ * @returns {Array} The list of values.
+ */
+export function getIteratorValues(iterator) {
+  const values = [];
+  let ival = iterator.next();
+  while (!ival.done) {
+    values.push(ival.value);
+    ival = iterator.next();
+  }
+  return values;
+}
+
+/**
+ * Get a slice index iterator.
+ *
+ * @param {Image} image The image to parse.
+ * @param {Index} index The current index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {Matrix33} viewOrientation The view orientation.
+ * @returns {object} The slice iterator.
+ */
+export function getSliceIterator(
+  image, index, isRescaled, viewOrientation) {
+  const size = image.getGeometry().getSize();
+  // zero-ify non direction index
+  let dirMax2Index = 2;
+  if (viewOrientation &amp;&amp; typeof viewOrientation !== 'undefined') {
+    dirMax2Index = viewOrientation.getColAbsMax(2).index;
+  }
+  const posValues = index.getValues();
+  // keep the main direction and any other than 3D
+  const indexFilter = function (element, i) {
+    return (i === dirMax2Index || i > 2) ? element : 0;
+  };
+  const posStart = new Index(posValues.map(indexFilter));
+  let start = size.indexToOffset(posStart);
+
+  // default to non rescaled data
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  let dataAccessor;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
+  const ncols = size.get(0);
+  const nrows = size.get(1);
+  const nslices = size.get(2);
+  let sliceSize = size.getDimSize(2);
+
+  const ncomp = image.getNumberOfComponents();
+  const isPlanar = image.getPlanarConfiguration() === 1;
+  const getRange = function (
+    dataAccessor2, start2, maxIter, increment,
+    blockMaxIter, blockIncrement, reverse1, reverse2) {
+    if (ncomp === 1) {
+      return range(dataAccessor2, start2, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2);
+    } else if (ncomp === 3) {
+      return range3d(dataAccessor2, 3 * start2, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar);
+    }
+  };
+
+  let rangeObj;
+  if (viewOrientation &amp;&amp; typeof viewOrientation !== 'undefined') {
+    const dirMax0 = viewOrientation.getColAbsMax(0);
+    const dirMax2 = viewOrientation.getColAbsMax(2);
+
+    // default reverse
+    const reverse1 = false;
+    const reverse2 = false;
+
+    if (dirMax2.index === 2) {
+      // axial
+      const maxIter = ncols * nrows;
+      if (dirMax0.index === 0) {
+        // xyz
+        rangeObj = getRange(dataAccessor,
+          start, maxIter, 1, ncols, ncols, reverse1, reverse2);
+      } else {
+        // yxz
+        rangeObj = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, 1, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 0) {
+      // sagittal
+      const maxIter = nslices * nrows;
+      if (dirMax0.index === 1) {
+        // yzx
+        rangeObj = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
+      } else {
+        // zyx
+        rangeObj = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 1) {
+      // coronal
+      const maxIter = nslices * ncols;
+      if (dirMax0.index === 0) {
+        // xzy
+        rangeObj = getRange(dataAccessor,
+          start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
+      } else {
+        // zxy
+        rangeObj = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
+      }
+    } else {
+      throw new Error(`Unknown direction: ${dirMax2.index}`);
+    }
+  } else if (image.getNumberOfComponents() === 1) {
+    rangeObj = simpleRange(dataAccessor, start, start + sliceSize);
+  } else if (image.getNumberOfComponents() === 3) {
+    // 3 times bigger...
+    start *= 3;
+    sliceSize *= 3;
+    rangeObj = simpleRange3d(
+      dataAccessor, start, start + sliceSize, 1, isPlanar);
+  } else {
+    throw new Error(`Unsupported number of components: ${
+      image.getNumberOfComponents()}`);
+  }
+
+  return rangeObj;
+}
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {Image} image The image to parse.
+ * @param {Index} index The current index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {Point2D} min The minimum position (optional).
+ * @param {Point2D} max The maximum position (optional).
+ * @returns {object} The slice iterator.
+ */
+export function getRegionSliceIterator(
+  image, index, isRescaled, min, max) {
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error(`Unsupported number of components for region iterator: ${
+      image.getNumberOfComponents() }`);
+  }
+
+  // default to non rescaled data
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  let dataAccessor;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
+  const size = image.getGeometry().getSize();
+  if (typeof min === 'undefined') {
+    min = new Point2D(0, 0);
+  }
+  if (typeof max === 'undefined') {
+    max = new Point2D(
+      size.get(0) - 1,
+      size.get(1)
+    );
+  }
+  // position to pixel for max: extra X is ok, remove extra Y
+  const startOffset = size.indexToOffset(index.getWithNew2D(
+    min.getX(), min.getY()
+  ));
+  const endOffset = size.indexToOffset(index.getWithNew2D(
+    max.getX(), max.getY() - 1
+  ));
+
+  // minimum 1 column
+  const rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  const rowIncrement = size.get(0) - rangeNumberOfColumns;
+
+  return rangeRegion(
+    dataAccessor, startOffset, endOffset + 1,
+    1, rangeNumberOfColumns, rowIncrement);
+}
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {Image} image The image to parse.
+ * @param {Index} index The current index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {number[][][]} regions An array of [x, y] pairs (min, max).
+ * @returns {object|undefined} The slice iterator.
+ */
+export function getVariableRegionSliceIterator(
+  image, index, isRescaled, regions) {
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error(`Unsupported number of components for region iterator: ${
+      image.getNumberOfComponents() }`);
+  }
+
+  // default to non rescaled data
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  let dataAccessor;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
+  const size = image.getGeometry().getSize();
+
+  const offsetRegions = [];
+  let region;
+  let min = null;
+  let max = null;
+  let regionIndex = null;
+  for (let i = 0; i &lt; regions.length; ++i) {
+    region = regions[i];
+    const width = region[1][0] - region[0][0];
+    if (width !== 0) {
+      regionIndex = i;
+      if (!min) {
+        min = region[0];
+      }
+      offsetRegions.push([
+        region[0][0],
+        width,
+        size.get(0) - region[1][0]
+      ]);
+    }
+  }
+  if (regionIndex !== null) {
+    max = regions[regionIndex][1];
+  }
+
+  // exit if no offsets
+  if (offsetRegions.length === 0) {
+    return undefined;
+  }
+
+  const startOffset = size.indexToOffset(index.getWithNew2D(
+    min[0], min[1]
+  ));
+  const endOffset = size.indexToOffset(index.getWithNew2D(
+    max[0], max[1]
+  ));
+
+  return rangeRegions(
+    dataAccessor, startOffset, endOffset + 1,
+    1, offsetRegions);
+}
+
+/**
+ * Get a multiple value iterator. The input array defines the values and
+ * their start index.
+ *
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
+ * @param {Array} values An array of {index, value} pairs.
+ * @param {number} end The end of the range (excluded).
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+export function valueRange(values, end) {
+  let nextIndex = 0;
+  let nextValueIndex = 0;
+  // result
+  return {
+    next() {
+      if (nextIndex &lt; end) {
+        if (nextValueIndex + 1 &lt; values.length &amp;&amp;
+          nextIndex >= values[nextValueIndex + 1].index) {
+          ++nextValueIndex;
+        }
+        const result = {
+          value: values[nextValueIndex].value,
+          done: false,
+          index: nextIndex
+        };
+        ++nextIndex;
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+}
+</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/image/iterator.js"},"i1":{"basePath":"/dwv/doc/stable","searchIndexUrl":"/dwv/doc/stable/_assets/search-index.mwmcznlk-8710cd19.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/image/iterator-js","siteName":"DWV","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/image/iterator-js","basePath":"/dwv/doc/stable","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/dwv/doc/stable/_islands/theme-toggle-2OFR67FU.js","settings":"/dwv/doc/stable/_islands/settings-HUVOQWPC.js","code-viewer":"/dwv/doc/stable/_islands/code-viewer-J4JM56PM.js","embed":"/dwv/doc/stable/_islands/embed-S4IPJ47N.js","playground":"/dwv/doc/stable/_islands/playground-GHNL23CG.js","tabs":"/dwv/doc/stable/_islands/tabs-NRSQKCSU.js","sidebar":"/dwv/doc/stable/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/dwv/doc/stable/_islands/mobile-nav-ITUCHCYZ.js","toc":"/dwv/doc/stable/_islands/toc-YFAY7IHK.js","toc-mobile":"/dwv/doc/stable/_islands/toc-mobile-6DGE76YF.js","cmdk":"/dwv/doc/stable/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/dwv/doc/stable/_islands/code-tabs-C6ACVICP.js","copy-btn":"/dwv/doc/stable/_islands/copy-btn-5QCTJLYG.js","copy-page":"/dwv/doc/stable/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>
