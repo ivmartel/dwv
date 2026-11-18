@@ -9,7 +9,7 @@ Definitions:
 - _URL_: the data is accessed via a URL which resolves to data published on the same server as the application or on one that allows Cross-Origin Resource Sharing (CORS). A _discrete_ URL is a URL that represents a single file or medium. A _multipart_ URL represents a document that's comprised of multiple component parts (see wikipedia [MIME#Multipart_messages](https://en.wikipedia.org/wiki/MIME#Multipart_messages)).
 - _ZIP_: archive file format that supports lossless data compression. A ZIP file may contain one or more files or directories that may have been compressed (see wikipedia [ZIP](<https://en.wikipedia.org/wiki/ZIP_(file_format)>)).
 
-Note: for more details about which parts of the DICOM standard are supported, see the DICOM [conformance](/tutorials/conformance) page.
+Note: for more details about which parts of the DICOM standard are supported, see the DICOM [conformance](./tutorial-conformance.html) page.
 
 ### DWV-REQ-IO-01-001 Load DICOM file(s)
 The user can load DICOM data provided as one or multiple HTML File(s) representing DICOM files.
@@ -104,7 +104,31 @@ The user can save image and meta data to a DICOM file.
 ### DWV-REQ-IO-05-002 Write anonymised DICOM file
 The user can save image and anonymised meta data to a DICOM file.
 
+### DWV-REQ-IO-05-003 Write DICOM SEG
+The user can save a segmentation as a DICOM Segmentation (SEG) file. The segmentation is saved as a binary segmentation that references the image it was created on. Each segment keeps its number, label and colour.
+
+### DWV-REQ-IO-05-004 Write DICOM RTSTRUCT
+The user can save a segmentation as a DICOM RT Structure Set (RTSTRUCT) file. The segments are converted to closed planar contours (one or more per slice) that reference the image the segmentation was created on. Each segment is saved as a Region Of Interest (ROI) that keeps its number, name and colour.
+
+### DWV-REQ-IO-05-005 Write DICOM SR annotations
+The user can save annotations as a DICOM Structured Report (SR) file following the TID 1500 Measurement Report template. Each annotation is saved with its shape, its label, its measures and quantifications, and a reference to the image it was drawn on.
+
+### DWV-REQ-IO-06-001 Load DICOM SEG
+The user can load a DICOM Segmentation (SEG) file. Once loaded, the user can access the segmentation as a mask image and its list of segments (number, label and colour).
+
+### DWV-REQ-IO-06-002 Load DICOM RTSTRUCT
+The user can load a DICOM RT Structure Set (RTSTRUCT) file. The image series referenced by the structure set must be loaded first. The contours of each Region Of Interest (ROI) are converted into a mask image aligned with the referenced image; each ROI becomes a segment (number, name and colour).
+
+### DWV-REQ-IO-06-003 Load DICOM SR annotations
+The user can load annotations from a DICOM Structured Report (SR) file following the TID 1500 Measurement Report template. Once loaded, the user can access the annotations: their shape, label, measures, quantifications and the image they reference.
+
+### DWV-REQ-IO-07-001 Load multi-volume data
+The user can load data that contains multiple volumes of the same geometry, for example a time series or a diffusion acquisition with multiple b-values. The data can be provided as multiple single-frame files or as one multi-frame file. The volumes are identified using DICOM tags such as Temporal Position Identifier, Temporal Position Index or Diffusion b-value. The embedding application can change the list of tags used.
+
 ## ui
+Definitions:
+- _View_: the display of an image (or part of it) in an HTML `<canvas>` element. Multiple views can display the same data, for example with different orientations.
+- _Tool_: an interaction mode that transforms user input (mouse, touch or keyboard) on a view into changes of the displayed data or of its annotations.
 
 ### DWV-REQ-UI-01-001 Integration in web application
 The library can be integrated in a web application, a browser without any extensions must be sufficient to run the application. The supported browsers are the last two versions of browsers that have more than 1% audience worldwide (at the time of the dwv package creation).
@@ -118,6 +142,12 @@ The user can decide which orientation the displayed image should use: the acquis
 ### DWV-REQ-UI-02-003 Image overlay
 The user can load multiple data in a single HTML div. This will result in multiple HTML `<canvas>` aligned with each other by using the Image Position Patient DICOM tag.
 
+### DWV-REQ-UI-02-004 Display segmentation
+The user can display a segmentation (loaded from a DICOM SEG or RTSTRUCT file, or created by the user) over the image it references. The segmentation is aligned with the image and each segment is shown with its colour. The user can show or hide each segment.
+
+### DWV-REQ-UI-02-005 Display annotations
+The user can display annotations (loaded from a DICOM SR file or drawn by the user) over the image they reference. Each annotation is shown on the slice it was drawn on, with its label, measures and quantifications.
+
 ### DWV-REQ-UI-03-001 Change image window/level
 The user can change the window/level of the displayed image. On change, a `wlchange` event will be fired containing the changed values.
 
@@ -130,6 +160,9 @@ The user can change the zoom and pan of the displayed image. On zoom change, a `
 ### DWV-REQ-UI-03-004 Change image opacity
 The user can change the opacity of the displayed image. On change, a `opacitychange` event will be fired containing the changed values.
 
+### DWV-REQ-UI-03-005 Change image volume
+For multi-volume data, the user can change the displayed volume while keeping the current position in the volume. On change, a `positionchange` event will be fired containing the changed values.
+
 ### DWV-REQ-UI-04-001 Views window/level synchronisation
 The user can decide to synchronise or not the window/level between different views of the same data.
 
@@ -137,7 +170,7 @@ The user can decide to synchronise or not the window/level between different vie
 The user can decide to synchronise or not the position between different views.
 
 ### DWV-REQ-UI-04-003 Views zoom/pan synchronisation
-The user can decide to synchronise or not the window/level between different views.
+The user can decide to synchronise or not the zoom/pan between different views.
 
 ### DWV-REQ-UI-04-004 Views opacity synchronisation
 The user can decide to synchronise or not the opacity between different views of the same data.
@@ -145,14 +178,14 @@ The user can decide to synchronise or not the opacity between different views of
 ### DWV-REQ-UI-05-001 Window/Level tool
 The user can change the window/level of the displayed data via specific interaction on the image `<canvas>`:
 - `left click drag up/down` or `one touch drag up/down` changes the window,
-- `left click drag left/right` or `one touch drag up/down` changes the level,
-- `double left click` or `double touch` centre's the window/level on the clicked intensity,
+- `left click drag left/right` or `one touch drag left/right` changes the level,
+- `double left click` or `double touch` centres the window/level on the clicked intensity,
 - `left click` or `touch` shows the position and intensity.
 
 The user must be able to reset the window/level to their original values.
 
 ### DWV-REQ-UI-05-002 Window/Level presets
-Specific window/level data pre-sets must be made available. Only data with CT modality will provide some. They are ['name' (window center, window width)]:
+Specific window/level presets must be made available: the ones defined in the DICOM data, a 'minmax' one calculated from the image intensities and, depending on the data modality, default ones. The default presets can be overridden by the embedding application. Only data with CT modality has default presets, they are ['name' (window center, window width)]:
 - 'mediastinum' (40, 400),
 - 'lung' (-500, 1500),
 - 'bone' (500, 2000),
@@ -191,19 +224,19 @@ The user can draw an arrow shape on the displayed data. An arrow is characterise
 The user can draw a circle shape on the displayed data. A circle is characterised by a center point and a radius. The center can be changed when moving the complete shape, the radius via control points on the shape. A label can be associated to the shape. The following measures are provided with the shape: radius and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
 
 ### DWV-REQ-UI-07-003 Draw ellipse
-The user can draw an ellipse shape on the displayed data. An ellipse is characterised by a center point and two radiuses. The center can be changed when moving the complete shape, the radiuses via control points on the shape. The following measures are provided with the shape: radius a, radius b and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
+The user can draw an ellipse shape on the displayed data. An ellipse is characterised by a center point and two radiuses. The center can be changed when moving the complete shape, the radiuses via control points on the shape. A label can be associated to the shape. The following measures are provided with the shape: radius a, radius b and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
 
 ### DWV-REQ-UI-07-004 Draw free hand
-The user can draw a free hand shape on the displayed data. A free hand shape is a non closed shape charaterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape.
+The user can draw a free hand shape on the displayed data. A free hand shape is a non closed shape characterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape.
 
 ### DWV-REQ-UI-07-005 Draw protractor
-The user can draw a protractor shape on the displayed data. A protractor is charaterised by three modifiable anchor points. The shape can be moved in its entirety. The following measure are provided with the shape: the angle between the two lines that form the protractor. No quantifications are provided with the shape.
+The user can draw a protractor shape on the displayed data. A protractor is characterised by three modifiable anchor points. The shape can be moved in its entirety. The following measures are provided with the shape: the angle between the two lines that form the protractor. No quantifications are provided with the shape.
 
 ### DWV-REQ-UI-07-006 Draw rectangle
-The user can draw a rectangle shape on the displayed data. A rectangle is charaterised by four modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: width, height and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
+The user can draw a rectangle shape on the displayed data. A rectangle is characterised by four modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: width, height and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
 
 ### DWV-REQ-UI-07-007 Draw ruler
-The user can draw a ruler shape on the displayed data. An arrow is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measure are provided with the shape: the length of the line. No quantifications are provided with the shape.
+The user can draw a ruler shape on the displayed data. A ruler is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: the length of the line. No quantifications are provided with the shape.
 
 ### DWV-REQ-UI-07-008 Draw ROI
 The user can draw a Region Of Interest (ROI) shape on the displayed data. A ROI is a closed shape characterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape.
@@ -212,7 +245,7 @@ The user can draw a Region Of Interest (ROI) shape on the displayed data. A ROI 
 The user can delete draws.
 
 ### DWV-REQ-UI-08-002 Draw action undo/redo
-The user can undo/redo all actions of the draw tool using `CRTL-Z` and `CRTL-Y` or special buttons on touch enabled devices. The actions are: anchor move, shape move, shape creation and shape deletion.
+The user can undo/redo all actions of the draw tool using `CTRL-Z` and `CTRL-Y` or special buttons on touch enabled devices. The actions are: anchor move, shape move, shape creation and shape deletion.
 
 ### DWV-REQ-UI-09-001 Livewire
 The user can draw a region of interest while guided with a [livewire segmentation technique](https://en.wikipedia.org/wiki/Livewire_Segmentation_Technique).
