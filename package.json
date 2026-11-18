@@ -71,6 +71,7 @@
     "test": "vitest",
     "test-ci": "vitest --coverage --watch false --reporter default --reporter json",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
+    "doc-gh-pages": "node resources/scripts/doc.js --base-path /dwv/doc/stable/",
     "types": "tsc -p resources/api/tsconfig.json",
     "api": "api-extractor run -c resources/api/api-extractor.json --local",
     "api-ci": "api-extractor run -c resources/api/api-extractor.json"
