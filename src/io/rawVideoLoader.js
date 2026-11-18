@@ -6,6 +6,8 @@ import {LoaderBase} from './loaderBase.js';
 /**
  * Raw video loader.
  *
+ * Warning; not compatible with a node usage.
+ *
  * Url example (cors enabled):
  *   {@link https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4}.
  */
@@ -41,6 +43,7 @@ export class RawVideoLoader extends LoaderBase {
   load(buffer, origin, index) {
     this.setLoading(true);
     // create a DOM video
+    // note: uses the global document, not compatible with a node usage
     const video = document.createElement('video');
     if (typeof origin === 'string') {
       // url case
