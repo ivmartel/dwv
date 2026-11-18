@@ -70,7 +70,12 @@ When upgrading to a newer edition, update together:
   via `resources/api/tsconfig.json`) + `api` (api-extractor, checked against
   `resources/api/dwv.api.md`).
 - `yarn build-all` — `build` + `pack-node` (Node-targeted bundle,
-  `config/webpack.node.js`).
+  `config/webpack.node.js`, output `dist/dwv.node.min.js`, the package's
+  `node` export). The Node bundle is limited, mainly for DICOM parsing
+  (`DicomParser`, tags, dictionary) and writing (`DicomWriter`): no URL or
+  file loading (the loaders rely on browser `XMLHttpRequest`/`FileReader`),
+  so pass the raw bytes (`ArrayBuffer`) yourself; no web-worker based
+  decompression of compressed pixel data, and no rendering (canvas, Konva).
 - `yarn build-demo` — builds the demo pages (`config/webpack.demo.js`), used
   by CI to publish to `gh-pages`.
 - `yarn doc` — generates jsdoc site (`resources/doc/jsdoc.conf.json`).
