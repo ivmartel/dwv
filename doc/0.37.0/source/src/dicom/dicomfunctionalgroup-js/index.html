@@ -1,0 +1,501 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/dicom/dicomFunctionalGroup.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/_assets/styles.mwm9kbrx-f9794ac0.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/dicom/dicomFunctionalGroup.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">import {getSpacingFromMeasure} from './dicomImage.js';
+import {logger} from '../utils/logger.js';
+import {arrayEquals} from '../utils/array.js';
+import {
+  getDicomCodeItem,
+  DcmCodes,
+  getDcmDicomCode
+} from './dicomCode.js';
+import {
+  DataElement,
+  safeGetAll
+} from './dataElement.js';
+
+/**
+ * @import {Spacing} from '../image/spacing.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  DerivationImageSequence: '00089124',
+  SourceImageSequence: '00082112',
+  ReferencedSOPClassUID: '00081150',
+  ReferencedSOPInstanceUID: '00081155',
+  FrameContentSequence: '00209111',
+  DimensionIndexValue: '00209157',
+  DimensionOrganizationSequence: '00209221',
+  DimensionOrganizationUID: '00209164',
+  DimensionIndexSequence: '00209222',
+  DimensionIndexPointer: '00209165',
+  DimensionDescriptionLabel: '00209421',
+  SegmentIdentificationSequence: '0062000A',
+  ReferencedSegmentNumber: '0062000B',
+  PlanePositionSequence: '00209113',
+  ImagePosition: '00200032',
+  PlaneOrientationSequence: '00209116',
+  ImageOrientation: '00200037',
+  PixelMeasuresSequence: '00289110',
+  PerFrameFunctionalGroupsSequence: '52009230'
+};
+
+/**
+ * Check the dimension organization from a dicom element.
+ *
+ * @param {Record&lt;string, DataElement>} dataElements The root dicom element.
+ * @returns {object} The dimension organizations and indices.
+ */
+export function getDimensionOrganization(dataElements) {
+  // Dimension Organization Sequence (required)
+  const orgSq = dataElements[TagKeys.DimensionOrganizationSequence];
+  if (typeof orgSq === 'undefined' || orgSq.value.length !== 1) {
+    throw new Error('Unsupported dimension organization sequence length');
+  }
+  // Dimension Organization UID
+  const orgUID = orgSq.value[0][TagKeys.DimensionOrganizationUID].value[0];
+
+  // Dimension Index Sequence (conditionally required)
+  const indices = [];
+  const indexSqElem = dataElements[TagKeys.DimensionIndexSequence];
+  if (typeof indexSqElem !== 'undefined') {
+    const indexSq = indexSqElem.value;
+    // expecting 2D index
+    if (indexSq.length !== 2) {
+      throw new Error('Unsupported dimension index sequence length');
+    }
+    let indexPointer;
+    for (let i = 0; i &lt; indexSq.length; ++i) {
+      // Dimension Organization UID (required)
+      const indexOrg = indexSq[i][TagKeys.DimensionOrganizationUID].value[0];
+      if (indexOrg !== orgUID) {
+        throw new Error(
+          'Dimension Index Sequence contains a unknown Dimension Organization');
+      }
+      // Dimension Index Pointer (required)
+      indexPointer = indexSq[i][TagKeys.DimensionIndexPointer].value[0];
+
+      const index = {
+        DimensionOrganizationUID: indexOrg,
+        DimensionIndexPointer: indexPointer
+      };
+      // Dimension Description Label (optional)
+      const descriptionLabelEl =
+        indexSq[i][TagKeys.DimensionDescriptionLabel];
+      if (typeof descriptionLabelEl !== 'undefined') {
+        index.DimensionDescriptionLabel = descriptionLabelEl.value[0];
+      }
+      // store
+      indices.push(index);
+    }
+    // expecting Image Position at last position
+    if (indexPointer !== '(0020,0032)') {
+      throw new Error('Unsupported non image position as last index');
+    }
+  }
+
+  return {
+    organizations: {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID
+        }
+      ]
+    },
+    indices: {
+      value: indices
+    }
+  };
+}
+
+/**
+ * DICOM functional group: item of a
+ *  SharedFunctionalGroupsSequence (5200,9229) or
+ *  PerframeFunctionalGroupsSequence (5200,9230).
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.16.html}.
+ */
+export class DicomFunctionalGroup {
+  /**
+   * The dimension index.
+   *
+   * @type {number[]}
+   */
+  dimIndex;
+  /**
+   * The frame image position patient.
+   *
+   * @type {number[]}
+   */
+  imagePosPat;
+  /**
+   * List of derivation images.
+   *
+   * @type {Array}
+   */
+  derivationImages;
+  /**
+   * The reference segment number.
+   *
+   * @type {number}
+   */
+  refSegmentNumber;
+
+  /**
+   * The frame image orientation.
+   *
+   * @type {number[]|undefined}
+   */
+  imageOrientationPatient;
+  /**
+   * The frame spacing.
+   *
+   * @type {Spacing|undefined}
+   */
+  spacing;
+
+  /**
+   * @param {number[]} dimIndex The dimension index.
+   * @param {number[]} imagePosPat The frame image position patient.
+   * @param {Array} derivationImages List of derivation images.
+   * @param {number} refSegmentNumber The reference segment number.
+   */
+  constructor(dimIndex, imagePosPat, derivationImages, refSegmentNumber) {
+    this.dimIndex = dimIndex;
+    this.imagePosPat = imagePosPat;
+    this.derivationImages = derivationImages;
+    this.refSegmentNumber = refSegmentNumber;
+  }
+}
+
+/**
+ * Get a functional group object from a dicom element.
+ *
+ * @param {Record&lt;string, DataElement>} dataElements The dicom element.
+ * @returns {DicomFunctionalGroup|undefined} A functional group object.
+ */
+export function getFunctionalGroup(dataElements) {
+  // Derivation Image Sequence
+  const derivationImages = [];
+  if (typeof dataElements[TagKeys.DerivationImageSequence] !== 'undefined') {
+    const derivationImageSq =
+      dataElements[TagKeys.DerivationImageSequence].value;
+    // Source Image Sequence
+    for (let i = 0; i &lt; derivationImageSq.length; ++i) {
+      const sourceImages = [];
+      if (typeof derivationImageSq[i][TagKeys.SourceImageSequence] !==
+        'undefined') {
+        const sourceImageSq =
+          derivationImageSq[i][TagKeys.SourceImageSequence].value;
+        for (let j = 0; j &lt; sourceImageSq.length; ++j) {
+          const sourceImage = {};
+          // Referenced SOP Class UID
+          if (typeof sourceImageSq[j][TagKeys.ReferencedSOPClassUID] !==
+            'undefined') {
+            sourceImage.referencedSOPClassUID =
+              sourceImageSq[j][TagKeys.ReferencedSOPClassUID].value[0];
+          }
+          // Referenced SOP Instance UID
+          if (typeof sourceImageSq[j][TagKeys.ReferencedSOPInstanceUID] !==
+            'undefined') {
+            sourceImage.referencedSOPInstanceUID =
+              sourceImageSq[j][TagKeys.ReferencedSOPInstanceUID].value[0];
+          }
+          sourceImages.push(sourceImage);
+        }
+      }
+      derivationImages.push({
+        sourceImages
+      });
+    }
+  }
+  // Frame Content Sequence (required, only one)
+  if (typeof dataElements[TagKeys.FrameContentSequence] === 'undefined') {
+    logger.info('Missing frame content sequence');
+    return;
+  }
+  const frameContentSq = dataElements[TagKeys.FrameContentSequence].value;
+  if (frameContentSq.length === 0) {
+    logger.info('Empty frame content sequence');
+    return;
+  }
+  // Dimension Index Value
+  const dimIndex = frameContentSq[0][TagKeys.DimensionIndexValue].value;
+  // Referenced Segment Number (can be undefined for non SEG)
+  let refSegmentNumber;
+  // Segment Identification Sequence (required for SEG, only one)
+  const segmentIdSq = dataElements[TagKeys.SegmentIdentificationSequence];
+  if (typeof segmentIdSq !== 'undefined') {
+    const item0 = segmentIdSq.value[0];
+    refSegmentNumber =
+      parseInt(item0[TagKeys.ReferencedSegmentNumber].value[0], 10);
+  }
+  // Plane Position Sequence (required, only one)
+  if (typeof dataElements[TagKeys.PlanePositionSequence] === 'undefined') {
+    logger.info('Missing plane position sequence');
+    return;
+  }
+  const planePosSq = dataElements[TagKeys.PlanePositionSequence].value;
+  if (planePosSq.length === 0) {
+    logger.info('Empty plane position sequence');
+    return;
+  }
+  // Image Position (Patient) (conditionally required)
+  const imagePosPat = planePosSq[0][TagKeys.ImagePosition].value;
+  for (let p = 0; p &lt; imagePosPat.length; ++p) {
+    imagePosPat[p] = parseFloat(imagePosPat[p]);
+  }
+  const funcGroup = new DicomFunctionalGroup(
+    dimIndex,
+    imagePosPat,
+    derivationImages,
+    refSegmentNumber
+  );
+  // Plane Orientation Sequence
+  if (typeof dataElements[TagKeys.PlaneOrientationSequence] !== 'undefined') {
+    const framePlaneOrientationSeq =
+      dataElements[TagKeys.PlaneOrientationSequence];
+    if (framePlaneOrientationSeq.value.length !== 0) {
+      // should only be one Image Orientation (Patient)
+      const frameImageOrientation =
+        framePlaneOrientationSeq.value[0][TagKeys.ImageOrientation].value;
+      if (typeof frameImageOrientation !== 'undefined') {
+        funcGroup.imageOrientationPatient = frameImageOrientation;
+      }
+    }
+  }
+  // Pixel Measures Sequence
+  if (typeof dataElements[TagKeys.PixelMeasuresSequence] !== 'undefined') {
+    const framePixelMeasuresSeq = dataElements[TagKeys.PixelMeasuresSequence];
+    if (framePixelMeasuresSeq.value.length !== 0) {
+      // should only be one
+      const frameSpacing =
+        getSpacingFromMeasure(framePixelMeasuresSeq.value[0]);
+      if (typeof frameSpacing !== 'undefined') {
+        funcGroup.spacing = frameSpacing;
+      }
+    } else {
+      logger.warn(
+        'No shared functional group pixel measure sequence items.');
+    }
+  }
+
+  return funcGroup;
+}
+
+/**
+ * Get the list of per frame DicomFunctionalGroup from the root list
+ * of data elements.
+ *
+ * @param {Record&lt;string, DataElement>} dataElements The root dicom element.
+ * @param {number} [numberOfFrames] Optional number of frames to compare
+ *   with per frame sequence size.
+ * @returns {DicomFunctionalGroup[]|undefined} The list of frame
+ *   information object.
+ */
+export function getPerFrameFunctionalGroups(dataElements, numberOfFrames) {
+  // Per-frame Functional Groups Sequence
+  const perFrameFuncGroupSequence =
+    safeGetAll(dataElements, TagKeys.PerFrameFunctionalGroupsSequence);
+
+  let funcGroups;
+  if (typeof perFrameFuncGroupSequence !== 'undefined') {
+    // check size
+    if (typeof numberOfFrames !== 'undefined' &amp;&amp;
+      numberOfFrames !== perFrameFuncGroupSequence.length) {
+      throw new Error(
+        'perFrameFuncGroupSequence meta and numberOfFrames are not equal.');
+    }
+    // create frame info object from per frame func
+    funcGroups = [];
+    for (const item of perFrameFuncGroupSequence) {
+      funcGroups.push(getFunctionalGroup(item));
+    }
+  }
+
+  return funcGroups;
+}
+
+/**
+ * Check if two functional group objects are equal.
+ *
+ * @param {DicomFunctionalGroup} group1 The first frame info.
+ * @param {DicomFunctionalGroup} group2 The second frame info.
+ * @returns {boolean} True if both groups are equal.
+ */
+export function isEqualFunctionalGroup(group1, group2) {
+  // basics
+  if (typeof group1 === 'undefined' ||
+    typeof group2 === 'undefined' ||
+    group1 === null ||
+    group2 === null) {
+    return false;
+  }
+  let isEqual =
+    arrayEquals(group1.dimIndex, group2.dimIndex) &amp;&amp;
+    arrayEquals(group1.imagePosPat, group2.imagePosPat) &amp;&amp;
+    group1.refSegmentNumber === group2.refSegmentNumber;
+
+  isEqual = isEqual &amp;&amp;
+    group1.derivationImages.length === group2.derivationImages.length;
+  for (let i = 0; i &lt; group1.derivationImages.length; ++i) {
+    const derivationImage1 = group1.derivationImages[i];
+    const derivationImage2 = group2.derivationImages[i];
+    isEqual = isEqual &amp;&amp;
+      derivationImage1.sourceImages.length ===
+      derivationImage2.sourceImages.length;
+    for (let j = 0; j &lt; derivationImage1.length; ++j) {
+      const sourceImage1 = derivationImage1.sourceImages[j];
+      const sourceImage2 = derivationImage2.sourceImages[j];
+      isEqual = isEqual &amp;&amp;
+        sourceImage1.referencedSOPClassUID ===
+        sourceImage2.referencedSOPClassUID &amp;&amp;
+        sourceImage1.referencedSOPInstanceUID ===
+        sourceImage2.referencedSOPInstanceUID;
+    }
+  }
+
+  return isEqual;
+}
+
+/**
+ * Get a dicom item from a functional group object.
+ *
+ * @param {DicomFunctionalGroup} funcGroup The functional group object.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
+ */
+export function getDicomFunctionalGroupItem(funcGroup) {
+  const item = {
+    FrameContentSequence: {
+      value: [
+        {
+          DimensionIndexValues: funcGroup.dimIndex
+        }
+      ]
+    },
+    PlanePositionSequence: {
+      value: [
+        {
+          ImagePositionPatient: funcGroup.imagePosPat
+        }
+      ]
+    },
+    SegmentIdentificationSequence: {
+      value: [
+        {
+          ReferencedSegmentNumber: funcGroup.refSegmentNumber
+        }
+      ]
+    }
+  };
+  // optional DerivationImageSequence
+  if (funcGroup.derivationImages !== undefined) {
+    const sourceImgPurposeOfReferenceCode =
+      getDicomCodeItem(
+        getDcmDicomCode(DcmCodes.SourceImageForImageProcessingOperation)
+      );
+    const segDerivationCode =
+      getDicomCodeItem(getDcmDicomCode(DcmCodes.Segmentation));
+
+    const derivationImageItems = [];
+    for (const derivationImage of funcGroup.derivationImages) {
+      const sourceImages = [];
+      for (const sourceImage of derivationImage.sourceImages) {
+        sourceImages.push({
+          PurposeOfReferenceCodeSequence: {
+            value: [sourceImgPurposeOfReferenceCode]
+          },
+          ReferencedSOPClassUID: sourceImage.referencedSOPClassUID,
+          ReferencedSOPInstanceUID: sourceImage.referencedSOPInstanceUID
+        });
+      }
+
+      derivationImageItems.push({
+        DerivationCodeSequence: {
+          value: [segDerivationCode]
+        },
+        SourceImageSequence: {
+          value: sourceImages
+        }
+      });
+    }
+
+    item.DerivationImageSequence = {
+      value: derivationImageItems
+    };
+  }
+
+  return item;
+}
+
+/**
+ * Get a value that is constant across the frames of a multi-frame file.
+ * Frames without the value are ignored.
+ *
+ * @param {Record&lt;string, DataElement>} elements The DICOM tags.
+ * @param {Function} valueGetter The per frame functional group value getter.
+ * @param {string} name The value name, used for logging.
+ * @returns {any|undefined} The value, or undefined if absent or if it
+ *   varies across frames: the file then does not represent a single
+ *   volume and the value cannot be used as a volume id.
+ */
+export function getConstantPerFrameValue(elements, valueGetter, name) {
+  let res;
+  const perFrameGroupSeq =
+    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+  if (typeof perFrameGroupSeq === 'undefined') {
+    return undefined;
+  }
+  for (const group of perFrameGroupSeq) {
+    const value = valueGetter(group);
+    if (typeof value !== 'undefined') {
+      if (typeof res === 'undefined') {
+        res = value;
+      } else if (res !== value) {
+        logger.debug(`Unhandled varying ${name}`);
+        return undefined;
+      }
+    }
+  }
+  return res;
+}
+
+/**
+ * Get the DICOM tags of one frame of a multi-frame file: the root tags
+ * with a per frame functional groups sequence that only contains the
+ * frame item. Getters written for the root tags (for example using
+ * getConstantPerFrameValue) then return the frame value.
+ *
+ * @param {Record&lt;string, DataElement>} elements The DICOM tags.
+ * @param {number} frameNumber The frame number.
+ * @returns {Record&lt;string, DataElement>} The frame DICOM tags.
+ */
+export function getFrameElements(elements, frameNumber) {
+  const perFrameGroupSeq =
+    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+  const frameGroupSeq = new DataElement('SQ');
+  frameGroupSeq.value = [perFrameGroupSeq[frameNumber]];
+  return {
+    ...elements,
+    [TagKeys.PerFrameFunctionalGroupsSequence]: frameGroupSeq
+  };
+}
+
+/**
+ * Get the DICOM tags of each frame of a multi-frame file (see
+ * getFrameElements).
+ *
+ * @param {Record&lt;string, DataElement>} elements The DICOM tags.
+ * @returns {Array&lt;Record&lt;string, DataElement>>} The DICOM tags of each
+ *   frame, the input tags if there are no per frame functional groups.
+ */
+export function getFramesElements(elements) {
+  const perFrameGroupSeq =
+    safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
+  if (typeof perFrameGroupSeq === 'undefined') {
+    return [elements];
+  }
+  return perFrameGroupSeq.map((_group, i) => getFrameElements(elements, i));
+}
+</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/dicom/dicomFunctionalGroup.js"},"i1":{"basePath":"/","searchIndexUrl":"/_assets/search-index.mwm9kbrx-f9794ac0.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/dicom/dicomfunctionalgroup-js","siteName":"DWV","basePath":"/","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/dicom/dicomfunctionalgroup-js","basePath":"/","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/_islands/theme-toggle-2OFR67FU.js","settings":"/_islands/settings-HUVOQWPC.js","code-viewer":"/_islands/code-viewer-J4JM56PM.js","embed":"/_islands/embed-S4IPJ47N.js","playground":"/_islands/playground-GHNL23CG.js","tabs":"/_islands/tabs-NRSQKCSU.js","sidebar":"/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/_islands/mobile-nav-ITUCHCYZ.js","toc":"/_islands/toc-YFAY7IHK.js","toc-mobile":"/_islands/toc-mobile-6DGE76YF.js","cmdk":"/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/_islands/code-tabs-C6ACVICP.js","copy-btn":"/_islands/copy-btn-5QCTJLYG.js","copy-page":"/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>

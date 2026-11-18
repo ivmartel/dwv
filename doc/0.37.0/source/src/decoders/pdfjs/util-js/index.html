@@ -1,0 +1,1276 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/decoders/pdfjs/util.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/_assets/styles.mwm9kbrx-f9794ac0.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/decoders/pdfjs/util.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">/* eslint-disable */
+
+/**
+ * Modified for dwv:
+ * - export root var,
+ * - remove old style import/export and
+ *   related (for ex 'use strict').
+ */
+
+/* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
+/* Copyright 2012 Mozilla Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/* globals Cmd, ColorSpace, Dict, MozBlobBuilder, Name, PDFJS, Ref, URL,
+           Promise */
+
+var isWorker = (typeof window === 'undefined');
+
+export var FONT_IDENTITY_MATRIX = [0.001, 0, 0, 0.001, 0, 0];
+
+export var TextRenderingMode = {
+  FILL: 0,
+  STROKE: 1,
+  FILL_STROKE: 2,
+  INVISIBLE: 3,
+  FILL_ADD_TO_PATH: 4,
+  STROKE_ADD_TO_PATH: 5,
+  FILL_STROKE_ADD_TO_PATH: 6,
+  ADD_TO_PATH: 7,
+  FILL_STROKE_MASK: 3,
+  ADD_TO_PATH_FLAG: 4
+};
+
+export var ImageKind = {
+  GRAYSCALE_1BPP: 1,
+  RGB_24BPP: 2,
+  RGBA_32BPP: 3
+};
+
+export var AnnotationType = {
+  WIDGET: 1,
+  TEXT: 2,
+  LINK: 3
+};
+
+export var StreamType = {
+  UNKNOWN: 0,
+  FLATE: 1,
+  LZW: 2,
+  DCT: 3,
+  JPX: 4,
+  JBIG: 5,
+  A85: 6,
+  AHX: 7,
+  CCF: 8,
+  RL: 9
+};
+
+export var FontType = {
+  UNKNOWN: 0,
+  TYPE1: 1,
+  TYPE1C: 2,
+  CIDFONTTYPE0: 3,
+  CIDFONTTYPE0C: 4,
+  TRUETYPE: 5,
+  CIDFONTTYPE2: 6,
+  TYPE3: 7,
+  OPENTYPE: 8,
+  TYPE0: 9,
+  MMTYPE1: 10
+};
+
+// The global PDFJS object exposes the API
+// In production, it will be declared outside a global wrapper
+// In development, it will be declared here
+// if (!globalScope.PDFJS) {
+//   globalScope.PDFJS = {};
+// }
+
+var PDFJS = {};
+
+// globalScope.PDFJS.pdfBug = false;
+PDFJS.pdfBug = false;
+
+PDFJS.VERBOSITY_LEVELS = {
+  errors: 0,
+  warnings: 1,
+  infos: 5
+};
+
+// All the possible operations for an operator list.
+export var OPS = PDFJS.OPS = {
+  // Intentionally start from 1 so it is easy to spot bad operators that will be
+  // 0's.
+  dependency: 1,
+  setLineWidth: 2,
+  setLineCap: 3,
+  setLineJoin: 4,
+  setMiterLimit: 5,
+  setDash: 6,
+  setRenderingIntent: 7,
+  setFlatness: 8,
+  setGState: 9,
+  save: 10,
+  restore: 11,
+  transform: 12,
+  moveTo: 13,
+  lineTo: 14,
+  curveTo: 15,
+  curveTo2: 16,
+  curveTo3: 17,
+  closePath: 18,
+  rectangle: 19,
+  stroke: 20,
+  closeStroke: 21,
+  fill: 22,
+  eoFill: 23,
+  fillStroke: 24,
+  eoFillStroke: 25,
+  closeFillStroke: 26,
+  closeEOFillStroke: 27,
+  endPath: 28,
+  clip: 29,
+  eoClip: 30,
+  beginText: 31,
+  endText: 32,
+  setCharSpacing: 33,
+  setWordSpacing: 34,
+  setHScale: 35,
+  setLeading: 36,
+  setFont: 37,
+  setTextRenderingMode: 38,
+  setTextRise: 39,
+  moveText: 40,
+  setLeadingMoveText: 41,
+  setTextMatrix: 42,
+  nextLine: 43,
+  showText: 44,
+  showSpacedText: 45,
+  nextLineShowText: 46,
+  nextLineSetSpacingShowText: 47,
+  setCharWidth: 48,
+  setCharWidthAndBounds: 49,
+  setStrokeColorSpace: 50,
+  setFillColorSpace: 51,
+  setStrokeColor: 52,
+  setStrokeColorN: 53,
+  setFillColor: 54,
+  setFillColorN: 55,
+  setStrokeGray: 56,
+  setFillGray: 57,
+  setStrokeRGBColor: 58,
+  setFillRGBColor: 59,
+  setStrokeCMYKColor: 60,
+  setFillCMYKColor: 61,
+  shadingFill: 62,
+  beginInlineImage: 63,
+  beginImageData: 64,
+  endInlineImage: 65,
+  paintXObject: 66,
+  markPoint: 67,
+  markPointProps: 68,
+  beginMarkedContent: 69,
+  beginMarkedContentProps: 70,
+  endMarkedContent: 71,
+  beginCompat: 72,
+  endCompat: 73,
+  paintFormXObjectBegin: 74,
+  paintFormXObjectEnd: 75,
+  beginGroup: 76,
+  endGroup: 77,
+  beginAnnotations: 78,
+  endAnnotations: 79,
+  beginAnnotation: 80,
+  endAnnotation: 81,
+  paintJpegXObject: 82,
+  paintImageMaskXObject: 83,
+  paintImageMaskXObjectGroup: 84,
+  paintImageXObject: 85,
+  paintInlineImageXObject: 86,
+  paintInlineImageXObjectGroup: 87,
+  paintImageXObjectRepeat: 88,
+  paintImageMaskXObjectRepeat: 89,
+  paintSolidColorImageMask: 90,
+  constructPath: 91
+};
+
+// A notice for devs. These are good for things that are helpful to devs, such
+// as warning that Workers were disabled, which is important to devs but not
+// end users.
+export function info(msg) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.infos) {
+    console.log('Info: ' + msg);
+  }
+}
+
+// Non-fatal warnings.
+export function warn(msg) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.warnings) {
+    console.log('Warning: ' + msg);
+  }
+}
+
+// Fatal errors that should trigger the fallback UI and halt execution by
+// throwing an exception.
+export function error(msg) {
+  // If multiple arguments were passed, pass them all to the log function.
+  if (arguments.length > 1) {
+    var logArguments = ['Error:'];
+    logArguments.push.apply(logArguments, arguments);
+    console.log.apply(console, logArguments);
+    // Join the arguments into a single string for the lines below.
+    msg = [].join.call(arguments, ' ');
+  } else {
+    console.log('Error: ' + msg);
+  }
+  console.log(backtrace());
+  UnsupportedManager.notify(UNSUPPORTED_FEATURES.unknown);
+  throw new Error(msg);
+}
+
+export function backtrace() {
+  try {
+    throw new Error();
+  } catch (e) {
+    return e.stack ? e.stack.split('\n').slice(2).join('\n') : '';
+  }
+}
+
+export function assert(cond, msg) {
+  if (!cond) {
+    error(msg);
+  }
+}
+
+export var UNSUPPORTED_FEATURES = PDFJS.UNSUPPORTED_FEATURES = {
+  unknown: 'unknown',
+  forms: 'forms',
+  javaScript: 'javaScript',
+  smask: 'smask',
+  shadingPattern: 'shadingPattern',
+  font: 'font'
+};
+
+export var UnsupportedManager = PDFJS.UnsupportedManager =
+  (function UnsupportedManagerClosure() {
+  var listeners = [];
+  return {
+    listen: function (cb) {
+      listeners.push(cb);
+    },
+    notify: function (featureId) {
+      warn('Unsupported feature &quot;' + featureId + '&quot;');
+      for (var i = 0, ii = listeners.length; i &lt; ii; i++) {
+        listeners[i](featureId);
+      }
+    }
+  };
+})();
+
+// Combines two URLs. The baseUrl shall be absolute URL. If the url is an
+// absolute URL, it will be returned as is.
+export function combineUrl(baseUrl, url) {
+  if (!url) {
+    return baseUrl;
+  }
+  if (/^[a-z][a-z0-9+\-.]*:/i.test(url)) {
+    return url;
+  }
+  var i;
+  if (url.charAt(0) === '/') {
+    // absolute path
+    i = baseUrl.indexOf('://');
+    if (url.charAt(1) === '/') {
+      ++i;
+    } else {
+      i = baseUrl.indexOf('/', i + 3);
+    }
+    return baseUrl.substring(0, i) + url;
+  } else {
+    // relative path
+    var pathLength = baseUrl.length;
+    i = baseUrl.lastIndexOf('#');
+    pathLength = i >= 0 ? i : pathLength;
+    i = baseUrl.lastIndexOf('?', pathLength);
+    pathLength = i >= 0 ? i : pathLength;
+    var prefixLength = baseUrl.lastIndexOf('/', pathLength);
+    return baseUrl.substring(0, prefixLength + 1) + url;
+  }
+}
+
+// Validates if URL is safe and allowed, e.g. to avoid XSS.
+function isValidUrl(url, allowRelative) {
+  if (!url) {
+    return false;
+  }
+  // RFC 3986 (http://tools.ietf.org/html/rfc3986#section-3.1)
+  // scheme = ALPHA *( ALPHA / DIGIT / &quot;+&quot; / &quot;-&quot; / &quot;.&quot; )
+  var protocol = /^[a-z][a-z0-9+\-.]*(?=:)/i.exec(url);
+  if (!protocol) {
+    return allowRelative;
+  }
+  protocol = protocol[0].toLowerCase();
+  switch (protocol) {
+    case 'http':
+    case 'https':
+    case 'ftp':
+    case 'mailto':
+    case 'tel':
+      return true;
+    default:
+      return false;
+  }
+}
+PDFJS.isValidUrl = isValidUrl;
+
+function shadow(obj, prop, value) {
+  Object.defineProperty(obj, prop, { value: value,
+                                     enumerable: true,
+                                     configurable: true,
+                                     writable: false });
+  return value;
+}
+PDFJS.shadow = shadow;
+
+export var PasswordResponses = PDFJS.PasswordResponses = {
+  NEED_PASSWORD: 1,
+  INCORRECT_PASSWORD: 2
+};
+
+var PasswordException = (function PasswordExceptionClosure() {
+  function PasswordException(msg, code) {
+    this.name = 'PasswordException';
+    this.message = msg;
+    this.code = code;
+  }
+
+  PasswordException.prototype = new Error();
+  PasswordException.constructor = PasswordException;
+
+  return PasswordException;
+})();
+PDFJS.PasswordException = PasswordException;
+
+var UnknownErrorException = (function UnknownErrorExceptionClosure() {
+  function UnknownErrorException(msg, details) {
+    this.name = 'UnknownErrorException';
+    this.message = msg;
+    this.details = details;
+  }
+
+  UnknownErrorException.prototype = new Error();
+  UnknownErrorException.constructor = UnknownErrorException;
+
+  return UnknownErrorException;
+})();
+PDFJS.UnknownErrorException = UnknownErrorException;
+
+var InvalidPDFException = (function InvalidPDFExceptionClosure() {
+  function InvalidPDFException(msg) {
+    this.name = 'InvalidPDFException';
+    this.message = msg;
+  }
+
+  InvalidPDFException.prototype = new Error();
+  InvalidPDFException.constructor = InvalidPDFException;
+
+  return InvalidPDFException;
+})();
+PDFJS.InvalidPDFException = InvalidPDFException;
+
+var MissingPDFException = (function MissingPDFExceptionClosure() {
+  function MissingPDFException(msg) {
+    this.name = 'MissingPDFException';
+    this.message = msg;
+  }
+
+  MissingPDFException.prototype = new Error();
+  MissingPDFException.constructor = MissingPDFException;
+
+  return MissingPDFException;
+})();
+PDFJS.MissingPDFException = MissingPDFException;
+
+var UnexpectedResponseException =
+    (function UnexpectedResponseExceptionClosure() {
+  function UnexpectedResponseException(msg, status) {
+    this.name = 'UnexpectedResponseException';
+    this.message = msg;
+    this.status = status;
+  }
+
+  UnexpectedResponseException.prototype = new Error();
+  UnexpectedResponseException.constructor = UnexpectedResponseException;
+
+  return UnexpectedResponseException;
+})();
+PDFJS.UnexpectedResponseException = UnexpectedResponseException;
+
+var NotImplementedException = (function NotImplementedExceptionClosure() {
+  function NotImplementedException(msg) {
+    this.message = msg;
+  }
+
+  NotImplementedException.prototype = new Error();
+  NotImplementedException.prototype.name = 'NotImplementedException';
+  NotImplementedException.constructor = NotImplementedException;
+
+  return NotImplementedException;
+})();
+
+var MissingDataException = (function MissingDataExceptionClosure() {
+  function MissingDataException(begin, end) {
+    this.begin = begin;
+    this.end = end;
+    this.message = 'Missing data [' + begin + ', ' + end + ')';
+  }
+
+  MissingDataException.prototype = new Error();
+  MissingDataException.prototype.name = 'MissingDataException';
+  MissingDataException.constructor = MissingDataException;
+
+  return MissingDataException;
+})();
+
+var XRefParseException = (function XRefParseExceptionClosure() {
+  function XRefParseException(msg) {
+    this.message = msg;
+  }
+
+  XRefParseException.prototype = new Error();
+  XRefParseException.prototype.name = 'XRefParseException';
+  XRefParseException.constructor = XRefParseException;
+
+  return XRefParseException;
+})();
+
+
+export function bytesToString(bytes) {
+  assert(bytes !== null &amp;&amp; typeof bytes === 'object' &amp;&amp;
+         bytes.length !== undefined, 'Invalid argument for bytesToString');
+  var length = bytes.length;
+  var MAX_ARGUMENT_COUNT = 8192;
+  if (length &lt; MAX_ARGUMENT_COUNT) {
+    return String.fromCharCode.apply(null, bytes);
+  }
+  var strBuf = [];
+  for (var i = 0; i &lt; length; i += MAX_ARGUMENT_COUNT) {
+    var chunkEnd = Math.min(i + MAX_ARGUMENT_COUNT, length);
+    var chunk = bytes.subarray(i, chunkEnd);
+    strBuf.push(String.fromCharCode.apply(null, chunk));
+  }
+  return strBuf.join('');
+}
+
+export function stringToBytes(str) {
+  assert(typeof str === 'string', 'Invalid argument for stringToBytes');
+  var length = str.length;
+  var bytes = new Uint8Array(length);
+  for (var i = 0; i &lt; length; ++i) {
+    bytes[i] = str.charCodeAt(i) &amp; 0xFF;
+  }
+  return bytes;
+}
+
+export function string32(value) {
+  return String.fromCharCode((value >> 24) &amp; 0xff, (value >> 16) &amp; 0xff,
+                             (value >> 8) &amp; 0xff, value &amp; 0xff);
+}
+
+export function log2(x) {
+  var n = 1, i = 0;
+  while (x > n) {
+    n &lt;&lt;= 1;
+    i++;
+  }
+  return i;
+}
+
+export function readInt8(data, start) {
+  return (data[start] &lt;&lt; 24) >> 24;
+}
+
+export function readUint16(data, offset) {
+  return (data[offset] &lt;&lt; 8) | data[offset + 1];
+}
+
+export function readUint32(data, offset) {
+  return ((data[offset] &lt;&lt; 24) | (data[offset + 1] &lt;&lt; 16) |
+         (data[offset + 2] &lt;&lt; 8) | data[offset + 3]) >>> 0;
+}
+
+// Lazy test the endianness of the platform
+// NOTE: This will be 'true' for simulated TypedArrays
+export function isLittleEndian() {
+  var buffer8 = new Uint8Array(2);
+  buffer8[0] = 1;
+  var buffer16 = new Uint16Array(buffer8.buffer);
+  return (buffer16[0] === 1);
+}
+
+Object.defineProperty(PDFJS, 'isLittleEndian', {
+  configurable: true,
+  get: function PDFJS_isLittleEndian() {
+    return shadow(PDFJS, 'isLittleEndian', isLittleEndian());
+  }
+});
+
+//#if !(FIREFOX || MOZCENTRAL || B2G || CHROME)
+//// Lazy test if the userAgant support CanvasTypedArrays
+export function hasCanvasTypedArrays() {
+  var canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 1;
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.createImageData(1, 1);
+  return (typeof imageData.data.buffer !== 'undefined');
+}
+
+Object.defineProperty(PDFJS, 'hasCanvasTypedArrays', {
+  configurable: true,
+  get: function PDFJS_hasCanvasTypedArrays() {
+    return shadow(PDFJS, 'hasCanvasTypedArrays', hasCanvasTypedArrays());
+  }
+});
+
+export var Uint32ArrayView = (function Uint32ArrayViewClosure() {
+
+  function Uint32ArrayView(buffer, length) {
+    this.buffer = buffer;
+    this.byteLength = buffer.length;
+    this.length = length === undefined ? (this.byteLength >> 2) : length;
+    ensureUint32ArrayViewProps(this.length);
+  }
+  Uint32ArrayView.prototype = Object.create(null);
+
+  var uint32ArrayViewSetters = 0;
+  function createUint32ArrayProp(index) {
+    return {
+      get: function () {
+        var buffer = this.buffer, offset = index &lt;&lt; 2;
+        return (buffer[offset] | (buffer[offset + 1] &lt;&lt; 8) |
+          (buffer[offset + 2] &lt;&lt; 16) | (buffer[offset + 3] &lt;&lt; 24)) >>> 0;
+      },
+      set: function (value) {
+        var buffer = this.buffer, offset = index &lt;&lt; 2;
+        buffer[offset] = value &amp; 255;
+        buffer[offset + 1] = (value >> 8) &amp; 255;
+        buffer[offset + 2] = (value >> 16) &amp; 255;
+        buffer[offset + 3] = (value >>> 24) &amp; 255;
+      }
+    };
+  }
+
+  function ensureUint32ArrayViewProps(length) {
+    while (uint32ArrayViewSetters &lt; length) {
+      Object.defineProperty(Uint32ArrayView.prototype,
+        uint32ArrayViewSetters,
+        createUint32ArrayProp(uint32ArrayViewSetters));
+      uint32ArrayViewSetters++;
+    }
+  }
+
+  return Uint32ArrayView;
+})();
+//#else
+//PDFJS.hasCanvasTypedArrays = true;
+//#endif
+
+export var IDENTITY_MATRIX = [1, 0, 0, 1, 0, 0];
+
+export var Util = PDFJS.Util = (function UtilClosure() {
+  function Util() {}
+
+  var rgbBuf = ['rgb(', 0, ',', 0, ',', 0, ')'];
+
+  // makeCssRgb() can be called thousands of times. Using |rgbBuf| avoids
+  // creating many intermediate strings.
+  Util.makeCssRgb = function Util_makeCssRgb(r, g, b) {
+    rgbBuf[1] = r;
+    rgbBuf[3] = g;
+    rgbBuf[5] = b;
+    return rgbBuf.join('');
+  };
+
+  // Concatenates two transformation matrices together and returns the result.
+  Util.transform = function Util_transform(m1, m2) {
+    return [
+      m1[0] * m2[0] + m1[2] * m2[1],
+      m1[1] * m2[0] + m1[3] * m2[1],
+      m1[0] * m2[2] + m1[2] * m2[3],
+      m1[1] * m2[2] + m1[3] * m2[3],
+      m1[0] * m2[4] + m1[2] * m2[5] + m1[4],
+      m1[1] * m2[4] + m1[3] * m2[5] + m1[5]
+    ];
+  };
+
+  // For 2d affine transforms
+  Util.applyTransform = function Util_applyTransform(p, m) {
+    var xt = p[0] * m[0] + p[1] * m[2] + m[4];
+    var yt = p[0] * m[1] + p[1] * m[3] + m[5];
+    return [xt, yt];
+  };
+
+  Util.applyInverseTransform = function Util_applyInverseTransform(p, m) {
+    var d = m[0] * m[3] - m[1] * m[2];
+    var xt = (p[0] * m[3] - p[1] * m[2] + m[2] * m[5] - m[4] * m[3]) / d;
+    var yt = (-p[0] * m[1] + p[1] * m[0] + m[4] * m[1] - m[5] * m[0]) / d;
+    return [xt, yt];
+  };
+
+  // Applies the transform to the rectangle and finds the minimum axially
+  // aligned bounding box.
+  Util.getAxialAlignedBoundingBox =
+    function Util_getAxialAlignedBoundingBox(r, m) {
+
+    var p1 = Util.applyTransform(r, m);
+    var p2 = Util.applyTransform(r.slice(2, 4), m);
+    var p3 = Util.applyTransform([r[0], r[3]], m);
+    var p4 = Util.applyTransform([r[2], r[1]], m);
+    return [
+      Math.min(p1[0], p2[0], p3[0], p4[0]),
+      Math.min(p1[1], p2[1], p3[1], p4[1]),
+      Math.max(p1[0], p2[0], p3[0], p4[0]),
+      Math.max(p1[1], p2[1], p3[1], p4[1])
+    ];
+  };
+
+  Util.inverseTransform = function Util_inverseTransform(m) {
+    var d = m[0] * m[3] - m[1] * m[2];
+    return [m[3] / d, -m[1] / d, -m[2] / d, m[0] / d,
+      (m[2] * m[5] - m[4] * m[3]) / d, (m[4] * m[1] - m[5] * m[0]) / d];
+  };
+
+  // Apply a generic 3d matrix M on a 3-vector v:
+  //   | a b c |   | X |
+  //   | d e f | x | Y |
+  //   | g h i |   | Z |
+  // M is assumed to be serialized as [a,b,c,d,e,f,g,h,i],
+  // with v as [X,Y,Z]
+  Util.apply3dTransform = function Util_apply3dTransform(m, v) {
+    return [
+      m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+      m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
+      m[6] * v[0] + m[7] * v[1] + m[8] * v[2]
+    ];
+  };
+
+  // This calculation uses Singular Value Decomposition.
+  // The SVD can be represented with formula A = USV. We are interested in the
+  // matrix S here because it represents the scale values.
+  Util.singularValueDecompose2dScale =
+    function Util_singularValueDecompose2dScale(m) {
+
+    var transpose = [m[0], m[2], m[1], m[3]];
+
+    // Multiply matrix m with its transpose.
+    var a = m[0] * transpose[0] + m[1] * transpose[2];
+    var b = m[0] * transpose[1] + m[1] * transpose[3];
+    var c = m[2] * transpose[0] + m[3] * transpose[2];
+    var d = m[2] * transpose[1] + m[3] * transpose[3];
+
+    // Solve the second degree polynomial to get roots.
+    var first = (a + d) / 2;
+    var second = Math.sqrt((a + d) * (a + d) - 4 * (a * d - c * b)) / 2;
+    var sx = first + second || 1;
+    var sy = first - second || 1;
+
+    // Scale values are the square roots of the eigenvalues.
+    return [Math.sqrt(sx), Math.sqrt(sy)];
+  };
+
+  // Normalize rectangle rect=[x1, y1, x2, y2] so that (x1,y1) &lt; (x2,y2)
+  // For coordinate systems whose origin lies in the bottom-left, this
+  // means normalization to (BL,TR) ordering. For systems with origin in the
+  // top-left, this means (TL,BR) ordering.
+  Util.normalizeRect = function Util_normalizeRect(rect) {
+    var r = rect.slice(0); // clone rect
+    if (rect[0] > rect[2]) {
+      r[0] = rect[2];
+      r[2] = rect[0];
+    }
+    if (rect[1] > rect[3]) {
+      r[1] = rect[3];
+      r[3] = rect[1];
+    }
+    return r;
+  };
+
+  // Returns a rectangle [x1, y1, x2, y2] corresponding to the
+  // intersection of rect1 and rect2. If no intersection, returns 'false'
+  // The rectangle coordinates of rect1, rect2 should be [x1, y1, x2, y2]
+  Util.intersect = function Util_intersect(rect1, rect2) {
+    function compare(a, b) {
+      return a - b;
+    }
+
+    // Order points along the axes
+    var orderedX = [rect1[0], rect1[2], rect2[0], rect2[2]].sort(compare),
+        orderedY = [rect1[1], rect1[3], rect2[1], rect2[3]].sort(compare),
+        result = [];
+
+    rect1 = Util.normalizeRect(rect1);
+    rect2 = Util.normalizeRect(rect2);
+
+    // X: first and second points belong to different rectangles?
+    if ((orderedX[0] === rect1[0] &amp;&amp; orderedX[1] === rect2[0]) ||
+        (orderedX[0] === rect2[0] &amp;&amp; orderedX[1] === rect1[0])) {
+      // Intersection must be between second and third points
+      result[0] = orderedX[1];
+      result[2] = orderedX[2];
+    } else {
+      return false;
+    }
+
+    // Y: first and second points belong to different rectangles?
+    if ((orderedY[0] === rect1[1] &amp;&amp; orderedY[1] === rect2[1]) ||
+        (orderedY[0] === rect2[1] &amp;&amp; orderedY[1] === rect1[1])) {
+      // Intersection must be between second and third points
+      result[1] = orderedY[1];
+      result[3] = orderedY[2];
+    } else {
+      return false;
+    }
+
+    return result;
+  };
+
+  Util.sign = function Util_sign(num) {
+    return num &lt; 0 ? -1 : 1;
+  };
+
+  Util.appendToArray = function Util_appendToArray(arr1, arr2) {
+    Array.prototype.push.apply(arr1, arr2);
+  };
+
+  Util.prependToArray = function Util_prependToArray(arr1, arr2) {
+    Array.prototype.unshift.apply(arr1, arr2);
+  };
+
+  Util.extendObj = function extendObj(obj1, obj2) {
+    for (var key in obj2) {
+      obj1[key] = obj2[key];
+    }
+  };
+
+  Util.getInheritableProperty = function Util_getInheritableProperty(dict,
+                                                                     name) {
+    while (dict &amp;&amp; !dict.has(name)) {
+      dict = dict.get('Parent');
+    }
+    if (!dict) {
+      return null;
+    }
+    return dict.get(name);
+  };
+
+  Util.inherit = function Util_inherit(sub, base, prototype) {
+    sub.prototype = Object.create(base.prototype);
+    sub.prototype.constructor = sub;
+    for (var prop in prototype) {
+      sub.prototype[prop] = prototype[prop];
+    }
+  };
+
+  Util.loadScript = function Util_loadScript(src, callback) {
+    var script = document.createElement('script');
+    var loaded = false;
+    script.setAttribute('src', src);
+    if (callback) {
+      script.onload = function() {
+        if (!loaded) {
+          callback();
+        }
+        loaded = true;
+      };
+    }
+    document.getElementsByTagName('head')[0].appendChild(script);
+  };
+
+  return Util;
+})();
+
+/**
+ * PDF page viewport created based on scale, rotation and offset.
+ * @class
+ * @alias PDFJS.PageViewport
+ */
+export var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
+  /**
+   * @constructor
+   * @private
+   * @param viewBox {Array} xMin, yMin, xMax and yMax coordinates.
+   * @param scale {number} scale of the viewport.
+   * @param rotation {number} rotations of the viewport in degrees.
+   * @param offsetX {number} offset X
+   * @param offsetY {number} offset Y
+   * @param dontFlip {boolean} if true, axis Y will not be flipped.
+   */
+  function PageViewport(viewBox, scale, rotation, offsetX, offsetY, dontFlip) {
+    this.viewBox = viewBox;
+    this.scale = scale;
+    this.rotation = rotation;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+
+    // creating transform to convert pdf coordinate system to the normal
+    // canvas like coordinates taking in account scale and rotation
+    var centerX = (viewBox[2] + viewBox[0]) / 2;
+    var centerY = (viewBox[3] + viewBox[1]) / 2;
+    var rotateA, rotateB, rotateC, rotateD;
+    rotation = rotation % 360;
+    rotation = rotation &lt; 0 ? rotation + 360 : rotation;
+    switch (rotation) {
+      case 180:
+        rotateA = -1; rotateB = 0; rotateC = 0; rotateD = 1;
+        break;
+      case 90:
+        rotateA = 0; rotateB = 1; rotateC = 1; rotateD = 0;
+        break;
+      case 270:
+        rotateA = 0; rotateB = -1; rotateC = -1; rotateD = 0;
+        break;
+      //case 0:
+      default:
+        rotateA = 1; rotateB = 0; rotateC = 0; rotateD = -1;
+        break;
+    }
+
+    if (dontFlip) {
+      rotateC = -rotateC; rotateD = -rotateD;
+    }
+
+    var offsetCanvasX, offsetCanvasY;
+    var width, height;
+    if (rotateA === 0) {
+      offsetCanvasX = Math.abs(centerY - viewBox[1]) * scale + offsetX;
+      offsetCanvasY = Math.abs(centerX - viewBox[0]) * scale + offsetY;
+      width = Math.abs(viewBox[3] - viewBox[1]) * scale;
+      height = Math.abs(viewBox[2] - viewBox[0]) * scale;
+    } else {
+      offsetCanvasX = Math.abs(centerX - viewBox[0]) * scale + offsetX;
+      offsetCanvasY = Math.abs(centerY - viewBox[1]) * scale + offsetY;
+      width = Math.abs(viewBox[2] - viewBox[0]) * scale;
+      height = Math.abs(viewBox[3] - viewBox[1]) * scale;
+    }
+    // creating transform for the following operations:
+    // translate(-centerX, -centerY), rotate and flip vertically,
+    // scale, and translate(offsetCanvasX, offsetCanvasY)
+    this.transform = [
+      rotateA * scale,
+      rotateB * scale,
+      rotateC * scale,
+      rotateD * scale,
+      offsetCanvasX - rotateA * scale * centerX - rotateC * scale * centerY,
+      offsetCanvasY - rotateB * scale * centerX - rotateD * scale * centerY
+    ];
+
+    this.width = width;
+    this.height = height;
+    this.fontScale = scale;
+  }
+  PageViewport.prototype = /** @lends PDFJS.PageViewport.prototype */ {
+    /**
+     * Clones viewport with additional properties.
+     * @param args {Object} (optional) If specified, may contain the 'scale' or
+     * 'rotation' properties to override the corresponding properties in
+     * the cloned viewport.
+     * @returns {PDFJS.PageViewport} Cloned viewport.
+     */
+    clone: function PageViewPort_clone(args) {
+      args = args || {};
+      var scale = 'scale' in args ? args.scale : this.scale;
+      var rotation = 'rotation' in args ? args.rotation : this.rotation;
+      return new PageViewport(this.viewBox.slice(), scale, rotation,
+                              this.offsetX, this.offsetY, args.dontFlip);
+    },
+    /**
+     * Converts PDF point to the viewport coordinates. For examples, useful for
+     * converting PDF location into canvas pixel coordinates.
+     * @param x {number} X coordinate.
+     * @param y {number} Y coordinate.
+     * @returns {Object} Object that contains 'x' and 'y' properties of the
+     * point in the viewport coordinate space.
+     * @see {@link convertToPdfPoint}
+     * @see {@link convertToViewportRectangle}
+     */
+    convertToViewportPoint: function PageViewport_convertToViewportPoint(x, y) {
+      return Util.applyTransform([x, y], this.transform);
+    },
+    /**
+     * Converts PDF rectangle to the viewport coordinates.
+     * @param rect {Array} xMin, yMin, xMax and yMax coordinates.
+     * @returns {Array} Contains corresponding coordinates of the rectangle
+     * in the viewport coordinate space.
+     * @see {@link convertToViewportPoint}
+     */
+    convertToViewportRectangle:
+      function PageViewport_convertToViewportRectangle(rect) {
+      var tl = Util.applyTransform([rect[0], rect[1]], this.transform);
+      var br = Util.applyTransform([rect[2], rect[3]], this.transform);
+      return [tl[0], tl[1], br[0], br[1]];
+    },
+    /**
+     * Converts viewport coordinates to the PDF location. For examples, useful
+     * for converting canvas pixel location into PDF one.
+     * @param x {number} X coordinate.
+     * @param y {number} Y coordinate.
+     * @returns {Object} Object that contains 'x' and 'y' properties of the
+     * point in the PDF coordinate space.
+     * @see {@link convertToViewportPoint}
+     */
+    convertToPdfPoint: function PageViewport_convertToPdfPoint(x, y) {
+      return Util.applyInverseTransform([x, y], this.transform);
+    }
+  };
+  return PageViewport;
+})();
+
+export var PDFStringTranslateTable = [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0x2D8, 0x2C7, 0x2C6, 0x2D9, 0x2DD, 0x2DB, 0x2DA, 0x2DC, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x2022, 0x2020, 0x2021, 0x2026, 0x2014,
+  0x2013, 0x192, 0x2044, 0x2039, 0x203A, 0x2212, 0x2030, 0x201E, 0x201C,
+  0x201D, 0x2018, 0x2019, 0x201A, 0x2122, 0xFB01, 0xFB02, 0x141, 0x152, 0x160,
+  0x178, 0x17D, 0x131, 0x142, 0x153, 0x161, 0x17E, 0, 0x20AC
+];
+
+export function stringToPDFString(str) {
+  var i, n = str.length, strBuf = [];
+  if (str[0] === '\xFE' &amp;&amp; str[1] === '\xFF') {
+    // UTF16BE BOM
+    for (i = 2; i &lt; n; i += 2) {
+      strBuf.push(String.fromCharCode(
+        (str.charCodeAt(i) &lt;&lt; 8) | str.charCodeAt(i + 1)));
+    }
+  } else {
+    for (i = 0; i &lt; n; ++i) {
+      var code = PDFStringTranslateTable[str.charCodeAt(i)];
+      strBuf.push(code ? String.fromCharCode(code) : str.charAt(i));
+    }
+  }
+  return strBuf.join('');
+}
+
+export function stringToUTF8String(str) {
+  return decodeURIComponent(escape(str));
+}
+
+export function isEmptyObj(obj) {
+  for (var key in obj) {
+    return false;
+  }
+  return true;
+}
+
+export function isBool(v) {
+  return typeof v === 'boolean';
+}
+
+export function isInt(v) {
+  return typeof v === 'number' &amp;&amp; ((v | 0) === v);
+}
+
+export function isNum(v) {
+  return typeof v === 'number';
+}
+
+export function isString(v) {
+  return typeof v === 'string';
+}
+
+export function isName(v) {
+  return v instanceof Name;
+}
+
+export function isCmd(v, cmd) {
+  return v instanceof Cmd &amp;&amp; (cmd === undefined || v.cmd === cmd);
+}
+
+export function isDict(v, type) {
+  if (!(v instanceof Dict)) {
+    return false;
+  }
+  if (!type) {
+    return true;
+  }
+  var dictType = v.get('Type');
+  return isName(dictType) &amp;&amp; dictType.name === type;
+}
+
+export function isArray(v) {
+  return v instanceof Array;
+}
+
+export function isStream(v) {
+  return typeof v === 'object' &amp;&amp; v !== null &amp;&amp; v.getBytes !== undefined;
+}
+
+export function isArrayBuffer(v) {
+  return typeof v === 'object' &amp;&amp; v !== null &amp;&amp; v.byteLength !== undefined;
+}
+
+export function isRef(v) {
+  return v instanceof Ref;
+}
+
+/**
+ * Promise Capability object.
+ *
+ * @typedef {Object} PromiseCapability
+ * @property {Promise} promise - A promise object.
+ * @property {function} resolve - Fullfills the promise.
+ * @property {function} reject - Rejects the promise.
+ */
+
+/**
+ * Creates a promise capability object.
+ * @alias PDFJS.createPromiseCapability
+ *
+ * @return {PromiseCapability} A capability object contains:
+ * - a Promise, resolve and reject methods.
+ */
+function createPromiseCapability() {
+  var capability = {};
+  capability.promise = new Promise(function (resolve, reject) {
+    capability.resolve = resolve;
+    capability.reject = reject;
+  });
+  return capability;
+}
+
+PDFJS.createPromiseCapability = createPromiseCapability;
+
+export var StatTimer = (function StatTimerClosure() {
+  function rpad(str, pad, length) {
+    while (str.length &lt; length) {
+      str += pad;
+    }
+    return str;
+  }
+  function StatTimer() {
+    this.started = {};
+    this.times = [];
+    this.enabled = true;
+  }
+  StatTimer.prototype = {
+    time: function StatTimer_time(name) {
+      if (!this.enabled) {
+        return;
+      }
+      if (name in this.started) {
+        warn('Timer is already running for ' + name);
+      }
+      this.started[name] = Date.now();
+    },
+    timeEnd: function StatTimer_timeEnd(name) {
+      if (!this.enabled) {
+        return;
+      }
+      if (!(name in this.started)) {
+        warn('Timer has not been started for ' + name);
+      }
+      this.times.push({
+        'name': name,
+        'start': this.started[name],
+        'end': Date.now()
+      });
+      // Remove timer from started so it can be called again.
+      delete this.started[name];
+    },
+    toString: function StatTimer_toString() {
+      var i, ii;
+      var times = this.times;
+      var out = '';
+      // Find the longest name for padding purposes.
+      var longest = 0;
+      for (i = 0, ii = times.length; i &lt; ii; ++i) {
+        var name = times[i]['name'];
+        if (name.length > longest) {
+          longest = name.length;
+        }
+      }
+      for (i = 0, ii = times.length; i &lt; ii; ++i) {
+        var span = times[i];
+        var duration = span.end - span.start;
+        out += rpad(span['name'], ' ', longest) + ' ' + duration + 'ms\n';
+      }
+      return out;
+    }
+  };
+  return StatTimer;
+})();
+
+PDFJS.createBlob = function createBlob(data, contentType) {
+  if (typeof Blob !== 'undefined') {
+    return new Blob([data], { type: contentType });
+  }
+  // Blob builder is deprecated in FF14 and removed in FF18.
+  var bb = new MozBlobBuilder();
+  bb.append(data);
+  return bb.getBlob(contentType);
+};
+
+PDFJS.createObjectURL = (function createObjectURLClosure() {
+  // Blob/createObjectURL is not available, falling back to data schema.
+  var digits =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+  return function createObjectURL(data, contentType) {
+    if (!PDFJS.disableCreateObjectURL &amp;&amp;
+        typeof URL !== 'undefined' &amp;&amp; URL.createObjectURL) {
+      var blob = PDFJS.createBlob(data, contentType);
+      return URL.createObjectURL(blob);
+    }
+
+    var buffer = 'data:' + contentType + ';base64,';
+    for (var i = 0, ii = data.length; i &lt; ii; i += 3) {
+      var b1 = data[i] &amp; 0xFF;
+      var b2 = data[i + 1] &amp; 0xFF;
+      var b3 = data[i + 2] &amp; 0xFF;
+      var d1 = b1 >> 2, d2 = ((b1 &amp; 3) &lt;&lt; 4) | (b2 >> 4);
+      var d3 = i + 1 &lt; ii ? ((b2 &amp; 0xF) &lt;&lt; 2) | (b3 >> 6) : 64;
+      var d4 = i + 2 &lt; ii ? (b3 &amp; 0x3F) : 64;
+      buffer += digits[d1] + digits[d2] + digits[d3] + digits[d4];
+    }
+    return buffer;
+  };
+})();
+
+export function MessageHandler(name, comObj) {
+  this.name = name;
+  this.comObj = comObj;
+  this.callbackIndex = 1;
+  this.postMessageTransfers = true;
+  var callbacksCapabilities = this.callbacksCapabilities = {};
+  var ah = this.actionHandler = {};
+
+  ah['console_log'] = [function ahConsoleLog(data) {
+    console.log.apply(console, data);
+  }];
+  ah['console_error'] = [function ahConsoleError(data) {
+    console.error.apply(console, data);
+  }];
+  ah['_unsupported_feature'] = [function ah_unsupportedFeature(data) {
+    UnsupportedManager.notify(data);
+  }];
+
+  comObj.onmessage = function messageHandlerComObjOnMessage(event) {
+    var data = event.data;
+    if (data.isReply) {
+      var callbackId = data.callbackId;
+      if (data.callbackId in callbacksCapabilities) {
+        var callback = callbacksCapabilities[callbackId];
+        delete callbacksCapabilities[callbackId];
+        if ('error' in data) {
+          callback.reject(data.error);
+        } else {
+          callback.resolve(data.data);
+        }
+      } else {
+        error('Cannot resolve callback ' + callbackId);
+      }
+    } else if (data.action in ah) {
+      var action = ah[data.action];
+      if (data.callbackId) {
+        Promise.resolve().then(function () {
+          return action[0].call(action[1], data.data);
+        }).then(function (result) {
+          comObj.postMessage({
+            isReply: true,
+            callbackId: data.callbackId,
+            data: result
+          });
+        }, function (reason) {
+          comObj.postMessage({
+            isReply: true,
+            callbackId: data.callbackId,
+            error: reason
+          });
+        });
+      } else {
+        action[0].call(action[1], data.data);
+      }
+    } else {
+      error('Unknown action from worker: ' + data.action);
+    }
+  };
+}
+
+MessageHandler.prototype = {
+  on: function messageHandlerOn(actionName, handler, scope) {
+    var ah = this.actionHandler;
+    if (ah[actionName]) {
+      error('There is already an actionName called &quot;' + actionName + '&quot;');
+    }
+    ah[actionName] = [handler, scope];
+  },
+  /**
+   * Sends a message to the comObj to invoke the action with the supplied data.
+   * @param {String} actionName Action to call.
+   * @param {JSON} data JSON data to send.
+   * @param {Array} [transfers] Optional list of transfers/ArrayBuffers
+   */
+  send: function messageHandlerSend(actionName, data, transfers) {
+    var message = {
+      action: actionName,
+      data: data
+    };
+    this.postMessage(message, transfers);
+  },
+  /**
+   * Sends a message to the comObj to invoke the action with the supplied data.
+   * Expects that other side will callback with the response.
+   * @param {String} actionName Action to call.
+   * @param {JSON} data JSON data to send.
+   * @param {Array} [transfers] Optional list of transfers/ArrayBuffers.
+   * @returns {Promise} Promise to be resolved with response data.
+   */
+  sendWithPromise:
+    function messageHandlerSendWithPromise(actionName, data, transfers) {
+    var callbackId = this.callbackIndex++;
+    var message = {
+      action: actionName,
+      data: data,
+      callbackId: callbackId
+    };
+    var capability = createPromiseCapability();
+    this.callbacksCapabilities[callbackId] = capability;
+    try {
+      this.postMessage(message, transfers);
+    } catch (e) {
+      capability.reject(e);
+    }
+    return capability.promise;
+  },
+  /**
+   * Sends raw message to the comObj.
+   * @private
+   * @param message {Object} Raw message.
+   * @param transfers List of transfers/ArrayBuffers, or undefined.
+   */
+  postMessage: function (message, transfers) {
+    if (transfers &amp;&amp; this.postMessageTransfers) {
+      this.comObj.postMessage(message, transfers);
+    } else {
+      this.comObj.postMessage(message);
+    }
+  }
+};
+
+export function loadJpegStream(id, imageUrl, objs) {
+  var img = new Image();
+  img.onload = (function loadJpegStream_onloadClosure() {
+    objs.resolve(id, img);
+  });
+  img.onerror = (function loadJpegStream_onerrorClosure() {
+    objs.resolve(id, null);
+    warn('Error during JPEG image loading');
+  });
+  img.src = imageUrl;
+}</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/decoders/pdfjs/util.js"},"i1":{"basePath":"/","searchIndexUrl":"/_assets/search-index.mwm9kbrx-f9794ac0.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/decoders/pdfjs/util-js","siteName":"DWV","basePath":"/","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/decoders/pdfjs/util-js","basePath":"/","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/_islands/theme-toggle-2OFR67FU.js","settings":"/_islands/settings-HUVOQWPC.js","code-viewer":"/_islands/code-viewer-J4JM56PM.js","embed":"/_islands/embed-S4IPJ47N.js","playground":"/_islands/playground-GHNL23CG.js","tabs":"/_islands/tabs-NRSQKCSU.js","sidebar":"/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/_islands/mobile-nav-ITUCHCYZ.js","toc":"/_islands/toc-YFAY7IHK.js","toc-mobile":"/_islands/toc-mobile-6DGE76YF.js","cmdk":"/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/_islands/code-tabs-C6ACVICP.js","copy-btn":"/_islands/copy-btn-5QCTJLYG.js","copy-page":"/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>

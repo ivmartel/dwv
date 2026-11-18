@@ -1,0 +1,378 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/dicom/dictionary.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/_assets/styles.mwm9kbrx-f9794ac0.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/dicom/dictionary.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">/* eslint-disable @stylistic/js/quote-props */
+/* eslint @stylistic/js/max-len:0 */
+
+import dictionaryData from
+  'dcmstdtojs/dist/assets/2024a/dicom_tags.json' with {type: 'json'};
+
+/**
+ * DICOM tag dictionary 2024a.
+ *
+ * @type {Record&lt;string, Record&lt;string, string[]>>}
+ */
+export const dictionary = dictionaryData;
+
+/**
+ * Add tags to the dictionary.
+ *
+ * @param {string} group The group key.
+ * @param {Record&lt;string, string[]>} tags The tags to add as an
+ *   object indexed by element key with values as:
+ *   [VR, multiplicity, TagName] (all strings).
+ */
+export function addTagsToDictionary(group, tags) {
+  // TODO: add checks!
+  dictionary[group] = tags;
+}
+
+/**
+ * Tag groups: key to name pairs.
+ * Copied from gdcm-2.6.1\Source\DataDictionary\GroupName.dic
+ * -> removed duplicates (commented).
+ *
+ * @type {Record&lt;string, string>}
+ */
+export const tagGroups = {
+  '0000': 'Command',
+  '0002': 'Meta Element',
+  '0004': 'File Set',
+  //'0004': 'Directory',
+  '0008': 'Identifying',
+  '0009': 'SPI Identifying',
+  '0010': 'Patient',
+  '0012': 'Clinical Trial',
+  '0018': 'Acquisition',
+  '0019': 'SPI Acquisition',
+  '0020': 'Image',
+  '0021': 'SPI Image',
+  '0022': 'Ophthalmology',
+  '0028': 'Image Presentation',
+  '0032': 'Study',
+  '0038': 'Visit',
+  '003A': 'Waveform',
+  '0040': 'Procedure',
+  //'0040': ''Modality Worklist',
+  '0042': 'Encapsulated Document',
+  '0050': 'Device Information',
+  //'0050': 'XRay Angio Device',
+  '0054': 'Nuclear Medicine',
+  '0060': 'Histogram',
+  '0070': 'Presentation State',
+  '0072': 'Hanging Protocol',
+  '0088': 'Storage',
+  //'0088': 'Medicine',
+  '0100': 'Authorization',
+  '0400': 'Digital Signature',
+  '1000': 'Code Table',
+  '1010': 'Zonal Map',
+  '2000': 'Film Session',
+  '2010': 'Film Box',
+  '2020': 'Image Box',
+  '2030': 'Annotation',
+  '2040': 'Overlay Box',
+  '2050': 'Presentation LUT',
+  '2100': 'Print Job',
+  '2110': 'Printer',
+  '2120': 'Queue',
+  '2130': 'Print Content',
+  '2200': 'Media Creation',
+  '3002': 'RT Image',
+  '3004': 'RT Dose',
+  '3006': 'RT StructureSet',
+  '3008': 'RT Treatment',
+  '300A': 'RT Plan',
+  '300C': 'RT Relationship',
+  '300E': 'RT Approval',
+  '4000': 'Text',
+  '4008': 'Results',
+  '4FFE': 'MAC Parameters',
+  '5000': 'Curve',
+  '5002': 'Curve',
+  '5004': 'Curve',
+  '5006': 'Curve',
+  '5008': 'Curve',
+  '500A': 'Curve',
+  '500C': 'Curve',
+  '500E': 'Curve',
+  '5010': 'Curve',
+  '5012': 'Curve',
+  '5014': 'Curve',
+  '5016': 'Curve',
+  '5018': 'Curve',
+  '501A': 'Curve',
+  '501C': 'Curve',
+  '501E': 'Curve',
+  '5400': 'Waveform Data',
+  '6000': 'Overlays',
+  '6002': 'Overlays',
+  '6004': 'Overlays',
+  '6006': 'Overlays',
+  '6008': 'Overlays',
+  '600A': 'Overlays',
+  '600C': 'Overlays',
+  '600E': 'Overlays',
+  '6010': 'Overlays',
+  '6012': 'Overlays',
+  '6014': 'Overlays',
+  '6016': 'Overlays',
+  '6018': 'Overlays',
+  '601A': 'Overlays',
+  '601C': 'Overlays',
+  '601E': 'Overlays',
+  'FFFC': 'Generic',
+  '7FE0': 'Pixel Data',
+  'FFFF': 'Unknown'
+};
+
+/**
+ * List of Value Representation (VR) with 32bit Value Length (VL).
+ *
+ * Added locally used 'ox'.
+ * See {@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_7.html#table_7.1-1}.
+ *
+ * @type {Record&lt;string, boolean>}
+ */
+const vr32bitVL = {
+  OB: true,
+  OD: true,
+  OF: true,
+  OL: true,
+  OV: true,
+  OW: true,
+  SQ: true,
+  SV: true,
+  UC: true,
+  UN: true,
+  UR: true,
+  UT: true,
+  UV: true,
+  ox: true
+};
+
+/**
+ * Does the input Value Representation (VR) have a 32bit Value Length (VL).
+ *
+ * @param {string} vr The data Value Representation (VR).
+ * @returns {boolean} True if this VR has a 32-bit VL.
+ */
+export function is32bitVLVR(vr) {
+  return typeof vr32bitVL[vr] !== 'undefined';
+}
+
+/**
+ * List of string VR with extended or replaced default character repertoire defined in
+ *   Specific Character Set (0008,0005).
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_6.html#sect_6.1.2.2}.
+ *
+ * @type {Record&lt;string, boolean>}
+ */
+const vrCharSetString = {
+  SH: true,
+  LO: true,
+  UC: true,
+  ST: true,
+  LT: true,
+  UT: true,
+  PN: true
+};
+
+/**
+ * Does the input Value Representation (VR) have an special character repertoire.
+ *
+ * @param {string} vr The data VR.
+ * @returns {boolean} True if this VR has a special char set.
+ */
+export function isCharSetStringVR(vr) {
+  return typeof vrCharSetString[vr] !== 'undefined';
+}
+
+/**
+ * VR equivalent javascript types.
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
+ *
+ * @type {Record&lt;string, string>}
+ */
+export const vrTypes = {
+  AE: 'string',
+  AS: 'string',
+  AT: undefined,
+  CS: 'string',
+  DA: 'string',
+  DS: 'string',
+  DT: 'string',
+  FL: 'Float32',
+  FD: 'Float64',
+  IS: 'string',
+  LO: 'string',
+  LT: 'string',
+  OB: 'Uint8',
+  OD: 'Uint64',
+  OF: 'Uint32',
+  OL: 'Uint32',
+  OV: 'Uint64',
+  OW: 'Uint16',
+  PN: 'string',
+  SH: 'string',
+  SL: 'Int32',
+  SQ: undefined,
+  SS: 'Int16',
+  ST: 'string',
+  SV: 'Int64',
+  TM: 'string',
+  UC: 'string',
+  UI: 'string',
+  UL: 'Uint32',
+  UN: 'Uint8',
+  UR: 'string',
+  US: 'Uint16',
+  UT: 'string',
+  UV: 'Uint64'
+};
+
+/**
+ * Transfer syntaxes.
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part06/chapter_A.html#table_A-1}.
+ *
+ * @type {Record&lt;string, string>}
+ */
+export const transferSyntaxes = {
+  '1.2.840.10008.1.2': 'Implicit VR Little Endian',
+  '1.2.840.10008.1.2.1': 'Explicit VR Little Endian',
+  '1.2.840.10008.1.2.1.98': 'Encapsulated Uncompressed Explicit VR Little Endian',
+  '1.2.840.10008.1.2.1.99': 'Deflated Explicit VR Little Endian',
+  '1.2.840.10008.1.2.2': 'Explicit VR Big Endian (Retired)',
+  '1.2.840.10008.1.2.4.50': 'JPEG Baseline (Process 1)',
+  '1.2.840.10008.1.2.4.51': 'JPEG Extended (Process 2 &amp; 4)',
+  '1.2.840.10008.1.2.4.52': 'JPEG Extended (Process 3 &amp; 5) (Retired)',
+  '1.2.840.10008.1.2.4.53': 'JPEG Spectral Selection, Non-Hierarchical (Process 6 &amp; 8) (Retired)',
+  '1.2.840.10008.1.2.4.54': 'JPEG Spectral Selection, Non-Hierarchical (Process 7 &amp; 9) (Retired)',
+  '1.2.840.10008.1.2.4.55': 'JPEG Full Progression, Non-Hierarchical (Process 10 &amp; 12) (Retired)',
+  '1.2.840.10008.1.2.4.56': 'JPEG Full Progression, Non-Hierarchical (Process 11 &amp; 13) (Retired)',
+  '1.2.840.10008.1.2.4.57': 'JPEG Lossless, Non-Hierarchical (Process 14)',
+  '1.2.840.10008.1.2.4.58': 'JPEG Lossless, Non-Hierarchical (Process 15) (Retired)',
+  '1.2.840.10008.1.2.4.59': 'JPEG Extended, Hierarchical (Process 16 &amp; 18) (Retired)',
+  '1.2.840.10008.1.2.4.60': 'JPEG Extended, Hierarchical (Process 17 &amp; 19) (Retired)',
+  '1.2.840.10008.1.2.4.61': 'JPEG Spectral Selection, Hierarchical (Process 20 &amp; 22) (Retired)',
+  '1.2.840.10008.1.2.4.62': 'JPEG Spectral Selection, Hierarchical (Process 21 &amp; 23) (Retired)',
+  '1.2.840.10008.1.2.4.63': 'JPEG Full Progression, Hierarchical (Process 24 &amp; 26) (Retired)',
+  '1.2.840.10008.1.2.4.64': 'JPEG Full Progression, Hierarchical (Process 25 &amp; 27) (Retired)',
+  '1.2.840.10008.1.2.4.65': 'JPEG Lossless, Hierarchical (Process 28) (Retired)',
+  '1.2.840.10008.1.2.4.66': 'JPEG Lossless, Hierarchical (Process 29) (Retired)',
+  '1.2.840.10008.1.2.4.70': 'JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])',
+  '1.2.840.10008.1.2.4.80': 'JPEG-LS Lossless Image Compression',
+  '1.2.840.10008.1.2.4.81': 'JPEG-LS Lossy (Near-Lossless) Image Compression',
+  '1.2.840.10008.1.2.4.90': 'JPEG 2000 Image Compression (Lossless Only)',
+  '1.2.840.10008.1.2.4.91': 'JPEG 2000 Image Compression',
+  '1.2.840.10008.1.2.4.92': 'JPEG 2000 Part 2 Multi-component Image Compression (Lossless Only)',
+  '1.2.840.10008.1.2.4.93': 'JPEG 2000 Part 2 Multi-component Image Compression',
+  '1.2.840.10008.1.2.4.94': 'JPIP Referenced',
+  '1.2.840.10008.1.2.4.95': 'JPIP Referenced Deflate',
+  '1.2.840.10008.1.2.4.100': 'MPEG2 Main Profile / Main Level',
+  '1.2.840.10008.1.2.4.100.1': 'Fragmentable MPEG2 Main Profile / Main Level',
+  '1.2.840.10008.1.2.4.101': 'MPEG2 Main Profile / High Level',
+  '1.2.840.10008.1.2.4.101.1': 'Fragmentable MPEG2 Main Profile / High Level',
+  '1.2.840.10008.1.2.4.102': 'MPEG-4 AVC/H.264 High Profile / Level 4.1',
+  '1.2.840.10008.1.2.4.102.1': 'Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.1',
+  '1.2.840.10008.1.2.4.103': 'MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1',
+  '1.2.840.10008.1.2.4.103.1': 'Fragmentable MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1',
+  '1.2.840.10008.1.2.4.104': 'MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video',
+  '1.2.840.10008.1.2.4.104.1': 'Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video',
+  '1.2.840.10008.1.2.4.105': 'MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video',
+  '1.2.840.10008.1.2.4.105.1': 'Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video',
+  '1.2.840.10008.1.2.4.106': 'MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2',
+  '1.2.840.10008.1.2.4.106.1': 'Fragmentable MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2',
+  '1.2.840.10008.1.2.4.107': 'HEVC/H.265 Main Profile / Level 5.1',
+  '1.2.840.10008.1.2.4.108': 'HEVC/H.265 Main 10 Profile / Level 5.1',
+  '1.2.840.10008.1.2.4.201': 'High-Throughput JPEG 2000 Image Compression (Lossless Only)',
+  '1.2.840.10008.1.2.4.202': 'High-Throughput JPEG 2000 with RPCL Options Image Compression (Lossless Only)',
+  '1.2.840.10008.1.2.4.203': 'High-Throughput JPEG 2000 Image Compression',
+  '1.2.840.10008.1.2.4.204': 'JPIP HTJ2K Referenced',
+  '1.2.840.10008.1.2.4.205': 'JPIP HTJ2K Referenced Deflate',
+  '1.2.840.10008.1.2.5': 'RLE Lossless',
+  '1.2.840.10008.1.2.6.1': 'RFC 2557 MIME encapsulation (Retired)',
+  '1.2.840.10008.1.2.6.2': 'XML Encoding (Retired)',
+  '1.2.840.10008.1.2.7.1': 'SMPTE ST 2110-20 Uncompressed Progressive Active Video',
+  '1.2.840.10008.1.2.7.2': 'SMPTE ST 2110-20 Uncompressed Interlaced Active Video',
+  '1.2.840.10008.1.2.7.3': 'SMPTE ST 2110-30 PCM Digital Audio',
+  '1.2.840.10008.1.20': 'Papyrus 3 Implicit VR Little Endian (Retired)'
+};
+
+/**
+ * Transfer syntaxes indexed by keyword.
+ *
+ * @type {Record&lt;string, string>}
+ */
+export const transferSyntaxKeywords = {
+  ImplicitVRLittleEndian: '1.2.840.10008.1.2',
+  ExplicitVRLittleEndian: '1.2.840.10008.1.2.1',
+  EncapsulatedUncompressedExplicitVRLittleEndian: '1.2.840.10008.1.2.1.98',
+  DeflatedExplicitVRLittleEndian: '1.2.840.10008.1.2.1.99',
+  ExplicitVRBigEndian: '1.2.840.10008.1.2.2',
+  JPEGBaseline8Bit: '1.2.840.10008.1.2.4.50',
+  JPEGExtended12Bit: '1.2.840.10008.1.2.4.51',
+  JPEGExtended35: '1.2.840.10008.1.2.4.52',
+  JPEGSpectralSelectionNonHierarchical68: '1.2.840.10008.1.2.4.53',
+  JPEGSpectralSelectionNonHierarchical79: '1.2.840.10008.1.2.4.54',
+  JPEGFullProgressionNonHierarchical1012: '1.2.840.10008.1.2.4.55',
+  JPEGFullProgressionNonHierarchical1113: '1.2.840.10008.1.2.4.56',
+  JPEGLossless: '1.2.840.10008.1.2.4.57',
+  JPEGLosslessNonHierarchical15: '1.2.840.10008.1.2.4.58',
+  JPEGExtendedHierarchical1618: '1.2.840.10008.1.2.4.59',
+  JPEGExtendedHierarchical1719: '1.2.840.10008.1.2.4.60',
+  JPEGSpectralSelectionHierarchical2022: '1.2.840.10008.1.2.4.61',
+  JPEGSpectralSelectionHierarchical2123: '1.2.840.10008.1.2.4.62',
+  JPEGFullProgressionHierarchical2426: '1.2.840.10008.1.2.4.63',
+  JPEGFullProgressionHierarchical2527: '1.2.840.10008.1.2.4.64',
+  JPEGLosslessHierarchical28: '1.2.840.10008.1.2.4.65',
+  JPEGLosslessHierarchical29: '1.2.840.10008.1.2.4.66',
+  JPEGLosslessSV1: '1.2.840.10008.1.2.4.70',
+  JPEGLSLossless: '1.2.840.10008.1.2.4.80',
+  JPEGLSNearLossless: '1.2.840.10008.1.2.4.81',
+  JPEG2000Lossless: '1.2.840.10008.1.2.4.90',
+  JPEG2000: '1.2.840.10008.1.2.4.91',
+  JPEG2000MCLossless: '1.2.840.10008.1.2.4.92',
+  JPEG2000MC: '1.2.840.10008.1.2.4.93',
+  JPIPReferenced: '1.2.840.10008.1.2.4.94',
+  JPIPReferencedDeflate: '1.2.840.10008.1.2.4.95',
+  MPEG2MPML: '1.2.840.10008.1.2.4.100',
+  MPEG2MPMLF: '1.2.840.10008.1.2.4.100.1',
+  MPEG2MPHL: '1.2.840.10008.1.2.4.101',
+  MPEG2MPHLF: '1.2.840.10008.1.2.4.101.1',
+  MPEG4HP41: '1.2.840.10008.1.2.4.102',
+  MPEG4HP41F: '1.2.840.10008.1.2.4.102.1',
+  MPEG4HP41BD: '1.2.840.10008.1.2.4.103',
+  MPEG4HP41BDF: '1.2.840.10008.1.2.4.103.1',
+  MPEG4HP422D: '1.2.840.10008.1.2.4.104',
+  MPEG4HP422DF: '1.2.840.10008.1.2.4.104.1',
+  MPEG4HP423D: '1.2.840.10008.1.2.4.105',
+  MPEG4HP423DF: '1.2.840.10008.1.2.4.105.1',
+  MPEG4HP42STEREO: '1.2.840.10008.1.2.4.106',
+  MPEG4HP42STEREOF: '1.2.840.10008.1.2.4.106.1',
+  HEVCMP51: '1.2.840.10008.1.2.4.107',
+  HEVCM10P51: '1.2.840.10008.1.2.4.108',
+  HTJ2KLossless: '1.2.840.10008.1.2.4.201',
+  HTJ2KLosslessRPCL: '1.2.840.10008.1.2.4.202',
+  HTJ2K: '1.2.840.10008.1.2.4.203',
+  JPIPHTJ2KReferenced: '1.2.840.10008.1.2.4.204',
+  JPIPHTJ2KReferencedDeflate: '1.2.840.10008.1.2.4.205',
+  RLELossless: '1.2.840.10008.1.2.5',
+  RFC2557MIMEEncapsulation: '1.2.840.10008.1.2.6.1',
+  XMLEncoding: '1.2.840.10008.1.2.6.2',
+  SMPTEST211020UncompressedProgressiveActiveVideo: '1.2.840.10008.1.2.7.1',
+  SMPTEST211020UncompressedInterlacedActiveVideo: '1.2.840.10008.1.2.7.2',
+  SMPTEST211030PCMDigitalAudio: '1.2.840.10008.1.2.7.3',
+  Papyrus3ImplicitVRLittleEndian: '1.2.840.10008.1.20'
+};
+
+/**
+ * Standard SOP Class UIDs indexed by keyword. Not comprehensive, just ones needed by DWV.
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part04/sect_B.5.html#table_B.5-1}.
+ *
+ * @type {Record&lt;string, string>}
+ */
+export const SOPClassUIDs = {
+  SecondaryCapture: '1.2.840.10008.5.1.4.1.1.7'
+};</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/dicom/dictionary.js"},"i1":{"basePath":"/","searchIndexUrl":"/_assets/search-index.mwm9kbrx-f9794ac0.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/dicom/dictionary-js","siteName":"DWV","basePath":"/","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/dicom/dictionary-js","basePath":"/","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/_islands/theme-toggle-2OFR67FU.js","settings":"/_islands/settings-HUVOQWPC.js","code-viewer":"/_islands/code-viewer-J4JM56PM.js","embed":"/_islands/embed-S4IPJ47N.js","playground":"/_islands/playground-GHNL23CG.js","tabs":"/_islands/tabs-NRSQKCSU.js","sidebar":"/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/_islands/mobile-nav-ITUCHCYZ.js","toc":"/_islands/toc-YFAY7IHK.js","toc-mobile":"/_islands/toc-mobile-6DGE76YF.js","cmdk":"/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/_islands/code-tabs-C6ACVICP.js","copy-btn":"/_islands/copy-btn-5QCTJLYG.js","copy-page":"/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>

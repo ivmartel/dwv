@@ -1,0 +1,400 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>tests/utils/array.test.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/_assets/styles.mwm9kbrx-f9794ac0.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">tests/utils/array.test.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">import {describe, test, assert} from 'vitest';
+import {stringToUint8Array} from '../../src/utils/string.js';
+import {
+  toStringId,
+  getArrayFromStringId,
+  arrayMap,
+  arrayContains,
+  arraySortEquals,
+  arrayEquals,
+  parseMultipart,
+  buildMultipart
+} from '../../src/utils/array.js';
+
+/**
+ * Tests for the 'utils/array' file.
+ */
+/** @module tests/utils */
+
+describe('utils', () => {
+
+  /**
+   * Tests for {@link toStringId}.
+   *
+   * @function module:tests/utils~tostringid
+   */
+  test('toStringId', () => {
+    // test #00: all dims
+    const i00 = [1, 2, 3];
+    const i00strId = '#0-1_#1-2_#2-3';
+    assert.equal(toStringId(i00), i00strId, 'toStringId #00');
+    assert.ok(arrayEquals(getArrayFromStringId(i00strId), i00),
+      'getFromStringId #00');
+
+    // test #01: 2 dims
+    const i01 = [0, 2, 3];
+    const i01strId = '#1-2_#2-3';
+    assert.equal(toStringId(i01, [1, 2]), i01strId, 'toStringId #01');
+    assert.ok(arrayEquals(getArrayFromStringId(i01strId), i01),
+      'getFromStringId #01');
+
+    // test #01: 1 dim -> X
+    const i02 = [1, 0, 0];
+    const i02strId = '#0-1';
+    assert.equal(toStringId(i02, [0]), i02strId, 'toStringId #02');
+    assert.ok(arrayEquals(getArrayFromStringId(i02strId), i02),
+      'getFromStringId #02');
+
+    // test #03: 1 dim -> Y
+    const i03 = [0, 2, 0];
+    const i03strId = '#1-2';
+    assert.equal(toStringId(i03, [1]), i03strId, 'toStringId #03');
+    assert.ok(arrayEquals(getArrayFromStringId(i03strId), i03),
+      'getFromStringId #03');
+
+    // test #04: 1 dim -> Z
+    const i04 = [0, 0, 3];
+    const i04strId = '#2-3';
+    assert.equal(toStringId(i04, [2]), i04strId, 'toStringId #04');
+    assert.ok(arrayEquals(getArrayFromStringId(i04strId), i04),
+      'getFromStringId #04');
+
+    // test #05: 4 dims
+    const i05 = [1, 2, 3, 4];
+    const i05strId = '#0-1_#1-2_#2-3_#3-4';
+    assert.equal(toStringId(i05), i05strId, 'toStringId #05');
+    assert.ok(arrayEquals(getArrayFromStringId(i05strId), i05),
+      'getFromStringId #05');
+
+    // test #06: 5 dims
+    const i06 = [0, 0, 0, 0, 1];
+    const i06strId = '#4-1';
+    assert.equal(toStringId(i06, [4]), i06strId, 'toStringId #06');
+    assert.ok(arrayEquals(getArrayFromStringId(i06strId), i06),
+      'getFromStringId #06');
+
+    // error case
+    const i10 = [0, 0, 0];
+    assert.throws(function () {
+      toStringId(i10, [3]);
+    },
+    Error,
+    'Non valid dimension for toStringId',
+    'toStringId error');
+  });
+
+  /**
+   * Tests for {@link arrayMap}.
+   *
+   * @function module:tests/utils~arraymap
+   */
+  test('arrayMap', () => {
+    // basic case
+    const arr000 = [0, 1, 2, 3];
+    const arr001 = [1, 2, 3, 4];
+    const res00 = arrayMap(arr000, arr001, Math.min);
+    const theoRes00 = [0, 1, 2, 3];
+    assert.deepEqual(res00, theoRes00, 'test #00');
+
+    // smaller second array
+    const arr010 = [0, 1, 2, 3];
+    const arr011 = [1, 2, 3];
+    const res01 = arrayMap(arr010, arr011, Math.min);
+    const theoRes01 = [0, 1, 2, 3];
+    assert.deepEqual(res01, theoRes01, 'test #01');
+
+    // smaller first array
+    const arr020 = [0, 1, 2];
+    const arr021 = [1, 2, 3, 4];
+    const res02 = arrayMap(arr020, arr021, Math.min);
+    const theoRes02 = [0, 1, 2, 4];
+    assert.deepEqual(res02, theoRes02, 'test #02');
+
+    // undefined in second array
+    const arr100 = [0, 1, 2];
+    const arr101 = [1, undefined, 3];
+    const res10 = arrayMap(arr100, arr101, Math.min);
+    const theoRes10 = [0, 1, 2];
+    assert.deepEqual(res10, theoRes10, 'test #10');
+
+    // undefined in first array
+    const arr110 = [0, undefined, 2];
+    const arr111 = [1, 2, 3];
+    const res11 = arrayMap(arr110, arr111, Math.min);
+    const theoRes11 = [0, 2, 2];
+    assert.deepEqual(res11, theoRes11, 'test #11');
+
+    // undefined in both arrays
+    const arr120 = [0, undefined, 2];
+    const arr121 = [1, undefined, 3];
+    const res12 = arrayMap(arr120, arr121, Math.min);
+    const theoRes12 = [0, undefined, 2];
+    assert.deepEqual(res12, theoRes12, 'test #12');
+  });
+
+  /**
+   * Tests for {@link arrayContains}.
+   *
+   * @function module:tests/utils~arraycontains
+   */
+  test('arrayContains', () => {
+    assert.notOk(arrayContains(undefined, undefined), 'contains test #000');
+    const arrTest001 = null;
+    assert.notOk(arrayContains(undefined, arrTest001), 'contains test #001');
+    const arrTest002 = [];
+    assert.notOk(arrayContains(undefined, arrTest002), 'contains test #002');
+    const arrTest003 = [''];
+    assert.notOk(arrayContains(undefined, arrTest003), 'contains test #003');
+    const arrTest004 = ['a'];
+    assert.notOk(arrayContains(undefined, arrTest004), 'contains test #004');
+
+    const arr10 = null;
+    assert.notOk(arrayContains(arr10, undefined), 'contains test #100');
+    const arrTest101 = null;
+    assert.notOk(arrayContains(arr10, arrTest101), 'contains test #101');
+    const arrTest102 = [];
+    assert.notOk(arrayContains(arr10, arrTest102), 'contains test #102');
+    const arrTest103 = [''];
+    assert.notOk(arrayContains(arr10, arrTest103), 'contains test #103');
+    const arrTest104 = ['a'];
+    assert.notOk(arrayContains(arr10, arrTest104), 'contains test #104');
+
+    const arr20 = [];
+    assert.notOk(arrayContains(arr20, undefined), 'contains test #200');
+    const arrTest201 = null;
+    assert.notOk(arrayContains(arr20, arrTest201), 'contains test #201');
+    const arrTest202 = [];
+    assert.notOk(arrayContains(arr20, arrTest202), 'contains test #202');
+    const arrTest203 = [''];
+    assert.notOk(arrayContains(arr20, arrTest203), 'contains test #203');
+    const arrTest204 = ['a'];
+    assert.notOk(arrayContains(arr20, arrTest204), 'contains test #204');
+
+    const arr30 = ['a', 'b', 'c'];
+    const arrTest300 = ['a'];
+    assert.ok(arrayContains(arr30, arrTest300), 'contains test #300');
+    const arrTest301 = ['a', 'b'];
+    assert.ok(arrayContains(arr30, arrTest301), 'contains test #301');
+    const arrTest302 = ['b', 'a'];
+    assert.ok(arrayContains(arr30, arrTest302), 'contains test #302');
+    const arrTest303 = ['a', 'b', 'c'];
+    assert.ok(arrayContains(arr30, arrTest303), 'contains test #303');
+    assert.notOk(arrayContains(arr30, undefined), 'contains test #310');
+    const arrTest311 = null;
+    assert.notOk(arrayContains(arr30, arrTest311), 'contains test #311');
+    const arrTest312 = [];
+    assert.notOk(arrayContains(arr30, arrTest312), 'contains test #312');
+    const arrTest313 = [''];
+    assert.notOk(arrayContains(arr30, arrTest313), 'contains test #313');
+    const arrTest320 = ['d'];
+    assert.notOk(arrayContains(arr30, arrTest320), 'contains test #320');
+    const arrTest321 = ['a', 'd'];
+    assert.notOk(arrayContains(arr30, arrTest321), 'contains test #321');
+    const arrTest322 = ['d', 'a'];
+    assert.notOk(arrayContains(arr30, arrTest322), 'contains test #322');
+    const arrTest323 = [0, 'a'];
+    assert.notOk(arrayContains(arr30, arrTest323), 'contains test #323');
+    const arrTest324 = ['a', 'b', 'c', 0];
+    assert.notOk(arrayContains(arr30, arrTest324), 'contains test #324');
+  });
+
+  /**
+   * Tests for {@link arraySortEquals}.
+   *
+   * @function module:tests/utils~arraysortequals
+   */
+  test('arraySortEquals', () => {
+    // null
+    assert.notOk(arraySortEquals(null, null), '2 null arrays');
+    assert.notOk(arraySortEquals(null, [1, 2, 3]), 'left null array');
+    assert.notOk(arraySortEquals([1, 2, 3], null), 'right null array');
+
+    // undefined
+    assert.notOk(arraySortEquals(undefined, undefined),
+      '2 undefined arrays');
+    assert.notOk(arraySortEquals(undefined, [1, 2, 3]),
+      'left undefined arrays');
+    assert.notOk(arraySortEquals([1, 2, 3], undefined),
+      'right undefined arrays');
+
+    // empty
+    assert.notOk(arraySortEquals([1], []), 'right empty array');
+    assert.notOk(arraySortEquals([], [1]), 'left empty array');
+    assert.ok(arraySortEquals([], []), '2 empty arrays');
+
+    // simple arrays
+    const arr00 = [1, 2, 3];
+    assert.ok(arraySortEquals(arr00, arr00), 'array equal #0');
+    const arr01 = [3, 2, 1];
+    assert.ok(arraySortEquals(arr00, arr01), 'array equal #1');
+    const arr02 = [1, 2, 3, 4];
+    assert.notOk(arraySortEquals(arr00, arr02), 'array equal #2');
+    const arr03 = [1, 'a', null, undefined];
+    assert.ok(arraySortEquals(arr03, arr03), 'array equal #3');
+
+    // array of object
+    const arr10 = [{a: 0}];
+    const arr11 = [{a: 0}];
+    assert.notOk(arraySortEquals(arr10, arr11),
+      'array of object equal #0');
+    const obj = {a: 0};
+    const arr12 = [obj];
+    const arr13 = [obj];
+    assert.ok(arraySortEquals(arr12, arr13),
+      'array of object equal #1');
+  });
+
+  // test data
+  let multipart01 = 'preamble\r\n';
+  multipart01 += '--boundary\r\n';
+  multipart01 += '\r\n';
+  multipart01 += '--boundary--';
+
+  // (inspired from https://github.com/jmhmd/parse-multipart-data/blob/master/src/multipart.ts)
+  let str10 = '------WebKitFormBoundaryvef1fLxmoUdYZWXp\r\n';
+  str10 +=
+    'Content-Disposition: form-data; name=&quot;uploads[]&quot;; filename=&quot;A.txt&quot;\r\n';
+  str10 += 'Content-Type: text/plain\r\n';
+  str10 += '\r\n';
+  str10 += '@11X111Y\r\n';
+  str10 += '111Z\rCCCC\nCCCC\r\nCCCCC@\r\n';
+  str10 += '\r\n';
+  str10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp\r\n';
+  str10 +=
+    'Content-Disposition: form-data; name=&quot;uploads[]&quot;; filename=&quot;B.txt&quot;\r\n';
+  str10 += 'Content-Type: text/plain\r\n';
+  str10 += '\r\n';
+  str10 += '@22X222Y\r\n';
+  str10 += '222Z\r222W\n2220\r\n';
+  str10 += '666@\r\n';
+  str10 += '\r\n';
+  str10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp\r\n';
+  str10 += 'Content-Disposition: form-data; name=&quot;input1&quot;\r\n';
+  str10 += '\r\n';
+  str10 += 'value1\r\n';
+  str10 += '\r\n';
+  str10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp--\r\n';
+
+  /* eslint-disable @stylistic/js/array-element-newline */
+  const multipart10 = {
+    str: str10,
+    parts: [
+      {
+        'Content-Disposition': 'form-data; name=&quot;uploads[]&quot;; filename=&quot;A.txt&quot;',
+        'Content-Type': 'text/plain',
+        data: new Uint8Array([
+          64, 49, 49, 88, 49, 49, 49, 89, 13, 10,
+          49, 49, 49, 90, 13, 67, 67, 67, 67, 10, 67, 67, 67, 67, 13, 10,
+          67, 67, 67, 67, 67, 64, 13, 10
+        ])
+      },
+      {
+        'Content-Disposition': 'form-data; name=&quot;uploads[]&quot;; filename=&quot;B.txt&quot;',
+        'Content-Type': 'text/plain',
+        data: new Uint8Array([
+          64, 50, 50, 88, 50, 50, 50, 89, 13, 10,
+          50, 50, 50, 90, 13, 50, 50, 50, 87, 10, 50, 50, 50, 48, 13, 10,
+          54, 54, 54, 64, 13, 10
+        ])
+      },
+      {
+        'Content-Disposition': 'form-data; name=&quot;input1&quot;',
+        data: new Uint8Array([
+          118, 97, 108, 117, 101, 49, 13, 10
+        ])
+      }
+    ]
+  };
+  /* eslint-enable @stylistic/js/array-element-newline */
+
+  // with preamble and epilogue
+  let str11 = 'preamble\r\n';
+  str11 += str10;
+  str11 += 'epilogue\r\n';
+  const multipart11 = {
+    str: str11
+  };
+
+  const compareMultipartObjects = function (obj0, obj1) {
+    if (obj0.length !== obj1.length) {
+      return false;
+    }
+    for (let i = 0; i &lt; obj0.length; ++i) {
+      const keys = Object.keys(obj0[i]);
+      for (let k = 0; k &lt; keys.length; ++k) {
+        const key = keys[k];
+        if (key !== 'data') {
+          if (obj0[i][key] !== obj1[i][key]) {
+            return false;
+          }
+        } else {
+          for (let j = 0; j &lt; obj0[i].data.length; ++j) {
+            if (obj0[i].data[j] !== obj1[i].data[j]) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return true;
+  };
+
+  const compareBuffers = function (buf1, buf2) {
+    if (buf1.byteLength !== buf2.byteLength) {
+      console.log('compareBuffers: length', buf1.byteLength, buf2.byteLength);
+      return false;
+    }
+    const dv1 = new Int8Array(buf1);
+    const dv2 = new Int8Array(buf2);
+    for (let i = 0; i !== buf1.byteLength; i++) {
+      if (dv1[i] !== dv2[i]) {
+        console.log('compareBuffers: buffer', i, dv1[i], dv2[i]);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Tests for {@link parseMultipart}.
+   *
+   * @function module:tests/utils~parseMultipart
+   */
+  test('Parse multipart - #DWV-REQ-IO-02-002 Load DICOM multipart URL',
+    () => {
+      // empty
+      const res00 = parseMultipart(new Uint8Array(0).buffer);
+      assert.equal(res00.length, 0, 'Empty multipart length');
+
+      // empty part
+      const u8Test01 = stringToUint8Array(multipart01);
+      const res01 = parseMultipart(u8Test01.buffer);
+      assert.equal(res01.length, 1, 'Empty multipart part length');
+      const keys01 = Object.keys(res01);
+      assert.equal(keys01.length, 1, 'Empty multipart part keys length');
+      assert.ok(typeof res01[0].data !== 'undefined',
+        'Empty multipart part has data');
+      assert.equal(res01[0].data.length, 0, 'Empty multipart part data length');
+
+      // test #10
+      // parse multipart
+      const u8Test10 = stringToUint8Array(multipart10.str);
+      const resMulti10 = parseMultipart(u8Test10.buffer);
+      assert.ok(compareMultipartObjects(resMulti10, multipart10.parts),
+        'Compare multipart object #10');
+      // build multipart
+      const resBuff10 = buildMultipart(multipart10.parts,
+        '----WebKitFormBoundaryvef1fLxmoUdYZWXp');
+      assert.ok(compareBuffers(resBuff10, u8Test10),
+        'Compare multipart buffer #10');
+
+      // test #11: with preamble and epilogue
+      const u8Test11 = stringToUint8Array(multipart11.str);
+      const resMulti11 = parseMultipart(u8Test11.buffer);
+      assert.ok(compareMultipartObjects(resMulti11, multipart10.parts),
+        'Compare multipart object #11');
+    }
+  );
+
+});
+</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"tests/utils/array.test.js"},"i1":{"basePath":"/","searchIndexUrl":"/_assets/search-index.mwm9kbrx-f9794ac0.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/tests/utils/array-test-js","siteName":"DWV","basePath":"/","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/tests/utils/array-test-js","basePath":"/","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/_islands/theme-toggle-2OFR67FU.js","settings":"/_islands/settings-HUVOQWPC.js","code-viewer":"/_islands/code-viewer-J4JM56PM.js","embed":"/_islands/embed-S4IPJ47N.js","playground":"/_islands/playground-GHNL23CG.js","tabs":"/_islands/tabs-NRSQKCSU.js","sidebar":"/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/_islands/mobile-nav-ITUCHCYZ.js","toc":"/_islands/toc-YFAY7IHK.js","toc-mobile":"/_islands/toc-mobile-6DGE76YF.js","cmdk":"/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/_islands/code-tabs-C6ACVICP.js","copy-btn":"/_islands/copy-btn-5QCTJLYG.js","copy-page":"/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>

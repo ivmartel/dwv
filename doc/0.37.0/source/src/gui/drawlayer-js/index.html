@@ -1,0 +1,1461 @@
+<!doctype html><html lang="en" data-scrollbar="styled"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="clean-jsdoc-theme 5.2.1" /><title>src/gui/drawLayer.js | DWV</title><script>(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'){d.dataset.theme='dark'}else{d.dataset.theme='light'}var fs=localStorage.getItem('clean-font-size');if(fs==='sm'){d.style.fontSize='15px'}else if(fs==='lg'){d.style.fontSize='18px'}var ls=localStorage.getItem('clean-line-spacing');if(ls==='compact'){d.style.setProperty('--clean-line-height','1.4')}else if(ls==='relaxed'){d.style.setProperty('--clean-line-height','1.8')}}catch(_){}}());</script><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&amp;family=Roboto:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/_assets/styles.mwm9kbrx-f9794ac0.css" /></head><body><div class="flex min-h-screen flex-col bg-background text-(--clean-fg)"><header class="sticky top-0 z-30 border-b border-(--clean-border) bg-background"><div class="mx-auto flex h-16 w-full min-w-0 max-w-screen-2xl items-center gap-4 px-4"><a href="/" class="flex min-w-0 items-center pl-3 no-underline"><span class="truncate text-lg font-heading font-bold text-(--clean-fg)">DWV</span></a><span class="shrink-0 rounded bg-(--clean-bg-muted) px-2 py-0.5 text-xs text-muted-foreground">v0.38.0-beta.0</span><div class="ml-auto flex shrink-0 items-center gap-1"><div class="flex items-center gap-1"><div data-island="cmdk" data-island-id="i1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Search" title="Search (Ctrl K)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><div class="hidden items-center gap-1 md:flex"><div data-island="theme-toggle" data-island-id="i2"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-label="Switch to dark theme" title="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button></div><div data-island="settings" data-island-id="i3"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div><div class="md:hidden"><div data-island="mobile-nav" data-island-id="i4"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open navigation" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M15 3v18"></path></svg></button></div></div></div></div></header><div class="mx-auto grid w-full max-w-screen-2xl flex-1 grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[16rem_minmax(0,1fr)]"><aside class="hidden md:block"><div class="sticky overflow-y-auto [scrollbar-gutter:stable] pr-2 top-20 max-h-[calc(100vh-6rem)]"><div data-island="sidebar" data-island-id="i5"><nav aria-label="Documentation navigation" class="text-(--clean-fg)"><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer items-center text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house shrink-0" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="min-w-0 wrap-break-words">Home</span></a></li><li class="my-0.5"><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/github) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">GitHub</span></a></li><li class="my-0.5"><a href="https://www.npmjs.com/package/dwv" target="_blank" rel="noopener noreferrer" class="group flex gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)] items-center"><span aria-hidden="true" class="inline-block h-4 w-4 shrink-0 bg-(--clean-fg)" style="mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;-webkit-mask:url(https://cdn.simpleicons.org/npm) center / contain no-repeat;opacity:0.8;"></span><span class="min-w-0 wrap-break-words">npm</span></a></li></ul><hr class="my-3 border-(--clean-border)"/><div class="mt-4 first:mt-0"><button type="button" aria-expanded="true" class="mb-1 flex w-full items-center rounded-xl py-1.5 px-3 text-left text-sm font-bold text-(--clean-fg) cursor-pointer hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">Tutorials</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ml-auto shrink-0 transition-transform rotate-90" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><ul class="m-0 list-none p-0"><li class="my-0.5"><a href="/tutorials/annotations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">annotations</span></a></li><li class="my-0.5"><a href="/tutorials/architecture" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">architecture</span></a></li><li class="my-0.5"><a href="/tutorials/conformance" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">conformance</span></a></li><li class="my-0.5"><a href="/tutorials/data-load" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">data-load</span></a></li><li class="my-0.5"><a href="/tutorials/developing" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">developing</span></a></li><li class="my-0.5"><a href="/tutorials/errors" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">errors</span></a></li><li class="my-0.5"><a href="/tutorials/examples" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">examples</span></a></li><li class="my-0.5"><a href="/tutorials/integrations" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">integrations</span></a></li><li class="my-0.5"><a href="/tutorials/layout" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">layout</span></a></li><li class="my-0.5"><a href="/tutorials/module" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">module</span></a></li><li class="my-0.5"><a href="/tutorials/standards" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">standards</span></a></li><li class="my-0.5"><a href="/tutorials/test-results" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">test-results</span></a></li><li class="my-0.5"><a href="/tutorials/user-stories" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">user-stories</span></a></li><li class="my-0.5"><a href="/tutorials/view-create" class="group flex items-start gap-x-3 w-full px-3 py-1.5 text-left text-sm no-underline break-words hyphens-auto overflow-hidden rounded-xl outline-offset-[-1px] cursor-pointer text-[var(--clean-fg)] hover:bg-[var(--clean-bg-muted)]"><span class="min-w-0 wrap-break-words">view-create</span></a></li></ul></div></nav></div></div></aside><main class="min-w-0 px-4 md:px-8 lg:px-12"><div data-island="code-viewer" data-island-id="i0"><div class="my-4 overflow-hidden rounded-lg border border-(--clean-border) bg-(--clean-bg)"><div class="flex items-center justify-between border-b border-(--clean-border) bg-(--clean-bg-muted) px-3 py-2 text-sm"><span class="font-mono text-(--clean-fg)">src/gui/drawLayer.js</span><span class="text-xs text-(--clean-fg-muted)">javascript</span></div><div class="h-[calc(100vh-13rem)] min-h-[24rem]"><pre class="m-0 h-full overflow-auto whitespace-pre p-4 text-sm leading-relaxed text-(--clean-fg)"><code class="language-javascript">import {ListenerHandler} from '../utils/listen.js';
+import {DrawController} from '../app/drawController.js';
+import {getScaledOffset} from './layerGroup.js';
+import {
+  InteractionEventNames,
+  getInteractionEventOptions
+} from './generic.js';
+import {logger} from '../utils/logger.js';
+import {toStringId} from '../utils/array.js';
+import {precisionRound} from '../math/number.js';
+import {AddAnnotationCommand} from '../command/drawCommands.js';
+import {
+  isNodeWithId,
+  isPositionNode,
+  isNodeNameLabel
+} from '../tools/shapes/drawBounds.js';
+import {Style} from '../gui/style.js';
+import {custom} from '../app/custom.js';
+
+// external
+import Konva from 'konva';
+
+/**
+ * @import {Point, Point2D, Point3D} from '../math/point.js';
+ * @import {Vector3D} from '../math/vector.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ * @import {Index} from '../math/index.js';
+ * @import {Image} from '../image/image.js';
+ * @import {PlaneHelper} from '../image/planeHelper.js';
+ * @import {Annotation} from '../image/annotation.js';
+ * @import {AnnotationGroup} from '../image/annotationGroup.js';
+ * @import {DrawShapeHandler} from '../tools/shapes/drawShapeHandler.js';
+ */
+
+/**
+ * Debug function to output the layer hierarchy as text.
+ *
+ * @param {object} layer The Konva layer.
+ * @param {string} prefix A display prefix (used in recursion).
+ * @returns {string} A text representation of the hierarchy.
+ */
+// function getHierarchyLog(layer, prefix) {
+//   if (typeof prefix === 'undefined') {
+//     prefix = '';
+//   }
+//   const kids = layer.getChildren();
+//   let log = prefix + '|__ ' + layer.name() + ': ' + layer.id() + '\n';
+//   for (let i = 0; i &lt; kids.length; ++i) {
+//     log += getHierarchyLog(kids[i], prefix + '    ');
+//   }
+//   return log;
+// }
+
+/**
+ * Draw layer.
+ *
+ * Not an EventTarget in order to forward native DOM events while
+ * preserving `preventDefault()` for tools (see '#fireDomEvent').
+ */
+export class DrawLayer {
+
+  /**
+   * The container div.
+   *
+   * @type {HTMLDivElement}
+   */
+  #containerDiv;
+
+  /**
+   * Konva stage.
+   *
+   * @type {Konva.Stage}
+   */
+  #konvaStage = null;
+
+  /**
+   * The layer base size as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #baseSize;
+
+  /**
+   * The layer base spacing as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #baseSpacing;
+
+  /**
+   * The layer fit scale.
+   *
+   * @type {Scalar2D}
+   */
+  #fitScale = {x: 1, y: 1};
+
+  /**
+   * The layer flip scale.
+   *
+   * @type {Scalar3D}
+   */
+  #flipScale = {x: 1, y: 1, z: 1};
+
+  /**
+   * The base layer offset.
+   *
+   * @type {Scalar2D}
+   */
+  #baseOffset = {x: 0, y: 0};
+
+  /**
+   * The view offset.
+   *
+   * @type {Scalar2D}
+   */
+  #viewOffset = {x: 0, y: 0};
+
+  /**
+   * The zoom offset.
+   *
+   * @type {Scalar2D}
+   */
+  #zoomOffset = {x: 0, y: 0};
+
+  /**
+   * The pan offset.
+   *
+   * @type {Scalar2D}
+   */
+  #panOffset = {x: 0, y: 0};
+
+  /**
+   * The flip offset.
+   *
+   * @type {Scalar2D}
+   */
+  #flipOffset = {x: 0, y: 0};
+
+  /**
+   * The current annotation highlight reset function.
+   *
+   * @type {Function|undefined}
+   */
+  #resetHighlight;
+
+  /**
+   * The draw controller.
+   *
+   * @type {DrawController}
+   */
+  #drawController;
+
+  /**
+   * The plane helper.
+   *
+   * @type {PlaneHelper}
+   */
+  #planeHelper;
+
+  /**
+   * The associated data id.
+   *
+   * @type {string}
+   */
+  #dataId;
+
+  /**
+   * The reference layer id.
+   *
+   * @type {string}
+   */
+  #referenceLayerId;
+
+  /**
+   * Current position group id.
+   *
+   * @type {string|undefined}
+   */
+  #currentPosGroupId;
+
+  /**
+   * Current time index.
+   *
+   * @type {number|undefined}
+   */
+  #currentTimeIndex;
+
+  /**
+   * Draw shape handler.
+   *
+   * @type {DrawShapeHandler|undefined}
+   */
+  #shapeHandler;
+
+  /**
+   * Visible labels flag.
+   *
+   * @type {boolean}
+   */
+  #visibleLabels = true;
+
+  /**
+   * @param {HTMLDivElement} containerDiv The layer div, its id will be used
+   *   as this layer id.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+    // specific css class name
+    this.#containerDiv.className += ' drawLayer';
+  }
+
+  /**
+   * Set the draw shape handler.
+   *
+   * @param {DrawShapeHandler|undefined} handler The shape handler.
+   */
+  setShapeHandler(handler) {
+    this.#shapeHandler = handler;
+  }
+
+  /**
+   * Get the associated data id.
+   *
+   * @returns {string} The id.
+   */
+  getDataId() {
+    return this.#dataId;
+  }
+
+  /**
+   * Get the reference layer id.
+   *
+   * @returns {string} The id.
+   */
+  getReferenceLayerId() {
+    return this.#referenceLayerId;
+  }
+
+  /**
+   * Listener handler.
+   *
+   * @type {ListenerHandler}
+   */
+  #listenerHandler = new ListenerHandler();
+
+  /**
+   * Get the Konva stage.
+   *
+   * @returns {Konva.Stage} The stage.
+   */
+  getKonvaStage() {
+    return this.#konvaStage;
+  }
+
+  /**
+   * Get the Konva layer.
+   *
+   * @returns {Konva.Layer} The layer.
+   */
+  getKonvaLayer() {
+    // there should only be one layer
+    return this.#konvaStage.getLayers()[0];
+  }
+
+  /**
+   * Get the draw controller.
+   *
+   * @returns {DrawController} The controller.
+   */
+  getDrawController() {
+    return this.#drawController;
+  }
+
+  /**
+   * Set the plane helper.
+   *
+   * @param {PlaneHelper} helper The helper.
+   */
+  setPlaneHelper(helper) {
+    this.#planeHelper = helper;
+  }
+
+  // common layer methods [start] ---------------
+
+  /**
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  getId() {
+    return this.#containerDiv.id;
+  }
+
+  /**
+   * Remove the HTML element from the DOM.
+   */
+  removeFromDOM() {
+    this.#containerDiv.remove();
+  }
+
+  /**
+   * Get the layer base size (without scale).
+   *
+   * @returns {Scalar2D} The size as {x,y}.
+   */
+  getBaseSize() {
+    return this.#baseSize;
+  }
+
+  /**
+   * Get the layer opacity.
+   *
+   * @returns {number} The opacity ([0:1] range).
+   */
+  getOpacity() {
+    return this.#konvaStage.opacity();
+  }
+
+  /**
+   * Set the layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  setOpacity(alpha) {
+    const opacity = Math.min(Math.max(alpha, 0), 1);
+    if (opacity === this.#konvaStage.opacity()) {
+      return;
+    }
+
+    this.#konvaStage.opacity(opacity);
+
+    /**
+     * Opacity change event.
+     *
+     * @event App#opacitychange
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.srclayerid The source layer id.
+     * @property {string} detail.dataid The data id.
+     * @property {Array} detail.value The changed value.
+     */
+    this.#fireEvent(new CustomEvent('opacitychange', {
+      detail: {
+        value: [opacity]
+      }
+    }));
+  }
+
+  /**
+   * Add a flip offset along the layer X axis.
+   */
+  addFlipOffsetX() {
+    // flip offset
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
+    this.#flipOffset.x += size.width / scale.x;
+    // apply
+    const offset = this.#konvaStage.offset();
+    offset.x += this.#flipOffset.x;
+    this.#konvaStage.offset(offset);
+  }
+
+  /**
+   * Add a flip offset along the layer Y axis.
+   */
+  addFlipOffsetY() {
+    // flip offset
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
+    this.#flipOffset.y += size.height / scale.y;
+    // apply
+    const offset = this.#konvaStage.offset();
+    offset.y += this.#flipOffset.y;
+    this.#konvaStage.offset(offset);
+  }
+
+  /**
+   * Flip the scale along the layer X axis.
+   */
+  flipScaleX() {
+    this.#flipScale.x *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Y axis.
+   */
+  flipScaleY() {
+    this.#flipScale.y *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Z axis.
+   */
+  flipScaleZ() {
+    this.#flipScale.z *= -1;
+  }
+
+  /**
+   * Set the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Point3D} [center] The scale center.
+   */
+  setScale(newScale, center) {
+    const orientedNewScale =
+      this.#planeHelper.getTargetOrientedPositiveXYZ({
+        x: newScale.x * this.#flipScale.x,
+        y: newScale.y * this.#flipScale.y,
+        z: newScale.z * this.#flipScale.z,
+      });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+
+    const offset = this.#konvaStage.offset();
+
+    if (Math.abs(newScale.x) === 1 &amp;&amp;
+      Math.abs(newScale.y) === 1 &amp;&amp;
+      Math.abs(newScale.z) === 1) {
+      // reset zoom offset for scale=1
+      const resetOffset = {
+        x: offset.x - this.#zoomOffset.x,
+        y: offset.y - this.#zoomOffset.y
+      };
+      // store new offset
+      this.#zoomOffset = {x: 0, y: 0};
+      this.#konvaStage.offset(resetOffset);
+    } else if (typeof center !== 'undefined') {
+      let worldCenter = this.#planeHelper.getPlaneOffsetFromOffset3D({
+        x: center.getX(),
+        y: center.getY(),
+        z: center.getZ()
+      });
+      // center was obtained with viewLayer.displayToMainPlanePos
+      // compensated for baseOffset
+      // TODO: justify...
+      worldCenter = {
+        x: worldCenter.x + this.#baseOffset.x,
+        y: worldCenter.y + this.#baseOffset.y
+      };
+
+      const newOffset = getScaledOffset(
+        offset, this.#konvaStage.scale(), finalNewScale, worldCenter);
+
+      const newZoomOffset = {
+        x: this.#zoomOffset.x + newOffset.x - offset.x,
+        y: this.#zoomOffset.y + newOffset.y - offset.y
+      };
+      // store new offset
+      this.#zoomOffset = newZoomOffset;
+      this.#konvaStage.offset(newOffset);
+    }
+
+    this.#konvaStage.scale(finalNewScale);
+    // update labels
+    this.#updateLabelScale(finalNewScale);
+  }
+
+  /**
+   * Initialise the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+   *   without the fit scale (as provided by getAbsoluteZoomOffset).
+   */
+  initScale(newScale, absoluteZoomOffset) {
+    const orientedNewScale = this.#planeHelper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+    this.#konvaStage.scale(finalNewScale);
+
+    this.#zoomOffset = {
+      x: absoluteZoomOffset.x / this.#fitScale.x,
+      y: absoluteZoomOffset.y / this.#fitScale.y
+    };
+    const offset = this.#konvaStage.offset();
+    this.#konvaStage.offset({
+      x: offset.x + this.#zoomOffset.x,
+      y: offset.y + this.#zoomOffset.y
+    });
+  }
+
+  /**
+   * Set the layer offset.
+   *
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
+   */
+  setOffset(newOffset) {
+    const newPanOffset =
+      this.#planeHelper.getPlaneOffsetFromOffset3D(newOffset);
+    const offset = this.#konvaStage.offset();
+    this.#konvaStage.offset({
+      x: offset.x - this.#panOffset.x + newPanOffset.x,
+      y: offset.y - this.#panOffset.y + newPanOffset.y
+    });
+    this.#panOffset = newPanOffset;
+  }
+
+  /**
+   * Set the base layer offset. Updates the layer offset.
+   *
+   * @param {Vector3D} scrollOffset The scroll offset vector.
+   * @param {Vector3D} planeOffset The plane offset vector.
+   * @returns {boolean} True if the offset was updated.
+   */
+  setBaseOffset(scrollOffset, planeOffset) {
+    const scrollDimIndex = this.#planeHelper.getNativeScrollDimIndex();
+    const newOffset = this.#planeHelper.getPlaneOffsetFromOffset3D({
+      x: scrollDimIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollDimIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollDimIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
+    });
+    const needsUpdate = this.#baseOffset.x !== newOffset.x ||
+      this.#baseOffset.y !== newOffset.y;
+    // reset offset if needed
+    if (needsUpdate) {
+      const offset = this.#konvaStage.offset();
+      this.#konvaStage.offset({
+        x: offset.x - this.#baseOffset.x + newOffset.x,
+        y: offset.y - this.#baseOffset.y + newOffset.y
+      });
+      this.#baseOffset = newOffset;
+    }
+    return needsUpdate;
+  }
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  display(flag) {
+    this.#containerDiv.style.display = flag ? '' : 'none';
+  }
+
+  /**
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
+  isVisible() {
+    return this.#containerDiv.style.display === '';
+  }
+
+  /**
+   * Draw the content (imageData) of the layer.
+   * The imageData variable needs to be set.
+   */
+  draw() {
+    this.#konvaStage.draw();
+  }
+
+  /**
+   * Initialise the layer: set the canvas and context.
+   *
+   * @param {Scalar2D} size The image size as {x,y}.
+   * @param {Scalar2D} spacing The image spacing as {x,y}.
+   * @param {string} refLayerId The reference image dataId.
+   */
+  initialise(size, spacing, refLayerId) {
+    // set locals
+    this.#baseSize = size;
+    this.#baseSpacing = spacing;
+    this.#referenceLayerId = refLayerId;
+
+    // create stage
+    this.#konvaStage = new Konva.Stage({
+      container: this.#containerDiv,
+      width: this.#baseSize.x,
+      height: this.#baseSize.y,
+      listening: false
+    });
+    // reset style
+    // (avoids a not needed vertical scrollbar)
+    this.#konvaStage.getContent().setAttribute('style', '');
+
+    // create layer
+    const konvaLayer = new Konva.Layer({
+      listening: false,
+      visible: true
+    });
+    this.#konvaStage.add(konvaLayer);
+  }
+
+  /**
+   * Set the annotation group.
+   *
+   * @param {AnnotationGroup} annotationGroup The annotation group.
+   * @param {string} dataId The associated data id.
+   * @param {object} exeCallback The undo stack callback.
+   */
+  setAnnotationGroup(annotationGroup, dataId, exeCallback) {
+    this.#dataId = dataId;
+    // local listeners
+    annotationGroup.addEventListener('annotationadd',
+      (/** @type {CustomEvent} */ event) => {
+        // draw annotation
+        this.#addAnnotationDraw(event.detail.data, true);
+        this.getKonvaLayer().draw();
+      });
+    annotationGroup.addEventListener('annotationupdate',
+      (/** @type {CustomEvent} */ event) => {
+        // update annotation draw
+        this.#updateAnnotationDraw(event.detail.data);
+        this.getKonvaLayer().draw();
+      });
+    annotationGroup.addEventListener('annotationremove',
+      (/** @type {CustomEvent} */ event) => {
+        // remove annotation draw
+        this.#removeAnnotationDraw(event.detail.data);
+        this.getKonvaLayer().draw();
+      });
+    annotationGroup.addEventListener(
+      'annotationgroupeditablechange',
+      (/** @type {CustomEvent} */ event) => {
+        this.activateCurrentPositionShapes(event.detail.data);
+      }
+    );
+
+    // create draw controller
+    this.#drawController = new DrawController(annotationGroup);
+
+    // annotations are allready in the annotation list,
+    // -> no need to add them, just draw and save command
+    if (annotationGroup.getLength() !== 0) {
+      for (const annotation of annotationGroup.getList()) {
+        // draw annotation
+        this.#addAnnotationDraw(annotation, false);
+        // create the draw command
+        const command = new AddAnnotationCommand(
+          annotation, this.getDrawController());
+        // add command to undo stack
+        exeCallback(command);
+      }
+    }
+  }
+
+  /**
+   * Activate shapes at current position.
+   *
+   * @param {boolean} flag The flag to activate or not.
+   */
+  activateCurrentPositionShapes(flag) {
+    const konvaLayer = this.getKonvaLayer();
+
+    const drawController = this.getDrawController();
+    const canActivate = flag &amp;&amp;
+      drawController.getAnnotationGroup().isEditable();
+
+    // stop stage listening
+    this.#konvaStage.listening(false);
+
+    if (typeof this.#shapeHandler !== 'undefined') {
+      // reset shape editor (remove anchors) if its shape
+      // is not at the current position anymore
+      const editorGroup = this.#shapeHandler.getEditorShapeGroup();
+      if (!canActivate ||
+        typeof editorGroup === 'undefined' ||
+        editorGroup.getParent() !== this.#getCurrentPosGroup()) {
+        this.#shapeHandler.disableAndResetEditor();
+      }
+      // remove listeners for all position groups
+      const allPosGroups = konvaLayer.getChildren();
+      for (const posGroup of allPosGroups) {
+        if (posGroup instanceof Konva.Group) {
+          posGroup.getChildren().forEach((group) => {
+            if (group instanceof Konva.Group) {
+              this.#shapeHandler.removeShapeListeners(group);
+            }
+          });
+        }
+      }
+    }
+
+    // activate shape listeners if possible
+    if (canActivate) {
+      // start stage listening
+      this.#konvaStage.listening(true);
+      // shape groups at the current position
+      const shapeGroups =
+        this.#getCurrentPosGroup().getChildren();
+      // listen if we have shapes
+      if (shapeGroups.length !== 0) {
+        konvaLayer.listening(true);
+      }
+      // add listeners for position group
+      if (typeof this.#shapeHandler !== 'undefined') {
+        shapeGroups.forEach((group) => {
+          if (group instanceof Konva.Group) {
+            const annotation = drawController.getAnnotation(group.id());
+            this.#shapeHandler.addShapeGroupListeners(group, annotation, this);
+          }
+        });
+      }
+    }
+
+    konvaLayer.draw();
+  }
+
+  /**
+   * Get the position group id for an annotation.
+   *
+   * @param {Annotation} annotation The target annotation.
+   * @returns {string|undefined} The group id.
+   */
+  #getAnnotationPosGroupId(annotation) {
+    let points;
+    // annotation planePoints are only present
+    // for non aquisition plane
+    if (typeof annotation.planePoints !== 'undefined') {
+      // use plane points
+      points = annotation.planePoints;
+    } else if (typeof annotation.planeOrigin !== 'undefined') {
+      // just use plane origin
+      points = [annotation.planeOrigin];
+    }
+    let posId;
+    if (typeof points !== 'undefined') {
+      // 1-based frame number to 0-based time index
+      let timeIndex;
+      if (typeof annotation.referencedFrameNumber !== 'undefined') {
+        timeIndex = annotation.referencedFrameNumber - 1;
+      }
+      posId = this.#getPositionId(points, timeIndex);
+    }
+    return posId;
+  }
+
+  /**
+   * Get a string id from input plane points.
+   *
+   * @param {Point3D[]} points A list of points that defined a plane.
+   * @param {number} [timeIndex] Optional time index.
+   * @returns {string} The string id.
+   */
+  #getPositionId(points, timeIndex) {
+    let res = '';
+    for (const point of points) {
+      if (res.length !== 0) {
+        res += '-';
+      }
+      const posValues = [
+        precisionRound(point.getX(), 2),
+        precisionRound(point.getY(), 2),
+        precisionRound(point.getZ(), 2),
+      ];
+      res += toStringId(posValues);
+    }
+    if (typeof timeIndex !== 'undefined') {
+      res += `-${timeIndex}`;
+    }
+    return res;
+  }
+
+  /**
+   * Find the shape group associated to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Konva.Group|undefined} The shape group.
+   */
+  #findShapeGroup(annotation) {
+    let res;
+
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
+    const layerChildren = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId));
+    if (layerChildren.length !== 0) {
+      const posGroup = layerChildren[0];
+      if (!(posGroup instanceof Konva.Group)) {
+        return;
+      }
+      const posChildren = posGroup.getChildren(
+        isNodeWithId(annotation.trackingUid));
+      if (posChildren.length !== 0 &amp;&amp;
+        posChildren[0] instanceof Konva.Group) {
+        res = posChildren[0];
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Draw an annotation: create the shape group and add it to
+   *   the Konva layer.
+   *
+   * @param {Annotation} annotation The annotation to draw.
+   * @param {boolean} visible The position group visibility.
+   */
+  #addAnnotationDraw(annotation, visible) {
+    // check for compatible view
+    if (!annotation.canView() ||
+      !annotation.isCompatibleView(this.#planeHelper)) {
+      return;
+    }
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
+    // Get or create position-group if it does not exist and
+    // append it to konvaLayer
+    let posGroup = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId))[0];
+    if (typeof posGroup === 'undefined') {
+      posGroup = new Konva.Group({
+        id: posGroupId,
+        name: 'position-group',
+        visible
+      });
+      this.getKonvaLayer().add(posGroup);
+    }
+    if (!(posGroup instanceof Konva.Group)) {
+      return;
+    };
+
+    const style = new Style();
+    const stage = this.getKonvaStage();
+    style.setZoomScale(stage.scale());
+
+    // shape group (use first one since it will be removed from
+    // the group when we change it)
+    const factory = annotation.getFactory();
+    if (typeof factory === 'undefined') {
+      throw new Error('Cannot add an annotation draw without factory');
+    }
+    const shapeGroup = factory.createShapeGroup(annotation, style);
+    // add group to posGroup (switches its parent)
+    posGroup.add(shapeGroup);
+
+    // activate shape if possible
+    if (visible &amp;&amp;
+      typeof this.#shapeHandler !== 'undefined'
+    ) {
+      this.#shapeHandler.addShapeGroupListeners(shapeGroup, annotation, this);
+    }
+    // set label visibility
+    this.setLabelVisibility(shapeGroup);
+  }
+
+  /**
+   * Remove an annotation draw.
+   *
+   * @param {Annotation} annotation The annotation to remove.
+   * @returns {boolean} True if the shape group has been found and removed.
+   */
+  #removeAnnotationDraw(annotation) {
+    const shapeGroup = this.#findShapeGroup(annotation);
+    if (!(shapeGroup instanceof Konva.Group)) {
+      logger.debug('No shape group to remove');
+      return false;
+    };
+    shapeGroup.remove();
+    return true;
+  }
+
+  /**
+   * Update an annotation draw.
+   *
+   * @param {Annotation} annotation The annotation to update.
+   */
+  #updateAnnotationDraw(annotation) {
+    if (this.#removeAnnotationDraw(annotation)) {
+      this.#addAnnotationDraw(annotation, true);
+    }
+  }
+
+  /**
+   * Fit the layer to its parent container.
+   *
+   * @param {Scalar2D} containerSize The container size as {x,y}.
+   * @param {number} divToWorldSizeRatio The div to world size ratio.
+   * @param {Scalar2D} fitOffset The fit offset as {x,y}.
+   */
+  fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
+    // fit scale
+    const newFitScale = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
+    };
+    const fitRatio = {
+      x: newFitScale.x / this.#fitScale.x,
+      y: newFitScale.y / this.#fitScale.y
+    };
+
+    // size ratio (calculated before update)
+    const sizeRatio = {
+      x: containerSize.x / (this.#konvaStage.width() * fitRatio.x),
+      y: containerSize.y / (this.#konvaStage.height() * fitRatio.y)
+    };
+
+    // set canvas size if different from previous
+    if (this.#konvaStage.width() !== containerSize.x ||
+      this.#konvaStage.height() !== containerSize.y) {
+      this.#konvaStage.width(containerSize.x);
+      this.#konvaStage.height(containerSize.y);
+    }
+
+    // #scale = inputScale * fitScale * flipScale
+    // flipScale does not change here, we can omit it
+    // newScale = (#scale / fitScale) * newFitScale
+    const newScale = {
+      x: this.#konvaStage.scale().x * fitRatio.x,
+      y: this.#konvaStage.scale().y * fitRatio.y
+    };
+
+    // set scales if different from previous
+    if (this.#konvaStage.scale().x !== newScale.x ||
+      this.#konvaStage.scale().y !== newScale.y) {
+      this.#fitScale = newFitScale;
+      this.#konvaStage.scale(newScale);
+      this.#updateLabelScale(newScale);
+    }
+
+    // view offset
+    const newViewOffset = {
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
+    };
+    // flip offset
+    const scaledImageSize = {
+      x: containerSize.x / newFitScale.x,
+      y: containerSize.y / newFitScale.y
+    };
+    const newFlipOffset = {
+      x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
+      y: this.#flipOffset.y !== 0 ? scaledImageSize.y : 0,
+    };
+
+    // set offsets if different from previous
+    if (this.#viewOffset.x !== newViewOffset.x ||
+      this.#viewOffset.y !== newViewOffset.y ||
+      this.#flipOffset.x !== newFlipOffset.x ||
+      this.#flipOffset.y !== newFlipOffset.y) {
+      const newZoomOffset = {
+        x: this.#zoomOffset.x * sizeRatio.x,
+        y: this.#zoomOffset.y * sizeRatio.y
+      };
+      // update global offset
+      this.#konvaStage.offset({
+        x: this.#konvaStage.offset().x +
+          newViewOffset.x - this.#viewOffset.x +
+          newFlipOffset.x - this.#flipOffset.x +
+          newZoomOffset.x - this.#zoomOffset.x,
+        y: this.#konvaStage.offset().y +
+          newViewOffset.y - this.#viewOffset.y +
+          newFlipOffset.y - this.#flipOffset.y +
+          newZoomOffset.y - this.#zoomOffset.y
+      });
+      // update private local offsets
+      this.#flipOffset = newFlipOffset;
+      this.#viewOffset = newViewOffset;
+      this.#zoomOffset = newZoomOffset;
+    }
+  }
+
+  /**
+   * Get the top most visible annotation at the current position
+   *   that contains the input plane point.
+   *
+   * @param {Point2D} planePoint The plane point, in the reference
+   *   view layer plane coordinates.
+   * @param {number} [tolerance] Optional maximum distance to a shape,
+   *   in plane coordinates, defaults to 0.
+   * @returns {Annotation|undefined} The annotation, undefined if none.
+   */
+  getAnnotationAt(planePoint, tolerance = 0) {
+    const posGroup = this.getKonvaLayer().getChildren(
+      isNodeWithId(this.#currentPosGroupId))[0];
+    if (!(posGroup instanceof Konva.Group) || !posGroup.isVisible()) {
+      return;
+    }
+    const drawController = this.getDrawController();
+    // last child is drawn on top
+    const shapeGroups = posGroup.getChildren().slice().reverse();
+    for (const shapeGroup of shapeGroups) {
+      if (!shapeGroup.isVisible()) {
+        continue;
+      }
+      const annotation = drawController.getAnnotation(shapeGroup.id());
+      if (annotation?.contains(planePoint, tolerance)) {
+        return annotation;
+      }
+    }
+  }
+
+  /**
+   * Check the visibility of an annotation.
+   *
+   * @param {string} id The id of the annotation.
+   * @returns {boolean} True if the annotation is visible.
+   */
+  isAnnotationVisible(id) {
+    // get the group (annotation and group have same id)
+    const group = this.#getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // get visibility
+    return group.isVisible();
+  }
+
+  /**
+   * Set the visibility of an annotation.
+   *
+   * @param {string} id The id of the annotation.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   * @returns {boolean} False if the annotation shape cannot be found.
+   */
+  setAnnotationVisibility(id, visible) {
+    // get the group (annotation and group have same id)
+    const group = this.#getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !group.isVisible();
+    }
+    group.visible(visible);
+
+    // udpate
+    this.draw();
+
+    return true;
+  }
+
+  /**
+   * Temporarily highlight an annotation: its opacity progressively
+   *   dims to 20% and comes back to normal in one pulse. Only one
+   *   annotation is highlighted at a time: a new call resets the
+   *   previous highlight.
+   *
+   * @param {string} id The id of the annotation.
+   * @param {number} [duration] The highlight duration in milliseconds,
+   *   defaults to 500.
+   * @returns {boolean} False if the annotation shape cannot be found.
+   */
+  highlightAnnotation(id, duration) {
+    if (typeof duration === 'undefined') {
+      duration = 500;
+    }
+    // reset previous highlight
+    if (typeof this.#resetHighlight !== 'undefined') {
+      this.#resetHighlight();
+    }
+    // get the group (annotation and group have same id)
+    const group = this.#getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+
+    // custom highlight
+    if (typeof custom.highlightAnnotation !== 'undefined') {
+      this.#resetHighlight = custom.highlightAnnotation(
+        group, this.getKonvaLayer(), duration);
+      return true;
+    }
+
+    const opacity = group.opacity();
+    const reset = () => {
+      anim.stop();
+      group.opacity(opacity);
+      this.draw();
+      if (this.#resetHighlight === reset) {
+        this.#resetHighlight = undefined;
+      }
+    };
+    // opacity goes from 1 to 0.2 and back to 1 over the duration
+    // (the animation redraws the layer at each frame)
+    const anim = new Konva.Animation((frame) => {
+      if (frame.time >= duration) {
+        reset();
+        return false;
+      }
+      const dim = 0.8 * Math.sin(Math.PI * frame.time / duration);
+      group.opacity(opacity * (1 - dim));
+    }, this.getKonvaLayer());
+    this.#resetHighlight = reset;
+    anim.start();
+
+    return true;
+  }
+
+  /**
+   * Set the visibility of all labels.
+   *
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  setLabelsVisibility(visible) {
+    this.#visibleLabels = visible;
+
+    const posGroups = this.getKonvaLayer().getChildren();
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        const shapeGroups = posGroup.getChildren();
+        for (const shapeGroup of shapeGroups) {
+          if (shapeGroup instanceof Konva.Group) {
+            this.#setLabelVisibility(shapeGroup, visible);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Set a shape group label visibility.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  #setLabelVisibility(shapeGroup, visible) {
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(label instanceof Konva.Label)) {
+      return;
+    }
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !label.isVisible();
+    }
+    // set visible only for non empty text
+    if (typeof label.getText() !== 'undefined' &amp;&amp;
+      label.getText().text().length !== 0) {
+      label.visible(visible);
+      const connector = shapeGroup.getChildren(node =>
+        (node.className === 'Line') &amp;&amp; node.name() === 'connector')[0];
+      if (connector) {
+        connector.visible(visible);
+      }
+    }
+  }
+
+  /**
+   * Set a shape group label visibility according to
+   *  this layer setting.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  setLabelVisibility(shapeGroup) {
+    this.#setLabelVisibility(shapeGroup, this.#visibleLabels);
+  }
+
+  /**
+   * Delete a Draw from the stage.
+   *
+   * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
+   * @param {string} _id The id of the group to delete.
+   * @param {Function} _exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  deleteDraw(_id, _exeCallback) {
+    // does nothing
+  }
+
+  /**
+   * Delete all Draws from the stage.
+   *
+   * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
+   * @param {Function} _exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  deleteDraws(_exeCallback) {
+    // does nothing
+  }
+
+  /**
+   * Get the total number of draws of this layer
+   * (at all positions).
+   *
+   * @returns {number|undefined} The total number of draws.
+   */
+  getNumberOfDraws() {
+    const posGroups = this.getKonvaLayer().getChildren();
+    let count = 0;
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        count += posGroup.getChildren().length;
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Enable and listen to container interaction events.
+   */
+  bindInteraction() {
+    this.#konvaStage.listening(true);
+    // allow pointer events
+    this.#containerDiv.style.pointerEvents = 'auto';
+    // interaction events
+    const names = InteractionEventNames;
+    for (let i = 0; i &lt; names.length; ++i) {
+      this.#containerDiv.addEventListener(names[i], this.#fireDomEvent,
+        getInteractionEventOptions(names[i]));
+    }
+  }
+
+  /**
+   * Disable and stop listening to container interaction events.
+   */
+  unbindInteraction() {
+    this.#konvaStage.listening(false);
+    // disable pointer events
+    this.#containerDiv.style.pointerEvents = 'none';
+    // interaction events
+    const names = InteractionEventNames;
+    for (let i = 0; i &lt; names.length; ++i) {
+      this.#containerDiv.removeEventListener(names[i], this.#fireDomEvent);
+    }
+  }
+
+  /**
+   * Set the current position.
+   *
+   * @param {Point} position The new position.
+   * @param {Index} [index] Optional coresponding index.
+   * @returns {boolean} True if the position was updated.
+   */
+  setCurrentPosition(position, index) {
+    if (typeof index === 'undefined') {
+      index = this.#planeHelper.worldToIndex(position);
+    }
+    const planePoints = this.#planeHelper.getPlanePoints(position);
+    let points;
+    if (this.#planeHelper.isAquisitionOrientation()) {
+      // just use plane origin
+      points = [planePoints[0]];
+    } else {
+      // use plane points
+      points = planePoints;
+    }
+    // use the index: the position can hold a volume id
+    // (keep the current one if not provided, for ex from a 3D mask
+    // of a 4D image)
+    if (index.length() > 3) {
+      this.#currentTimeIndex = index.get(3);
+    }
+    const posGroupId = this.#getPositionId(points, this.#currentTimeIndex);
+
+    this.#activateDrawLayer(posGroupId);
+    // TODO: add check
+    this.#fireEvent(new CustomEvent('positionchange', {
+      detail: {
+        value: [
+          index.getValues(),
+          position.getValues(),
+        ],
+        valid: true
+      }
+    }));
+
+    return true;
+  }
+
+  /**
+   * Activate the current draw layer.
+   *
+   * @param {string} posGroupId The position group ID.
+   */
+  #activateDrawLayer(posGroupId) {
+    this.#currentPosGroupId = posGroupId;
+
+    // get all position groups
+    const posGroups = this.getKonvaLayer().getChildren(isPositionNode);
+    // reset or set the visible property
+    let visible;
+    for (let i = 0, leni = posGroups.length; i &lt; leni; ++i) {
+      visible = false;
+      if (typeof posGroupId !== 'undefined' &amp;&amp;
+        posGroups[i].id() === posGroupId) {
+        visible = true;
+      }
+      // group members inherit the visible property
+      posGroups[i].visible(visible);
+    }
+
+    // show current draw layer
+    this.getKonvaLayer().draw();
+  }
+
+  /**
+   * Get the current position group.
+   *
+   * @returns {Konva.Group|undefined} The Konva group.
+   */
+  #getCurrentPosGroup() {
+    if (typeof this.#currentPosGroupId === 'undefined') {
+      return;
+    }
+    // get position groups
+    const posGroups = this.getKonvaLayer().getChildren((node) => {
+      return node.id() === this.#currentPosGroupId;
+    });
+    // if one group, use it
+    // if no group, create one
+    let posGroup;
+    if (posGroups.length === 1) {
+      if (posGroups[0] instanceof Konva.Group) {
+        posGroup = posGroups[0];
+      }
+    } else if (posGroups.length === 0) {
+      posGroup = new Konva.Group();
+      posGroup.name('position-group');
+      posGroup.id(this.#currentPosGroupId);
+      posGroup.visible(true); // dont inherit
+      // add new group to layer
+      this.getKonvaLayer().add(posGroup);
+    } else {
+      logger.warn('Unexpected number of draw position groups');
+    }
+    // return
+    return posGroup;
+  }
+
+  /**
+   * Get a Konva group using its id.
+   *
+   * @param {string} id The group id.
+   * @returns {Konva.Group|undefined} The Konva group.
+   */
+  #getGroup(id) {
+    return this.getKonvaLayer().findOne(`#${id}`);
+  }
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type.
+   */
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {CustomEvent} event The event to fire.
+   */
+  #fireEvent = (event) => {
+    const detail = Object.assign({}, event.detail, {
+      srclayerid: this.getId(),
+      dataid: this.#dataId,
+    });
+    this.#listenerHandler.fireEvent(new CustomEvent(event.type, {detail}));
+  };
+
+  /**
+   * Forward a DOM interaction event.
+   *
+   * @param {object} event The DOM event to forward.
+   */
+  #fireDomEvent = (event) => {
+    event.srclayerid = this.getId();
+    event.dataid = this.#dataId;
+    this.#listenerHandler.fireEvent(event);
+  };
+
+  // common layer methods [end] ---------------
+
+  /**
+   * Update label scale: compensate for it so
+   *   that label size stays visually the same.
+   *
+   * @param {Scalar2D} scale The scale to compensate for as {x,y}.
+   */
+  #updateLabelScale(scale) {
+    // same formula as in labelFactory::create
+    // compensate for scale and times 2 so that font 10 looks like a 10
+    const ratioX = 2 / scale.x;
+    const ratioY = 2 / scale.y;
+    // compensate scale for labels
+    const labels = this.#konvaStage.find('Label');
+    for (let i = 0; i &lt; labels.length; ++i) {
+      labels[i].scale({x: ratioX, y: ratioY});
+    }
+  }
+
+} // DrawLayer class
+
+// *************************
+// legacy code to allow to convert old state into annotation
+// *************************
+
+/**
+ * Draw meta data.
+ */
+export class DrawMeta {
+  /**
+   * Draw quantification.
+   *
+   * @type {object}
+   */
+  quantification;
+
+  /**
+   * Draw text expression. Can contain variables surrounded with '{}' that will
+   * be extracted from the quantification object.
+   *
+   * @type {string}
+   */
+  textExpr;
+}
+
+/**
+ * Draw details.
+ */
+export class DrawDetails {
+  /**
+   * The draw ID.
+   *
+   * @type {number}
+   */
+  id;
+
+  /**
+   * The draw position: an Index converted to string.
+   *
+   * @type {string}
+   */
+  position;
+
+  /**
+   * The draw type.
+   *
+   * @type {string}
+   */
+  type;
+
+  /**
+   * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   *
+   * @type {string}
+   */
+  color;
+
+  /**
+   * The draw meta.
+   *
+   * @type {DrawMeta}
+   */
+  meta;
+}
+</code></pre></div></div></div></main></div><footer class="border-t border-(--clean-border) bg-background py-6 text-sm text-muted-foreground"><div class="mx-auto flex w-full max-w-screen-2xl flex-col items-start justify-between gap-2 px-4 md:flex-row md:items-center"><div class="flex items-center gap-1.5"><span>DWV</span><span>© 2026</span></div><a href="https://github.com/ivmartel/dwv" target="_blank" rel="noreferrer noopener" class="text-muted-foreground hover:underline">Repository</a></div></footer></div><script type="application/json" data-island-props>{"i0":{"language":"javascript","filename":"src/gui/drawLayer.js"},"i1":{"basePath":"/","searchIndexUrl":"/_assets/search-index.mwm9kbrx-f9794ac0.json"},"i2":{},"i3":{},"i4":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/gui/drawlayer-js","siteName":"DWV","basePath":"/","collapsibleGroups":["Tutorials"]},"i5":{"nav":[{"label":"Home","slug":"","icon":"lucide:home","menu":true,"order":0},{"label":"GitHub","href":"https://github.com/ivmartel/dwv","external":true,"icon":"simpleicons:github","menu":true,"order":1},{"label":"npm","href":"https://www.npmjs.com/package/dwv","external":true,"icon":"simpleicons:npm","menu":true,"order":2},{"label":"annotations","slug":"tutorials/annotations","group":"Tutorials","order":0},{"label":"architecture","slug":"tutorials/architecture","group":"Tutorials","order":0},{"label":"conformance","slug":"tutorials/conformance","group":"Tutorials","order":0},{"label":"data-load","slug":"tutorials/data-load","group":"Tutorials","order":0},{"label":"developing","slug":"tutorials/developing","group":"Tutorials","order":0},{"label":"errors","slug":"tutorials/errors","group":"Tutorials","order":0},{"label":"examples","slug":"tutorials/examples","group":"Tutorials","order":0},{"label":"integrations","slug":"tutorials/integrations","group":"Tutorials","order":0},{"label":"layout","slug":"tutorials/layout","group":"Tutorials","order":0},{"label":"module","slug":"tutorials/module","group":"Tutorials","order":0},{"label":"standards","slug":"tutorials/standards","group":"Tutorials","order":0},{"label":"test-results","slug":"tutorials/test-results","group":"Tutorials","order":0},{"label":"user-stories","slug":"tutorials/user-stories","group":"Tutorials","order":0},{"label":"view-create","slug":"tutorials/view-create","group":"Tutorials","order":0}],"currentSlug":"source/src/gui/drawlayer-js","basePath":"/","collapsibleGroups":["Tutorials"]}}</script><script type="module">(function(){var map={"theme-toggle":"/_islands/theme-toggle-2OFR67FU.js","settings":"/_islands/settings-HUVOQWPC.js","code-viewer":"/_islands/code-viewer-J4JM56PM.js","embed":"/_islands/embed-S4IPJ47N.js","playground":"/_islands/playground-GHNL23CG.js","tabs":"/_islands/tabs-NRSQKCSU.js","sidebar":"/_islands/sidebar-N4QUUT4G.js","mobile-nav":"/_islands/mobile-nav-ITUCHCYZ.js","toc":"/_islands/toc-YFAY7IHK.js","toc-mobile":"/_islands/toc-mobile-6DGE76YF.js","cmdk":"/_islands/cmdk-DXPOVQQ6.js","code-tabs":"/_islands/code-tabs-C6ACVICP.js","copy-btn":"/_islands/copy-btn-5QCTJLYG.js","copy-page":"/_islands/copy-page-TR246LIJ.js"};var seen=new Set();document.querySelectorAll('[data-island]').forEach(function(el){seen.add(el.getAttribute('data-island'));});seen.forEach(function(name){var src=map[name];if(src){import(src);}});})();</script><script>(function(){function flash(h){var b=h.querySelector('[data-heading-anchor]');if(!b)return;b.setAttribute('data-copied','');window.setTimeout(function(){b.removeAttribute('data-copied');},3000);}function onClick(e){var t=e.target;if(!t||!t.closest)return;if(t.closest('a'))return;var h=t.closest('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');if(!h)return;var id=h.id;if(!id)return;var iconOnly=!!t.closest('[data-heading-anchor]');if(!iconOnly){if(location.hash.slice(1)===id){h.scrollIntoView();}else{location.hash=id;}}try{var url=location.origin+location.pathname+location.search+'#'+id;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){flash(h);}).catch(function(){});}}catch(_){}}document.addEventListener('click',onClick);}());</script><script>(function(){var IDLE=700;var timers=new WeakMap();function onScroll(e){var el=e.target;if(el===document||el===window)el=document.documentElement;if(!el||!el.classList)return;el.classList.add('clean-scrolling');var prev=timers.get(el);if(prev)window.clearTimeout(prev);timers.set(el,window.setTimeout(function(){el.classList.remove('clean-scrolling');},IDLE));}document.addEventListener('scroll',onScroll,true);}());</script></body></html>
