@@ -50,7 +50,7 @@ export class ViewController {
   /**
    * Third dimension player ID (created by setInterval).
    *
-   * @type {ReturnType<typeof setInterval>|undefined}
+   * @type {number|undefined}
    */
   #playerID;
 
@@ -816,7 +816,7 @@ export class ViewController {
       const canScroll3D = size.canScroll3D();
       const helper = this.getPositionHelper();
 
-      this.#playerID = setInterval(() => {
+      const playerID = setInterval(() => {
         let canDoMore;
         if (canScroll3D) {
           canDoMore = helper.incrementPositionAlongScroll();
@@ -838,6 +838,10 @@ export class ViewController {
           this.setCurrentPosition(geometry.indexToWorld(index));
         }
       }, milliseconds);
+      // setInterval returns a number with the DOM types but a
+      // NodeJS.Timeout with the node ones (for ex in the IDE)
+      this.#playerID = /** @type {number} */ (
+        /** @type {unknown} */ (playerID));
     } else {
       this.stop();
     }
