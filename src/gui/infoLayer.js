@@ -1,29 +1,16 @@
-import {
-  getLayerDetailsFromLayerDivId,
-  getLayerDetailsFromInfoLayerDivId
-} from './layerGroup.js';
+import {getLayerDetailsFromLayerDivId} from './layerGroup.js';
 
 /**
  * @import {InfoDataItem} from './infoData.js';
  */
 
 /**
- * Get the HTML div id of a position element.
- *
- * @param {string} pos The position indicator.
- * @returns {string} The div id.
- */
-function getPosDivId(pos) {
-  return `info-${pos}`;
-}
-
-/**
- * Get the HTML li id for a data.
+ * Get the key of the HTML li element of a data.
  *
  * @param {InfoDataItem} data The associated data.
- * @returns {string} The ID.
+ * @returns {string} The key.
  */
-function getLiId(data) {
+function getLiKey(data) {
   let type;
   if (typeof data.tags !== 'undefined') {
     type = data.tags.join('');
@@ -33,7 +20,7 @@ function getLiId(data) {
   let format = encodeURIComponent(data.format.toLowerCase());
   format = format.replace(/%[0-9A-F]{2}/gi, '');
 
-  return `${getPosDivId(data.pos)}-${type}-${format}`;
+  return `${data.pos}-${type}-${format}`;
 }
 
 /**
@@ -55,10 +42,26 @@ export class InfoLayer {
   #containerDiv;
 
   /**
-   * @param {HTMLDivElement} div The associated HTML div.
+   * The id of the parent layer group div.
+   *
+   * @type {string}
    */
-  constructor(div) {
+  #groupDivId;
+
+  /**
+   * The HTML li elements, indexed by key (see `getLiKey`).
+   *
+   * @type {Map<string, HTMLLIElement>}
+   */
+  #liElements = new Map();
+
+  /**
+   * @param {HTMLDivElement} div The associated HTML div.
+   * @param {string} groupDivId The id of the parent layer group div.
+   */
+  constructor(div, groupDivId) {
     this.#containerDiv = div;
+    this.#groupDivId = groupDivId;
   }
 
   /**
@@ -74,9 +77,7 @@ export class InfoLayer {
     // avoid events from other layers
     if (typeof event.detail?.srclayerid !== 'undefined') {
       const srcDetails = getLayerDetailsFromLayerDivId(event.detail.srclayerid);
-      const details =
-        getLayerDetailsFromInfoLayerDivId(this.#containerDiv.id);
-      if (srcDetails.groupDivId !== details.groupDivId) {
+      if (srcDetails.groupDivId !== this.#groupDivId) {
         return;
       }
     }
@@ -109,7 +110,10 @@ export class InfoLayer {
       for (const item of data) {
         if (item.pos === pos) {
           const li = doc.createElement('li');
-          li.id = getLiId(item);
+          const key = getLiKey(item);
+          if (!this.#liElements.has(key)) {
+            this.#liElements.set(key, li);
+          }
           // fill in tags
           if (typeof item.tags !== 'undefined') {
             li.appendChild(doc.createTextNode(item.value));
@@ -120,7 +124,6 @@ export class InfoLayer {
       }
       // position element
       const posElement = doc.createElement('div');
-      posElement.id = getPosDivId(pos);
       posElement.className = `info-${pos} info`;
       posElement.appendChild(ul);
       // append to main div
@@ -140,8 +143,7 @@ export class InfoLayer {
     const doc = this.#containerDiv.ownerDocument;
     // updates all the data
     for (const item of data) {
-      const id = `#${getLiId(item)}`;
-      const li = this.#containerDiv.querySelector(id);
+      const li = this.#liElements.get(getLiKey(item));
       const text = item.value;
       if (text && li) {
         // update li

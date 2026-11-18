@@ -4,8 +4,6 @@ import {
   LayerGroup,
   getLayerDivId,
   getLayerDetailsFromLayerDivId,
-  getInfoLayerDivId,
-  getLayerDetailsFromInfoLayerDivId,
   getLayerDetailsFromEvent,
   getScaledOffset,
 } from '../../src/gui/layerGroup.js';
@@ -270,16 +268,6 @@ describe('gui', () => {
       'layerGroup active draw layer is undefined after remove');
   });
 
-  test('getInfoLayerDivId returns expected id', () => {
-    assert.equal(getInfoLayerDivId('layerGroupA'), 'layerGroupA-infolayer');
-    assert.equal(getInfoLayerDivId('lg0'), 'lg0-infolayer');
-  });
-
-  test('getLayerDetailsFromInfoLayerDivId returns the groupDivId', () => {
-    const details = getLayerDetailsFromInfoLayerDivId('layerGroupA-infolayer');
-    assert.equal(details.groupDivId, 'layerGroupA');
-  });
-
   test('getLayerDetailsFromEvent returns null when no .layer ancestor', () => {
     const div = document.createElement('div');
     const ev = {target: div};
@@ -316,7 +304,7 @@ describe('gui', () => {
     div.id = 'lgWithInfo';
     document.body.appendChild(div);
     new LayerGroup(div, true);
-    const infoDiv = div.querySelector('#lgWithInfo-infolayer');
+    const infoDiv = div.querySelector('.infoLayer');
     assert.ok(infoDiv, 'info layer div exists');
     assert.ok(infoDiv.classList.contains('infoLayer'));
   });
