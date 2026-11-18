@@ -35,7 +35,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link NumericMeasurement} with undefined.
      *
-     * @function module:tests/dicom~numericmeasurement-undefined
+     * @function module:tests/dicom~numericmeasurementUndefined
      */
     test('undefined', () => {
       const measurement = new NumericMeasurement();
@@ -46,7 +46,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link NumericMeasurement} value toString.
      *
-     * @function module:tests/dicom~numericmeasurement-value-tostring
+     * @function module:tests/dicom~numericmeasurementValueTostring
      */
     test('toString', () => {
       const code = new DicomCode('millimeter');
@@ -67,7 +67,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link NumericMeasurement} toString.
      *
-     * @function module:tests/dicom~numericmeasurement-tostring
+     * @function module:tests/dicom~numericmeasurementTostring
      */
     test('toString', () => {
       const code = new DicomCode('millimeter');
@@ -93,7 +93,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link NumericMeasurement} code toString.
      *
-     * @function module:tests/dicom~numericmeasurement-code-tostring
+     * @function module:tests/dicom~numericmeasurementCodeTostring
      */
     test('code toString', () => {
       const qualifierCode = new DicomCode('mean');
@@ -109,7 +109,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link NumericMeasurement} undefined toString.
      *
-     * @function module:tests/dicom~numericmeasurement-undefined-tostring
+     * @function module:tests/dicom~numericmeasurementUndefinedTostring
      */
     test('undefined toString', () => {
       const measurement = new NumericMeasurement();
@@ -120,7 +120,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link NumericMeasurement} round trip.
      *
-     * @function module:tests/dicom~numericmeasurement-round-trip
+     * @function module:tests/dicom~numericmeasurementRoundTrip
      */
     test('round trip',
       () => {
@@ -182,7 +182,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNumericMeasurement} value.
      *
-     * @function module:tests/dicom~getnumericmeasurement-value
+     * @function module:tests/dicom~getnumericmeasurementValue
      */
     test('value', () => {
       const deNumericValue = new DataElement('DS');
@@ -226,7 +226,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNumericMeasurement} code.
      *
-     * @function module:tests/dicom~getnumericmeasurement-code
+     * @function module:tests/dicom~getnumericmeasurementCode
      */
     test('code', () => {
       const deCodeMeaning = new DataElement('LO');
@@ -259,7 +259,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNumericMeasurement}.
      *
-     * @function module:tests/dicom~getnumericmeasurement-good-input
+     * @function module:tests/dicom~getnumericmeasurementGoodInput
      */
     test('good input', () => {
       const deNumericValue = new DataElement('DS');
@@ -321,7 +321,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNumericMeasurement} undefined.
      *
-     * @function module:tests/dicom~getnumericmeasurement-undefined
+     * @function module:tests/dicom~getnumericmeasurementUndefined
      */
     test('undefined', () => {
       const result = getNumericMeasurement({});
@@ -337,7 +337,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomNumericMeasurementItem} value.
      *
-     * @function module:tests/dicom~getdicomnumericmeasurementitem-value
+     * @function module:tests/dicom~getdicomnumericmeasurementitemValue
      */
     test('value', () => {
       const value = new MeasuredValue();
@@ -356,7 +356,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomNumericMeasurementItem} code.
      *
-     * @function module:tests/dicom~getdicomnumericmeasurementitem-code
+     * @function module:tests/dicom~getdicomnumericmeasurementitemCode
      */
     test('code', () => {
       const code = new DicomCode('mean');
@@ -375,7 +375,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomNumericMeasurementItem}.
      *
-     * @function module:tests/dicom~getdicomnumericmeasurementitem-good-input
+     * @function module:tests/dicom~getdicomnumericmeasurementitemGoodInput
      */
     test('good input', () => {
       const value = new MeasuredValue();
@@ -397,7 +397,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomNumericMeasurementItem} undefined.
      *
-     * @function module:tests/dicom~getdicomnumericmeasurementitem-undefined
+     * @function module:tests/dicom~getdicomnumericmeasurementitemUndefined
      */
     test('undefined', () => {
       const measurement = new NumericMeasurement();

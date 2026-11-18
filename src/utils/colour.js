@@ -1,10 +1,9 @@
 // example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Scalar3D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Scalar3D} from '../math/scalar.js';
+ */
 
 /**
  * RGB colour class.
@@ -61,7 +60,7 @@ export function isEqualRgb(c1, c2) {
  * Convert YBR to RGB.
  *
  * Ref:
- * - {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2},
+ * - {@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2},
  * - {@link https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion}.
  *
  * @param {number} y The Y component.
@@ -98,8 +97,8 @@ export function hexToRgb(hexStr) {
  * @returns {string} A string representing the hex color as '#ab01ef'.
  */
 export function rgbToHex(rgb) {
-  return '#' +
-    ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
+  return `#${
+    ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1)}`;
 }
 
 /**
@@ -203,7 +202,7 @@ export function cielabToCiexyz(triplet) {
    * @returns {number} The result.
    */
   function invLabFunc(x) {
-    let res = null;
+    let res;
     // delta = 6 / 29 = 0.206896552
     if (x > 0.206896552) {
       res = Math.pow(x, 3);
@@ -241,7 +240,7 @@ export function ciexyzToCielab(triplet) {
    * @returns {number} The result.
    */
   function labFunc(x) {
-    let res = null;
+    let res;
     // delta = 6 / 29 = 0.206896552
     // delta^3 = 0.008856452
     if (x > 0.008856452) {
@@ -280,7 +279,7 @@ export function ciexyzToSrgb(triplet) {
    * @returns {number} The result.
    */
   function gammaFunc(x) {
-    let res = null;
+    let res;
     if (x <= 0.0031308) {
       res = 12.92 * x;
     } else {
@@ -318,7 +317,7 @@ export function srgbToCiexyz(triplet) {
    * @returns {number} The result.
    */
   function invGammaFunc(x) {
-    let res = null;
+    let res;
     if (x <= 0.04045) {
       res = x / 12.92;
     } else {
@@ -382,3 +381,44 @@ export function colourNameToHex(name) {
   }
   return res;
 }
+
+// ITK snap colours
+const itkSnapColours = [
+  new RGB(0, 0, 0),
+  new RGB(255, 0, 0),
+  new RGB(0, 255, 0),
+  new RGB(0, 0, 255),
+  new RGB(255, 255, 0),
+  new RGB(0, 255, 255),
+  new RGB(255, 0, 255),
+  new RGB(255, 239, 213),
+  new RGB(0, 0, 205),
+  new RGB(205, 133, 63),
+  new RGB(210, 180, 140),
+  new RGB(102, 205, 170),
+  new RGB(0, 0, 128),
+  new RGB(0, 139, 139),
+  new RGB(46, 139, 87),
+  new RGB(255, 228, 225)
+];
+
+/**
+ * Get a default RGB colour for a given number
+ * (for example a segment number).
+ *
+ * @param {number} number The input number.
+ * @returns {RGB} A colour.
+ */
+export function getDefaultColour(number) {
+  let colour;
+  if (number < itkSnapColours.length) {
+    colour = itkSnapColours[number];
+  } else {
+    colour = new RGB(
+      Math.random() * 255,
+      Math.random() * 255,
+      Math.random() * 255
+    );
+  }
+  return colour;
+};

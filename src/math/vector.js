@@ -81,9 +81,9 @@ export class Vector3D {
    * @returns {string} The vector as a string.
    */
   toString() {
-    return '(' + this.#x +
-      ', ' + this.#y +
-      ', ' + this.#z + ')';
+    return `(${ this.#x
+    }, ${ this.#y
+    }, ${this.#z})`;
   }
 
   /**

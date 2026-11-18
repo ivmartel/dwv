@@ -2,31 +2,29 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
 import {Point3D} from '../math/point.js';
 import {Geometry} from './geometry.js';
 import {Size} from './size.js';
-import {getTypedArray} from '../dicom/dicomParser.js';
+import {getTypedArrayLike} from '../dicom/dicomParser.js';
 import {Spacing} from './spacing.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {Point} from '../math/point.js';
-/* eslint-enable no-unused-vars */
-
 /**
- * List of compatible typed arrays.
- *
- * @typedef {(
- *   Uint8Array | Int8Array |
- *   Uint16Array | Int16Array |
- *   Uint32Array | Int32Array
- * )} TypedArray
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Point} from '../math/point.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**
  * Resampling worker task.
  */
 class ResamplingWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
+  getStartMessage() {
+    // the source buffer can be a view on the whole image buffer (4D):
+    // posting it would copy the whole image, so post a copy of the view
+    // data only (made at run time to not keep copies for queued tasks)
+    // and transfer it to avoid a second copy
+    const sourceImageBuffer = this.startMessage.sourceImageBuffer.slice();
+    return {
+      message: {...this.startMessage, sourceImageBuffer},
+      transfer: [sourceImageBuffer.buffer]
+    };
   }
   getWorker() {
     return new Worker(
@@ -82,50 +80,52 @@ export function generateWorkerMessages(
   const sourceTotalSize = sourceSize.getTotalSize();
   const targetTotalSize = targetSize.getTotalSize();
 
-  const generateMessage = (sourceStartOffset, targetStartOffset, frame) => {
+  const generateMessage = (sourceFrameBuffer, targetStartOffset, frame) => {
     return {
-      sourceImageBuffer: sourceImageBuffer,
+      sourceImageBuffer: sourceFrameBuffer,
       sourceOrigin: sourceImageGeometry.getOrigin().getValues(),
       sourceSize: sourceImageGeometry.getSize().getValues(),
       sourceSpacing: sourceImageGeometry.getSpacing().getValues(),
       sourceOrientation: sourceImageGeometry.getOrientation().getValues(),
-      sourceUnitVectors: sourceUnitVectors,
-      sourceTotalSize: sourceTotalSize,
+      sourceUnitVectors,
+      sourceTotalSize,
 
       // targetImageBuffer: targetImageBuffer,
       targetOrigin: targetImageGeometry.getOrigin().getValues(),
       targetSize: targetImageGeometry.getSize().getValues(),
       targetSpacing: targetImageGeometry.getSpacing().getValues(),
       targetOrientation: targetImageGeometry.getOrientation().getValues(),
-      targetUnitVectors: targetUnitVectors,
-      targetTotalSize: targetTotalSize,
+      targetUnitVectors,
+      targetTotalSize,
 
-      pixelRepresentation: pixelRepresentation,
+      pixelRepresentation,
       interpolate: interpolated,
-      sourceStartOffset: sourceStartOffset,
-      targetStartOffset: targetStartOffset,
+      targetStartOffset,
 
-      jobId: jobId,
-      frame: frame
+      jobId,
+      frame
     };
   };
 
   if (targetNDims <= 3) {
-    return [generateMessage(0, 0, 0)];
-  } else {
-    const frames = targetSize.get(3);
-    const sourceFrameSize = sourceSize.getDimSize(3);
-    const targetFrameSize = targetSize.getDimSize(3);
-
-    const messages = [];
-    for (let f = 0; f < frames; f++) {
-      const sourceOffset = sourceFrameSize * f;
-      const targetOffset = targetFrameSize * f;
-      messages.push(generateMessage(sourceOffset, targetOffset, f));
-    }
-
-    return messages;
+    return [generateMessage(sourceImageBuffer, 0, 0)];
   }
+
+  const frames = targetSize.get(3);
+  const sourceFrameSize = sourceSize.getDimSize(3);
+  const targetFrameSize = targetSize.getDimSize(3);
+
+  // pass a view on the frame data only: the task posts a copy of it
+  const messages = [];
+  for (let f = 0; f < frames; f++) {
+    const sourceOffset = sourceFrameSize * f;
+    const targetOffset = targetFrameSize * f;
+    const sourceFrameBuffer = sourceImageBuffer.subarray(
+      sourceOffset, sourceOffset + sourceFrameSize);
+    messages.push(generateMessage(sourceFrameBuffer, targetOffset, f));
+  }
+
+  return messages;
 }
 
 /**
@@ -370,21 +370,16 @@ export function generateResampledGeometry(
  * Generate the buffer for the resampled image.
  *
  * @param {TypedArray} sourceImageBuffer The current image buffer.
- * @param {number} pixelRepresentation The source image pixel representation.
  * @param {Size} targetSize The size of the target.
  *
  * @returns {TypedArray} The new buffer.
  */
 export function generateBuffer(
   sourceImageBuffer,
-  pixelRepresentation,
   targetSize
 ) {
-  const targetImageBuffer = getTypedArray(
-    sourceImageBuffer.BYTES_PER_ELEMENT * 8,
-    pixelRepresentation,
-    targetSize.getTotalSize()
-  );
+  const targetImageBuffer = getTypedArrayLike(
+    sourceImageBuffer, targetSize.getTotalSize());
 
   if (targetImageBuffer === null) {
     throw new Error('Cannot reallocate data for image resampling.');
@@ -437,7 +432,7 @@ export class ResamplingThread {
     // We can't just pass in an Image or we would get a circular dependency
 
     // Just needs to be resonably unique
-    const jobId = Date.now() + '' + Math.random();
+    const jobId = String(Date.now()) + Math.random();
 
     const targetImageGeometry =
       generateResampledGeometry(
@@ -449,7 +444,6 @@ export class ResamplingThread {
     const targetImageBuffer =
       generateBuffer(
         sourceImageBuffer,
-        pixelRepresentation,
         targetImageGeometry.getSize()
       );
 
@@ -475,7 +469,7 @@ export class ResamplingThread {
     return {
       buffer: targetImageBuffer,
       geometry: targetImageGeometry,
-      jobId: jobId
+      jobId
     };
   }
 

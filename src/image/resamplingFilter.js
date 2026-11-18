@@ -1,6 +1,11 @@
 
-import {Matrix33, BIG_EPSILON} from '../math/matrix.js';
-import {getTypedArray} from '../dicom/dicomParser.js';
+import {Matrix33} from '../math/matrix.js';
+import {BIG_EPSILON} from '../math/number.js';
+import {getTypedArrayLike} from '../dicom/dicomParser.js';
+
+/**
+ * @import {TypedArray} from '../math/types.js';
+ */
 
 /**
  * Resampling file class.
@@ -13,10 +18,9 @@ export class ResamplingFilter {
    * @param {TypedArray} buffer The buffer to sample.
    * @param {number[]} size The buffer size.
    * @param {number[]} unitVectors The buffer offset space unit vectors.
-   * @param {number} startOffset The offset to add to all sampled points.
    * @returns {number} The sampled value.
    */
-  #trilinearSample(point, buffer, size, unitVectors, startOffset) {
+  #trilinearSample(point, buffer, size, unitVectors) {
     // base point
     const q0x = Math.floor(point[0]);
     const q0y = Math.floor(point[1]);
@@ -37,14 +41,14 @@ export class ResamplingFilter {
     const y1v = y1 * unitVectors[1];
     const z0v = z0 * unitVectors[2];
     const z1v = z1 * unitVectors[2];
-    const off000 = x0v + y0v + z0v + startOffset;
-    const off001 = x0v + y0v + z1v + startOffset;
-    const off010 = x0v + y1v + z0v + startOffset;
-    const off011 = x0v + y1v + z1v + startOffset;
-    const off100 = x1v + y0v + z0v + startOffset;
-    const off101 = x1v + y0v + z1v + startOffset;
-    const off110 = x1v + y1v + z0v + startOffset;
-    const off111 = x1v + y1v + z1v + startOffset;
+    const off000 = x0v + y0v + z0v;
+    const off001 = x0v + y0v + z1v;
+    const off010 = x0v + y1v + z0v;
+    const off011 = x0v + y1v + z1v;
+    const off100 = x1v + y0v + z0v;
+    const off101 = x1v + y0v + z1v;
+    const off110 = x1v + y1v + z0v;
+    const off111 = x1v + y1v + z1v;
 
     // bounding points values
     const x0ok = x0 >= 0 && x0 < size[0];
@@ -107,7 +111,6 @@ export class ResamplingFilter {
    * Generate the buffer for the resampled frame.
    *
    * @param {TypedArray} sourceImageBuffer The current image buffer.
-   * @param {number} pixelRepresentation The source image pixel representation.
    * @param {number[]} targetSize The size of the target.
    * @param {number[]} targetUnitVectors The buffer offset space unit vectors.
    *
@@ -115,17 +118,13 @@ export class ResamplingFilter {
    */
   #generateReturnBuffer(
     sourceImageBuffer,
-    pixelRepresentation,
     targetSize,
     targetUnitVectors
   ) {
     const totalSize = targetUnitVectors[2] * targetSize[2];
 
-    const targetImageBuffer = getTypedArray(
-      sourceImageBuffer.BYTES_PER_ELEMENT * 8,
-      pixelRepresentation,
-      totalSize
-    );
+    const targetImageBuffer = getTypedArrayLike(
+      sourceImageBuffer, totalSize);
 
     if (targetImageBuffer === null) {
       throw new Error('Cannot reallocate data for image resampling.');
@@ -151,16 +150,12 @@ export class ResamplingFilter {
     const targetSpacing = workerMessage.targetSpacing;
 
     const sourceImageBuffer = workerMessage.sourceImageBuffer;
-    const pixelRepresentation = workerMessage.pixelRepresentation;
-
     const targetImageBuffer = this.#generateReturnBuffer(
       sourceImageBuffer,
-      pixelRepresentation,
       targetSize,
       targetUnitVectors
     );
 
-    const sourceStartOffset = workerMessage.sourceStartOffset;
     const targetStartOffset = workerMessage.targetStartOffset;
     const interpolate = workerMessage.interpolate;
 
@@ -227,8 +222,7 @@ export class ResamplingFilter {
                 point,
                 sourceImageBuffer,
                 sourceSize,
-                sourceUnitVectors,
-                sourceStartOffset
+                sourceUnitVectors
               );
               targetImageBuffer[targetOffset] = sample;
 
@@ -237,8 +231,7 @@ export class ResamplingFilter {
               const inOffset =
                 (sourceUnitVectors[0] * Math.round(point[0])) +
                 (sourceUnitVectors[1] * Math.round(point[1])) +
-                (sourceUnitVectors[2] * Math.round(point[2])) +
-                sourceStartOffset;
+                (sourceUnitVectors[2] * Math.round(point[2]));
 
               targetImageBuffer[targetOffset] =
                 workerMessage.sourceImageBuffer[inOffset];
@@ -249,10 +242,10 @@ export class ResamplingFilter {
     }
 
     return {
-      targetImageBuffer: targetImageBuffer,
+      targetImageBuffer,
       startOffset: targetStartOffset,
-      jobId: jobId,
-      frame: frame
+      jobId,
+      frame
     };
   }
 }

@@ -1,33 +1,12 @@
 import {Vector3D} from './vector.js';
 import {Point3D} from './point.js';
 import {Index} from './index.js';
+import {isSimilar} from './number.js';
 import {logger} from '../utils/logger.js';
 
-// Number.EPSILON is difference between 1 and the smallest
-// floating point number greater than 1
-// -> ~2e-16
-// BIG_EPSILON -> ~2e-12
-export const BIG_EPSILON = Number.EPSILON * 1e4;
-export const BIG_EPSILON_EXPONENT = 12;
-// 'real world', for example when comparing positions
-export const REAL_WORLD_EPSILON = 1e-4;
-export const REAL_WORLD_EXPONENT = 5;
-
 /**
- * Check if two numbers are similar.
- *
- * @param {number} a The first number.
- * @param {number} b The second number.
- * @param {number} [tol] Optional comparison tolerance,
- *   defaults to Number.EPSILON.
- * @returns {boolean} True if similar.
+ * @import {TypedArray} from './types.js';
  */
-export function isSimilar(a, b, tol) {
-  if (typeof tol === 'undefined') {
-    tol = Number.EPSILON;
-  }
-  return Math.abs(a - b) < tol;
-}
 
 /**
  * Immutable 3x3 Matrix.
@@ -184,8 +163,8 @@ export class Matrix33 {
    */
   multiplyArray3D(array3D) {
     if (array3D.length !== 3) {
-      throw new Error('Cannot multiply 3x3 matrix with non 3D array: ' +
-        array3D.length);
+      throw new Error(`Cannot multiply 3x3 matrix with non 3D array: ${
+        array3D.length }`);
     }
     // (no loop for speedup)
     const a0 = array3D[0];
@@ -209,12 +188,6 @@ export class Matrix33 {
 
   /**
    * Multiply this matrix by a 3D typed array.
-   *
-   * @typedef {(
-   *   Uint8Array | Int8Array |
-   *   Uint16Array | Int16Array |
-   *   Uint32Array | Int32Array
-   * )} TypedArray
    *
    * @param {TypedArray} sourceArray The input 3D array.
    * @param {TypedArray} outArray The array to write to.
@@ -291,7 +264,7 @@ export class Matrix33 {
     const index = values.indexOf(absMax);
     return {
       value: this.get(row, index),
-      index: index
+      index
     };
   }
 
@@ -311,7 +284,7 @@ export class Matrix33 {
     const index = values.indexOf(absMax);
     return {
       value: this.get(index, col),
-      index: index
+      index
     };
   }
 
@@ -328,7 +301,7 @@ export class Matrix33 {
       const sign = max.value > 0 ? 1 : -1;
       for (let i = 0; i < 3; ++i) {
         if (i === max.index) {
-          res.push(1 * sign);
+          res.push(sign);
         } else {
           res.push(0);
         }

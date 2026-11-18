@@ -1,8 +1,7 @@
-import {startsWith, getFileExtension} from '../utils/string.js';
-import {getUrlFromUri} from '../utils/uri.js';
 import {getViewFromDOMVideo} from '../image/domReader.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
+import {LoaderBase} from './loaderBase.js';
 
 /**
  * Raw video loader.
@@ -10,25 +9,7 @@ import {urlContentTypes} from './urlsLoader.js';
  * Url example (cors enabled):
  *   {@link https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4}.
  */
-export class RawVideoLoader {
-
-  /**
-   * Set the loader options.
-   *
-   * @param {object} _opt The input options.
-   */
-  setOptions(_opt) {
-    // does nothing
-  }
-
-  /**
-   * Is the load ongoing? TODO...
-   *
-   * @returns {boolean} True if loading.
-   */
-  isLoading() {
-    return true;
-  }
+export class RawVideoLoader extends LoaderBase {
 
   /**
    * Create a Data URI from an HTTP request response.
@@ -45,8 +26,8 @@ export class RawVideoLoader {
       videoDataStr += String.fromCharCode(bytes[i]);
     }
     // create uri
-    const uri = 'data:video/' + dataType +
-      ';base64,' + window.btoa(videoDataStr);
+    const uri = `data:video/${ dataType
+    };base64,${btoa(videoDataStr)}`;
     return uri;
   }
 
@@ -58,7 +39,9 @@ export class RawVideoLoader {
    * @param {number} index The data index.
    */
   load(buffer, origin, index) {
+    this.setLoading(true);
     // create a DOM video
+    // note: uses the global document, not compatible with a node usage
     const video = document.createElement('video');
     if (typeof origin === 'string') {
       // url case
@@ -70,13 +53,15 @@ export class RawVideoLoader {
     // onload handler
     video.onloadedmetadata = (event) => {
       try {
-        getViewFromDOMVideo(event.target,
-          this.onloaditem, this.onload,
-          this.onprogress, this.onloadend,
-          origin, index);
+        if (this.isLoading()) {
+          getViewFromDOMVideo(event.target,
+            this.onloaditem, this.onload,
+            this.onprogress, this.onloadend,
+            origin, index);
+        }
       } catch (error) {
         this.onerror({
-          error: error,
+          error,
           source: origin
         });
         this.onloadend({
@@ -90,74 +75,41 @@ export class RawVideoLoader {
    * Abort load.
    */
   abort() {
+    this.setLoading(false);
     this.onabort({});
     this.onloadend({});
   }
 
   /**
-   * Check if the loader can load the provided file.
-   * True for files with type 'video.*'.
+   * Check if the loader supports the input extension.
    *
-   * @param {File} file The file to check.
-   * @returns {boolean} True if the file can be loaded.
+   * @param {string} value The extensione.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadFile(file) {
-    return (typeof file.type !== 'undefined' &&
-      file.type.match('video.*') !== null);
+  canLoadExtension(value) {
+    return value === 'mp4' ||
+      value === 'ogg' ||
+      value === 'webm';
   }
 
   /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'rawvideo',
-   * - the `options.requestHeaders` contains an item
-   *   starting with 'Accept: video/'.
-   * - the url has a 'mp4', 'ogg' or 'webm' extension.
+   * Check if the input is the loader name.
    *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
    */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'rawvideo') {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          // starts with 'video/'
-          return startsWith(acceptHeader.value, 'video/');
-        }
-      }
-    }
-
-    const urlObjext = getUrlFromUri(url);
-    const ext = getFileExtension(urlObjext.pathname);
-    return (ext === 'mp4') ||
-      (ext === 'ogg') ||
-      (ext === 'webm');
+  isLoaderName(value) {
+    return value === 'rawvideo';
   }
 
   /**
-   * Check if the loader can load the provided memory object.
+   * Check if the loader supports the input media type.
    *
-   * @param {object} mem The memory object.
-   * @returns {boolean} True if the object can be loaded.
+   * @param {string} value The media type.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadMemory(mem) {
-    if (typeof mem.filename !== 'undefined') {
-      const tmpFile = new File(['from memory'], mem.filename);
-      return this.canLoadFile(tmpFile);
-    }
-    return false;
+  canLoadMediaType(value) {
+    return value.startsWith('video/');
   }
 
   /**
@@ -177,64 +129,5 @@ export class RawVideoLoader {
   loadUrlAs() {
     return urlContentTypes.ArrayBuffer;
   }
-
-  /**
-   * Handle a load start event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load start event.
-   */
-  onloadstart(_event) {}
-
-  /**
-   * Handle a progress event.
-   * Default does nothing.
-   *
-   * @param {object} _event The progress event.
-   */
-  onprogress(_event) {}
-
-  /**
-   * Handle a load item event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load item event fired
-   * when a file item has been loaded successfully.
-   */
-  onloaditem(_event) {}
-
-  /**
-   * Handle a load event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   * when a file has been loaded successfully.
-   */
-  onload(_event) {}
-
-  /**
-   * Handle an load end event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load end event fired
-   *  when a file load has completed, successfully or not.
-   */
-  onloadend(_event) {}
-
-  /**
-   * Handle an error event.
-   * Default does nothing.
-   *
-   * @param {object} _event The error event.
-   */
-  onerror(_event) {}
-
-  /**
-   * Handle an abort event.
-   * Default does nothing.
-   *
-   * @param {object} _event The abort event.
-   */
-  onabort(_event) {}
 
 } // class RawVideoLoader

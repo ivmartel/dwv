@@ -1,8 +1,7 @@
-import {startsWith, getFileExtension} from '../utils/string.js';
-import {getUrlFromUri} from '../utils/uri.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
 import {MemoryLoader} from './memoryLoader.js';
+import {LoaderBase} from './loaderBase.js';
 
 /**
  * The zip library.
@@ -16,42 +15,34 @@ import JSZip from 'jszip';
 /**
  * ZIP data loader.
  */
-export class ZipLoader {
+export class ZipLoader extends LoaderBase {
 
   /**
-   * Loading flag.
+   * Current file name.
    *
-   * @type {boolean}
+   * @type {string}
    */
-  #isLoading = false;
-
-  /**
-   * Set the loader options.
-   *
-   * @param {object} _opt The input options.
-   */
-  setOptions(_opt) {
-    // does nothing
-  }
-
-  /**
-   * Is the load ongoing?
-   *
-   * @returns {boolean} True if loading.
-   */
-  isLoading() {
-    return this.#isLoading;
-  }
-
   #filename = '';
+
+  /**
+   * List of files.
+   *
+   * @type {object[]}
+   */
   #files = [];
+
+  /**
+   * Zip file objects.
+   *
+   * @type {object[]}
+   */
   #zobjs = null;
 
   /**
    * JSZip.async callback.
    *
    * @param {ArrayBuffer} content Unzipped file image.
-   * @param {object} origin The origin of the file.
+   * @param {string} origin The origin of the file.
    * @param {number} index The data index.
    */
   #zipAsyncCallback(content, origin, index) {
@@ -64,7 +55,7 @@ export class ZipLoader {
       lengthComputable: true,
       loaded: (unzipPercent / 2),
       total: 100,
-      index: index,
+      index,
       item: {
         loaded: unzipPercent,
         total: 100,
@@ -76,8 +67,12 @@ export class ZipLoader {
     if (this.#files.length < this.#zobjs.length) {
       const num = this.#files.length;
       this.#filename = this.#zobjs[num].name;
-      this.#zobjs[num].async('arrayBuffer').then((content) => {
-        this.#zipAsyncCallback(content, origin, index);
+      this.#zobjs[num].async('arrayBuffer').then((bufContent) => {
+        this.#zipAsyncCallback(bufContent, origin, index);
+      }).catch((err) => {
+        this.setLoading(false);
+        this.onerror({error: err});
+        this.onloadend({});
       });
     } else {
       const memoryIO = new MemoryLoader();
@@ -93,7 +88,7 @@ export class ZipLoader {
       memoryIO.onload = this.onload;
       memoryIO.onloadend = (event) => {
         // reset loading flag
-        this.#isLoading = false;
+        this.setLoading(false);
         // call listeners
         this.onloadend(event);
       };
@@ -117,17 +112,32 @@ export class ZipLoader {
       source: origin
     });
     // set loading flag
-    this.#isLoading = true;
+    this.setLoading(true);
 
     JSZip.loadAsync(buffer).then((zip) => {
       this.#files = [];
       this.#zobjs = zip.file(/.*\.dcm/);
+      if (this.#zobjs.length === 0) {
+        this.setLoading(false);
+        this.onerror({
+          error: new Error('No DICOM file found in ZIP')
+        });
+        this.onloadend({});
+        return;
+      }
       // recursively load zip files into the files array
-      const num = this.#files.length;
-      this.#filename = this.#zobjs[num].name;
-      this.#zobjs[num].async('arrayBuffer').then((content) => {
+      this.#filename = this.#zobjs[0].name;
+      this.#zobjs[0].async('arrayBuffer').then((content) => {
         this.#zipAsyncCallback(content, origin, index);
+      }).catch((err) => {
+        this.setLoading(false);
+        this.onerror({error: err});
+        this.onloadend({});
       });
+    }).catch((err) => {
+      this.setLoading(false);
+      this.onerror({error: err});
+      this.onloadend({});
     });
   }
 
@@ -136,79 +146,40 @@ export class ZipLoader {
    */
   abort() {
     // reset loading flag
-    this.#isLoading = false;
+    this.setLoading(false);
     // call listeners
     this.onabort({});
     this.onloadend({});
   }
 
   /**
-   * Check if the loader can load the provided file.
-   * True if the file has a 'zip' extension.
+   * Check if the loader supports the input extension.
    *
-   * @param {File} file The file to check.
-   * @returns {boolean} True if the file can be loaded.
+   * @param {string} value The extensione.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadFile(file) {
-    const ext = getFileExtension(file.name);
-    return (ext === 'zip');
+  canLoadExtension(value) {
+    return value === 'zip';
   }
 
   /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'zip',
-   * - the `options.requestHeaders` contains an item
-   *   starting with 'Accept: application/zip'.
-   * - the url has a 'zip' extension.
+   * Check if the input is the loader name.
    *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
    */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'zip') {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          // starts with 'application/zip'
-          return startsWith(acceptHeader.value, 'application/zip');
-        }
-      }
-    }
-
-    const urlObjext = getUrlFromUri(url);
-    const ext = getFileExtension(urlObjext.pathname);
-    return (ext === 'zip');
+  isLoaderName(value) {
+    return value === 'zip';
   }
 
   /**
-   * Check if the loader can load the provided memory object.
+   * Check if the loader supports the input media type.
    *
-   * @param {object} mem The memory object.
-   * @returns {boolean} True if the object can be loaded.
+   * @param {string} value The media type.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadMemory(mem) {
-    const contentType = mem['Content-Type'];
-    if (typeof contentType !== 'undefined' &&
-      contentType.startsWith('application/zip')) {
-      return true;
-    }
-    if (typeof mem.filename !== 'undefined') {
-      const tmpFile = new File(['from memory'], mem.filename);
-      return this.canLoadFile(tmpFile);
-    }
-    return false;
+  canLoadMediaType(value) {
+    return value === 'application/zip';
   }
 
   /**
@@ -228,64 +199,5 @@ export class ZipLoader {
   loadUrlAs() {
     return urlContentTypes.ArrayBuffer;
   }
-
-  /**
-   * Handle a load start event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load start event.
-   */
-  onloadstart(_event) {}
-
-  /**
-   * Handle a load progress event.
-   * Default does nothing.
-   *
-   * @param {object} _event The progress event.
-   */
-  onprogress(_event) {}
-
-  /**
-   * Handle a load item event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load item event fired
-   *   when a file item has been loaded successfully.
-   */
-  onloaditem(_event) {}
-
-  /**
-   * Handle a load event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when a file has been loaded successfully.
-   */
-  onload(_event) {}
-
-  /**
-   * Handle an load end event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load end event fired
-   *  when a file load has completed, successfully or not.
-   */
-  onloadend(_event) {}
-
-  /**
-   * Handle an error event.
-   * Default does nothing.
-   *
-   * @param {object} _event The error event.
-   */
-  onerror(_event) {}
-
-  /**
-   * Handle an abort event.
-   * Default does nothing.
-   *
-   * @param {object} _event The abort event.
-   */
-  onabort(_event) {}
 
 } // class ZipLoader

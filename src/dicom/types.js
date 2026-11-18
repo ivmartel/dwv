@@ -1,0 +1,75 @@
+// DICOM related typedefs, in their own file to allow exporting them
+// without functions.
+// Keep this file type only: typedefs and JSDoc `@import` only, no
+// runtime import or code, so that it stays a leaf of the module graph
+// and cannot create circular dependencies.
+
+/**
+ * @import {NumberValue} from '../math/types.js';
+ * @import {VolumeId} from '../image/types.js';
+ */
+
+/**
+ * A simple (non sequence) tag value: either a single primitive
+ *   or, for multi-valued VRs, an array of primitives.
+ *
+ * @typedef {string | number | string[] | number[]} SimpleTagValue
+ */
+
+/**
+ * A simple sequence (VR=SQ) tag value.
+ *
+ * @typedef {object} SimpleSequenceValue
+ * @property {SimpleTagValues[]} value The sequence items.
+ * @property {boolean} [undefinedLength] Undefined length flag.
+ */
+
+/**
+ * The meta data as simple tag values: indexed by tag name instead of
+ *   tag key, with direct values (no element object) for non sequence,
+ *   non merged tags.
+ *
+ * @typedef {Record<string, SimpleTagValue | SimpleSequenceValue>}
+ *   SimpleTagValues
+ */
+
+/**
+ * Private diffusion b-value tag rule: either `{manufacturer, key}`
+ * or `{uidPrefix, key}`.
+ *
+ * @typedef {object} PrivateBValueRule
+ * @property {string} [manufacturer] The normalised manufacturer.
+ * @property {string} [uidPrefix] The SOP instance UID prefix.
+ * @property {string} key The private tag key.
+ */
+
+/**
+ * Volume id candidate getter.
+ *
+ * @typedef {object} VolumeIdCandidate
+ * @property {string} name The candidate name.
+ * @property {Function} getter The volume id getter:
+ *   `(elements) => SourcedNumberValue|undefined`, the returned id
+ *   does not need a source (the candidate name is used), for
+ *   example `{value: 4.6, unit: 'unit.ms', tagKey: '00180081'}`.
+ *   An id without unit is an index: its associated value is guessed
+ *   once all data is loaded.
+ * @property {boolean} [preLoad] Flag to also use the candidate
+ *   while loading.
+ * @property {boolean} [relative] Flag to display the ids relative to
+ *   the smallest one, for example to get times since the first
+ *   acquisition instead of timestamps. Not applied to the ids.
+ */
+
+/**
+ * Pixel value of one volume.
+ *
+ * @typedef {object} VolumeValue
+ * @property {VolumeId} volumeId The volume id: with source and
+ *   possible associated value if the image has volume ids, else just
+ *   the volume index as id.
+ * @property {NumberValue} pixValue The rescaled pixel value and its unit.
+ */
+
+// ESM module marker
+export {};

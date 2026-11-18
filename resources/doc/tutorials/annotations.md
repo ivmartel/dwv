@@ -1,4 +1,4 @@
-This page is part of the dwv [architecture](./tutorial-architecture.html) description and
+This page is part of the dwv [architecture](/tutorials/architecture) description and
 describes the dwv annotations.
 
 Summary:
@@ -10,25 +10,25 @@ Summary:
 The DICOM SR strucutre used to store annotations is based on the 'DICOM SR for communicating planar annotations'
 document from David A. Clunie ([ref](https://docs.google.com/document/d/1bR6m7foTCzofoZKeIRN5YreBrkjgMcBfNA7r9wXEGR4/edit?tab=t.0)).
 
-SCOORD items are translated according to their `Graphic Type` ((0070,0023) see [part03/sect_C.18.6](https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2)):
-- Point -> [Point2D](./Point2D.html)
+SCOORD items are translated according to their `Graphic Type` ((0070,0023) see [part03/sect_C.18.6](https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2)):
+- Point -> [Point2D](../point2d/)
 - Multipoint: not used
 - Polyline ->
-  - [Line](./Line.html): if open shape and 2 points
-  - [Protractor](./Protractor.html): if open shape and 3 points
-  - [Rectangle](./Rectangle.html): if closed shape with 5 points that form 4 perpendicular lines
-  - [ROI](./ROI.html): if closed shape and not rectangle
-- Circle -> [Circle](./Circle.html)
-- Ellipse -> [Ellipse](./Ellipse.html)
+  - [Line](../line/): if open shape and 2 points
+  - [Protractor](../protractor/): if open shape and 3 points
+  - [Rectangle](../rectangle/): if closed shape with 5 points that form 4 perpendicular lines
+  - [ROI](../roi/): if closed shape and not rectangle
+- Circle -> [Circle](../circle/)
+- Ellipse -> [Ellipse](../ellipse/)
 
 Closed shapes are polylines that have the same point as first and last item in their point list.
 
-DWV uses the [Comprehensive 3D SR IOD](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.35.13.3.html#table_A.35.13-1) since it allows for the usage of the SCOORD3D value type.
+DWV uses the [Comprehensive 3D SR IOD](https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.35.13.3.html#table_A.35.13-1) since it allows for the usage of the SCOORD3D value type.
 
 ### TID 1500 format
 
-[TID 1500](https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1500) is the root
-template for a "Measurement Report". It consists of one "Imaging Measurements" container including (1-n) "Measurement Group". Measurement Groups can follow [TID 1410](https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1410) "Planar ROI Measurements and Qualitative Evaluations" or [TID 1501](https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1501) "Measurement and Qualitative Evaluation Group".
+[TID 1500](https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1500) is the root
+template for a "Measurement Report". It consists of one "Imaging Measurements" container including (1-n) "Measurement Group". Measurement Groups can follow [TID 1410](https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1410) "Planar ROI Measurements and Qualitative Evaluations" or [TID 1501](https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1501) "Measurement and Qualitative Evaluation Group".
 
 SR documents following TID 1500 include the root tag (0040,A504) "Content Template Sequence" attribute containing an item with (0008,0105) "Mapping Resource": “DCMR” and (0040,DB00) "Template Identifier": “1500”.
 

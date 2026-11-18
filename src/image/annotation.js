@@ -1,20 +1,19 @@
 import {logger} from '../utils/logger.js';
 import {getFlags, replaceFlags} from '../utils/string.js';
-import {Point} from '../math/point.js';
+import {Point, Point2D, Point3D} from '../math/point.js';
 import {getOrientationName} from '../math/orientation.js';
-import {defaultToolOptions, toolOptions} from '../tools/index.js';
+import {getDistanceToSegment} from '../math/line.js';
+import {defaultToolOptions, toolOptions} from '../tools/toolOptions.js';
 import {guid} from '../math/stats.js';
+import {Index} from '../math/index.js';
 import {getUID} from '../dicom/dicomWriter.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D, Point3D} from '../math/point.js';
-import {Index} from '../math/index.js';
-import {Value} from '../math/value.js';
-import {ViewController} from '../app/viewController.js';
-import {PlaneHelper} from './planeHelper.js';
-import {DicomCode} from '../dicom/dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {NumberValue} from '../math/types.js';
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {PlaneHelper} from './planeHelper.js';
+ * @import {DicomCode} from '../dicom/dicomCode.js';
+ */
 
 /**
  * Image annotation.
@@ -35,7 +34,7 @@ export class Annotation {
   trackingUid;
 
   /**
-   * Referenced image SOP isntance UID.
+   * Referenced image SOP instance UID.
    *
    * @type {string}
    */
@@ -49,7 +48,9 @@ export class Annotation {
   referencedSopClassUID;
 
   /**
-   * Referenced frame number.
+   * Referenced frame number, 1-based as the DICOM
+   * Referenced Frame Number: frame number 1 is
+   * the first frame (time index 0).
    *
    * @type {number|undefined}
    */
@@ -79,7 +80,7 @@ export class Annotation {
   /**
    * Annotation quantification.
    *
-   * @type {Object<string, Value>|undefined}
+   * @type {Record<string, NumberValue>|undefined}
    */
   quantification;
 
@@ -165,12 +166,9 @@ export class Annotation {
   addMetaItem(concept, value) {
     const conceptId = concept.value;
     if (typeof this.#meta[conceptId] !== 'undefined') {
-      logger.warn('Overwriting annotation meta with id=' + conceptId);
+      logger.warn(`Overwriting annotation meta with id=${conceptId}`);
     }
-    this.#meta[concept.value] = {
-      concept: concept,
-      value: value
-    };
+    this.#meta[concept.value] = {concept, value};
   }
 
   /**
@@ -218,7 +216,10 @@ export class Annotation {
     this.referencedSopInstanceUID = viewController.getCurrentImageUid();
     this.referencedSopClassUID = viewController.getSopClassUid();
     if (currentPosition.length() > 3) {
-      this.referencedFrameNumber = currentPosition.get(3);
+      // the position can hold a volume id, use the index
+      const currentIndex =
+        viewController.getIndexFromPosition(currentPosition);
+      this.referencedFrameNumber = currentIndex.get(3) + 1;
     }
     // set plane origin (not saved with file)
     this.planeOrigin =
@@ -257,17 +258,25 @@ export class Annotation {
         res = true;
       }
     } else {
-      // oriented view: compare cosines (independent of slice index)
-      const cosines = planeHelper.getCosines();
-      const cosine1 = new Point3D(cosines[0], cosines[1], cosines[2]);
-      const cosine2 = new Point3D(cosines[3], cosines[4], cosines[5]);
-
-      if (cosine1.equals(this.planePoints[1]) &&
-        cosine2.equals(this.planePoints[2])) {
-        res = true;
-      }
+      // oriented view: compare cosines (independent of slice index),
+      //   legacy ones for annotations saved by previous versions
+      res = this.#hasPlaneCosines(planeHelper.getCosines()) ||
+        this.#hasPlaneCosines(planeHelper.getLegacyCosines());
     }
     return res;
+  }
+
+  /**
+   * Check if the plane points have the input cosines.
+   *
+   * @param {number[]} cosines The 2 cosines vectors (3D).
+   * @returns {boolean} True if same cosines.
+   */
+  #hasPlaneCosines(cosines) {
+    const cosine1 = new Point3D(cosines[0], cosines[1], cosines[2]);
+    const cosine2 = new Point3D(cosines[3], cosines[4], cosines[5]);
+    return cosine1.equals(this.planePoints[1]) &&
+      cosine2.equals(this.planePoints[2]);
   }
 
   /**
@@ -278,15 +287,28 @@ export class Annotation {
   setViewController(viewController) {
     // check uid
     if (!viewController.includesImageUid(this.referencedSopInstanceUID)) {
-      logger.warn('Cannot view annotation with reference UID: ' +
-        this.referencedSopInstanceUID);
+      logger.warn(`Cannot view annotation with reference UID: ${
+        this.referencedSopInstanceUID }`);
       return;
     }
     // check if same view
-    if (!this.isCompatibleView(viewController.getPlaneHelper())) {
+    const planeHelper = viewController.getPlaneHelper();
+    if (!this.isCompatibleView(planeHelper)) {
       return;
     }
     this.#viewController = viewController;
+
+    // replace legacy plane cosines
+    if (typeof this.planePoints !== 'undefined') {
+      const cosines = planeHelper.getCosines();
+      if (!this.#hasPlaneCosines(cosines)) {
+        this.planePoints = [
+          this.planePoints[0],
+          new Point3D(cosines[0], cosines[1], cosines[2]),
+          new Point3D(cosines[3], cosines[4], cosines[5])
+        ];
+      }
+    }
 
     // set plane origin (not saved with file)
     this.planeOrigin =
@@ -307,7 +329,7 @@ export class Annotation {
       }
       const values = [origin.getX(), origin.getY(), origin.getZ()];
       if (typeof this.referencedFrameNumber !== 'undefined') {
-        values.push(this.referencedFrameNumber);
+        values.push(this.#getFramePositionValue());
       }
       const originPoint = new Point(values);
       res = this.#viewController.getIndexFromPosition(originPoint);
@@ -335,7 +357,7 @@ export class Annotation {
       // add frame number if defined
       if (typeof this.referencedFrameNumber !== 'undefined') {
         const values = res.getValues();
-        values[3] = this.referencedFrameNumber;
+        values[3] = this.#getFramePositionValue();
         res = new Point(values);
       }
     }
@@ -343,9 +365,44 @@ export class Annotation {
   }
 
   /**
+   * Get the fourth dimension position value of the referenced frame:
+   *   the volume id if the image has some, the frame index otherwise.
+   *
+   * @returns {number} The position value.
+   */
+  #getFramePositionValue() {
+    const values = this.#viewController.getCurrentIndex().getValues();
+    values[3] = this.referencedFrameNumber - 1;
+    return this.#viewController.getPositionFromIndex(
+      new Index(values)).get(3);
+  }
+
+  /**
+   * Check if a plane point is on the annotation math shape,
+   *   within a tolerance.
+   *
+   * @param {Point2D} point The plane point to check.
+   * @param {number} [tolerance] Optional maximum distance to the shape,
+   *   defaults to 0.
+   * @returns {boolean} True if the point is on the shape.
+   */
+  contains(point, tolerance = 0) {
+    // arrow: the math shape is the tip and the reference point the tail
+    if (this.mathShape instanceof Point2D &&
+      typeof this.referencePoints?.[0] !== 'undefined') {
+      return getDistanceToSegment(
+        point, this.mathShape, this.referencePoints[0]) <= tolerance;
+    }
+    if (typeof this.mathShape?.contains !== 'function') {
+      return false;
+    }
+    return this.mathShape.contains(point, tolerance);
+  }
+
+  /**
    * Set the annotation text expression.
    *
-   * @param {Object.<string, string>} labelText The list of label
+   * @param {Record<string, string>} labelText The list of label
    *   texts indexed by modality.
    */
   setTextExpr(labelText) {

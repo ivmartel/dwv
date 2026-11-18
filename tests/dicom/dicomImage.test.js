@@ -169,9 +169,9 @@ describe('dicom', () => {
   });
 
   /**
-   * Tests for @function getImage2DSize}.
+   * Tests for {@link getImage2DSize}.
    *
-   * @function module:tests/dicom~getimage2dsize
+   * @function module:tests/dicom~getImage2DSize
    */
   test('getImage2DSize', () => {
     const TagKeys = {
@@ -202,7 +202,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getPixelAspectRatio}.
    *
-   * @function module:tests/dicom~getpixelaspectratio
+   * @function module:tests/dicom~getPixelAspectRatio
    */
   test('getPixelAspectRatio', () => {
     const TagKeys = {
@@ -226,7 +226,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getSpacingFromMeasure}.
    *
-   * @function module:tests/dicom~getspacingfrommeasure
+   * @function module:tests/dicom~getSpacingFromMeasure
    */
   test('getSpacingFromMeasure', () => {
     const TagKeys = {
@@ -261,7 +261,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getTagPixelUnit}.
    *
-   * @function module:tests/dicom~gettagpixelunit
+   * @function module:tests/dicom~getTagPixelUnit
    */
   test('getTagPixelUnit', () => {
     const TagKeys = {
@@ -297,7 +297,7 @@ describe('dicom', () => {
   /**
    * Tests for (@link getOrientationMatrix}.
    *
-   * @function module:tests/dicom~getorientationmatrix
+   * @function module:tests/dicom~getOrientationMatrix
    */
   test('getOrientationMatrix', () => {
     const TagKeys = {
@@ -330,7 +330,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getDicomMeasureItem}.
    *
-   * @function module:tests/dicom~getdicommeasureitem
+   * @function module:tests/dicom~getDicomMeasureItem
    */
   test('getDicomMeasureItem', () => {
     const spacing = new Spacing([1.5, 2.5, 3.5]);
@@ -344,7 +344,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getDicomPlaneOrientationItem}.
    *
-   * @function module:tests/dicom~getdicomplaneorientationitem
+   * @function module:tests/dicom~getDicomPlaneOrientationItem
    */
   test('getDicomPlaneOrientationItem', () => {
     /* eslint-disable @stylistic/js/array-element-newline */
@@ -363,7 +363,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getPhotometricInterpretation}.
    *
-   * @function module:tests/dicom~getphotometricinterpretation
+   * @function module:tests/dicom~getPhotometricInterpretation
    */
   test('getPhotometricInterpretation', () => {
     const TagKeys = {
@@ -424,7 +424,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link isSecondatyCapture}.
    *
-   * @function module:tests/dicom~issecondatycapture
+   * @function module:tests/dicom~isSecondatyCapture
    */
   test('isSecondatyCapture', () => {
     // valid secondary capture UIDs
@@ -442,7 +442,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link getReferencedSeriesUID}.
    *
-   * @function module:tests/dicom~getreferencedseriesuid
+   * @function module:tests/dicom~getReferencedSeriesUID
    */
   test('getReferencedSeriesUID', () => {
     const TagKeys = {

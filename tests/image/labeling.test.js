@@ -27,7 +27,7 @@ describe('image', () => {
   /**
    * Tests for {@link LabelingFilter}.
    *
-   * @function module:tests/image~labelingfilter-class
+   * @function module:tests/image~labelingfilterClass
    */
   test('LabelingFilter class', () => {
     const labelingFilter = new LabelingFilter();
@@ -254,6 +254,16 @@ describe('image', () => {
       labels2[0].largestSliceZ,
       1,
       'Expected largest slice Z for label diameters'
+    );
+    assert.equal(
+      labels2[0].minZ,
+      0,
+      'Expected min Z for label diameters'
+    );
+    assert.equal(
+      labels2[0].maxZ,
+      2,
+      'Expected max Z for label diameters'
     );
     assert.equal(
       major2.offset1,

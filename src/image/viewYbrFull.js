@@ -12,7 +12,7 @@ export function generateImageDataYbrFull(
   iterator,
   alphaFunc) {
   let index = 0;
-  let rgb = null;
+  let rgb;
   let ival = iterator.next();
   while (!ival.done) {
     // convert ybr to rgb

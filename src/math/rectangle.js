@@ -2,12 +2,11 @@ import {Point2D} from './point.js';
 import {getStats} from './stats.js';
 import {Index} from './index.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController.js';
-import {Scalar2D} from './scalar.js';
-import {Value} from './value.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Scalar2D} from './scalar.js';
+ * @import {NumberValue} from './types.js';
+ */
 
 /**
  * Mulitply the three inputs if the last two are not null.
@@ -184,13 +183,29 @@ export class Rectangle {
   }
 
   /**
+   * Check if a point is inside the rectangle, or within a tolerance
+   *   of its outline.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the outline
+   *   for an outside point, defaults to 0.
+   * @returns {boolean} True if the point is in the rectangle.
+   */
+  contains(point, tolerance = 0) {
+    return point.getX() >= this.getBegin().getX() - tolerance &&
+      point.getX() <= this.getEnd().getX() + tolerance &&
+      point.getY() >= this.getBegin().getY() - tolerance &&
+      point.getY() <= this.getEnd().getY() + tolerance;
+  }
+
+  /**
    * Quantify a rectangle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(viewController, index, flags) {
     const spacing2D = viewController.get2DSpacing();
@@ -229,18 +244,20 @@ export class Rectangle {
         round.min, round.max, index);
       const unit = viewController.getPixelUnit();
       const quantif = getStats(values, flags);
-      quant.min = {value: quantif.min, unit: unit};
-      quant.max = {value: quantif.max, unit: unit};
-      quant.mean = {value: quantif.mean, unit: unit};
-      quant.stdDev = {value: quantif.stdDev, unit: unit};
-      if (typeof quantif.median !== 'undefined') {
-        quant.median = {value: quantif.median, unit: unit};
-      }
-      if (typeof quantif.p25 !== 'undefined') {
-        quant.p25 = {value: quantif.p25, unit: unit};
-      }
-      if (typeof quantif.p75 !== 'undefined') {
-        quant.p75 = {value: quantif.p75, unit: unit};
+      if (typeof quantif !== 'undefined') {
+        quant.min = {value: quantif.min, unit};
+        quant.max = {value: quantif.max, unit};
+        quant.mean = {value: quantif.mean, unit};
+        quant.stdDev = {value: quantif.stdDev, unit};
+        if (typeof quantif.median !== 'undefined') {
+          quant.median = {value: quantif.median, unit};
+        }
+        if (typeof quantif.p25 !== 'undefined') {
+          quant.p25 = {value: quantif.p25, unit};
+        }
+        if (typeof quantif.p75 !== 'undefined') {
+          quant.p75 = {value: quantif.p75, unit};
+        }
       }
     }
 

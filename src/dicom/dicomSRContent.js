@@ -26,17 +26,14 @@ import {
   getSpatialCoordinate3D,
   getDicomSpatialCoordinate3DItem
 } from './dicomSpatialCoordinate3D.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {
-  safeGet,
-  safeGetAll,
-  DataElement
-} from './dataElement.js';
-import {DicomCode} from './dicomCode.js';
+import {safeGet, safeGetAll} from './dataElement.js';
 import {MeasuredValue} from './dicomMeasuredValue.js';
-/* eslint-enable no-unused-vars */
+
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {DicomCode} from './dicomCode.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -63,7 +60,7 @@ const TagKeys = {
 /**
  * DICOM relationship types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
  */
 export const RelationshipTypes = {
   contains: 'CONTAINS',
@@ -78,7 +75,7 @@ export const RelationshipTypes = {
 /**
  * DICOM value types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
  */
 export const ValueTypes = {
   text: 'TEXT',
@@ -102,7 +99,7 @@ export const ValueTypes = {
 /**
  * DICOM Continuity Of Contents.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.8.html#table_C.18.8-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.8.html#table_C.18.8-1}.
  */
 export const ContinuityOfContents = {
   separate: 'SEPARATE',
@@ -125,7 +122,7 @@ export const ValueTypeValueTagName = {
 /**
  * Get the content template value.
  *
- * @param {Object<string, DataElement>} dataElements The dicom elements.
+ * @param {Record<string, DataElement>} dataElements The dicom elements.
  * @returns {string|undefined} The template as
  *   'MappingResource'-'TemplateIdentifier'.
  */
@@ -139,7 +136,7 @@ export function getContentTemplate(dataElements) {
     const templateId = safeGet(templateItem, TagKeys.TemplateIdentifier);
     if (typeof mappingResource !== 'undefined' &&
       typeof templateId !== 'undefined') {
-      template = mappingResource + '-' + templateId;
+      template = `${mappingResource}-${templateId}`;
     }
   }
   return template;
@@ -148,7 +145,7 @@ export function getContentTemplate(dataElements) {
 /**
  * DICOM SR content: item of a SR content sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.17.3.html}.
  */
 export class DicomSRContent {
   /**
@@ -205,19 +202,19 @@ export class DicomSRContent {
     let res = '';
 
     if (typeof this.relationshipType !== 'undefined') {
-      res += '(' + this.relationshipType + ') ';
+      res += `(${this.relationshipType}) `;
     }
 
-    res += this.valueType + ': ';
+    res += `${this.valueType}: `;
 
     if (typeof this.conceptNameCode !== 'undefined') {
       res += this.conceptNameCode.toString();
     }
 
-    res += ' = ' + this.value.toString();
+    res += ` = ${this.value.toString()}`;
 
     for (const item of this.contentSequence) {
-      res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
+      res += `\n${prefix}- ${item.toString(`${prefix}`)}  `;
     }
 
     return res;
@@ -256,7 +253,7 @@ export function isEqualContentItem(item1, item2) {
 /**
  * Get a content item object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {DicomSRContent} A content item object.
  */
 export function getSRContent(dataElements) {
@@ -302,7 +299,7 @@ export function getSRContent(dataElements) {
       content.value =
         safeGet(dataElements, TagKeys[valueTagName]);
     } else {
-      console.warn('Unsupported input ValueType: ' + valueType);
+      console.warn(`Unsupported input ValueType: ${valueType}`);
     }
   }
 
@@ -320,10 +317,11 @@ export function getSRContent(dataElements) {
  * Get a simple dicom element item from a content item object.
  *
  * @param {DicomSRContent} content The content item object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomSRContentItem(content) {
   // dicom item (tags are in ~group/element order)
+  /** @type {SimpleTagValues} */
   let contentItem = {};
 
   if (typeof content.relationshipType !== 'undefined') {
@@ -373,7 +371,7 @@ export function getDicomSRContentItem(content) {
     if (typeof valueTagName !== 'undefined') {
       contentItem[valueTagName] = content.value;
     } else {
-      console.warn('Unsupported output ValueType: ' + content.valueType);
+      console.warn(`Unsupported output ValueType: ${content.valueType}`);
     }
   }
 

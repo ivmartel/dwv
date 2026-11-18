@@ -1,10 +1,9 @@
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
-import {MaskSegment} from '../dicom/dicomSegment.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {MaskImage} from './maskImage.js';
+ * @import {MaskSegment} from '../dicom/dicomSegment.js';
+ */
 
 /**
  * Mask segment helper: helps handling the segments list,
@@ -16,7 +15,7 @@ export class MaskSegmentHelper {
   /**
    * The associated mask.
    *
-   * @type {Image}
+   * @type {MaskImage}
    */
   #mask;
 
@@ -28,7 +27,7 @@ export class MaskSegmentHelper {
   #segments;
 
   /**
-   * @param {Image} mask The associated mask image.
+   * @param {MaskImage} mask The associated mask image.
    */
   constructor(mask) {
     this.#mask = mask;
@@ -46,7 +45,7 @@ export class MaskSegmentHelper {
   /**
    * Get the associated mask image.
    *
-   * @returns {Image} The mask image.
+   * @returns {MaskImage} The mask image.
    */
   getMask() {
     return this.#mask;
@@ -103,7 +102,7 @@ export class MaskSegmentHelper {
           values.push(segment.number);
         }
       } else {
-        logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
+        logger.warn(`Unknown segment in maskHasSegments: ${numbers[i]}`);
         unknowns.push(i);
       }
     }
@@ -146,8 +145,8 @@ export class MaskSegmentHelper {
       }
     } else {
       logger.warn(
-        'Not adding segment, it is allready in the segments list: ' +
-        segment.number);
+        `Not adding segment, it is allready in the segments list: ${
+          segment.number }`);
     }
   }
 
@@ -162,8 +161,8 @@ export class MaskSegmentHelper {
       this.#segments.splice(index, 1);
     } else {
       logger.warn(
-        'Cannot remove segment, it is not in the segments list: ' +
-        segmentNumber);
+        `Cannot remove segment, it is not in the segments list: ${
+          segmentNumber }`);
     }
   }
 
@@ -178,8 +177,8 @@ export class MaskSegmentHelper {
       this.#segments[index] = segment;
     } else {
       logger.warn(
-        'Cannot update segment, it is not in the segments list: ' +
-        segment.number);
+        `Cannot update segment, it is not in the segments list: ${
+          segment.number }`);
     }
   }
 
@@ -198,7 +197,7 @@ export class MaskSegmentHelper {
    *
    * @typedef Overlap
    * @property {string} label The segment label.
-   * @property {Object.<number, OverlapCount>} overlap A Dictionary
+   * @property {Record<number, OverlapCount>} overlap A Dictionary
    *  containing the counts. The key is the segment number of the overlapping
    *  segment.
    * @property {number} count The voxel volume of this segment.
@@ -211,7 +210,7 @@ export class MaskSegmentHelper {
    * The value is a Dictionary of all of the segments in the second set
    * that overlap with the key segment.
    *
-   * @typedef {Object.<number, Overlap>} OverlapMap
+   * @typedef {Record<number, Overlap>} OverlapMap
    */
 
   /**

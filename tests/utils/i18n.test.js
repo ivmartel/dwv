@@ -21,6 +21,11 @@ describe('utils', () => {
 
     const t2 = i18n.t('unit.cm');
     assert.equal(t2, undefined, 'test #2');
+
+    // volume id units
+    assert.equal(i18n.t('unit.ms'), 'ms', 'milliseconds');
+    assert.equal(i18n.t('unit.s'), 's', 'seconds');
+    assert.equal(i18n.t('unit.smm2'), 's/mm²', 'b-value');
   });
 
 });

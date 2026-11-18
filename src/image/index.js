@@ -6,14 +6,13 @@ import {
   CADReport,
   AnnotationGroupFactory
 } from './annotationGroupFactory.js';
-import {
-  Image,
-  createImage,
-  createMaskImage
-} from './image.js';
+import {Image} from './image.js';
+import {MaskImage} from './maskImage.js';
+import {demoCreateImage} from './imageFactory.js';
+import {ImageContour} from './imageContour.js';
 import {
   View,
-  createView
+  demoCreateView
 } from './view.js';
 import {Geometry} from './geometry.js';
 import {Size} from './size.js';
@@ -29,35 +28,47 @@ import {
 } from './windowLevel.js';
 import {
   MaskFactory,
-  getDefaultDicomSegJson
+  demoCreateMaskImage,
+  getDefaultDicomSegJson,
+  mergeMaskImages
 } from './maskFactory.js';
+import {
+  RtStructFactory,
+  getDefaultDicomRTStructJson,
+  bufferToPolygons,
+  simplifyPolygon
+} from './rtStructFactory.js';
 import {PositionHelper} from './positionHelper.js';
 import {PlaneHelper} from './planeHelper.js';
-import {DeleteSegmentCommand} from './deleteSegmentCommand.js';
-import {
-  ChangeSegmentColourCommand
-} from './changeSegmentColourCommand.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
 import {MaskSegmentViewHelper} from './maskSegmentViewHelper.js';
+import {SegmentCollection} from './segmentCollection.js';
 import {Diameter, Diameters, Label} from './label.js';
+import {WindowPreset} from './windowPreset.js';
+import {ImageHistogram} from './imageHistogram.js';
 
+// also export typedefs
+export * from './types.js';
 
 export {
   Annotation,
   AnnotationGroup,
   AnnotationGroupFactory,
   CADReport,
-  ChangeSegmentColourCommand,
   ColourMap,
-  DeleteSegmentCommand,
   Diameter,
   Diameters,
   Geometry,
   Image,
+  ImageHistogram,
+  MaskImage,
+  ImageContour,
   Label,
   MaskFactory,
+  RtStructFactory,
   MaskSegmentHelper,
   MaskSegmentViewHelper,
+  SegmentCollection,
   PlaneHelper,
   PositionHelper,
   RescaleSlopeAndIntercept,
@@ -66,10 +77,15 @@ export {
   Spacing,
   View,
   WindowLevel,
+  WindowPreset,
   luts,
-  createImage,
-  createMaskImage,
-  createView,
+  demoCreateImage,
+  demoCreateMaskImage,
+  demoCreateView,
   equalWl,
   getDefaultDicomSegJson,
+  getDefaultDicomRTStructJson,
+  mergeMaskImages,
+  bufferToPolygons,
+  simplifyPolygon,
 };

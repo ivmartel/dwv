@@ -6,15 +6,17 @@ export default defineConfig({
       './tests/**/*.test.js'
     ],
     outputFile: './build/test-results.json',
-    environment: 'jsdom',
+    environment: 'node',
     coverage: {
       provider: 'v8',
       reporter: ['text-summary', 'html'],
+      reportsDirectory: './build/coverage',
+      exclude: ['tests/**'],
       thresholds: {
-        statements: 30,
-        branches: 30,
-        functions: 30,
-        lines: 30
+        statements: 50,
+        branches: 50,
+        functions: 50,
+        lines: 50
       }
     }
   },

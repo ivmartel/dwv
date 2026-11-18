@@ -25,7 +25,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SopInstanceReference}.
      *
-     * @function module:tests/dicom~sopinstancereference-good-input
+     * @function module:tests/dicom~sopinstancereferenceGoodInput
      */
     test('good input', () => {
       const ref = new SopInstanceReference();
@@ -36,7 +36,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SopInstanceReference} toString.
      *
-     * @function module:tests/dicom~sopinstancereference-tostring
+     * @function module:tests/dicom~sopinstancereferenceTostring
      */
     test('toString', () => {
       const ref = new SopInstanceReference();
@@ -53,7 +53,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SopInstanceReference} toString only SOPInstanceUID.
      *
-     * @function module:tests/dicom~sopinstancereference-tostring-sopinstance
+     * @function module:tests/dicom~sopinstancereferenceTostringSopinstance
      */
     test('toString SOPinstance', () => {
       const ref = new SopInstanceReference();
@@ -66,7 +66,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SopInstanceReference} toString only SOPClassUID.
      *
-     * @function module:tests/dicom~sopinstancereference-tostring-sopclass
+     * @function module:tests/dicom~sopinstancereferenceTostringSopclass
      */
     test('toString SOPClass', () => {
       const ref = new SopInstanceReference();
@@ -79,7 +79,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SopInstanceReference} undefined toString.
      *
-     * @function module:tests/dicom~sopinstancereference-undefined-tostring
+     * @function module:tests/dicom~sopinstancereferenceUndefinedTostring
      */
     test('undefined toString', () => {
       const ref = new SopInstanceReference();
@@ -90,7 +90,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SopInstanceReference} round trip.
      *
-     * @function module:tests/dicom~sopinstancereference-round-trip
+     * @function module:tests/dicom~sopinstancereferenceRoundTrip
      */
     test('round trip', () => {
       const de1 = new DataElement('UI');
@@ -129,7 +129,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSopInstanceReference}.
      *
-     * @function module:tests/dicom~getsopinstancereference-good-input
+     * @function module:tests/dicom~getsopinstancereferenceGoodInput
      */
     test('good input', () => {
       const de1 = new DataElement('UI');
@@ -151,7 +151,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSopInstanceReference} only SOPClassUID.
      *
-     * @function module:tests/dicom~getsopinstancereference-sopclass
+     * @function module:tests/dicom~getsopinstancereferenceSopclass
      */
     test('SOPClass', () => {
       const de1 = new DataElement('UI');
@@ -170,7 +170,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSopInstanceReference} only SOPInstanceUID.
      *
-     * @function module:tests/dicom~getsopinstancereference-sopinstance
+     * @function module:tests/dicom~getsopinstancereferenceSopinstance
      */
     test('SOPInstance', () => {
       const de2 = new DataElement('UI');
@@ -189,7 +189,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSopInstanceReference} empty.
      *
-     * @function module:tests/dicom~getsopinstancereference-empty
+     * @function module:tests/dicom~getsopinstancereferenceEmpty
      */
     test('empty', () => {
       const dataElements = {};
@@ -202,7 +202,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSopInstanceReference} other tag.
      *
-     * @function module:tests/dicom~getsopinstancereference-other-tag
+     * @function module:tests/dicom~getsopinstancereferenceOtherTag
      */
     test('other tag', () => {
       const de1 = new DataElement('UI');
@@ -227,7 +227,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSopInstanceReference} multiple.
      *
-     * @function module:tests/dicom~getsopinstancereference-multiple
+     * @function module:tests/dicom~getsopinstancereferenceMultiple
      */
     test('multiple', () => {
       const de1 = new DataElement('UI');
@@ -253,7 +253,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSopInstanceReferenceItem}.
      *
-     * @function module:tests/dicom~getdicomsopinstancereferenceitem-good-input
+     * @function module:tests/dicom~getdicomsopinstancereferenceitemGoodInput
      */
     test('good input', () => {
       const ref = new SopInstanceReference();
@@ -269,7 +269,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSopInstanceReferenceItem} with SOPClassUID.
      *
-     * @function module:tests/dicom~getdicomsopinstancereferenceitem-sopclass
+     * @function module:tests/dicom~getdicomsopinstancereferenceitemSopclass
      */
     test('SOPClass', () => {
       const ref = new SopInstanceReference();
@@ -284,7 +284,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSopInstanceReferenceItem} with SOPInstanceUID.
      *
-     * @function module:tests/dicom~getdicomsopinstancereferenceitem-sopinstance
+     * @function module:tests/dicom~getdicomsopinstancereferenceitemSopinstance
      */
     test('SOPInstance', () => {
       const ref = new SopInstanceReference();
@@ -299,7 +299,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSopInstanceReferenceItem} undefined.
      *
-     * @function module:tests/dicom~getdicomsopinstancereferenceitem-undefined
+     * @function module:tests/dicom~getdicomsopinstancereferenceitemUndefined
      */
     test('undefined', () => {
       const ref = new SopInstanceReference();
@@ -311,7 +311,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSopInstanceReferenceItem} name mapping.
      *
-     * @function module:tests/dicom~getdicomsopinstancereferenceitem-mapping
+     * @function module:tests/dicom~getdicomsopinstancereferenceitemMapping
      */
     test('mapping', () => {
       const ref = new SopInstanceReference();

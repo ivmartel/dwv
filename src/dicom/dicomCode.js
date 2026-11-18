@@ -1,7 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * DICOM code tag keys.
@@ -17,7 +17,7 @@ const TagKeys = {
 /**
  * DICOM code: item of a basic code sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_8.8.html}.
  */
 export class DicomCode {
   /**
@@ -64,9 +64,9 @@ export class DicomCode {
    * @returns {string} The code as string.
    */
   toString() {
-    return '(' + this.value + ', ' +
-      this.schemeDesignator + ', \'' +
-      this.meaning + '\')';
+    return `(${this.value}, ${
+      this.schemeDesignator }, '${
+      this.meaning }')`;
   }
 }
 
@@ -88,7 +88,7 @@ export function isEqualCode(code1, code2) {
 /**
  * Get a code object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {DicomCode} A code object.
  */
 export function getCode(dataElements) {
@@ -125,10 +125,11 @@ export function getCode(dataElements) {
  * Get a simple dicom element item from a code object.
  *
  * @param {DicomCode} code The code object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomCodeItem(code) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleTagValues} */
   const item = {};
   // value
   if (typeof code.value !== 'undefined') {
@@ -150,7 +151,7 @@ export function getDicomCodeItem(code) {
 
 /**
  * DICOM codes.
- * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
+ * List: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_d.html}.
  */
 export const DcmCodes = {
   CADProcessingAndFindingsSummary: {
@@ -353,8 +354,8 @@ const QuantificationName2DictItem = {
   height: {key: '121207', scheme: 'DCM'},
   width: {key: '103355008', scheme: 'SCT'},
   radius: {key: '131190003', scheme: 'SCT'},
-  a: {key: '103339001', scheme: 'SCT'},
-  b: {key: '103340004', scheme: 'SCT'},
+  longAxis: {key: '103339001', scheme: 'SCT'},
+  shortAxis: {key: '103340004', scheme: 'SCT'},
   min: {key: '113051', scheme: 'DCM'},
   max: {key: '113048', scheme: 'DCM'},
   mean: {key: '113049', scheme: 'DCM'},
@@ -408,9 +409,9 @@ export function getQuantificationName(code) {
 
 /**
  * Quantification unit to UCUM key. Associated tags:
- * - Rescale type {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.html#sect_C.11.1.1.2},
- * - Units {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.9.html#sect_C.8.9.1.1.3}.
- * - SUV {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/sect_CID_85.html}.
+ * - Rescale type {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.11.html#sect_C.11.1.1.2},
+ * - Units {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.9.html#sect_C.8.9.1.1.3}.
+ * - SUV {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/sect_CID_85.html}.
  */
 const QuantificationUnit2UcumKey = {
   'unit.mm': 'mm',

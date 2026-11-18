@@ -16,7 +16,7 @@ describe('dicom', () => {
   /**
    * Tests for {@link DataElement} using simple DICOM data.
    *
-   * @function module:tests/dicom~data-element-class
+   * @function module:tests/dicom~dataElementClass
    */
   test('Data element class', () => {
     assert.equal(checkDataElement(), ' undefined is undefined,',

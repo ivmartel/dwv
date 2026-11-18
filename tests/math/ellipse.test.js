@@ -12,7 +12,7 @@ describe('math', () => {
   /**
    * Tests for {@link Ellipse}.
    *
-   * @function module:tests/math~ellipse-class
+   * @function module:tests/math~ellipseClass
    */
   test('Ellipse class - #DWV-REQ-UI-07-003 Draw ellipse',
     () => {
@@ -50,7 +50,7 @@ describe('math', () => {
   /**
    * Tests for {@link Ellipse} quantification.
    *
-   * @function module:tests/math~ellipse-quantification
+   * @function module:tests/math~ellipseQuantification
    */
   test('Ellipse quantification - #DWV-REQ-UI-07-003 Draw ellipse',
     () => {
@@ -58,19 +58,19 @@ describe('math', () => {
       const e0 = new Ellipse(center0, 1, 2);
       // view controller
       const mockVc0 = {
-        canQuantifyImage: function () {
+        canQuantifyImage() {
           return true;
         },
-        get2DSpacing: function () {
+        get2DSpacing() {
           return {x: 1, y: 1};
         },
-        getImageVariableRegionValues: function () {
+        getImageVariableRegionValues() {
           return [0, 1, 1, 0, 0, 1, 1, 0];
         },
-        getPixelUnit: function () {
+        getPixelUnit() {
           return '';
         },
-        getLengthUnit: function () {
+        getLengthUnit() {
           return 'unit.mm';
         }
       };
@@ -129,4 +129,14 @@ describe('math', () => {
       'index list and theo result have same values');
   });
 
+});
+
+describe('math ellipse contains', () => {
+  test('Ellipse contains', () => {
+    const e0 = new Ellipse(new Point2D(0, 0), 10, 2);
+    assert.ok(e0.contains(new Point2D(9, 0)), 'inside along a');
+    assert.notOk(e0.contains(new Point2D(0, 3)), 'outside along b');
+    assert.ok(e0.contains(new Point2D(0, 3), 1), 'within tolerance');
+    assert.notOk(e0.contains(new Point2D(8, 2)), 'outside diagonal');
+  });
 });

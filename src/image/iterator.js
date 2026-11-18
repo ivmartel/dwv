@@ -1,11 +1,10 @@
 import {Index} from '../math/index.js';
 import {Point2D} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
-import {Matrix33} from '../math/matrix.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from './image.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ */
 
 /**
  * Get an simple iterator for a given range for a one component data.
@@ -25,7 +24,7 @@ export function simpleRange(dataAccessor, start, end, increment) {
   let nextIndex = start;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -82,12 +81,10 @@ export function range(dataAccessor, start, maxIter, increment,
     } else {
       increment *= -1;
     }
-  } else {
-    if (reverse2) {
-      // start at end of line
-      nextIndex += (blockMaxIter - 1) * increment;
-      increment *= -1;
-    }
+  } else if (reverse2) {
+    // start at end of line
+    nextIndex += (blockMaxIter - 1) * increment;
+    increment *= -1;
   }
   const finalBlockIncrement = blockIncrement - blockMaxIter * increment;
 
@@ -96,7 +93,7 @@ export function range(dataAccessor, start, maxIter, increment,
   let blockCount = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (mainCount < maxIter) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -139,7 +136,7 @@ export function rangeRegion(
   let regionElementCount = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -181,7 +178,7 @@ export function rangeRegions(
   let regionElementCount = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: dataAccessor(nextIndex),
@@ -245,7 +242,7 @@ export function simpleRange3d(
 
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         const result = {
           value: [
@@ -325,7 +322,7 @@ export function range3d(dataAccessor, start, maxIter, increment,
 
   // result
   return {
-    next: function () {
+    next() {
       const r0 = iters[0].next();
       const r1 = iters[1].next();
       const r2 = iters[2].next();
@@ -397,7 +394,7 @@ export function getSliceIterator(
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  let dataAccessor = null;
+  let dataAccessor;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -416,18 +413,18 @@ export function getSliceIterator(
   const ncomp = image.getNumberOfComponents();
   const isPlanar = image.getPlanarConfiguration() === 1;
   const getRange = function (
-    dataAccessor, start, maxIter, increment,
+    dataAccessor2, start2, maxIter, increment,
     blockMaxIter, blockIncrement, reverse1, reverse2) {
     if (ncomp === 1) {
-      return range(dataAccessor, start, maxIter, increment,
+      return range(dataAccessor2, start2, maxIter, increment,
         blockMaxIter, blockIncrement, reverse1, reverse2);
     } else if (ncomp === 3) {
-      return range3d(dataAccessor, 3 * start, maxIter, increment,
+      return range3d(dataAccessor2, 3 * start2, maxIter, increment,
         blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar);
     }
   };
 
-  let rangeObj = null;
+  let rangeObj;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
     const dirMax0 = viewOrientation.getColAbsMax(0);
     const dirMax2 = viewOrientation.getColAbsMax(2);
@@ -436,10 +433,9 @@ export function getSliceIterator(
     const reverse1 = false;
     const reverse2 = false;
 
-    let maxIter = null;
     if (dirMax2.index === 2) {
       // axial
-      maxIter = ncols * nrows;
+      const maxIter = ncols * nrows;
       if (dirMax0.index === 0) {
         // xyz
         rangeObj = getRange(dataAccessor,
@@ -451,7 +447,7 @@ export function getSliceIterator(
       }
     } else if (dirMax2.index === 0) {
       // sagittal
-      maxIter = nslices * nrows;
+      const maxIter = nslices * nrows;
       if (dirMax0.index === 1) {
         // yzx
         rangeObj = getRange(dataAccessor,
@@ -463,7 +459,7 @@ export function getSliceIterator(
       }
     } else if (dirMax2.index === 1) {
       // coronal
-      maxIter = nslices * ncols;
+      const maxIter = nslices * ncols;
       if (dirMax0.index === 0) {
         // xzy
         rangeObj = getRange(dataAccessor,
@@ -474,21 +470,19 @@ export function getSliceIterator(
           start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
       }
     } else {
-      throw new Error('Unknown direction: ' + dirMax2.index);
+      throw new Error(`Unknown direction: ${dirMax2.index}`);
     }
+  } else if (image.getNumberOfComponents() === 1) {
+    rangeObj = simpleRange(dataAccessor, start, start + sliceSize);
+  } else if (image.getNumberOfComponents() === 3) {
+    // 3 times bigger...
+    start *= 3;
+    sliceSize *= 3;
+    rangeObj = simpleRange3d(
+      dataAccessor, start, start + sliceSize, 1, isPlanar);
   } else {
-    if (image.getNumberOfComponents() === 1) {
-      rangeObj = simpleRange(dataAccessor, start, start + sliceSize);
-    } else if (image.getNumberOfComponents() === 3) {
-      // 3 times bigger...
-      start *= 3;
-      sliceSize *= 3;
-      rangeObj = simpleRange3d(
-        dataAccessor, start, start + sliceSize, 1, isPlanar);
-    } else {
-      throw new Error('Unsupported number of components: ' +
-        image.getNumberOfComponents());
-    }
+    throw new Error(`Unsupported number of components: ${
+      image.getNumberOfComponents()}`);
   }
 
   return rangeObj;
@@ -507,15 +501,15 @@ export function getSliceIterator(
 export function getRegionSliceIterator(
   image, index, isRescaled, min, max) {
   if (image.getNumberOfComponents() !== 1) {
-    throw new Error('Unsupported number of components for region iterator: ' +
-      image.getNumberOfComponents());
+    throw new Error(`Unsupported number of components for region iterator: ${
+      image.getNumberOfComponents() }`);
   }
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  let dataAccessor = null;
+  let dataAccessor;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -565,15 +559,15 @@ export function getRegionSliceIterator(
 export function getVariableRegionSliceIterator(
   image, index, isRescaled, regions) {
   if (image.getNumberOfComponents() !== 1) {
-    throw new Error('Unsupported number of components for region iterator: ' +
-      image.getNumberOfComponents());
+    throw new Error(`Unsupported number of components for region iterator: ${
+      image.getNumberOfComponents() }`);
   }
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  let dataAccessor = null;
+  let dataAccessor;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -642,7 +636,7 @@ export function valueRange(values, end) {
   let nextValueIndex = 0;
   // result
   return {
-    next: function () {
+    next() {
       if (nextIndex < end) {
         if (nextValueIndex + 1 < values.length &&
           nextIndex >= values[nextValueIndex + 1].index) {

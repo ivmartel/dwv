@@ -1,5 +1,7 @@
-import {describe, test, assert} from 'vitest';
+// @vitest-environment jsdom
+import {describe, test, assert, vi} from 'vitest';
 import {safeGet} from '../../src/dicom/dataElement.js';
+import {logger} from '../../src/utils/logger.js';
 import {
   getDwvVersion,
   getDwvVersionUI,
@@ -10,6 +12,9 @@ import {
   isVersionInBounds,
   cleanString,
   hasDicomPrefix,
+  getTypedArrayLike,
+  getTransferSyntaxName,
+  getSyntaxDecompressionName,
   DicomParser
 } from '../../src/dicom/dicomParser.js';
 import {
@@ -17,6 +22,12 @@ import {
   getPixelDataTag
 } from '../../src/dicom/dicomTag.js';
 import {getFileListFromDicomDir} from '../../src/dicom/dicomDir.js';
+import {DicomWriter} from '../../src/dicom/dicomWriter.js';
+import {
+  dictionary,
+  transferSyntaxKeywords
+} from '../../src/dicom/dictionary.js';
+import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
 import dwvTestSimple from '../data/dwv-test-simple.dcm?inline';
@@ -49,13 +60,13 @@ describe('dicom', () => {
 
     // test #1: basic
     const version10 = '1.2.3';
-    const classUID10 = getDwvUIDPrefix() + '.' + version10;
+    const classUID10 = `${getDwvUIDPrefix()}.${ version10}`;
     const version11 = getDwvVersionFromImplementationClassUID(classUID10);
     assert.deepEqual(version10, version11, 'Implementation class test #1');
 
     // test #2: with beta
     const version20 = '4.5.6-beta.19';
-    const classUID20 = getDwvUIDPrefix() + '.' + '4.5.6.99.19';
+    const classUID20 = `${getDwvUIDPrefix()}.4.5.6.99.19`;
     const version21 = getDwvVersionFromImplementationClassUID(classUID20);
     assert.deepEqual(version20, version21, 'Implementation class test #2');
   });
@@ -73,9 +84,9 @@ describe('dicom', () => {
     const testVersions = function (version0, versions, id) {
       for (let i = 0; i < versions.length; ++i) {
         assert.equal(compareVersions(version0, versions[i]), -1,
-          'compare version #' + id + '-' + i + '0');
+          `compare version #${id}-${i}0`);
         assert.equal(compareVersions(versions[i], version0), 1,
-          'compare version #' + id + '-' + i + '1');
+          `compare version #${id}-${i}1`);
       }
     };
     const versions01 = [
@@ -136,7 +147,7 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using simple DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~simple-dicom-parsing
+   * @function module:tests/dicom~simpleDicomParsing
    */
   test('Simple DICOM parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
@@ -193,7 +204,7 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using simple DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~simple-dicom-parsing-until-tag
+   * @function module:tests/dicom~simpleDicomParsingUntilTag
    */
   test('Simple DICOM parsing until tag',
     () => {
@@ -258,7 +269,7 @@ describe('dicom', () => {
    * Tests for {@link DicomParser} using sequence test DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicom-sequence-parsing
+   * @function module:tests/dicom~dicomSequenceParsing
    */
   test('DICOM sequence parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     () => {
@@ -303,7 +314,7 @@ describe('dicom', () => {
 
       // ReferringPhysicianIdentificationSequence: explicit empty item
       const seq12 = tags['00080096'].value;
-      assert.equal(seq12[0]['FFFEE000'].value.length, 0,
+      assert.equal(seq12[0].FFFEE000.value.length, 0,
         'ReferringPhysicianIdentificationSequence item length');
 
       // ConsultingPhysicianIdentificationSequence: implicit empty item
@@ -340,6 +351,88 @@ describe('dicom', () => {
   );
 
   /**
+   * Concatenate strings (as ASCII codes) and byte arrays.
+   *
+   * @param {...(string|number[])} parts The parts to concatenate.
+   * @returns {number[]} The bytes.
+   */
+  const toBytes = (...parts) => parts.flatMap((part) =>
+    typeof part === 'string'
+      ? Array.from(part, (c) => c.charCodeAt(0))
+      : part
+  );
+
+  /**
+   * Get an explicit VR little endian DICOM element.
+   *
+   * @param {number} group The tag group.
+   * @param {number} element The tag element.
+   * @param {string} vr The VR (with a 16 bits VL).
+   * @param {number[]} value The value bytes.
+   * @returns {number[]} The element bytes.
+   */
+  const toElementBytes = (group, element, vr, value) => {
+    if (value.length % 2 !== 0) {
+      value = value.concat(0x20);
+    }
+    const tag = [group & 0xff, group >> 8, element & 0xff, element >> 8];
+    const vl = [value.length & 0xff, value.length >> 8];
+    return toBytes(tag, vr, vl, value);
+  };
+
+  /**
+   * Get an explicit VR little endian DICOM buffer with a
+   * SpecificCharacterSet and a PatientName.
+   *
+   * @param {string} charSet The SpecificCharacterSet value.
+   * @param {number[]} nameBytes The PatientName value bytes.
+   * @returns {ArrayBuffer} The DICOM buffer.
+   */
+  const getCharSetBuffer = (charSet, nameBytes) => {
+    const meta = toElementBytes(0x0002, 0x0010, 'UI',
+      toBytes('1.2.840.10008.1.2.1 '));
+    const bytes = toBytes(
+      new Array(128).fill(0),
+      'DICM',
+      toElementBytes(0x0002, 0x0000, 'UL', [meta.length, 0, 0, 0]),
+      meta,
+      toElementBytes(0x0008, 0x0005, 'CS', toBytes(charSet)),
+      toElementBytes(0x0010, 0x0010, 'PN', nameBytes)
+    );
+    return new Uint8Array(bytes).buffer;
+  };
+
+  /**
+   * Tests for SpecificCharacterSet ISO 2022 IR 149 (Korean) with
+   * code extensions.
+   *
+   * @function module:tests/dicom~charSetCodeExtensions
+   */
+  test('SpecificCharacterSet ISO 2022 IR 149 with code extensions', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+    // korean: ISO 2022 IR 149, G1 designated with ESC $ ) C
+    const escC = [0x1b, 0x24, 0x29, 0x43];
+    const koreanName = toBytes(
+      'Hong^Gildong=',
+      escC, [0xfb, 0xf3], '^',
+      escC, [0xd1, 0xce, 0xd4, 0xd7], '=',
+      escC, [0xc8, 0xab], '^',
+      escC, [0xb1, 0xe6, 0xb5, 0xbf]
+    );
+    const koreanParser = new DicomParser();
+    koreanParser.parse(getCharSetBuffer('ISO 2022 IR 149', koreanName));
+    assert.equal(
+      koreanParser.getDicomElements()['00100010'].value[0],
+      'Hong^Gildong=洪^吉洞=홍^길동',
+      'Korean PatientName'
+    );
+
+    assert.equal(warnSpy.mock.calls.length, 0, 'No warning');
+    warnSpy.mockRestore();
+  });
+
+  /**
    * Tests for {@link cleanString}.
    *
    * @function module:tests/dicom~cleanstring
@@ -350,50 +443,60 @@ describe('dicom', () => {
       cleanString();
     },
     TypeError,
-    'Cannot read properties of undefined (reading \'length\')',
+    'Cannot read properties of undefined (reading \'replace\')',
     'cleanstring undefined throws.');
     // null
     assert.throws(function () {
       cleanString(null);
     },
     TypeError,
-    'Cannot read properties of null (reading \'length\')',
+    'Cannot read properties of null (reading \'replace\')',
     'cleanstring null throws.');
     // number
     assert.throws(function () {
       cleanString(3);
     },
     TypeError,
-    'res.trim is not a function',
+    'inputStr.replace is not a function',
     'cleanstring number throws.');
     // empty
     assert.equal(cleanString(''), '', 'Clean empty');
     // short
     assert.equal(cleanString('a'), 'a', 'Clean short');
     // special
-    const special = String.fromCharCode('u200B');
+    const special = '\0';
     assert.equal(cleanString(special), '', 'Clean just special');
     // regular
     let str = ' El cielo azul ';
     let refStr = 'El cielo azul';
     assert.equal(cleanString(str), refStr, 'Clean regular');
     // regular with special
-    str = ' El cielo azul' + special;
+    str = ` El cielo azul${special}`;
     refStr = 'El cielo azul';
     assert.equal(
       cleanString(str), refStr, 'Clean regular with special');
-    // regular with special and ending space (not trimmed)
-    str = ' El cielo azul ' + special;
+    // regular with special and ending space
+    str = ` El cielo azul ${special}`;
     refStr = 'El cielo azul';
     assert.equal(
       cleanString(str), refStr, 'Clean regular with special 2');
+    // regular with special before ending space
+    str = ` El cielo azul${special} `;
+    refStr = 'El cielo azul';
+    assert.equal(
+      cleanString(str), refStr, 'Clean regular with special 3');
+    // regular with multiple specials
+    str = `El cielo${special} azul${special}${special}`;
+    refStr = 'El cielo azul';
+    assert.equal(
+      cleanString(str), refStr, 'Clean regular with multiple specials');
   });
 
   /**
    * Tests for {@link DicomParser} using DICOMDIR data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~dicomdir-parsing
+   * @function module:tests/dicom~dicomdirParsing
    */
   test('DICOMDIR parsing - #DWV-REQ-IO-02-004 Load DICOMDIR URL',
     () => {
@@ -428,24 +531,175 @@ describe('dicom', () => {
       let iStart = 0;
       let iEnd = nFilesSeries0Study0;
       for (let i = iStart; i < iEnd; ++i) {
-        files00.push('IMAGES/IM' + i);
+        files00.push(`IMAGES/IM${i}`);
       }
       assert.deepEqual(list[0][0], files00, 'Study#0:Series#0 file names');
       const files01 = [];
       iStart = iEnd;
       iEnd += nFilesSeries1Study0;
       for (let i = iStart; i < iEnd; ++i) {
-        files01.push('IMAGES/IM' + i);
+        files01.push(`IMAGES/IM${i}`);
       }
       assert.deepEqual(list[0][0], files00, 'Study#0:Series#1 file names');
       const files10 = [];
       iStart = iEnd;
       iEnd += nFilesSeries0Study1;
       for (let i = iStart; i < iEnd; ++i) {
-        files10.push('IMAGES/IM' + i);
+        files10.push(`IMAGES/IM${i}`);
       }
       assert.deepEqual(list[0][0], files00, 'Study#1:Series#0 file names');
     }
   );
+
+  /**
+   * Write then parse data elements with the input pixel data.
+   *
+   * @param {number} pixelRepresentation The pixel representation.
+   * @param {string} pixelTagKey The pixel data tag key.
+   * @param {object} pixelElement The pixel data element.
+   * @returns {object} The parsed pixel data element.
+   */
+  const writeAndParsePixels = function (
+    pixelRepresentation, pixelTagKey, pixelElement) {
+    const tags = {
+      Modality: 'RTDOSE',
+      SOPClassUID: '1.2.840.10008.5.1.4.1.1.481.2',
+      MediaStorageSOPClassUID: '1.2.840.10008.5.1.4.1.1.481.2',
+      SOPInstanceUID: '1.2.826.0.1.3680043.9.7278.1.3333.1',
+      MediaStorageSOPInstanceUID: '1.2.826.0.1.3680043.9.7278.1.3333.1',
+      StudyInstanceUID: '1.2.826.0.1.3680043.9.7278.1.1111.1',
+      SeriesInstanceUID: '1.2.826.0.1.3680043.9.7278.1.2222.1',
+      TransferSyntaxUID: transferSyntaxKeywords.ExplicitVRLittleEndian,
+      PhotometricInterpretation: 'MONOCHROME2',
+      SamplesPerPixel: 1,
+      PixelRepresentation: pixelRepresentation,
+      Rows: 2,
+      Columns: 2,
+      BitsAllocated: 32,
+      BitsStored: 32,
+      HighBit: 31
+    };
+    const elements = generateDataElements(tags)[0];
+    delete elements['7FE00010'];
+    elements[pixelTagKey] = pixelElement;
+
+    const parser = new DicomParser();
+    parser.parse(new DicomWriter().getBuffer(elements));
+    return parser.getDicomElements()[pixelTagKey];
+  };
+
+  /**
+   * Tests for 32 bits integer pixel data parsing.
+   *
+   * @function module:tests/dicom~integer32PixelData
+   */
+  test('32 bits integer pixel data parsing', () => {
+    // unsigned: values above 16 bits
+    const uValues = new Uint32Array([0, 65536, 123456789, 4294967295]);
+    const uElement = writeAndParsePixels(0, '7FE00010', {
+      tag: getPixelDataTag(),
+      vr: 'OW',
+      vl: uValues.byteLength,
+      value: uValues
+    });
+    assert.ok(uElement.value[0] instanceof Uint32Array, 'unsigned type');
+    assert.deepEqual(Array.from(uElement.value[0]), Array.from(uValues),
+      'unsigned values');
+
+    // signed
+    const sValues = new Int32Array([-2147483648, -1, 70000, 2147483647]);
+    const sElement = writeAndParsePixels(1, '7FE00010', {
+      tag: getPixelDataTag(),
+      vr: 'OW',
+      vl: sValues.byteLength,
+      value: sValues
+    });
+    assert.ok(sElement.value[0] instanceof Int32Array, 'signed type');
+    assert.deepEqual(Array.from(sElement.value[0]), Array.from(sValues),
+      'signed values');
+  });
+
+  /**
+   * Tests for float pixel data parsing.
+   *
+   * @function module:tests/dicom~floatPixelData
+   */
+  test('Float pixel data parsing', () => {
+    const values = new Float32Array([-1.5, 0, 0.25, 1234.5]);
+    const element = writeAndParsePixels(0, '7FE00008', {
+      tag: new Tag('7FE0', '0008'),
+      vr: 'OF',
+      vl: values.byteLength,
+      value: values
+    });
+    assert.ok(element.value[0] instanceof Float32Array, 'float type');
+    assert.deepEqual(Array.from(element.value[0]), Array.from(values),
+      'float values');
+  });
+
+  /**
+   * Tests for {@link getTypedArrayLike}.
+   *
+   * @function module:tests/dicom~getTypedArrayLike
+   */
+  test('getTypedArrayLike', () => {
+    const arrays = [
+      new Uint8Array(1),
+      new Int8Array(1),
+      new Uint16Array(1),
+      new Int16Array(1),
+      new Uint32Array(1),
+      new Int32Array(1),
+      new Float32Array(1),
+      new Float64Array(1)
+    ];
+    for (const array of arrays) {
+      const res = getTypedArrayLike(array, 3);
+      assert.equal(res.constructor, array.constructor,
+        `${array.constructor.name} type`);
+      assert.equal(res.length, 3, `${array.constructor.name} length`);
+    }
+  });
+
+  /**
+   * Tests for {@link getTransferSyntaxName} and
+   *   {@link getSyntaxDecompressionName}.
+   *
+   * @function module:tests/dicom~transferSyntax
+   */
+  test('transferSyntax', () => {
+    // known syntax
+    assert.equal(
+      getTransferSyntaxName(transferSyntaxKeywords.JPEGBaseline8Bit),
+      'JPEG Baseline (Process 1)', 'jpeg baseline name');
+    assert.equal(
+      getSyntaxDecompressionName(transferSyntaxKeywords.JPEG2000),
+      'jpeg2000', 'jpeg 2000 decompression');
+    // syntax added in 2024a: named but not decoded
+    assert.equal(
+      getTransferSyntaxName(transferSyntaxKeywords.HTJ2KLossless),
+      'High-Throughput JPEG 2000 Image Compression (Lossless Only)',
+      'htj2k lossless name');
+    for (const syntax of [
+      transferSyntaxKeywords.HTJ2KLossless,
+      transferSyntaxKeywords.HTJ2KLosslessRPCL,
+      transferSyntaxKeywords.HTJ2K
+    ]) {
+      assert.isUndefined(getSyntaxDecompressionName(syntax),
+        `no decompression for ${syntax}`);
+    }
+    // unknown syntax
+    assert.equal(getTransferSyntaxName('1.2.3'), 'Unknown', 'unknown name');
+  });
+
+  /**
+   * Tests for the dictionary edition.
+   *
+   * @function module:tests/dicom~dictionary
+   */
+  test('dictionary', () => {
+    // FrameType (0008,9007) VM is 4-5 since 2024a
+    assert.equal(dictionary['0008']['9007'][1], '4-5', 'FrameType VM');
+  });
 
 });

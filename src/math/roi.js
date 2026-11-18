@@ -1,4 +1,5 @@
 import {Point2D} from '../math/point.js';
+import {getDistanceToSegment} from './line.js';
 
 /**
  * Region Of Interest shape.
@@ -100,6 +101,38 @@ export class ROI {
       res = new Point2D(a1 * cx, a1 * cy);
     }
     return res;
+  }
+
+  /**
+   * Check if a point is inside the roi (seen as a closed polygon),
+   *   or within a tolerance of its outline.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the outline
+   *   for an outside point, defaults to 0.
+   * @returns {boolean} True if the point is in the roi.
+   */
+  contains(point, tolerance = 0) {
+    const points = this.#points;
+    const x = point.getX();
+    const y = point.getY();
+    let inside = false;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      const pi = points[i];
+      const pj = points[j];
+      if (getDistanceToSegment(point, pj, pi) <= tolerance) {
+        return true;
+      }
+      // even-odd rule: count crossings of an horizontal ray
+      if ((pi.getY() > y) !== (pj.getY() > y)) {
+        const crossX = pi.getX() + (pj.getX() - pi.getX()) *
+          (y - pi.getY()) / (pj.getY() - pi.getY());
+        if (x < crossX) {
+          inside = !inside;
+        }
+      }
+    }
+    return inside;
   }
 
 } // ROI class

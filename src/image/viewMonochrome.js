@@ -1,8 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WindowLut} from './windowLut.js';
-import {ColourMap} from './luts.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WindowLut} from './windowLut.js';
+ * @import {ColourMap} from './luts.js';
+ */
 
 /**
  * Generate image data for 'MONOCHROME*' photometric interpretation.
@@ -20,7 +19,7 @@ export function generateImageDataMonochrome(
   windowLut,
   colourMap) {
   let index = 0;
-  let pxValue = 0;
+  let pxValue;
   let ival = iterator.next();
   while (!ival.done) {
     // pixel value

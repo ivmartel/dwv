@@ -1,269 +1,11 @@
-import {Point, Point3D} from '../math/point.js';
-import {WindowLevel} from '../image/windowLevel.js';
 import {LayerGroup} from './layerGroup.js';
+import {CanvasSizeChecker} from './generic.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawLayer} from '../gui/drawLayer.js';
-/* eslint-enable no-unused-vars */
-
 /**
- * Window/level binder.
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {DrawLayer} from '../gui/drawLayer.js';
  */
-export class WindowLevelBinder {
-  /**
-   * Get the associated event.
-   *
-   * @returns {string} The event name.
-   */
-  getEventType = function () {
-    return 'wlchange';
-  };
-  /**
-   * Get the event handler.
-   *
-   * @param {LayerGroup} layerGroup The input lqyer group.
-   * @returns {Function} The event handler.
-   */
-  getCallback = function (layerGroup) {
-    return function (event) {
-      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      if (viewLayers.length !== 0) {
-        const vc = viewLayers[0].getViewController();
-        if (event.value.length === 2) {
-          const wl = new WindowLevel(event.value[0], event.value[1]);
-          vc.setWindowLevel(wl);
-        }
-        if (event.value.length === 3) {
-          vc.setWindowLevelPreset(event.value[2]);
-        }
-      }
-    };
-  };
-}
-
-/**
- * Colour map binder.
- */
-export class ColourMapBinder {
-  /**
-   * Get the associated event.
-   *
-   * @returns {string} The event name.
-   */
-  getEventType = function () {
-    return 'colourmapchange';
-  };
-  /**
-   * Get the event handler.
-   *
-   * @param {LayerGroup} layerGroup The input lqyer group.
-   * @returns {Function} The event handler.
-   */
-  getCallback = function (layerGroup) {
-    return function (event) {
-      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      if (viewLayers.length !== 0) {
-        const vc = viewLayers[0].getViewController();
-        vc.setColourMap(event.value[0]);
-      }
-    };
-  };
-}
-
-/**
- * Mask view binder.
- */
-export class MaskViewBinder {
-  /**
-   * Get the associated event.
-   *
-   * @returns {string} The event name.
-   */
-  getEventType = function () {
-    return 'maskviewchange';
-  };
-  /**
-   * Get the event handler.
-   *
-   * @param {LayerGroup} layerGroup The input layer group.
-   * @returns {Function} The event handler.
-   */
-  getCallback = function (layerGroup) {
-    return function (event) {
-      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      if (viewLayers.length !== 0) {
-        viewLayers[0].setFillOpacity(event.value[0]);
-        viewLayers[0].setContourThickness(event.value[1]);
-      }
-    };
-  };
-}
-
-/**
- * Position binder.
- */
-export class PositionBinder {
-  /**
-   * Get the associated event.
-   *
-   * @returns {string} The event name.
-   */
-  getEventType = function () {
-    return 'positionchange';
-  };
-  /**
-   * Get the event handler.
-   *
-   * @param {LayerGroup} layerGroup The input lqyer group.
-   * @returns {Function} The event handler.
-   */
-  getCallback = function (layerGroup) {
-    return function (event) {
-      const pointValues = event.value[1];
-      const vls = layerGroup.getViewLayersByDataId(event.dataid);
-      let vl;
-      let sameData = false;
-      if (vls.length !== 0) {
-        // use first layer
-        vl = vls[0];
-        sameData = true;
-      } else {
-        vl = layerGroup.getBaseViewLayer();
-      }
-      const vc = vl.getViewController();
-      // bind 3D for all
-      // bind 4D if same data, otherwise use 3D and keep current
-      const currentPos = vc.getCurrentPosition();
-      const currentDims = currentPos.length();
-      const inputDims = pointValues.length;
-      if (!sameData &&
-        inputDims > 3 && currentDims > 3) {
-        pointValues[3] = currentPos.get(3);
-      }
-      vc.setCurrentPosition(new Point(pointValues));
-    };
-  };
-}
-
-/**
- * Zoom binder.
- */
-export class ZoomBinder {
-  /**
-   * Get the associated event.
-   *
-   * @returns {string} The event name.
-   */
-  getEventType = function () {
-    return 'zoomchange';
-  };
-  /**
-   * Get the event handler.
-   *
-   * @param {LayerGroup} layerGroup The input lqyer group.
-   * @returns {Function} The event handler.
-   */
-  getCallback = function (layerGroup) {
-    return function (event) {
-      const scale = {
-        x: event.value[0],
-        y: event.value[1],
-        z: event.value[2]
-      };
-      let center;
-      if (event.value.length === 6) {
-        center = new Point3D(
-          event.value[3],
-          event.value[4],
-          event.value[5]
-        );
-      }
-      layerGroup.setScale(scale, center);
-      layerGroup.draw();
-    };
-  };
-}
-
-/**
- * Offset binder.
- */
-export class OffsetBinder {
-  /**
-   * Get the associated event.
-   *
-   * @returns {string} The event name.
-   */
-  getEventType = function () {
-    return 'offsetchange';
-  };
-  /**
-   * Get the event handler.
-   *
-   * @param {LayerGroup} layerGroup The input lqyer group.
-   * @returns {Function} The event handler.
-   */
-  getCallback = function (layerGroup) {
-    return function (event) {
-      layerGroup.setOffset({
-        x: event.value[0],
-        y: event.value[1],
-        z: event.value[2]
-      });
-      layerGroup.draw();
-    };
-  };
-}
-
-/**
- * Opacity binder. Only propagates to view layers of the same data.
- */
-export class OpacityBinder {
-  /**
-   * Get the associated event.
-   *
-   * @returns {string} The event name.
-   */
-  getEventType = function () {
-    return 'opacitychange';
-  };
-  /**
-   * Get the event handler.
-   *
-   * @param {LayerGroup} layerGroup The input lqyer group.
-   * @returns {Function} The event handler.
-   */
-  getCallback = function (layerGroup) {
-    return function (event) {
-      // exit if no data id
-      if (typeof event.dataid === 'undefined') {
-        return;
-      }
-      // propagate to first view layer if it is not base layer
-      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      const baseLayer = layerGroup.getBaseViewLayer();
-      if (viewLayers.length !== 0 && baseLayer !== viewLayers[0]) {
-        viewLayers[0].setOpacity(event.value);
-        viewLayers[0].draw();
-      }
-    };
-  };
-}
-
-/**
- * List of binders.
- */
-export const binderList = {
-  WindowLevelBinder,
-  PositionBinder,
-  ZoomBinder,
-  OffsetBinder,
-  OpacityBinder,
-  ColourMapBinder,
-  MaskViewBinder
-};
 
 /**
  * Stage: controls a list of layer groups and their
@@ -291,6 +33,13 @@ export class Stage {
    * @type {boolean}
    */
   #imageSmoothing = false;
+
+  /**
+   * Canvas size checker, shared by all the view layers.
+   *
+   * @type {CanvasSizeChecker}
+   */
+  #canvasSizeChecker = new CanvasSizeChecker();
 
   // layer group binders
   #binders = [];
@@ -334,8 +83,8 @@ export class Stage {
     if (typeof this.getLayerGroup(index) !== 'undefined') {
       this.#activeLayerGroupIndex = index;
     } else {
-      logger.warn('No layer group to set as active with index: ' +
-        index);
+      logger.warn(`No layer group to set as active with index: ${
+        index }`);
     }
   }
 
@@ -413,7 +162,8 @@ export class Stage {
    */
   addLayerGroup(htmlElement, withInfoOverlay) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
-    const layerGroup = new LayerGroup(htmlElement, withInfoOverlay);
+    const layerGroup = new LayerGroup(
+      htmlElement, withInfoOverlay, this.#canvasSizeChecker);
     layerGroup.setImageSmoothing(this.#imageSmoothing);
     // add to storage
     const isBound = this.#callbackStore && this.#callbackStore.length !== 0;
@@ -632,9 +382,14 @@ export class Stage {
    *
    * @param {object} binder The layer binder.
    * @param {number} index The index of the associated layer group.
-   * @returns {Function} The binder function.
+   * @returns {EventListener|undefined} The binder function.
    */
   #getBinderCallback(binder, index) {
+    // silent exit
+    // TODO: check if avoidable
+    if (!this.#callbackStore) {
+      return;
+    }
     if (typeof this.#callbackStore[index] === 'undefined') {
       this.#callbackStore[index] = [];
     }
@@ -645,15 +400,15 @@ export class Stage {
     if (typeof binderObj === 'undefined') {
       // create new callback object
       binderObj = {
-        binder: binder,
-        callback: (event) => {
+        binder,
+        callback: ((/** @type {CustomEvent} */ event) => {
           // stop listeners
           this.#removeEventListeners(index, binder);
           // apply binder
           binder.getCallback(this.#layerGroups[index])(event);
           // re-start listeners
           this.#addEventListeners(index, binder);
-        }
+        })
       };
       this.#callbackStore[index].push(binderObj);
     }

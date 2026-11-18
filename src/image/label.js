@@ -1,8 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point} from '../math/point.js';
-import {Value} from '../math/value.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point} from '../math/point.js';
+ * @import {NumberValue} from '../math/types.js';
+ */
 
 /**
  * Diameter type.
@@ -11,7 +10,7 @@ export class Diameter {
   /**
    * The scaled diameter value.
    *
-   * @type {Value}
+   * @type {NumberValue}
    */
   diameter;
 
@@ -72,7 +71,7 @@ export class Label {
   /**
    * The volume of the labeled segment.
    *
-   * @type {Value}
+   * @type {NumberValue}
    */
   volume;
 
@@ -93,7 +92,7 @@ export class Label {
   /**
    * The scaled height of the segment.
    *
-   * @type {Value}
+   * @type {NumberValue}
    */
   height;
 
@@ -110,4 +109,18 @@ export class Label {
    * @type {number}
    */
   largestSliceZ;
+
+  /**
+   * The minimum Z index of the segment.
+   *
+   * @type {number}
+   */
+  minZ;
+
+  /**
+   * The maximum Z index of the segment.
+   *
+   * @type {number}
+   */
+  maxZ;
 }

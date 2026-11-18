@@ -1,0 +1,454 @@
+import {Size} from '../image/size.js';
+import {Spacing} from '../image/spacing.js';
+import {
+  Geometry,
+  getSliceGeometrySpacing,
+  getComparePoint3D
+} from '../image/geometry.js';
+import {safeGet, safeGetAll} from './dataElement.js';
+import {
+  getImage2DSize,
+  getPixelSpacing,
+  getPixelAspectRatio,
+  getOrientationMatrix,
+  getSpacingFromMeasure
+} from './dicomImage.js';
+import {
+  getVolumeId,
+  guessVolumeIndices
+} from './dicomVolume.js';
+import {getOrientationFromCosines} from '../math/orientation.js';
+import {
+  Point3D,
+  point3DFromArray,
+  includesPoint3D,
+  getEqualPoint3DFunction
+} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {
+  REAL_WORLD_EPSILON,
+  isAboveEpsilon
+} from '../math/number.js';
+import {arraySortEquals} from '../utils/array.js';
+import {logger} from '../utils/logger.js';
+import {
+  getPerFrameFunctionalGroups,
+  getFrameElements
+} from './dicomFunctionalGroup.js';
+
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {DicomFunctionalGroup} from './dicomFunctionalGroup.js';
+ */
+
+/**
+ * @typedef {Record<string, DataElement>} DataElements
+ */
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  NumberOfFrames: '00280008',
+  ImagePositionPatient: '00200032',
+  SharedFunctionalGroupsSequence: '52009229',
+  PlaneOrientationSequence: '00209116',
+  ImageOrientationPatient: '00200037',
+  PixelMeasuresSequence: '00289110'
+};
+
+/**
+ * Get the image geometry from root DICOM elements.
+ *
+ * @param {DataElements} dataElements The DICOM data elements.
+ * @returns {Geometry} The image geometry.
+ */
+export function getRootGeometry(dataElements) {
+  const size2D = getImage2DSize(dataElements);
+  const sizeValues = [size2D[0], size2D[1], 1];
+
+  // NumberOfFrames
+  const numberOfFrames = safeGet(dataElements, TagKeys.NumberOfFrames);
+  if (typeof numberOfFrames !== 'undefined') {
+    const number = parseInt(numberOfFrames, 10);
+    if (number > 1) {
+      sizeValues.push(number);
+    }
+  }
+
+  // image size
+  const size = new Size(sizeValues);
+
+  // image spacing
+  let spacingValues = [1, 1, 1];
+  const spacing2D = getPixelSpacing(dataElements);
+  if (typeof spacing2D !== 'undefined') {
+    spacingValues = [spacing2D[0], spacing2D[1], 1];
+  } else {
+    // try pixel aspect ratio
+    const ratio = getPixelAspectRatio(dataElements);
+    if (typeof ratio !== 'undefined') {
+      spacingValues = [ratio[0], ratio[1], 1];
+      logger.warn('Use pixel aspect ratio as spacing');
+    }
+  }
+  const spacing = new Spacing(spacingValues);
+
+  // ImagePositionPatient
+  const imagePositionPatient =
+    safeGetAll(dataElements, TagKeys.ImagePositionPatient);
+  // slice position
+  let slicePosition = new Array(0, 0, 0);
+  if (typeof imagePositionPatient !== 'undefined') {
+    slicePosition = [
+      parseFloat(imagePositionPatient[0]),
+      parseFloat(imagePositionPatient[1]),
+      parseFloat(imagePositionPatient[2])
+    ];
+  }
+
+  // Image orientation patient
+  const orientationMatrix = getOrientationMatrix(dataElements);
+
+  // geometry
+  const origin = new Point3D(
+    slicePosition[0], slicePosition[1], slicePosition[2]);
+  const volumeId = getVolumeId(dataElements);
+
+  return new Geometry([origin], size, spacing, orientationMatrix, volumeId);
+}
+
+/**
+ * Check the distance between a frame origin and a reference origin.
+ *
+ * @param {Point3D} frameOrigin The frame origin to check.
+ * @param {Point3D} refOrigin The reference origin to check against.
+ * @param {number} index The frame index, used for error message.
+ * @throws {Error} If distance is too high.
+ */
+function checkDistance(frameOrigin, refOrigin, index) {
+  const dist = frameOrigin.getDistance(refOrigin);
+  // warn is bigger than epsilon, error if bigger than 100*epsilon
+  if (dist > REAL_WORLD_EPSILON) {
+    if (dist < REAL_WORLD_EPSILON * 100) {
+      logger.warn(
+        `Frame origin ${index} is far from reference origin (${dist}).`
+      );
+    } else {
+      throw new Error(`No reference origin for frame origin ${index}`);
+    }
+  }
+}
+
+/**
+ * Complete origins using reference origins if with gaps.
+ *
+ * `frameOrigins` are not assumed to be in reference (ascending) order:
+ * a DICOM file's `PerFrameFunctionalGroupsSequence` frame order is not
+ * guaranteed to be spatially sorted for any writer. Match each frame
+ * to its closest reference origin first, then rebuild the continuous
+ * run in ascending reference order, filling any true gaps
+ * from `refOrigins`.
+ *
+ * @param {Point3D[]} frameOrigins The frame origins.
+ * @param {Point3D[]} refOrigins The reference image origins.
+ * @returns {Point3D[]} The continous origins, in ascending reference order.
+ */
+function completeOriginsFromReference(
+  frameOrigins,
+  refOrigins) {
+  // match each frame to its closest reference index, keeping the frame's
+  // own (authoritative) origin rather than the reference one
+  const frameByRefIndex = new Map();
+  for (let i = 0; i < frameOrigins.length; ++i) {
+    const frameOrigin = frameOrigins[i];
+    const refIndex = frameOrigin.getClosest(refOrigins);
+    checkDistance(frameOrigin, refOrigins[refIndex], i);
+    frameByRefIndex.set(refIndex, frameOrigin);
+  }
+
+  const refIndices = [...frameByRefIndex.keys()];
+  const minRefIndex = Math.min(...refIndices);
+  const maxRefIndex = Math.max(...refIndices);
+
+  // result, in ascending reference order, filling gaps from refOrigins
+  const resOrigins = [];
+  for (let j = minRefIndex; j <= maxRefIndex; ++j) {
+    resOrigins.push(
+      frameByRefIndex.has(j) ? frameByRefIndex.get(j) : refOrigins[j]);
+  }
+
+  return resOrigins;
+}
+
+/**
+ * Complete origins using a base geometry if with gaps.
+ *
+ * @param {Point3D[]} frameOrigins The frame origins.
+ * @param {Geometry} baseGeometry The base geometry.
+ * @returns {Point3D[]} The continous origins.
+ */
+function completeOriginsFromGeometry(
+  frameOrigins,
+  baseGeometry) {
+  // result
+  const resOrigins = [];
+
+  resOrigins.push(frameOrigins[0]);
+  let sliceIndex = 0;
+  for (let g = 1; g < frameOrigins.length; ++g) {
+    ++sliceIndex;
+    let index = new Index([0, 0, sliceIndex]);
+    let point = baseGeometry.indexToWorld(index).get3D();
+    const frameOrigin = frameOrigins[g];
+    // check if more pos pats are needed
+    let dist = frameOrigin.getDistance(point);
+    const distPrevious = dist;
+    // TODO: good threshold?
+    while (isAboveEpsilon(dist)) {
+      logger.debug(`Adding intermediate pos pats at ${
+        point.toString() }`);
+      resOrigins.push(point);
+      ++sliceIndex;
+      index = new Index([0, 0, sliceIndex]);
+      point = baseGeometry.indexToWorld(index).get3D();
+      dist = frameOrigin.getDistance(point);
+      if (dist > distPrevious) {
+        throw new Error(
+          'Test distance is increasing when adding intermediate pos pats');
+      }
+    }
+    // add frame pos pat
+    resOrigins.push(frameOrigin);
+  }
+
+  return resOrigins;
+}
+
+/**
+ * Get the frames geometry from root DICOM elements and per-frame infos.
+ *
+ * @param {DataElements} dataElements The DICOM data elements.
+ * @param {DicomFunctionalGroup[]} perFrameFuncGroups The per-frame
+ *   functional groups.
+ * @param {boolean} [completeOrigins] Flag to complete origins if gaps,
+ *   defaults to false.
+ * @param {Point3D[]} [refOrigins] Reference origins used to complete
+ *   gaps, if not present the code will calculate them if completeOrigins
+ *   is true.
+ * @returns {Geometry} The geometry.
+ * @throws {Error} Error for missing or wrong data.
+ */
+export function getFramesGeometry(
+  dataElements,
+  perFrameFuncGroups,
+  completeOrigins,
+  refOrigins) {
+  // image size
+  const size2D = getImage2DSize(dataElements);
+  const size = new Size([size2D[0], size2D[1], 1]);
+
+  // Shared Functional Groups Sequence
+  let spacing;
+  let imageOrientationPatient;
+  const sharedFunctionalGroupsSeq =
+    safeGetAll(dataElements, TagKeys.SharedFunctionalGroupsSequence);
+  if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
+    // should be only one
+    const funcGroup0 = sharedFunctionalGroupsSeq[0];
+    // Plane Orientation Sequence
+    if (typeof funcGroup0[TagKeys.PlaneOrientationSequence] !== 'undefined') {
+      const planeOrientationSeq =
+        funcGroup0[TagKeys.PlaneOrientationSequence];
+      if (planeOrientationSeq.value.length !== 0) {
+        // should be only one
+        imageOrientationPatient =
+          planeOrientationSeq.value[0][TagKeys.ImageOrientationPatient].value;
+      } else {
+        logger.warn(
+          'No shared functional group plane orientation sequence items.');
+      }
+    }
+    // Pixel Measures Sequence
+    if (typeof funcGroup0[TagKeys.PixelMeasuresSequence] !== 'undefined') {
+      const pixelMeasuresSeq = funcGroup0[TagKeys.PixelMeasuresSequence];
+      if (pixelMeasuresSeq.value.length !== 0) {
+        // should be only one
+        spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
+      } else {
+        logger.warn(
+          'No shared functional group pixel measure sequence items.');
+      }
+    }
+  }
+
+  // check frame infos
+  const frameOrigins = [];
+  for (let ii = 0; ii < perFrameFuncGroups.length; ++ii) {
+    // populate frame origins
+    const frameOrigin = point3DFromArray(perFrameFuncGroups[ii].imagePosPat);
+    if (!includesPoint3D(frameOrigins, frameOrigin)) {
+      frameOrigins.push(frameOrigin);
+    }
+    // store orientation if needed, avoid multi
+    if (typeof perFrameFuncGroups[ii].imageOrientationPatient !== 'undefined') {
+      if (typeof imageOrientationPatient === 'undefined') {
+        imageOrientationPatient =
+          perFrameFuncGroups[ii].imageOrientationPatient;
+      } else if (!arraySortEquals(
+        imageOrientationPatient,
+        perFrameFuncGroups[ii].imageOrientationPatient)) {
+        throw new Error('Unsupported multi orientation frames geometry.');
+      }
+    }
+    // store spacing if needed, avoid multi
+    if (typeof perFrameFuncGroups[ii].spacing !== 'undefined') {
+      if (typeof spacing === 'undefined') {
+        spacing = perFrameFuncGroups[ii].spacing;
+      } else if (!spacing.equals(perFrameFuncGroups[ii].spacing)) {
+        throw new Error('Unsupported multi resolution frames geometry.');
+      }
+    }
+  }
+
+  // check spacing and orientation
+  if (typeof spacing === 'undefined') {
+    throw new Error('No spacing found for frames geometry');
+  }
+  if (typeof imageOrientationPatient === 'undefined') {
+    throw new Error('No imageOrientationPatient found for frames geometry');
+  }
+  // orientation
+  const orientationMatrix = getOrientationFromCosines(
+    imageOrientationPatient.map((item) => parseFloat(item))
+  );
+  if (typeof orientationMatrix === 'undefined') {
+    throw new Error(
+      'Invalid imageOrientationPatient found for frames geometry');
+  }
+
+  let origins;
+  if (typeof completeOrigins === 'undefined' ||
+    completeOrigins === false) {
+    origins = frameOrigins;
+    // frames can be in any order: compute spacing on sorted origins
+    const sortedOrigins = origins.slice().sort(
+      getComparePoint3D(orientationMatrix));
+    const geoSpacing = getSliceGeometrySpacing(sortedOrigins);
+    if (spacing.length() === 2) {
+      spacing = new Spacing([spacing.get(0), spacing.get(1), geoSpacing]);
+    } else if (spacing.get(2) !== geoSpacing) {
+      logger.debug(`Different tag spacing from geo spacing: ${
+        spacing.get(2)} - ${geoSpacing}`);
+    }
+  } else if (typeof refOrigins !== 'undefined') {
+    origins = completeOriginsFromReference(frameOrigins, refOrigins);
+  } else {
+    // tmp geometry with correct spacing but only one slice
+    const baseGeometry = new Geometry(
+      [frameOrigins[0]], size, spacing, orientationMatrix);
+
+    origins = completeOriginsFromGeometry(frameOrigins, baseGeometry);
+  }
+
+  if (spacing.length() !== 3) {
+    throw new Error('Incomplete spacing found for frames geometry');
+  }
+
+  // final geometry
+  const geometry = new Geometry(
+    [origins[0]], size, spacing, orientationMatrix);
+  // append origins
+  for (let m = 1; m < origins.length; ++m) {
+    geometry.appendOrigin(origins[m], m);
+  }
+
+  // stamp a tag-derived time (for example TemporalPositionIndex), so
+  // the frames of a multi-frame file are appended to their timepoint
+  // (see ImageFactory getFrameGeometry)
+  const volumeId = getVolumeId(dataElements);
+  if (typeof volumeId !== 'undefined') {
+    geometry.setInitialTime(volumeId);
+  }
+
+  return geometry;
+}
+
+/**
+ * Get the geometry of each frame from the per-frame functional groups:
+ *   a one slice geometry with the frame position and the frame time.
+ *   The frame time is the data volume id (if any) if the frame positions
+ *   are unique. If frames share positions (several volumes in one
+ *   file), the frame time is the frame volume id (see dicomVolume
+ *   guessVolumeIndices).
+ *
+ * @param {DataElements} dataElements The DICOM data elements.
+ * @returns {Geometry[]|undefined} The list of geometries indexed by
+ *   frame (encoding order) number. Undefined if there are no per-frame
+ *   functional groups or if their positions are not unique and cannot
+ *   be grouped into volumes.
+ * @throws {Error} Error for missing or wrong data.
+ */
+export function getSortedFramesGeometry(dataElements) {
+  const funcGroups = getPerFrameFunctionalGroups(dataElements);
+  if (typeof funcGroups === 'undefined') {
+    return;
+  }
+  // a group can be undefined if its required sequences are missing
+  if (funcGroups.some(funcGroup => typeof funcGroup === 'undefined')) {
+    logger.warn('Incomplete per-frame functional groups, ' +
+      'not using them for geometry');
+    return;
+  }
+
+  // frame origins and index in the list of unique origins
+  const frameOrigins = [];
+  const uniqueOrigins = [];
+  const frameUniqueIndices = [];
+  for (const funcGroup of funcGroups) {
+    const frameOrigin = point3DFromArray(funcGroup.imagePosPat);
+    let uniqueIndex = uniqueOrigins.findIndex(
+      getEqualPoint3DFunction(frameOrigin));
+    if (uniqueIndex === -1) {
+      uniqueIndex = uniqueOrigins.length;
+      uniqueOrigins.push(frameOrigin);
+    }
+    frameOrigins.push(frameOrigin);
+    frameUniqueIndices.push(uniqueIndex);
+  }
+
+  // duplicate origins: group frames into volumes
+  let frameTimes;
+  if (uniqueOrigins.length !== frameOrigins.length) {
+    const frameElementsList = [];
+    for (let i = 0; i < frameOrigins.length; ++i) {
+      frameElementsList.push(getFrameElements(dataElements, i));
+    }
+    const guess = guessVolumeIndices(
+      frameElementsList, frameUniqueIndices, uniqueOrigins.length);
+    if (typeof guess === 'undefined') {
+      logger.warn('Duplicate frame origins without volume ids, ' +
+        'not using them for geometry');
+      return;
+    }
+    frameTimes = guess.volumeIds;
+  }
+
+  // common geometry (spacing, orientation, time)
+  const geometry = getFramesGeometry(dataElements, funcGroups);
+  const geoSize = geometry.getSize();
+  const frameSize = new Size([geoSize.get(0), geoSize.get(1), 1]);
+
+  const res = [];
+  for (let i = 0; i < frameOrigins.length; ++i) {
+    res.push(new Geometry(
+      [frameOrigins[i]],
+      frameSize,
+      geometry.getSpacing(),
+      geometry.getOrientation(),
+      typeof frameTimes !== 'undefined'
+        ? frameTimes[i] : geometry.getInitialTime()
+    ));
+  }
+  return res;
+}

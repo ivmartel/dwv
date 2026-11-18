@@ -11,19 +11,8 @@ export default [
     },
     settings: {
       jsdoc: {
-        mode: 'jsdoc',
-        // 1. jsdoc gives an error for index signatures as type:
-        // {[key: string]: {red: number[], green: number[], blue: number[]}}
-        // -> ERROR: Unable to parse a tag's type expression for source file ...
-        //    Invalid type expression
-        // 2. in typescript mode, eslint/jsdoc 'check-types'
-        // gives a warning when using: Object<>
-        // -> Use object shorthand or index signatures instead of `Object`,
-        //    e.g., `{[key: string]: string}`
-        // => adding Object to preferredTypes removes the warning
-        preferredTypes: {
-          Object: 'Object'
-        }
+        // in order to use @import
+        mode: 'typescript',
       }
     },
     rules: {

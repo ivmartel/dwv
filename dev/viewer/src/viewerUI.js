@@ -1,0 +1,1202 @@
+import {ViewConfig} from '../../../src/app/application.js';
+import {precisionRound} from '../../../src/math/number.js';
+import {getDwvVersion} from '../../../src/dicom/dicomParser.js';
+import {Point} from '../../../src/math/point.js';
+import {Matrix33} from '../../../src/math/matrix.js';
+import {i18n} from '../../../src/utils/i18n.js';
+
+import {DataTableUI} from './dataTableUI.js';
+import {AnnotationService} from './annotationService.js';
+import {AnnotationList} from './annotationList.js';
+import {SegmentationService} from './segmentationService.js';
+import {SegmentationList} from './segmentationList.js';
+import {SegmentationExtraUI} from './segmentExtra.js';
+import {DrawToolUI} from './drawToolUI.js';
+import {BrushToolUI} from './brushToolUI.js';
+import {formatQuantificationValue} from './quantification.js';
+
+/**
+ * @import {DwvAppService} from './dwvAppService.js';
+ */
+
+/**
+ * Layout protocol class.
+ */
+export class LayoutProtocol {
+  /**
+   * @type {string}
+   */
+  #id;
+  /**
+   * @type {object[]}
+   */
+  #displaySets;
+
+  /**
+   * @param {object} config As
+   *   {id, displaySets: [{divId, dataSelector, orientation}]}.
+   */
+  constructor(config) {
+    this.#id = config.id;
+    this.#displaySets = config.displaySets;
+  }
+
+  /**
+   * Get the layout id.
+   *
+   * @returns {string} The id.
+   */
+  getId() {
+    return this.#id;
+  }
+
+  /**
+   * Get the layer groups div ids from this layout.
+   *
+   * @returns {string[]} The ids.
+   */
+  getLayerGroupDivIds() {
+    const ids = [];
+    for (const set of this.#displaySets) {
+      const id = set.divId;
+      if (!ids.includes(id)) {
+        ids.push(id);
+      }
+    }
+    return ids;
+  }
+
+  /**
+   * Convert a display set into a view config.
+   *
+   * @param {object} set The display set.
+   * @returns {ViewConfig} The view config.
+   */
+  #displaySetToViewConfig(set) {
+    const config = new ViewConfig(set.divId);
+    config.orientation = set.orientation;
+    return config;
+  }
+  /**
+   * Get the first view config for the given div id.
+   *
+   * @param {string} divId The div id.
+   * @returns {ViewConfig} The config.
+   */
+  getViewConfigsByDivId(divId) {
+    const set = this.#displaySets.find((elem) => elem.divId === divId);
+    return this.#displaySetToViewConfig(set);
+  }
+
+  /**
+   * Get the view configs for the given data id.
+   *
+   * @param {string} dataId The data id.
+   * @returns {ViewConfig[]} The view configs.
+   */
+  getViewConfigsByDataId(dataId) {
+    const sets =
+      this.#displaySets.filter((elem) => elem.dataSelector(dataId));
+    if (sets.length === 0) {
+      console.warn(`Data not selected for display: ${dataId}`);
+    }
+    const res = [];
+    for (const set of sets) {
+      res.push(this.#displaySetToViewConfig(set));
+    }
+    return res;
+  }
+
+  /**
+   * Get the data view configs for the given data ids.
+   *
+   * @param {string[]} dataIds The data id.
+   * @returns {Record<string, ViewConfig[]>} The data view configs.
+   */
+  getDataViewConfigs(dataIds) {
+    const res = {};
+    for (const dataId of dataIds) {
+      res[dataId] = this.getViewConfigsByDataId(dataId);
+    }
+    return res;
+  }
+}
+
+// layout related
+
+/**
+ * Select all: returns true.
+ *
+ * @returns {boolean} True if selected.
+ */
+function selectAll(/*id*/) {
+  return true;
+}
+/**
+ * Select event ids.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+function selectEven(id) {
+  return parseInt(id, 10) % 2 === 0;
+}
+/**
+ * Select odd ids.
+ *
+ * @param {string} id The id to check.
+ * @returns {boolean} True if selected.
+ */
+function selectOdd(id) {
+  return parseInt(id, 10) % 2 !== 0;
+}
+/**
+ * Get the viewer layouts.
+ *
+ * @param {DwvAppService} _dwvAppService The associated dwv app service
+ *   (used by the commented modality selectors).
+ * @returns {LayoutProtocol[]} The layouts.
+ */
+function getLayouts(_dwvAppService) {
+  /**
+   * Select CT modality data.
+   *
+   * @param {string} id The id to check.
+   * @returns {boolean} True if selected.
+   */
+  // function selectCT(id) {
+  //   const dataCtrl = _dwvAppService.getDataController();
+  //   const modality = dataCtrl.get(id).meta['00080060'].value[0];
+  //   return modality === 'CT';
+  // }
+  /**
+   * Select PET modality data.
+   *
+   * @param {string} id The id to check.
+   * @returns {boolean} True if selected.
+   */
+  // function selectPET(id) {
+  //   const dataCtrl = _dwvAppService.getDataController();
+  //   const modality = dataCtrl.get(id).meta['00080060'].value[0];
+  //   return modality === 'PT';
+  // }
+
+  // single div
+  const layoutConfig0 = {
+    id: '1*1',
+    displaySets: [
+      {
+        divId: 'layerGroup0',
+        dataSelector: selectAll,
+      }
+    ]
+  };
+  // one line, two columns
+  const layoutConfig1 = {
+    id: '1*2',
+    displaySets: [
+      {
+        divId: 'layerGroup0',
+        dataSelector: selectEven,
+      },
+      {
+        divId: 'layerGroup1',
+        dataSelector: selectOdd,
+      }
+    ]
+  };
+  // MPR
+  const layoutConfig2 = {
+    id: 'mpr',
+    displaySets: [
+      {
+        divId: 'layerGroup0',
+        orientation: 'axial',
+        dataSelector: selectAll,
+      },
+      {
+        divId: 'layerGroup1',
+        orientation: 'coronal',
+        dataSelector: selectAll,
+      },
+      {
+        divId: 'layerGroup2',
+        orientation: 'sagittal',
+        dataSelector: selectAll,
+      }
+    ]
+  };
+
+  return [
+    new LayoutProtocol(layoutConfig0),
+    new LayoutProtocol(layoutConfig1),
+    new LayoutProtocol(layoutConfig2)
+  ];
+}
+
+/**
+ * Viewer UI: creates the main viewer HTML elements
+ * and binds them to the app.
+ */
+export class ViewerUI {
+
+  /**
+   * The associated viewer dwvAppService.
+   *
+   * @type {DwvAppService}
+   */
+  #dwvAppService;
+
+  /**
+   * The available layouts.
+   *
+   * @type {LayoutProtocol[]}
+   */
+  #layouts;
+
+  /**
+   * The selected layout index.
+   *
+   * @type {number}
+   */
+  #selectedLayoutIndex = 0;
+
+  /**
+   * The last position change event detail, used to refresh the
+   *   position text at load end.
+   *
+   * @type {object|undefined}
+   */
+  #lastPositionDetail;
+
+  /**
+   * The tools configuration.
+   *
+   * @type {object}
+   */
+  #tools;
+
+  /**
+   * The tool features UIs, indexed by tool name.
+   *
+   * @type {object}
+   */
+  #toolFeaturesUI = {};
+
+  /**
+   * The data table UI.
+   *
+   * @type {DataTableUI}
+   */
+  #dataTable;
+
+  /**
+   * @param {DwvAppService} dwvAppService The associated viewer dwvAppService.
+   */
+  constructor(dwvAppService) {
+    this.#dwvAppService = dwvAppService;
+    this.#layouts = getLayouts(dwvAppService);
+    this.#tools = dwvAppService.getTools();
+  }
+
+  /**
+   * Get the selected layout.
+   *
+   * @returns {LayoutProtocol} The layout.
+   */
+  #getSelectedLayout() {
+    return this.#layouts[this.#selectedLayoutIndex];
+  }
+
+  /**
+   * Create the HTML and the associated UIs.
+   */
+  setup() {
+    // add layer groups div
+    this.#addLayerGroupsDivs(this.#getSelectedLayout());
+
+    // data table
+    this.#dataTable = new DataTableUI(this.#dwvAppService);
+    this.#dataTable.registerListeners();
+    this.#dataTable.registerLayerAddListeners(this.#getSelectedLayout());
+
+    // tool features UI
+    const toolsUI = {
+      Draw: DrawToolUI,
+      Brush: BrushToolUI
+    };
+    for (const toolName in this.#tools) {
+      if (typeof toolsUI[toolName] !== 'undefined') {
+        const toolUI =
+          new toolsUI[toolName](this.#dwvAppService, this.#tools[toolName]);
+        toolUI.registerListeners();
+        this.#toolFeaturesUI[toolName] = toolUI;
+      }
+    }
+
+    // annotation
+    const annotService = new AnnotationService(this.#dwvAppService);
+    annotService.connect();
+    const annotUI = new AnnotationList(annotService);
+    annotUI.registerListeners();
+
+    // segmentation
+    const segService = new SegmentationService(this.#dwvAppService);
+    segService.connect();
+    const segUI = new SegmentationList(segService);
+    segUI.registerListeners();
+
+    // segmentation extra (overlap check and merge)
+    const segExtra = new SegmentationExtraUI(this.#dwvAppService);
+    segExtra.registerListeners();
+
+    // lines
+    this.#setupFileLine();
+    this.#setupPositionLine();
+    this.#setupLayoutLine();
+    this.#setupRotateLine();
+    this.#setupBindersCheckboxes();
+    this.#setupToolsCheckboxes();
+    this.#addAbout(getDwvVersion());
+  }
+
+  /**
+   * Bind app to ui.
+   */
+  registerListeners() {
+    this.#registerLoadListeners();
+    this.#registerOtherListeners();
+  }
+
+  /**
+   * Register the other listeners: UI update at first render,
+   * position change and filter shortcut.
+   */
+  #registerOtherListeners() {
+    // update UI at first render of first data
+    const onRenderEnd = () => {
+      // set app tool
+      this.#setAppTool();
+      // enable html
+      const elementIds = [
+        'tools',
+        'changelayout',
+        'resetviews',
+        'changesmoothing',
+        'rotate-x',
+        'rotate-y',
+        'rotate-z',
+        'rotate-match',
+        'rotate-reset'
+      ];
+      for (const elementId of elementIds) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.disabled = false;
+        }
+      }
+      // remove handler
+      this.#dwvAppService.removeEventListener('renderend', onRenderEnd);
+    };
+    // add handler (will be removed at first success)
+    this.#dwvAppService.addEventListener('renderend', onRenderEnd);
+
+    this.#dwvAppService.addEventListener('positionchange', (event) => {
+      const input = document.getElementById('position');
+      input.value = event.detail.value[1].map(getPrecisionRound(2));
+      // index and values as small text
+      this.#lastPositionDetail = event.detail;
+      this.#updatePositionText(event.detail);
+      // update sliders' value
+      this.#updateSliders(this.#getSelectedLayout());
+    });
+
+    // filter shortcut
+    document.addEventListener('keydown', (event) => {
+      if (this.#getSelectedToolName() === 'Filter' &&
+        event.altKey && event.key === 'r') {
+        // run the sharpen filter
+        const dataCtrl = this.#dwvAppService.getDataController();
+        this.#dwvAppService.setToolFeatures({
+          filterName: 'Sharpen',
+          runArgs: {
+            dataId: dataCtrl.getDataIds()[0]
+          },
+          run: true
+        });
+      }
+    });
+  }
+
+  /**
+   * Register the load listeners: load progress display,
+   * data view config and post-load listeners.
+   */
+  #registerLoadListeners() {
+    this.#dwvAppService.addEventListener('loadstart', (event) => {
+      // remove post-load listeners
+      const dataCtrl = this.#dwvAppService.getDataController();
+      if (dataCtrl.getDataIds().length !== 0) {
+        this.#removePostLoadListeners();
+      }
+      // add new data view config for new data
+      this.#addNewDataViewConfig(event.detail.dataid);
+    });
+    this.#dwvAppService.addEventListener('loadprogress', () => {
+      const progressElement = document.getElementById('loadprogress');
+      progressElement.value = this.#dwvAppService.getLoadProgress();
+    });
+    this.#dwvAppService.addEventListener('load', () => {
+      // update sliders with new data info
+      // (has to be after full load)
+      this.#initSliders(this.#getSelectedLayout());
+      // volume values are skipped while loading: refresh them
+      if (typeof this.#lastPositionDetail !== 'undefined') {
+        this.#updatePositionText(this.#lastPositionDetail);
+      }
+      // add post-load listeners
+      this.#addPostLoadListeners();
+    });
+  }
+
+  /**
+   * Init individual slider on layer related event.
+   * WARNING: needs to be called with the final geometry.
+   *
+   * @param {CustomEvent} event The layer event.
+   */
+  #initSliderOnEvent = (event) => {
+    this.#initSlider(event.detail.layergroupid);
+  };
+
+  /**
+   * Add post-load event listeners.
+   */
+  #addPostLoadListeners() {
+    // post-load since sliders need the full geometry
+    this.#dwvAppService.addEventListener(
+      'viewlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.addEventListener(
+      'drawlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.addEventListener(
+      'layerremove', this.#initSliderOnEvent);
+  }
+
+  /**
+   * Remove post-load event listeners.
+   */
+  #removePostLoadListeners() {
+    this.#dwvAppService.removeEventListener(
+      'viewlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.removeEventListener(
+      'drawlayeradd', this.#initSliderOnEvent);
+    this.#dwvAppService.removeEventListener(
+      'layerremove', this.#initSliderOnEvent);
+  }
+
+  /**
+   * Merge with first app config.
+   *
+   * @param {Record<string, ViewConfig[]>} dataViewConfigs A list
+   *   of data view configs.
+   */
+  #mergeAppConfig(dataViewConfigs) {
+    const stgCtrl = this.#dwvAppService.getStageController();
+    for (const dataId in dataViewConfigs) {
+      const configs = dataViewConfigs[dataId];
+      const appConfigs = stgCtrl.getViewConfigs(dataId);
+      if (appConfigs.length !== 0) {
+        // use first as base
+        for (const config of configs) {
+          mergeConfigs(config, appConfigs[0]);
+        }
+      }
+    }
+  }
+
+  /**
+   * Update the app position on slider input.
+   *
+   * @param {string} layerGroupDivId The layer group div id.
+   * @param {string} value The slider value.
+   */
+  #onSliderInput(layerGroupDivId, value) {
+    const stgCtrl = this.#dwvAppService.getStageController();
+    const lg = stgCtrl.getLayerGroupByDivId(layerGroupDivId);
+    const ph = lg.getPositionHelper();
+    const pos = ph.getCurrentPositionAtScrollValue(value);
+    ph.setCurrentPosition(pos);
+  }
+
+  /**
+   * Init sliders: show them and set max.
+   *
+   * @param {LayoutProtocol} layout The current layout.
+   */
+  #initSliders(layout) {
+    for (const divId of layout.getLayerGroupDivIds()) {
+      this.#initSlider(divId);
+    }
+  }
+
+  /**
+   * Init individual slider.
+   * WARNING: needs to be called with the final geometry.
+   *
+   * @param {string} layerGroupId The id of the layer group.
+   */
+  #initSlider(layerGroupId) {
+    const slider = document.getElementById(`${layerGroupId}-slider`);
+    if (slider) {
+      // disabled by default
+      slider.disabled = true;
+      // init if possible
+      const stgCtrl = this.#dwvAppService.getStageController();
+      const lg = stgCtrl.getLayerGroupByDivId(layerGroupId);
+      if (typeof lg !== 'undefined') {
+        const ph = lg.getPositionHelper();
+        if (typeof ph !== 'undefined') {
+          const max = ph.getMaximumScrollValue();
+          if (max !== 0) {
+            slider.disabled = false;
+            slider.max = max;
+            slider.value = ph.getCurrentPositionScrollValue();
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Update sliders: set the slider value to the current scroll index.
+   *
+   * @param {LayoutProtocol} layout The current layout.
+   */
+  #updateSliders(layout) {
+    for (const divId of layout.getLayerGroupDivIds()) {
+      const slider = document.getElementById(`${divId}-slider`);
+      if (slider) {
+        const stgCtrl = this.#dwvAppService.getStageController();
+        const lg = stgCtrl.getLayerGroupByDivId(divId);
+        if (typeof lg !== 'undefined') {
+          const ph = lg.getPositionHelper();
+          slider.value = ph.getCurrentPositionScrollValue();
+        }
+      }
+    }
+  }
+
+  /**
+   * Get a vertical slider for a given layer group.
+   *
+   * @param {string} layerGroupDivId The layer group div id.
+   * @returns {HTMLInputElement} The slider as html range.
+   */
+  #getSlider(layerGroupDivId) {
+    const range = document.createElement('input');
+    range.type = 'range';
+    range.className = 'vertical-slider';
+    range.id = `${layerGroupDivId}-slider`;
+    range.min = '0';
+    range.max = '0';
+    range.disabled = true;
+    // update app on slider change
+    range.oninput = () => {
+      this.#onSliderInput(layerGroupDivId, range.value);
+    };
+    return range;
+  }
+
+  /**
+   * Replace the content of the root 'dwv' div with the layout
+   * layer group divs and their sliders.
+   *
+   * @param {LayoutProtocol} layout The layout.
+   */
+  #addLayerGroupsDivs(layout) {
+    const root = document.getElementById('dwv');
+    // clean up
+    root.innerHTML = '';
+    // add divs
+    for (const divId of layout.getLayerGroupDivIds()) {
+      const layerDiv = document.createElement('div');
+      layerDiv.id = divId;
+      layerDiv.className = 'layerGroup';
+
+      root.appendChild(layerDiv);
+      root.appendChild(this.#getSlider(divId));
+    }
+  }
+
+  /**
+   * Add data view config for the input data.
+   *
+   * @param {string} dataId The data ID.
+   */
+  #addNewDataViewConfig(dataId) {
+    const configs = this.#getSelectedLayout().getViewConfigsByDataId(dataId);
+    const stgCtrl = this.#dwvAppService.getStageController();
+    for (const config of configs) {
+      stgCtrl.addDataViewConfig(dataId, config, false);
+    }
+  }
+
+  /**
+   * Setup file line.
+   */
+  #setupFileLine() {
+    // bind app to input files
+    const fileinput = document.getElementById('fileinput');
+    fileinput.addEventListener('change', (event) => {
+      const files = event.target.files;
+      if (files.length !== 0) {
+        this.#dwvAppService.loadFiles(files);
+      } else {
+        throw new Error('No files to load');
+      }
+    });
+  }
+
+  /**
+   * Update the position texts: the spatial one with index and value,
+   *   as '(index: 1,2,3) value: 3640', and, for images with several
+   *   volumes, the temporal one with the rescaled values of all volumes,
+   *   as 'Per EchoTime: (4.6 ms, 3640), (9.2 ms, 2000)'.
+   *
+   * @param {object} detail The position change event detail.
+   */
+  #updatePositionText(detail) {
+    const span = document.getElementById('positionspan');
+    if (span) {
+      let text = `(index: ${detail.value[0]})`;
+      if (detail.value.length > 2) {
+        text += ` value: ${detail.value[2]}`;
+      }
+      span.textContent = text;
+    }
+    const temporalSpan = document.getElementById('temporalpositionspan');
+    if (temporalSpan) {
+      temporalSpan.textContent =
+        this.#getPerVolumeText(detail.dataid, detail.value[1]) ?? '';
+    }
+  }
+
+  /**
+   * Get the rescaled values of all volumes at a position as text.
+   *
+   * @param {string} [dataId] The data id, defaults to the first data.
+   * @param {number[]} positionValues The world position values.
+   * @returns {string|undefined} The text, undefined if the image
+   *   is not complete or does not have several volumes.
+   */
+  #getPerVolumeText(dataId, positionValues) {
+    const dataCtrl = this.#dwvAppService.getDataController();
+    const data = dataCtrl.get(dataId ?? dataCtrl.getDataIds()[0]);
+    // skip while loading: the volumes of a partially loaded image
+    //   are not at their final buffer offsets
+    if (typeof data?.image === 'undefined' ||
+      !data.image.getComplete()) {
+      return undefined;
+    }
+    const volumeValues = data.image.getRescaledValuesAtPosition(
+      new Point(positionValues));
+    if (volumeValues.length < 2) {
+      return undefined;
+    }
+    // limit the number of displayed values
+    const maxValues = 10;
+    const texts = [];
+    for (const item of volumeValues.slice(0, maxValues)) {
+      // associated value if any, else the id
+      const volumeId = item.volumeId;
+      const display = volumeId.value ?? volumeId.id;
+      let id = `${display.value}`;
+      if (typeof display.unit !== 'undefined') {
+        id += `${i18n.t(display.unit) ?? display.unit}`;
+      }
+      const value = formatQuantificationValue(
+        item.pixValue.value, item.pixValue.unit);
+      texts.push(`(${id}, ${value})`);
+    }
+    if (volumeValues.length > maxValues) {
+      texts.push(`... (${volumeValues.length} volumes)`);
+    }
+    // the name of the displayed value
+    const firstId = volumeValues[0].volumeId;
+    const name = (firstId.value ?? firstId.id).source ?? 'volume';
+    return `Per ${name}: ${texts.join(', ')}`;
+  }
+
+  /**
+   * Setup position line.
+   */
+  #setupPositionLine() {
+    const positionInput = document.getElementById('position');
+    positionInput.addEventListener('change', (event) => {
+      // active view layer of the active layer group
+      const vl = this.#dwvAppService.getStageController()
+        .getActiveLayerGroup()?.getActiveViewLayer();
+      if (typeof vl === 'undefined') {
+        console.warn('No active view layer to set the position of');
+        return;
+      }
+      const vc = vl.getViewController();
+      const element = event.target;
+      const values = element.value.split(',');
+      const point = new Point(values.map(parseFloat));
+      vc.setCurrentPosition(point);
+    });
+  }
+
+  /**
+   * Setup layout line.
+   */
+  #setupLayoutLine() {
+    const resetViewsButton = document.getElementById('resetviews');
+    resetViewsButton.disabled = true;
+    resetViewsButton.addEventListener('click', () => {
+      this.#dwvAppService.getStageController().resetZoomPan();
+    });
+
+    const changeLayoutSelect = document.getElementById('changelayout');
+    changeLayoutSelect.disabled = true;
+    for (const layout of this.#layouts) {
+      const layoutId = layout.getId();
+      const option = document.createElement('option');
+      option.value = layoutId;
+      if (layoutId === this.#getSelectedLayout().getId()) {
+        option.selected = true;
+      }
+      option.appendChild(document.createTextNode(layoutId));
+      changeLayoutSelect.appendChild(option);
+    }
+    changeLayoutSelect.addEventListener('change', (event) => {
+      const selectElement = event.target;
+      const layoutId = selectElement.value;
+      const layoutIndex = this.#layouts.findIndex(
+        (elem) => elem.getId() === layoutId
+      );
+      if (layoutIndex === -1) {
+        throw new Error(`Unknown layout: ${layoutId}`);
+      } else {
+        this.#selectedLayoutIndex = layoutIndex;
+      }
+      const selectedLayout = this.#getSelectedLayout();
+
+      // add layer groups div
+      this.#addLayerGroupsDivs(selectedLayout);
+
+      // get configs
+      const dataCtrl = this.#dwvAppService.getDataController();
+      const dataIds = dataCtrl.getDataIds();
+      const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
+
+      // merge app configs for possible extras (like window level)
+      this.#mergeAppConfig(dataViewConfigs);
+
+      // clear data table
+      this.#dataTable.unRegisterViewListeners();
+      this.#dataTable.clearDataTable();
+
+      // update layout for data table
+      this.#dataTable.unRegisterLayerAddListeners();
+      this.#dataTable.registerLayerAddListeners(selectedLayout);
+
+      // set config (deletes previous layers)
+      const stgCtrl = this.#dwvAppService.getStageController();
+      stgCtrl.setDataViewConfigs(dataViewConfigs);
+
+      // render data (creates layers)
+      for (let i = 0; i < dataIds.length; ++i) {
+        stgCtrl.render(dataIds[i]);
+      }
+
+      // listen to view changes
+      this.#dataTable.registerViewListeners();
+
+      // need to set tool after config change
+      this.#setAppTool();
+    });
+
+    const smoothingChk = document.getElementById('changesmoothing');
+    smoothingChk.checked = false;
+    smoothingChk.disabled = true;
+    smoothingChk.addEventListener('change', (event) => {
+      const inputElement = event.target;
+      this.#dwvAppService.getStageController().setImageSmoothing(
+        inputElement.checked);
+    });
+  }
+
+  /**
+   * Resample the data of the first layer group with a rotation.
+   *
+   * @param {Matrix33} rotation The rotation matrix.
+   */
+  #rotateFirstData(rotation) {
+    const lg = this.#dwvAppService.getStageController().getLayerGroupByDivId(
+      'layerGroup0');
+    const dataId = lg.getBaseViewLayer().getDataId();
+    const image = this.#dwvAppService.getDataController().get(dataId).image;
+    const geometry = image.getGeometry();
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+    this.#dwvAppService.resample(dataId, newOrientation);
+  }
+
+  /**
+   * Setup rotate line.
+   */
+  #setupRotateLine() {
+    const dataCtrl = this.#dwvAppService.getDataController();
+    const stgCtrl = this.#dwvAppService.getStageController();
+
+    const angle = (Math.PI / 180) * 20;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotations = {
+      'rotate-x': new Matrix33([
+        1, 0, 0,
+        0, cos, -sin,
+        0, sin, cos
+      ]),
+      'rotate-y': new Matrix33([
+        cos, 0, -sin,
+        0, 1, 0,
+        sin, 0, cos
+      ]),
+      'rotate-z': new Matrix33([
+        cos, -sin, 0,
+        sin, cos, 0,
+        0, 0, 1
+      ])
+    };
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    for (const buttonId in rotations) {
+      const button = document.getElementById(buttonId);
+      button.disabled = true;
+      button.addEventListener('click', () => {
+        this.#rotateFirstData(rotations[buttonId]);
+      });
+    }
+
+    const rotateMatchButton = document.getElementById('rotate-match');
+    rotateMatchButton.disabled = true;
+    rotateMatchButton.addEventListener('click', () => {
+      const dataIds = dataCtrl.getDataIds();
+      if (dataIds.length < 2) {
+        console.log('Not enough datas to match geometries');
+        return;
+      }
+      // log geometries if resample is needed
+      const geometry0 = dataCtrl.get(dataIds[0]).image.getGeometry();
+      const geometry1 = dataCtrl.get(dataIds[1]).image.getGeometry();
+      if (!geometry0.getOrientation().equals(geometry1.getOrientation())) {
+        console.log('Resample match');
+        console.log('geometry0', geometry0.toString());
+        console.log('geometry1', geometry1.toString());
+      }
+      // resample match data 0 and 1
+      this.#dwvAppService.resampleMatch(dataIds[0], dataIds[1]);
+    });
+
+    const rotateResetButton = document.getElementById('rotate-reset');
+    rotateResetButton.disabled = true;
+    rotateResetButton.addEventListener('click', () => {
+      const lg = stgCtrl.getLayerGroupByDivId('layerGroup0');
+      const vl = lg.getBaseViewLayer();
+      const dataId = vl.getDataId();
+
+      this.#dwvAppService.revertResample(dataId);
+    });
+  }
+
+  /**
+   * Setup the binders checkboxes.
+   */
+  #setupBindersCheckboxes() {
+    const propList = [
+      'WindowLevel',
+      'Position',
+      'Zoom',
+      'Offset',
+      'Opacity',
+      'ColourMap',
+      'MaskView'
+    ];
+    const binders = [];
+    // add all binders at startup
+    for (let b = 0; b < propList.length; ++b) {
+      binders.push(`${propList[b]}Binder`);
+    }
+    this.#dwvAppService.setLayerGroupsBinders(binders);
+
+    const onBinderChange = (propName, checked) => {
+      const binderName = `${propName}Binder`;
+      if (checked) {
+        binders.push(binderName);
+      } else {
+        const index = binders.indexOf(binderName);
+        if (index !== -1) {
+          binders.splice(index, 1);
+        }
+      }
+      this.#dwvAppService.setLayerGroupsBinders(binders);
+    };
+
+    const fieldset = document.getElementById('binders');
+
+    // individual binders
+    for (let i = 0; i < propList.length; ++i) {
+      const propName = propList[i];
+
+      const input = document.createElement('input');
+      input.id = `binder-${i}`;
+      input.type = 'checkbox';
+      input.checked = true;
+      input.onchange = function () {
+        onBinderChange(propName, input.checked);
+      };
+
+      const label = document.createElement('label');
+      label.htmlFor = input.id;
+      label.appendChild(document.createTextNode(propName));
+
+      fieldset.appendChild(input);
+      fieldset.appendChild(label);
+    }
+
+    // check all
+    const allInput = document.createElement('input');
+    allInput.id = 'binder-all';
+    allInput.type = 'checkbox';
+    allInput.checked = true;
+    allInput.onchange = function () {
+      // align the individual binders on 'all' (click updates the app)
+      for (let j = 0; j < propList.length; ++j) {
+        const input = document.getElementById(`binder-${j}`);
+        if (input.checked !== allInput.checked) {
+          input.click();
+        }
+      }
+    };
+    const allLabel = document.createElement('label');
+    allLabel.htmlFor = allInput.id;
+    allLabel.appendChild(document.createTextNode('all'));
+    fieldset.appendChild(allInput);
+    fieldset.appendChild(allLabel);
+  }
+
+  /**
+   * Setup the tools buttons (first one selected) and
+   * the tool options div.
+   */
+  #setupToolsCheckboxes() {
+    const getKeyCheck = function (char, button) {
+      return function (event) {
+        // do not trigger while typing in a form field
+        const target = event.target;
+        const isFormField = target instanceof HTMLElement &&
+          (target.isContentEditable ||
+            ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+        if (isFormField) {
+          return;
+        }
+        if (!event.ctrlKey &&
+          !event.altKey &&
+          !event.shiftKey &&
+          event.key === char) {
+          button.click();
+        }
+      };
+    };
+
+    // shortcuts already in use ('a' aborts loads, see dwvAppService)
+    const usedShortcuts = ['a'];
+    /**
+     * Get the shortcut of a tool: the first letter of its name
+     *   that is not already used.
+     *
+     * @param {string} name The tool name.
+     * @returns {string|undefined} The shortcut, undefined if none
+     *   is available.
+     */
+    const getShortcut = function (name) {
+      const shortcut = Array.from(name.toLowerCase()).find(
+        (char) => char >= 'a' && char <= 'z' &&
+          !usedShortcuts.includes(char));
+      if (typeof shortcut !== 'undefined') {
+        usedShortcuts.push(shortcut);
+      }
+      return shortcut;
+    };
+
+    const fieldset = document.getElementById('tools');
+    const keys = Object.keys(this.#tools);
+    for (let i = 0; i < keys.length; ++i) {
+      const key = keys[i];
+
+      const button = document.createElement('button');
+      button.name = 'tools';
+      button.id = `tool-${i}`;
+      button.title = key;
+      button.appendChild(document.createTextNode(key));
+      button.onclick = () => {
+        this.#selectToolButton(button);
+        this.#setAppTool(key);
+      };
+
+      // select first one
+      if (i === 0) {
+        this.#selectToolButton(button);
+      }
+
+      // let the tool UI merge its own selection with the button
+      const featuresUI = this.#toolFeaturesUI[key];
+      if (typeof featuresUI?.getToolButtonHtml !== 'undefined') {
+        fieldset.appendChild(featuresUI.getToolButtonHtml(button));
+      } else {
+        fieldset.appendChild(button);
+      }
+
+      // keyboard shortcut (the title is the tool name, see
+      //   #getSelectedToolName)
+      const shortcut = getShortcut(key);
+      if (typeof shortcut !== 'undefined') {
+        button.setAttribute('aria-keyshortcuts', shortcut);
+        document.addEventListener('keydown', getKeyCheck(shortcut, button));
+      }
+    }
+
+    // tool options
+    const div = document.createElement('div');
+    div.id = 'toolOptions';
+    fieldset.appendChild(div);
+  }
+
+  /**
+   * Mark a tool button as selected, unselecting the others.
+   *
+   * @param {HTMLButtonElement} button The button to select.
+   */
+  #selectToolButton(button) {
+    const buttons = document.querySelectorAll('button[name="tools"]');
+    for (const item of buttons) {
+      item.classList.remove('selected');
+      item.setAttribute('aria-pressed', 'false');
+    }
+    button.classList.add('selected');
+    button.setAttribute('aria-pressed', 'true');
+  }
+
+  /**
+   * Set the app tool.
+   *
+   * @param {string} [toolName] The tool to set, defaults
+   *   to the selected one.
+   */
+  #setAppTool(toolName) {
+    // find the tool name if not provided
+    if (typeof toolName === 'undefined') {
+      toolName = this.#getSelectedToolName();
+      if (typeof toolName === 'undefined') {
+        console.warn('Cannot find tool to set the app with...');
+        return;
+      }
+    }
+
+    // set tool for app
+    this.#dwvAppService.setTool(toolName);
+
+    // force window level non strict mode
+    if (toolName === 'WindowLevel') {
+      this.#dwvAppService.setToolFeatures({
+        activeViewLayerOnly: false
+      });
+    }
+
+    // clear options html
+    const toolOptionsEl = document.getElementById('toolOptions');
+    if (toolOptionsEl !== null) {
+      toolOptionsEl.innerHTML = '';
+    }
+    // tool features
+    const featuresUI = this.#toolFeaturesUI[toolName];
+    if (toolOptionsEl !== null &&
+      typeof featuresUI !== 'undefined') {
+      // setup html
+      const featuresHtml = featuresUI.getHtml();
+      if (typeof featuresHtml !== 'undefined') {
+        toolOptionsEl.appendChild(featuresHtml);
+      }
+      // pass value to app
+      const features = featuresUI.getValue();
+      if (typeof features !== 'undefined') {
+        this.#dwvAppService.setToolFeatures(features);
+      }
+    }
+  }
+
+  /**
+   * Get the selected tool name.
+   *
+   * @returns {string|undefined} The tool name.
+   */
+  #getSelectedToolName() {
+    let res;
+    const element = document.querySelector('button[name="tools"].selected');
+    if (element) {
+      res = element.title;
+    }
+    return res;
+  }
+
+  /**
+   * Add the about line content.
+   *
+   * @param {string} version The dwv version.
+   */
+  #addAbout(version) {
+    const aboutDiv = document.getElementById('about');
+    const link = document.createElement('a');
+    link.href = 'https://github.com/ivmartel/dwv';
+    link.appendChild(document.createTextNode('dwv'));
+    const text = document.createTextNode(
+      ` v${version} on ${navigator.userAgent}`);
+
+    aboutDiv.appendChild(link);
+    aboutDiv.appendChild(text);
+  }
+}
+
+/**
+ * Merge a data config into the first input one.
+ * Copies all but the divId and orientation property.
+ *
+ * @param {ViewConfig} config The config where to merge.
+ * @param {ViewConfig} configToMerge The config to merge.
+ * @returns {ViewConfig} The updated config.
+ */
+function mergeConfigs(config, configToMerge) {
+  for (const key in configToMerge) {
+    if (key !== 'divId' &&
+      key !== 'orientation') {
+      config[key] = configToMerge[key];
+    }
+  }
+  return config;
+}
+
+/**
+ * Get a rounding function for a specific precision.
+ *
+ * @param {number} precision The rounding precision.
+ * @returns {Function} The rounding function.
+ */
+function getPrecisionRound(precision) {
+  return function (x) {
+    return precisionRound(x, precision);
+  };
+}

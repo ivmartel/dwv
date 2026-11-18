@@ -37,10 +37,9 @@ describe('utils', () => {
    */
   test('isEqualRgb', () => {
     const rgb00 = {r: 0, g: 0, b: 0};
-    let rgb01;
-    assert.ok(!isEqualRgb(rgb00, rgb01), 'equal undefined #0');
-    assert.ok(!isEqualRgb(rgb01, rgb00), 'equal undefined #1');
-    assert.ok(!isEqualRgb(rgb01, rgb01), 'equal undefined #2');
+    assert.ok(!isEqualRgb(rgb00, undefined), 'equal undefined #0');
+    assert.ok(!isEqualRgb(undefined, rgb00), 'equal undefined #1');
+    assert.ok(!isEqualRgb(undefined, undefined), 'equal undefined #2');
     const rgb02 = null;
     assert.ok(!isEqualRgb(rgb00, rgb02), 'equal null #0');
     assert.ok(!isEqualRgb(rgb02, rgb00), 'equal null #0');
@@ -146,7 +145,7 @@ describe('utils', () => {
    *
    * Ref: {@link https://www.easyrgb.com/en/convert.php}.
    *
-   * @function module:tests/utils~cielab-to-ciexyz
+   * @function module:tests/utils~cielabToCiexyz
    */
   test('cielab to ciexyz', () => {
     const lab00 = {l: 0, a: 0, b: 0};
@@ -167,7 +166,7 @@ describe('utils', () => {
    *
    * Ref: {@link https://www.easyrgb.com/en/convert.php}.
    *
-   * @function module:tests/utils~ciexyz-to-cielab
+   * @function module:tests/utils~ciexyzToCielab
    */
   test('ciexyz to cielab', () => {
     const xyz00 = {x: 0, y: 0, z: 0};
@@ -188,7 +187,7 @@ describe('utils', () => {
    *
    * Ref: {@link https://www.easyrgb.com/en/convert.php}.
    *
-   * @function module:tests/utils~ciexyz-to-srgb
+   * @function module:tests/utils~ciexyzToSrgb
    */
   test('ciexyz to srgb', () => {
     const xyz00 = {x: 0, y: 0, z: 0};
@@ -209,7 +208,7 @@ describe('utils', () => {
    *
    * Ref: {@link https://www.easyrgb.com/en/convert.php}.
    *
-   * @function module:tests/utils~srgb-to-ciexyz
+   * @function module:tests/utils~srgbToCiexyz
    */
   test('srgb to ciexyz', () => {
     const rgb00 = {r: 0, g: 0, b: 0};
@@ -231,7 +230,7 @@ describe('utils', () => {
    *
    * Ref: {@link https://www.easyrgb.com/en/convert.php}.
    *
-   * @function module:tests/utils~cielab-to-rgb
+   * @function module:tests/utils~cielabToRgb
    */
   test('cielab to rgb', () => {
     const lab00 = {l: 0, a: 0, b: 0};
@@ -252,7 +251,7 @@ describe('utils', () => {
    *
    * Ref: {@link https://www.easyrgb.com/en/convert.php}.
    *
-   * @function module:tests/utils~srgb-to-cielab
+   * @function module:tests/utils~srgbToCielab
    */
   test('srgb to cielab', () => {
     const rgb00 = {r: 0, g: 0, b: 0};

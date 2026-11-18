@@ -27,7 +27,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate3D} undefined.
      *
-     * @function module:tests/dicom~spatialcoordinate3d-undefined
+     * @function module:tests/dicom~spatialcoordinate3dUndefined
      */
     test('undefined', () => {
       const coord = new SpatialCoordinate3D();
@@ -40,7 +40,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate3D} toString.
      *
-     * @function module:tests/dicom~spatialcoordinate3d-tostring
+     * @function module:tests/dicom~spatialcoordinate3dTostring
      */
     test('toString', () => {
       const coord = new SpatialCoordinate3D();
@@ -54,7 +54,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate3D} toString multiple.
      *
-     * @function module:tests/dicom~spatialcoordinate3d-tostring-multiple
+     * @function module:tests/dicom~spatialcoordinate3dTostringMultiple
      */
     test('toString multiple', () => {
       const coord = new SpatialCoordinate3D();
@@ -68,7 +68,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate3D} toString empty.
      *
-     * @function module:tests/dicom~spatialcoordinate3d-tostring-empty
+     * @function module:tests/dicom~spatialcoordinate3dTostringEmpty
      */
     test('toString empty', () => {
       const coord = new SpatialCoordinate3D();
@@ -82,7 +82,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate3D} round trip.
      *
-     * @function module:tests/dicom~spatialcoordinate3d-round-trip
+     * @function module:tests/dicom~spatialcoordinate3dRoundTrip
      */
     test('round trip',
       () => {
@@ -139,7 +139,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate3D}.
      *
-     * @function module:tests/dicom~getspatialcoordinate3d-good-input
+     * @function module:tests/dicom~getspatialcoordinate3dGoodInput
      */
     test('good input', () => {
       const deGraphicData = new DataElement('OD');
@@ -172,7 +172,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate3D} with only graphic type and data.
      *
-     * @function module:tests/dicom~getspatialcoordinate3d-only-graphic
+     * @function module:tests/dicom~getspatialcoordinate3dOnlyGraphic
      */
     test('only graphic', () => {
       const deGraphicData = new DataElement('OD');
@@ -197,7 +197,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate3D} with mulitple values.
      *
-     * @function module:tests/dicom~getspatialcoordinate3d-multiple
+     * @function module:tests/dicom~getspatialcoordinate3dMultiple
      */
     test('multiple', () => {
       const deGraphicData = new DataElement('OD');
@@ -224,7 +224,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate3D} with only frame reference UID.
      *
-     * @function module:tests/dicom~getspatialcoordinate3d-only-frame
+     * @function module:tests/dicom~getspatialcoordinate3dOnlyFrame
      */
     test('only frame', () => {
       const deFrameUID = new DataElement('UI');
@@ -245,7 +245,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate3D} with only fiducial UID.
      *
-     * @function module:tests/dicom~getspatialcoordinate3d-only-fiducial
+     * @function module:tests/dicom~getspatialcoordinate3dOnlyFiducial
      */
     test('only fiducial', () => {
       const deFiducialUID = new DataElement('UI');
@@ -266,7 +266,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate3D} empty.
      *
-     * @function module:tests/dicom~getspatialcoordinate3d-empty
+     * @function module:tests/dicom~getspatialcoordinate3dEmpty
      */
     test('empty', () => {
       const result = getSpatialCoordinate3D({});
@@ -280,7 +280,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate3D} uses first graphic.
      *
-     * @function module:tests/dicom~getspatialcoordinate3d-first-graphic
+     * @function module:tests/dicom~getspatialcoordinate3dFirstGraphic
      */
     test('first graphic', () => {
       const deGraphicType = new DataElement('CS');
@@ -302,7 +302,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSpatialCoordinate3DItem}.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinate3ditem-good
+     * @function module:tests/dicom~getdicomspatialcoordinate3ditemGood
      */
     test('good', () => {
       const coord = new SpatialCoordinate3D();
@@ -322,7 +322,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSpatialCoordinate3DItem} only graphic.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinate3ditem-only-graphic
+     * @function module:tests/dicom~getdicomspatialcoordinate3ditemOnlyGraphic
      */
     test('only graphic', () => {
       const coord = new SpatialCoordinate3D();
@@ -340,7 +340,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSpatialCoordinate3DItem} undefined.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinate3ditem-undefined
+     * @function module:tests/dicom~getdicomspatialcoordinate3ditemUndefined
      */
     test('undefined', () => {
       const coord = new SpatialCoordinate3D();
@@ -358,7 +358,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSpatialCoordinate3DItem} empty.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinate3ditem-empty
+     * @function module:tests/dicom~getdicomspatialcoordinate3ditemEmpty
      */
     test('empty', () => {
       const coord = new SpatialCoordinate3D();
@@ -371,7 +371,7 @@ describe('dicom', () => {
      * Tests for {@link getDicomSpatialCoordinate3DItem}
      * preserves graphic array.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinate3ditem-graphic-arr
+     * @function module:tests/dicom~getdicomspatialcoordinate3ditemGraphicArr
      */
     test('graphic arr', () => {
       const coord = new SpatialCoordinate3D();

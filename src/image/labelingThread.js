@@ -1,32 +1,21 @@
 import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Geometry} from './geometry.js';
-/* eslint-enable no-unused-vars */
-
 /**
- * List of compatible typed arrays.
- *
- * @typedef {(
- *   Uint8Array | Int8Array |
- *   Uint16Array | Int16Array |
- *   Uint32Array | Int32Array
- * )} TypedArray
+ * @import {Geometry} from './geometry.js';
+ * @import {Size} from './size.js';
+ * @import {Spacing} from './spacing.js';
+ * @import {TypedArray} from '../math/types.js';
  */
 
 /**
- * Generate a worker message to send to the labeling worker.
+ * Generate a worker message with geometry metadata only.
  *
- * @param {TypedArray} imageBuffer The buffer to label.
- * @param {Geometry} imageGeometry The image geometry.
+ * @param {Size} imageSize The image size.
+ * @param {Spacing} imageSpacing The image spacing.
  *
- * @returns {object} The message to send to the worker.
+ * @returns {object} The geometry part of a worker message.
  */
-export function generateWorkerMessage(imageBuffer, imageGeometry) {
-  const imageSize = imageGeometry.getSize();
-  const imageSpacing = imageGeometry.getSpacing();
-
+export function generateGeometryMessage(imageSize, imageSpacing) {
   // We can't pass these metadata objects directly, so we will just
   // pull out what we need and pass that.
   const ndims = imageSize.length();
@@ -42,24 +31,36 @@ export function generateWorkerMessage(imageBuffer, imageGeometry) {
     sizes[d] = imageSize.get(d);
   }
 
-  const totalSize = imageSize.getTotalSize();
-
   return {
-    imageBuffer: imageBuffer,
-    unitVectors: unitVectors,
-    sizes: sizes,
+    unitVectors,
+    sizes,
     spacing: imageSpacing.getValues(),
-    totalSize: totalSize
+    totalSize: imageSize.getTotalSize()
   };
 }
+
+/**
+ * Generate a worker message to send to the labeling worker.
+ *
+ * @param {TypedArray} imageBuffer The buffer to label.
+ * @param {Geometry} imageGeometry The image geometry.
+ *
+ * @returns {object} The message to send to the worker.
+ */
+export function generateWorkerMessage(imageBuffer, imageGeometry) {
+  return {
+    imageBuffer,
+    ...generateGeometryMessage(
+      imageGeometry.getSize(), imageGeometry.getSpacing()
+    )
+  };
+}
+
 
 /**
  * Labeling worker task.
  */
 class LabelingWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
   getWorker() {
     return new Worker(
       new URL('./labeling.worker.js', import.meta.url),
@@ -79,7 +80,7 @@ export class LabelingThread {
    *
    * @type {ThreadPool}
    */
-  #threadPool = new ThreadPool(1);
+  #threadPool = new ThreadPool(5);
 
   constructor() {
     this.#threadPool.onerror = ((e) => {
@@ -97,6 +98,7 @@ export class LabelingThread {
     // We can't just pass in an Image or we would get a circular dependency
 
     this.#threadPool.onworkitem = this.ondone;
+    this.#threadPool.onwork = () => {};
 
     const workerTask = new LabelingWorkerTask(
       generateWorkerMessage(imageBuffer, geometry),
@@ -105,6 +107,46 @@ export class LabelingThread {
 
     // add it the queue and run it
     this.#threadPool.addWorkerTask(workerTask);
+  }
+
+  /**
+   * Trigger a labels recalculation for overlapping segments.
+   * Spawns one worker task per segment for parallel execution.
+   *
+   * @param {Array.<{segNumber: number, size: Size,
+   *   slices: Array.<{sliceIndex: number, data: Uint8Array}>,
+   *   minSlice: number}>} segments Per-segment raw slice
+   *   data with local (0-based) slice indices and the global minSlice offset.
+   * @param {Geometry} geometry The full image geometry.
+   */
+  runOverlap(segments, geometry) {
+    const allLabels = [];
+    const minSliceBySegNumber = new Map(
+      segments.map(({segNumber, minSlice}) => [segNumber, minSlice ?? 0])
+    );
+
+    this.#threadPool.onworkitem = (event) => {
+      for (const label of event.data.labels) {
+        const sliceOffset = minSliceBySegNumber.get(label.id) ?? 0;
+        label.centroidIndex[2] += sliceOffset;
+        label.largestSliceZ += sliceOffset;
+        label.minZ += sliceOffset;
+        label.maxZ += sliceOffset;
+      }
+      allLabels.push(...event.data.labels);
+    };
+    this.#threadPool.onwork = () => {
+      this.ondone({data: {labels: allLabels}});
+    };
+
+    for (const {segNumber, size, slices} of segments) {
+      const geoMsg = generateGeometryMessage(size, geometry.getSpacing());
+
+      this.#threadPool.addWorkerTask(new LabelingWorkerTask(
+        {segmentSlice: {segNumber, slices}, ...geoMsg},
+        {}
+      ));
+    }
   }
 
   /**

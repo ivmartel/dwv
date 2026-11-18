@@ -3,11 +3,11 @@ import {
   getDicomCodeItem
 } from './dicomCode.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-import {DicomCode} from './dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {DicomCode} from './dicomCode.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -23,7 +23,7 @@ const TagKeys = {
 /**
  * DICOM measured value: property of a numeric measurement.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.html#table_C.18.1-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.html#table_C.18.1-1}.
  */
 export class MeasuredValue {
   /**
@@ -57,8 +57,8 @@ export class MeasuredValue {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.numericValue + ' ' +
-      this.measurementUnitsCode.toString();
+    return `${this.numericValue} ${
+      this.measurementUnitsCode.toString()}`;
   };
 
 };
@@ -66,7 +66,7 @@ export class MeasuredValue {
 /**
  * Get a measured value object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {MeasuredValue} A measured value object.
  */
 export function getMeasuredValue(dataElements) {
@@ -101,10 +101,11 @@ export function getMeasuredValue(dataElements) {
  * Get a simple dicom element item from a measured value object.
  *
  * @param {MeasuredValue} value The measured value object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomMeasuredValueItem(value) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleTagValues} */
   const item = {};
 
   if (typeof value.measurementUnitsCode !== 'undefined') {

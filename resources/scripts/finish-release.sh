@@ -11,7 +11,6 @@ usage() {
   echo -e "  -r The release version, format 'm.n.p'"
   echo -e "  -n The next version, format 'm.n.p'"
   echo -e "  -s The step at which to start (optional, [1,4])"
-  echo -e "Warning: the command needs to be run from the root of the repository."
   echo -e "Example:"
   echo -e "> finish-release -r 0.28.0 -n 0.29.0"
   echo ""
@@ -58,8 +57,27 @@ then
    error "Empty next version";
    usage
 fi
+versionRegex="^[0-9]+\.[0-9]+\.[0-9]+$"
+if [[ ! "$releaseVersion" =~ $versionRegex ]]
+then
+   error "Bad release version format: '$releaseVersion'";
+   usage
+fi
+if [[ ! "$nextVersion" =~ $versionRegex ]]
+then
+   error "Bad next version format: '$nextVersion'";
+   usage
+fi
+if [[ ! "$step" =~ ^[1-4]$ ]]
+then
+   error "Bad step: '$step'";
+   usage
+fi
 
 info "Finishing release for '$releaseVersion' with next version '$nextVersion'..."
+
+# run from the root of the repository
+cd "$(git rev-parse --show-toplevel)"
 
 # branch name
 releaseBranch="v${releaseVersion}"
@@ -69,6 +87,13 @@ if [ $step -eq 1 ]
 then
   info "(1/4) commit prepared changes"
 
+  # check the current branch is the release one
+  currentBranch=$(git branch --show-current)
+  if [ "$currentBranch" != "$releaseBranch" ]
+  then
+    error "Not on the release branch '$releaseBranch' but on '$currentBranch'"
+    exit 1
+  fi
   git commit -a -m "Release ${releaseBranch}"
 
   ((step++))
@@ -77,9 +102,10 @@ fi
 ###################
 if [ $step -eq 2 ]
 then
-  info "2/4 udpate master branch"
+  info "(2/4) update master branch"
 
   git checkout master
+  git pull
   # merge release into master
   git merge --no-ff $releaseBranch
   # push master
@@ -91,9 +117,10 @@ fi
 ###################
 if [ $step -eq 3 ]
 then
-  info "3/4 update develop branch"
+  info "(3/4) update develop branch"
 
   git checkout develop
+  git pull
   # merge release into develop
   git merge --no-ff $releaseBranch
   # update version number in files
@@ -103,9 +130,6 @@ then
   a1="  return '[0-9]+\.[0-9]+\.[0-9]+';"
   b1="  return '${nextVersion}-beta.0';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
-  a2="[0-9]+\.[0-9]+\.[0-9]+"
-  b2="${nextVersion}-beta.0"
-  sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
   # commit
   git commit -a -m "Bumped version number to v${nextVersion}-beta.0"
   # push develop
@@ -117,7 +141,7 @@ fi
 ###################
 if [ $step -eq 4 ]
 then
-  info "4/4 clean up"
+  info "(4/4) clean up"
 
   git branch -d $releaseBranch
 

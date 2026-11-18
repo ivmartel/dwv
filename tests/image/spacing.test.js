@@ -10,7 +10,7 @@ describe('image', () => {
   /**
    * Tests for {@link Spacing}.
    *
-   * @function module:tests/image~spacing-class
+   * @function module:tests/image~spacingClass
    */
   test('Spacing class', () => {
     // bad input

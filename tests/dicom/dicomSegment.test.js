@@ -5,14 +5,15 @@ import {
   getSegment,
   getDicomSegmentItem
 } from '../../src/dicom/dicomSegment.js';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
+import {
+  getElementsFromSimpleTagValues
+} from '../../src/dicom/simpleTagValues.js';
 import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../../src/dicom/dataElement.js';
-import {DicomCode} from '../../src/dicom/dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../../src/dicom/dataElement.js';
+ * @import {DicomCode} from '../../src/dicom/dicomCode.js';
+ */
 
 /**
  * Tests for the 'dicom/dicomSegment.js' file.
@@ -23,7 +24,7 @@ describe('dicom', () => {
   /**
    * Get a dicom code from simple dicom elements.
    *
-   * @param {Object<string, DataElement>} simpleElements DICOM simple elements.
+   * @param {Record<string, DataElement>} simpleElements DICOM simple elements.
    * @returns {DicomCode} The corresponding DICOM code.
    */
   function getCodeFromSimpleDicom(simpleElements) {
@@ -65,21 +66,22 @@ describe('dicom', () => {
         segmentSimpleElements.SegmentedPropertyTypeCodeSequence.value[0]),
     };
     assert.ok(isEqualSegment(segment1, segment),
-      testName + ' segment from simple element');
+      `${testName} segment from simple element`);
 
     // simple dicom element -> dicom element
-    const segmentElements = getElementsFromJSONTags(segmentSimpleElements);
+    const segmentElements =
+      getElementsFromSimpleTagValues(segmentSimpleElements);
     // dicom element -> segment
     const segment2 = getSegment(segmentElements);
     // compare
     assert.ok(isEqualSegment(segment2, segment),
-      testName + ' segment from element');
+      `${testName} segment from element`);
   }
 
   /**
    * Tests for {@link MaskSegment} using simple DICOM data.
    *
-   * @function module:tests/dicom~dicom-segment-class
+   * @function module:tests/dicom~dicomSegmentClass
    */
   test('DICOM segment class', () => {
     const number0 = 0;

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DICOM dump diff</title>
+<meta charset="UTF-8">
+<link rel="icon" href="../../favicon.ico"/>
+<link rel="stylesheet"
+  href="../../../node_modules/diff2html/bundles/css/diff2html.min.css">
+<style>
+body { font-family: Arial, Helvetica, sans-serif; }
+fieldset { background: whitesmoke; border: 1px solid grey; }
+#output { margin-top: 10px; }
+</style>
+</head>
+
+<body>
+
+<h1>DWV DICOM dump diff</h1>
+
+<p>Load two DICOM files: they will be parsed, their tags dumped as text
+and the two dumps compared side by side.</p>
+
+<fieldset>
+<label for="infile0">DICOM file 1: </label>
+<input id="infile0" type="file" name="file0">
+<br>&nbsp;
+<br><label for="infile1">DICOM file 2: </label>
+<input id="infile1" type="file" name="file1">
+</fieldset>
+
+<div id="output"></div>
+
+</body>
+</html>

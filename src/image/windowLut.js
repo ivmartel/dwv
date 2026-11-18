@@ -1,8 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ModalityLut} from './modalityLut.js';
-import {VoiLut} from './voiLut.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ModalityLut} from './modalityLut.js';
+ * @import {VoiLut} from './voiLut.js';
+ */
 
 /**
  * Window LUT class: combines a modality LUT and a VOI LUT.
@@ -55,8 +54,14 @@ export class WindowLut {
   constructor(modalityLut, isSigned, isDiscrete) {
     this.#modalityLut = modalityLut;
 
-    if (isSigned) {
-      const size = this.#modalityLut.getLength();
+    if (isDiscrete &&
+      typeof this.#modalityLut.getLength() === 'undefined') {
+      throw new Error('Cannot create window LUT without LUT length');
+    }
+
+    // signed shift is only needed to index a LUT
+    const size = this.#modalityLut.getLength();
+    if (isSigned && typeof size !== 'undefined') {
       this.#signedShift = size / 2;
     } else {
       this.#signedShift = 0;
@@ -120,9 +125,8 @@ export class WindowLut {
   getValue(offset) {
     if (this.#isDiscrete) {
       return this.#lut[offset + this.#signedShift];
-    } else {
-      return Math.floor(this.#voiLut.apply(offset + this.#signedShift));
     }
+    return Math.floor(this.#voiLut.apply(offset + this.#signedShift));
   }
 
 } // class WindowLut

@@ -1,30 +1,42 @@
-import {ListenerHandler} from '../utils/listen.js';
 import {mergeObjects} from '../utils/operator.js';
+import {
+  getFrameElements,
+  getFramesElements
+} from '../dicom/dicomFunctionalGroup.js';
 import {MaskFactory} from '../image/maskFactory.js';
 import {ImageFactory} from '../image/imageFactory.js';
 import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
+import {RtStructFactory} from '../image/rtStructFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
 import {safeGet} from '../dicom/dataElement.js';
 import {
   getVolumeIdTagValue,
-  getPostLoadVolumeIdTagValue
+  getVolumeValues,
+  guessVolumeIndices
 } from '../dicom/dicomVolume.js';
-import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
-import {getReferencedSeriesUID} from '../dicom/dicomImage.js';
+import {
+  getAllPixelDataTagKeys,
+  hasAnyPixelDataElement
+} from '../dicom/dicomTag.js';
+import {
+  getReferencedSeriesUID,
+  getReferencedSeriesUIDFromRTStruct
+} from '../dicom/dicomImage.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from '../image/image.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {AnnotationGroup} from '../image/annotationGroup.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from '../image/image.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {AnnotationGroup} from '../image/annotationGroup.js';
+ * @import {VolumeId} from '../image/types.js';
+ */
 
 /**
  * Related DICOM tag keys.
  */
 const TagKeys = {
-  Modality: '00080060'
+  Modality: '00080060',
+  SOPInstanceUID: '00080018'
 };
 
 /**
@@ -42,28 +54,30 @@ export const dataEventNames = [
 /**
  * Merge meta datas.
  *
- * @param {Object<string, DataElement>} meta0 The first data to merge.
- * @param {Object<string, DataElement>} meta1 The second data to merge.
- * @param {string} meta1Id A meta1 specific id.
- * @returns {Object<string, DataElement>} The merged data.
+ * @param {Record<string, DataElement>} meta0 The first data to merge.
+ * @param {Record<string, DataElement>} meta1 The second data to merge.
+ * @param {Function} [secondIdGetter] Function `(meta) => number|undefined`
+ * called on each raw (not yet merged) meta to get its second id, added
+ * as a suffix to disambiguate metas that would otherwise share the
+ * same base id.
+ * @returns {Record<string, DataElement>} The merged data.
  */
-function mergeMeta(meta0, meta1, meta1Id) {
+function mergeMeta(meta0, meta1, secondIdGetter) {
   // update meta data
-  let idKey = '';
+  let idKey;
   if (typeof meta1['00020010'] !== 'undefined') {
     // dicom case, use 'InstanceNumber'
     idKey = '00200013';
   } else {
     idKey = 'imageUid';
   }
-  // possible time suffix
   // merge
   return mergeObjects(
     meta0,
     meta1,
     idKey,
     'value',
-    meta1Id
+    secondIdGetter
   );
 }
 
@@ -74,7 +88,7 @@ export class DicomData {
   /**
    * DICOM meta data.
    *
-   * @type {Object<string, DataElement>}
+   * @type {Record<string, DataElement>}
    */
   meta;
 
@@ -85,7 +99,7 @@ export class DicomData {
    */
   image;
   /**
-   * Annotattion group extracted from meta data.
+   * Annotation group extracted from meta data.
    *
    * @type {AnnotationGroup|undefined}
    */
@@ -99,11 +113,21 @@ export class DicomData {
   buffer;
 
   /**
-   * Number of files/urls associated to the data.
+   * Number of load items (files, urls, buffers...) associated
+   * to the data.
    *
    * @type {number}
    */
-  numberOfFiles;
+  numberOfItems;
+
+  /**
+   * Frame number, set when the buffer only contains one frame
+   * of a multi-frame data: frames are sent one by one and assembled
+   * by the image (see Image.appendSlice).
+   *
+   * @type {number|undefined}
+   */
+  frameNumber;
 
   /**
    * List of data creation warning.
@@ -122,7 +146,7 @@ export class DicomData {
   #hasDuplicateOrigin = false;
 
   /**
-   * @param {Object<string, DataElement>} meta The DICOM meta data.
+   * @param {Record<string, DataElement>} meta The DICOM meta data.
    */
   constructor(meta) {
     this.meta = meta;
@@ -162,7 +186,7 @@ export class DicomData {
   }
 
   /**
-   * Append slice and update meta data.
+   * Append data and update meta data.
    *
    * @param {DicomData} data The data to append.
    */
@@ -171,28 +195,40 @@ export class DicomData {
     // if there was, then the image must be created when
     // the load finishes via a DicomSliceDataList.buildImage
     if (!this.#hasDuplicateOrigin) {
-      // append slice to current image
+      // frames of an already appended file share its meta:
+      // only merge the meta of new files
+      let isNewFile = true;
+      if (typeof data.frameNumber !== 'undefined' &&
+        typeof this.image !== 'undefined') {
+        const sopInstanceUid = safeGet(data.meta, TagKeys.SOPInstanceUID);
+        isNewFile = !this.image.includesImageUid(sopInstanceUid);
+      }
+
+      // append image to current image
       if (typeof this.image !== 'undefined' &&
         typeof data.image !== 'undefined'
       ) {
-        this.#appendSlice(data.image);
+        this.#appendImage(data.image);
       }
 
-      this.#mergeMeta(data.meta);
+      if (isNewFile) {
+        this.#mergeMeta(data.meta);
+      }
     }
   }
 
   /**
-   * Append a slice image to this image.
+   * Append an image to this image.
    *
    * @param {Image} image The image to append.
    */
-  #appendSlice(image) {
+  #appendImage(image) {
+    const geom1 = image.getGeometry();
+
     // check if append is possible
     const geom0 = this.image.getGeometry();
-    const geom1 = image.getGeometry();
     const canAppend = geom0.canAppendOrigin(
-      geom1.getOrigin(), geom1.getInitialTime());
+      geom1.getOrigin(), geom1.getInitialTime()?.id.value);
 
     // store result if not possible to stop future appends
     if (!canAppend.success) {
@@ -208,15 +244,10 @@ export class DicomData {
   /**
    * Merge meta data to this meta.
    *
-   * @param {Object<string, DataElement>} meta The data to merge.
+   * @param {Record<string, DataElement>} meta The data to merge.
    */
   #mergeMeta(meta) {
-    const meta1IdNum = getVolumeIdTagValue(meta);
-    let meta1Id;
-    if (typeof meta1IdNum !== 'undefined') {
-      meta1Id = meta1IdNum.toString();
-    }
-    this.meta = mergeMeta(this.meta, meta, meta1Id);
+    this.meta = mergeMeta(this.meta, meta, getVolumeIdTagValue);
   }
 }
 
@@ -231,13 +262,24 @@ export class DicomSliceDataList {
   #list = [];
 
   /**
-   * Add a clone of the input data to the local list.
+   * Add a clone of the input data to the local list. The pixel
+   * data is not cloned: the image is already created and the meta
+   * of frames includes the pixel data of the full file.
    *
    * @param {DicomData} data The data to clone and add.
    */
   addClone(data) {
-    const clone = new DicomData(structuredClone(data.meta));
+    const pixelDataKeys = getAllPixelDataTagKeys();
+    /** @type {Record<string, DataElement>} */
+    const meta = {};
+    for (const key of Object.keys(data.meta)) {
+      if (!pixelDataKeys.includes(key)) {
+        meta[key] = data.meta[key];
+      }
+    }
+    const clone = new DicomData(structuredClone(meta));
     clone.image = data.image.clone();
+    clone.frameNumber = data.frameNumber;
     this.add(clone);
   }
 
@@ -251,26 +293,44 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Build a data from the stored slice data.
+   * Get the DICOM tags of each stored data. Frames share their file
+   * meta: the frame tags are used so that per-frame getters return
+   * the frame value.
+   *
+   * @returns {Array<Record<string, DataElement>>} The DICOM tags.
+   */
+  getElementsList() {
+    return this.#list.map(data =>
+      typeof data.frameNumber !== 'undefined'
+        ? getFrameElements(data.meta, data.frameNumber)
+        : data.meta);
+  }
+
+  /**
+   * Build a data from the stored slice data. The items can be
+   * single frame files or frames of multi-frame files.
    *
    * @returns {{image, meta}} The result data.
    */
   buildData() {
-    // get and check the number of volumes
-    const numberOfVolumes = this.#getNumberOfVolumes();
-    if (typeof numberOfVolumes === 'undefined') {
-      throw new Error('Non constant number of volumes');
+    const originList = this.#getOriginList();
+
+    // get and check the number of slices per volumes
+    const numberOfSlicesPerVolumes =
+      this.#getNumberOfSlicesPerVolumes(originList);
+    if (typeof numberOfSlicesPerVolumes === 'undefined') {
+      throw new Error('Non constant number of slices per volumes');
     }
-    if (numberOfVolumes === 0) {
+    if (numberOfSlicesPerVolumes === 0) {
       throw new Error('Duplicate origins but no volumes');
     }
-    if (numberOfVolumes === 1) {
-      throw new Error('Duplicate origins but just one volume');
+    if (numberOfSlicesPerVolumes === 1) {
+      throw new Error('Duplicate origins but just one slice per volume');
     }
 
-    // get indices per volumes
-    const volsIndices = this.#getVolumesIndices(
-      numberOfVolumes, getPostLoadVolumeIdTagValue);
+    // guess the volume id tag and get indices per volumes
+    const {volsIndices, volumeIds, volumeIndexGetter} =
+      this.#guessVolumesIndices(originList);
 
     if (typeof volsIndices === 'undefined') {
       throw new Error('Cannot create image for multi-volume');
@@ -282,20 +342,24 @@ export class DicomSliceDataList {
     for (let i = 0; i < volsIndices.length; ++i) {
       const indices = volsIndices[i];
       // meta
-      // TODO fix slow when in indices loop
-      const sliceMeta = this.#list[indices[0]].meta;
+      // intentionally limited to first items,
+      // merged object is too big and slow when it contains
+      // all the info
+      // frames share their file meta: use the frame tags so that
+      // the volume index getter returns the frame value
+      const firstData = this.#list[indices[0]];
+      const sliceMeta = typeof firstData.frameNumber !== 'undefined'
+        ? getFrameElements(firstData.meta, firstData.frameNumber)
+        : firstData.meta;
       if (typeof meta === 'undefined') {
         meta = sliceMeta;
       } else {
-        const sliceMetaId = i + ':' +
-          getPostLoadVolumeIdTagValue(sliceMeta);
-        meta = mergeMeta(
-          meta, sliceMeta, sliceMetaId);
+        meta = mergeMeta(meta, sliceMeta, volumeIndexGetter);
       }
       // image
       for (const index of indices) {
         const sliceImage = this.#list[index].image;
-        sliceImage.getGeometry().setInitialTime(i);
+        sliceImage.getGeometry().setInitialTime(volumeIds[i]);
         if (typeof image === 'undefined') {
           image = sliceImage;
         } else {
@@ -307,74 +371,65 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Get the list of indices per volume.
+   * Guess the volume id getter and derive the indices per volume
+   * from it (see dicomVolume guessVolumeIndices).
    *
-   * @param {number} numberOfVolumes The number of expected volumes.
-   * @param {Function} volumeIndexGetter A function to get the volume index from
-   *   meta data.
-   * @returns {number[][]|undefined} List of indices per volume or
-   *   undefined if something went wrong.
+   * @param {object[]} originList The list of origins and their
+   *   occurences, as returned by #getOriginList.
+   * @returns {{volsIndices: number[][]|undefined,
+   *   volumeIds: VolumeId[]|undefined,
+   *   volumeIndexGetter: Function|undefined}} The indices per volume,
+   *   the id of each volume and the volume id getter that
+   *   produced them, all undefined if no candidate worked.
    */
-  #getVolumesIndices(numberOfVolumes, volumeIndexGetter) {
-    const originList = this.#getOriginList();
-    const volumesIndices = [];
-    const volIndexValues = [];
+  #guessVolumesIndices(originList) {
+    // slice index of each data
+    const sliceIndices = [];
+    for (let i = 0; i < originList.length; ++i) {
+      for (const index of originList[i].indices) {
+        sliceIndices[index] = i;
+      }
+    }
+    const elementsList = this.getElementsList();
+    const guess = guessVolumeIndices(
+      elementsList, sliceIndices, originList.length);
+    if (typeof guess === 'undefined') {
+      return {
+        volsIndices: undefined,
+        volumeIds: undefined,
+        volumeIndexGetter: undefined
+      };
+    }
+
+    // data indices per volume, in origin list order
+    const volsIndices = [];
+    const volumeIds = [];
     for (const item of originList) {
-      // build volume index list
-      if (volIndexValues.length === 0) {
-        for (const index of item.indices) {
-          const relData = this.#list[index];
-          const volumeIndex = volumeIndexGetter(relData.meta);
-          if (volIndexValues.includes(volumeIndex)) {
-            // duplicate volume index
-            return;
-          } else {
-            volIndexValues.push(volumeIndex);
-          }
-        }
-        if (volIndexValues.length !== numberOfVolumes) {
-          // too many indices
-          return;
-        }
-        volIndexValues.sort();
-      }
-      // add indices to volume indices
       for (const index of item.indices) {
-        const relData = this.#list[index];
-        const volumeIndex = volumeIndexGetter(relData.meta);
-        const volIndex = volIndexValues.indexOf(volumeIndex);
-        if (volIndex === -1) {
-          // unknown index
-          return;
+        const volIndex = guess.volumeIndices[index];
+        if (typeof volsIndices[volIndex] === 'undefined') {
+          volsIndices[volIndex] = [];
+          volumeIds[volIndex] = guess.volumeIds[index];
         }
-        // add data index to volume indices
-        if (typeof volumesIndices[volIndex] === 'undefined') {
-          volumesIndices[volIndex] = [];
-        }
-        volumesIndices[volIndex].push(index);
+        volsIndices[volIndex].push(index);
       }
     }
-
-    // check same size
-    const numberOfSlices = originList.length;
-    for (const list of volumesIndices) {
-      if (list.length !== numberOfSlices) {
-        // wrong number of slices
-        return;
-      }
-    }
-
-    return volumesIndices;
+    return {
+      volsIndices,
+      volumeIds,
+      volumeIndexGetter: guess.getter
+    };
   }
 
   /**
-   * Get the number of volumes of a data.
+   * Get the number of slices per volumes of a data.
    *
-   * @returns {number|undefined} The number of volumes or
-   *   undefined if non constant.
+   * @param {object[]} originList The list of origins and their
+   *   occurences, as returned by #getOriginList.
+   * @returns {number|undefined} The number of slices per volumes or
+   *   undefined if non constant between volumes.
    */
-  #getNumberOfVolumes() {
-    const originList = this.#getOriginList();
+  #getNumberOfSlicesPerVolumes(originList) {
     if (originList.length === 0) {
       return 0;
     }
@@ -390,51 +445,47 @@ export class DicomSliceDataList {
   }
 
   /**
-   * Get the list of origins and thein occurences in a list
+   * Get the list of origins and their occurences in a list
    *   of {pos, indices, count}.
    *
    * @returns {object[]} A list of origins and
    *   their number of occurences.
    */
   #getOriginList() {
-    // equal callback
-    const getEqualPosCallback = function (pos) {
-      return function (element) {
-        return element.pos.equals(pos);
-      };
-    };
-
-    const res = [];
+    // origins by key: Point3D.equals is an exact comparison so
+    // equal origins have the same string, the map keeps the
+    // insertion order
+    const originMap = new Map();
     for (let i = 0; i < this.#list.length; ++i) {
       const relData = this.#list[i];
       const origin = relData.image.getGeometry().getOrigin();
-      const findCallback = getEqualPosCallback(origin);
-      const found = res.find(findCallback);
-      if (typeof found === 'undefined') {
-        res.push({
+      const key = origin.toString();
+      let item = originMap.get(key);
+      if (typeof item === 'undefined') {
+        item = {
           pos: origin,
-          indices: [i],
-          count: 1
-        });
-      } else {
-        ++found.count;
-        found.indices.push(i);
+          indices: [],
+          count: 0
+        };
+        originMap.set(key, item);
       }
+      ++item.count;
+      item.indices.push(i);
     }
 
-    return res;
+    return [...originMap.values()];
   }
 }
 
 /**
  * DicomData controller.
  */
-export class DataController {
+export class DataController extends EventTarget {
 
   /**
    * List of DICOM data.
    *
-   * @type {Object<string, DicomData>}
+   * @type {Record<string, DicomData>}
    */
   #dataList = {};
 
@@ -442,14 +493,14 @@ export class DataController {
    * Temporary slice list for data with duplicate origin
    * that needs to be created once the load is finished.
    *
-   * @type {Object<string, DicomSliceDataList>}
+   * @type {Record<string, DicomSliceDataList>}
    */
   #tmpSliceList = {};
 
   /**
-   * List of DICOM data.
+   * List of stashed DICOM data.
    *
-   * @type {Object<string, DicomData>}
+   * @type {Record<string, DicomData>}
    */
   #dataListStashed = {};
 
@@ -459,13 +510,6 @@ export class DataController {
    * @type {number}
    */
   #dataIdCounter = -1;
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the next data id.
@@ -491,6 +535,8 @@ export class DataController {
    */
   reset() {
     this.#dataList = {};
+    this.#tmpSliceList = {};
+    this.#dataListStashed = {};
   }
 
   /**
@@ -566,16 +612,15 @@ export class DataController {
      * Data image set event.
      *
      * @event DataController#dataimageset
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The event value, first element is the image.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The event value,
+     *   first element is the image.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'dataimageset',
-      value: [image],
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('dataimageset', {
+      detail: {value: [image], dataid: dataId}
+    }));
   }
 
   /**
@@ -608,6 +653,7 @@ export class DataController {
         if (typeof factory.checkElements(data.meta) === 'undefined') {
           data.image = factory.create(
             data.meta,
+            /** @type {Uint8Array} */
             data.buffer,
             this.#dataList[refDataId].image
           );
@@ -619,7 +665,8 @@ export class DataController {
           data.image = factory.create(
             data.meta,
             data.buffer,
-            data.numberOfFiles
+            data.numberOfItems,
+            data.frameNumber
           );
         }
       }
@@ -628,6 +675,20 @@ export class DataController {
       factory = new AnnotationGroupFactory();
       if (typeof factory.checkElements(data.meta) === 'undefined') {
         data.annotationGroup = factory.create(data.meta);
+      }
+    } else if (modality === 'RTSTRUCT') {
+      // RT structure set: rasterize contours into a mask image
+      const referencedSeriesUID =
+        getReferencedSeriesUIDFromRTStruct(data.meta);
+      const refDataId = this.getDataIdFromSeriesUid(referencedSeriesUID);
+      if (typeof refDataId === 'undefined') {
+        throw new Error(
+          'Cannot create RT struct: referenced series is not loaded');
+      }
+      factory = new RtStructFactory();
+      if (typeof factory.checkElements(data.meta) === 'undefined') {
+        data.image = factory.create(
+          data.meta, this.#dataList[refDataId].image);
       }
     }
 
@@ -658,10 +719,10 @@ export class DataController {
       typeof data.annotationGroup === 'undefined') {
       // create content
       this.#setDataContent(data);
-      // store data for possible processing at complete time
-      // (see markDataAsComplete)
-      if (typeof data.numberOfFiles !== 'undefined' &&
-        data.numberOfFiles > 1) {
+      // store data (slice or frame) for possible processing
+      // at complete time (see markDataAsComplete)
+      if (typeof data.numberOfItems !== 'undefined' &&
+        data.numberOfItems > 1) {
         this.#tmpSliceList[dataId] = new DicomSliceDataList();
         // add first data as clone since this data
         // is the base for future appends with no
@@ -688,14 +749,13 @@ export class DataController {
      * Data add event.
      *
      * @event DataController#dataadd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'dataadd',
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('dataadd', {
+      detail: {dataid: dataId}
+    }));
 
     return true;
   }
@@ -724,18 +784,18 @@ export class DataController {
       }
       // remove data from list
       delete this.#dataList[dataId];
+      delete this.#tmpSliceList[dataId];
       /**
        * Data remove event.
        *
        * @event DataController#dataremove
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {string} dataid The data id.
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {string} detail.dataid The data id.
        */
-      this.#fireEvent({
-        type: 'dataremove',
-        dataid: dataId
-      });
+      this.dispatchEvent(new CustomEvent('dataremove', {
+        detail: {dataid: dataId}
+      }));
     }
   }
 
@@ -790,7 +850,7 @@ export class DataController {
    */
   update(dataId, data) {
     if (typeof this.#dataList[dataId] === 'undefined') {
-      throw new Error('Cannot find data to update: ' + dataId);
+      throw new Error(`Cannot find data to update: ${dataId}`);
     }
     const dataToUpdate = this.#dataList[dataId];
 
@@ -810,17 +870,16 @@ export class DataController {
     }
 
     /**
-     * Data udpate event.
+     * Data update event.
      *
      * @event DataController#dataupdate
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} dataid The data id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.dataid The data id.
      */
-    this.#fireEvent({
-      type: 'dataupdate',
-      dataid: dataId
-    });
+    this.dispatchEvent(new CustomEvent('dataupdate', {
+      detail: {dataid: dataId}
+    }));
   }
 
   /**
@@ -832,7 +891,7 @@ export class DataController {
   markDataAsComplete(dataId) {
     const data = this.#dataList[dataId];
     if (typeof data === 'undefined') {
-      throw new Error('Cannot find data to mark as complete: ' + dataId);
+      throw new Error(`Cannot find data to mark as complete: ${dataId}`);
     }
 
     const res = {imageHasChanged: false};
@@ -847,11 +906,21 @@ export class DataController {
       this.setImage(dataId, finalData.image);
       // set meta
       data.meta = finalData.meta;
-      // reset tmp var
-      delete this.#tmpSliceList[dataId];
       // mark image as changed
       res.imageHasChanged = true;
+    } else if (typeof data.image !== 'undefined') {
+      // volumes created while loading (pre-load volume id): check
+      // they share the same origins, as the post-load path does
+      const check = data.image.getGeometry().checkTimeOrigins();
+      if (!check.success) {
+        throw new Error(`Inconsistent volumes: ${check.message}`);
+      }
     }
+
+    // volume associated values need all data
+    this.#setVolumeValues(dataId);
+    // release the slice list (also when not used)
+    delete this.#tmpSliceList[dataId];
 
     // mark image as complete
     data.setComplete(true);
@@ -860,48 +929,39 @@ export class DataController {
   }
 
   /**
-   * Add an event listener to this class.
+   * Set the associated values of the volume ids of a data image (see
+   * dicomVolume getVolumeValues), from the DICOM tags of its loaded
+   * items: the stored slice data if any, else the frames of the data.
    *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
+   * @param {string} dataId The data id.
    */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
+  #setVolumeValues(dataId) {
+    const data = this.#dataList[dataId];
+    const geometry = data.image?.getGeometry();
+    const volumeIds = geometry?.getVolumeIds();
+    if (typeof volumeIds === 'undefined' || volumeIds.length < 2) {
+      return;
+    }
+    const elementsList = this.#tmpSliceList[dataId]?.getElementsList() ??
+      getFramesElements(data.meta);
+    const values = getVolumeValues(volumeIds, elementsList);
+    if (typeof values !== 'undefined') {
+      geometry.setVolumeValues(values);
+    }
   }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 
   /**
    * Get a fireEvent function that adds the input data id
    * to the event value.
    *
    * @param {string} dataId The data id.
-   * @returns {Function} A fireEvent function.
+   * @returns {EventListener} A fireEvent function.
    */
   #getFireEvent(dataId) {
-    return (event) => {
-      event.dataid = dataId;
-      this.#fireEvent(event);
-    };
+    return ((/** @type {CustomEvent} */ event) => {
+      const detail = Object.assign({}, event.detail, {dataid: dataId});
+      this.dispatchEvent(new CustomEvent(event.type, {detail}));
+    });
   }
 
 } // DataController class

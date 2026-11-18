@@ -27,9 +27,88 @@ export default [
       // prefer const
       // https://eslint.org/docs/rules/prefer-const
       'prefer-const': 'error',
+      // disallow implicit type conversions
+      // https://eslint.org/docs/rules/no-implicit-coercion
+      'no-implicit-coercion': 'error',
+      // require parseInt radix argument
+      // https://eslint.org/docs/rules/radix
+      radix: 'error',
+      // throw Error objects, not literals
+      // https://eslint.org/docs/rules/no-throw-literal
+      'no-throw-literal': 'error',
+      // require default case in switch statements
+      // https://eslint.org/docs/rules/default-case
+      'default-case': 'error',
+      // enforce default clauses to be last
+      // https://eslint.org/docs/rules/default-case-last
+      'default-case-last': 'error',
+      // disallow unnecessary return statements
+      // https://eslint.org/docs/rules/no-useless-return
+      'no-useless-return': 'error',
+      // disallow loops that can never iterate more than once
+      // https://eslint.org/docs/rules/no-unreachable-loop
+      'no-unreachable-loop': 'error',
       // allow for some unused args
       // https://eslint.org/docs/rules/no-unused-vars
       'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
+
+      // TODO activate
+      // enforce consistent return values from functions
+      // https://eslint.org/docs/rules/consistent-return
+      //'consistent-return': 'error',
+
+      // code quality / correctness
+
+      // disallow reassigning function parameters
+      // -> used when param in undefined
+      // https://eslint.org/docs/rules/no-param-reassign
+      //'no-param-reassign': 'warn',
+
+      // disallow variable declarations that shadow outer scope variables
+      // https://eslint.org/docs/rules/no-shadow
+      'no-shadow': 'error',
+      // disallow returning from Promise executors
+      // https://eslint.org/docs/rules/no-promise-executor-return
+      'no-promise-executor-return': 'error',
+      // disallow await inside loops
+      // https://eslint.org/docs/rules/no-await-in-loop
+      'no-await-in-loop': 'error',
+      // disallow useless string concatenation
+      // https://eslint.org/docs/rules/no-useless-concat
+      'no-useless-concat': 'error',
+      // disallow unnecessary constructors
+      // https://eslint.org/docs/rules/no-useless-constructor
+      'no-useless-constructor': 'error',
+
+      // modern js idioms
+
+      // prefer template literals over string concatenation
+      // https://eslint.org/docs/rules/prefer-template
+      'prefer-template': 'error',
+      // require object literal shorthand syntax
+      // https://eslint.org/docs/rules/object-shorthand
+      'object-shorthand': 'error',
+      // prefer rest params over arguments
+      // https://eslint.org/docs/rules/prefer-rest-params
+      'prefer-rest-params': 'error',
+      // prefer spread over Function.prototype.apply
+      // https://eslint.org/docs/rules/prefer-spread
+      'prefer-spread': 'error',
+      // require dot notation when possible
+      // https://eslint.org/docs/rules/dot-notation
+      'dot-notation': 'error',
+
+      // flow clarity
+
+      // disallow else after a return
+      // https://eslint.org/docs/rules/no-else-return
+      'no-else-return': 'error',
+      // disallow if as the only statement in an else block
+      // https://eslint.org/docs/rules/no-lonely-if
+      'no-lonely-if': 'error',
+      // disallow yoda conditions
+      // https://eslint.org/docs/rules/yoda
+      yoda: 'error',
 
       // formatting rules
 
@@ -115,7 +194,7 @@ export default [
       // no multi spaces
       // https://eslint.style/rules/js/no-multi-spaces
       '@stylistic/js/no-multi-spaces': 'error',
-      // no space for named functions (default {'max': 2})
+      // disallow multiple consecutive empty lines (default {'max': 2})
       // https://eslint.style/rules/js/no-multiple-empty-lines
       '@stylistic/js/no-multiple-empty-lines': 'error',
       // linebreak after operator
@@ -123,7 +202,10 @@ export default [
       '@stylistic/js/operator-linebreak': 'error',
       // quotes around object property names
       // https://eslint.style/rules/js/quote-props
-      '@stylistic/js/quote-props': ['error', 'as-needed']
+      '@stylistic/js/quote-props': ['error', 'as-needed'],
+      // disallow leading/trailing decimal points in numeric literals
+      // https://eslint.style/rules/js/no-floating-decimal
+      '@stylistic/js/no-floating-decimal': 'error'
     },
   }
 ];

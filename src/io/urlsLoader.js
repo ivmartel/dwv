@@ -1,7 +1,8 @@
 import {endsWith, getRootPath} from '../utils/string.js';
 import {MultiProgressHandler} from '../utils/progress.js';
 import {getFileListFromDicomDir} from '../dicom/dicomDir.js';
-import {loaderList} from './loaderList.js';
+import {getLoaderList} from './loaderList.js';
+import {LoadHandlers} from './loadHandlers.js';
 
 // url content types
 export const urlContentTypes = {
@@ -12,7 +13,7 @@ export const urlContentTypes = {
 /**
  * Urls loader.
  */
-export class UrlsLoader {
+export class UrlsLoader extends LoadHandlers {
 
   /**
    * Input data.
@@ -226,9 +227,9 @@ export class UrlsLoader {
       if (status !== 200 && status !== 0) {
         this.onerror({
           source: dataElement,
-          error: 'GET ' + event.target.responseURL +
-            ' ' + event.target.status +
-            ' (' + event.target.statusText + ')',
+          error: `GET ${ event.target.responseURL
+          } ${ event.target.status
+          } (${event.target.statusText})`,
           target: event.target
         });
         this.#addLoadend();
@@ -260,6 +261,7 @@ export class UrlsLoader {
     mproghandler.setNToLoad(data.length);
 
     // create loaders
+    const loaderList = getLoaderList();
     const loaders = [];
     for (let m = 0; m < loaderList.length; ++m) {
       loaders.push(new loaderList[m]());
@@ -275,7 +277,7 @@ export class UrlsLoader {
         foundLoader = true;
         // load options
         loader.setOptions({
-          numberOfFiles: data.length,
+          numberOfItems: data.length,
           defaultCharacterSet: this.getDefaultCharacterSet()
         });
         // set loader callbacks
@@ -294,7 +296,7 @@ export class UrlsLoader {
       }
     }
     if (!foundLoader) {
-      throw new Error('No loader found for url: ' + dataElement);
+      throw new Error(`No loader found for url: ${dataElement}`);
     }
 
     // store last run request index
@@ -313,7 +315,7 @@ export class UrlsLoader {
 
       // check loader
       if (!loader.canLoadUrl(dataElement, options)) {
-        throw new Error('Input url of different type: ' + dataElement);
+        throw new Error(`Input url of different type: ${dataElement}`);
       }
       /**
        * The http request.
@@ -415,9 +417,9 @@ export class UrlsLoader {
       if (status !== 200 && status !== 0) {
         this.onerror({
           source: dicomDirUrl,
-          error: 'GET ' + event.target.responseURL +
-            ' ' + event.target.status +
-            ' (' + event.target.statusText + ')',
+          error: `GET ${ event.target.responseURL
+          } ${ event.target.status
+          } (${event.target.statusText})`,
           target: event.target
         });
         this.onloadend({});
@@ -430,7 +432,7 @@ export class UrlsLoader {
         const rootUrl = getRootPath(dicomDirUrl);
         const fullUrls = [];
         for (let i = 0; i < urls.length; ++i) {
-          fullUrls.push(rootUrl + '/' + urls[i]);
+          fullUrls.push(`${rootUrl}/${urls[i]}`);
         }
         // load urls
         this.#loadUrls(fullUrls, options);
@@ -467,56 +469,6 @@ export class UrlsLoader {
     }
   }
 
-  /**
-   * Handle a load start event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load start event.
-   */
-  onloadstart(_event) {}
-
-  /**
-   * Handle a load progress event.
-   * Default does nothing.
-   *
-   * @param {object} _event The progress event.
-   */
-  onprogress(_event) {}
-
-  /**
-   * Handle a load item event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load item event fired
-   *   when a file item has been loaded successfully.
-   */
-  onloaditem(_event) {}
-
-  /**
-   * Handle a load event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when a file has been loaded successfully.
-   */
-  onload(_event) {}
-
-  /**
-   * Handle a load end event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load end event fired
-   *  when a file load has completed, successfully or not.
-   */
-  onloadend(_event) {}
-
-  /**
-   * Handle an error event.
-   * Default does nothing.
-   *
-   * @param {object} _event The error event.
-   */
-  onerror(_event) {}
 
   /**
    * Handle a timeout event.
@@ -525,13 +477,5 @@ export class UrlsLoader {
    * @param {object} _event The timeout event.
    */
   ontimeout(_event) {}
-
-  /**
-   * Handle an abort event.
-   * Default does nothing.
-   *
-   * @param {object} _event The abort event.
-   */
-  onabort(_event) {}
 
 } // class UrlsLoader

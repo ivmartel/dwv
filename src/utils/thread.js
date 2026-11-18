@@ -1,4 +1,60 @@
 /**
+ * Fallback default thread pool size, used if the number of logical
+ * processors is not available.
+ */
+const FALLBACK_POOL_SIZE = 4;
+
+/**
+ * Get the number of logical processors.
+ *
+ * @returns {number|undefined} The number of logical processors
+ *   (`navigator.hardwareConcurrency`), undefined if not available.
+ */
+function getHardwareConcurrency() {
+  let res;
+  if (typeof navigator !== 'undefined' &&
+    typeof navigator.hardwareConcurrency !== 'undefined' &&
+    navigator.hardwareConcurrency > 0) {
+    res = navigator.hardwareConcurrency;
+  }
+  return res;
+}
+
+/**
+ * Get the default thread pool size: half the number of logical
+ * processors (at least one), or {@link FALLBACK_POOL_SIZE} if not
+ * available. Leaves room for the main thread and limits the number of
+ * workers (and their buffer copies), which matters on memory limited
+ * devices such as iOS ones.
+ *
+ * @returns {number} The pool size.
+ */
+export function getDefaultPoolSize() {
+  const hardwareConcurrency = getHardwareConcurrency();
+  let res = FALLBACK_POOL_SIZE;
+  if (typeof hardwareConcurrency !== 'undefined') {
+    res = Math.max(1, Math.floor(hardwareConcurrency / 2));
+  }
+  return res;
+}
+
+/**
+ * Clamp a thread pool size to the number of logical processors,
+ * if available.
+ *
+ * @param {number} poolSize The pool size.
+ * @returns {number} The clamped pool size.
+ */
+export function clampPoolSize(poolSize) {
+  const hardwareConcurrency = getHardwareConcurrency();
+  if (typeof hardwareConcurrency !== 'undefined' &&
+    poolSize > hardwareConcurrency) {
+    poolSize = hardwareConcurrency;
+  }
+  return poolSize;
+}
+
+/**
  * Thread Pool.
  *
  * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
@@ -8,35 +64,52 @@ export class ThreadPool {
   /**
    * @type {number}
    */
-  poolSize;
+  #poolSize;
   /**
    * @type {WorkerTask[]}
    */
-  taskQueue;
+  #taskQueue;
   /**
    * @type {WorkerThread[]}
    */
-  freeThreads;
+  #freeThreads;
   /**
    * @type {WorkerThread[]}
    */
-  runningThreads;
+  #runningThreads;
 
   /**
-   * @param {number} poolSize The size of the pool.
+   * @param {number} [poolSize] The size of the pool, defaults to
+   *   {@link getDefaultPoolSize}. Must be a positive integer, it is
+   *   clamped to the number of logical processors if available.
    */
   constructor(poolSize) {
-    this.poolSize = poolSize;
-    // task queue
-    this.taskQueue = [];
-    // lsit of available threads
-    this.freeThreads = [];
-    // create 'poolSize' number of worker threads
-    for (let i = 0; i < poolSize; ++i) {
-      this.freeThreads.push(new WorkerThread(this));
+    if (typeof poolSize === 'undefined') {
+      poolSize = getDefaultPoolSize();
     }
-    // list of running threads (unsed in abort)
-    this.runningThreads = [];
+    if (!Number.isInteger(poolSize) || poolSize < 1) {
+      throw new Error(
+        `Thread pool size must be a positive integer: ${poolSize}`);
+    }
+    this.#poolSize = clampPoolSize(poolSize);
+    // initialize members
+    this.#init();
+  }
+
+  /**
+   * Initialize the thread pool.
+   */
+  #init() {
+    // task queue
+    this.#taskQueue = [];
+    // list of available threads
+    this.#freeThreads = [];
+    // create 'poolSize' number of worker threads
+    for (let i = 0; i < this.#poolSize; ++i) {
+      this.#freeThreads.push(new WorkerThread(this));
+    }
+    // list of running threads (used in abort)
+    this.#runningThreads = [];
   }
 
   /**
@@ -47,20 +120,20 @@ export class ThreadPool {
    */
   addWorkerTask(workerTask) {
     // send work start if first task
-    if (this.freeThreads.length === this.poolSize) {
+    if (this.#freeThreads.length === this.#poolSize) {
       this.onworkstart({type: 'work-start'});
     }
     // launch task or queue
-    if (this.freeThreads.length > 0) {
+    if (this.#freeThreads.length > 0) {
       // get the first free worker thread
-      const workerThread = this.freeThreads.shift();
-      // add the thread to the runnning list
-      this.runningThreads.push(workerThread);
+      const workerThread = this.#freeThreads.shift();
+      // add the thread to the running list
+      this.#runningThreads.push(workerThread);
       // run the input task
       workerThread.run(workerTask);
     } else {
       // no free thread, add task to queue
-      this.taskQueue.push(workerTask);
+      this.#taskQueue.push(workerTask);
     }
   }
 
@@ -70,6 +143,8 @@ export class ThreadPool {
   abort() {
     // stop all threads
     this.#stop();
+    // reinitialize so the pool can be reused
+    this.#init();
     // callback
     this.onabort({type: 'work-abort'});
     this.onworkend({type: 'work-end'});
@@ -82,24 +157,22 @@ export class ThreadPool {
    */
   onTaskEnd(workerThread) {
     // launch next task in queue or finish
-    if (this.taskQueue.length > 0) {
+    if (this.#taskQueue.length > 0) {
       // get waiting task
-      const workerTask = this.taskQueue.shift();
+      const workerTask = this.#taskQueue.shift();
       // use input thread to run the waiting task
       workerThread.run(workerTask);
     } else {
       // stop the worker
       workerThread.stop();
       // no task to run, add to free list
-      this.freeThreads.push(workerThread);
+      this.#freeThreads.push(workerThread);
       // remove from running list
-      for (let i = 0; i < this.runningThreads.length; ++i) {
-        if (this.runningThreads[i].getId() === workerThread.getId()) {
-          this.runningThreads.splice(i, 1);
-        }
-      }
+      this.#runningThreads = this.#runningThreads.filter(
+        (thread) => thread.getId() !== workerThread.getId()
+      );
       // the work is done when the queue is back to its initial size
-      if (this.freeThreads.length === this.poolSize) {
+      if (this.#freeThreads.length === this.#poolSize) {
         this.onwork({type: 'work'});
         this.onworkend({type: 'work-end'});
       }
@@ -123,18 +196,13 @@ export class ThreadPool {
 
   /**
    * Stop the pool: stop all running threads.
-   *
    */
   #stop() {
-    // clear tasks
-    this.taskQueue = [];
-    // cancel running workers
-    for (let i = 0; i < this.runningThreads.length; ++i) {
-      this.runningThreads[i].stop();
+    for (const thread of this.#runningThreads) {
+      thread.stop();
     }
-    this.runningThreads = [];
+    this.#runningThreads = [];
   }
-
 
   /**
    * Handle a work start event.
@@ -252,11 +320,12 @@ class WorkerThread {
       this.worker.onerror = this.onerror;
     }
     // launch the worker
-    this.worker.postMessage(this.runningTask.startMessage);
+    const {message, transfer} = this.runningTask.getStartMessage();
+    this.worker.postMessage(message, transfer);
   }
 
   /**
-   * Finish a task and tell the parent.
+   * Finish a task.
    */
   stop() {
     // stop the worker
@@ -264,6 +333,7 @@ class WorkerThread {
       this.worker.terminate();
       // force create at next run
       this.worker = undefined;
+      this.runningTask = undefined;
     }
   }
 
@@ -317,6 +387,19 @@ export class WorkerTask {
     this.startMessage = message;
     // information about the work data
     this.info = info;
+  }
+
+  /**
+   * Get the message to post to the worker, called just before
+   * running the task. The transferred objects are moved to the worker
+   * (no copy) and are no longer usable by the caller.
+   * Default returns the start message with no transferred objects.
+   *
+   * @returns {{message: object, transfer: Transferable[]}} The message
+   *   and the list of objects to transfer.
+   */
+  getStartMessage() {
+    return {message: this.startMessage, transfer: []};
   }
 
   /**

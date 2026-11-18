@@ -1,0 +1,562 @@
+import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {WheelTick} from './behaviors/wheelTick.js';
+
+// Avoid mouse events. To use with browser mobile simulation.
+const TOUCH_EVENTS_DEBUG = false;
+
+// Max display-pixel distance from the down point still considered a tap
+// (mouse/finger jitter tolerance), not a move.
+const MOVE_TOLERANCE = 5;
+
+/**
+ * `MouseEvent#button` values (left through fifth / forward).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+ *
+ * @type {Readonly<{
+ *   left: 0,
+ *   middle: 1,
+ *   right: 2,
+ *   back: 3,
+ *   forward: 4
+ * }>}
+ */
+export const MouseEventButtons = {
+  left: 0,
+  middle: 1,
+  right: 2,
+  back: 3,
+  forward: 4
+};
+
+/**
+ * @import {App} from '../app/application.js';
+ * @import {DragBehavior} from './behaviors/dragBehavior.js';
+ * @import {HoverBehavior} from './behaviors/hoverBehavior.js';
+ * @import {Point2D} from '../math/point.js';
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {WheelBehavior} from './behaviors/wheelBehavior.js';
+ * @import {DoubleClickBehavior} from './behaviors/doubleClickBehavior.js';
+ * @import {TapBehavior} from './behaviors/tapBehavior.js';
+ * @import {TwoTouchBehavior} from './behaviors/twoTouchBehavior.js';
+ * @import {StageController} from '../app/stageController.js';
+ */
+
+/**
+ * @typedef {object} LayerGroupPointerOptions
+ * @property {StageController} stageController The stage controller.
+ * @property {DragBehavior} [dragBehavior] Drag behaviour:
+ *   mouse down / touch start + move + end (mouse or touch).
+ * @property {HoverBehavior} [hoverBehavior] Hover behaviour:
+ *   mouse move without click (only mouse).
+ * @property {WheelBehavior} [wheelBehavior] Mouse wheel handling
+ *   (only mouse).
+ * @property {DoubleClickBehavior} [doubleClickBehavior] Double-click
+ *   behaviour, also triggered by long touch.
+ * @property {TwoTouchBehavior} [twoTouchBehavior] Two-finger behaviour
+ *   (only touch).
+ * @property {TapBehavior} [tapBehavior] Tap behaviour: can be one tap
+ *   or sticky tap for multiple taps (finite or finished with double click).
+ *   For mouse or touch.
+ * @property {number|null} [longTouchToDblClickMs] After a touchstart on the
+ *   single-touch path, schedule {@link LayerGroupPointer#dblclick} after this
+ *   many milliseconds (defaults to 500).
+ */
+
+/**
+ * Normalises layer mouse/touch input into a single-pointer drag lifecycle.
+ * Per-move deltas are computed inside {@link DragBehavior#onUpdate}.
+ * Hover ({@link HoverBehavior}) is driven from mouse events only, not touch.
+ *
+ * Extends {@link EventTarget} so subclasses (tools) can use
+ * `addEventListener` / `dispatchEvent` like other UI tools.
+ *
+ * Event entry points use the same names as tools (`mousedown`, `mousemove`,
+ * `wheel`, `dblclick`, …). Those handlers are arrow functions so they stay
+ * bound when the toolbox invokes them as bare callbacks (`func(event)`).
+ *
+ * `preventDefault` is only called on the `NonPassiveInteractionEventNames`
+ * (from `gui/generic.js`), the events the layers listen to as not passive.
+ */
+export class LayerGroupPointer extends EventTarget {
+
+  /**
+   * @type {StageController}
+   */
+  #stageController;
+
+  /**
+   * @type {DragBehavior|undefined}
+   */
+  #dragBehavior;
+
+  /**
+   * @type {HoverBehavior|undefined}
+   */
+  #hoverBehavior;
+
+  /**
+   * @type {WheelBehavior|undefined}
+   */
+  #wheelBehavior;
+
+  /**
+   * @type {WheelTick}
+   */
+  #wheelTick = new WheelTick();
+
+  /**
+   * @type {DoubleClickBehavior|undefined}
+   */
+  #doubleClickBehavior;
+
+  /**
+   * @type {TwoTouchBehavior|undefined}
+   */
+  #twoTouchBehavior;
+
+  /**
+   * @type {TapBehavior|undefined}
+   */
+  #tapBehavior;
+
+  /**
+   * @type {number|null}
+   */
+  #longTouchToDblClickMs;
+
+  /**
+   * @type {number|undefined}
+   */
+  #longTouchTimerId;
+
+  /**
+   * True after a mouse down, reset at mouseup or mouseout.
+   *
+   * @type {boolean}
+   */
+  #downed = false;
+
+  /**
+   * Pointer position at mousedown or touchstart, used to measure
+   * {@link MOVE_TOLERANCE}.
+   *
+   * @type {Point2D|undefined}
+   */
+  #downPoint;
+
+  /**
+   * @param {LayerGroupPointerOptions} options Constructor options.
+   */
+  constructor({
+    stageController,
+    dragBehavior,
+    hoverBehavior,
+    wheelBehavior,
+    doubleClickBehavior,
+    twoTouchBehavior,
+    tapBehavior,
+    longTouchToDblClickMs = 500
+  }) {
+    super();
+    this.#stageController = stageController;
+    this.#dragBehavior = dragBehavior;
+    this.#hoverBehavior = hoverBehavior;
+    this.#wheelBehavior = wheelBehavior;
+    this.#doubleClickBehavior = doubleClickBehavior;
+    this.#twoTouchBehavior = twoTouchBehavior;
+    this.#tapBehavior = tapBehavior;
+    this.#longTouchToDblClickMs = longTouchToDblClickMs;
+  }
+
+  /**
+   * Get the layer group associated with a div id.
+   *
+   * @param {string} divId The div id.
+   * @returns {LayerGroup|undefined} The layer group,
+   *   or undefined if not found.
+   */
+  #getLayerGroupByDivId(divId) {
+    return this.#stageController.getLayerGroupByDivId(divId);
+  }
+
+  /**
+   * Mouse position and layer group from a DOM event targeting a view layer.
+   *
+   * @param {MouseEvent} event The mouse or touch event.
+   * @returns {{point: Point2D, layerGroup: LayerGroup}}
+   *   Pointer position and layer group.
+   */
+  #getMouseLayerContext(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#getLayerGroupByDivId(layerDetails.groupDivId);
+    return {
+      point: getMousePoint(event),
+      layerGroup
+    };
+  }
+
+  /**
+   * Live check of a pointer position against {@link #downPoint}: false
+   * (tap jitter, not a move) while within {@link MOVE_TOLERANCE}.
+   *
+   * @param {Point2D} point Pointer position to check, typically at
+   *   mouseup/touchend.
+   * @returns {boolean} True when the point is more than
+   *   {@link MOVE_TOLERANCE} display pixels away from the down point.
+   */
+  #isMoved(point) {
+    return typeof this.#downPoint === 'undefined' ||
+      this.#downPoint.getDistance(point) > MOVE_TOLERANCE;
+  }
+
+  /**
+   * First touch position and layer group from a touch event.
+   *
+   * @param {TouchEvent} event The touch event.
+   * @returns {{point: Point2D, layerGroup: LayerGroup}}
+   *   Primary touch point and layer group.
+   */
+  #getPrimaryTouchLayerContext(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#getLayerGroupByDivId(layerDetails.groupDivId);
+    return {
+      point: getTouchPoints(event)[0],
+      layerGroup
+    };
+  }
+
+  /**
+   * Get the list of event names that this tool can fire.
+   * Default implementation returns an empty array.
+   *
+   * @returns {string[]} The list of event names.
+   */
+  getEventNames() {
+    return [];
+  }
+
+  /**
+   * Handle mouse wheel. Prevents the default (page scroll) only
+   * when the tool has a wheel behaviour.
+   *
+   * @param {WheelEvent} event The mouse wheel event.
+   */
+  wheel = (event) => {
+    if (typeof this.#wheelBehavior === 'undefined') {
+      return;
+    }
+    event.preventDefault();
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#getLayerGroupByDivId(layerDetails.groupDivId);
+    this.#wheelBehavior.onWheel(event, layerGroup);
+
+    this.#wheelTick.add(event);
+    const up = this.#wheelTick.getSum() >= 0;
+    if (!this.#wheelTick.isTick()) {
+      return;
+    }
+    this.#wheelTick.clear();
+
+    this.#wheelBehavior.onWheelTick(up, layerGroup);
+  };
+
+  /**
+   * @param {MouseEvent} event The double click event.
+   */
+  dblclick = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+    if (typeof this.#doubleClickBehavior !== 'undefined') {
+      this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
+    } else if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.onEnd();
+    }
+  };
+
+  /**
+   * @param {Point2D} point Display point.
+   * @param {LayerGroup} layerGroup Layer group.
+   */
+  #longTouch(point, layerGroup) {
+    // similar to this.dblclick
+    if (typeof this.#doubleClickBehavior !== 'undefined') {
+      this.#doubleClickBehavior.onDoubleClick(point, layerGroup);
+    } else if (this.#tapBehavior?.isActive()) {
+      // add last point
+      this.#tapBehavior.onTap(point, layerGroup);
+      this.#tapBehavior.onEnd();
+    }
+    // avoid tap on touchend
+    this.#downed = false;
+    // reset timer
+    this.#longTouchTimerId = undefined;
+  };
+
+  /**
+   * End behaviors that have end method.
+   */
+  cancel() {
+    this.#downed = false;
+    this.#downPoint = undefined;
+    this.#clearLongTouchTimer();
+
+    // reset drag
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+    // reset sticky tap
+    if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.reset();
+    }
+    // reset two touch
+    if (this.#twoTouchBehavior?.isActive()) {
+      this.#twoTouchBehavior?.reset();
+    }
+    // reset hover
+    this.#hoverBehavior?.reset();
+  }
+
+  /**
+   * Handle mouse down.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   */
+  mousedown = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+    // reset
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+    // context
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+    // set flags
+    this.#downed = true;
+    this.#downPoint = point;
+
+    if (!this.#tapBehavior?.isActive() &&
+      this.#dragBehavior?.canStart(point, layerGroup)) {
+      this.#dragBehavior.onStart(point, layerGroup, {
+        mouseDownButton: event.button
+      });
+    }
+  };
+
+  /**
+   * Handle mouse move.
+   *
+   * @param {MouseEvent} event The mouse move event.
+   */
+  mousemove = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+    // context
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+
+    if (this.#downed) {
+      // remove hover for down+move
+      this.#hoverBehavior?.onEnd();
+      // update drag
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.onUpdate(point, layerGroup);
+      }
+    } else {
+      // update sticky tap
+      if (this.#tapBehavior?.isActive()) {
+        this.#tapBehavior.onUpdate(point, layerGroup);
+      }
+      // update hover
+      this.#hoverBehavior?.onUpdate(point, layerGroup);
+    }
+  };
+
+  /**
+   * Handle mouse up.
+   *
+   * @param {MouseEvent} event The mouse up event.
+   */
+  mouseup = (event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+    // context
+    const {point, layerGroup} = this.#getMouseLayerContext(event);
+    const moved = this.#isMoved(point);
+
+    if (this.#dragBehavior?.isActive()) {
+      if (moved) {
+        // up+move -> end drag
+        this.#dragBehavior.onEnd();
+      } else {
+        // up and no move -> reset drag
+        this.#dragBehavior.reset();
+      }
+    }
+
+    if (this.#tapBehavior &&
+      (this.#tapBehavior.isActive() || (this.#downed && !moved))) {
+      // active tap -> sticky tap
+      // down + no move -> discrete tap
+      this.#tapBehavior.onTap(point, layerGroup);
+    }
+
+    // reset flag
+    this.#downed = false;
+  };
+
+  /**
+   * @param {MouseEvent} _event The mouse out event.
+   */
+  mouseout = (_event) => {
+    if (TOUCH_EVENTS_DEBUG) {
+      return;
+    }
+
+    // end drag
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.onEnd();
+    }
+    // end sticky tap
+    if (this.#tapBehavior?.isActive()) {
+      this.#tapBehavior.onEnd();
+    }
+    // end hover
+    this.#hoverBehavior?.onEnd();
+    // reset flags
+    this.#downed = false;
+    this.#downPoint = undefined;
+  };
+
+  /**
+   * Handle touch start. Always prevents the default to stop the browser
+   * from scrolling or zooming the page and from emulating mouse events
+   * (which would be handled a second time by the mouse handlers).
+   *
+   * @param {TouchEvent} event The touch start event.
+   */
+  touchstart = (event) => {
+    event.preventDefault();
+    // reset
+    if (this.#dragBehavior?.isActive()) {
+      this.#dragBehavior.reset();
+    }
+    this.#clearLongTouchTimer();
+    // get touch points
+    const touchPoints = getTouchPoints(event);
+    // set flags
+    this.#downed = true;
+    this.#downPoint = touchPoints[0];
+
+    if (touchPoints.length === 1) {
+      // one touch drag
+      const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
+      if (this.#dragBehavior?.canStart(point, layerGroup)) {
+        this.#dragBehavior.onStart(point, layerGroup, {});
+      }
+      // long single touch to dblclick
+      const delay = this.#longTouchToDblClickMs;
+      if (delay !== null && delay !== undefined && delay > 0) {
+        // @ts-expect-error -- recommended type is ReturnType<typeof
+        //   setTimeout> but lint does not like it
+        this.#longTouchTimerId = setTimeout(() => {
+          this.#longTouch(point, layerGroup);
+        }, delay);
+      }
+    } else if (touchPoints.length === 2) {
+      this.#twoTouchBehavior?.onStart(touchPoints);
+    }
+  };
+
+  /**
+   * @param {TouchEvent} event The touch move event.
+   */
+  touchmove = (event) => {
+    // reset
+    this.#clearLongTouchTimer();
+
+    // context
+    const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
+
+    const touchPoints = getTouchPoints(event);
+    if (touchPoints.length === 1) {
+      // one touch drag
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.onUpdate(point, layerGroup);
+      }
+    } else if (touchPoints.length === 2) {
+      // Transition frames may have two touches before two-touch is active.
+      if (this.#dragBehavior?.isActive()) {
+        this.#dragBehavior.reset();
+      }
+      if (this.#twoTouchBehavior?.isActive()) {
+        this.#twoTouchBehavior.onUpdate(touchPoints, layerGroup);
+      }
+    }
+  };
+
+  /**
+   * @param {TouchEvent} event The touch end event.
+   */
+  touchend = (event) => {
+    // reset
+    this.#clearLongTouchTimer();
+
+    if (this.#twoTouchBehavior?.isActive()) {
+      this.#twoTouchBehavior.onEnd();
+      return;
+    }
+
+    // context
+    const {point, layerGroup} = this.#getPrimaryTouchLayerContext(event);
+    const moved = this.#isMoved(point);
+
+    if (this.#dragBehavior?.isActive()) {
+      if (moved) {
+        // up+move -> end drag
+        this.#dragBehavior.onEnd();
+      } else {
+        // up and no move -> reset drag
+        this.#dragBehavior.reset();
+      }
+    }
+
+    if (this.#tapBehavior &&
+      (this.#tapBehavior.isActive() || (this.#downed && !moved))) {
+      // active tap -> sticky tap
+      // down + no move -> discrete tap
+      this.#tapBehavior.onTap(point, layerGroup);
+    }
+
+    // reset flag
+    this.#downed = false;
+  };
+
+  /**
+   * Handle touch cancel: the browser or the system interrupted the touch
+   * (for example an incoming call or an OS gesture), end it with
+   * {@link LayerGroupPointer#cancel}.
+   *
+   * @param {TouchEvent} _event The touch cancel event.
+   */
+  touchcancel = (_event) => {
+    this.cancel();
+  };
+
+  #clearLongTouchTimer() {
+    if (typeof this.#longTouchTimerId !== 'undefined') {
+      clearTimeout(this.#longTouchTimerId);
+      this.#longTouchTimerId = undefined;
+    }
+  }
+
+}

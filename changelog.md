@@ -1,5 +1,72 @@
 # Changelog
 
+## [v0.37.0](https://github.com/ivmartel/dwv/releases/tag/v0.37.0) - 18/11/2026
+
+### Added
+
+- Make overlay and scroll tooltip element ids unique per layer group [#2384](https://github.com/ivmartel/dwv/issues/2384)
+- Remove coronal acquisition special case [#2372](https://github.com/ivmartel/dwv/issues/2372)
+- Add support for all orientations [#2371](https://github.com/ivmartel/dwv/issues/2371)
+- Improve memory management [#2369](https://github.com/ivmartel/dwv/issues/2369)
+- Bump DICOM standard edition to 2024a [#2362](https://github.com/ivmartel/dwv/issues/2362)
+- Improve LINEAR_EXACT voi lut support [#2361](https://github.com/ivmartel/dwv/issues/2361)
+- Add an image method to retrieve values at a position [#2357](https://github.com/ivmartel/dwv/issues/2357)
+- Make geometry aware of multi-volume details [#2347](https://github.com/ivmartel/dwv/issues/2347)
+- Allow for key range write rules [#2344](https://github.com/ivmartel/dwv/issues/2344)
+- Change writer rules to be key based only [#2343](https://github.com/ivmartel/dwv/issues/2343)
+- Apply writing rules to sequences [#2342](https://github.com/ivmartel/dwv/issues/2342)
+- Add tap event [#2340](https://github.com/ivmartel/dwv/issues/2340)
+- Add annotation highlight [#2337](https://github.com/ivmartel/dwv/issues/2337)
+- Add option to remove all private tags in DicomWriter [#2302](https://github.com/ivmartel/dwv/issues/2302)
+- Remove deprecated State class [#2293](https://github.com/ivmartel/dwv/issues/2293)
+- Expect discrete slice spacing in worldToIndex [#2292](https://github.com/ivmartel/dwv/issues/2292)
+- Add agent readme [#2291](https://github.com/ivmartel/dwv/issues/2291)
+- Allow to load multi-slice multi-frame file(s) [#2258](https://github.com/ivmartel/dwv/issues/2258)
+- Use DICOM tags dictionary from dcmStdToJs [#2239](https://github.com/ivmartel/dwv/issues/2239)
+- Add temporal position identifiers [#2229](https://github.com/ivmartel/dwv/issues/2229)
+- Add dump diff dev page [#2228](https://github.com/ivmartel/dwv/issues/2228)
+- Allow to merge masks [#2221](https://github.com/ivmartel/dwv/issues/2221)
+- Display segments with overlap [#2187](https://github.com/ivmartel/dwv/issues/2187)
+- Revise orientation comparison tolerances [#2186](https://github.com/ivmartel/dwv/issues/2186)
+- Replace local ListenerHandler by extending EventTarget [#2176](https://github.com/ivmartel/dwv/issues/2176)
+- load multiple multipart urls [#2171](https://github.com/ivmartel/dwv/issues/2171)
+- Use typescript eslint/jsdoc mode [#2146](https://github.com/ivmartel/dwv/issues/2146)
+- Split tool mouse handling from behaviors [#2128](https://github.com/ivmartel/dwv/issues/2128)
+- Split draw shapes logic [#2116](https://github.com/ivmartel/dwv/issues/2116)
+- Use long and short axis length for ellipse quantification [#2091](https://github.com/ivmartel/dwv/issues/2091)
+- Revise touch screen support [#1560](https://github.com/ivmartel/dwv/issues/1560)
+- Add support for RTSTRUCT data [#306](https://github.com/ivmartel/dwv/issues/306)
+
+### Fixed
+
+- Missing FrameOfReferenceUID for generated masks and RT Struct [#2359](https://github.com/ivmartel/dwv/issues/2359)
+- Float data display error [#2338](https://github.com/ivmartel/dwv/issues/2338)
+- Annotation referenced frame number is not 1-based [#2319](https://github.com/ivmartel/dwv/issues/2319)
+- Hitachi private b-value rule not working [#2307](https://github.com/ivmartel/dwv/issues/2307)
+- Bad parse of private tag with implicit VR [#2306](https://github.com/ivmartel/dwv/issues/2306)
+- Wrong spacing when loading non ordered frames [#2290](https://github.com/ivmartel/dwv/issues/2290)
+- Merged meta data modifies instance number [#2216](https://github.com/ivmartel/dwv/issues/2216)
+- mergeObjects keeps references to objects [#2215](https://github.com/ivmartel/dwv/issues/2215)
+- Wrong output typed array for jpeg 2000 and baseline compressed data [#2125](https://github.com/ivmartel/dwv/issues/2125)
+
+---
+
+## [v0.36.4](https://github.com/ivmartel/dwv/releases/tag/v0.36.4) - 05/08/2026
+
+### Fixed
+
+- Allow for different SeriesTime in image append check [#2257](https://github.com/ivmartel/dwv/issues/2257)
+
+---
+
+## [v0.36.3](https://github.com/ivmartel/dwv/releases/tag/v0.36.3) - 26/05/2026
+
+### Fixed
+
+- Tolerance is too small for render check [#2185](https://github.com/ivmartel/dwv/issues/2185)
+
+---
+
 ## [v0.36.2](https://github.com/ivmartel/dwv/releases/tag/v0.36.2) - 26/03/2026
 
 ### Fixed

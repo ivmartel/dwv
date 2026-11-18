@@ -1,38 +1,12 @@
-import {startsWith, getFileExtension} from '../utils/string.js';
-import {getUrlFromUri} from '../utils/uri.js';
 import {getViewFromDOMImage} from '../image/domReader.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
+import {LoaderBase} from './loaderBase.js';
 
 /**
  * Raw image loader.
  */
-export class RawImageLoader {
-
-  /**
-   * If abort is triggered, all image.onload callbacks have to be cancelled.
-   *
-   * @type {boolean}
-   */
-  #aborted = false;
-
-  /**
-   * Set the loader options.
-   *
-   * @param {object} _opt The input options.
-   */
-  setOptions(_opt) {
-    // does nothing
-  }
-
-  /**
-   * Is the load ongoing? TODO...
-   *
-   * @returns {boolean} True if loading.
-   */
-  isLoading() {
-    return true;
-  }
+export class RawImageLoader extends LoaderBase {
 
   /**
    * Create a Data URI from an HTTP request response.
@@ -48,8 +22,8 @@ export class RawImageLoader {
       imageType = 'jpeg';
     }
     // create uri
-    const file = new Blob([response], {type: 'image/' + imageType});
-    return window.URL.createObjectURL(file);
+    const file = new Blob([response], {type: `image/${imageType}`});
+    return URL.createObjectURL(file);
   }
 
   /**
@@ -60,18 +34,20 @@ export class RawImageLoader {
    * @param {number} index The data index.
    */
   load(buffer, origin, index) {
-    this.#aborted = false;
+    this.setLoading(true);
     // create a DOM image
+    // note: uses the global Image constructor, not compatible
+    //   with a node usage
     const image = new Image();
     // triggered by ctx.drawImage
     image.onload = (/*event*/) => {
       try {
-        if (!this.#aborted) {
+        if (this.isLoading()) {
           this.onprogress({
             lengthComputable: true,
             loaded: 100,
             total: 100,
-            index: index,
+            index,
             source: origin
           });
           const data = getViewFromDOMImage(image, origin, index);
@@ -81,7 +57,7 @@ export class RawImageLoader {
         }
       } catch (error) {
         this.onerror({
-          error: error,
+          error,
           source: origin
         });
       } finally {
@@ -105,87 +81,42 @@ export class RawImageLoader {
    * Abort load.
    */
   abort() {
-    this.#aborted = true;
+    this.setLoading(false);
     this.onabort({});
     this.onloadend({});
   }
 
   /**
-   * Check if the loader can load the provided file.
-   * True for files with type 'image.*'.
+   * Check if the loader supports the input extension.
    *
-   * @param {File} file The file to check.
-   * @returns {boolean} True if the file can be loaded.
+   * @param {string} value The extensione.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadFile(file) {
-    return (typeof file.type !== 'undefined' &&
-      file.type.match('image.*') !== null);
+  canLoadExtension(value) {
+    return value === 'jpeg' ||
+      value === 'jpg' ||
+      value === 'png' ||
+      value === 'gif';
   }
 
   /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'rawimage',
-   * - the `options.requestHeaders` contains an item
-   *   starting with 'Accept: image/'.
-   * - the url has a 'contentType' and it is 'image/jpeg', 'image/png'
-   *   or 'image/gif' (as in wado urls),
-   * - the url has no 'contentType' and the extension is 'jpeg', 'jpg',
-   *   'png' or 'gif'.
+   * Check if the input is the loader name.
    *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
    */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'rawimage') {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          // starts with 'image/'
-          return startsWith(acceptHeader.value, 'image/');
-        }
-      }
-    }
-
-    const urlObjext = getUrlFromUri(url);
-    // extension
-    const ext = getFileExtension(urlObjext.pathname);
-    const hasImageExt = (ext === 'jpeg') || (ext === 'jpg') ||
-      (ext === 'png') || (ext === 'gif');
-    // content type (for wado url)
-    const contentType = urlObjext.searchParams.get('contentType');
-    const hasContentType = contentType !== null &&
-      typeof contentType !== 'undefined';
-    const hasImageContentType = (contentType === 'image/jpeg') ||
-      (contentType === 'image/png') ||
-      (contentType === 'image/gif');
-
-    return hasContentType ? hasImageContentType : hasImageExt;
+  isLoaderName(value) {
+    return value === 'rawimage';
   }
 
   /**
-   * Check if the loader can load the provided memory object.
+   * Check if the loader supports the input media type.
    *
-   * @param {object} mem The memory object.
-   * @returns {boolean} True if the object can be loaded.
+   * @param {string} value The media type.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadMemory(mem) {
-    if (typeof mem.filename !== 'undefined') {
-      const tmpFile = new File(['from memory'], mem.filename);
-      return this.canLoadFile(tmpFile);
-    }
-    return false;
+  canLoadMediaType(value) {
+    return value.startsWith('image/');
   }
 
   /**
@@ -205,64 +136,5 @@ export class RawImageLoader {
   loadUrlAs() {
     return urlContentTypes.ArrayBuffer;
   }
-
-  /**
-   * Handle a load start event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load start event.
-   */
-  onloadstart(_event) {}
-
-  /**
-   * Handle a progress event.
-   * Default does nothing.
-   *
-   * @param {object} _event The progress event.
-   */
-  onprogress(_event) {}
-
-  /**
-   * Handle a load item event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load item event fired
-   *   when a file item has been loaded successfully.
-   */
-  onloaditem(_event) {}
-
-  /**
-   * Handle a load event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when a file has been loaded successfully.
-   */
-  onload(_event) {}
-
-  /**
-   * Handle an load end event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load end event fired
-   *  when a file load has completed, successfully or not.
-   */
-  onloadend(_event) {}
-
-  /**
-   * Handle an error event.
-   * Default does nothing.
-   *
-   * @param {object} _event The error event.
-   */
-  onerror(_event) {}
-
-  /**
-   * Handle an abort event.
-   * Default does nothing.
-   *
-   * @param {object} _event The abort event.
-   */
-  onabort(_event) {}
 
 } // class RawImageLoader

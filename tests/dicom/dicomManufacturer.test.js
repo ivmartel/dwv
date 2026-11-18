@@ -24,7 +24,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getManufacturer}.
      *
-     * @function module:tests/dicom~getmanufacturer-good-input
+     * @function module:tests/dicom~getmanufacturerGoodInput
      */
     test('good input', () => {
       const de = new DataElement('LO');
@@ -41,7 +41,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getManufacturer} returns first.
      *
-     * @function module:tests/dicom~getmanufacturer-returns-first
+     * @function module:tests/dicom~getmanufacturerReturnsFirst
      */
     test('returns first', () => {
       const de = new DataElement('LO');
@@ -58,7 +58,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getManufacturer} with no tag.
      *
-     * @function module:tests/dicom~getmanufacturer-no-tag
+     * @function module:tests/dicom~getmanufacturerNoTag
      */
     test('no tag', () => {
       const elements = {};
@@ -69,7 +69,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getManufacturer} with no value.
      *
-     * @function module:tests/dicom~getmanufacturer-no-value
+     * @function module:tests/dicom~getmanufacturerNoValue
      */
     test('no value', () => {
       const de = new DataElement('LO');
@@ -86,7 +86,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getManufacturer} with undefined value.
      *
-     * @function module:tests/dicom~getmanufacturer-undefined-value
+     * @function module:tests/dicom~getmanufacturerUndefinedValue
      */
     test('undefined value', () => {
       const de = new DataElement('LO');
@@ -102,7 +102,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getManufacturer} with undefined tag.
      *
-     * @function module:tests/dicom~getmanufacturer-undefined-tag
+     * @function module:tests/dicom~getmanufacturerUndefinedTag
      */
     test('undefined tag', () => {
       const elements = {
@@ -120,7 +120,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNormalisedManufacturer} for GE.
      *
-     * @function module:tests/dicom~getnormalisedmanufacturer-ge
+     * @function module:tests/dicom~getnormalisedmanufacturerGe
      */
     test('GE', () => {
       const de = new DataElement('LO');
@@ -152,7 +152,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNormalisedManufacturer} for Siemens.
      *
-     * @function module:tests/dicom~getnormalisedmanufacturer-siemens
+     * @function module:tests/dicom~getnormalisedmanufacturerSiemens
      */
     test('Siemens', () => {
       const de0 = new DataElement('LO');
@@ -184,7 +184,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNormalisedManufacturer} for Philipss.
      *
-     * @function module:tests/dicom~getnormalisedmanufacturer-philips
+     * @function module:tests/dicom~getnormalisedmanufacturerPhilips
      */
     test('Philips', () => {
       const de0 = new DataElement('LO');
@@ -214,9 +214,32 @@ describe('dicom', () => {
     });
 
     /**
+     * Tests for {@link getNormalisedManufacturer} for Hitachi.
+     *
+     * @function module:tests/dicom~getnormalisedmanufacturerHitachi
+     */
+    test('Hitachi', () => {
+      const de0 = new DataElement('LO');
+      de0.value = ['Hitachi Medical Corporation'];
+      const elements0 = {
+        [TagKeys.Manufacturer]: de0
+      };
+      const result0 = getNormalisedManufacturer(elements0);
+      assert.equal(result0, NormalisedManufacturers.HITACHI);
+
+      const de1 = new DataElement('LO');
+      de1.value = ['HITACHI'];
+      const elements1 = {
+        [TagKeys.Manufacturer]: de1
+      };
+      const result1 = getNormalisedManufacturer(elements1);
+      assert.equal(result1, NormalisedManufacturers.HITACHI);
+    });
+
+    /**
      * Tests for {@link getNormalisedManufacturer} for unknown.
      *
-     * @function module:tests/dicom~getnormalisedmanufacturer-unknown
+     * @function module:tests/dicom~getnormalisedmanufacturerUnknown
      */
     test('unknown', () => {
       const de0 = new DataElement('LO');
@@ -239,7 +262,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNormalisedManufacturer} for empty.
      *
-     * @function module:tests/dicom~getnormalisedmanufacturer-empty
+     * @function module:tests/dicom~getnormalisedmanufacturerEmpty
      */
     test('empty', () => {
       const elements = {};
@@ -250,7 +273,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNormalisedManufacturer} no value.
      *
-     * @function module:tests/dicom~getnormalisedmanufacturer-no-value
+     * @function module:tests/dicom~getnormalisedmanufacturerNoValue
      */
     test('no value', () => {
       const de = new DataElement('LO');
@@ -268,7 +291,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getNormalisedManufacturer} returns first.
      *
-     * @function module:tests/dicom~getnormalisedmanufacturer-returns-first
+     * @function module:tests/dicom~getnormalisedmanufacturerReturnsFirst
      */
     test('returns first', () => {
       const de = new DataElement('LO');

@@ -37,7 +37,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor} without corrected image.
      *
-     * @function module:tests/dicom~getsuvfactor-no-corrected
+     * @function module:tests/dicom~getsuvfactorNoCorrected
      */
     test('no corrected', () => {
       const deSeriesDate = new DataElement('DA');
@@ -61,7 +61,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor} without decay correction.
      *
-     * @function module:tests/dicom~getsuvfactor-no-decay
+     * @function module:tests/dicom~getsuvfactorNoDecay
      */
     test('no decay', () => {
       const deCorrectImage = new DataElement('CS');
@@ -89,7 +89,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor} without Units.
      *
-     * @function module:tests/dicom~getsuvfactor-no-units
+     * @function module:tests/dicom~getsuvfactorNoUnits
      */
     test('no units', () => {
       const deCorrectImage = new DataElement('CS');
@@ -121,7 +121,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor} without PatientWeight.
      *
-     * @function module:tests/dicom~getsuvfactor-no-weight
+     * @function module:tests/dicom~getsuvfactorNoWeight
      */
     test('no weight', () => {
       const deCorrectImage = new DataElement('CS');
@@ -158,7 +158,7 @@ describe('dicom', () => {
      * Tests for {@link getSuvFactor} without
      * RadiopharmaceuticalInformationSequence.
      *
-     * @function module:tests/dicom~getsuvfactor-no-radio
+     * @function module:tests/dicom~getsuvfactorNoRadio
      */
     test('no radio', () => {
       const deCorrectImage = new DataElement('CS');
@@ -199,7 +199,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor} without RadionuclideTotalDose.
      *
-     * @function module:tests/dicom~getsuvfactor-no-total-dose
+     * @function module:tests/dicom~getsuvfactorNoTotalDose
      */
     test('no total dose', () => {
       const deCorrectImage = new DataElement('CS');
@@ -243,7 +243,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor} without RadionuclideHalfLife.
      *
-     * @function module:tests/dicom~getsuvfactor-no-half-life
+     * @function module:tests/dicom~getsuvfactorNoHalfLife
      */
     test('no half life', () => {
       const deCorrectImage = new DataElement('CS');
@@ -292,7 +292,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor}.
      *
-     * @function module:tests/dicom~getsuvfactor-good-input
+     * @function module:tests/dicom~getsuvfactorGoodInput
      */
     test('good input', () => {
       const deCorrectImage = new DataElement('CS');
@@ -346,7 +346,7 @@ describe('dicom', () => {
      * Tests for {@link getSuvFactor} with
      * RadiopharmaceuticalStartDateTime.
      *
-     * @function module:tests/dicom~getsuvfactor-radio-start-date
+     * @function module:tests/dicom~getsuvfactorRadioStartDate
      */
     test('radio start date', () => {
       const deCorrectImage = new DataElement('CS');
@@ -404,7 +404,7 @@ describe('dicom', () => {
      * Tests for {@link getSuvFactor} with invalid
      * PatientWeight.
      *
-     * @function module:tests/dicom~getsuvfactor-invalid-weight
+     * @function module:tests/dicom~getsuvfactorInvalidWeight
      */
     test('invalid weight', () => {
       const deCorrectImage = new DataElement('CS');
@@ -444,7 +444,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSuvFactor} correct.
      *
-     * @function module:tests/dicom~getsuvfactor-correct
+     * @function module:tests/dicom~getsuvfactorCorrect
      */
     test('correct', () => {
       const deCorrectImage = new DataElement('CS');

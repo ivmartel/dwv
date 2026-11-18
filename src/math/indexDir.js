@@ -1,8 +1,9 @@
 import {Circle} from './circle.js';
 import {Ellipse} from './ellipse.js';
+import {Histogram} from './histogram.js';
 import {Index} from './index.js';
 import {Matrix33} from './matrix.js';
-import {NumberRange} from './stats.js';
+import {NumberRange} from './number.js';
 import {Point, Point2D, Point3D} from './point.js';
 import {Protractor} from './protractor.js';
 import {Rectangle} from './rectangle.js';
@@ -15,11 +16,15 @@ import {
 } from './orientation.js';
 import {getEllipseIndices} from './ellipse.js';
 import {getRectangleIndices} from './rectangle.js';
-import {Value} from './value.js';
+import {precisionRound} from './number.js';
+
+// also export typedefs
+export * from './types.js';
 
 export {
   Circle,
   Ellipse,
+  Histogram,
   Index,
   Matrix33,
   NumberRange,
@@ -32,9 +37,9 @@ export {
   Scalar2D,
   Scalar3D,
   Vector3D,
-  Value,
   Orientation,
   getOrientationName,
   getEllipseIndices,
   getRectangleIndices,
+  precisionRound,
 };

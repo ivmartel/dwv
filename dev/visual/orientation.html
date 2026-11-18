@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DWV orientation check</title>
+<meta charset="UTF-8">
+<meta name="description" content="DICOM Web Viewer (DWV) orientation check">
+<link rel="icon" href="../favicon.ico"/>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; }
+table { border-collapse: collapse; }
+th, td { padding: 3px; vertical-align: top; }
+th { text-align: left; font-weight: normal; color: #666; }
+td.name { font-family: monospace; }
+.layerGroup, .reference {
+  width: 200px;
+  height: 200px;
+  background-color: #000;
+  /* allow child centering */
+  position: relative;
+  overflow: hidden;
+}
+.layer {
+  /* needed for overlay */
+  position: absolute;
+  /* center */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.reference canvas {
+  width: 200px;
+  height: 200px;
+  image-rendering: pixelated;
+}
+</style>
+</head>
+
+<body>
+
+<h1>DWV orientation check</h1>
+
+<p>Each row is the same synthetic volume written as a series with a
+  different Image Orientation (Patient): all the 24 axis aligned
+  orientations. The name is the orientation code: anatomical direction
+  of the row, of the column and of the normal (LPS). Each series is
+  displayed without target orientation and with an axial, coronal and
+  sagittal one, all views at the same world position. A correct display
+  matches the expected row: a readable plane letter in the centre (A for
+  axial, C for coronal, S for sagittal), the anatomical labels on the
+  side they name (axial: A at the top, P at the bottom, R on the left
+  and L on the right; coronal: S at the top, I at the bottom, R on the
+  left and L on the right; sagittal: S at the top, I at the bottom, A on
+  the left and P on the right) and the dark marker in the top left
+  corner. The 'no orientation' view should match the expected view of
+  the acquisition plane.</p>
+
+<p>
+  <label><input type="checkbox" id="viewOnFirstLoadItem">
+    view on first load item</label>
+</p>
+
+<table id="views"></table>
+
+</body>
+</html>

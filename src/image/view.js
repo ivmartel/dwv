@@ -1,37 +1,37 @@
 import {Index} from '../math/index.js';
-import {ModalityLut} from './modalityLut.js';
+import {ModalityLut, isLutBitsStored} from './modalityLut.js';
 import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
-import {VoiLut} from './voiLut.js';
+import {VoiLut, VoiLutFunctionNames} from './voiLut.js';
 import {
   WindowLevel,
   equalWl,
   validateWindowLevel
 } from './windowLevel.js';
+import {WindowPreset} from './windowPreset.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
-import {generateImageDataPaletteColor} from './viewPaletteColor.js';
+import {
+  generateImageDataPaletteColor,
+  generateImageDataPaletteColorBlend
+} from './viewPaletteColor.js';
 import {generateImageDataRgb} from './viewRgb.js';
 import {generateImageDataYbrFull} from './viewYbrFull.js';
 import {ViewFactory} from './viewFactory.js';
+import {MaskImage} from './maskImage.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {getSliceIterator} from '../image/iterator.js';
-import {ListenerHandler} from '../utils/listen.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
-import {ColourMap} from './luts.js';
-import {Matrix33} from '../math/matrix.js';
-import {
-  Point,
-  Point3D
-} from '../math/point.js';
-import {DataElement} from '../dicom/dataElement.js';
 import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
-/* eslint-enable no-unused-vars */
+import {MAX_CONTOUR_SIZE} from './imageContour.js';
 
-export const MAX_CONTOUR_SIZE = 10;
+/**
+ * @import {Image} from './image.js';
+ * @import {ColourMap} from './luts.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Point, Point3D} from '../math/point.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * List of view event names.
@@ -49,13 +49,15 @@ export const viewEventNames = [
 ];
 
 /**
- * Create a View from DICOM elements and image.
+ * Demo View creation from DICOM elements and image.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * Warning: not to be used in production code.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @param {Image} image The associated image.
  * @returns {View} The View object.
  */
-export function createView(elements, image) {
+export function demoCreateView(elements, image) {
   const factory = new ViewFactory();
   return factory.create(elements, image);
 }
@@ -67,16 +69,16 @@ export function createView(elements, image) {
  * (either directly or with helper methods).
  *
  * @example
- * import {DicomParser, createImage, createView} from '//esm.sh/dwv';
+ * import {DicomParser, demoCreateImage, demoCreateView} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
  *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = demoCreateImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = createView(dicomParser.getDicomElements(), image);
+ *   const view = demoCreateView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;
@@ -98,7 +100,7 @@ export function createView(elements, image) {
  * request.onload = onload;
  * request.send();
  */
-export class View {
+export class View extends EventTarget {
 
   /**
    * The associated image.
@@ -108,7 +110,9 @@ export class View {
   #image;
 
   /**
-   * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
+   * Window lookup table: pre-computed for constant RSI integer data
+   *   with a limited number of bits stored, applied on rescaled
+   *   values otherwise.
    *
    * @type {WindowLut}
    */
@@ -122,12 +126,19 @@ export class View {
   #isConstantRSI;
 
   /**
+   * Flag for image data that can use pre-computed lookup tables.
+   *
+   * @type {boolean}
+   */
+  #isLutData;
+
+  /**
    * Window presets.
    * Minmax will be filled at first use (see view.setWindowLevelPreset).
    *
-   * @type {object}
+   * @type {Record<string, WindowPreset>}
    */
-  #windowPresets = {minmax: {name: 'minmax'}};
+  #windowPresets = {minmax: new WindowPreset('minmax')};
 
   /**
    * Current window preset name.
@@ -225,26 +236,50 @@ export class View {
     // transparent: 0 (background) and hidden
     if (value === 0 || this.#segmentViewHelper.isHidden(value)) {
       return 0;
-    } else {
-      if (this.getContourThickness() !== 0) {
-        // ideally getContourDistance would be passed in by an
-        // iterator, but that would require a large change to a
-        // lot of components for this one edge case.
-        const contourDistance =
-          this.#image.getContourDistance(
-            index,
-            this.getOrientation()
-          );
-        if (contourDistance <= this.getContourThickness()) {
-          return 0xff;
-        } else {
-          return 0xff * this.getFillOpacity();
-        }
-      } else {
-        return 0xff * this.getFillOpacity();
-      }
     }
+
+    let alpha = this.#getMaskAlpha(index);
+    // highlighted segment
+    if (typeof this.#segmentHighlight !== 'undefined' &&
+      value === this.#segmentHighlight.segmentNumber) {
+      alpha *= this.#segmentHighlight.opacity;
+    }
+    return alpha;
   };
+
+  /**
+   * Get the mask alpha of a non background and visible value.
+   *
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the value in [0,255] range.
+   */
+  #getMaskAlpha(index) {
+    if (this.getContourThickness() !== 0) {
+      // ideally getContourDistance would be passed in by an
+      // iterator, but that would require a large change to a
+      // lot of components for this one edge case.
+      // (this function is only called by the mask alpha function,
+      // only installed when isMask() is true, so #image is a MaskImage here)
+      const contourDistance =
+        /** @type {MaskImage} */ (this.#image).getContour().getDistance(
+          index,
+          this.getOrientation()
+        );
+      if (contourDistance <= this.getContourThickness()) {
+        return 0xff;
+      }
+      return 0xff * this.getFillOpacity();
+    }
+
+    return 0xff * this.getFillOpacity();
+  }
+
+  /**
+   * Highlighted segment: its number and opacity factor.
+   *
+   * @type {{segmentNumber: number, opacity: number}|undefined}
+   */
+  #segmentHighlight;
 
   /**
    * Segment view helper to handle
@@ -255,16 +290,10 @@ export class View {
   #segmentViewHelper;
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
    * @param {Image} image The associated image.
    */
   constructor(image) {
+    super();
     this.setImage(image);
   }
 
@@ -285,9 +314,17 @@ export class View {
   setImage(image) {
     this.#image = image;
 
-    // default to middle index
+    // resync window presets
+    const imagePresets = image.getMeta().windowPresets;
+    if (typeof imagePresets !== 'undefined') {
+      for (const key of Object.keys(imagePresets)) {
+        this.#windowPresets[key] = imagePresets[key];
+      }
+    }
+
+    // default to the image initial index
     if (typeof this.getCurrentPosition() === 'undefined') {
-      this.setCurrentIndex(this.#getMiddleIndex(), true);
+      this.setCurrentIndex(image.getInitialIndex(), true);
     }
 
     // reset alpha function
@@ -320,7 +357,7 @@ export class View {
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return this.#image.getMeta().Modality === 'SEG';
+    return this.#image instanceof MaskImage;
   }
 
   /**
@@ -332,9 +369,53 @@ export class View {
   setMaskViewHelper(helper) {
     this.#segmentViewHelper = helper;
 
-    this.#fireEvent({
-      type: 'alphafuncchange'
-    });
+    this.dispatchEvent(new CustomEvent('alphafuncchange'));
+  }
+
+  /**
+   * Get the segment highlight.
+   *
+   * @returns {{segmentNumber: number, opacity: number}|undefined}
+   *   The highlighted segment number and its opacity factor.
+   */
+  getSegmentHighlight() {
+    return this.#segmentHighlight;
+  }
+
+  /**
+   * Set the segment highlight: the opacity of the given segment
+   *   is multiplied by the input factor. Only one segment can be
+   *   highlighted at a time.
+   * This only has an effect on segmentation views.
+   *
+   * @param {number} [segmentNumber] The segment number,
+   *   undefined to remove the highlight.
+   * @param {number} [opacity] The opacity factor (between 0 and 1),
+   *   defaults to 1.
+   * @fires View#segmenthighlightchange
+   */
+  setSegmentHighlight(segmentNumber, opacity) {
+    if (typeof segmentNumber === 'undefined') {
+      this.#segmentHighlight = undefined;
+    } else {
+      if (typeof opacity === 'undefined') {
+        opacity = 1;
+      }
+      this.#segmentHighlight = {
+        segmentNumber,
+        opacity: Math.min(Math.max(opacity, 0), 1)
+      };
+    }
+
+    /**
+     * Segment highlight change event. Not propagated to the app
+     *   (not part of `viewEventNames`) since it can be fired at
+     *   each frame of a highlight animation.
+     *
+     * @event View#segmenthighlightchange
+     * @type {CustomEvent}
+     */
+    this.dispatchEvent(new CustomEvent('segmenthighlightchange'));
   }
 
   /**
@@ -385,13 +466,13 @@ export class View {
      * Mask view change event.
      *
      * @event View#maskviewchange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'maskviewchange',
-      value: [this.#fillOpacity, this.#contourThickness]
-    });
+    this.dispatchEvent(new CustomEvent('maskviewchange', {
+      detail: {value: [this.#fillOpacity, this.#contourThickness]}
+    }));
   }
 
   /**
@@ -421,27 +502,9 @@ export class View {
     }
 
     // fire mask view change
-    this.#fireEvent({
-      type: 'maskviewchange',
-      value: [this.#fillOpacity, this.#contourThickness]
-    });
-  }
-
-  /**
-   * Get the middle index of the current image.
-   *
-   * @returns {Index} The middle index.
-   */
-  #getMiddleIndex() {
-    const geometry = this.#image.getGeometry();
-    const size = geometry.getSize();
-    const values = new Array(size.length());
-    values.fill(0);
-    // middle
-    values[0] = Math.floor(size.get(0) / 2);
-    values[1] = Math.floor(size.get(1) / 2);
-    values[2] = Math.floor(size.get(2) / 2);
-    return size.normaliseIndex(new Index(values));
+    this.dispatchEvent(new CustomEvent('maskviewchange', {
+      detail: {value: [this.#fillOpacity, this.#contourThickness]}
+    }));
   }
 
   /**
@@ -480,12 +543,47 @@ export class View {
      * Alpha func change event.
      *
      * @event View#alphafuncchange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
      */
-    this.#fireEvent({
-      type: 'alphafuncchange'
-    });
+    this.dispatchEvent(new CustomEvent('alphafuncchange'));
+  }
+
+  /**
+   * Check if the image data is float.
+   *
+   * @returns {boolean} True if the image buffer is a float array.
+   */
+  #isFloat() {
+    const buffer = this.#image.getBuffer();
+    return buffer instanceof Float32Array ||
+      buffer instanceof Float64Array;
+  }
+
+  /**
+   * Get the VOI LUT function name: the one from the image meta data
+   * or, if not defined, LINEAR_EXACT for float data (LINEAR assumes
+   * integer pixel values) and undefined otherwise (LINEAR).
+   *
+   * @returns {string|undefined} The VOI LUT function name.
+   */
+  #getVoiLutFunctionName() {
+    let name = this.#image.getMeta().VOILUTFunction;
+    if (typeof name === 'undefined' && this.#isFloat()) {
+      name = VoiLutFunctionNames.linear_exact;
+    }
+    return name;
+  }
+
+  /**
+   * Check if the image data can use pre-computed lookup tables:
+   *   integer data with a limited number of bits stored.
+   *
+   * @returns {boolean} True if the image data can use lookup tables.
+   */
+  #canUseLut() {
+    return !this.#isFloat() &&
+      isLutBitsStored(this.#image.getMeta().BitsStored);
   }
 
   /**
@@ -526,17 +624,22 @@ export class View {
 
     // get the window lut
     if (typeof this.#isConstantRSI === 'undefined' ||
-      this.#image.isConstantRSI() !== this.#isConstantRSI) {
+      this.#image.isConstantRSI() !== this.#isConstantRSI ||
+      this.#canUseLut() !== this.#isLutData) {
       this.#isConstantRSI = this.#image.isConstantRSI();
-      // set or update windowLut if isConstantRSI has changed
+      this.#isLutData = this.#canUseLut();
+      // set or update windowLut if isConstantRSI or isLutData has changed
       // (can be different at first slice and after having loaded
       //  the full volume...)
       let rsi;
       let isDiscrete;
-      if (this.#isConstantRSI) {
+      if (this.#isConstantRSI && this.#isLutData) {
         rsi = this.#image.getRescaleSlopeAndIntercept();
         isDiscrete = true;
       } else {
+        // non constant RSI, float or large integer data:
+        // no pre-computed lookup tables, the values are rescaled
+        // by the iterator
         rsi = new RescaleSlopeAndIntercept(1, 0);
         isDiscrete = false;
       }
@@ -547,7 +650,7 @@ export class View {
       // create the window lookup table
       this.#windowLut = new WindowLut(
         modalityLut,
-        this.#image.getMeta().PixelRepresentation === 1,
+        !this.#isFloat() && this.#image.getMeta().PixelRepresentation === 1,
         isDiscrete);
     }
 
@@ -561,11 +664,11 @@ export class View {
     if (typeof voiLut === 'undefined' ||
       !equalWl(this.#currentWl, voiLutWl)) {
       // set lut window level
-      const voiLut = new VoiLut(
+      const newVoiLut = new VoiLut(
         this.#currentWl,
-        this.#image.getMeta().VOILUTFunction
+        this.#getVoiLutFunctionName()
       );
-      this.#windowLut.setVoiLut(voiLut);
+      this.#windowLut.setVoiLut(newVoiLut);
     }
 
     // return
@@ -575,7 +678,7 @@ export class View {
   /**
    * Get the window presets.
    *
-   * @returns {object} The window presets.
+   * @returns {Record<string, WindowPreset>} The window presets.
    */
   getWindowPresets() {
     return this.#windowPresets;
@@ -593,7 +696,7 @@ export class View {
   /**
    * Set the window presets.
    *
-   * @param {object} presets The window presets.
+   * @param {Record<string, WindowPreset>} presets The window presets.
    */
   setWindowPresets(presets) {
     this.#windowPresets = presets;
@@ -602,13 +705,11 @@ export class View {
   /**
    * Add window presets to the existing ones.
    *
-   * @param {object} presets The window presets.
+   * @param {Record<string, WindowPreset>} presets The window presets.
    */
   addWindowPresets(presets) {
     const keys = Object.keys(presets);
-    let key = null;
-    for (let i = 0; i < keys.length; ++i) {
-      key = keys[i];
+    for (const key of keys) {
       if (typeof this.#windowPresets[key] !== 'undefined') {
         if (typeof this.#windowPresets[key].perslice !== 'undefined' &&
           this.#windowPresets[key].perslice === true) {
@@ -625,14 +726,13 @@ export class View {
          * Window/level add preset event.
          *
          * @event View#wlpresetadd
-         * @type {object}
-         * @property {string} type The event type.
-         * @property {string} name The name of the preset.
+         * @type {CustomEvent}
+         * @property {object} detail The event detail.
+         * @property {string} detail.name The name of the preset.
          */
-        this.#fireEvent({
-          type: 'wlpresetadd',
-          name: key
-        });
+        this.dispatchEvent(new CustomEvent('wlpresetadd', {
+          detail: {name: key}
+        }));
       }
     }
   }
@@ -673,7 +773,7 @@ export class View {
   setColourMap(name) {
     // check if we have it
     if (!luts[name]) {
-      throw new Error('Unknown colour map: \'' + name + '\'');
+      throw new Error(`Unknown colour map: '${name}'`);
     }
 
     this.#colourMapName = name;
@@ -682,14 +782,13 @@ export class View {
      * Color change event.
      *
      * @event View#colourmapchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'colourmapchange',
-      value: [name]
-    });
+    this.dispatchEvent(new CustomEvent('colourmapchange', {
+      detail: {value: [name]}
+    }));
   }
 
   /**
@@ -823,14 +922,12 @@ export class View {
       this.#currentPosition = position;
       if (!silent) {
         // fire event with valid: false
-        this.#fireEvent({
-          type: 'positionchange',
-          value: [
-            index.getValues(),
-            inPosition.getValues(),
-          ],
-          valid: false
-        });
+        this.dispatchEvent(new CustomEvent('positionchange', {
+          detail: {
+            value: [index.getValues(), inPosition.getValues()],
+            valid: false
+          }
+        }));
       }
 
       // do no send invalid positionchange event: avoid empty repaint
@@ -865,34 +962,35 @@ export class View {
     this.#currentPosition = position;
 
     if (!silent) {
-      /**
-       * Position change event.
-       *
-       * @event View#positionchange
-       * @type {object}
-       * @property {Array} value The changed value as [index, pixelValue].
-       * @property {number[]} diffDims An array of modified indices.
-       */
-      const posEvent = {
-        type: 'positionchange',
-        value: [
-          index.getValues(),
-          inPosition.getValues(),
-        ],
-        diffDims: diffDims,
-        data: {
-          imageUid: this.#image.getImageUid(index)
-        }
-      };
+      /** @type {Array} */
+      const posValue = [
+        index.getValues(),
+        inPosition.getValues(),
+      ];
 
       // add value if possible
       if (this.#image.canQuantify()) {
         const pixValue = this.#image.getRescaledValueAtIndex(index);
-        posEvent.value.push(pixValue);
+        posValue.push(pixValue);
       }
 
-      // fire
-      this.#fireEvent(posEvent);
+      /**
+       * Position change event.
+       *
+       * @event View#positionchange
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {Array} detail.value The changed value as
+       *   [index, pixelValue].
+       * @property {number[]} detail.diffDims An array of modified indices.
+       */
+      this.dispatchEvent(new CustomEvent('positionchange', {
+        detail: {
+          value: posValue,
+          diffDims,
+          data: {imageUid: this.#image.getImageUid(index)}
+        }
+      }));
     }
 
     // all good
@@ -915,7 +1013,7 @@ export class View {
     }
     if (name !== 'manual' &&
       typeof this.#windowPresets[name] === 'undefined') {
-      throw new Error('Unknown window level preset: \'' + name + '\'');
+      throw new Error(`Unknown window level preset: '${name}'`);
     }
     if (typeof silent === 'undefined') {
       silent = false;
@@ -925,7 +1023,7 @@ export class View {
     const wlBound = validateWindowLevel(
       wl,
       this.#image.getRescaledDataRange(),
-      this.#image.getMeta().VOILUTFunction
+      this.#getVoiLutFunctionName()
     );
 
     // check if new wl
@@ -946,10 +1044,7 @@ export class View {
         } else {
           // add if not present
           this.addWindowPresets({
-            manual: {
-              wl: [wlBound],
-              name: 'manual'
-            }
+            manual: new WindowPreset('manual', [wlBound])
           });
         }
       }
@@ -958,20 +1053,21 @@ export class View {
        * Window/level change event.
        *
        * @event View#wlchange
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {Array} value The changed value.
-       * @property {number} wc The new window center value.
-       * @property {number} ww The new window wdth value.
-       * @property {boolean} skipGenerate Flag to skip view generation.
+       * @type {CustomEvent}
+       * @property {object} detail The event detail.
+       * @property {Array} detail.value The changed value.
+       * @property {number} detail.wc The new window center value.
+       * @property {number} detail.ww The new window width value.
+       * @property {boolean} detail.skipGenerate Flag to skip view generation.
        */
-      this.#fireEvent({
-        type: 'wlchange',
-        value: [wlBound.center, wlBound.width, name],
-        wc: wlBound.center,
-        ww: wlBound.width,
-        skipGenerate: silent
-      });
+      this.dispatchEvent(new CustomEvent('wlchange', {
+        detail: {
+          value: [wlBound.center, wlBound.width, name],
+          wc: wlBound.center,
+          ww: wlBound.width,
+          skipGenerate: silent
+        }
+      }));
     }
   }
 
@@ -995,10 +1091,11 @@ export class View {
   setWindowLevelPreset(name, silent) {
     const preset = this.getWindowPresets()[name];
     if (typeof preset === 'undefined') {
-      throw new Error('Unknown window level preset: \'' + name + '\'');
+      throw new Error(`Unknown window level preset: '${name}'`);
     }
-    // special min/max
-    if (name === 'minmax' && typeof preset.wl === 'undefined') {
+    // special min/max: not cached since the data range can change
+    // (for ex while loading)
+    if (name === 'minmax') {
       preset.wl = [this.getWindowLevelMinMax()];
     }
     // default to first
@@ -1029,37 +1126,6 @@ export class View {
   }
 
   /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
-
-  /**
    * Get the image window/level that covers the full data range.
    * Warning: uses the latest set rescale LUT or the default linear one.
    *
@@ -1072,7 +1138,7 @@ export class View {
     return validateWindowLevel(
       new WindowLevel(center, width),
       range,
-      this.#image.getMeta().VOILUTFunction
+      this.#getVoiLutFunctionName()
     );
   }
 
@@ -1105,7 +1171,7 @@ export class View {
     }
 
     const image = this.getImage();
-    const isRescaled = !image.isConstantRSI();
+    const isRescaled = !image.isConstantRSI() || !this.#canUseLut();
     const iterator = getSliceIterator(
       image, index, isRescaled, this.getOrientation());
 
@@ -1123,13 +1189,28 @@ export class View {
         break;
 
       case 'PALETTE COLOR':
-        generateImageDataPaletteColor(
-          data,
-          iterator,
-          this.getAlphaFunction(),
-          image.getPaletteColourMap(),
-          image.getMeta().BitsStored === 16
-        );
+        if (image instanceof MaskImage && image.getHasOverlap()) {
+          generateImageDataPaletteColorBlend(
+            data,
+            iterator,
+            image.getPaletteColourMap(),
+            image.getSegmentCollection(),
+            image.getGeometry().getSize().getDimSize(2),
+            image.getGeometry().getSize(),
+            this.getOrientation(),
+            this.getContourThickness(),
+            this.getFillOpacity(),
+            this.#segmentViewHelper
+          );
+        } else {
+          generateImageDataPaletteColor(
+            data,
+            iterator,
+            this.getAlphaFunction(),
+            image.getPaletteColourMap(),
+            image.getMeta().BitsStored === 16
+          );
+        }
         break;
 
       case 'RGB':
@@ -1150,7 +1231,7 @@ export class View {
 
       default:
         throw new Error(
-          'Unsupported photometric interpretation: ' + photoInterpretation);
+          `Unsupported photometric interpretation: ${photoInterpretation}`);
     }
   }
 

@@ -76,13 +76,13 @@ export class BucketQueue {
     if (node === null) {
       // Item not in list, ergo item not in queue
       return false;
-    } else {
-      // Found item, do standard list node deletion
-      node.next = node.next.next;
-
-      this.size--;
-      return true;
     }
+
+    // Found item, do standard list node deletion
+    node.next = node.next.next;
+
+    this.size--;
+    return true;
   }
 
   isEmpty() {

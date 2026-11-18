@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert} from 'vitest';
 import {ZipLoader} from '../../src/io/zipLoader.js';
 
@@ -10,7 +11,7 @@ describe('io', () => {
   /**
    * Tests for {@link ZipLoader} events with single frame data.
    *
-   * @function module:tests/io~zip-loader-canloadurl
+   * @function module:tests/io~zipLoaderCanloadurl
    */
   test('ZIP loader canloadurl - #DWV-REQ-IO-02-003 Load DICOM ZIP URL',
     () => {

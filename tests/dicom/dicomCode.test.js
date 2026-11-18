@@ -9,7 +9,9 @@ import {
   getConceptNameCode,
   getMeasurementUnitsCode
 } from '../../src/dicom/dicomCode.js';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
+import {
+  getElementsFromSimpleTagValues
+} from '../../src/dicom/simpleTagValues.js';
 
 /**
  * Tests for the 'dicom/dicomCode.js' file.
@@ -36,21 +38,21 @@ describe('dicom', () => {
       urnValue: codeSimpleElements.URNCodeValue
     };
     assert.ok(isEqualCode(code1, code),
-      testName + ' code from simple element');
+      `${testName} code from simple element`);
 
     // simple dicom element -> dicom element
-    const codeElements = getElementsFromJSONTags(codeSimpleElements);
+    const codeElements = getElementsFromSimpleTagValues(codeSimpleElements);
     // dicom element -> code
     const code2 = getCode(codeElements);
     // compare
     assert.ok(isEqualCode(code2, code),
-      testName + ' code from element');
+      `${testName} code from element`);
   }
 
   /**
    * Tests for {@link DicomCode} using simple DICOM data.
    *
-   * @function module:tests/dicom~dicom-code-class
+   * @function module:tests/dicom~dicomCodeClass
    */
   test('DICOM code class', () => {
     const meaning0 = 'code0';
@@ -65,7 +67,7 @@ describe('dicom', () => {
       'Test #00 toString');
 
     // example codes
-    // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.10.html
+    // see https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_8.10.html
 
     const code01 = {
       meaning: 'Dimeglumine gadopentetate 469.01mg/mL inj soln 15mL pfld syr',
@@ -142,8 +144,8 @@ describe('dicom', () => {
     const code0 = getConceptNameCode('test');
     assert.equal(code0, undefined, 'getConceptNameCode #0');
 
-    const code1 = getConceptNameCode('a');
-    const theoCode1 = new DicomCode('a');
+    const code1 = getConceptNameCode('longAxis');
+    const theoCode1 = new DicomCode('longAxis');
     theoCode1.value = '103339001';
     theoCode1.schemeDesignator = 'SCT';
     assert.ok(isEqualCode(code1, theoCode1), 'getConceptNameCode #1');

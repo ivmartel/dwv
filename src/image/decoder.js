@@ -1,22 +1,30 @@
 import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 /**
- * List of compatible typed arrays.
- *
- * @typedef {(
- *   Uint8Array | Int8Array |
- *   Uint16Array | Int16Array |
- *   Uint32Array | Int32Array
- * )} TypedArray
+ * @import {TypedArray} from '../math/types.js';
  */
+
+/**
+ * Decoder worker task: posts a compact copy of the input buffer.
+ */
+class DecoderWorkerTask extends WorkerTask {
+  getStartMessage() {
+    // the input buffer is usually a view on the whole file buffer:
+    // posting it would copy the whole file, so post a copy of the view
+    // data only (made at run time to not keep copies for queued tasks)
+    // and transfer it to avoid a second copy
+    const buffer = this.startMessage.buffer.slice();
+    return {
+      message: {...this.startMessage, buffer},
+      transfer: [buffer.buffer]
+    };
+  }
+}
 
 /**
  * Jpeg baseline worker task.
  */
-class JpegBaselineWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
+class JpegBaselineWorkerTask extends DecoderWorkerTask {
   getWorker() {
     return new Worker(
       new URL('../decoders/pdfjs/jpegbaseline.worker.js', import.meta.url),
@@ -30,10 +38,7 @@ class JpegBaselineWorkerTask extends WorkerTask {
 /**
  * Jpeg lossless worker task.
  */
-class JpegLosslessWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
+class JpegLosslessWorkerTask extends DecoderWorkerTask {
   getWorker() {
     return new Worker(
       new URL('../decoders/rii-mango/jpegloss.worker.js', import.meta.url),
@@ -47,10 +52,7 @@ class JpegLosslessWorkerTask extends WorkerTask {
 /**
  * Jpeg 2000 worker task.
  */
-class Jpeg2000WorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
+class Jpeg2000WorkerTask extends DecoderWorkerTask {
   getWorker() {
     return new Worker(
       new URL('../decoders/pdfjs/jpeg2000.worker.js', import.meta.url),
@@ -64,10 +66,7 @@ class Jpeg2000WorkerTask extends WorkerTask {
 /**
  * RLE worker task.
  */
-class RleWorkerTask extends WorkerTask {
-  constructor(message, info) {
-    super(message, info);
-  }
+class RleWorkerTask extends DecoderWorkerTask {
   getWorker() {
     return new Worker(
       new URL('../decoders/dwv/rle.worker.js', import.meta.url),
@@ -110,7 +109,7 @@ export class PixelBufferDecoder {
   constructor(algoName) {
     this.#algoName = algoName;
     // create pool
-    this.#pool = new ThreadPool(10);
+    this.#pool = new ThreadPool();
   }
 
   /**

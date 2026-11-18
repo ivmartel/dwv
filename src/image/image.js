@@ -2,32 +2,26 @@ import {Index} from '../math/index.js';
 import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
 import {arrayContains} from '../utils/array.js';
-import {getTypedArray} from '../dicom/dicomParser.js';
-import {ListenerHandler} from '../utils/listen.js';
-import {valueRange} from './iterator.js';
+import {getTypedArrayLike} from '../dicom/dicomParser.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
-import {ImageFactory} from './imageFactory.js';
-import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
-import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread.js';
-import {MAX_CONTOUR_SIZE} from './view.js';
 import {BooleanResult} from '../utils/result.js';
 import {equalWl} from './windowLevel.js';
+import {ImageHistogram} from './imageHistogram.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Geometry} from './geometry.js';
-import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix.js';
-import {NumberRange} from '../math/stats.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {RGB} from '../utils/colour.js';
-import {ColourMap} from './luts.js';
-import {Point} from '../math/point.js';
-import {Label} from './label.js';
-/* eslint-enable no-unused-vars */
-
-const ML_PER_MM = 0.001; // ml/mm^3
+/**
+ * @import {Geometry} from './geometry.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {NumberRange} from '../math/number.js';
+ * @import {RGB} from '../utils/colour.js';
+ * @import {ColourMap} from './luts.js';
+ * @import {Point} from '../math/point.js';
+ * @import {MaskImage} from './maskImage.js';
+ * @import {TypedArray} from '../math/types.js';
+ * @import {VolumeId} from './types.js';
+ * @import {VolumeValue} from '../dicom/types.js';
+ */
 
 
 /**
@@ -54,7 +48,7 @@ export const imageEventNames = [
  */
 function getSliceIndex(volumeGeometry, sliceGeometry) {
   // possible time
-  const timeId = sliceGeometry.getInitialTime();
+  const timeId = sliceGeometry.getInitialTime()?.id.value;
   // index values
   const values = [];
   // x, y
@@ -62,41 +56,13 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
   values.push(0);
   // z
   values.push(volumeGeometry.getSliceIndex(sliceGeometry.getOrigin(), timeId));
-  // time
+  // time: volume index if the time is a volume id
   if (typeof timeId !== 'undefined') {
-    values.push(timeId);
+    const volumeIndex = volumeGeometry.getVolumeIndex(timeId);
+    values.push(volumeIndex !== -1 ? volumeIndex : timeId);
   }
   // return index
   return new Index(values);
-}
-
-/**
- * Create an Image from DICOM elements.
- *
- * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {Image} The Image object.
- */
-export function createImage(elements) {
-  const factory = new ImageFactory();
-  return factory.create(
-    elements,
-    elements['7FE00010'].value[0],
-    1
-  );
-}
-
-/**
- * Create a mask Image from DICOM elements.
- *
- * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {Image} The mask Image object.
- */
-export function createMaskImage(elements) {
-  const factory = new MaskFactory();
-  return factory.create(
-    elements,
-    elements['7FE00010'].value[0]
-  );
 }
 
 /**
@@ -107,14 +73,14 @@ export function createMaskImage(elements) {
  * - planar configuration (default RGBRGB...).
  *
  * @example
- * import {DicomParser, createImage} from '//esm.sh/dwv';
+ * import {DicomParser, demoCreateImage} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
  *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = demoCreateImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
@@ -138,7 +104,7 @@ export function createMaskImage(elements) {
  * request.onload = onload;
  * request.send();
  */
-export class Image {
+export class Image extends EventTarget {
 
   /**
    * Data geometry.
@@ -148,13 +114,12 @@ export class Image {
   #geometry;
 
   /**
-   * List of compatible typed arrays.
+   * Constructor signature shared by {@link Image} and its subclasses,
+   * used by {@link Image#clone} to build the copy via the concrete
+   * (possibly subclassed) constructor.
    *
-   * @typedef {(
-   *   Uint8Array | Int8Array |
-   *   Uint16Array | Int16Array |
-   *   Uint32Array | Int32Array
-   * )} TypedArray
+   * @typedef {function(new:Image, Geometry, TypedArray, Array<string>=)}
+   *   ImageConstructor
    */
 
   /**
@@ -163,14 +128,6 @@ export class Image {
    * @type {TypedArray}
    */
   #buffer;
-
-  /**
-   * Data contour buffer.
-   * If there is no data contour this is null.
-   *
-   * @type {Uint8Array?}
-   */
-  #contourBuffer;
 
   /**
    * Whether the image has been resampled or not.
@@ -267,7 +224,7 @@ export class Image {
   /**
    * Meta information.
    *
-   * @type {Object<string, any>}
+   * @type {Record<string, any>}
    */
   #meta = {};
 
@@ -288,23 +245,9 @@ export class Image {
   /**
    * Histogram.
    *
-   * @type {Array}
+   * @type {ImageHistogram|null}
    */
   #histogram = null;
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
-   * The labeling thread.
-   *
-   * @type {LabelingThread}
-   */
-  #labelingThread;
 
   /**
    * The resampling thread.
@@ -326,15 +269,14 @@ export class Image {
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
    */
   constructor(geometry, buffer, imageUids) {
+    super();
     this.#geometry = geometry;
     this.#buffer = buffer;
     this.#resampled = false;
     this.#resamplingJobId = '0';
     this.#rawGeometry = null;
     this.#rawBuffer = null;
-    this.#contourBuffer = null;
     this.#imageUids = imageUids;
-    this.#labelingThread = null;
     this.#resamplingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
@@ -363,6 +305,33 @@ export class Image {
   }
 
   /**
+   * Get the initial index, used as default position by views:
+   * the middle of the image (first frame for 4D).
+   *
+   * @returns {Index} The index.
+   */
+  getInitialIndex() {
+    const size = this.#geometry.getSize();
+    const values = new Array(size.length()).fill(0);
+    for (let i = 0; i < Math.min(3, values.length); ++i) {
+      values[i] = Math.floor(size.get(i) / 2);
+    }
+    return new Index(values);
+  }
+
+  /**
+   * Check whether the image has overlapping segments. Always false for a
+   * plain image; {@link MaskImage} overrides this with a real check.
+   *
+   * @returns {boolean} False.
+   * @deprecated Since v0.37, please use `instanceof MaskImage` and
+   *   `MaskImage#getHasOverlap` instead.
+   */
+  getHasOverlap() {
+    return false;
+  }
+
+  /**
    * Get the image UID at a given index.
    *
    * @param {Index} [index] The index at which to get the id.
@@ -387,7 +356,7 @@ export class Image {
     const uidIndex = this.#imageUids.indexOf(uid);
     if (uidIndex !== -1) {
       const origins = this.getGeometry().getOrigins();
-      origin = origins[uidIndex];
+      origin = origins[uidIndex % origins.length];
     }
     return origin;
   }
@@ -460,6 +429,16 @@ export class Image {
   }
 
   /**
+   * Check is the image is a mask.
+   *
+   * @returns {boolean} True if mask.
+   * @deprecated Since v0.37, please use `instanceof MaskImage` instead.
+   */
+  isMask() {
+    return false;
+  }
+
+  /**
    * Can the data be scrolled?
    *
    * @param {Matrix33} viewOrientation The view orientation.
@@ -468,12 +447,12 @@ export class Image {
    */
   canScroll(viewOrientation) {
     const size = this.getGeometry().getSize();
-    // also check the numberOfFiles in case we are in the middle of a load
-    let nFiles = 1;
-    if (typeof this.#meta.numberOfFiles !== 'undefined') {
-      nFiles = this.#meta.numberOfFiles;
+    // also check the slice capacity in case we are in the middle of a load
+    let sliceCapacity = 1;
+    if (typeof this.#meta.sliceCapacity !== 'undefined') {
+      sliceCapacity = this.#meta.sliceCapacity;
     }
-    return size.canScroll(viewOrientation) || nFiles !== 1;
+    return size.canScroll(viewOrientation) || sliceCapacity !== 1;
   }
 
   /**
@@ -512,7 +491,7 @@ export class Image {
       if (typeof this.#rsis[offset] !== 'undefined') {
         res = this.#rsis[offset];
       } else {
-        logger.warn('undefined non constant rsi at ' + offset);
+        logger.warn(`undefined non constant rsi at ${offset}`);
       }
     }
     return res;
@@ -545,24 +524,22 @@ export class Image {
           'Cannot store non constant RSI with empty slice index.');
       }
       this.#rsis.splice(offset, 0, inRsi);
-    } else {
-      if (!this.#rsi.equals(inRsi)) {
-        if (typeof offset === 'undefined') {
-          // no slice index, replace existing
-          this.#rsi = inRsi;
-        } else {
-          // first non constant rsi
-          this.#isConstantRSI = false;
-          // switch to non constant mode
-          this.#rsis = [];
-          // initialise RSIs
-          for (let i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
-            this.#rsis.push(this.#rsi);
-          }
-          // store
-          this.#rsi = null;
-          this.#rsis.splice(offset, 0, inRsi);
+    } else if (!this.#rsi.equals(inRsi)) {
+      if (typeof offset === 'undefined') {
+        // no slice index, replace existing
+        this.#rsi = inRsi;
+      } else {
+        // first non constant rsi
+        this.#isConstantRSI = false;
+        // switch to non constant mode
+        this.#rsis = [];
+        // initialise RSIs
+        for (let i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
+          this.#rsis.push(this.#rsi);
         }
+        // store
+        this.#rsi = null;
+        this.#rsis.splice(offset, 0, inRsi);
       }
     }
   }
@@ -611,7 +588,7 @@ export class Image {
   setPaletteColourMap(map) {
     this.#paletteColourMap = map;
     // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
@@ -634,7 +611,7 @@ export class Image {
     this.#paletteColourMap.green[index] = colour.g;
     this.#paletteColourMap.blue[index] = colour.b;
     // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
@@ -667,7 +644,7 @@ export class Image {
   /**
    * Get the meta information of the image.
    *
-   * @returns {Object<string, any>} The meta information of the image.
+   * @returns {Record<string, any>} The meta information of the image.
    */
   getMeta() {
     return this.#meta;
@@ -676,7 +653,7 @@ export class Image {
   /**
    * Set the meta information of the image.
    *
-   * @param {Object<string, any>} rhs The meta information of the image.
+   * @param {Record<string, any>} rhs The meta information of the image.
    */
   setMeta(rhs) {
     this.#meta = rhs;
@@ -690,50 +667,6 @@ export class Image {
    */
   getValueAtOffset(offset) {
     return this.#buffer[offset];
-  }
-
-  /**
-   * Get the offsets where the buffer equals the input value.
-   * Loops through the whole volume, can get long for big data...
-   *
-   * @param {number|RGB} value The value to check.
-   * @returns {number[]} The list of offsets.
-   */
-  getOffsets(value) {
-    // value to array
-    let bufferValue;
-    if (typeof value === 'number') {
-      if (this.#numberOfComponents !== 1) {
-        throw new Error(
-          'Number of components is not 1 for getting single value.');
-      }
-      bufferValue = [value];
-    } else if (typeof value.r !== 'undefined' &&
-      typeof value.g !== 'undefined' &&
-      typeof value.b !== 'undefined') {
-      if (this.#numberOfComponents !== 3) {
-        throw new Error(
-          'Number of components is not 3 for getting RGB value.');
-      }
-      bufferValue = [value.r, value.g, value.b];
-    }
-
-    // main loop
-    const offsets = [];
-    let equal;
-    for (let i = 0; i < this.#buffer.length; i = i + this.#numberOfComponents) {
-      equal = true;
-      for (let j = 0; j < this.#numberOfComponents; ++j) {
-        if (this.#buffer[i + j] !== bufferValue[j]) {
-          equal = false;
-          break;
-        }
-      }
-      if (equal) {
-        offsets.push(i);
-      }
-    }
-    return offsets;
   }
 
   /**
@@ -828,8 +761,11 @@ export class Image {
   clone() {
     // clone the image buffer
     const clonedBuffer = this.#buffer.slice(0);
-    // create the image copy
-    const copy = new Image(
+    // create the image copy (via the concrete constructor so a MaskImage
+    // clones into another MaskImage, see MaskImage#clone for the rest of
+    // the mask-specific state)
+    const Ctor = /** @type {ImageConstructor} */ (this.constructor);
+    const copy = new Ctor(
       this.getGeometry().clone(), clonedBuffer, this.#imageUids);
     // copy the RSI(s)
     if (this.isConstantRSI()) {
@@ -850,38 +786,85 @@ export class Image {
   }
 
   /**
-   * Re-allocate buffer memory to an input size.
+   * Replace the inner buffer wholesale (as opposed to editing its content
+   * in place). Primarily intended for subclass use, where a private
+   * (`#`) field on this class isn't reachable directly.
    *
-   * @param {number} size The new size.
+   * @param {TypedArray} newBuffer The new buffer.
+   * @fires Image#imagecontentchange
    */
-  #realloc(size) {
-    // save buffer
-    let tmpBuffer = this.#buffer;
-    // create new
-    this.#buffer = getTypedArray(
-      this.#buffer.BYTES_PER_ELEMENT * 8,
-      this.#meta.PixelRepresentation,
-      size);
-    if (this.#buffer === null) {
-      throw new Error('Cannot reallocate data for image.');
-    }
-    // put old in new
-    this.#buffer.set(tmpBuffer);
-
-    // clean
-    tmpBuffer = null;
+  replaceBuffer(newBuffer) {
+    this.#buffer = newBuffer;
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
   }
 
   /**
    * Re-allocate buffer memory to an input size.
    *
    * @param {number} size The new size.
+   * @fires Image#imagebufferrealloc
    */
-  #reallocContour(size) {
-    let tmpBuffer = this.#contourBuffer;
-    this.#contourBuffer = new Uint8Array(size);
-    this.#contourBuffer.set(tmpBuffer);
+  #realloc(size) {
+    // save buffer
+    let tmpBuffer = this.#buffer;
+    // create new
+    this.#buffer = getTypedArrayLike(this.#buffer, size);
+    if (this.#buffer === null) {
+      throw new Error('Cannot reallocate data for image.');
+    }
+    // put old in new
+    this.#buffer.set(tmpBuffer);
+
+    // force GC
+    // eslint-disable-next-line no-useless-assignment
     tmpBuffer = null;
+
+    /**
+     * Buffer reallocation event: internal-only signal (not part of
+     * {@link imageEventNames}) for a subclass to re-point any state
+     * aliased to the previous buffer instance, for example MaskImage's
+     * segment collection label map.
+     *
+     * @event Image#imagebufferrealloc
+     * @type {CustomEvent}
+     */
+    this.dispatchEvent(new CustomEvent('imagebufferrealloc'));
+  }
+
+  /**
+   * Shift already-present buffer content to make room for a slice (or
+   * volume of slices) being inserted before the end of the buffer.
+   * No-op if the insertion point is already at (or past) the end.
+   *
+   * @param {number} indexOffset Buffer offset where the new content will
+   *   be written.
+   * @param {number} insertSize Buffer size of the content being inserted.
+   * @param {number} maxOffset Buffer offset marking the end of the
+   *   previously valid content.
+   * @fires Image#imagesliceshift
+   */
+  #shiftSlice(indexOffset, insertSize, maxOffset) {
+    if (indexOffset >= maxOffset) {
+      return;
+    }
+    this.#buffer.set(
+      this.#buffer.subarray(indexOffset, maxOffset),
+      indexOffset + insertSize
+    );
+
+    /**
+     * Buffer slice-shift event: internal-only signal (not part of
+     * {@link imageEventNames}) for a subclass to replicate the same
+     * shift on any of its own buffer-aliased state, for example
+     * MaskImage's contour.
+     *
+     * @event Image#imagesliceshift
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     */
+    this.dispatchEvent(new CustomEvent('imagesliceshift', {
+      detail: {indexOffset, insertSize, maxOffset}
+    }));
   }
 
   /**
@@ -891,7 +874,7 @@ export class Image {
    * @returns {BooleanResult} Result with success set to true if
    *   the image can be appended.
    */
-  canAppend(rhs) {
+  canAppendSlice(rhs) {
     // check input
     if (rhs === null) {
       return {
@@ -901,11 +884,24 @@ export class Image {
     }
 
     // check geometry
-    const geoCanAppend = this.#geometry.canAppend(rhs.getGeometry());
+    const geoCanAppend = this.#geometry.canAppendSlice(rhs.getGeometry());
     if (!geoCanAppend.success) {
       return geoCanAppend;
     }
 
+    return this.#checkMetaEquality(rhs);
+  }
+
+  /**
+   * Check photometric interpretation and meta data equality against
+   * a candidate slice or image to append. Shared by `canAppendSlice`
+   * and `canAppendImage`.
+   *
+   * @param {Image} rhs The image to check.
+   * @returns {BooleanResult} Result with success set to true if
+   *   the meta data is compatible.
+   */
+  #checkMetaEquality(rhs) {
     if (this.#photometricInterpretation !==
       rhs.getPhotometricInterpretation()) {
       return {
@@ -918,15 +914,19 @@ export class Image {
     for (const key in this.#meta) {
       if (
         key === 'windowPresets' ||
-        key === 'numberOfFiles' ||
+        key === 'sliceCapacity' ||
         key === 'custom'
       ) {
         continue;
       }
+      // allow for different series time (for multi-volume)
+      if (key === 'SeriesTime') {
+        continue;
+      }
 
       if (this.#meta[key] !== rhs.getMeta()[key]) {
-        const message = 'Cannot append a slice with different ' + key +
-          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key];
+        const message = `Cannot append a slice with different ${ key
+        }: ${this.#meta[key]} != ${rhs.getMeta()[key]}`;
         return {
           success: false,
           message
@@ -945,7 +945,7 @@ export class Image {
    */
   appendSlice(rhs) {
     // check if possible
-    const canAppend = this.canAppend(rhs);
+    const canAppend = this.canAppendSlice(rhs);
     if (!canAppend.success) {
       throw new Error(canAppend.message);
     }
@@ -967,14 +967,17 @@ export class Image {
     let size = this.getGeometry().getSize();
 
     // possible time
-    const timeId = rhs.getGeometry().getInitialTime();
+    const time = rhs.getGeometry().getInitialTime();
+    const timeId = time?.id.value;
+
+    const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
 
     // append frame if needed
     let isNewFrame = false;
     if (typeof timeId !== 'undefined' &&
       !this.#geometry.hasSlicesAtTime(timeId)) {
       // update grometry
-      this.appendFrame(timeId, rhs.getGeometry().getOrigin());
+      this.appendFrame(time, rhs.getGeometry().getOrigin());
       // update size
       size = this.#geometry.getSize();
       // update flag
@@ -988,17 +991,12 @@ export class Image {
     const sliceSize = this.#numberOfComponents * size.getDimSize(2);
 
     // create full buffer if not done yet
-    if (typeof this.#meta.numberOfFiles === 'undefined') {
-      throw new Error('Missing number of files for buffer manipulation.');
+    if (typeof this.#meta.sliceCapacity === 'undefined') {
+      throw new Error('Missing slice capacity for buffer manipulation.');
     }
-    const fullBufferSize = sliceSize * this.#meta.numberOfFiles;
+    const fullBufferSize = sliceSize * this.#meta.sliceCapacity;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
-
-      if (this.#contourBuffer !== null) {
-        const contourSize = size.getDimSize(2) * 3 * this.#meta.numberOfFiles;
-        this.#reallocContour(contourSize);
-      }
     }
 
     // slice index
@@ -1012,25 +1010,9 @@ export class Image {
     }
     // offset of the input slice
     const indexOffset = fullSliceIndex * sliceSize;
-    const totalSlices = this.#geometry.getCurrentTotalNumberOfSlices();
     const maxOffset = totalSlices * sliceSize;
     // move content if needed
-    if (indexOffset < maxOffset) {
-      this.#buffer.set(
-        this.#buffer.subarray(indexOffset, maxOffset),
-        indexOffset + sliceSize
-      );
-
-      if (this.#contourBuffer !== null) {
-        const contourSliceSize = size.getDimSize(2) * 3;
-        const contourIndexOffset = fullSliceIndex * contourSliceSize;
-        const contourMaxOffset = totalSlices * contourSliceSize;
-        this.#contourBuffer.set(
-          this.#contourBuffer.subarray(contourIndexOffset, contourMaxOffset),
-          contourIndexOffset + contourSliceSize
-        );
-      }
-    }
+    this.#shiftSlice(indexOffset, sliceSize, maxOffset);
     // add new slice content
     this.#buffer.set(rhs.getBuffer(), indexOffset);
 
@@ -1055,7 +1037,7 @@ export class Image {
       const windowPresets = this.#meta.windowPresets;
       const rhsPresets = rhs.getMeta().windowPresets;
       const keys = Object.keys(rhsPresets);
-      let pkey = null;
+      let pkey;
       for (let i = 0; i < keys.length; ++i) {
         pkey = keys[i];
         const rhsPreset = rhsPresets[pkey];
@@ -1090,12 +1072,10 @@ export class Image {
      * Image geometry change event.
      *
      * @event Image#imagegeometrychange
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
      */
-    this.#fireEvent({
-      type: 'imagegeometrychange'
-    });
+    this.dispatchEvent(new CustomEvent('imagegeometrychange'));
   }
 
   /**
@@ -1108,34 +1088,30 @@ export class Image {
     // create full buffer if not done yet
     const size = this.#geometry.getSize();
     const frameSize = this.#numberOfComponents * size.getDimSize(2);
-    if (typeof this.#meta.numberOfFiles === 'undefined') {
-      throw new Error('Missing number of files for frame buffer manipulation.');
+    if (typeof this.#meta.sliceCapacity === 'undefined') {
+      throw new Error('Missing slice capacity for frame buffer manipulation.');
     }
-    const fullBufferSize = frameSize * this.#meta.numberOfFiles;
+    const fullBufferSize = frameSize * this.#meta.sliceCapacity;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
-
-      if (this.#contourBuffer !== null) {
-        const contourSize = size.getDimSize(2) * 3 * this.#meta.numberOfFiles;
-        this.#reallocContour(contourSize);
-      }
     }
     // check index
-    if (frameIndex >= this.#meta.numberOfFiles) {
-      logger.warn('Ignoring frame at index ' + frameIndex +
-        ' (size: ' + this.#meta.numberOfFiles + ')');
+    if (frameIndex >= this.#meta.sliceCapacity) {
+      logger.warn(`Ignoring frame at index ${ frameIndex
+      } (size: ${this.#meta.sliceCapacity})`);
       return;
     }
     // append
     this.#buffer.set(frameBuffer, frameSize * frameIndex);
     // update geometry
-    this.appendFrame(frameIndex, new Point3D(0, 0, 0));
+    this.appendFrame({id: {value: frameIndex}}, new Point3D(0, 0, 0));
   }
 
   /**
    * Append a frame to the image.
    *
-   * @param {number} time The frame time value.
+   * @param {VolumeId} time The frame time: a volume id or, without
+   *   source, a frame index.
    * @param {Point3D} origin The origin of the frame.
    */
   appendFrame(time, origin) {
@@ -1144,12 +1120,10 @@ export class Image {
      * Append frame event.
      *
      * @event Image#appendframe
-     * @type {object}
-     * @property {string} type The event type.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
      */
-    this.#fireEvent({
-      type: 'appendframe'
-    });
+    this.dispatchEvent(new CustomEvent('appendframe'));
     // memory will be updated at the first appendSlice or appendFrameBuffer
   }
 
@@ -1180,226 +1154,15 @@ export class Image {
   /**
    * Get the histogram.
    *
-   * @returns {Array} The histogram.
+   * @returns {ImageHistogram} The histogram.
    */
   getHistogram() {
     if (!this.#histogram) {
-      const res = this.calculateHistogram();
-      this.#dataRange = res.dataRange;
-      this.#rescaledDataRange = res.rescaledDataRange;
-      this.#histogram = res.histogram;
+      this.#histogram = this.#calculateHistogram();
+      this.#dataRange = this.#histogram.getRange();
+      this.#rescaledDataRange = this.#histogram.getRescaledRange();
     }
     return this.#histogram;
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
-
-  // ****************************************
-  // image data modifiers... carefull...
-  // ****************************************
-
-  /**
-   * Set the inner buffer values at given offsets.
-   *
-   * @param {number[]} offsets List of offsets where to set the data.
-   * @param {number|RGB} value The value to set at the given offsets.
-   * @fires Image#imagecontentchange
-   */
-  setAtOffsets(offsets, value) {
-    // value to array
-    let bufferValue;
-    if (typeof value === 'number') {
-      if (this.#numberOfComponents !== 1) {
-        throw new Error(
-          'Number of components is not 1 for setting single value.');
-      }
-      bufferValue = [value];
-    } else if (typeof value.r !== 'undefined' &&
-      typeof value.g !== 'undefined' &&
-      typeof value.b !== 'undefined') {
-      if (this.#numberOfComponents !== 3) {
-        throw new Error(
-          'Number of components is not 3 for setting RGB value.');
-      }
-      bufferValue = [value.r, value.g, value.b];
-    }
-
-    let offset;
-    for (let i = 0, leni = offsets.length; i < leni; ++i) {
-      offset = offsets[i];
-      for (let j = 0; j < this.#numberOfComponents; ++j) {
-        this.#buffer[offset + j] = bufferValue[j];
-      }
-    }
-    // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
-  }
-
-  /**
-   * Reset the contour buffer for the values at an offset.
-   *
-   * @param {number} offset The offset to reset.
-   */
-  #resetContourAtOffset(offset) {
-    if (this.#contourBuffer !== null) {
-      this.#contourBuffer[offset * 3] = 0;
-      this.#contourBuffer[(offset * 3) + 1] = 0;
-      this.#contourBuffer[(offset * 3) + 2] = 0;
-    }
-  }
-
-  /**
-   * Reset the contour buffer for the values around an offset.
-   * Prevents certain artifacts, especially at small brush sizes
-   * and when erasing.
-   *
-   * @param {number} offset The offset to reset.
-   */
-  #resetContourAroundOffset(offset) {
-    this.#resetContourAtOffset(offset);
-
-    const size = this.#geometry.getSize();
-    const xOffset = size.getDimSize(0);
-    const yOffset = size.getDimSize(1);
-    const zOffset = size.getDimSize(2);
-
-    const max = MAX_CONTOUR_SIZE / 2;
-    const min = -max;
-    for (let x = min; x < max; x++) {
-      for (let y = min; y < max; y++) {
-        for (let z = min; z < max; z++) {
-          const p =
-            offset +
-            (xOffset * x) +
-            (yOffset * y) +
-            (zOffset * z);
-          if (p >= 0 && p < this.#buffer.length) {
-            this.#resetContourAtOffset(p);
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Set the inner buffer values at given offsets.
-   *
-   * @param {number[][]} offsetsLists List of offset lists where
-   *   to set the data.
-   * @param {number} value The value to set at the given offsets.
-   * @returns {Array} A list of objects representing the original values before
-   *  replacing them.
-   * @fires Image#imagecontentchange
-   */
-  setAtOffsetsAndGetOriginals(offsetsLists, value) {
-    const originalValuesLists = [];
-
-    // update and store
-    for (let j = 0; j < offsetsLists.length; ++j) {
-      const offsets = offsetsLists[j];
-      // first value
-      let offset = offsets[0];
-      let previousValue = this.#buffer[offset];
-      // original value storage
-      const originalValues = [];
-      originalValues.push({
-        index: 0,
-        value: previousValue
-      });
-      for (let i = 0; i < offsets.length; ++i) {
-        offset = offsets[i];
-        const currentValue = this.#buffer[offset];
-        // check if new value
-        if (previousValue !== currentValue) {
-          // store new value
-          originalValues.push({
-            index: i,
-            value: currentValue
-          });
-          previousValue = currentValue;
-        }
-        // write update value
-        this.#buffer[offset] = value;
-        this.#resetContourAroundOffset(offset);
-      }
-      originalValuesLists.push(originalValues);
-    }
-    // fire imagecontentchange
-    this.#fireEvent({type: 'imagecontentchange'});
-    return originalValuesLists;
-  }
-
-  /**
-   * Set the inner buffer values at given offsets.
-   *
-   * @param {number[][]} offsetsLists List of offset lists
-   *   where to set the data.
-   * @param {number|Array} value The value to set at the given offsets.
-   * @fires Image#imagecontentchange
-   */
-  setAtOffsetsWithIterator(offsetsLists, value) {
-    const isValueArray = Array.isArray(value);
-
-    for (let j = 0; j < offsetsLists.length; ++j) {
-      const offsets = offsetsLists[j];
-      let iterator;
-      if (isValueArray) {
-        // input value is a list of iterators
-        // created by setAtOffsetsAndGetOriginals
-        iterator = valueRange(
-          value[j], offsets.length);
-      } else {
-        // input value is a simple color
-        iterator = valueRange(
-          [{index: 0, value: value}], offsets.length);
-      }
-
-      // set values
-      let ival = iterator.next();
-      while (!ival.done) {
-        const offset = offsets[ival.index];
-        this.#buffer[offset] = ival.value;
-        this.#resetContourAroundOffset(offset);
-        ival = iterator.next();
-      }
-    }
-    /**
-     * Image content change event.
-     *
-     * @event Image#imagecontentchange
-     * @type {object}
-     * @property {string} type The event type.
-     */
-    this.#fireEvent({type: 'imagecontentchange'});
   }
 
   /**
@@ -1495,6 +1258,57 @@ export class Image {
   }
 
   /**
+   * Get the rescaled values of all volumes (fourth dimension) at
+   *   a position.
+   *
+   * @param {Point} position The world position, only its first
+   *   three dimensions are used.
+   * @returns {VolumeValue[]} The values with their unit and volume id,
+   *   ordered by volume index, empty if the position is out of bounds
+   *   or if the image cannot be quantified (more than one component).
+   */
+  getRescaledValuesAtPosition(position) {
+    const result = [];
+    if (!this.canQuantify()) {
+      return result;
+    }
+    const geometry = this.getGeometry();
+    const size = geometry.getSize();
+    const unit = this.getMeta().pixelUnit;
+    // spatial index, with a volume index if the image has volumes
+    const values = geometry.worldToIndex(position).getValues().slice(0, 3);
+    const hasVolumes = size.length() > 3;
+    if (hasVolumes) {
+      values.push(0);
+    }
+    if (!geometry.isIndexInBounds(new Index(values))) {
+      return result;
+    }
+    const nVolumes = hasVolumes ? size.get(3) : 1;
+    // use the volume ids only if there is one per volume
+    // (not the case while loading for example)
+    let volumeIds = geometry.getVolumeIds();
+    if (volumeIds?.length !== nVolumes) {
+      volumeIds = undefined;
+    }
+    for (let v = 0; v < nVolumes; ++v) {
+      if (hasVolumes) {
+        values[3] = v;
+      }
+      const volumeId = typeof volumeIds !== 'undefined'
+        ? {...volumeIds[v]} : {id: {value: v}};
+      result.push({
+        volumeId,
+        pixValue: {
+          value: this.getRescaledValueAtIndex(new Index(values)),
+          unit
+        }
+      });
+    }
+    return result;
+  }
+
+  /**
    * Calculate the data range of the image.
    * WARNING: for speed reasons, only calculated on the first frame...
    *
@@ -1503,7 +1317,7 @@ export class Image {
   calculateDataRange() {
     let min = this.getValueAtOffset(0);
     let max = min;
-    let value = 0;
+    let value;
     const size = this.getGeometry().getSize();
     let leni = size.getTotalSize();
     // max to 3D
@@ -1520,7 +1334,7 @@ export class Image {
       }
     }
     // return
-    return {min: min, max: max};
+    return {min, max};
   }
 
   /**
@@ -1540,52 +1354,18 @@ export class Image {
         min: ((resmin < resmax) ? resmin : resmax),
         max: ((resmin > resmax) ? resmin : resmax)
       };
-    } else {
-      let rmin = this.getRescaledValueAtOffset(0);
-      let rmax = rmin;
-      let rvalue = 0;
-      const size = this.getGeometry().getSize();
-      let leni = size.getTotalSize();
-      // max to 3D
-      if (size.length() === 3) {
-        leni = size.getDimSize(3);
-      }
-      for (let i = 0; i < leni; ++i) {
-        rvalue = this.getRescaledValueAtOffset(i);
-        if (rvalue > rmax) {
-          rmax = rvalue;
-        }
-        if (rvalue < rmin) {
-          rmin = rvalue;
-        }
-      }
-      // return
-      return {min: rmin, max: rmax};
     }
-  }
 
-  /**
-   * Calculate the histogram of the image.
-   *
-   * @returns {object} The histogram, data range and rescaled data range.
-   */
-  calculateHistogram() {
-    const size = this.getGeometry().getSize();
-    const histo = [];
-    let min = this.getValueAtOffset(0);
-    let max = min;
-    let value = 0;
     let rmin = this.getRescaledValueAtOffset(0);
     let rmax = rmin;
-    let rvalue = 0;
-    for (let i = 0, leni = size.getTotalSize(); i < leni; ++i) {
-      value = this.getValueAtOffset(i);
-      if (value > max) {
-        max = value;
-      }
-      if (value < min) {
-        min = value;
-      }
+    let rvalue;
+    const size = this.getGeometry().getSize();
+    let leni = size.getTotalSize();
+    // max to 3D
+    if (size.length() >= 3) {
+      leni = size.getDimSize(3);
+    }
+    for (let i = 0; i < leni; ++i) {
       rvalue = this.getRescaledValueAtOffset(i);
       if (rvalue > rmax) {
         rmax = rvalue;
@@ -1593,22 +1373,30 @@ export class Image {
       if (rvalue < rmin) {
         rmin = rvalue;
       }
-      histo[rvalue] = (histo[rvalue] || 0) + 1;
-    }
-    // set data range
-    const dataRange = {min: min, max: max};
-    const rescaledDataRange = {min: rmin, max: rmax};
-    // generate data for plotting
-    const histogram = [];
-    for (let b = rmin; b <= rmax; ++b) {
-      histogram.push([b, (histo[b] || 0)]);
     }
     // return
-    return {
-      dataRange: dataRange,
-      rescaledDataRange: rescaledDataRange,
-      histogram: histogram
-    };
+    return {min: rmin, max: rmax};
+  }
+
+  /**
+   * Calculate the histogram of the image.
+   *
+   * @returns {ImageHistogram} The histogram.
+   */
+  #calculateHistogram() {
+    const size = this.getGeometry().getSize();
+    const sliceSize = size.getDimSize(2);
+    const histogram = new ImageHistogram(this.getMeta().pixelUnit);
+    for (let start = 0, leni = size.getTotalSize();
+      start < leni; start += sliceSize) {
+      // rsi of this slice (index ignored for constant rsi)
+      const sliceHistogram = histogram.getHistogram(
+        this.getRescaleSlopeAndIntercept(size.offsetToIndex(start)));
+      for (let i = start; i < start + sliceSize; ++i) {
+        sliceHistogram.add(this.getValueAtOffset(i));
+      }
+    }
+    return histogram;
   }
 
   /**
@@ -1622,8 +1410,8 @@ export class Image {
   convolute2D(weights) {
     if (weights.length !== 9) {
       throw new Error(
-        'The convolution matrix does not have a length of 9; it has ' +
-        weights.length);
+        `The convolution matrix does not have a length of 9; it has ${
+          weights.length }`);
     }
 
     const newImage = this.clone();
@@ -1672,7 +1460,7 @@ export class Image {
     wOff[2] = (-ncols + 1) * factor;
     wOff[3] = -factor;
     wOff[4] = 0;
-    wOff[5] = 1 * factor;
+    wOff[5] = factor;
     wOff[6] = (ncols - 1) * factor;
     wOff[7] = (ncols) * factor;
     wOff[8] = (ncols + 1) * factor;
@@ -1730,8 +1518,8 @@ export class Image {
 
     // loop vars
     let pixelOffset = startOffset;
-    let newValue = 0;
-    let wOffFinal = [];
+    let newValue;
+    let wOffFinal;
     for (let c = 0; c < ncomp; ++c) {
       // component offset
       pixelOffset += c * componentOffset;
@@ -1811,345 +1599,6 @@ export class Image {
   }
 
   /**
-   * Initialize the contour buffer.
-   * Should be called on every segmentation image, or any image where
-   * contour rendering needs to be supported.
-   */
-  initializeContour() {
-    this.#contourBuffer = new Uint8Array(this.#buffer.length * 3);
-  }
-
-  /**
-   * Get whether or not the contour buffer has been initialized.
-   *
-   * @returns {boolean} True if buffer has been initialized.
-   */
-  countourIsInitialized() {
-    return this.#contourBuffer !== null;
-  }
-
-  /**
-   * Move cursor a step in the X direction to check for border pixels.
-   *
-   * @param {number} distance Accumulated distance travelled.
-   * @param {number} index Current cursor index before moving.
-   * @param {number} direction Offset to move cursor.
-   * @param {number} dim The index of the current dimension.
-   * @param {number} checkValue Initial pixel value.
-   * @param {Function[]} queue Ordered queue of locations to check.
-   * @returns {Function} A function that returns the distance to the nearest
-   *  border pixel or 0.
-   */
-  #recursiveDistanceCheckX(distance, index, direction, dim, checkValue, queue) {
-    return () => {
-      const newIndex = index + direction;
-      const newDistance = distance + 1;
-
-      const size = this.#geometry.getSize();
-      const borderCheck = size.offsetToIndex(newIndex);
-
-      if (
-        newIndex >= this.#buffer.length ||
-        newIndex < 0 ||
-        borderCheck.get(dim) === 0 ||
-        borderCheck.get(dim) === size.get(dim) - 1 ||
-        newDistance === 255
-      ) {
-        return newDistance;
-      }
-
-      if (newDistance > MAX_CONTOUR_SIZE) {
-        return 255;
-      }
-
-      if (this.#buffer[newIndex] !== checkValue) {
-        return newDistance;
-      } else {
-        queue.push(this.#recursiveDistanceCheckX(
-          newDistance,
-          newIndex,
-          direction,
-          dim,
-          checkValue,
-          queue
-        ));
-
-        return 0;
-      }
-    };
-  }
-
-  /**
-   * Move cursor a step in the Y direction to check for border pixels.
-   * Also spawns two new cursors checking in the X directions to either side.
-   *
-   * @param {number} distance Accumulated distance travelled.
-   * @param {number} index Current cursor index before moving.
-   * @param {number} yDirection Offset to move cursor.
-   * @param {number} xDirection Offset to move cursor.
-   * @param {number} yDim The index of the y dimension.
-   * @param {number} xDim The index of the x dimension.
-   * @param {number} checkValue Initial pixel value.
-   * @param {Function[]} queue Ordered queue of locations to check.
-   * @returns {Function} A function that returns the distance to the nearest
-   *  border pixel or 0.
-   */
-  #recursiveDistanceCheckY(
-    distance,
-    index,
-    yDirection,
-    xDirection,
-    yDim,
-    xDim,
-    checkValue,
-    queue
-  ) {
-    return () => {
-      const newIndex = index + yDirection;
-      const newDistance = distance + 1;
-
-      const size = this.#geometry.getSize();
-      const borderCheck = size.offsetToIndex(newIndex);
-
-      if (
-        newIndex >= this.#buffer.length ||
-        newIndex < 0 ||
-        borderCheck.get(yDim) === 0 ||
-        borderCheck.get(yDim) === size.get(yDim) - 1 ||
-        newDistance === 255
-      ) {
-        return newDistance;
-      }
-
-      if (newDistance > MAX_CONTOUR_SIZE) {
-        return 255;
-      }
-
-      if (this.#buffer[newIndex] !== checkValue) {
-        return newDistance;
-      } else {
-        queue.push(this.#recursiveDistanceCheckX(
-          newDistance,
-          newIndex,
-          xDirection,
-          xDim,
-          checkValue,
-          queue
-        ));
-
-        queue.push(this.#recursiveDistanceCheckX(
-          newDistance,
-          newIndex,
-          -xDirection,
-          xDim,
-          checkValue,
-          queue
-        ));
-
-        queue.push(this.#recursiveDistanceCheckY(
-          newDistance,
-          newIndex,
-          yDirection,
-          xDirection,
-          yDim,
-          xDim,
-          checkValue,
-          queue
-        ));
-
-        return 0;
-      }
-    };
-  }
-
-  /**
-   * Calculate the distance to the nearest border pixel.
-   * (or return the cached distance).
-   *
-   * @param {number} index Index/offset of the pixel to check.
-   * @param {Matrix33} viewOrientation The orientation of the view.
-   * @returns {number} The distance to the nearest border pixel or 0.
-   */
-  getContourDistance(index, viewOrientation) {
-    if (this.#contourBuffer === null) {
-      // Contour not enabled
-      return 0;
-    }
-
-    const orientationIndex = viewOrientation.getThirdColMajorDirection();
-
-    const xDim = (orientationIndex + 1) % 3;
-    const yDim = (orientationIndex + 2) % 3;
-
-    const contourIndex = index * 3 + orientationIndex;
-
-    const bufferedDistance = this.#contourBuffer[contourIndex];
-    if (bufferedDistance > 0) {
-      return bufferedDistance;
-    }
-
-    const checkValue = this.#buffer[index];
-    const operationQueue = [];
-
-    const size = this.#geometry.getSize();
-    const yDimSize = size.getDimSize(yDim);
-    const xDimSize = size.getDimSize(xDim);
-
-    operationQueue.push(this.#recursiveDistanceCheckY(
-      0,
-      index,
-      yDimSize,
-      xDimSize,
-      yDim,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    operationQueue.push(this.#recursiveDistanceCheckX(
-      0,
-      index,
-      xDimSize,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    operationQueue.push(this.#recursiveDistanceCheckX(
-      0,
-      index,
-      -xDimSize,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    operationQueue.push(this.#recursiveDistanceCheckY(
-      0,
-      index,
-      -yDimSize,
-      xDimSize,
-      yDim,
-      xDim,
-      checkValue,
-      operationQueue
-    ));
-
-    let opCount = 0;
-    // Enough to check every square up to MAX_CONTOUR_SIZE
-    const maxOps = Math.pow(MAX_CONTOUR_SIZE, 2);
-    while (operationQueue.length > 0) {
-      opCount++;
-      if (opCount > maxOps) {
-        this.#contourBuffer[contourIndex] = 255;
-        return 255;
-      }
-
-      const operation = operationQueue.shift();
-      const distanceCheck = operation();
-
-      if (distanceCheck > 0) {
-        // Return the first valid distance we find
-        this.#contourBuffer[contourIndex] = distanceCheck;
-        return distanceCheck;
-      }
-    }
-
-    // Something has gone wrong
-    return Infinity;
-  }
-
-  /**
-   * Recalculate labels.
-   */
-  recalculateLabels() {
-    if (this.#labelingThread === null) {
-      this.#labelingThread = new LabelingThread();
-
-      const spacing = this.#geometry.getSpacing();
-      const lengthUnit = this.getMeta().lengthUnit;
-      let pixelVolume = 1;
-      let volumeUnit = 'unit.pixel';
-      if (lengthUnit === 'unit.mm') {
-        pixelVolume =
-          spacing.get(0) *
-          spacing.get(1) *
-          spacing.get(2) *
-          ML_PER_MM;
-        volumeUnit = 'unit.ml';
-      }
-
-      this.#labelingThread.ondone = (event) => {
-        const labels = event.data.labels;
-        // add centroid point and volume
-        for (const label of labels) {
-          label.centroid = this.#geometry.indexToWorld(
-            new Index(label.centroidIndex));
-          label.volume = {
-            value: label.count * pixelVolume,
-            unit: volumeUnit
-          };
-          // diameters should be already in the correct units
-          let majorDiameter;
-          let minorDiameter;
-          if (typeof label.diameters !== 'undefined') {
-            if (typeof label.diameters.major !== 'undefined') {
-              majorDiameter = label.diameters.major.diameter;
-            }
-            if (typeof label.diameters.minor !== 'undefined') {
-              minorDiameter = label.diameters.minor.diameter;
-            }
-          }
-          label.diameters = {
-            major: {
-              diameter: {
-                value: majorDiameter,
-                unit: lengthUnit
-              }
-            },
-            minor: {
-              diameter: {
-                value: minorDiameter,
-                unit: lengthUnit
-              }
-            }
-          };
-          label.height = {
-            value: label.height,
-            unit: lengthUnit
-          };
-        }
-        // sort
-        /** @type {Label[]} */
-        const labelsSorted =
-          labels.sort((v1, v2) => {
-            return v2.volume.value - v1.volume.value;
-          }).sort((v1, v2) => {
-            return v1.id - v2.id;
-          });
-
-        this.#fireEvent({
-          type: 'labelschanged',
-          labels: labelsSorted
-        });
-
-        //TODO: This is temporary until a proper method of displaying
-        // diameters is implmented.
-        // ------
-        if (event.data.buffer) {
-          this.#buffer = event.data.buffer;
-          this.#fireEvent({type: 'imagecontentchange'});
-        }
-        // ------
-      };
-    }
-
-    this.#fireEvent({type: 'labelingstart'});
-
-    this.#labelingThread.run(this.#buffer, this.#geometry);
-  }
-
-  /**
    * Return if this image has been resampled.
    *
    * @returns {boolean} If the image has been resampled.
@@ -2181,12 +1630,13 @@ export class Image {
         // we only care about the most recent one.
         if (this.#resamplingJobId === data.jobId) {
           this.#buffer.set(data.targetImageBuffer, data.startOffset);
-          this.#fireEvent({type: 'imageresampled', frame: data.frame});
+          this.dispatchEvent(new CustomEvent('imageresampled',
+            {detail: {frame: data.frame}}));
         }
       };
 
       this.#resamplingThread.ondone = (_) => {
-        this.#fireEvent({type: 'imageresamplingcomplete'});
+        this.dispatchEvent(new CustomEvent('imageresamplingcomplete'));
       };
     }
 
@@ -2197,7 +1647,7 @@ export class Image {
       ? {buffer: this.#rawBuffer, geometry: this.#rawGeometry}
       : {buffer: this.#buffer, geometry: this.#geometry};
 
-    this.#fireEvent({type: 'imageresamplingstart'});
+    this.dispatchEvent(new CustomEvent('imageresamplingstart'));
 
     const resampled = this.#resamplingThread.run(
       source.buffer,
@@ -2217,10 +1667,15 @@ export class Image {
 
     this.#buffer = resampled.buffer;
     this.#geometry = resampled.geometry;
+    // keep volume ids
+    const volumeIds = source.geometry.getVolumeIds();
+    if (typeof volumeIds !== 'undefined') {
+      this.#geometry.setVolumeIds(volumeIds);
+    }
     this.#resamplingJobId = resampled.jobId;
 
-    this.#fireEvent({type: 'imagecontentchange'});
-    this.#fireEvent({type: 'imagegeometrychange'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
+    this.dispatchEvent(new CustomEvent('imagegeometrychange'));
   }
 
   /**
@@ -2231,7 +1686,7 @@ export class Image {
       return;
     }
 
-    this.#fireEvent({type: 'imageresamplingstart'});
+    this.dispatchEvent(new CustomEvent('imageresamplingstart'));
 
     this.#resampled = false;
     this.#buffer = this.#rawBuffer;
@@ -2239,9 +1694,9 @@ export class Image {
     this.#rawBuffer = null;
     this.#rawGeometry = null;
 
-    this.#fireEvent({type: 'imagecontentchange'});
-    this.#fireEvent({type: 'imagegeometrychange'});
-    this.#fireEvent({type: 'imageresampled'});
+    this.dispatchEvent(new CustomEvent('imagecontentchange'));
+    this.dispatchEvent(new CustomEvent('imagegeometrychange'));
+    this.dispatchEvent(new CustomEvent('imageresampled'));
   }
 
 } // class Image

@@ -15,7 +15,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle}.
    *
-   * @function module:tests/math~rectangle-class
+   * @function module:tests/math~rectangleClass
    */
   test('Rectangle class - #DWV-REQ-UI-07-006 Draw rectangle',
     () => {
@@ -61,7 +61,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle} quantification.
    *
-   * @function module:tests/math~rectangle-quantification
+   * @function module:tests/math~rectangleQuantification
    */
   test('Rectangle quantification - #DWV-REQ-UI-07-006 Draw rectangle',
     () => {
@@ -70,19 +70,19 @@ describe('math', () => {
       const r00 = new Rectangle(p00, p01);
       // view controller
       const mockVc0 = {
-        canQuantifyImage: function () {
+        canQuantifyImage() {
           return true;
         },
-        get2DSpacing: function () {
+        get2DSpacing() {
           return {x: 1, y: 1};
         },
-        getImageRegionValues: function () {
+        getImageRegionValues() {
           return [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0];
         },
-        getPixelUnit: function () {
+        getPixelUnit() {
           return '';
         },
-        getLengthUnit: function () {
+        getLengthUnit() {
           return 'unit.mm';
         }
       };
@@ -108,7 +108,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle} getRectangleIndices.
    *
-   * @function module:tests/math~rectangle-getrectangleindices
+   * @function module:tests/math~rectangleGetrectangleindices
    */
   test('Rectangle getRectangleIndices',
     () => {
@@ -126,4 +126,14 @@ describe('math', () => {
     }
   );
 
+});
+
+describe('math rectangle contains', () => {
+  test('Rectangle contains', () => {
+    const r0 = new Rectangle(new Point2D(10, 10), new Point2D(0, 0));
+    assert.ok(r0.contains(new Point2D(5, 5)), 'inside');
+    assert.ok(r0.contains(new Point2D(0, 10)), 'on corner');
+    assert.notOk(r0.contains(new Point2D(11, 5)), 'outside');
+    assert.ok(r0.contains(new Point2D(11, 5), 1), 'within tolerance');
+  });
 });

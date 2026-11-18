@@ -2,21 +2,20 @@ import {Index} from '../math/index.js';
 import {Point} from '../math/point.js';
 import {Vector3D} from '../math/vector.js';
 import {viewEventNames} from '../image/view.js';
-import {ListenerHandler} from '../utils/listen.js';
 import {logger} from '../utils/logger.js';
-import {precisionRound} from '../utils/string.js';
+import {precisionRound} from '../math/number.js';
 import {ViewLayer} from './viewLayer.js';
 import {DrawLayer} from './drawLayer.js';
 import {SOPClassUIDs} from '../dicom/dictionary.js';
 import {InfoLayer} from './infoLayer.js';
+import {CanvasSizeChecker} from './generic.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D, Point3D} from '../math/point.js';
-import {Scalar2D, Scalar3D} from '../math/scalar.js';
-import {PositionHelper} from '../image/positionHelper.js';
-import {InfoData} from './infoData.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D, Point3D} from '../math/point.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ * @import {PositionHelper} from '../image/positionHelper.js';
+ * @import {InfoData} from './infoData.js';
+ */
 
 /**
  * Get the layer div id.
@@ -27,7 +26,7 @@ import {InfoData} from './infoData.js';
  * @returns {string} A string id.
  */
 export function getLayerDivId(groupDivId, layerIndex) {
-  return groupDivId + '-layer-' + layerIndex;
+  return `${groupDivId}-layer-${layerIndex}`;
 }
 
 /**
@@ -47,29 +46,6 @@ export function getLayerDetailsFromLayerDivId(idString) {
     layerIndex: split[1],
     layerId: idString,
   };
-}
-
-/**
- * Get the info layer div id.
- * For example: 'layerGroup0-infoLayer'.
- *
- * @param {string} groupDivId The layer group div id.
- * @returns {string} A string id.
- */
-export function getInfoLayerDivId(groupDivId) {
-  return groupDivId + '-infolayer';
-}
-
-/**
- * Get the layer details from an info layer div id
- * created by getInfoLayerDivId.
- *
- * @param {string} idString The layer div id.
- * @returns {object} The layer details as {groupDivId}.
- */
-export function getLayerDetailsFromInfoLayerDivId(idString) {
-  const groupDivId = idString.substring(0, idString.length - 10);
-  return {groupDivId};
 }
 
 /**
@@ -136,7 +112,7 @@ export function getScaledOffset(offset, scale, newScale, center) {
  * - planePos = viewController.getOffset3DFromPlaneOffset(pos)
  *   no need yet for a planePos to displayPos...
  */
-export class LayerGroup {
+export class LayerGroup extends EventTarget {
 
   /**
    * The container div.
@@ -144,6 +120,13 @@ export class LayerGroup {
    * @type {HTMLElement}
    */
   #containerDiv;
+
+  /**
+   * Canvas size checker, shared with the view layers.
+   *
+   * @type {CanvasSizeChecker}
+   */
+  #canvasSizeChecker;
 
   // jsdoc does not like
   // @type {(ViewLayer|DrawLayer)[]}
@@ -182,13 +165,6 @@ export class LayerGroup {
    * @type {number}
    */
   #activeLayerIndex = undefined;
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Flag to activate crosshair or not.
@@ -273,18 +249,25 @@ export class LayerGroup {
    * @param {HTMLElement} containerDiv The associated HTML div.
    * @param {boolean} [withInfoLayer] Optional with info layer flag,
    * default to false.
+   * @param {CanvasSizeChecker} [canvasSizeChecker] Optional canvas size
+   *   checker, shared with the view layers; defaults to a new one.
    */
-  constructor(containerDiv, withInfoLayer) {
+  constructor(containerDiv, withInfoLayer, canvasSizeChecker) {
+    super();
     this.#containerDiv = containerDiv;
+    if (typeof canvasSizeChecker === 'undefined') {
+      canvasSizeChecker = new CanvasSizeChecker();
+    }
+    this.#canvasSizeChecker = canvasSizeChecker;
+    const doc = containerDiv.ownerDocument;
 
     if (typeof withInfoLayer !== 'undefined' &&
       withInfoLayer === true
     ) {
-      const layerDiv = document.createElement('div');
-      layerDiv.id = getInfoLayerDivId(containerDiv.id);
+      const layerDiv = doc.createElement('div');
       layerDiv.className = 'infoLayer';
       containerDiv.appendChild(layerDiv);
-      this.#infoLayer = new InfoLayer(layerDiv);
+      this.#infoLayer = new InfoLayer(layerDiv, containerDiv.id);
     }
   }
 
@@ -758,23 +741,31 @@ export class LayerGroup {
 
     const layer = this.#layers[index];
     if (typeof this.#infoLayer !== 'undefined') {
-      this.unbindInfoData();
-      const dataId = layer.getDataId();
-      this.bindInfoData(dataId);
+      // a draw layer has no info data: use its reference view layer one
+      let infoLayer = layer;
+      if (layer instanceof DrawLayer) {
+        infoLayer = this.getViewLayerById(layer.getReferenceLayerId());
+      }
+      const dataId = infoLayer?.getDataId();
+      // only switch binding if there is info data for the new data
+      if (typeof this.#infoDatas[dataId] !== 'undefined' &&
+        dataId !== this.#infoDataId) {
+        this.unbindInfoData();
+        this.bindInfoData(dataId);
+      }
     }
 
     /**
      * Active layer change event.
      *
      * @event LayerGroup#activelayerchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'activelayerchange',
-      value: [this.#layers[index]]
-    });
+    this.dispatchEvent(new CustomEvent('activelayerchange', {
+      detail: {value: [this.#layers[index]]}
+    }));
   }
 
   /**
@@ -795,8 +786,7 @@ export class LayerGroup {
     if (typeof index !== 'undefined') {
       this.setActiveLayer(index);
     } else {
-      logger.warn('No layer to set as active with id: ' +
-        id);
+      logger.warn(`No layer to set as active with id: ${id}`);
     }
   }
 
@@ -818,8 +808,8 @@ export class LayerGroup {
     if (typeof index !== 'undefined') {
       this.setActiveLayer(index);
     } else {
-      logger.warn('No layer to set as active with dataId: ' +
-        dataId);
+      logger.warn(`No layer to set as active with dataId: ${
+        dataId }`);
     }
   }
 
@@ -838,7 +828,7 @@ export class LayerGroup {
     // prepend to container
     this.#containerDiv.append(div);
     // view layer
-    const layer = new ViewLayer(div);
+    const layer = new ViewLayer(div, this.#canvasSizeChecker);
     layer.setImageSmoothing(this.#imageSmoothing);
     // add layer
     this.#layers.push(layer);
@@ -894,6 +884,7 @@ export class LayerGroup {
     // propagate viewLayer events
     viewLayer.addEventListener('renderstart', this.#fireEvent);
     viewLayer.addEventListener('renderend', this.#fireEvent);
+    viewLayer.addEventListener('basesizechange', this.#fireEvent);
   }
 
   /**
@@ -912,6 +903,7 @@ export class LayerGroup {
     // stop propagating viewLayer events
     viewLayer.removeEventListener('renderstart', this.#fireEvent);
     viewLayer.removeEventListener('renderend', this.#fireEvent);
+    viewLayer.removeEventListener('basesizechange', this.#fireEvent);
 
     // stop view layer - image binding
     // (binding is done in layer.setView)
@@ -929,6 +921,8 @@ export class LayerGroup {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.addEventListener(
       'positionchange', this.#fireEvent);
+    // propagate opacity change
+    drawLayer.addEventListener('opacitychange', this.#fireEvent);
   }
 
   /**
@@ -942,6 +936,7 @@ export class LayerGroup {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.removeEventListener(
       'positionchange', this.#fireEvent);
+    drawLayer.removeEventListener('opacitychange', this.#fireEvent);
   }
 
   /**
@@ -990,7 +985,8 @@ export class LayerGroup {
    * @returns {HTMLDivElement} A DOM div.
    */
   #getNextLayerDiv() {
-    const div = document.createElement('div');
+    const doc = this.#containerDiv.ownerDocument;
+    const div = doc.createElement('div');
     div.id = getLayerDivId(this.getDivId(), this.#layers.length);
     div.className = 'layer';
     div.style.pointerEvents = 'none';
@@ -1061,16 +1057,14 @@ export class LayerGroup {
      * Remove layer event.
      *
      * @event LayerGroup#removelayer
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} layerid The layer id.
-     * @property {string} layergroupid The layer group id.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.layerid The layer id.
+     * @property {string} detail.layergroupid The layer group id.
      */
-    this.#fireEvent({
-      type: 'layerremove',
-      layerid: layer.getId(),
-      layergroupid: this.getDivId()
-    });
+    this.dispatchEvent(new CustomEvent('layerremove', {
+      detail: {layerid: layer.getId(), layergroupid: this.getDivId()}
+    }));
   }
 
   /**
@@ -1104,15 +1098,15 @@ export class LayerGroup {
     const position = vc.getCurrentPosition();
     const planePos = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(planePos);
+    const doc = this.#containerDiv.ownerDocument;
 
     // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
-      const lineH = document.createElement('hr');
-      lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
+      const lineH = doc.createElement('hr');
       lineH.className = 'horizontal';
-      lineH.style.width = this.#containerDiv.offsetWidth + 'px';
+      lineH.style.width = `${this.#containerDiv.offsetWidth}px`;
       lineH.style.left = '0px';
-      lineH.style.top = displayPos.getY() + 'px';
+      lineH.style.top = `${displayPos.getY()}px`;
       // add to local array
       this.#crosshairHtmlElements.push(lineH);
       // add to html
@@ -1121,11 +1115,10 @@ export class LayerGroup {
 
     // vertical line
     if (typeof displayPos.getX() !== 'undefined') {
-      const lineV = document.createElement('hr');
-      lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
+      const lineV = doc.createElement('hr');
       lineV.className = 'vertical';
-      lineV.style.width = this.#containerDiv.offsetHeight + 'px';
-      lineV.style.left = (displayPos.getX()) + 'px';
+      lineV.style.width = `${this.#containerDiv.offsetHeight}px`;
+      lineV.style.left = `${displayPos.getX()}px`;
       lineV.style.top = '0px';
       // add to local array
       this.#crosshairHtmlElements.push(lineV);
@@ -1153,6 +1146,7 @@ export class LayerGroup {
   showTooltip(point) {
     // remove previous div
     this.removeTooltipDiv();
+    const doc = this.#containerDiv.ownerDocument;
 
     const viewLayer = this.getBaseViewLayer();
     const viewController = viewLayer.getViewController();
@@ -1162,16 +1156,16 @@ export class LayerGroup {
 
     // create
     if (typeof value !== 'undefined') {
-      const span = document.createElement('span');
-      span.id = 'scroll-tooltip';
+      const span = doc.createElement('span');
+      span.className = 'scroll-tooltip';
       // tooltip position
-      span.style.left = (point.getX() + 10) + 'px';
-      span.style.top = (point.getY() + 10) + 'px';
+      span.style.left = `${point.getX() + 10}px`;
+      span.style.top = `${point.getY() + 10}px`;
       let text = precisionRound(value, 3).toString();
       if (typeof viewController.getPixelUnit() !== 'undefined') {
-        text += ' ' + viewController.getPixelUnit();
+        text += ` ${viewController.getPixelUnit()}`;
       }
-      span.appendChild(document.createTextNode(text));
+      span.appendChild(doc.createTextNode(text));
       // add to local var
       this.#tooltipHtmlElement = span;
       // add to html
@@ -1271,19 +1265,20 @@ export class LayerGroup {
   /**
    * Update info data on position change.
    *
-   * @param {object} event The position change event.
+   * @param {CustomEvent} event The position change event.
    */
   #updateInfoData = (event) => {
-    const infoData = this.#infoDatas[event.dataid];
+    const dataid = event.detail?.dataid;
+    const infoData = this.#infoDatas[dataid];
     if (typeof infoData !== 'undefined') {
-      infoData.onSliceChange(event);
+      infoData.onPositionChange(event);
     }
   };
 
   /**
    * Update layers (but not the event source layer) to a position change.
    *
-   * @param {object} event The position change event.
+   * @param {CustomEvent} event The position change event.
    * @function
    */
   updateLayersToPositionChange = (event) => {
@@ -1298,8 +1293,9 @@ export class LayerGroup {
       }
     }
 
-    const index = new Index(event.value[0]);
-    const position = new Point(event.value[1]);
+    const value = event.detail?.value;
+    const index = new Index(value[0]);
+    const position = new Point(value[1]);
 
     // origin of the first view layer
     const viewLayerOffsets = {};
@@ -1330,17 +1326,15 @@ export class LayerGroup {
           // no offset
           scrollOffset = new Vector3D(0, 0, 0);
           planeOffset = new Vector3D(0, 0, 0);
-        } else {
-          if (vc.isPositionInBounds(position) &&
-            typeof origin !== 'undefined') {
-            // TODO: compensate for possible different orientation between views
-            const scrollDiff = baseViewLayerOrigin0.minus(origin0);
-            scrollOffset = new Vector3D(
-              scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
-            const planeDiff = baseViewLayerOrigin.minus(origin);
-            planeOffset = new Vector3D(
-              planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
-          }
+        } else if (vc.isPositionInBounds(position) &&
+          typeof origin !== 'undefined') {
+          // TODO: compensate for possible different orientation between views
+          const scrollDiff = baseViewLayerOrigin0.minus(origin0);
+          scrollOffset = new Vector3D(
+            scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
+          const planeDiff = baseViewLayerOrigin.minus(origin);
+          planeOffset = new Vector3D(
+            planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
         }
 
         // set and store offsets
@@ -1370,7 +1364,8 @@ export class LayerGroup {
 
       // update position (triggers redraw)
       let hasSetPos = false;
-      if (layer.getId() !== event.srclayerid) {
+      const srclayerid = event.detail?.srclayerid;
+      if (layer.getId() !== srclayerid) {
         hasSetPos = layer.setCurrentPosition(position, index);
       }
 
@@ -1381,11 +1376,9 @@ export class LayerGroup {
     }
 
     const hasValidPosition = this.hasAnyLayerWithValidPosition();
-    this.#fireEvent({
-      type: 'outofrange',
-      layergroupid: this.getDivId(),
-      value: [!hasValidPosition]
-    });
+    this.dispatchEvent(new CustomEvent('outofrange', {
+      detail: {layergroupid: this.getDivId(), value: [!hasValidPosition]}
+    }));
 
     // show crosshair after position update
     if (this.#showCrosshair) {
@@ -1414,8 +1407,8 @@ export class LayerGroup {
     // check container
     if (this.#containerDiv.offsetWidth === 0 &&
       this.#containerDiv.offsetHeight === 0) {
-      throw new Error('Cannot fit to zero sized container with id \'' +
-        this.#containerDiv.id + '\'.'
+      throw new Error(`Cannot fit to zero sized container with id '${
+        this.#containerDiv.id }'.`
       );
     }
     // get max world size
@@ -1429,7 +1422,7 @@ export class LayerGroup {
     if (this.#containerDiv.offsetHeight === 0) {
       const ratioX = this.#containerDiv.offsetWidth / maxWorldSize.x;
       const height = maxWorldSize.y * ratioX;
-      this.#containerDiv.style.height = height + 'px';
+      this.#containerDiv.style.height = `${height}px`;
     }
     // return best fit
     return Math.min(
@@ -1555,14 +1548,11 @@ export class LayerGroup {
      * Zoom change event.
      *
      * @event LayerGroup#zoomchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'zoomchange',
-      value: value
-    });
+    this.dispatchEvent(new CustomEvent('zoomchange', {detail: {value}}));
   }
 
   /**
@@ -1598,18 +1588,13 @@ export class LayerGroup {
      * Offset change event.
      *
      * @event LayerGroup#offsetchange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {Array} value The changed value.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {Array} detail.value The changed value.
      */
-    this.#fireEvent({
-      type: 'offsetchange',
-      value: [
-        this.#offset.x,
-        this.#offset.y,
-        this.#offset.z
-      ]
-    });
+    this.dispatchEvent(new CustomEvent('offsetchange', {
+      detail: {value: [this.#offset.x, this.#offset.y, this.#offset.z]}
+    }));
   }
 
   /**
@@ -1675,34 +1660,14 @@ export class LayerGroup {
   }
 
   /**
-   * Add an event listener to this class.
+   * Re-dispatch an event from a sub-layer as a new CustomEvent on this group.
    *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
+   * @param {CustomEvent} event The event to re-dispatch.
    */
   #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
+    const detail = event.detail !== null && typeof event.detail === 'object'
+      ? Object.assign({}, event.detail) : {};
+    this.dispatchEvent(new CustomEvent(event.type, {detail}));
   };
 
 } // LayerGroup class

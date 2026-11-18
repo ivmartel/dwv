@@ -1,5 +1,8 @@
-import {logger} from '../utils/logger.js';
 import {Point2D} from '../math/point.js';
+
+/**
+ * @import {Scalar2D} from '../math/scalar.js';
+ */
 
 /**
  * List of interaction event names.
@@ -11,42 +14,58 @@ export const InteractionEventNames = [
   'mouseout',
   'wheel',
   'dblclick',
+  'contextmenu',
   'touchstart',
   'touchmove',
-  'touchend'
+  'touchend',
+  'touchcancel'
 ];
+
+/**
+ * List of the interaction event names whose default can be prevented
+ * by tools (see `LayerGroupPointer`): their listeners are not passive.
+ */
+export const NonPassiveInteractionEventNames = [
+  'wheel',
+  'contextmenu',
+  'touchstart'
+];
+
+/**
+ * Get the listener options of an interaction event: only the
+ * {@link NonPassiveInteractionEventNames} are not passive.
+ *
+ * @param {string} eventName The interaction event name.
+ * @returns {AddEventListenerOptions} The listener options.
+ */
+export function getInteractionEventOptions(eventName) {
+  return {
+    passive: !NonPassiveInteractionEventNames.includes(eventName)
+  };
+}
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.
  *
- * @param {Array} touches The list of touch events.
+ * @param {TouchList} touches The list of touch events.
+ * @param {DOMRect} rect The bounding client rect.
  * @returns {Point2D[]} The list of positions of the touch events.
  */
-function getTouchesPositions(touches) {
-  // get the touch offset from all its parents
+function getTouchesPositions(touches, rect) {
+  // compensate for margin, padding...
   let offsetLeft = 0;
   let offsetTop = 0;
-  if (touches.length !== 0 &&
-    typeof touches[0].target !== 'undefined') {
-    let offsetParent = touches[0].target.offsetParent;
-    while (offsetParent) {
-      if (!isNaN(offsetParent.offsetLeft)) {
-        offsetLeft += offsetParent.offsetLeft;
-      }
-      if (!isNaN(offsetParent.offsetTop)) {
-        offsetTop += offsetParent.offsetTop;
-      }
-      offsetParent = offsetParent.offsetParent;
-    }
-  } else {
-    logger.debug('No touch target offset parent.');
+  if (typeof rect !== 'undefined') {
+    offsetLeft = rect.left;
+    offsetTop = rect.top;
   }
+
   // set its position
   const positions = [];
   for (let i = 0; i < touches.length; ++i) {
     positions.push(new Point2D(
-      touches[i].pageX - offsetLeft,
-      touches[i].pageY - offsetTop
+      touches[i].clientX - offsetLeft,
+      touches[i].clientY - offsetTop
     ));
   }
   return positions;
@@ -55,19 +74,22 @@ function getTouchesPositions(touches) {
 /**
  * Get the offsets of an input touch event.
  *
- * @param {object} event The event to get the offset from.
+ * @param {TouchEvent} event The event to get the offset from.
  * @returns {Point2D[]} The array of points.
  */
 export function getTouchPoints(event) {
+  const rect = /** @type {HTMLElement} */ (event.currentTarget)
+    .getBoundingClientRect();
+
   let positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = getTouchesPositions(event.targetTouches);
+    positions = getTouchesPositions(event.targetTouches, rect);
   } else if (typeof event.changedTouches !== 'undefined' &&
     event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = getTouchesPositions(event.changedTouches);
+    positions = getTouchesPositions(event.changedTouches, rect);
   }
   return positions;
 }
@@ -75,7 +97,7 @@ export function getTouchPoints(event) {
 /**
  * Get the offset of an input mouse event.
  *
- * @param {object} event The event to get the offset from.
+ * @param {MouseEvent} event The event to get the offset from.
  * @returns {Point2D} The 2D point.
  */
 export function getMousePoint(event) {
@@ -98,28 +120,112 @@ export function getMousePoint(event) {
  *
  * @param {number} width The canvas width.
  * @param {number} height The canvas height.
- * @returns {boolean} True is the canvas can be created.
+ * @param {Document} doc The document used to create the test canvases.
+ * @returns {boolean} True if the canvas can be created.
  */
-export function canCreateCanvas(width, height) {
+export function canCreateCanvas(width, height, doc) {
+  // zero sized canvases cannot be drawn from
+  if (width < 1 || height < 1) {
+    return false;
+  }
   // test canvas with input size
-  const testCvs = document.createElement('canvas');
+  const testCvs = doc.createElement('canvas');
   testCvs.width = width;
   testCvs.height = height;
   // crop canvas to speed up test
-  const cropCvs = document.createElement('canvas');
+  const cropCvs = doc.createElement('canvas');
   cropCvs.width = 1;
   cropCvs.height = 1;
   // contexts
   const testCtx = testCvs.getContext('2d');
   const cropCtx = cropCvs.getContext('2d');
-  // set data
-  if (testCtx) {
+  let result = false;
+  if (testCtx && cropCtx) {
     testCtx.fillRect(width - 1, height - 1, 1, 1);
     // Render the test pixel in the bottom-right corner of the
     // test canvas in the top-left of the 1x1 crop canvas. This
     // dramatically reducing the time for getImageData to complete.
     cropCtx.drawImage(testCvs, width - 1, height - 1, 1, 1, 0, 0, 1, 1);
+    // Verify image data (alpha component, Pass = 255, Fail = 0)
+    result = cropCtx.getImageData(0, 0, 1, 1).data[3] !== 0;
   }
-  // Verify image data (alpha component, Pass = 255, Fail = 0)
-  return cropCtx && cropCtx.getImageData(0, 0, 1, 1).data[3] !== 0;
+  // release the canvases memory without waiting for garbage collection
+  // (safari has a limit on the total canvas memory)
+  testCvs.width = 0;
+  testCvs.height = 0;
+  cropCvs.width = 0;
+  cropCvs.height = 0;
+  return result;
+}
+
+/**
+ * Check if a size is smaller or equal to another one in both dimensions.
+ *
+ * @param {Scalar2D} size The size to check.
+ * @param {Scalar2D} other The size to compare to.
+ * @returns {boolean} True if size fits in other.
+ */
+function fitsIn(size, other) {
+  return size.x <= other.x && size.y <= other.y;
+}
+
+/**
+ * Canvas size checker: calls `canCreateCanvas` and caches its
+ * results. The browser canvas size limits do not change during a session,
+ * a size smaller than a valid one is valid and a size larger than
+ * an invalid one is invalid.
+ *
+ * Meant to be shared by the view layers of a stage.
+ */
+export class CanvasSizeChecker {
+  /**
+   * Sizes known to be valid: only the largest ones are kept.
+   *
+   * @type {Scalar2D[]}
+   */
+  #validSizes = [];
+
+  /**
+   * Sizes known to be invalid: only the smallest ones are kept.
+   *
+   * @type {Scalar2D[]}
+   */
+  #invalidSizes = [];
+
+  /**
+   * Test if a canvas with the input size can be created.
+   *
+   * @param {Scalar2D} size The canvas size as {x,y}.
+   * @param {Document} doc The document used to create the test canvases.
+   * @returns {boolean} True if the canvas can be created.
+   */
+  canCreate(size, doc) {
+    // zero sized canvases cannot be created
+    // (not cached: they would mark all sizes as invalid)
+    if (size.x < 1 || size.y < 1) {
+      return false;
+    }
+    // check cache
+    if (this.#validSizes.some((item) => fitsIn(size, item))) {
+      return true;
+    }
+    if (this.#invalidSizes.some((item) => fitsIn(item, size))) {
+      return false;
+    }
+    // test
+    const result = canCreateCanvas(size.x, size.y, doc);
+    // update cache, keeping only the entries not made redundant
+    // by the new one
+    const newSize = {x: size.x, y: size.y};
+    if (result) {
+      this.#validSizes = this.#validSizes.filter(
+        (item) => !fitsIn(item, newSize));
+      this.#validSizes.push(newSize);
+    } else {
+      this.#invalidSizes = this.#invalidSizes.filter(
+        (item) => !fitsIn(newSize, item));
+      this.#invalidSizes.push(newSize);
+    }
+    return result;
+  }
 }

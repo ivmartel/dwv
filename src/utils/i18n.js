@@ -21,7 +21,10 @@ export const i18n = {
         cm2: 'cm²',
         ml: 'ml',
         degree: '°',
-        pixel: 'pixels'
+        pixel: 'pixels',
+        ms: 'ms',
+        s: 's',
+        smm2: 's/mm²'
       };
       res = units[props[1]];
     }

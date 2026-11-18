@@ -11,7 +11,7 @@ describe('math', () => {
   /**
    * Tests for {@link Path}.
    *
-   * @function module:tests/math~path-class
+   * @function module:tests/math~pathClass
    */
   test('Path class - #DWV-REQ-UI-07-004 Draw free hand', () => {
     const path0 = new Path();

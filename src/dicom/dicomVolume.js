@@ -7,11 +7,20 @@ import {
   NormalisedManufacturers,
   getNormalisedManufacturer
 } from './dicomManufacturer.js';
+import {cleanString} from './dicomParser.js';
+import {getDateObj, getTimeInSeconds} from './dicomDate.js';
+import {getConstantPerFrameValue} from './dicomFunctionalGroup.js';
+import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {
+ *   PrivateBValueRule,
+ *   VolumeIdCandidate
+ * } from './types.js';
+ * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {VolumeId} from '../image/types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -20,25 +29,45 @@ const TagKeys = {
   SOPClassUID: '00080016',
   SOPInstanceUID: '00080018',
   Manufacturer: '00080070',
+  AcquisitionDate: '00080022',
   AcquisitionTime: '00080032',
+  ContentDate: '00080023',
+  ContentTime: '00080033',
   DimensionIndexSequence: '00209222',
   DimensionIndexPointer: '00209165',
   SharedFunctionalGroupsSequence: '52009229',
-  PerFrameFunctionalGroupsSequence: '52009230',
   MRDiffusionSequence: '00189117',
   DiffusionBValue: '00189087',
   DiffusionBValueAT: '(0018,9087)',
   FrameContentSequence: '00209111',
-  DimensionIndexValues: '00209157'
+  DimensionIndexValues: '00209157',
+  TemporalPositionIdentifier: '00200100',
+  TemporalPositionIndex: '00209128',
+  TemporalPositionSequence: '00209310',
+  TemporalPositionTimeOffset: '0020930D',
+  EchoTime: '00180081',
+  TriggerTime: '00181060',
+  InversionTime: '00180082'
 };
 
 /**
- * Private b-value tag rules. Tested in order.
- * Rules are either `{manufacturer, key}` or `{uidPrefix, key}`.
- *
- * @type {object[]}
+ * Related SOP class UIDs.
  */
-const LocalBValueRules = [
+const SOPClassUIDs = {
+  MR: '1.2.840.10008.5.1.4.1.1.4',
+  EnhancedMR: '1.2.840.10008.5.1.4.1.1.4.1',
+  EnhancedMRColorImage: '1.2.840.10008.5.1.4.1.1.4.3',
+  LegacyConvertedEnhancedMRImageStorage: '1.2.840.10008.5.1.4.1.1.4.4'
+};
+
+/**
+ * Default private b-value tag rules. Tested in order.
+ * Rules are either `{manufacturer, key}` or `{uidPrefix, key}`.
+ * Can be used to extend `custom.privateBValueRules`.
+ *
+ * @type {PrivateBValueRule[]}
+ */
+export const defaultPrivateBValueRules = [
   {
     manufacturer: NormalisedManufacturers.SIEMENS,
     key: '0019100C'
@@ -48,25 +77,125 @@ const LocalBValueRules = [
     key: '00431039'
   },
   {
-    manufacturer: NormalisedManufacturers.HITASHI,
+    manufacturer: NormalisedManufacturers.HITACHI,
     key: '00291030'
   }
 ];
 
 /**
- * Related SOP class UIDs.
+ * Ordered list of candidate volume id getters. Since the tag that
+ * actually discriminates volumes is not known until the full data
+ * is loaded, `guessVolumeIndices` tries these in order and keeps the
+ * first one that produces a valid, consistent per-volume grouping.
+ * It is used for the files of a series (see `DicomSliceDataList`)
+ * and for the frames of a multi-frame file (see
+ * `getSortedFramesGeometry`).
+ * Most explicit/reliable discriminators come first, AcquisitionTime
+ * (the historical default) comes last.
+ * Candidates flagged with `preLoad` are also used while loading
+ * (see `getVolumeIdTagValue`): they must not vary between the
+ * slices of a single volume.
+ * Candidates either read an index (an id without unit, for example
+ * TemporalPositionIdentifier) or a value (for example EchoTime).
+ * The associated value of indices is guessed once all data is loaded
+ * (see `getVolumeValues`), values have none.
+ *
+ * @type {VolumeIdCandidate[]}
  */
-const SOPClassUIDs = {
-  MR: '1.2.840.10008.5.1.4.1.1.4',
-  EnhancedMR: '1.2.840.10008.5.1.4.1.1.4.1',
-  MRSpectroscopy: '1.2.840.10008.5.1.4.1.1.4.2',
-  EnhancedMRColorImage: '1.2.840.10008.5.1.4.1.1.4.3'
-};
+export const defaultVolumeIdCandidates = [
+  {
+    name: 'TemporalPositionIdentifier',
+    getter: makeNumericTagGetter(
+      TagKeys.TemporalPositionIdentifier, value => parseInt(value, 10)),
+    preLoad: true
+  },
+  {
+    name: 'TemporalPositionIndex',
+    getter: getTemporalPositionIndex,
+    preLoad: true
+  },
+  {
+    name: 'DiffusionBValue',
+    getter: getMRVolumeId,
+    preLoad: true
+  },
+  {
+    name: 'EchoTime',
+    getter: makeNumericTagGetter(TagKeys.EchoTime, parseFloat, 'unit.ms')
+  },
+  {
+    name: 'TriggerTime',
+    getter: makeNumericTagGetter(TagKeys.TriggerTime, parseFloat, 'unit.ms')
+  },
+  {
+    name: 'InversionTime',
+    getter: makeNumericTagGetter(
+      TagKeys.InversionTime, parseFloat, 'unit.ms')
+  },
+  {
+    // seconds since the first acquisition
+    name: 'AcquisitionTime',
+    getter: getAcquisitionTime,
+    relative: true
+  }
+];
+
+/**
+ * Ordered list of candidate volume associated value getters, used for
+ * volume ids that are indices (without unit, for example
+ * TemporalPositionIdentifier) once all data is loaded: the first one
+ * that gives each volume a time span, the spans not overlapping and
+ * following the volume ids order, is kept (see `guessVolumeValues`).
+ * The associated value of a volume is its smallest value, relative to
+ * the one of the first volume for `relative` candidates. Same shape
+ * as volume id candidates (`preLoad` is not used).
+ *
+ * @type {VolumeIdCandidate[]}
+ */
+const volumeValueCandidates = [
+  {
+    name: 'TemporalPositionTimeOffset',
+    getter: getTemporalPositionTimeOffset
+  },
+  {
+    // seconds since the first acquisition
+    name: 'AcquisitionTime',
+    getter: getAcquisitionTime,
+    relative: true
+  },
+  {
+    // seconds since the first content
+    name: 'ContentTime',
+    getter: getContentTime,
+    relative: true
+  }
+];
+
+/**
+ * Create a sourced number value.
+ *
+ * @param {number|undefined} value The value.
+ * @param {string} tagKey The key of the tag the value is read from.
+ * @param {string} [unit] The value unit as an i18n key.
+ * @returns {SourcedNumberValue|undefined} The sourced value, undefined
+ *   if the value is undefined.
+ */
+function createSourcedValue(value, tagKey, unit) {
+  if (typeof value === 'undefined') {
+    return undefined;
+  }
+  /** @type {SourcedNumberValue} */
+  const res = {value, tagKey};
+  if (typeof unit !== 'undefined') {
+    res.unit = unit;
+  }
+  return res;
+}
 
 /**
  * Get the diffusion b-value from a functional DICOM sequence.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
 function getDiffusionBValueFromFunctionalSeq(elements) {
@@ -82,7 +211,7 @@ function getDiffusionBValueFromFunctionalSeq(elements) {
 /**
  * Get the diffusion b-value from standard DICOM tag.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The value, if present.
  */
 function getStandardDiffusionBValueFromEMR(elements) {
@@ -96,113 +225,137 @@ function getStandardDiffusionBValueFromEMR(elements) {
   }
   // from Per Frame Functional Groups Sequence
   if (typeof res === 'undefined') {
-    const perFrameGroupSeq =
-      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
-    if (typeof perFrameGroupSeq !== 'undefined') {
-      // TODO: go to specific frame number?
-      for (const group of perFrameGroupSeq) {
-        res = getDiffusionBValueFromFunctionalSeq(group);
-        if (typeof res !== 'undefined') {
-          break;
-        }
-      }
-    }
+    res = getConstantPerFrameValue(
+      elements, getDiffusionBValueFromFunctionalSeq, 'DiffusionBValue');
   }
   return res;
+}
+
+/**
+ * Get the first value of a private tag. Private tags read from
+ * implicit VR data are not in the dictionary and are parsed as 'UN',
+ * their value is then the raw bytes: decode them as an ASCII string.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @param {string} key The tag key.
+ * @returns {string|undefined} The value, if present.
+ */
+function getPrivateTagValue(elements, key) {
+  const element = elements[key];
+  if (typeof element !== 'undefined' &&
+    element.vr === 'UN' &&
+    typeof element.value !== 'undefined') {
+    const str = cleanString(String.fromCharCode(...element.value));
+    // first of multiple values
+    return str.length !== 0 ? str.split('\\')[0] : undefined;
+  }
+  return safeGet(elements, key);
 }
 
 /**
  * Get the diffusion b-value from MR from non standard
  *   and/or private DICOM tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
- * @returns {string|undefined} The value, if present.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {{value: string, key: string}|undefined} The value and
+ *   the key of the tag it was read from, if present.
  */
 function getNonStandardDiffusionBValueFromMR(elements) {
   let res;
 
   // manufacturers private tag
-  if (typeof res === 'undefined') {
-    const manufacturer = getNormalisedManufacturer(elements);
-    const sopInstanceUID = safeGet(elements, TagKeys.SOPInstanceUID);
+  const manufacturer = getNormalisedManufacturer(elements);
+  const sopInstanceUID = safeGet(elements, TagKeys.SOPInstanceUID);
 
-    let rules;
-    if (typeof custom.privateBValueRules !== 'undefined') {
-      rules = custom.privateBValueRules;
-    } else {
-      rules = LocalBValueRules;
+  let rules;
+  if (typeof custom.privateBValueRules !== 'undefined') {
+    rules = custom.privateBValueRules;
+  } else {
+    rules = defaultPrivateBValueRules;
+  }
+
+  for (const rule of rules) {
+    let value;
+    if (typeof rule.uidPrefix !== 'undefined' &&
+      typeof sopInstanceUID !== 'undefined' &&
+      sopInstanceUID.startsWith(rule.uidPrefix)) {
+      value = getPrivateTagValue(elements, rule.key);
+    } else if (typeof rule.manufacturer !== 'undefined' &&
+      typeof manufacturer !== 'undefined' &&
+      rule.manufacturer === manufacturer) {
+      value = getPrivateTagValue(elements, rule.key);
     }
-
-    for (const rule of rules) {
-      if (typeof rule.uidPrefix !== 'undefined' &&
-        typeof sopInstanceUID !== 'undefined' &&
-        sopInstanceUID.startsWith(rule.uidPrefix)) {
-        res = safeGet(elements, rule.key);
-      } else if (typeof rule.manufacturer !== 'undefined' &&
-        typeof manufacturer !== 'undefined' &&
-        rule.manufacturer === manufacturer) {
-        res = safeGet(elements, rule.key);
-      }
-      // break at first valid result
-      if (typeof res !== 'undefined' &&
-        !isNaN(parseInt(res, 10))) {
-        // TODO just break or exit function?
-        break;
-      }
+    // keep first valid result
+    if (typeof value !== 'undefined' &&
+      !isNaN(parseFloat(value))) {
+      res = {value, key: rule.key};
+      break;
     }
   }
 
   // b-value at root level
   if (typeof res === 'undefined') {
-    res = safeGet(elements, TagKeys.DiffusionBValue);
+    const value = safeGet(elements, TagKeys.DiffusionBValue);
+    if (typeof value !== 'undefined') {
+      res = {value, key: TagKeys.DiffusionBValue};
+    }
   }
 
   return res;
 }
 
 /**
+ * Check if the dimension index sequence has a pointer to the b-value.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {boolean} True if a b-value pointer is present.
+ */
+function hasBValueDimensionPointer(elements) {
+  const indexSeq = safeGetAll(elements, TagKeys.DimensionIndexSequence);
+  return typeof indexSeq !== 'undefined' &&
+    indexSeq.some(dimIndex =>
+      safeGet(dimIndex, TagKeys.DimensionIndexPointer) ===
+      TagKeys.DiffusionBValueAT);
+}
+
+/**
+ * Get the b-value dimension index value of a frame.
+ * Hard coded logic based on real cases...
+ *
+ * @param {Record<string, DataElement>} group The per frame
+ *   functional group.
+ * @returns {number|undefined} The value, if present.
+ */
+function getPhilipsFrameBValueIndex(group) {
+  let res;
+  const frameContentSeq = safeGetAll(group, TagKeys.FrameContentSequence);
+  if (typeof frameContentSeq !== 'undefined') {
+    // should be only one
+    const dimValues =
+      safeGetAll(frameContentSeq[0], TagKeys.DimensionIndexValues);
+    if (typeof dimValues !== 'undefined' &&
+      dimValues.length === 4) {
+      // does not follow order set in DimensionIndexSequence...
+      res = parseNumber(dimValues[2], parseFloat);
+    }
+  }
+  return res;
+}
+
+/**
  * Get the b-value from the frame content sequence if
  * the dimension index sequence has a pointer to the b-value.
+ * Note: the value is a dimension index, not the b-value itself.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
- * @returns {string|undefined} The value, if present.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {number|undefined} The value, if present.
  */
-function getDiffusionBValueFromFrameContent(elements) {
+function getPhilipsDiffusionBValueFromEMR(elements) {
   let res;
-
-  // check if the dim pointer is for b-value
-  let gotBValuePointer = false;
-  const indexSeq = safeGetAll(elements, TagKeys.DimensionIndexSequence);
-  if (typeof indexSeq !== 'undefined') {
-    for (const dimIndex of indexSeq) {
-      const pointer = safeGet(dimIndex, TagKeys.DimensionIndexPointer);
-      if (typeof pointer !== 'undefined' &&
-        pointer === TagKeys.DiffusionBValueAT
-      ) {
-        gotBValuePointer = true;
-        break;
-      }
-    }
+  if (hasBValueDimensionPointer(elements)) {
+    res = getConstantPerFrameValue(
+      elements, getPhilipsFrameBValueIndex, 'DimensionIndexValues b-value');
   }
-  // get from per frame functional group
-  if (gotBValuePointer) {
-    const perFrameGroupSeq =
-      safeGetAll(elements, TagKeys.PerFrameFunctionalGroupsSequence);
-    if (typeof perFrameGroupSeq !== 'undefined') {
-      const group = perFrameGroupSeq[0];
-      const frameContentSeq = safeGetAll(group, TagKeys.FrameContentSequence);
-      if (typeof frameContentSeq !== 'undefined') {
-        // should be only one
-        const dimValues =
-          safeGetAll(frameContentSeq[0], TagKeys.DimensionIndexValues);
-        if (typeof dimValues !== 'undefined') {
-          // does not follow order set in DimensionIndexSequence...
-          res = dimValues[2];
-        }
-      }
-    }
-  }
-
   return res;
 }
 
@@ -210,135 +363,576 @@ function getDiffusionBValueFromFrameContent(elements) {
  * Get the diffusion b-value from Enhanced MR from non standard
  *   and/or private DICOM tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
- * @returns {string|undefined} The value, if present.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {number|undefined} The value, if present.
  */
 function getNonStandardDiffusionBValueFromEMR(elements) {
   let res;
 
-  // manufacturer
-  const manufacturer = getNormalisedManufacturer(elements);
-
   // philips can use frame content
-  if (typeof manufacturer !== 'undefined' &&
-    manufacturer === NormalisedManufacturers.PHILIPS) {
-    res = getDiffusionBValueFromFrameContent(elements);
+  if (getNormalisedManufacturer(elements) ===
+    NormalisedManufacturers.PHILIPS) {
+    res = getPhilipsDiffusionBValueFromEMR(elements);
   }
 
   return res;
 }
 
 /**
- * Get the diffusion b-value.
+ * Parse a tag value to a number.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
- * @returns {number|undefined} The value, if present.
+ * @param {any} value The value to parse.
+ * @param {Function} parse The string to number parser to use.
+ * @returns {number|undefined} The number, or undefined if the value
+ *   is absent or not a number.
  */
-function getDiffusionBValue(elements) {
+function parseNumber(value, parse) {
+  let res;
+  if (typeof value !== 'undefined') {
+    const number = parse(value);
+    if (!isNaN(number)) {
+      res = number;
+    }
+  }
+  return res;
+}
+
+/**
+ * Get the diffusion b-value as a volume id: with the key of the tag
+ * it was read from and its unit (no unit if the value is not
+ * a b-value, for example a dimension index).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The volume id, if present.
+ */
+function getDiffusionBValueVolumeId(elements) {
   let res;
   // SOP class UID
   const sopClassUID = safeGet(elements, TagKeys.SOPClassUID);
 
+  const bValueUnit = 'unit.smm2';
   if (sopClassUID === SOPClassUIDs.EnhancedMR ||
-    sopClassUID === SOPClassUIDs.MRSpectroscopy ||
-    sopClassUID === SOPClassUIDs.EnhancedMRColorImage
+    sopClassUID === SOPClassUIDs.EnhancedMRColorImage ||
+    sopClassUID === SOPClassUIDs.LegacyConvertedEnhancedMRImageStorage
   ) {
     // standard tag
-    res = getStandardDiffusionBValueFromEMR(elements);
-    // if not found, check non standard tag
-    if (typeof res === 'undefined') {
-      res = getNonStandardDiffusionBValueFromEMR(elements);
-      if (typeof res !== 'undefined') {
-        console.log('got b-value for enhanced MR from non standard tag');
+    const value = getStandardDiffusionBValueFromEMR(elements);
+    if (typeof value !== 'undefined') {
+      res = {value, tagKey: TagKeys.DiffusionBValue};
+    } else {
+      // if not found, check non standard tag
+      // (a dimension index, not a b-value)
+      const index = getNonStandardDiffusionBValueFromEMR(elements);
+      if (typeof index !== 'undefined') {
+        logger.debug('Got b-value for enhanced MR from non standard tag');
+        res = {value: index, tagKey: TagKeys.DimensionIndexValues};
       }
     }
   } else if (sopClassUID === SOPClassUIDs.MR) {
     // non standard for MR
-    res = getNonStandardDiffusionBValueFromMR(elements);
-    // if not found, check standard EMR tag
-    if (typeof res === 'undefined') {
-      if (typeof res === 'undefined') {
-        res = getStandardDiffusionBValueFromEMR(elements);
+    const nonStandard = getNonStandardDiffusionBValueFromMR(elements);
+    if (typeof nonStandard !== 'undefined') {
+      res = {value: nonStandard.value, tagKey: nonStandard.key};
+    } else {
+      // if not found, check standard EMR tag
+      const value = getStandardDiffusionBValueFromEMR(elements);
+      if (typeof value !== 'undefined') {
+        res = {value, tagKey: TagKeys.DiffusionBValue};
       }
     }
   }
 
-  // cast to int
-  if (typeof res !== 'undefined') {
-    res = parseInt(res, 10);
+  if (typeof res === 'undefined') {
+    return undefined;
   }
-
-  return res;
+  // cast to number (FD/DS b-values can be fractional)
+  const value = parseNumber(res.value, parseFloat);
+  const unit = res.tagKey !== TagKeys.DimensionIndexValues
+    ? bValueUnit : undefined;
+  return createSourcedValue(value, res.tagKey, unit);
 }
 
 /**
- * Get the tag time value for MR images.
+ * Get the volume id for MR images (can be time, b-value...).
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
- * @returns {number|undefined} The value, if present.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The volume id, if present.
  */
-function getMRVolumeIdTagValue(elements) {
+function getMRVolumeId(elements) {
   let res;
 
   // filter by SOP class UID
   const sopClassUID = safeGet(elements, TagKeys.SOPClassUID);
   if (sopClassUID === SOPClassUIDs.MR ||
     sopClassUID === SOPClassUIDs.EnhancedMR ||
-    sopClassUID === SOPClassUIDs.MRSpectroscopy ||
-    sopClassUID === SOPClassUIDs.EnhancedMRColorImage
+    sopClassUID === SOPClassUIDs.EnhancedMRColorImage ||
+    sopClassUID === SOPClassUIDs.LegacyConvertedEnhancedMRImageStorage
   ) {
     // diffusion b-value
-    const bvalue = getDiffusionBValue(elements);
-    if (typeof bvalue !== 'undefined') {
-      res = bvalue;
-    }
+    res = getDiffusionBValueVolumeId(elements);
   }
 
   return res;
 }
 
 /**
- * Get the volume id from a list of tags. Default
- * returns MR diffusion b-value.
+ * Get the temporal position index of a frame.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {number|undefined} The id value if available.
+ * @param {Record<string, DataElement>} group The per frame
+ *   functional group.
+ * @returns {number|undefined} The value, if present.
+ */
+function getFrameTemporalPositionIndex(group) {
+  let res;
+  const frameContentSeq = safeGetAll(group, TagKeys.FrameContentSequence);
+  if (typeof frameContentSeq !== 'undefined') {
+    // should be only one
+    res = parseNumber(
+      safeGet(frameContentSeq[0], TagKeys.TemporalPositionIndex),
+      value => parseInt(value, 10));
+  }
+  return res;
+}
+
+/**
+ * Get the temporal position index for enhanced multi-frame images.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The volume id, if present.
+ */
+function getTemporalPositionIndex(elements) {
+  return createSourcedValue(
+    getConstantPerFrameValue(
+      elements, getFrameTemporalPositionIndex, 'TemporalPositionIndex'),
+    TagKeys.TemporalPositionIndex);
+}
+
+/**
+ * Get the temporal position time offset of a frame.
+ *
+ * @param {Record<string, DataElement>} group The per frame
+ *   functional group.
+ * @returns {number|undefined} The value, if present.
+ */
+function getFrameTemporalPositionTimeOffset(group) {
+  let res;
+  const temporalSeq = safeGetAll(group, TagKeys.TemporalPositionSequence);
+  if (typeof temporalSeq !== 'undefined') {
+    // should be only one
+    res = parseNumber(
+      safeGet(temporalSeq[0], TagKeys.TemporalPositionTimeOffset),
+      parseFloat);
+  }
+  return res;
+}
+
+/**
+ * Get the temporal position time offset (in seconds) for enhanced
+ * multi-frame images.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The value, if present.
+ */
+function getTemporalPositionTimeOffset(elements) {
+  return createSourcedValue(
+    getConstantPerFrameValue(
+      elements, getFrameTemporalPositionTimeOffset,
+      'TemporalPositionTimeOffset'),
+    TagKeys.TemporalPositionTimeOffset, 'unit.s');
+}
+
+/**
+ * Create a getter that reads a numeric value from a single tag.
+ *
+ * @param {string} key The tag key.
+ * @param {Function} parse The string to number parser to use.
+ * @param {string} [unit] The value unit as an i18n key.
+ * @returns {Function} The getter, returns undefined if the tag is absent
+ *   or not a number.
+ */
+function makeNumericTagGetter(key, parse, unit) {
+  return function (elements) {
+    return createSourcedValue(
+      parseNumber(safeGet(elements, key), parse), key, unit);
+  };
+}
+
+/**
+ * List of already logged deprecation messages.
+ *
+ * @type {string[]}
+ */
+const loggedDeprecations = [];
+
+/**
+ * Log a deprecation warning, only once per message.
+ *
+ * @param {string} message The deprecation message.
+ */
+function warnDeprecatedOnce(message) {
+  if (!loggedDeprecations.includes(message)) {
+    loggedDeprecations.push(message);
+    logger.warn(message);
+  }
+}
+
+/**
+ * Get the volume id of a candidate, its id named after the candidate.
+ *
+ * @param {VolumeIdCandidate} candidate The candidate.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {VolumeId|undefined} The volume id, if present with
+ *   a number id.
+ */
+function getCandidateVolumeId(candidate, elements) {
+  const id = candidate.getter(elements);
+  if (typeof id?.value !== 'number') {
+    return undefined;
+  }
+  return {id: {...id, source: candidate.name}};
+}
+
+/**
+ * Get a deprecated custom volume id getter as a candidate: its
+ * getter returns a number.
+ *
+ * @param {Function} getter The deprecated getter.
+ * @returns {VolumeIdCandidate} The candidate.
+ */
+function getDeprecatedCandidate(getter) {
+  return {
+    name: 'custom',
+    getter(elements) {
+      const value = getter(elements);
+      return typeof value !== 'undefined' ? {value} : undefined;
+    }
+  };
+}
+
+/**
+ * Get the volume id from a list of tags, used while loading (before
+ * the full data is known): the first defined volume id of the
+ * candidates flagged with `preLoad` (see defaultVolumeIdCandidates).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {VolumeId|undefined} The volume id if available.
+ */
+export function getVolumeId(elements) {
+  if (typeof custom.getVolumeIdTagValue !== 'undefined') {
+    warnDeprecatedOnce(
+      'custom.getVolumeIdTagValue: deprecated since v0.37,' +
+      ' please use custom.volumeIdCandidates with a preLoad candidate.'
+    );
+    return getCandidateVolumeId(
+      getDeprecatedCandidate(custom.getVolumeIdTagValue), elements);
+  }
+  for (const candidate of getVolumeIdCandidates()) {
+    if (candidate.preLoad === true) {
+      const volumeId = getCandidateVolumeId(candidate, elements);
+      if (typeof volumeId !== 'undefined') {
+        return volumeId;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Get the volume id number from a list of tags, used while loading
+ * (see getVolumeId).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {number|undefined} The id if available.
  */
 export function getVolumeIdTagValue(elements) {
-  let res;
+  return getVolumeId(elements)?.id.value;
+}
 
-  if (typeof custom.getVolumeIdTagValue !== 'undefined') {
-    res = custom.getVolumeIdTagValue(elements);
-  } else {
-    // MR (and enhanced MR) volume id
-    const volumeId = getMRVolumeIdTagValue(elements);
-    if (typeof volumeId !== 'undefined') {
-      res = volumeId;
+/**
+ * Get a time as a number of seconds. If the date is available, it is
+ * included so that times spanning midnight are correctly ordered.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @param {string} dateKey The date tag key.
+ * @param {string} timeKey The time tag key.
+ * @returns {SourcedNumberValue|undefined} The time, if present.
+ */
+function getDateTimeInSeconds(elements, dateKey, timeKey) {
+  if (typeof safeGet(elements, timeKey) === 'undefined') {
+    return undefined;
+  }
+  let res = getTimeInSeconds(elements[timeKey]);
+  if (typeof res !== 'undefined' &&
+    typeof safeGet(elements, dateKey) !== 'undefined') {
+    const date = getDateObj(elements[dateKey]);
+    const dateMs = Date.UTC(date.year, date.monthIndex, date.day);
+    if (!isNaN(dateMs)) {
+      res += dateMs / 1000;
     }
   }
+  return createSourcedValue(res, timeKey, 'unit.s');
+}
 
+/**
+ * Get the acquisition time as a number of seconds (see
+ * getDateTimeInSeconds).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The time, if present.
+ */
+function getAcquisitionTime(elements) {
+  return getDateTimeInSeconds(
+    elements, TagKeys.AcquisitionDate, TagKeys.AcquisitionTime);
+}
+
+/**
+ * Get the content time as a number of seconds (see
+ * getDateTimeInSeconds).
+ *
+ * @param {Record<string, DataElement>} elements The DICOM tags.
+ * @returns {SourcedNumberValue|undefined} The time, if present.
+ */
+function getContentTime(elements) {
+  return getDateTimeInSeconds(
+    elements, TagKeys.ContentDate, TagKeys.ContentTime);
+}
+
+/**
+ * Get the list of volume id candidates: the custom one if defined,
+ * the default one otherwise.
+ *
+ * @returns {VolumeIdCandidate[]}
+ *   The candidates.
+ */
+function getVolumeIdCandidates() {
+  return typeof custom.volumeIdCandidates !== 'undefined'
+    ? custom.volumeIdCandidates
+    : defaultVolumeIdCandidates;
+}
+
+/**
+ * Get a volume id candidate from its name, including the deprecated
+ * custom getters (named 'custom').
+ *
+ * @param {string} name The candidate name.
+ * @returns {VolumeIdCandidate|undefined} The candidate, if found.
+ */
+function getVolumeIdCandidate(name) {
+  const candidates = [...getVolumeIdCandidates()];
+  // post load first, as in guessVolumeIndices
+  for (const getter of [
+    custom.getVolumeIdTagValue,
+    custom.getPostLoadVolumeIdTagValue
+  ]) {
+    if (typeof getter !== 'undefined') {
+      candidates.unshift(getDeprecatedCandidate(getter));
+    }
+  }
+  return candidates.find(candidate => candidate.name === name);
+}
+
+/**
+ * Get the volume index of each item (file or frame) from its volume
+ * id. The grouping is valid if all items have a numeric id,
+ * there are at least two distinct ids and each (slice, volume)
+ * pair is unique with a total of slices times volumes items: every
+ * volume then contains every slice.
+ *
+ * @param {any[]} values The volume id of each item.
+ * @param {number[]} sliceIndices The slice index of each item.
+ * @param {number} numberOfSlices The number of distinct slices.
+ * @returns {number[]|undefined} The volume index of each item (volumes
+ *   ordered by ascending id), undefined if the grouping is not valid.
+ */
+export function getVolumeIndices(values, sliceIndices, numberOfSlices) {
+  if (values.length !== sliceIndices.length) {
+    return undefined;
+  }
+  // distinct values
+  const volValues = [];
+  for (const value of values) {
+    if (typeof value !== 'number' || isNaN(value)) {
+      return undefined;
+    }
+    if (!volValues.includes(value)) {
+      volValues.push(value);
+    }
+  }
+  if (volValues.length < 2 ||
+    volValues.length * numberOfSlices !== values.length) {
+    return undefined;
+  }
+  // sort as numbers
+  volValues.sort((a, b) => a - b);
+  // volume index per item, check unique (slice, volume) pairs
+  const res = [];
+  const seen = new Set();
+  for (let i = 0; i < values.length; ++i) {
+    const volIndex = volValues.indexOf(values[i]);
+    const key = volIndex * numberOfSlices + sliceIndices[i];
+    if (seen.has(key)) {
+      return undefined;
+    }
+    seen.add(key);
+    res.push(volIndex);
+  }
   return res;
 }
 
 /**
- * Get the volume id from a list of tags parsed after the load finishes.
- * Default uses acquisition time.
+ * Get the associated value of each volume from a value candidate: the
+ * smallest value of the volume (relative to the one of the first
+ * volume for `relative` candidates). Each volume spans from its
+ * smallest to its largest value, the spans must not overlap and
+ * must follow the volume order.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {number|undefined} The id value if available.
+ * @param {VolumeIdCandidate} candidate The candidate.
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM
+ *   tags of each item.
+ * @param {number[]} volumeIndices The volume index of each item.
+ * @returns {SourcedNumberValue[]|undefined} The associated value of each
+ *   volume, undefined if the candidate is not valid.
  */
-export function getPostLoadVolumeIdTagValue(elements) {
-  let res;
-
-  if (typeof custom.getPostLoadVolumeIdTagValue !== 'undefined') {
-    res = custom.getPostLoadVolumeIdTagValue(elements);
-  } else {
-    // constant acquisition time for volumes
-    const acqTime = safeGet(elements, TagKeys.AcquisitionTime);
-    if (typeof acqTime !== 'undefined') {
-      res = parseFloat(acqTime);
+function getCandidateVolumeValues(candidate, elementsList, volumeIndices) {
+  const mins = [];
+  const maxs = [];
+  for (let i = 0; i < elementsList.length; ++i) {
+    const value = candidate.getter(elementsList[i]);
+    const volIndex = volumeIndices[i];
+    if (typeof value?.value !== 'number' || isNaN(value.value) ||
+      volIndex < 0) {
+      return undefined;
+    }
+    if (typeof mins[volIndex] === 'undefined' ||
+      value.value < mins[volIndex].value) {
+      mins[volIndex] = value;
+    }
+    if (typeof maxs[volIndex] === 'undefined' ||
+      value.value > maxs[volIndex]) {
+      maxs[volIndex] = value.value;
     }
   }
+  // spans must not overlap and follow the volume order
+  for (let v = 0; v < mins.length; ++v) {
+    if (typeof mins[v] === 'undefined' ||
+      (v > 0 && maxs[v - 1] >= mins[v].value)) {
+      return undefined;
+    }
+  }
+  const offset = candidate.relative === true ? mins[0].value : 0;
+  return mins.map(min => ({
+    ...min,
+    value: min.value - offset,
+    source: candidate.name
+  }));
+}
 
-  return res;
+/**
+ * Guess the associated value of each volume: value candidates are tried
+ * in order, the first valid one is kept (see volumeValueCandidates).
+ *
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM
+ *   tags of each item.
+ * @param {number[]} volumeIndices The volume index of each item.
+ * @returns {SourcedNumberValue[]|undefined} The associated value of each
+ *   volume, undefined if no candidate is valid.
+ */
+function guessVolumeValues(elementsList, volumeIndices) {
+  for (const candidate of volumeValueCandidates) {
+    const values =
+      getCandidateVolumeValues(candidate, elementsList, volumeIndices);
+    if (typeof values !== 'undefined') {
+      logger.debug(`Using '${candidate.name}' as volume value`);
+      return values;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Get the associated value of each volume, once all data is loaded:
+ * the id relative to the first one for `relative` candidates
+ * (for example AcquisitionTime), guessed for indices (ids without
+ * unit, for example TemporalPositionIdentifier, see
+ * volumeValueCandidates). Other ids have none.
+ *
+ * @param {VolumeId[]} volumeIds The volume ids, sorted by id (as
+ *   returned by Geometry.getVolumeIds).
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM
+ *   tags of each item (file or frame).
+ * @returns {SourcedNumberValue[]|undefined} The associated value of each
+ *   volume, undefined if not available.
+ */
+export function getVolumeValues(volumeIds, elementsList) {
+  const candidate = getVolumeIdCandidate(volumeIds[0].id.source);
+  if (typeof candidate === 'undefined') {
+    return undefined;
+  }
+  if (candidate.relative === true) {
+    const first = volumeIds[0].id.value;
+    return volumeIds.map(volumeId =>
+      ({...volumeId.id, value: volumeId.id.value - first}));
+  }
+  if (typeof volumeIds[0].id.unit !== 'undefined') {
+    return undefined;
+  }
+  const ids = volumeIds.map(volumeId => volumeId.id.value);
+  return guessVolumeValues(
+    elementsList,
+    elementsList.map(elements =>
+      ids.indexOf(getCandidateVolumeId(candidate, elements)?.id.value)));
+}
+
+/**
+ * Guess the volume index of items (files or frames) that share slice
+ * positions: volume id candidates are tried in order, the first one
+ * that produces a valid grouping is kept (see getVolumeIndices).
+ * If the deprecated `custom.getPostLoadVolumeIdTagValue` is defined,
+ * it is used as the only candidate.
+ *
+ * @param {Array<Record<string, DataElement>>} elementsList The DICOM tags
+ *   of each item.
+ * @param {number[]} sliceIndices The slice index of each item.
+ * @param {number} numberOfSlices The number of distinct slices.
+ * @returns {{
+ *   volumeIndices: number[],
+ *   volumeIds: VolumeId[],
+ *   getter: Function
+ * }|undefined}
+ *   The volume index and volume id of each item (without associated
+ *   value, see getVolumeValues) and the volume id getter
+ *   (`(elements) => number|undefined`) that produced them, undefined
+ *   if no candidate produces a valid grouping.
+ */
+export function guessVolumeIndices(
+  elementsList, sliceIndices, numberOfSlices) {
+  let candidates;
+  if (typeof custom.getPostLoadVolumeIdTagValue !== 'undefined') {
+    warnDeprecatedOnce(
+      'custom.getPostLoadVolumeIdTagValue: deprecated since v0.37,' +
+      ' please use custom.volumeIdCandidates.'
+    );
+    candidates = [
+      getDeprecatedCandidate(custom.getPostLoadVolumeIdTagValue)
+    ];
+  } else {
+    candidates = getVolumeIdCandidates();
+  }
+  for (const candidate of candidates) {
+    const volumeIds = elementsList.map(
+      elements => getCandidateVolumeId(candidate, elements));
+    const volumeIndices = getVolumeIndices(
+      volumeIds.map(volumeId => volumeId?.id.value),
+      sliceIndices, numberOfSlices);
+    if (typeof volumeIndices !== 'undefined') {
+      logger.debug(`Using '${candidate.name}' as volume id`);
+      return {
+        volumeIndices,
+        volumeIds,
+        getter: elements =>
+          getCandidateVolumeId(candidate, elements)?.id.value
+      };
+    }
+  }
+  return undefined;
 }

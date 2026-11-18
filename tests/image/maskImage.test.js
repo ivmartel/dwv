@@ -1,0 +1,723 @@
+import {describe, test, assert, vi} from 'vitest';
+import {Geometry} from '../../src/image/geometry.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Point3D} from '../../src/math/point.js';
+import {Matrix33} from '../../src/math/matrix.js';
+import {Index} from '../../src/math/index.js';
+import {Image} from '../../src/image/image.js';
+import {MaskImage} from '../../src/image/maskImage.js';
+import {SegmentCollection} from '../../src/image/segmentCollection.js';
+import {MaskSegment} from '../../src/dicom/dicomSegment.js';
+import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
+import {logger} from '../../src/utils/logger.js';
+
+// run the labeling synchronously, without web workers
+vi.mock('../../src/image/labelingThread.js', async (importOriginal) => {
+  const original = await importOriginal();
+  const {LabelingFilter} = await import('../../src/image/labelingFilter.js');
+  class LabelingThread {
+    ondone(_event) {}
+    run(buffer, geometry) {
+      const filter = new LabelingFilter();
+      this.ondone({
+        data: filter.run(original.generateWorkerMessage(buffer, geometry))
+      });
+    }
+  }
+  return {...original, LabelingThread};
+});
+
+/**
+ * @import {ImageHistogram} from '../../src/image/imageHistogram.js';
+ */
+
+/**
+ * Get the count of a rescaled value in a histogram.
+ *
+ * @param {ImageHistogram} histogram The histogram.
+ * @param {number} value The rescaled value.
+ * @returns {number|undefined} The count, undefined if absent.
+ */
+function countOf(histogram, value) {
+  return histogram.getRescaledHistogram().getEntries().find(
+    (entry) => entry.value === value)?.count;
+}
+
+/**
+ * Tests for the 'image/maskImage.js' file.
+ */
+
+describe('MaskImage', () => {
+
+  test('isMask/getHasOverlap defaults differ from a plain Image', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]));
+    const image = new Image(geom, new Uint8Array(4), ['0']);
+    const mask = new MaskImage(geom, new Uint8Array(4), ['0']);
+
+    assert.equal(image.isMask(), false, 'plain image is not a mask');
+    assert.equal(mask.isMask(), true, 'mask image is a mask');
+    assert.equal(image.getHasOverlap(), false, 'plain image never overlaps');
+    assert.equal(
+      mask.getHasOverlap(), false, 'freshly created mask has no overlap'
+    );
+  });
+
+  test(
+    'constructing without a SegmentCollection creates one aliased ' +
+    'to the buffer (brush path)',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const buffer = new Uint8Array([1, 0, 2]);
+      const mask = new MaskImage(geom, buffer, ['0']);
+
+      assert.equal(
+        mask.getSegmentCollection().getLabelMap(), mask.getBuffer(),
+        'label map aliases the image buffer'
+      );
+    }
+  );
+
+  test(
+    'constructing with a SegmentCollection uses it as-is (loaded-mask path)',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const collection = new SegmentCollection(geom);
+      collection.addFrame(1, new Uint8Array([1, 1, 0]), 0, 0, 3, 1);
+      const mask = new MaskImage(geom, collection.getLabelMap(), ['0'],
+        collection);
+
+      assert.equal(
+        mask.getSegmentCollection(), collection,
+        'the exact collection instance is used'
+      );
+    }
+  );
+
+  test(
+    'segment collection label map follows the buffer after a realloc',
+    () => {
+      // single-slice mask, mirrors Brush#createMask
+      const size1 = new Size([2, 2, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const geom0 = new Geometry([new Point3D(0, 0, 0)], size1, spacing);
+      const mask = new MaskImage(geom0, new Uint8Array(4), ['0']);
+      mask.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
+
+      // paint segment 1 on slice 0
+      mask.setAtOffsetsAndGetOriginals([[0]], 1);
+
+      // append a second slice: triggers Image#realloc since the buffer
+      // must grow from 4 to 8 elements
+      const geom1 = new Geometry([new Point3D(0, 0, 1)], size1, spacing);
+      const slice = new Image(geom1, new Uint8Array(4), ['1']);
+      slice.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
+      mask.appendSlice(slice);
+
+      // paint segment 1 on the newly appended slice 1
+      mask.setAtOffsetsAndGetOriginals([[4]], 1);
+
+      const collection = mask.getSegmentCollection();
+      assert.equal(
+        collection.getLabelMap(), mask.getBuffer(),
+        'label map still aliases the (reallocated) image buffer'
+      );
+      assert.equal(
+        collection.getLabelMap()[4], 1,
+        'edit made on the appended slice is visible in the label map'
+      );
+    }
+  );
+
+  test(
+    'setAtOffsets keeps the segment collection in sync (e.g. ' +
+    'DeleteSegmentCommand / ChangeSegmentColourCommand)',
+    () => {
+      // mimic a mask loaded via MaskFactory: per-segment data in
+      // #segments, buffer aliased to the built label map
+      const size1 = new Size([3, 1, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const geom = new Geometry([new Point3D(0, 0, 0)], size1, spacing);
+      const collection = new SegmentCollection(geom);
+      const pixelBuffer = new Uint8Array([1, 1, 0]);
+      collection.addFrame(1, pixelBuffer, 0, 0, 3, 1);
+
+      const mask = new MaskImage(geom, collection.getLabelMap(), ['0'],
+        collection);
+
+      // simulate ChangeSegmentColourCommand renumbering segment 1 to 3
+      mask.setAtOffsets([0, 1], 3);
+
+      const oldBuffers = collection.getSegmentBuffers([{number: 1}]);
+      assert.isUndefined(
+        oldBuffers[0],
+        'old segment number no longer carries these pixels'
+      );
+      const newBuffers = collection.getSegmentBuffers([{number: 3}]);
+      assert.equal(newBuffers[2][0][0], 1, 'pixel tracked under new number');
+      assert.equal(newBuffers[2][0][1], 1, 'pixel tracked under new number');
+    }
+  );
+
+  test('getOffsets returns offsets matching a value', () => {
+    const size0 = 3;
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([size0, size0, 1]),
+      new Spacing([1, 1, 1]));
+    const buffer0 = [];
+    buffer0[0] = 1;
+    for (let i0 = 1; i0 < 2 * size0; ++i0) {
+      buffer0[i0] = 0;
+    }
+    for (let i1 = 2 * size0; i1 < size0 * size0; ++i1) {
+      buffer0[i1] = 1;
+    }
+    const theoOffset0 = [1, 2, 3, 4, 5];
+    const theoOffset1 = [0, 6, 7, 8];
+
+    const mask = new MaskImage(geom, buffer0, ['0']);
+
+    assert.deepEqual(mask.getOffsets(0), theoOffset0, 'Image offsets 0');
+    assert.deepEqual(mask.getOffsets(1), theoOffset1, 'Image offsets 1');
+  });
+
+  test('clone copies the segment collection, not just the buffer', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+    const collection = new SegmentCollection(geom);
+    collection.addFrame(1, new Uint8Array([1, 1, 0]), 0, 0, 3, 1);
+    collection.addFrame(2, new Uint8Array([0, 0, 1]), 0, 0, 3, 2);
+    const mask = new MaskImage(geom, collection.getLabelMap(), ['0'],
+      collection);
+
+    const clone = mask.clone();
+
+    assert.ok(clone instanceof MaskImage, 'clone is a MaskImage');
+    assert.notEqual(
+      clone.getSegmentCollection(), collection,
+      'clone has its own SegmentCollection instance'
+    );
+    assert.equal(
+      clone.getSegmentCollection().getLabelMap(), clone.getBuffer(),
+      'clone label map aliases the clone (not the original) buffer'
+    );
+
+    // mutating the clone must not affect the original
+    clone.setAtOffsets([2], 1);
+    assert.equal(
+      mask.getBuffer()[2], 2, 'original buffer unaffected (still segment 2)'
+    );
+    assert.equal(
+      collection.getSegmentBuffers([{number: 2}])[1][0][2], 1,
+      'original segment 2 still owns offset 2'
+    );
+    assert.equal(
+      clone.getSegmentCollection().getSegmentBuffers([{number: 1}])[0][0][2],
+      1,
+      'clone segment 1 now owns offset 2'
+    );
+  });
+
+  test('initializeContour/getContour', () => {
+    const geom = new Geometry(
+      new Point3D(0, 0, 0), new Size([3, 3, 1]), new Spacing([1, 1, 1]));
+    const buffer = new Uint8Array(9).fill(1);
+    const mask = new MaskImage(geom, buffer);
+
+    assert.notOk(
+      mask.getContour().isInitialized(),
+      'contour not initialized before initializeContour'
+    );
+
+    mask.initializeContour();
+
+    assert.ok(
+      mask.getContour().isInitialized(),
+      'contour initialized after initializeContour'
+    );
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const orientation = new Matrix33([
+      1, 0, 0,
+      0, 1, 0,
+      0, 0, 1,
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    assert.equal(
+      typeof mask.getContour().getDistance(4, orientation),
+      'number',
+      'getDistance returns a number'
+    );
+  });
+
+  test(
+    'appendSlice shifts the contour buffer in step with the image buffer',
+    () => {
+      const size = 2;
+      const spacing = new Spacing([1, 1, 1]);
+      // 2 initial slices (z=0, z=1), room reserved for 3 via sliceCapacity
+      const geometry = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([size, size, 1]), spacing);
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1);
+      const buffer = new Uint8Array(size * size * 2).fill(1);
+      const mask = new MaskImage(geometry, buffer, ['0', '1']);
+      mask.setMeta({PixelRepresentation: 0, sliceCapacity: 3});
+      mask.initializeContour();
+
+      const shiftSliceSpy = vi.spyOn(mask.getContour(), 'shiftSlice');
+
+      // insert a slice before existing content -> triggers a shift
+      const sliceGeometry = new Geometry(
+        [new Point3D(0, 0, -1)], new Size([size, size, 1]), spacing);
+      const slice = new Image(
+        sliceGeometry, new Uint8Array(size * size).fill(2), ['2']);
+      slice.setMeta({PixelRepresentation: 0, sliceCapacity: 3});
+      mask.appendSlice(slice);
+
+      // image-space shift: indexOffset=0, insertSize=sliceSize(4),
+      // maxOffset=2*sliceSize(8); contour tracks 3 values per voxel
+      // (numberOfComponents is 1 for a mask), so scale by 3
+      assert.deepEqual(
+        shiftSliceSpy.mock.calls[0], [0, 12, 24],
+        'contour shift scaled to contour-space offsets'
+      );
+      assert.ok(
+        mask.getContour().isInitialized(), 'contour still initialized'
+      );
+    }
+  );
+
+  test(
+    'appendSlice + brush-add on the new slice keeps segments on ' +
+    'distinct, correctly-indexed slices (export round-trip)',
+    () => {
+      // a SEG loaded with a segment on only one of the source's 2 slices:
+      // mask geometry starts with a single slice at z=1
+      const size = 2;
+      const spacing = new Spacing([1, 1, 1]);
+      const geometry = new Geometry(
+        [new Point3D(0, 0, 1)], new Size([size, size, 1]), spacing);
+      const collection = new SegmentCollection(geometry);
+      collection.addFrame(
+        1, new Uint8Array([1, 1, 1, 1]), 0, 0, size * size, 1);
+      const mask = new MaskImage(
+        geometry, collection.getLabelMap(), ['1'], collection);
+      mask.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
+
+      // append the other slice, z=0, which sorts *before* the existing
+      // one and so shifts the existing segment's buffer content
+      const sliceGeometry = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([size, size, 1]), spacing);
+      const slice = new Image(sliceGeometry, new Uint8Array(size * size),
+        ['0']);
+      slice.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
+      mask.appendSlice(slice);
+
+      // brush-paint a new segment 2 onto the newly appended slice (z=0,
+      // now buffer offsets 0..3)
+      mask.setAtOffsetsAndGetOriginals([[0, 1, 2, 3]], 2);
+
+      const roiBuffers = mask.getSegmentCollection().getSegmentBuffers(
+        [{number: 1}, {number: 2}]);
+
+      assert.deepEqual(
+        Object.keys(roiBuffers[0]), ['1'],
+        'segment 1 re-indexed to its shifted slice (1), not left at 0'
+      );
+      assert.deepEqual(
+        Object.keys(roiBuffers[1]), ['0'],
+        'segment 2 stays on the slice it was painted on (0)'
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment returns one volume histogram for 3D data',
+    () => {
+      // mask: segment 1 on first 3 voxels; image intensities beside it
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([4, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 1, 1, 0]), ['0']);
+      const segment = new MaskSegment(1, 'seg-1', 'MANUAL');
+      mask.setMeta({custom: {segments: [segment]}});
+
+      const image = new Image(
+        geom, new Uint8Array([10, 10, 20, 99]), ['0']);
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.equal(result.length, 1, 'one volume for 3D');
+      assert.equal(result[0].volume, 0);
+      assert.equal(countOf(result[0].histogram, 10), 2, 'value 10 twice');
+      assert.equal(countOf(result[0].histogram, 20), 1, 'value 20 once');
+      assert.isUndefined(
+        countOf(result[0].histogram, 99), 'outside-segment voxel ignored');
+    }
+  );
+
+  test(
+    'getHistogramBySegment resolves segment by trackingUid',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([2, 2, 0]), ['0']);
+      const segment = new MaskSegment(2, 'seg-2', 'MANUAL');
+      segment.trackingUid = '1.2.3.segment-uid';
+      mask.setMeta({custom: {segments: [segment]}});
+
+      const image = new Image(
+        geom, new Uint8Array([5, 7, 0]), ['0']);
+
+      const result = mask.getHistogramBySegment(
+        image, '1.2.3.segment-uid');
+
+      assert.equal(result.length, 1);
+      assert.equal(countOf(result[0].histogram, 5), 1);
+      assert.equal(countOf(result[0].histogram, 7), 1);
+    }
+  );
+
+  test(
+    'getHistogramBySegment returns empty array for unknown segment',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(geom, new Uint8Array([3, 4]), ['0']);
+
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+      const result = mask.getHistogramBySegment(image, 'missing');
+      const warnCalls = warnSpy.mock.calls;
+      warnSpy.mockRestore();
+
+      assert.deepEqual(result, []);
+      assert.deepEqual(
+        warnCalls,
+        [['getHistogramBySegment: unknown segment id: missing']],
+        'unknown segment warning logged'
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment returns a histogram per 4D volume ' +
+    'using a 3D mask',
+    () => {
+      // 3D mask reused on each volume of a 4D image
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 0)],
+        new Size([2, 1, 1, 2]),
+        new Spacing([1, 1, 1, 1]));
+      // vol0 intensities [10, 11], vol1 [20, 21]
+      const image = new Image(
+        imageGeom, new Uint8Array([10, 11, 20, 21]), ['0', '1']);
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.equal(result.length, 2, 'two volumes');
+      assert.equal(result[0].volume, 0);
+      assert.equal(countOf(result[0].histogram, 10), 1);
+      assert.isUndefined(countOf(result[0].histogram, 11));
+      assert.equal(result[1].volume, 1);
+      assert.equal(countOf(result[1].histogram, 20), 1);
+      assert.isUndefined(countOf(result[1].histogram, 21));
+    }
+  );
+
+  test(
+    'getHistogramBySegment maps mask slices to image slices by origin',
+    () => {
+      // mask: one slice at z=1
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 1)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      // image: two slices at z=0 and z=1
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+        new Size([2, 1, 2]),
+        new Spacing([1, 1, 1]));
+      const image = new Image(
+        imageGeom, new Uint8Array([10, 11, 20, 21]), ['0']);
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      assert.equal(result.length, 1, 'one volume');
+      assert.equal(countOf(result[0].histogram, 20), 1);
+      assert.isUndefined(countOf(result[0].histogram, 10));
+      assert.isUndefined(countOf(result[0].histogram, 21));
+    }
+  );
+
+  test(
+    'getHistogramBySegment rescales with a constant RSI',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      const image = new Image(
+        geom, new Uint8Array([1, 2, 3]), ['0']);
+      image.setRescaleSlopeAndIntercept(
+        new RescaleSlopeAndIntercept(0.5, -1024));
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      const entries = result[0].histogram.getRescaledHistogram().getEntries();
+      assert.deepEqual(entries, [
+        {value: -1023.5, count: 1},
+        {value: -1023, count: 1}
+      ]);
+    }
+  );
+
+  test(
+    'getHistogramBySegment rescales each slice with its own RSI',
+    () => {
+      const geom = new Geometry(
+        [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+        new Size([2, 1, 2]),
+        new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 0, 1, 0]), ['0', '1']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+
+      // slice 0: id rsi, slice 1: slope 2
+      const image = new Image(
+        geom, new Uint8Array([10, 11, 10, 11]), ['0', '1']);
+      image.setRescaleSlopeAndIntercept(
+        new RescaleSlopeAndIntercept(2, 0), 1);
+      assert.isFalse(image.isConstantRSI(), 'non constant rsi');
+
+      const result = mask.getHistogramBySegment(image, '1');
+
+      const entries = result[0].histogram.getRescaledHistogram().getEntries();
+      assert.deepEqual(entries, [
+        {value: 10, count: 1},
+        {value: 20, count: 1}
+      ]);
+    }
+  );
+
+  test(
+    'getHistogramBySegment throws when spatial sizes differ',
+    () => {
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2, 3]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /geometries are not compatible/
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment throws when orientations differ',
+    () => {
+      const size = new Size([2, 1, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const origins = [new Point3D(0, 0, 0)];
+      const maskGeom = new Geometry(origins, size, spacing);
+      const imageOrientation = new Matrix33([1, 0, 0, 0, 0, -1, 0, 1, 0]);
+      const imageGeom = new Geometry(
+        origins, size, spacing, imageOrientation);
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /geometries are not compatible/
+      );
+    }
+  );
+
+  test(
+    'getHistogramBySegment throws when origins differ',
+    () => {
+      const size = new Size([2, 1, 1]);
+      const spacing = new Spacing([1, 1, 1]);
+      const maskGeom = new Geometry(
+        [new Point3D(0, 0, 0)], size, spacing);
+      const imageGeom = new Geometry(
+        [new Point3D(0, 0, 5)], size, spacing);
+      const mask = new MaskImage(
+        maskGeom, new Uint8Array([1, 0]), ['0']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        imageGeom, new Uint8Array([1, 2]), ['0']);
+
+      assert.throws(
+        () => mask.getHistogramBySegment(image, '1'),
+        /geometries are not compatible/
+      );
+    }
+  );
+
+  test('getLabels is undefined before labeling', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([2, 1, 1]), new Spacing([1, 1, 1]));
+    const mask = new MaskImage(geom, new Uint8Array([1, 0]), ['0']);
+
+    assert.isUndefined(mask.getLabels());
+  });
+
+  test(
+    'getHistogramBySegment adds a histogram per label after labeling',
+    () => {
+      // 4 slices: segment 1 on slice 0 and on slices 2-3 (two labels)
+      const origins = [0, 1, 2, 3].map((z) => new Point3D(0, 0, z));
+      const geom = new Geometry(
+        origins, new Size([2, 1, 4]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom,
+        new Uint8Array([1, 0, 0, 0, 1, 0, 1, 1]),
+        ['0', '1', '2', '3']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        geom,
+        new Uint8Array([10, 99, 99, 99, 20, 99, 30, 40]),
+        ['0', '1', '2', '3']);
+
+      // no labels yet
+      const before = mask.getHistogramBySegment(image, '1');
+      assert.isUndefined(before[0].labelHistograms, 'no label histograms');
+
+      mask.recalculateLabels();
+      const labels = mask.getLabels();
+      assert.equal(labels.length, 2, 'two labels');
+
+      const result = mask.getHistogramBySegment(image, '1');
+      assert.equal(result.length, 1, 'one volume');
+      assert.equal(result[0].histogram.getTotal(), 4, 'segment total');
+
+      const labelHistograms = result[0].labelHistograms;
+      assert.equal(labelHistograms.length, 2, 'one histogram per label');
+      const values = labelHistograms.map(
+        (item) => item.histogram.getRescaledHistogram().getEntries().map(
+          (entry) => entry.value));
+      values.sort((a, b) => a[0] - b[0]);
+      assert.deepEqual(values, [[10], [20, 30, 40]], 'label values');
+      for (const item of labelHistograms) {
+        assert.isTrue(labels.includes(item.label), 'label reference');
+      }
+    }
+  );
+
+  test(
+    'getHistogramBySegment has no label histograms if labels share slices',
+    () => {
+      // 2 slices: segment 1 on voxels 0 and 2 of each slice,
+      // two labels (columns) that share both slices
+      const origins = [0, 1].map((z) => new Point3D(0, 0, z));
+      const geom = new Geometry(
+        origins, new Size([3, 1, 2]), new Spacing([1, 1, 1]));
+      const mask = new MaskImage(
+        geom, new Uint8Array([1, 0, 1, 1, 0, 1]), ['0', '1']);
+      mask.setMeta({
+        custom: {segments: [new MaskSegment(1, 'seg-1', 'MANUAL')]}
+      });
+      const image = new Image(
+        geom, new Uint8Array([10, 99, 20, 30, 99, 40]), ['0', '1']);
+
+      mask.recalculateLabels();
+      assert.equal(mask.getLabels().length, 2, 'two labels');
+
+      const result = mask.getHistogramBySegment(image, '1');
+      assert.equal(result[0].histogram.getTotal(), 4, 'segment total');
+      assert.isUndefined(result[0].labelHistograms, 'no label histograms');
+    }
+  );
+
+});
+
+describe('MaskImage getSegmentNumbersAtIndex', () => {
+  test('without overlap', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([3, 1, 1]), new Spacing([1, 1, 1]));
+    const mask = new MaskImage(geom, new Uint8Array([0, 2, 3]), ['0']);
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([0, 0, 0])), [], 'background');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([1, 0, 0])), [2], 'segment 2');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([2, 0, 0])), [3], 'segment 3');
+  });
+
+  test('with overlap', () => {
+    const geom = new Geometry(
+      [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+      new Size([3, 1, 2]), new Spacing([1, 1, 1]));
+    const collection = new SegmentCollection(geom);
+    // slice 1: segment 1 on x=0,1 and segment 2 on x=1,2
+    collection.addFrame(1, new Uint8Array([1, 1, 0]), 0, 1, 3, 1);
+    collection.addFrame(2, new Uint8Array([0, 1, 1]), 0, 1, 3, 2);
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const mask = new MaskImage(geom, collection.getLabelMap(), ['0', '1'],
+      collection);
+    const warnCalls = warnSpy.mock.calls;
+    warnSpy.mockRestore();
+    assert.deepEqual(
+      warnCalls,
+      [['SegmentCollection: detected overlapping segments']],
+      'overlap warning logged'
+    );
+    assert.ok(mask.getHasOverlap(), 'mask has overlap');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([0, 0, 1])), [1], 'only 1');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([1, 0, 1])), [1, 2],
+      'overlap 1 and 2');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([2, 0, 1])), [2], 'only 2');
+    assert.deepEqual(
+      mask.getSegmentNumbersAtIndex(new Index([1, 0, 0])), [],
+      'slice without segments');
+  });
+});

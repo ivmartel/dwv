@@ -1,9 +1,8 @@
 import {Point2D} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Line} from '../math/line.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Line} from '../math/line.js';
+ */
 
 /**
  * Helper for the LabelingFilter, provides a debug display for diameters and
@@ -16,7 +15,7 @@ export class LabelingDebug {
   /**
    * Cleans buffer of debug lines before calculations.
    *
-   * @param {TypedArray} imageBuffer The image buffer to clean.
+   * @param {Uint8Array} imageBuffer The image buffer to clean.
    */
   cleanBuffer(imageBuffer) {
     for (let i = 0; i < imageBuffer.length; i++) {
@@ -48,7 +47,7 @@ export class LabelingDebug {
    * Draw a debug line segment of an angle less that 45 degrees.
    * Points should be in slice world space.
    *
-   * @param {TypedArray} imageBuffer The image buffer to draw debug lines on.
+   * @param {Uint8Array} imageBuffer The image buffer to draw debug lines on.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
@@ -82,7 +81,7 @@ export class LabelingDebug {
    * Draw a debug line segment of an angle greater that 45 degrees.
    * Points should be in slice world space.
    *
-   * @param {TypedArray} imageBuffer The image buffer to draw debug lines on.
+   * @param {Uint8Array} imageBuffer The image buffer to draw debug lines on.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
@@ -116,7 +115,7 @@ export class LabelingDebug {
    * Draw a debug line segment.
    * Points should be in slice world space.
    *
-   * @param {TypedArray} imageBuffer The image buffer to draw debug lines on.
+   * @param {Uint8Array} imageBuffer The image buffer to draw debug lines on.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
@@ -144,24 +143,22 @@ export class LabelingDebug {
           z
         );
       }
+    } else if (p0.getY() < p1.getY()) {
+      this.#plotLineHigh(
+        imageBuffer,
+        unitVectors,
+        spacing,
+        line,
+        z
+      );
     } else {
-      if (p0.getY() < p1.getY()) {
-        this.#plotLineHigh(
-          imageBuffer,
-          unitVectors,
-          spacing,
-          line,
-          z
-        );
-      } else {
-        this.#plotLineHigh(
-          imageBuffer,
-          unitVectors,
-          spacing,
-          line.getFlipped(),
-          z
-        );
-      }
+      this.#plotLineHigh(
+        imageBuffer,
+        unitVectors,
+        spacing,
+        line.getFlipped(),
+        z
+      );
     }
   }
 
@@ -170,12 +167,12 @@ export class LabelingDebug {
    * The pixel value of the debug lines are the segmentation label of the
    * segment + 128.
    *
-   * @param {TypedArray} imageBuffer The image buffer to draw debug lines on.
+   * @param {Uint8Array} imageBuffer The image buffer to draw debug lines on.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} sizes The image dimensions.
    * @param {number[]} spacing The pixel spacing of the image.
-   * @param {TypedArray} borders The buffer containing the border pixel arrays.
+   * @param {Int32Array} borders The buffer containing the border pixel arrays.
    * @param {object} maxDiameters The dictionary of calculated diameters.
    */
   drawDebugLines(

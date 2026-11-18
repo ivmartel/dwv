@@ -6,6 +6,7 @@ import {
   isAnyPixelDataTag,
   hasAnyPixelDataElement
 } from './dicomTag.js';
+import {getDicomTagInfo} from './dicomTagInfo.js';
 import {
   is32bitVLVR,
   isCharSetStringVR,
@@ -21,10 +22,14 @@ import {DataReader} from './dataReader.js';
 import {logger} from '../utils/logger.js';
 
 /**
+ * @import {IntTypedArray, TypedArray} from '../math/types.js';
+ */
+
+/**
  * List of DICOM data elements indexed via a 8 character string formed from
  * the group and element numbers.
  *
- * @typedef {Object<string, DataElement>} DataElements
+ * @typedef {Record<string, DataElement>} DataElements
  */
 
 /**
@@ -33,7 +38,7 @@ import {logger} from '../utils/logger.js';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.36.2';
+  return '0.37.0';
 }
 
 /**
@@ -64,7 +69,7 @@ export function getDwvUIDPrefix() {
  * @returns {string} The name.
  */
 export function getImplementationVersionName() {
-  return 'DWV_' + getDwvVersion();
+  return `DWV_${getDwvVersion()}`;
 }
 
 /**
@@ -73,7 +78,7 @@ export function getImplementationVersionName() {
  * @returns {string} The uid.
  */
 export function getImplementationClassUID() {
-  return getDwvUIDPrefix() + '.' + getDwvVersionUI();
+  return `${getDwvUIDPrefix()}.${getDwvVersionUI()}`;
 }
 
 /**
@@ -171,7 +176,7 @@ export function isVersionInBounds(version, min, max) {
  * Check that an input buffer includes the DICOM prefix 'DICM'
  *   after the 128 bytes preamble.
  *
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part10/chapter_7.html#sect_7.1}.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
@@ -184,43 +189,30 @@ export function hasDicomPrefix(buffer) {
   }
   const prefixArray = new Uint8Array(buffer, 128, 4);
   const stringReducer = function (previous, current) {
-    return previous += String.fromCharCode(current);
+    return previous + String.fromCharCode(current);
   };
   return prefixArray.reduce(stringReducer, '') === 'DICM';
 }
 
-// Zero-width space (u200B)
-// @ts-ignore
-const ZWS = String.fromCharCode('u200B');
-
 /**
- * Clean string: remove zero-width space ending and trim.
+ * Clean string: remove null characters (padding) and trim.
  * Warning: no tests are done on the input, will fail if
  *   null or undefined or not string.
- * Exported for tests only.
  *
  * @param {string} inputStr The string to clean.
  * @returns {string} The cleaned string.
  */
 export function cleanString(inputStr) {
-  let res = inputStr;
-  // get rid of ending zero-width space
-  const lastIndex = inputStr.length - 1;
-  if (inputStr[lastIndex] === ZWS) {
-    res = inputStr.substring(0, lastIndex);
-  }
-  // trim spaces
-  res = res.trim();
-  // return
-  return res;
+  // remove null characters (UI padding) and trim spaces
+  return inputStr.replace(/\0/g, '').trim();
 }
 
 /**
  * Get the utfLabel (used by the TextDecoder) from a character set term.
  *
  * References:
- * - DICOM [Value Encoding]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html},
- * - DICOM [Specific Character Set]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2},
+ * - DICOM [Value Encoding]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_6.html},
+ * - DICOM [Specific Character Set]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2},
  * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}.
  *
  * @param {string} charSetTerm The DICOM character set.
@@ -253,8 +245,9 @@ function getUtfLabel(charSetTerm) {
   } else if (charSetTerm === 'ISO 2022 IR 87') {
     label = 'iso-2022-jp';
   } else if (charSetTerm === 'ISO 2022 IR 149') {
-    // not supported by TextDecoder when it says it should...
-    //label = "iso-2022-kr";
+    // not supported by TextDecoder as iso-2022-kr, use euc-kr
+    // after removing the escape sequences (see removeEscapeSequences)
+    label = 'euc-kr';
   } else if (charSetTerm === 'ISO 2022 IR 58') {
     // not supported by TextDecoder...
     //label = "iso-2022-cn";
@@ -268,6 +261,40 @@ function getUtfLabel(charSetTerm) {
     label = 'chinese';
   }
   return label;
+}
+
+/**
+ * Remove the ISO 2022 escape sequences from a buffer:
+ * ESC (0x1B), intermediate bytes (0x20-0x2F) and a final byte.
+ * Needed for ISO 2022 IR 149 (Korean), where the escape sequence
+ * only designates KS X 1001 to G1, so the rest decodes as EUC-KR.
+ *
+ * Ref: DICOM [Code Extensions]{@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_6.html#sect_6.1.2.5}.
+ *
+ * @param {Uint8Array} buffer The input buffer.
+ * @returns {Uint8Array} The buffer without escape sequences.
+ */
+function removeEscapeSequences(buffer) {
+  if (!buffer.includes(0x1b)) {
+    return buffer;
+  }
+  const result = [];
+  let i = 0;
+  while (i < buffer.length) {
+    if (buffer[i] === 0x1b) {
+      ++i;
+      // intermediate bytes
+      while (i < buffer.length && buffer[i] >= 0x20 && buffer[i] <= 0x2f) {
+        ++i;
+      }
+      // final byte
+      ++i;
+    } else {
+      result.push(buffer[i]);
+      ++i;
+    }
+  }
+  return new Uint8Array(result);
 }
 
 /**
@@ -462,23 +489,21 @@ function guessTransferSyntax(firstDataElement) {
   const implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90)
     ? false : true;
   // guess transfer syntax
-  let syntax = null;
+  let syntax;
   if (group === oEightGroupLittleEndian) {
     if (implicit) {
       syntax = transferSyntaxKeywords.ImplicitVRLittleEndian;
     } else {
       syntax = transferSyntaxKeywords.ExplicitVRLittleEndian;
     }
+  } else if (implicit) {
+    // ImplicitVRBigEndian: impossible
+    throw new Error(
+      'Not a valid DICOM file (no magic DICM word found' +
+      'and implicit VR big endian detected)'
+    );
   } else {
-    if (implicit) {
-      // ImplicitVRBigEndian: impossible
-      throw new Error(
-        'Not a valid DICOM file (no magic DICM word found' +
-        'and implicit VR big endian detected)'
-      );
-    } else {
-      syntax = transferSyntaxKeywords.ExplicitVRBigEndian;
-    }
+    syntax = transferSyntaxKeywords.ExplicitVRBigEndian;
   }
   // set transfer syntax data element
   const dataElement = new DataElement('UI');
@@ -499,8 +524,7 @@ function guessTransferSyntax(firstDataElement) {
  * @param {number} pixelRepresentation The pixel representation,
  *   0:unsigned;1:signed.
  * @param {number} size The size of the new array.
- * @returns {Uint8Array|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array}
- *   The good typed array.
+ * @returns {IntTypedArray} The good typed array.
  */
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
   let res = null;
@@ -525,13 +549,43 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
       }
     }
   } catch (error) {
-    if (error instanceof RangeError) {
-      const powerOf2 = Math.floor(Math.log(size) / Math.log(2));
-      logger.error('Cannot allocate array of size: ' +
-        size + ' (>2^' + powerOf2 + ').');
-    }
+    logAllocationError(error, size);
   }
   return res;
+}
+
+/**
+ * Get a new TypedArray of the same type as the input one
+ *   (preserves float arrays, unlike `getTypedArray`).
+ *
+ * @param {TypedArray} array The model array.
+ * @param {number} size The size of the new array.
+ * @returns {TypedArray} The new array or null if the allocation failed.
+ */
+export function getTypedArrayLike(array, size) {
+  let res = null;
+  try {
+    const ArrayConstructor =
+      /** @type {function(new:TypedArray, number)} */ (array.constructor);
+    res = new ArrayConstructor(size);
+  } catch (error) {
+    logAllocationError(error, size);
+  }
+  return res;
+}
+
+/**
+ * Log a typed array allocation error.
+ *
+ * @param {Error} error The allocation error.
+ * @param {number} size The size of the array.
+ */
+function logAllocationError(error, size) {
+  if (error instanceof RangeError) {
+    const powerOf2 = Math.floor(Math.log(size) / Math.log(2));
+    logger.error(`Cannot allocate array of size: ${
+      size } (>2^${powerOf2}).`);
+  }
 }
 
 /**
@@ -542,8 +596,8 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
  *   the 'isTagWithVR' function first.
  *
  * Reference:
- * - [Data Element explicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1},
- * - [Data Element implicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_7.5.2.html#table_7.5-1}.
+ * - [Data Element explicit]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_7.html#table_7.1-1},
+ * - [Data Element implicit]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_7.5.2.html#table_7.5-1}.
  *
  * ```
  * | Tag | VR  | VL | Value |
@@ -649,6 +703,13 @@ export class DicomParser {
   #textDecoder = this.#defaultTextDecoder;
 
   /**
+   * Flag to remove escape sequences before decoding special strings.
+   *
+   * @type {boolean}
+   */
+  #removeEscapeSequences = false;
+
+  /**
    * Decode an input string buffer using the default text decoder.
    *
    * @param {Uint8Array} buffer The buffer to decode.
@@ -665,6 +726,9 @@ export class DicomParser {
    * @returns {string} The decoded string.
    */
   #decodeSpecialString(buffer) {
+    if (this.#removeEscapeSequences) {
+      buffer = removeEscapeSequences(buffer);
+    }
     return this.#textDecoder.decode(buffer);
   }
 
@@ -707,7 +771,7 @@ export class DicomParser {
   /**
    * Get the DICOM data elements.
    *
-   * @returns {Object<string, DataElement>} The data elements.
+   * @returns {Record<string, DataElement>} The data elements.
    */
   getDicomElements() {
     return this.#dataElements;
@@ -807,7 +871,7 @@ export class DicomParser {
 
   /**
    * Read the pixel item data element.
-   * Ref: [Single frame fragments]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.4.html#table_A.4-1}.
+   * Ref: [Single frame fragments]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_A.4.html#table_A.4-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -839,14 +903,14 @@ export class DicomParser {
     return {
       data: itemData,
       endOffset: offset,
-      offsetTableVl: offsetTableVl
+      offsetTableVl
     };
   }
 
   /**
    * Read a DICOM data element.
    *
-   * Reference: [DICOM VRs]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
+   * Reference: [DICOM VRs]{@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -870,12 +934,12 @@ export class DicomParser {
     offset = readTagRes.endOffset;
 
     // Value Representation (VR)
-    let vr = null;
-    let is32bitVL = false;
+    let vr = 'NONE';
+    let is32bitVL = true;
     if (tag.isWithVR()) {
       // implicit VR
       if (implicit) {
-        vr = tag.getVrFromDictionary();
+        vr = getDicomTagInfo(tag)?.getVr();
         if (typeof vr === 'undefined') {
           vr = 'UN';
         }
@@ -889,20 +953,17 @@ export class DicomParser {
           offset += 2 * Uint8Array.BYTES_PER_ELEMENT;
         }
       }
-    } else {
-      vr = 'NONE';
-      is32bitVL = true;
     }
 
     // check vr
     if (!isKnownVR(vr)) {
-      logger.warn('Unknown VR: ' + vr +
-        ' (for tag ' + tag.getKey() + '), treating as \'UN\'');
+      logger.warn(`Unknown VR: ${ vr
+      } (for tag ${tag.getKey()}), treating as 'UN'`);
       vr = 'UN';
     }
 
     // Value Length (VL)
-    let vl = 0;
+    let vl;
     if (is32bitVL) {
       vl = reader.readUint32(offset);
       offset += Uint32Array.BYTES_PER_ELEMENT;
@@ -1009,7 +1070,7 @@ export class DicomParser {
     }
 
     // data
-    let data = null;
+    let data;
     const vrType = vrTypes[vr];
     if (isAnyPixelDataTag(tag)) {
       if (element.undefinedLength) {
@@ -1023,7 +1084,7 @@ export class DicomParser {
         delete element.items;
       } else {
         // check bits allocated and VR
-        // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
+        // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_A.2.html
         if (bitsAllocated > 8 && vr === 'OB') {
           logger.warn(
             'Reading DICOM pixel data with bitsAllocated>8 and OB VR' +
@@ -1031,9 +1092,17 @@ export class DicomParser {
           );
           element.vr = 'OW';
         }
-        // read
+        // read: float pixel data have dedicated tags, PixelData
+        // is integer data
         data = [];
-        if (bitsAllocated === 1) {
+        const tagKey = tag.getKey();
+        if (tagKey === '7FE00008') {
+          // FloatPixelData
+          data.push(reader.readFloat32Array(offset, vl));
+        } else if (tagKey === '7FE00009') {
+          // DoubleFloatPixelData
+          data.push(reader.readFloat64Array(offset, vl));
+        } else if (bitsAllocated === 1) {
           data.push(reader.readBinaryArray(
             offset, vl, pixelTags.imageBufferSize));
         } else if (bitsAllocated === 8) {
@@ -1049,11 +1118,13 @@ export class DicomParser {
             data.push(reader.readInt16Array(offset, vl));
           }
         } else if (bitsAllocated === 32) {
-          data.push(reader.readFloat32Array(offset, vl));
-        } else if (bitsAllocated === 64) {
-          data.push(reader.readFloat64Array(offset, vl));
+          if (pixelRepresentation === 0) {
+            data.push(reader.readUint32Array(offset, vl));
+          } else {
+            data.push(reader.readInt32Array(offset, vl));
+          }
         } else {
-          throw new Error('Unsupported bits allocated: ' + bitsAllocated);
+          throw new Error(`Unsupported bits allocated: ${bitsAllocated}`);
         }
       }
     } else if (typeof vrType !== 'undefined') {
@@ -1092,7 +1163,7 @@ export class DicomParser {
         }
         data = cleanString(data).split('\\');
       } else {
-        throw new Error('Unknown VR type: ' + vrType);
+        throw new Error(`Unknown VR type: ${vrType}`);
       }
     } else if (vr === 'xx') {
       // US or OW
@@ -1105,12 +1176,10 @@ export class DicomParser {
         } else {
           data = Array.from(reader.readInt8Array(offset, vl));
         }
+      } else if (pixelRepresentation === 0) {
+        data = Array.from(reader.readUint16Array(offset, vl));
       } else {
-        if (pixelRepresentation === 0) {
-          data = Array.from(reader.readUint16Array(offset, vl));
-        } else {
-          data = Array.from(reader.readInt16Array(offset, vl));
-        }
+        data = Array.from(reader.readInt16Array(offset, vl));
       }
     } else if (vr === 'xs') {
       // (US or SS) or (US or SS or OW)
@@ -1178,8 +1247,8 @@ export class DicomParser {
       // no VR -> no data
       data = [];
     } else {
-      logger.warn('Unknown VR: ' + vr +
-        ' (for tag ' + element.tag.getKey() + ')');
+      logger.warn(`Unknown VR: ${ vr
+      } (for tag ${element.tag.getKey()})`);
       // empty data...
       data = [];
     }
@@ -1219,9 +1288,9 @@ export class DicomParser {
    * @param {Tag} [untilTag] Optional tag to stop the parsing once reached.
    */
   parse(buffer, untilTag) {
-    let offset = 0;
-    let syntax = '';
-    let dataElement = null;
+    let offset;
+    let syntax;
+    let dataElement;
     // default readers
     const metaReader = new DataReader(buffer);
     let dataReader = new DataReader(buffer);
@@ -1260,8 +1329,8 @@ export class DicomParser {
       syntax = dataElement.value[0];
 
     } else {
-      logger.warn('Invalid DICM prefix (' + magicword +
-        '), trying to guess tansfer syntax.');
+      logger.warn(`Invalid DICM prefix (${ magicword
+      }), trying to guess tansfer syntax.`);
       // read first element
       dataElement = this.#readDataElement(dataReader, 0, false);
       // guess transfer syntax
@@ -1275,8 +1344,8 @@ export class DicomParser {
 
     // check transfer syntax support
     if (!isReadSupportedTransferSyntax(syntax)) {
-      throw new Error('Unsupported DICOM transfer syntax: \'' + syntax +
-        '\' (' + getTransferSyntaxName(syntax) + ')');
+      throw new Error(`Unsupported DICOM transfer syntax: '${ syntax
+      }' (${getTransferSyntaxName(syntax)})`);
     }
 
     // set implicit flag
@@ -1310,7 +1379,7 @@ export class DicomParser {
       if (typeof this.#dataElements[key] === 'undefined') {
         this.#dataElements[key] = dataElement;
       } else {
-        logger.warn('Not saving duplicate tag: ' + key);
+        logger.warn(`Not saving duplicate tag: ${key}`);
       }
     }
 
@@ -1319,8 +1388,8 @@ export class DicomParser {
       throw new Error('Problem while parsing, bad offset');
     }
     if (!reachedUntilTag && buffer.byteLength !== offset) {
-      logger.warn('Did not reach the end of the buffer: ' +
-        offset + ' != ' + buffer.byteLength);
+      logger.warn(`Did not reach the end of the buffer: ${
+        offset } != ${buffer.byteLength}`);
     }
 
     //-------------------------------------------------
@@ -1330,14 +1399,19 @@ export class DicomParser {
     let pixelTags;
     if (hasAnyPixelDataElement(this.#dataElements)) {
       // PixelRepresentation 0->unsigned, 1->signed
-      let pixelRepresentation = 0;
-      dataElement = this.#dataElements[TagKeys.PixelRepresentation];
-      if (typeof dataElement !== 'undefined') {
-        dataElement.value = this.#interpretElement(dataElement, dataReader);
-        pixelRepresentation = dataElement.value[0];
-      } else {
-        logger.warn(
-          'Reading DICOM pixel data with default pixelRepresentation.');
+      let pixelRepresentation;
+      // only present for pixel data (not float)
+      const pixelData = this.#dataElements[TagKeys.PixelData];
+      if (typeof pixelData !== 'undefined') {
+        dataElement = this.#dataElements[TagKeys.PixelRepresentation];
+        if (typeof dataElement !== 'undefined') {
+          dataElement.value = this.#interpretElement(dataElement, dataReader);
+          pixelRepresentation = dataElement.value[0];
+        } else {
+          logger.warn(
+            'Reading DICOM pixel data with default pixelRepresentation.');
+          pixelRepresentation = 0;
+        }
       }
 
       // BitsAllocated
@@ -1361,7 +1435,8 @@ export class DicomParser {
       pixelTags = {
         pixelRepresentation,
         bitsAllocated,
-        numberOfFrames
+        numberOfFrames,
+        imageBufferSize: undefined
       };
 
       // image buffer size
@@ -1379,7 +1454,7 @@ export class DicomParser {
       }
       if (typeof rows !== 'undefined' &&
         typeof cols !== 'undefined') {
-        pixelTags['imageBufferSize'] = rows * cols * numberOfFrames;
+        pixelTags.imageBufferSize = rows * cols * numberOfFrames;
       }
     }
 
@@ -1397,17 +1472,20 @@ export class DicomParser {
         charSetTerm = dataElement.value[0];
       } else {
         charSetTerm = dataElement.value[1];
-        logger.warn('Unsupported character set with code extensions: \'' +
-          charSetTerm + '\'.');
+        if (charSetTerm !== 'ISO 2022 IR 149') {
+          logger.warn(`Unsupported character set with code extensions: '${
+            charSetTerm }'.`);
+        }
       }
       this.setDecoderCharacterSet(getUtfLabel(charSetTerm));
+      this.#removeEscapeSequences = charSetTerm === 'ISO 2022 IR 149';
     }
 
     // interpret the dicom elements
     this.#interpret(this.#dataElements, dataReader, pixelTags);
 
     // handle fragmented pixel buffer
-    // Reference: http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_8.2.html
+    // Reference: http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
     dataElement = this.#dataElements[TagKeys.PixelData];
     if (typeof dataElement !== 'undefined') {
@@ -1421,7 +1499,7 @@ export class DicomParser {
           // manual concat...
           const nItemPerFrame = pixItems.length / numberOfFrames;
           const newPixItems = [];
-          let index = 0;
+          let index;
           for (let f = 0; f < numberOfFrames; ++f) {
             index = f * nItemPerFrame;
             // calculate the size of a frame

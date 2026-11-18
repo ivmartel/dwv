@@ -1,4 +1,3 @@
-import {ListenerHandler} from '../utils/listen.js';
 import {getReverseOrientation} from '../dicom/dicomParser.js';
 import {
   getDateObj,
@@ -7,11 +6,10 @@ import {
 } from '../dicom/dicomDate.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application.js';
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {App} from '../app/application.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Info data item class.
@@ -72,7 +70,7 @@ function createDefaultReplaceFormat(length) {
     if (i !== 0) {
       res += ', ';
     }
-    res += '{v' + i + '}';
+    res += `{v${i}}`;
   }
   return res;
 }
@@ -93,7 +91,7 @@ function createDefaultReplaceFormat(length) {
 function replaceFlags(inputStr, values) {
   let res = inputStr;
   for (let i = 0; i < values.length; ++i) {
-    res = res.replace('{v' + i + '}', values[i]);
+    res = res.replace(`{v${i}}`, values[i]);
   }
   return res;
 }
@@ -101,7 +99,7 @@ function replaceFlags(inputStr, values) {
 /**
  * DICOM Header info data.
  */
-export class InfoData {
+export class InfoData extends EventTarget {
 
   /**
    * Associated app.
@@ -120,7 +118,7 @@ export class InfoData {
   /**
    * Info data config indexed by modality.
    *
-   * @type {Object<string, InfoDataItem[]>}
+   * @type {Record<string, InfoDataItem[]>}
    */
   #infoConfigs;
 
@@ -141,7 +139,7 @@ export class InfoData {
   /**
    * Meta data storage indexed by dataUid.
    *
-   * @type {Object<string, InfoDataItem[]>|undefined}
+   * @type {Record<string, InfoDataItem[]>|undefined}
    */
   #infoData = {};
 
@@ -153,18 +151,12 @@ export class InfoData {
   #currentDataUid;
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
    * @param {App} app The associated application.
    * @param {string} dataId The associated data id.
-   * @param {Object<string, InfoDataItem[]>} configs The info data config.
+   * @param {Record<string, InfoDataItem[]>} configs The info data config.
    */
   constructor(app, dataId, configs) {
+    super();
     this.#app = app;
     this.#dataId = dataId;
     this.#infoConfigs = configs;
@@ -197,7 +189,7 @@ export class InfoData {
   /**
    * Handle a new loaded item event.
    *
-   * @param {Object<string, DataElement>} data The item meta data.
+   * @param {Record<string, DataElement>} data The item meta data.
    */
   addItemMeta(data) {
     // create and store info data
@@ -207,18 +199,19 @@ export class InfoData {
       if (typeof data['00080018'] !== 'undefined') {
         // SOP instance UID
         dataUid = data['00080018'].value[0];
-        this.#infoData[dataUid] = createInfoData(data, this.#infoConfigs);
+        // frames of a multi-frame data share the same meta
+        if (typeof this.#infoData[dataUid] === 'undefined') {
+          this.#infoData[dataUid] = createInfoData(data, this.#infoConfigs);
+        }
       } else {
         logger.warn('Missing DICOM SOP instance UID for info data indexing');
       }
-    } else {
+    } else if (typeof data.imageUid !== 'undefined') {
       // image file case
-      if (typeof data['imageUid'] !== 'undefined') {
-        dataUid = data['imageUid'].value[0];
-        this.#infoData[dataUid] = createInfoDataForDom(data, this.#infoConfigs);
-      } else {
-        logger.warn('Missing DOM image UID for info data indexing');
-      }
+      dataUid = data.imageUid.value[0];
+      this.#infoData[dataUid] = createInfoDataForDom(data, this.#infoConfigs);
+    } else {
+      logger.warn('Missing DOM image UID for info data indexing');
     }
     // store uid
     if (typeof dataUid !== 'undefined') {
@@ -229,16 +222,37 @@ export class InfoData {
   /**
    * Handle a changed slice event.
    *
-   * @param {object} event The slicechange event.
+   * @param {CustomEvent} event The slicechange event.
+   * @deprecated Since v0.37, please use onPositionChange.
    */
   onSliceChange = (event) => {
-    if (event.dataid !== this.#dataId) {
+    logger.debug(
+      'InfoData.onSliceChange: deprecated since v0.37,' +
+      ' please use onPositionChange.'
+    );
+    this.onPositionChange(event);
+  };
+
+  /**
+   * Handle a changed position event: updates the tags on slice change
+   *   and the position event items.
+   *
+   * @param {CustomEvent} event The positionchange event.
+   */
+  onPositionChange = (event) => {
+    const dataid = event.detail?.dataid;
+    if (dataid !== this.#dataId) {
       return;
     }
-    if (typeof event.data !== 'undefined' &&
-      typeof event.data.imageUid !== 'undefined' &&
-      this.#currentDataUid !== event.data.imageUid) {
-      this.#currentDataUid = event.data.imageUid;
+    let hasSliceChanged = false;
+    const eventData = event.detail?.data;
+    if (typeof eventData !== 'undefined' &&
+      typeof eventData.imageUid !== 'undefined' &&
+      this.#currentDataUid !== eventData.imageUid) {
+      this.#currentDataUid = eventData.imageUid;
+      hasSliceChanged = true;
+    }
+    if (hasSliceChanged || this.#eventNames.includes(event.type)) {
       this.#updateData(event);
     }
   };
@@ -246,18 +260,19 @@ export class InfoData {
   /**
    * Update the info data.
    *
-   * @param {object} event An event defined by the info map and
+   * @param {CustomEvent} event An event defined by the info map and
    *   registered in toggleListeners.
    */
   #updateData = (event) => {
-    if (typeof event.dataid !== 'undefined' &&
-      event.dataid !== this.#dataId) {
+    const dataid = event.detail?.dataid;
+    if (typeof dataid !== 'undefined' &&
+      dataid !== this.#dataId) {
       return;
     }
 
     const sliceInfoData = this.#infoData[this.#currentDataUid];
     if (typeof sliceInfoData === 'undefined') {
-      console.warn('No slice info data for: ' + this.#currentDataUid);
+      console.warn(`No slice info data for: ${this.#currentDataUid}`);
       return;
     }
 
@@ -268,26 +283,25 @@ export class InfoData {
         if (event.type === 'positionchange') {
           text = infoDataItem.value;
         }
-      } else {
+      } else if (typeof infoDataItem.event !== 'undefined' &&
+        infoDataItem.event === event.type) {
         // update text if the value is an event type
-        if (typeof infoDataItem.event !== 'undefined' &&
-          infoDataItem.event === event.type) {
-          const format = infoDataItem.format;
-          let values = event.value;
-          // optional number precision
-          if (typeof infoDataItem.precision !== 'undefined') {
-            let mapFunc = null;
-            if (infoDataItem.precision === 'round') {
-              mapFunc = Math.round;
-            } else {
-              mapFunc = getNumberToPrecision(
-                parseInt(infoDataItem.precision, 10)
-              );
-            }
-            values = values.map(mapFunc);
+
+        const format = infoDataItem.format;
+        let values = event.detail?.value;
+        // optional number precision
+        if (typeof infoDataItem.precision !== 'undefined') {
+          let mapFunc;
+          if (infoDataItem.precision === 'round') {
+            mapFunc = Math.round;
+          } else {
+            mapFunc = getNumberToPrecision(
+              parseInt(infoDataItem.precision, 10)
+            );
           }
-          text = replaceFlags(format, values);
+          values = values.map(mapFunc);
         }
+        text = replaceFlags(format, values);
       }
       if (typeof text !== 'undefined') {
         infoDataItem.value = text;
@@ -298,14 +312,13 @@ export class InfoData {
      * Value change event.
      *
      * @event InfoData#valuechange
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {InfoDataItem[]} data The value of the info data.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {InfoDataItem[]} detail.data The value of the info data.
      */
-    this.#fireEvent({
-      type: 'valuechange',
-      data: sliceInfoData
-    });
+    this.dispatchEvent(new CustomEvent('valuechange', {
+      detail: {data: sliceInfoData}
+    }));
   };
 
   /**
@@ -322,10 +335,13 @@ export class InfoData {
    */
   addAppListeners() {
     // listen to update tags data
-    this.#app.addEventListener('positionchange', this.onSliceChange);
+    this.#app.addEventListener('positionchange', this.onPositionChange);
     // add event listeners
+    // (positionchange is handled by onPositionChange)
     for (const eventName of this.#eventNames) {
-      this.#app.addEventListener(eventName, this.#updateData);
+      if (eventName !== 'positionchange') {
+        this.#app.addEventListener(eventName, this.#updateData);
+      }
     }
     // update flag
     this.#isListening = true;
@@ -336,44 +352,16 @@ export class InfoData {
    */
   removeAppListeners() {
     // stop listening to update tags data
-    this.#app.removeEventListener('positionchange', this.onSliceChange);
+    this.#app.removeEventListener('positionchange', this.onPositionChange);
     // remove event listeners
+    // (positionchange is handled by onPositionChange)
     for (const eventName of this.#eventNames) {
-      this.#app.removeEventListener(eventName, this.#updateData);
+      if (eventName !== 'positionchange') {
+        this.#app.removeEventListener(eventName, this.#updateData);
+      }
     }
     // update flag
     this.#isListening = false;
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent(event) {
-    this.#listenerHandler.fireEvent(event);
   }
 
 } // class InfoData
@@ -382,7 +370,7 @@ export class InfoData {
  * Create info data array for a DICOM image.
  *
  * @param {object} dicomElements DICOM elements of the image.
- * @param {Object<string, InfoDataItem[]>} configs The info data configs.
+ * @param {Record<string, InfoDataItem[]>} configs The info data configs.
  * @returns {InfoDataItem[]} Info data array.
  */
 function createInfoData(dicomElements, configs) {
@@ -469,7 +457,7 @@ function createInfoData(dicomElements, configs) {
  * Create info data array for a DOM image.
  *
  * @param {object} domElements Meta data.
- * @param {Object<string, InfoDataItem[]>} configs The info data configs.
+ * @param {Record<string, InfoDataItem[]>} configs The info data configs.
  * @returns {InfoDataItem[]} Info data array.
  */
 function createInfoDataForDom(domElements, configs) {

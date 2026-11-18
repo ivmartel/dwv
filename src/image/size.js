@@ -1,11 +1,10 @@
 import {Index} from '../math/index.js';
 import {Point} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {Scalar2D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Scalar2D} from '../math/scalar.js';
+ */
 
 /**
  * Immutable Size class.
@@ -65,7 +64,7 @@ export class Size {
    * @returns {string} The Size as a string.
    */
   toString() {
-    return '(' + this.#values.toString() + ')';
+    return `(${this.#values.toString()})`;
   }
 
   /**
@@ -130,10 +129,8 @@ export class Size {
     }
     if (typeof start === 'undefined') {
       start = 0;
-    } else {
-      if (start < 0 || start > dimension) {
-        throw new Error('Invalid start value for getDimSize');
-      }
+    } else if (start < 0 || start > dimension) {
+      throw new Error('Invalid start value for getDimSize');
     }
     let size = 1;
     for (let i = start; i < dimension; ++i) {
@@ -204,7 +201,7 @@ export class Size {
     } else {
       for (let k = 0; k < length; ++k) {
         if (dirs[k] > length - 1) {
-          throw new Error('Wrong input dir value: ' + dirs[k]);
+          throw new Error(`Wrong input dir value: ${dirs[k]}`);
         }
       }
     }
@@ -236,10 +233,8 @@ export class Size {
     }
     if (typeof start === 'undefined') {
       start = 0;
-    } else {
-      if (start < 0 || start > this.length() - 1) {
-        throw new Error('Invalid start value for indexToOffset');
-      }
+    } else if (start < 0 || start > this.length() - 1) {
+      throw new Error('Invalid start value for indexToOffset');
     }
     let offset = 0;
     for (let i = start; i < index.length(); ++i) {
@@ -265,7 +260,7 @@ export class Size {
   offsetToIndex(offset) {
     const values = new Array(this.length());
     let off = offset;
-    let dimSize = 0;
+    let dimSize;
     for (let i = this.length() - 1; i > 0; --i) {
       dimSize = this.getDimSize(i);
       values[i] = Math.floor(off / dimSize);

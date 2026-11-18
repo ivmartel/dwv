@@ -1,0 +1,359 @@
+# AGENTS.md
+
+This file provides guidance to AI agents when working with code in this repository.
+
+## Project
+
+DWV (DICOM Web Viewer) is a zero-footprint, pure-JavaScript/HTML5 medical image
+viewer library. It parses and renders DICOM (and some non-DICOM) data and
+provides tools for manipulation (scroll, window/level, zoom, pan, MPR,
+annotation, filters). Not certified for diagnostic use. Licensed GPL-3.0;
+contributions follow the guidelines and license terms in
+`.github/contributing.md`.
+
+DWV is an embeddable library, not an application: it runs inside a host page
+or framework it does not control, possibly inside a shadow DOM or an iframe,
+with several `App` instances on the same page, or under Node (see
+`pack-node`). Code in `src/` must not rely on or use global objects such as
+`window` (or the global `document`): no global event listeners, no lookups
+in the global document, no state kept on globals. Use the `rootDocument` app
+option (`AppOptions.rootDocument`, defaults to `document`) to find elements
+and register document-level events (for ex keyboard events in
+`ToolboxController`), and attach other listeners to the app's own elements.
+
+Package manager is `yarn` (yarn v4, `packageManager` pinned in package.json).
+Run `corepack enable` to install `yarn`
+shims that read the `packageManager` field and download and run that exact
+yarn version. Without enabling it, `corepack yarn <script>` (for ex
+`corepack yarn test-ci`) does the same for a single command. Corepack is
+bundled with Node up to v24 only; from Node 25 install it first with
+`npm install -g corepack`. npm also works
+for all scripts. Node >= 18 required (CI uses Node 26). Module type is `"module"`
+(ESM throughout `src/`).
+
+## DICOM standard
+
+For any question about the DICOM standard itself (tags, VRs, IODs, transfer
+syntaxes, DICOMweb...), use the `dicom` skill (`.agents/skills/dicom/SKILL.md`):
+look the answer up in the standard on dicom.nema.org and cite the section,
+rather than answering from memory.
+
+The code targets the DICOM standard **2024a** edition: the tag dictionary
+(`src/dicom/dictionary.js`) is loaded from
+`dcmstdtojs/dist/assets/2024a/dicom_tags.json`, and the links to the standard
+in the docs point to `/medical/dicom/2024a/`. The skill answers from that
+edition, compares it with the current one and reports significant changes (for
+ex a tag or VR added or changed since).
+
+When upgrading to a newer edition, update together:
+
+- the `dcmstdtojs` asset path in `src/dicom/dictionary.js` (and its jsdoc);
+- the `EDITION` in the `dicom` skill;
+- the dated dicom.nema.org links in the docs: the jsdoc in `src/` (and a few
+  in `tests/`) and the tutorials in `resources/doc/tutorials/`. Check each
+  linked section still has the same number and content in the new edition.
+
+## Commands
+
+- `yarn install` — install dependencies.
+- `yarn start` — webpack-dev-server (`config/webpack.dev.js`), opens example
+  pages, including the `dev/viewer/viewer.html` test viewer.
+- `yarn test` — run tests with vitest in watch mode.
+- `yarn test-ci` — one-shot vitest run with coverage (v8 provider, thresholds
+  50% statements/branches/functions/lines); this is what CI runs.
+- Run a single test file: `yarn vitest run tests/image/image.test.js`
+- Run tests matching a name: `yarn vitest run -t "some test name"`
+- `yarn lint` — eslint over `src/**/*.js`, `tests/**/*.js`, `*.js` using
+  `config/eslint.config-full.js` (a superset of the root `eslint.config.js`,
+  adds jsdoc rules).
+- `yarn build` — `pack` (webpack prod bundle) + `types` (tsc-generated `.d.ts`
+  via `resources/api/tsconfig.json`) + `api` (api-extractor, checked against
+  `resources/api/dwv.api.md`).
+- `yarn build-all` — `build` + `pack-node` (Node-targeted bundle,
+  `config/webpack.node.js`, output `dist/dwv.node.min.js`, the package's
+  `node` export). The Node bundle is limited, mainly for DICOM parsing
+  (`DicomParser`, tags, dictionary) and writing (`DicomWriter`): no URL or
+  file loading (the loaders rely on browser `XMLHttpRequest`/`FileReader`),
+  so pass the raw bytes (`ArrayBuffer`) yourself; no web-worker based
+  decompression of compressed pixel data, and no rendering (canvas, Konva).
+- `yarn build-demo` — builds the demo pages (`config/webpack.demo.js`), used
+  by CI to publish to `gh-pages`.
+- `yarn doc` — generates jsdoc site (`resources/doc/jsdoc.conf.json`).
+
+Tests live in `tests/<area>/*.test.js` mirroring `src/<area>/`, using vitest
+with `environment: 'node'` (jsdom pulled in as needed) and DICOM/zip/DICOMDIR
+fixtures under `tests/data`. Tests must run without printing logs: silence
+expected console or `logger` output with a spy.
+
+### What CI checks
+
+`.github/workflows/nodejs-ci.yml` runs on every push, pull request and
+merge-group, on Node 26 with yarn through corepack. A change passes when
+these steps all succeed, in this order:
+
+1. `yarn install --immutable` — `yarn.lock` must already match
+   `package.json`; commit the lockfile with any dependency change.
+2. `yarn lint` — no eslint errors. The jsdoc plugin's recommended rules
+   (missing jsdoc, params, returns...) are only warnings and don't fail
+   the step (there is no `--max-warnings`); the errors are the base
+   `eslint.config.js` rules plus `jsdoc/tag-lines` (one blank line before
+   the tags) and `jsdoc/require-description-complete-sentence`. Keep
+   warnings at zero anyway.
+3. `yarn test-ci` — all vitest tests pass and coverage stays at or above
+   50% for statements, branches, functions and lines (`vitest.config.js`).
+4. `yarn build-ci` — the webpack bundle, the `tsc` type generation (so the
+   jsdoc types must type-check) and api-extractor must all succeed. Its
+   `api-ci` step runs api-extractor without `--local`: it fails on any
+   api-extractor warning, and when the public API no longer matches the
+   committed `resources/api/dwv.api.md`. The local `yarn build` runs `api`
+   with `--local`, which rewrites `dwv.api.md` instead; commit that update
+   with the change that caused it.
+
+On pushes to `develop` or `master` CI also runs `yarn build-demo` and
+publishes the demo to `gh-pages` (`demo/trunk` or `demo/stable`). To
+reproduce CI locally, run `yarn lint && yarn test-ci && yarn build-ci`.
+
+The `verify` skill (`.agents/skills/verify/SKILL.md`) wraps these steps with
+the repo-specific checks CI does not do: clean test output (no logs),
+reporting `dwv.api.md` changes and reviewing the diff against the
+conventions below. Use it before reporting a change as done.
+
+## Requirements traceability
+
+User stories/requirements (`DWV-REQ-<GROUP>-<NN>-<NNN>`) are defined in
+`resources/doc/user-stories.json` (`{id, name, group, description}`) — this
+JSON is the source of truth, **not**
+`resources/doc/tutorials/user-stories.md`, which is a generated file (see
+below) and gets overwritten.
+
+Tests opt into traceability by suffixing their name with
+`- #<id> <name>`, e.g. in `tests/command/undoStack.test.js`:
+`test('UndoStack - #DWV-REQ-UI-08-002 Draw action undo/redo', ...)`. Both the
+id and the name after `#` must match a `user-stories.json` entry *verbatim*
+(exact string equality) or the reference is reported as unresolved. Not
+every test needs a requirement reference — only ones demonstrating a
+specific user story.
+
+The link is materialized by a separate sibling tool,
+[jsonqa2md](https://github.com/ivmartel/jsonqa2md) (cloned alongside this
+repo, not vendored in `src/`/`node_modules`), run manually as part of
+`resources/scripts/prep-release.sh` step 5:
+
+1. `yarn test-ci` (vitest `--reporter json`) writes `build/test-results.json`.
+2. `node ../jsonqa2md/jsonqa2md` reads that plus `user-stories.json` and
+   regenerates both `resources/doc/tutorials/user-stories.md` (with
+   `⚠️` warnings for duplicate ids/names within a group) and
+   `resources/doc/tutorials/test-results.md` (per-test pass/fail plus a
+   traceability matrix of which requirements have tests, and whether they
+   pass).
+
+When adding a new requirement or wiring a test to one: edit
+`resources/doc/user-stories.json`, not the `.md` files.
+
+## Architecture
+
+Library entry point `src/index.js` re-exports each subsystem's own
+`index.js` (`app`, `command`, `dicom`, `gui`, `image`, `math`, `tools`,
+`utils`). Everything uses native `EventTarget`/`CustomEvent` for
+communication — controllers re-listen to their children's events and
+re-dispatch them upward, so most state changes eventually surface as an
+event on the top-level `App`.
+
+Public typedefs (the ones that are part of the API) live in a single
+`<folder>/types.js` per source folder (currently `dicom`, `image`, `math`),
+re-exported by the folder's `index.js` with `export * from './types.js'`.
+Typedefs only used inside one module stay in that module. Keep `types.js`
+type only: typedefs and JSDoc `@import` only, no runtime import or code, so
+it stays a leaf of the module graph and cannot create circular dependencies.
+
+### App and its controllers (`src/app/`)
+
+`App` (`application.js`) is the public facade and central event bus, but it
+does not do the work itself: `App.init()` creates and wires five
+controllers, and most of `App`'s own methods are now thin,
+**deprecated-since-v0.37** forwarding wrappers — the controllers, reachable
+via `app.getLoadController()`/`getDataController()`/etc., are the current
+recommended API.
+
+- `LoadController` — picks `FilesLoader`/`UrlsLoader`/`MemoryLoader` based on
+  input type, re-dispatches their load events tagged with `{dataid,
+  isfirstitem}` (`isfirstitem` on `loaditem` only). The former `loadtype`
+  field was removed in v0.37 along with legacy `.json` state loading.
+- `DataController` — owns `#dataList: Record<dataId, DicomData>`. Its
+  `#setDataContent` inspects Modality/pixel-data presence to route parsed
+  data to `ImageFactory`, `MaskFactory` (Modality `SEG`), `AnnotationGroupFactory`
+  (Modality `SR`), or `RtStructFactory` (Modality `RTSTRUCT`, rasterizes
+  contours against an already-loaded reference series). Also handles
+  multi-volume/4D data via `DicomSliceDataList`, buffering same-origin slices
+  until load completes (see *Multi-volume / 4D data* below).
+- `StageController` — owns the single `Stage` (all `LayerGroup`s/layers).
+  Creates `View`s via `ViewFactory` at render time (one `View` per
+  layer/layer-group, even for a shared `Image`), builds `ViewLayer`/`DrawLayer`s,
+  and keeps each stored `ViewConfig` in sync with user-driven wl/opacity/
+  colourmap changes.
+- `ToolboxController` — holds `{name: toolInstance}`, tracks the selected
+  tool, binds a layer group's pointer/keyboard events to the active tool.
+- `UndoController` — thin wrapper around `UndoStack` (`src/command/undoStack.js`).
+- `ViewController` (per view layer, wraps one `View` + `PlaneHelper`) and
+  `DrawController` (per draw layer, wraps one `AnnotationGroup`, routes edits
+  through undoable commands) are created inside `ViewLayer`/`DrawLayer`
+  respectively, not by `App` directly.
+
+### Data flow: file/URL → pixels on screen
+
+1. **IO loaders** (`src/io/`): `LoaderBase` (extends `LoadHandlers`, the
+   on*-callback contract) is implemented by `DicomDataLoader`, `ZipLoader`,
+   `MultipartLoader` (WADO-RS multipart/related), `RawImageLoader`/
+   `RawVideoLoader` (non-DICOM). Loader
+   capability is queried via `canLoadFile`/`canLoadUrl`/`canLoadMemory`
+   (extension/media-type based). `getLoaderList()` (`loaderList.js`) is a
+   lazily-built singleton list to avoid a circular-import (`MultipartLoader`
+   → `MemoryLoader` → `loaderList` → `MultipartLoader`). The orchestrators
+   `FilesLoader`/`UrlsLoader`/`MemoryLoader` pick the first matching loader,
+   read the raw bytes (`FileReader`/`XMLHttpRequest`), and call `loader.load()`.
+   DWV is a DICOMweb User Agent only (WADO-URI, WADO-RS, STOW-RS) — QIDO-RS
+   only exists in the `dev/pacs` demo, not core `src/` — and has no DIMSE
+   networking (no C-STORE/C-FIND/C-MOVE/PDU/Association handling); it's
+   HTTP/DICOMweb only.
+2. **DICOM parsing** (`src/dicom/`): `DicomParser.parse()` reads the preamble,
+   File Meta group (incl. `TransferSyntaxUID`), then the dataset via
+   `DataReader` (endian/VR-aware), using `dictionary.js` for VR/transfer-syntax
+   tables, producing `Record<tagKey, DataElement>`.
+   `getSyntaxDecompressionName(syntax)` maps the transfer syntax to one of
+   `'jpeg2000'` / `'jpeg-baseline'` / `'jpeg-lossless'` / `'rle'` (or
+   undefined if uncompressed). Private tags (not in the dictionary) read
+   from implicit VR data come out as VR `UN` with raw byte values; callers
+   decode them as needed (e.g. `getPrivateTagValue` in `dicomVolume.js`).
+   `DicomWriter` (`dicomWriter.js`) writes data back
+   using per-tag writing rules; `setRemovePrivateTags(true)` drops all
+   odd-group tags (including inside sequences) and overrides the rules.
+3. **Pixel decompression** (`src/image/decoder.js`, `src/decoders/`): when a
+   decompression algo is needed, `DicomBufferToData` (`src/image/
+   dicomBufferToData.js`, called by `DicomDataLoader`) builds a
+   `PixelBufferDecoder` which dispatches to a `ThreadPool`
+   (`src/utils/thread.js`) of web workers — `decoders/pdfjs/` (vendored
+   Mozilla pdf.js, patched for 16-bit signed grayscale) handles JPEG
+   Baseline/JPEG2000, `decoders/rii-mango/` (vendored
+   rii-mango/JPEGLosslessDecoderJS) handles JPEG Lossless, `decoders/dwv/`
+   is dwv's own RLE decoder. The same `ThreadPool`/`WorkerTask` machinery is
+   reused for image labeling (`image/labelingThread.js`, e.g. flood fill) and
+   resampling (`image/resamplingThread.js`).
+4. **Image/AnnotationGroup construction** (`src/image/*Factory.js`, invoked
+   from `DataController`): `ImageFactory` builds an `Image` (pixel buffer +
+   `Geometry`/`Size`/`Spacing`, rescale slope/intercept via `rsi.js`, SUV
+   factor for PET, per-frame functional groups); `MaskFactory` builds a
+   `MaskImage` (a segmentation-specific subclass of `Image`, see below) from
+   DICOM SEG; `AnnotationGroupFactory` parses DICOM SR into an
+   `AnnotationGroup` of `Annotation`s; `RtStructFactory` rasterizes RTSTRUCT
+   contours into a `MaskImage`. The exported `demoCreateImage`/
+   `demoCreateMaskImage`/`demoCreateView` helpers (formerly `create*`) are
+   single-file shortcuts for demos only, not the app path.
+   Images are built progressively: the first load item creates the `Image`,
+   later items (slices, or frames of a multi-frame file) are added via
+   `appendSlice`/`appendFrameBuffer` into a buffer preallocated from
+   `meta.sliceCapacity` (load items × frames per item). Don't confuse it with
+   `numberOfItems` (loader option and `DicomData` property: how many
+   files/urls/buffers/multipart parts are in the load); `ImageFactory.create()`
+   is where the latter becomes the former.
+5. **View construction and rendering** (`src/image/view*.js`,
+   `src/gui/`, at render time via `StageController`): `ViewFactory` wraps an
+   `Image` in a `View` (orientation/position, `WindowLut`, colour map, window
+   presets — DICOM-provided, computed `'minmax'`, or app-supplied via
+   `custom.wlPresets`). `View.generateImageData()` dispatches on
+   `image.getPhotometricInterpretation()` to one of the pure pixel-fill
+   functions `generateImageDataMonochrome`/`Rgb`/`YbrFull`/`PaletteColor`
+   (each in its own `view*.js` file), which use `WindowLut` (= `ModalityLut`
+   + `VoiLut`, from `rsi.js`/`voiLut.js`) and a `ColourMap` (`luts.js`) to
+   produce an `ImageData`. `ViewLayer` (`src/gui/viewLayer.js`) draws that to
+   a plain HTML5 `<canvas>` (2D context) — no Konva involved.
+
+`Stage` (`src/gui/stage.js`) → multiple `LayerGroup`s (`layerGroup.js`) →
+each owns `ViewLayer`s (canvas pixel rendering), `DrawLayer`s (Konva-based
+vector annotation rendering, via `DrawController`), and an optional
+`InfoLayer` (overlay text, `infoData.js`). `binders.js` synchronises
+zoom/pan/window-level/etc. across multiple linked layer groups (e.g.
+axial/coronal/sagittal MPR views).
+
+### Tools (`src/tools/`)
+
+Every concrete tool (`WindowLevel`, `Scroll`, `ZoomAndPan`, `Opacity`, `Draw`,
+`Brush`, `Filter`, `Floodfill`, `Livewire` — registered in `toolList.js`)
+extends `LayerGroupPointer`, which normalises pointer/touch input into a
+drag lifecycle and is *composed* (not subclassed) from pluggable behaviors
+under `src/tools/behaviors/` (`dragBehavior`, `wheelBehavior`,
+`hoverBehavior`, `doubleClickBehavior`, `tapBehavior`, `twoTouchBehavior`,
+plus draw/brush/floodfill/livewire-specific variants). `src/tools/shapes/`
+holds the geometric shape classes and Konva renderers used by `Draw`/`Brush`
+(rectangle, ellipse, circle, arrow, ruler, protractor, ROI, bidimensional,
+plus label/anchor/editor helpers).
+
+Tools never mutate state directly — they create `Command` objects
+(`src/command/`: `AddAnnotationCommand`/`RemoveAnnotationCommand`/
+`UpdateAnnotationCommand`, `DrawBrushCommand`, `RunFilterCommand`,
+`DeleteSegmentCommand`, `ChangeSegmentColourCommand`) and push them through
+`UndoController.addToUndoStack()`, so all edits are undoable via
+`UndoStack` (`src/command/undoStack.js`).
+
+### Annotations vs. masks
+
+Two parallel models, both stored alongside regular pixel data on `DicomData`:
+
+- **Masks** (DICOM SEG/RTSTRUCT → `DicomData.image`): one label per voxel in
+  a `MaskImage` (`src/image/maskImage.js`, extends `Image`, split out from it
+  to keep segment-aware behavior — per-segment/per-slice bookkeeping, brush
+  offset-editing, per-segment volume/centroid/diameter labeling — off the
+  base pixel class), with a segment list (number/colour/name) managed by
+  `MaskSegmentHelper` (`src/image/maskSegmentHelper.js`, deliberately does
+  *not* touch pixels itself — pixel edits go through undoable commands).
+  `MaskImage` owns a `SegmentCollection` (per-segment ROI slice buffers) and
+  an `ImageContour` for outline-style rendering.
+- **Annotations** (DICOM SR, or drawing tools → `DicomData.annotationGroup`):
+  vector/graphic `Annotation` objects grouped in an `AnnotationGroup`,
+  rendered by `DrawLayer` (Konva).
+
+### Multi-volume / 4D data (`src/dicom/dicomVolume.js`)
+
+The tag that discriminates volumes is not known until all data is loaded, so
+`guessVolumeIndices` tries an ordered list of volume-id getters
+(`defaultVolumeIdCandidates`: TemporalPositionIdentifier,
+TemporalPositionIndex, DiffusionBValue (incl. private b-value tags via
+`defaultPrivateBValueRules`, VR `UN` values decoded as ASCII), …,
+AcquisitionTime last) and keeps the first
+that yields a valid, consistent per-volume grouping. Candidates flagged
+`preLoad` are also used while loading (`getVolumeIdTagValue`) and must not
+vary within a volume. The same logic serves both a series of files
+(`DicomSliceDataList` in `dataController.js`) and the frames of a single
+multi-frame file (`getSortedFramesGeometry` in `dicomGeometry.js`, used by
+`ImageFactory`).
+
+### Legacy state persistence (removed)
+
+The JSON app-state (`src/io/state.js`, `JSONTextLoader`,
+`App.applyJsonState()`, `App.setDrawings()`, `konvaToAnnotation`) was
+removed in v0.37; `.json` inputs are no longer loadable. Use the
+`Annotation`/`AnnotationGroup`/DICOM SR path.
+
+### Extensibility
+
+`src/app/custom.js` exports a single mutable `custom` object (window/level
+presets per modality, shape label texts, private b-value rules, volume-id
+candidates, pixel-unit getter, ROI dialog override) meant to be overridden by
+embedding applications — check it before adding new hardcoded
+modality-specific behavior. `custom.volumeIdCandidates` and
+`custom.privateBValueRules` replace the defaults; extend the exported
+`defaultVolumeIdCandidates`/`defaultPrivateBValueRules` (from `dicom/index.js`,
+typedefs in `dicom/types.js`) rather than rewriting them.
+`custom.getVolumeIdTagValue`/`getPostLoadVolumeIdTagValue` are deprecated
+since v0.37.
+
+### Cross-cutting utilities (`src/utils/`)
+
+- `logger.js` — global mutable `logger` singleton (`TRACE`..`ERROR`,
+  default `WARN`), used pervasively including to flag deprecated `App` calls.
+- `thread.js` — shared `ThreadPool`/`WorkerTask`/`WorkerThread` web-worker
+  infrastructure (see pixel decoding, labeling, resampling above).
+- `listen.js` — a manual `ListenerHandler` (non-`EventTarget`) used only by
+  `gui/viewLayer.js` and `gui/drawLayer.js`, distinct from the
+  `EventTarget`/`CustomEvent` pattern used everywhere else.
+- `i18n.js` — minimal translation namespace (currently unit symbols),
+  designed for override by the embedding app.

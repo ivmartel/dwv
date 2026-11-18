@@ -11,7 +11,7 @@ describe('math', () => {
   /**
    * Tests for {@link ROI}.
    *
-   * @function module:tests/math~roi-class
+   * @function module:tests/math~roiClass
    */
   test('ROI class - #DWV-REQ-UI-07-008 Draw ROI', () => {
     const r0 = new ROI();
@@ -45,4 +45,24 @@ describe('math', () => {
     assert.ok(r0.getCentroid().equals(theoCentroid), 'getCentroid');
   });
 
+});
+
+describe('math roi contains', () => {
+  test('ROI contains', () => {
+    // L shaped polygon
+    const r0 = new ROI([
+      new Point2D(0, 0),
+      new Point2D(10, 0),
+      new Point2D(10, 4),
+      new Point2D(4, 4),
+      new Point2D(4, 10),
+      new Point2D(0, 10)
+    ]);
+    assert.ok(r0.contains(new Point2D(2, 2)), 'inside');
+    assert.ok(r0.contains(new Point2D(2, 8)), 'inside leg');
+    assert.notOk(r0.contains(new Point2D(8, 8)), 'in L notch');
+    assert.ok(r0.contains(new Point2D(8, 5), 1), 'notch within tolerance');
+    assert.notOk(r0.contains(new Point2D(-2, 5), 1), 'outside');
+    assert.notOk(new ROI().contains(new Point2D(0, 0)), 'empty roi');
+  });
 });

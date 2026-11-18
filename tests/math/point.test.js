@@ -14,7 +14,7 @@ describe('math', () => {
   /**
    * Tests for {@link Point2D}.
    *
-   * @function module:tests/math~point2d-class
+   * @function module:tests/math~point2dClass
    */
   test('Point2D class', () => {
     const p0 = new Point2D(1, 2);
@@ -43,7 +43,7 @@ describe('math', () => {
   /**
    * Tests for {@link Point3D}.
    *
-   * @function module:tests/math~point3d-class
+   * @function module:tests/math~point3dClass
    */
   test('Point3D class', () => {
     const p0 = new Point3D(1, 2, 3);
@@ -140,7 +140,7 @@ describe('math', () => {
   /**
    * Tests for {@link Point}.
    *
-   * @function module:tests/math~point-class
+   * @function module:tests/math~pointClass
    */
   test('Point class', () => {
     const p0 = new Point([1, 2, 3]);
@@ -193,4 +193,13 @@ describe('math', () => {
     assert.equal(res50.get(3), 4, '[merge] #0 [3]');
   });
 
+});
+
+describe('math point contains', () => {
+  test('Point2D contains', () => {
+    const p0 = new Point2D(1, 1);
+    assert.ok(p0.contains(new Point2D(1, 1)), 'same point');
+    assert.notOk(p0.contains(new Point2D(4, 5)), 'other point');
+    assert.ok(p0.contains(new Point2D(4, 5), 5), 'within tolerance');
+  });
 });

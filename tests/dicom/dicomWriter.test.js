@@ -1,29 +1,47 @@
+// @vitest-environment jsdom
 import {describe, test, assert, vi} from 'vitest';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
+import {DataElement} from '../../src/dicom/dataElement.js';
+import {getTagFromKey} from '../../src/dicom/dicomTag.js';
 import {
   DicomWriter,
-  getElementsFromJSONTags,
-  getUID
+  WriterRuleActions,
+  getUID,
+  translateWriterRules
 } from '../../src/dicom/dicomWriter.js';
+import {logger} from '../../src/utils/logger.js';
 import {
   getTagFromDictionary,
-  getPixelDataTag
-} from '../../src/dicom/dicomTag.js';
+} from '../../src/dicom/dicomTagInfo.js';
 import {
   dictionary,
   transferSyntaxKeywords
 } from '../../src/dicom/dictionary.js';
+import {
+  generateDataElements,
+  generateSliceBuffers
+} from '../../dev/dicom/dicomGenerator.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WriterRule} from '../../src/dicom/dicomWriter.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WriterRule} from '../../src/dicom/dicomWriter.js';
+ */
 
 // test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm?inline';
 import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm?inline';
-import syntheticData from '/tests/dicom/synthetic-data.json';
+import syntheticImgData from '/tests/data/synthetic-img.json';
+import syntheticSegData from '/tests/data/synthetic-seg.json';
+import syntheticRtssData from '/tests/data/synthetic-rtss.json';
+import syntheticKosData from '/tests/data/synthetic-kos.json';
+
+// this suite iterates over all synthetic entries regardless of modality
+const syntheticData = [
+  ...syntheticImgData,
+  ...syntheticSegData,
+  ...syntheticRtssData,
+  ...syntheticKosData
+];
 
 /**
  * Tests for the 'dicom/dicomWriter.js' file.
@@ -64,7 +82,7 @@ describe('dicom', () => {
    * Tests for {@link DicomWriter} using multiframe DICOM data.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~write-multiframe
+   * @function module:tests/dicom~writeMultiframe
    */
   test('Write multiframe - #DWV-REQ-IO-05-001 Write DICOM file',
     () => {
@@ -113,7 +131,7 @@ describe('dicom', () => {
    * Tests for {@link DicomWriter} anomnymisation.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~write-anonymised
+   * @function module:tests/dicom~writeAnonymised
    */
   test('Write anonymised - #DWV-REQ-IO-05-002 Write anonymised DICOM file',
     () => {
@@ -123,7 +141,7 @@ describe('dicom', () => {
 
       const patientsNameAnonymised = 'anonymise-name';
       const patientsIdAnonymised = 'anonymise-id';
-      // rules with different levels: full tag, tag name and group name
+      // rules with different levels: tag key and group key
       const rules = {
         default: {
           action: 'copy', value: null
@@ -131,10 +149,10 @@ describe('dicom', () => {
         '00100010': {
           action: 'replace', value: patientsNameAnonymised
         },
-        PatientID: {
+        '00100020': {
           action: 'replace', value: patientsIdAnonymised
         },
-        Patient: {
+        '0010': {
           action: 'remove', value: null
         }
       };
@@ -190,10 +208,477 @@ describe('dicom', () => {
   );
 
   /**
+   * Tests for {@link DicomWriter} private tags removal.
+   *
+   * @function module:tests/dicom~writeRemovePrivateTags
+   */
+  test('Write remove private tags', () => {
+    /**
+     * Get a LO data element.
+     *
+     * @param {string} value The element value.
+     * @returns {DataElement} The data element.
+     */
+    const getLoElement = function (value) {
+      const element = new DataElement('LO');
+      element.value = [value];
+      return element;
+    };
+    /**
+     * Get the parsed elements of the test file with added private tags.
+     *
+     * @returns {Record<string, DataElement>} The data elements.
+     */
+    const getElements = function () {
+      const parser = new DicomParser();
+      parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+      const elements = parser.getDicomElements();
+      // top level private tags
+      elements['00090010'] = getLoElement('DWV_TEST');
+      elements['00091001'] = getLoElement('private-top');
+      // private tags in ReferencedImageSequence item
+      const item = elements['00081140'].value[0];
+      item['00110010'] = getLoElement('DWV_TEST');
+      item['00111001'] = getLoElement('private-seq');
+      return elements;
+    };
+    /**
+     * Write and re-parse elements.
+     *
+     * @param {DicomWriter} writer The writer.
+     * @returns {Record<string, DataElement>} The parsed elements.
+     */
+    const writeAndParse = function (writer) {
+      const parser = new DicomParser();
+      parser.parse(writer.getBuffer(getElements()));
+      return parser.getDicomElements();
+    };
+
+    // default: private tags are kept
+    let tags = writeAndParse(new DicomWriter());
+    assert.equal(tags['00091001'].value[0], 'private-top', 'top #0');
+    assert.equal(tags['00081140'].value[0]['00111001'].value[0],
+      'private-seq', 'seq #0');
+
+    // remove private tags: empty whitelist
+    const writer = new DicomWriter();
+    writer.setPrivateTagsWhitelist([]);
+    tags = writeAndParse(writer);
+    assert.notOk(tags['00090010'], 'top creator #1');
+    assert.notOk(tags['00091001'], 'top #1');
+    const item = tags['00081140'].value[0];
+    assert.notOk(item['00110010'], 'seq creator #1');
+    assert.notOk(item['00111001'], 'seq #1');
+    // public tags are kept
+    assert.equal(item['00081155'].value[0],
+      '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
+      'seq public #1');
+    assert.equal(tags['00100010'].value[0], 'dwv^PatientName', 'public #1');
+
+    // remove private tags except whitelisted ones (and their creator)
+    const writer2 = new DicomWriter();
+    writer2.setPrivateTagsWhitelist(['00111001']);
+    tags = writeAndParse(writer2);
+    assert.notOk(tags['00090010'], 'top creator #2');
+    assert.notOk(tags['00091001'], 'top #2');
+    const item2 = tags['00081140'].value[0];
+    assert.equal(item2['00110010'].value[0], 'DWV_TEST', 'seq creator #2');
+    assert.equal(item2['00111001'].value[0], 'private-seq', 'seq #2');
+
+    // undefined whitelist: back to keeping all private tags
+    writer2.setPrivateTagsWhitelist(undefined);
+    tags = writeAndParse(writer2);
+    assert.equal(tags['00091001'].value[0], 'private-top', 'top #3');
+  });
+
+  /**
+   * Tests for {@link DicomWriter} setRules warning for name based rules.
+   *
+   * @function module:tests/dicom~setRulesNameWarning
+   */
+  test('setRules name based rules warning', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const writer = new DicomWriter();
+    // key based rules: no warning
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      '00100010': {action: 'remove', value: null},
+      '0010': {action: 'remove', value: null}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 0, 'no warning');
+    // name based rules: warning
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      PatientName: {action: 'remove', value: null},
+      Patient: {action: 'remove', value: null}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 1, 'one warning');
+    assert.include(consoleSpy.mock.calls[0][0], 'PatientName, Patient');
+    consoleSpy.mockRestore();
+  });
+
+  /**
+   * Tests for {@link DicomWriter} setRules warning for unknown actions.
+   *
+   * @function module:tests/dicom~setRulesUnknownActionWarning
+   */
+  test('setRules unknown action warning', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const writer = new DicomWriter();
+    // known actions: no warning
+    writer.setRules({
+      default: {action: WriterRuleActions.copy, value: null},
+      '00100010': {action: WriterRuleActions.remove, value: null},
+      '00100020': {action: WriterRuleActions.clear, value: null},
+      '00100030': {action: WriterRuleActions.replace, value: '19000101'}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 0, 'no warning');
+    // unknown actions: warning
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      '00100010': {action: 'delete', value: null},
+      '00100020': {action: 'Remove', value: null}
+    });
+    assert.equal(consoleSpy.mock.calls.length, 1, 'one warning');
+    assert.include(consoleSpy.mock.calls[0][0], '00100010, 00100020');
+    consoleSpy.mockRestore();
+  });
+
+  /**
+   * Tests for {@link DicomWriter} unknown action rules fallback.
+   *
+   * @function module:tests/dicom~writeUnknownActionFallback
+   */
+  test('Write unknown action rules fallback', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    /**
+     * Get the written value of a test element with the given key.
+     *
+     * @param {DicomWriter} writer The writer.
+     * @param {string} key The element key.
+     * @returns {Array|null} The written value or null if removed.
+     */
+    const write = function (writer, key) {
+      const element = new DataElement('LO');
+      element.tag = getTagFromKey(key);
+      element.value = ['value'];
+      const res = writer.getElementToWrite(element);
+      return res === null ? null : res.value;
+    };
+
+    const writer = new DicomWriter();
+    writer.setRules({
+      default: {action: WriterRuleActions.remove, value: null},
+      // unknown: falls back to the group rule
+      '00100010': {action: 'delete', value: null},
+      '0010': {action: WriterRuleActions.clear, value: null},
+      // unknown: falls back to the default rule
+      '00200010': {action: 'Replace', value: 'x'}
+    });
+    assert.deepEqual(write(writer, '00100010'), [], 'group fallback');
+    assert.isNull(write(writer, '00200010'), 'default fallback');
+
+    // unknown default: falls back to copy
+    writer.setRules({
+      default: {action: 'keep', value: null}
+    });
+    assert.deepEqual(write(writer, '00100010'), ['value'], 'copy fallback');
+
+    // missing default: falls back to copy
+    writer.setRules({});
+    assert.deepEqual(write(writer, '00100010'), ['value'], 'no default');
+
+    consoleSpy.mockRestore();
+  });
+
+  /**
+   * Tests for {@link DicomWriter} range rules.
+   *
+   * @function module:tests/dicom~writeRangeRules
+   */
+  test('Write range rules', () => {
+    const writer = new DicomWriter();
+    writer.setRules({
+      default: {action: 'copy', value: null},
+      // tag range: overlay data and comments
+      '60xx3000': {action: 'remove', value: null},
+      '60xx4000': {action: 'remove', value: null},
+      // less specific tag range
+      '60xxxxx0': {action: 'clear', value: null},
+      // exact tag beats tag range
+      60023000: {action: 'replace', value: 'exact-tag'},
+      // group range
+      '50xx': {action: 'remove', value: null},
+      // exact group beats group range
+      5002: {action: 'replace', value: 'exact-group'},
+      // tag range beats exact group
+      '5004xxxx': {action: 'replace', value: 'tag-range'},
+      5004: {action: 'remove', value: null},
+      // lower case hex and upper case 'X'
+      '7fXX': {action: 'clear', value: null}
+    });
+    /**
+     * Get the written value of a test element with the given key.
+     *
+     * @param {string} key The element key.
+     * @returns {Array|null} The written value or null if removed.
+     */
+    const write = function (key) {
+      const element = new DataElement('LO');
+      element.tag = getTagFromKey(key);
+      element.value = ['value'];
+      const res = writer.getElementToWrite(element);
+      return res === null ? null : res.value;
+    };
+    // tag ranges
+    assert.isNull(write('60003000'), 'overlay data');
+    assert.isNull(write('601E4000'), 'overlay comments');
+    assert.deepEqual(write('60000010'), [], 'less specific range');
+    assert.deepEqual(write('60000011'), ['value'], 'no range match');
+    assert.deepEqual(write('60023000'), ['exact-tag'], 'exact tag');
+    // group ranges
+    assert.isNull(write('50000010'), 'curve');
+    assert.isNull(write('501E3000'), 'curve last');
+    assert.deepEqual(write('50020010'), ['exact-group'], 'exact group');
+    assert.deepEqual(write('50040010'), ['tag-range'], 'tag range first');
+    assert.deepEqual(write('7FE00010'), [], 'case');
+    // default
+    assert.deepEqual(write('00100010'), ['value'], 'default');
+  });
+
+  /**
+   * Tests for {@link translateWriterRules}.
+   *
+   * @function module:tests/dicom~translateWriterRules
+   */
+  test('translateWriterRules', () => {
+    const copy = {action: 'copy', value: null};
+    const remove = {action: 'remove', value: null};
+    const clear = {action: 'clear', value: null};
+    const replace = {action: 'replace', value: 'name'};
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const rules = translateWriterRules({
+      default: remove,
+      // tag name
+      PatientName: replace,
+      // tag name and key for the same tag: key wins
+      PatientID: replace,
+      '00100020': clear,
+      // group name
+      'Meta Element': copy,
+      // group name with multiple groups
+      Curve: remove,
+      // group name and key for the same group: key wins
+      Patient: remove,
+      '0010': copy,
+      // lower case key
+      '7fe00010': copy,
+      // unknown name
+      NotATagName: copy
+    });
+    const warnCalls = warnSpy.mock.calls;
+    warnSpy.mockRestore();
+    assert.deepEqual(
+      warnCalls,
+      [['Cannot translate unknown writer rule name: NotATagName']],
+      'unknown name warning logged'
+    );
+    const expected = {
+      default: remove,
+      '00100010': replace,
+      '00100020': clear,
+      '0002': copy,
+      5000: remove,
+      5002: remove,
+      5004: remove,
+      5006: remove,
+      5008: remove,
+      '500A': remove,
+      '500C': remove,
+      '500E': remove,
+      5010: remove,
+      5012: remove,
+      5014: remove,
+      5016: remove,
+      5018: remove,
+      '501A': remove,
+      '501C': remove,
+      '501E': remove,
+      '0010': copy,
+      '7FE00010': copy
+    };
+    assert.deepEqual(rules, expected);
+  });
+
+  /**
+   * Tests for {@link DicomWriter} rule values not modified by writing.
+   *
+   * @function module:tests/dicom~writeRuleValueReuse
+   */
+  test('Write rules with sequence value reuse', () => {
+    /**
+     * Get a data element.
+     *
+     * @param {string} vr The element VR.
+     * @param {string} value The element value.
+     * @returns {DataElement} The data element.
+     */
+    const getElement = function (vr, value) {
+      const element = new DataElement(vr);
+      element.value = [value];
+      return element;
+    };
+    /**
+     * Get a code sequence item.
+     *
+     * @returns {Record<string, DataElement>} The item.
+     */
+    const getCodeItem = function () {
+      return {
+        '00080100': getElement('SH', '113100'),
+        '00080102': getElement('SH', 'DCM'),
+        '00080104': getElement('LO', 'Basic Application Confidentiality')
+      };
+    };
+    // test data has a ReferencedImageSequence (replaced)
+    // and no DeidentificationMethodCodeSequence (added)
+    const rules = {
+      default: {action: 'copy', value: null},
+      '00081140': {action: 'replace', value: getCodeItem()},
+      '00120064': {action: 'replace', value: getCodeItem()}
+    };
+    const writer = new DicomWriter();
+    writer.setRules(rules, true);
+    // write twice with the same rules
+    for (let i = 0; i < 2; ++i) {
+      const parser = new DicomParser();
+      parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+      const newParser = new DicomParser();
+      newParser.parse(writer.getBuffer(parser.getDicomElements()));
+      const tags = newParser.getDicomElements();
+      for (const key of ['00081140', '00120064']) {
+        const item = tags[key].value[0];
+        assert.equal(item['00080100'].value[0], '113100', `${key} #${i}`);
+        assert.equal(item['00080104'].value[0],
+          'Basic Application Confidentiality', `${key} meaning #${i}`);
+      }
+    }
+    // rule values are not modified
+    assert.deepEqual(rules['00120064'].value, getCodeItem(), 'rule value');
+  });
+
+  /**
+   * Tests for {@link DicomWriter} replace rules with multiple values.
+   *
+   * @function module:tests/dicom~writeReplaceMultipleValues
+   */
+  test('Write replace rules with multiple values', () => {
+    /**
+     * Get a code sequence item.
+     *
+     * @param {string} code The code value.
+     * @returns {Record<string, DataElement>} The item.
+     */
+    const getCodeItem = function (code) {
+      const element = new DataElement('SH');
+      element.value = [code];
+      return {'00080100': element};
+    };
+    // test data has a ReferencedImageSequence (replaced)
+    // and no DeidentificationMethod(CodeSequence) (added)
+    const rules = {
+      default: {action: 'copy', value: null},
+      '00081140': {
+        action: 'replace',
+        value: [getCodeItem('113100'), getCodeItem('113105')]
+      },
+      '00120063': {action: 'replace', value: ['method-a', 'method-b']},
+      '00120064': {
+        action: 'replace',
+        value: [getCodeItem('113100'), getCodeItem('113105')]
+      }
+    };
+    const writer = new DicomWriter();
+    writer.setRules(rules, true);
+    const parser = new DicomParser();
+    parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+    const newParser = new DicomParser();
+    newParser.parse(writer.getBuffer(parser.getDicomElements()));
+    const tags = newParser.getDicomElements();
+
+    // multi-valued string
+    assert.deepEqual(tags['00120063'].value, ['method-a', 'method-b'],
+      'added multi-valued');
+    // sequences with multiple items
+    for (const key of ['00081140', '00120064']) {
+      const items = tags[key].value;
+      assert.equal(items.length, 2, `${key} length`);
+      assert.equal(items[0]['00080100'].value[0], '113100', `${key} #0`);
+      assert.equal(items[1]['00080100'].value[0], '113105', `${key} #1`);
+    }
+  });
+
+  /**
+   * Tests for {@link DicomWriter} rules applied to sequence items.
+   *
+   * @function module:tests/dicom~writeRulesInSequence
+   */
+  test('Write rules in sequence', () => {
+    /**
+     * Get a data element.
+     *
+     * @param {string} vr The element VR.
+     * @param {string} value The element value.
+     * @returns {DataElement} The data element.
+     */
+    const getElement = function (vr, value) {
+      const element = new DataElement(vr);
+      element.value = [value];
+      return element;
+    };
+
+    const parser = new DicomParser();
+    parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+    const elements = parser.getDicomElements();
+    // patient tags in ReferencedImageSequence item
+    const seqItem = elements['00081140'].value[0];
+    seqItem['00100010'] = getElement('PN', 'seq^PatientName');
+    seqItem['00100020'] = getElement('LO', 'seq-patient-id');
+    seqItem['00100030'] = getElement('DA', '19830101');
+
+    const rules = {
+      default: {action: WriterRuleActions.copy, value: null},
+      '00100010': {
+        action: WriterRuleActions.replace, value: 'anonymise-name'
+      },
+      '00100020': {action: WriterRuleActions.clear, value: null},
+      '0010': {action: WriterRuleActions.remove, value: null}
+    };
+    const writer = new DicomWriter();
+    writer.setRules(rules);
+    const newParser = new DicomParser();
+    newParser.parse(writer.getBuffer(elements));
+    const tags = newParser.getDicomElements();
+
+    // top level
+    assert.equal(tags['00100010'].value[0], 'anonymise-name', 'top name');
+    assert.notOk(tags['00100030'], 'top birth date');
+    // sequence item
+    const item = tags['00081140'].value[0];
+    assert.equal(item['00100010'].value[0], 'anonymise-name', 'seq name');
+    assert.equal(item['00100020'].value[0], '', 'seq id');
+    assert.notOk(item['00100030'], 'seq birth date');
+    // other tags are kept
+    assert.equal(item['00081155'].value[0],
+      '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
+      'seq other');
+  });
+
+  /**
    * Tests for {@link DicomWriter} anomnymisation and add tags.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~write-anonymised-and-add-tags
+   * @function module:tests/dicom~writeAnonymisedAndAddTags
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -206,7 +691,7 @@ describe('dicom', () => {
       const patientsName = 'dwv^PatientName';
       const patientComments = '';
       const issuerOfPatientID = 'dwv.org';
-      // rule with tagKey, tagName and non existing tag
+      // rule with tag keys and non existing tag
       const rules = {
         default: {
           action: 'copy', value: null
@@ -214,10 +699,12 @@ describe('dicom', () => {
         '00104000': {
           action: 'replace', value: patientComments
         },
-        IssuerOfPatientID: {
+        // IssuerOfPatientID
+        '00100021': {
           action: 'replace', value: issuerOfPatientID
         },
-        PatientBirthDateInAlternativeCalendar: {
+        // PatientBirthDateInAlternativeCalendar
+        '00100033': {
           action: 'replace', value: null
         },
         BADKEY00: {
@@ -240,7 +727,19 @@ describe('dicom', () => {
 
       // write buffer
       const dicomWriter = new DicomWriter();
+      const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
       dicomWriter.setRules(rules, true);
+      const warnCalls = warnSpy.mock.calls;
+      warnSpy.mockRestore();
+      assert.deepEqual(
+        warnCalls,
+        [[
+          'Writer rules not indexed by tag or group key: BADKEY00 ' +
+          '(they will be ignored, use translateWriterRules for name ' +
+          'based rules)'
+        ]],
+        'bad key warning logged'
+      );
       const buffer = dicomWriter.getBuffer(rawTags);
       // parse new buffer
       dicomParser = new DicomParser();
@@ -294,7 +793,7 @@ describe('dicom', () => {
         comparator.equal(
           value.join(),
           jsonTag,
-          name + ' - ' + tagName);
+          `${name} - ${tagName}`);
       } else {
         // check content
         if (jsonTags[tagName] === null || jsonTags[tagName] === 0) {
@@ -317,167 +816,10 @@ describe('dicom', () => {
   }
 
   /**
-   * Simple GradSquarePixGenerator.
-   *
-   * @param {object} tags The input tags.
-   * @returns {object} The pixel buffer.
-   */
-  function generateGradSquare(tags) {
-
-    const numberOfColumns = tags.Columns;
-    const numberOfRows = tags.Rows;
-    const isRGB = tags.PhotometricInterpretation.trim() === 'RGB';
-    const samplesPerPixel = tags.SamplesPerPixel;
-
-    let numberOfSamples = 1;
-    let numberOfColourPlanes = 1;
-    if (samplesPerPixel === 3) {
-      const planarConfiguration = tags.PlanarConfiguration;
-      if (planarConfiguration === 0) {
-        numberOfSamples = 3;
-      } else {
-        numberOfColourPlanes = 3;
-      }
-    }
-
-    const dataLength = numberOfRows * numberOfColumns * samplesPerPixel;
-
-    const bitsAllocated = tags.BitsAllocated;
-    const pixelRepresentation = tags.PixelRepresentation;
-    let pixelBuffer;
-    if (bitsAllocated === 8) {
-      if (pixelRepresentation === 0) {
-        pixelBuffer = new Uint8Array(dataLength);
-      } else {
-        pixelBuffer = new Int8Array(dataLength);
-      }
-    } else if (bitsAllocated === 16) {
-      if (pixelRepresentation === 0) {
-        pixelBuffer = new Uint16Array(dataLength);
-      } else {
-        pixelBuffer = new Int16Array(dataLength);
-      }
-    }
-
-    // full grad square
-    // const borderI = 0;
-    // const borderJ = 0;
-    // ~centered grad square
-    const borderI = Math.ceil(numberOfColumns * 0.25);
-    const borderJ = Math.ceil(numberOfRows * 0.25);
-
-    const minI = borderI;
-    const minJ = borderJ;
-    const maxI = numberOfColumns - borderI;
-    const maxJ = numberOfRows - borderJ;
-
-    const background = 0;
-    const max = 255;
-    let maxNoBounds = 1;
-
-    const getValue = function (i, j) {
-      let value = background;
-      if (i >= minI && i <= maxI &&
-        j >= minJ && j <= maxJ) {
-        value += Math.round((i + j) * (max / maxNoBounds));
-      }
-      return [value];
-    };
-
-    const getRGB = function (i, j) {
-      let value = getValue(i, j);
-      if (value > 255) {
-        value = 200;
-      }
-      return [value, 0, 0];
-    };
-
-    maxNoBounds = getValue(maxI, maxJ) / max;
-
-    const getFunc = isRGB ? getRGB : getValue;
-
-    // main loop
-    let offset = 0;
-    for (let c = 0; c < numberOfColourPlanes; ++c) {
-      for (let j = 0; j < numberOfRows; ++j) {
-        for (let i = 0; i < numberOfColumns; ++i) {
-          for (let s = 0; s < numberOfSamples; ++s) {
-            if (numberOfColourPlanes !== 1) {
-              pixelBuffer[offset] = getFunc(i, j)[c];
-            } else {
-              pixelBuffer[offset] = getFunc(i, j)[s];
-            }
-            ++offset;
-          }
-        }
-      }
-    }
-
-    const pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
-    return {
-      tag: getPixelDataTag(),
-      vr: bitsAllocated === 8 ? 'OB' : 'OW',
-      vl: pixVL,
-      value: pixelBuffer
-    };
-  }
-
-  /**
-   * Simple BinaryPixGenerator.
-   *
-   * @param {object} tags The input tags.
-   * @returns {object} The pixel buffer.
-   */
-  function generateBinary(tags) {
-
-    const numberOfColumns = tags.Columns;
-    const numberOfRows = tags.Rows;
-    let numberOfFrames = 1;
-    if (typeof tags.NumberOfFrames !== 'undefined') {
-      numberOfFrames = tags.NumberOfFrames;
-    }
-    const dataLength = numberOfRows * numberOfColumns * numberOfFrames;
-    const pixelBuffer = new Uint8Array(dataLength);
-
-    const borderI = Math.ceil(numberOfColumns * 0.25);
-    const borderJ = Math.ceil(numberOfRows * 0.25);
-
-    const minI = borderI;
-    const minJ = borderJ;
-    const maxI = numberOfColumns - borderI;
-    const maxJ = numberOfRows - borderJ;
-
-    const getFunc = function (i, j) {
-      const inRange = i >= minI && i < maxI &&
-        j >= minJ && j < maxJ;
-      return inRange ? 1 : 0;
-    };
-
-    // main loop
-    let offset = 0;
-    for (let f = 0; f < numberOfFrames; ++f) {
-      for (let j = 0; j < numberOfRows; ++j) {
-        for (let i = 0; i < numberOfColumns; ++i) {
-          pixelBuffer[offset] = getFunc(i, j);
-          ++offset;
-        }
-      }
-    }
-
-    const pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
-    return {
-      tag: getPixelDataTag(),
-      vr: 'OB',
-      vl: pixVL,
-      value: pixelBuffer
-    };
-  }
-
-  /**
    * Test a JSON config: write a DICOM file and read it back.
    *
    * @param {object} config A JSON config representing DICOM tags.
-   * @param {Object<string, WriterRule>} [writerRules] Optional DICOM
+   * @param {Record<string, WriterRule>} [writerRules] Optional DICOM
    *   writer rules.
    * @param {object} [outConfig] Optional resulting JSON after
    *   applying writer rules.
@@ -502,33 +844,29 @@ describe('dicom', () => {
     }
     // pass tags clone to avoid modifications (for ex by padElement)
     const jsonTags = structuredClone(config.tags);
-    // convert JSON to DICOM element object
-    const dicomElements = getElementsFromJSONTags(jsonTags);
-    // pixels (if possible)
-    if (config.tags.Modality !== 'KO') {
-      if (config.tags.Modality === 'SEG') {
-        // simple binary
-        dicomElements['7FE00010'] = generateBinary(config.tags);
-      } else {
-        // grad square
-        dicomElements['7FE00010'] = generateGradSquare(config.tags);
-      }
-    }
 
-    // create writer
-    const writer = new DicomWriter();
-    writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
+    // generate buffer
+    const genOptions = {};
+    if (typeof config.segmentSquares !== 'undefined') {
+      genOptions.segmentSquares = config.segmentSquares;
+    }
+    const writerOptions = {useUnVrForPrivateSq};
     if (typeof writerRules !== 'undefined') {
-      writer.setRules(writerRules, true);
+      writerOptions.writerRules = writerRules;
+      writerOptions.addMissingTags = true;
     }
-
-    // create DICOM buffer
-    let dicomBuffer = null;
+    let dicomBuffer;
     try {
-      dicomBuffer = writer.getBuffer(dicomElements);
+      // data elements
+      const dataElementsList = generateDataElements(
+        jsonTags, genOptions
+      );
+      // buffer (only one)
+      dicomBuffer = generateSliceBuffers(
+        dataElementsList, writerOptions
+      )[0];
     } catch (error) {
-      assert.ok(false, 'Caught error: ' + error);
-      return;
+      assert.ok(false, `Caught error: ${error}`);
     }
 
     // parse the buffer
@@ -571,7 +909,7 @@ describe('dicom', () => {
     result.tags.ReferringPhysicianIdentificationSequence = '';
 
     return {
-      rules: {
+      rules: translateWriterRules({
         default: {
           action: 'copy', value: null
         },
@@ -591,8 +929,8 @@ describe('dicom', () => {
           action: 'replace',
           value: result.tags.ReferringPhysicianIdentificationSequence
         }
-      },
-      result: result
+      }),
+      result
     };
   }
 
@@ -600,7 +938,7 @@ describe('dicom', () => {
    * Tests write/read DICOM data with explicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit
+   * @function module:tests/dicom~readWriteSyntheticExplicit
    */
   test(
     'Read-write synthetic explicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
@@ -617,7 +955,7 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with explicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit-with-rules
+   * @function module:tests/dicom~readWriteSyntheticExplicitWithRules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -638,7 +976,7 @@ describe('dicom', () => {
    * Tests write/read DICOM data with implicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-implicit
+   * @function module:tests/dicom~readWriteSyntheticImplicit
    */
   test(
     'Read-write synthetic implicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
@@ -655,7 +993,7 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with implicit encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-implicit-with-rules
+   * @function module:tests/dicom~readWriteSyntheticImplicitWithRules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -676,7 +1014,7 @@ describe('dicom', () => {
    * Tests write/read DICOM data with explicit big endian encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit-big-endian
+   * @function module:tests/dicom~readWriteSyntheticExplicitBigEndian
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -694,7 +1032,7 @@ describe('dicom', () => {
    * Tests write with rules / read DICOM data with explicit big endian encoding.
    * Using remote file for CI integration.
    *
-   * @function module:tests/dicom~read-write-synthetic-explicit-be-with-rules
+   * @function module:tests/dicom~readWriteSyntheticExplicitBeWithRules
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len

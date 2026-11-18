@@ -1,34 +1,34 @@
-import {Size} from './size.js';
-import {Spacing} from './spacing.js';
-import {Geometry} from './geometry.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {WindowLevel} from './windowLevel.js';
+import {WindowPreset} from './windowPreset.js';
 import {Image} from './image.js';
+import {Size} from './size.js';
+import {Geometry} from './geometry.js';
 import {ColourMap} from './luts.js';
 import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
   getPixelSpacing,
-  getPixelAspectRatio,
   getTagPixelUnit,
-  getOrientationMatrix,
   getPhotometricInterpretation,
   isMonochrome,
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
 import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
-import {getVolumeIdTagValue} from '../dicom/dicomVolume.js';
+import {
+  getRootGeometry,
+  getSortedFramesGeometry
+} from '../dicom/dicomGeometry.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
-import {Point3D} from '../math/point.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {TypedArray} from '../math/types.js';
+ */
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
+ * @typedef {Record<string, DataElement>} DataElements
  */
 
 /**
@@ -39,13 +39,11 @@ const TagKeys = {
   SOPClassUID: '00080016',
   SOPInstanceUID: '00080018',
   Modality: '00080060',
-  NumberOfFrames: '00280008',
-  ImagePositionPatient: '00200032',
   SamplesPerPixel: '00280002',
   PlanarConfiguration: '00280006',
+  NumberOfFrames: '00280008',
   RescaleSlope: '00281053',
   RescaleIntercept: '00281052',
-  VOILUTFunction: '00281056',
   MediaStorageSOPClassUID: '00020002',
   ImageType: '00080008',
   PhotometricInterpretation: '00280004',
@@ -93,13 +91,15 @@ const MetaTagKeys = {
   DeviceSerialNumber: '00181000',
   SoftwareVersions: '00181020',
   // general image
-  LossyImageCompression: '00282110'
+  LossyImageCompression: '00282110',
+  // voi lut
+  VOILUTFunction: '00281056'
 };
 
 /**
  * Get the palette colour map.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @returns {ColourMap|undefined} The palette colour map.
  */
 function getPaletteColourMap(dataElements) {
@@ -145,8 +145,8 @@ function getPaletteColourMap(dataElements) {
       // check double size
       if (vlSize !== 2 * descSize) {
         doScale = true;
-        logger.info('16bits lut but size is not double. desc: ' +
-          descSize + ' vl: ' + vlSize);
+        logger.info(`16bits lut but size is not double. desc: ${
+          descSize } vl: ${vlSize}`);
       }
       // (C.7.6.3.1.6 Palette Color Lookup Table Data)
       // Palette color values must always be scaled across the full
@@ -173,13 +173,13 @@ function getPaletteColourMap(dataElements) {
       logger.info(
         'Scaling 16bits color lut since the lut descriptor is 8.');
       let clone = redLutElement.value.slice(0);
-      // @ts-expect-error
+      // @ts-expect-error -- clone is a plain number[], it has no buffer
       redLut = Array.from(new Uint8Array(clone.buffer));
       clone = greenLutElement.value.slice(0);
-      // @ts-expect-error
+      // @ts-expect-error -- clone is a plain number[], it has no buffer
       greenLut = Array.from(new Uint8Array(clone.buffer));
       clone = blueLutElement.value.slice(0);
-      // @ts-expect-error
+      // @ts-expect-error -- clone is a plain number[], it has no buffer
       blueLut = Array.from(new Uint8Array(clone.buffer));
     }
     colourMap = new ColourMap(redLut, greenLut, blueLut);
@@ -191,9 +191,9 @@ function getPaletteColourMap(dataElements) {
 /**
  * Get the window level presets.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @param {number} intensityFactor The intensity factor.
- * @returns {object|undefined} The presets.
+ * @returns {Record<string, WindowPreset>|undefined} The presets.
  */
 function getWindowPresets(dataElements, intensityFactor) {
   let windowPresets;
@@ -208,25 +208,24 @@ function getWindowPresets(dataElements, intensityFactor) {
     for (let j = 0; j < windowCenter.length; ++j) {
       const center = parseFloat(windowCenter[j]);
       let width = parseFloat(windowWidth[j]);
-      if (center && width && width !== 0) {
+      if (!isNaN(center) && !isNaN(width) && width !== 0) {
         name = '';
         if (typeof windowCWExplanation !== 'undefined') {
           name = windowCWExplanation[j];
         }
         if (name === '') {
-          name = 'Default' + j;
+          name = `Default${j}`;
         }
+        // the width minimum depends on the VOI LUT function:
+        // it is applied by the view
         width *= intensityFactor;
-        if (width < 1) {
-          width = 1;
-        }
-        windowPresets[name] = {
-          wl: [new WindowLevel(
+        windowPresets[name] = new WindowPreset(
+          name,
+          [new WindowLevel(
             center * intensityFactor,
             width
-          )],
-          name: name
-        };
+          )]
+        );
       }
       if (width === 0) {
         logger.warn('Zero window width found in DICOM.');
@@ -235,6 +234,54 @@ function getWindowPresets(dataElements, intensityFactor) {
   }
   // return
   return windowPresets;
+}
+
+/**
+ * Frames geometry cache: frames of a multi-frame data share
+ * the same data elements, avoid calculating it for each frame.
+ *
+ * @type {WeakMap<DataElements, Geometry[]|undefined>}
+ */
+const framesGeometryCache = new WeakMap();
+
+/**
+ * Get the geometry of one frame of a multi-frame data.
+ *
+ * Frames with per-frame positions get their geometry from
+ * getSortedFramesGeometry: the frame position and the data time,
+ * or the volume index as time if frames share positions. Other
+ * frames are time frames: the frame geometry has the root position
+ * and the frame number as time. Once all frames are appended
+ * (see Image.appendSlice), the image has the same layout as the one
+ * created from the full buffer.
+ *
+ * @param {DataElements} dataElements The DICOM tags.
+ * @param {number} frameNumber The frame number.
+ * @returns {Geometry} The frame geometry.
+ */
+function getFrameGeometry(dataElements, frameNumber) {
+  if (!framesGeometryCache.has(dataElements)) {
+    framesGeometryCache.set(
+      dataElements, getSortedFramesGeometry(dataElements));
+  }
+  const framesGeometry = framesGeometryCache.get(dataElements);
+
+  let res;
+  if (typeof framesGeometry !== 'undefined') {
+    // clone: the geometry of the first frame is modified by appends
+    res = framesGeometry[frameNumber].clone();
+  } else {
+    const geometry = getRootGeometry(dataElements);
+    const size2D = getImage2DSize(dataElements);
+    res = new Geometry(
+      [geometry.getOrigin()],
+      new Size([size2D[0], size2D[1], 1]),
+      geometry.getSpacing(),
+      geometry.getOrientation(),
+      {id: {value: frameNumber}}
+    );
+  }
+  return res;
 }
 
 /**
@@ -306,76 +353,19 @@ export class ImageFactory {
    * Get an {@link Image} object from the read DICOM file.
    *
    * @param {DataElements} dataElements The DICOM tags.
-   * @param {Uint8Array | Int8Array |
-   *   Uint16Array | Int16Array |
-   *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
-   * @param {number} numberOfFiles The input number of files.
+   * @param {TypedArray} pixelBuffer The pixel buffer.
+   * @param {number} numberOfItems The number of load items.
+   * @param {number} [frameNumber] The frame number if the pixel buffer
+   *   only contains one frame of a multi-frame data: the image is
+   *   then one frame, the other ones are to be appended to it.
    * @returns {Image} A new Image.
    * @throws {Error} Error for missing or wrong data.
    */
-  create(dataElements, pixelBuffer, numberOfFiles) {
+  create(dataElements, pixelBuffer, numberOfItems, frameNumber) {
     // safe get shortcuts
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
     };
-    const safeGetAllLocal = function (key) {
-      return safeGetAll(dataElements, key);
-    };
-
-    const size2D = getImage2DSize(dataElements);
-    const sizeValues = [size2D[0], size2D[1], 1];
-
-    // NumberOfFrames
-    const numberOfFrames = safeGetLocal(TagKeys.NumberOfFrames);
-    if (typeof numberOfFrames !== 'undefined') {
-      const number = parseInt(numberOfFrames, 10);
-      if (number > 1) {
-        sizeValues.push(number);
-      }
-    }
-
-    // image size
-    const size = new Size(sizeValues);
-
-    // image spacing
-    let spacingValues = [1, 1, 1];
-    const spacing2D = getPixelSpacing(dataElements);
-    if (typeof spacing2D !== 'undefined') {
-      spacingValues = [spacing2D[0], spacing2D[1], 1];
-    } else {
-      // try pixel aspect ratio
-      const ratio = getPixelAspectRatio(dataElements);
-      if (typeof ratio !== 'undefined') {
-        spacingValues = [ratio[0], ratio[1], 1];
-        logger.warn('Use pixel aspect ratio as spacing');
-      }
-    }
-    const spacing = new Spacing(spacingValues);
-
-    // ImagePositionPatient
-    const imagePositionPatient = safeGetAllLocal(TagKeys.ImagePositionPatient);
-    // slice position
-    let slicePosition = new Array(0, 0, 0);
-    if (typeof imagePositionPatient !== 'undefined') {
-      slicePosition = [
-        parseFloat(imagePositionPatient[0]),
-        parseFloat(imagePositionPatient[1]),
-        parseFloat(imagePositionPatient[2])
-      ];
-    }
-
-    // Image orientation patient
-    const orientationMatrix = getOrientationMatrix(dataElements);
-
-    // geometry
-    const origin = new Point3D(
-      slicePosition[0], slicePosition[1], slicePosition[2]);
-    const time = getVolumeIdTagValue(dataElements);
-    const geometry = new Geometry(
-      [origin], size, spacing, orientationMatrix, time);
-
-    // SOP Instance UID
-    const sopInstanceUid = safeGetLocal(TagKeys.SOPInstanceUID);
 
     // Sample per pixels
     let samplesPerPixel = safeGetLocal(TagKeys.SamplesPerPixel);
@@ -383,13 +373,30 @@ export class ImageFactory {
       samplesPerPixel = 1;
     }
 
+    // geometry: frames of multi-frame data are created one by one
+    // and assembled by the image (see Image.appendSlice)
+    let geometry;
+    if (typeof frameNumber !== 'undefined') {
+      geometry = getFrameGeometry(dataElements, frameNumber);
+    } else {
+      geometry = getRootGeometry(dataElements);
+    }
+
+    // number of pixels
+    const numberOfPixels = geometry.getSize().getTotalSize();
+    // needed for unit
+    const spacing2D = getPixelSpacing(dataElements);
+
+    // SOP Instance UID
+    const sopInstanceUid = safeGetLocal(TagKeys.SOPInstanceUID);
+
     // check buffer size
-    const bufferSize = size.getTotalSize() * samplesPerPixel;
+    const bufferSize = numberOfPixels * samplesPerPixel;
     if (bufferSize !== pixelBuffer.length) {
-      logger.warn('Badly sized pixel buffer: ' +
-        pixelBuffer.length + ' != ' + bufferSize);
+      logger.warn(`Badly sized pixel buffer: ${
+        pixelBuffer.length } != ${bufferSize}`);
       if (bufferSize < pixelBuffer.length) {
-        pixelBuffer = pixelBuffer.slice(0, size.getTotalSize());
+        pixelBuffer = pixelBuffer.slice(0, numberOfPixels);
       } else {
         throw new Error('Underestimated buffer size, can\'t fix it...');
       }
@@ -436,7 +443,7 @@ export class ImageFactory {
     if (typeof this.#suvFactor !== 'undefined') {
       isPetWithSuv = true;
       intensityFactor = this.#suvFactor;
-      logger.info('Applying PET SUV calibration: ' + intensityFactor);
+      logger.info(`Applying PET SUV calibration: ${intensityFactor}`);
       slope *= intensityFactor;
       intercept *= intensityFactor;
     }
@@ -452,9 +459,16 @@ export class ImageFactory {
     }
 
     // meta information
+    // (slice capacity is used to allocate the full buffer
+    // when appending slices, for frames: the total number of frames)
     const meta = {
-      numberOfFiles: numberOfFiles
+      sliceCapacity: numberOfItems
     };
+    if (typeof frameNumber !== 'undefined') {
+      const numberOfFrames = parseInt(
+        safeGetLocal(TagKeys.NumberOfFrames), 10);
+      meta.sliceCapacity *= numberOfFrames;
+    }
 
     // defaults
     meta.TransferSyntaxUID = safeGetLocal(TagKeys.TransferSyntaxUID);
@@ -500,7 +514,6 @@ export class ImageFactory {
     if (typeof presets !== 'undefined') {
       meta.windowPresets = presets;
     }
-    meta.VOILUTFunction = safeGetLocal(TagKeys.VOILUTFunction);
 
     // store the meta data
     image.setMeta(meta);
@@ -508,4 +521,23 @@ export class ImageFactory {
     return image;
   }
 
+}
+
+/**
+ * Demo Image creation from DICOM elements: takes
+ * elements and first element of the pixel buffer
+ * to create an image.
+ *
+ * Warning: not to be used in production code.
+ *
+ * @param {Record<string, DataElement>} elements The DICOM elements.
+ * @returns {Image} The Image object.
+ */
+export function demoCreateImage(elements) {
+  const factory = new ImageFactory();
+  return factory.create(
+    elements,
+    elements['7FE00010'].value[0],
+    1
+  );
 }

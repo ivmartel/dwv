@@ -88,8 +88,8 @@ function computeGradient(greyscale) {
 
   let max = 0; // Maximum gradient found, for scaling purposes
 
-  let x = 0;
-  let y = 0;
+  let x;
+  let y;
 
   for (y = 0; y < greyscale.data.length - 1; y++) {
     gradient[y] = [];
@@ -112,7 +112,7 @@ function computeGradient(greyscale) {
   // Flip and scale.
   for (y = 0; y < gradient.length; y++) {
     for (x = 0; x < gradient[y].length; x++) {
-      // @ts-ignore
+      // @ts-expect-error -- gradient is untyped, TS can't infer element type
       gradient[y][x] = 1 - (gradient[y][x] / max);
     }
   }
@@ -504,7 +504,7 @@ export class Scissors {
 
   calculateTraining(
     buffer, granularity, input, output) {
-    let i = 0;
+    let i;
     // Build a map of raw-weights to trained-weights by favoring input values
     buffer.length = granularity;
     for (i = 0; i < granularity; i++) {
@@ -564,10 +564,9 @@ export class Scissors {
       const outsideT = this.getTrainedOutside(this.outside[py][px]);
 
       return 0.3 * gradT + 0.3 * lap + 0.1 * (dir + edgeT + insideT + outsideT);
-    } else {
-      // Normal weights
-      return 0.43 * grad + 0.43 * lap + 0.11 * dir;
     }
+    // Normal weights
+    return 0.43 * grad + 0.43 * lap + 0.11 * dir;
   }
 
   adj(p) {
@@ -582,7 +581,7 @@ export class Scissors {
     for (let y = sy; y <= ey; y++) {
       for (let x = sx; x <= ex; x++) {
         if (x !== p.x || y !== p.y) {
-          list[idx++] = {x: x, y: y};
+          list[idx++] = {x, y};
         }
       }
     }
@@ -599,8 +598,8 @@ export class Scissors {
 
     this.curPoint = sp;
 
-    let x = 0;
-    let y = 0;
+    let x;
+    let y;
 
     this.visited = [];
     for (y = 0; y < this.height; y++) {

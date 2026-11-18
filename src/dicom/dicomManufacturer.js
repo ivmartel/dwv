@@ -1,9 +1,8 @@
 import {safeGet} from '../dicom/dataElement.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -19,13 +18,13 @@ export const NormalisedManufacturers = {
   GE: 'ge',
   SIEMENS: 'siemens',
   PHILIPS: 'philips',
-  HITASHI: 'hitashi'
+  HITACHI: 'hitachi'
 };
 
 /**
  * Get the manufacturer.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The manufacturer.
  */
 export function getManufacturer(elements) {
@@ -35,7 +34,7 @@ export function getManufacturer(elements) {
 /**
  * Get the normalised manufacturer.
  *
- * @param {Object<string, DataElement>} elements The DICOM tags.
+ * @param {Record<string, DataElement>} elements The DICOM tags.
  * @returns {string|undefined} The manufacturer as a unique
  *   all lower case string.
  */
@@ -52,6 +51,9 @@ export function getNormalisedManufacturer(elements) {
     } else if (manufacturer.startsWith('Philips')) {
       // 'Philips Healthcare', 'Philips Medical Systems'
       res = NormalisedManufacturers.PHILIPS;
+    } else if (manufacturer.toUpperCase().startsWith('HITACHI')) {
+      // 'Hitachi Medical Corporation', 'HITACHI'
+      res = NormalisedManufacturers.HITACHI;
     } else {
       res = manufacturer.toLowerCase();
     }

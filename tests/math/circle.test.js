@@ -12,7 +12,7 @@ describe('math', () => {
   /**
    * Tests for {@link Circle}.
    *
-   * @function module:tests/math~circle-class
+   * @function module:tests/math~circleClass
    */
   test('Circle class - #DWV-REQ-UI-07-002 Draw circle', () => {
     const center0 = new Point2D(0, 0);
@@ -43,7 +43,7 @@ describe('math', () => {
   /**
    * Tests for {@link Circle} quantification.
    *
-   * @function module:tests/math~circle-quantification
+   * @function module:tests/math~circleQuantification
    */
   test('Circle quantification - #DWV-REQ-UI-07-002 Draw circle',
     () => {
@@ -51,19 +51,19 @@ describe('math', () => {
       const c0 = new Circle(center0, 2);
       // view controller
       const mockVc0 = {
-        canQuantifyImage: function () {
+        canQuantifyImage() {
           return true;
         },
-        get2DSpacing: function () {
+        get2DSpacing() {
           return {x: 1, y: 1};
         },
-        getImageVariableRegionValues: function () {
+        getImageVariableRegionValues() {
           return [0, 1, 1, 0, 0, 1, 1, 0];
         },
-        getPixelUnit: function () {
+        getPixelUnit() {
           return '';
         },
-        getLengthUnit: function () {
+        getLengthUnit() {
           return 'unit.mm';
         }
       };
@@ -86,4 +86,14 @@ describe('math', () => {
     }
   );
 
+});
+
+describe('math circle contains', () => {
+  test('Circle contains', () => {
+    const c0 = new Circle(new Point2D(0, 0), 5);
+    assert.ok(c0.contains(new Point2D(3, 4)), 'on outline');
+    assert.ok(c0.contains(new Point2D(1, 1)), 'inside');
+    assert.notOk(c0.contains(new Point2D(4, 4)), 'outside');
+    assert.ok(c0.contains(new Point2D(4, 4), 1), 'within tolerance');
+  });
 });

@@ -1,13 +1,12 @@
 import {getStats} from './stats.js';
 import {Index} from './index.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point.js';
-import {Value} from './value.js';
-import {ViewController} from '../app/viewController.js';
-import {Scalar2D} from './scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D} from '../math/point.js';
+ * @import {NumberValue} from './types.js';
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Scalar2D} from './scalar.js';
+ */
 
 /**
  * Mulitply the three inputs if the last two are not null.
@@ -101,6 +100,25 @@ export class Ellipse {
   }
 
   /**
+   * Check if a point is inside the ellipse, the ellipse radii being
+   *   extended by a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional radius extension, defaults to 0.
+   * @returns {boolean} True if the point is in the ellipse.
+   */
+  contains(point, tolerance = 0) {
+    const a = this.#a + tolerance;
+    const b = this.#b + tolerance;
+    if (a <= 0 || b <= 0) {
+      return false;
+    }
+    const dx = (point.getX() - this.#centre.getX()) / a;
+    const dy = (point.getY() - this.#centre.getY()) / b;
+    return dx * dx + dy * dy <= 1;
+  }
+
+  /**
    * Check for equality.
    *
    * @param {Ellipse} rhs The object to compare to.
@@ -183,18 +201,20 @@ export class Ellipse {
    * @param {Index} index The index at which to get the
    *   image values.
    * @param {string[]} flags A list of stat values to calculate.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(viewController, index, flags) {
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
     const lengthUnit = viewController.getLengthUnit();
-    const a = {
-      value: this.getA() * spacing2D.x,
+    const twoALength = 2 * this.getA() * spacing2D.x;
+    const twoBLength = 2 * this.getB() * spacing2D.y;
+    const longAxis = {
+      value: Math.max(twoALength, twoBLength),
       unit: lengthUnit
     };
-    const b = {
-      value: this.getB() * spacing2D.y,
+    const shortAxis = {
+      value: Math.min(twoALength, twoBLength),
       unit: lengthUnit
     };
     const worldSurface = this.getWorldSurface(spacing2D);
@@ -214,7 +234,7 @@ export class Ellipse {
     }
 
     // shape quantification
-    const quant = {a, b, surface};
+    const quant = {longAxis, shortAxis, surface};
 
     // pixel values quantification
     if (viewController.canQuantifyImage()) {
@@ -224,18 +244,20 @@ export class Ellipse {
           regions, index);
         const unit = viewController.getPixelUnit();
         const quantif = getStats(values, flags);
-        quant.min = {value: quantif.min, unit: unit};
-        quant.max = {value: quantif.max, unit: unit};
-        quant.mean = {value: quantif.mean, unit: unit};
-        quant.stdDev = {value: quantif.stdDev, unit: unit};
-        if (typeof quantif.median !== 'undefined') {
-          quant.median = {value: quantif.median, unit: unit};
-        }
-        if (typeof quantif.p25 !== 'undefined') {
-          quant.p25 = {value: quantif.p25, unit: unit};
-        }
-        if (typeof quantif.p75 !== 'undefined') {
-          quant.p75 = {value: quantif.p75, unit: unit};
+        if (typeof quantif !== 'undefined') {
+          quant.min = {value: quantif.min, unit};
+          quant.max = {value: quantif.max, unit};
+          quant.mean = {value: quantif.mean, unit};
+          quant.stdDev = {value: quantif.stdDev, unit};
+          if (typeof quantif.median !== 'undefined') {
+            quant.median = {value: quantif.median, unit};
+          }
+          if (typeof quantif.p25 !== 'undefined') {
+            quant.p25 = {value: quantif.p25, unit};
+          }
+          if (typeof quantif.p75 !== 'undefined') {
+            quant.p75 = {value: quantif.p75, unit};
+          }
         }
       }
     }

@@ -10,13 +10,14 @@ import {
   getDicomCodeItem
 } from './dicomCode.js';
 import {logger} from '../utils/logger.js';
+import {getDefaultColour} from '../utils/colour.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {RGB} from '../utils/colour.js';
-import {DataElement} from './dataElement.js';
-import {DicomCode} from './dicomCode.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {DicomCode} from './dicomCode.js';
+ * @import {RGB} from '../utils/colour.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -35,48 +36,9 @@ const TagKeys = {
 };
 
 /**
- * Get a default RGB colour for a segment.
- *
- * @param {number} segmentNumber The segment number.
- * @returns {RGB} A colour.
- */
-function getDefaultColour(segmentNumber) {
-  // ITK snap colours
-  const colours = [
-    new RGB(0, 0, 0),
-    new RGB(255, 0, 0),
-    new RGB(0, 255, 0),
-    new RGB(0, 0, 255),
-    new RGB(255, 255, 0),
-    new RGB(0, 255, 255),
-    new RGB(255, 0, 255),
-    new RGB(255, 239, 213),
-    new RGB(0, 0, 205),
-    new RGB(205, 133, 63),
-    new RGB(210, 180, 140),
-    new RGB(102, 205, 170),
-    new RGB(0, 0, 128),
-    new RGB(0, 139, 139),
-    new RGB(46, 139, 87),
-    new RGB(255, 228, 225)
-  ];
-  let colour;
-  if (segmentNumber < colours.length) {
-    colour = colours[segmentNumber];
-  } else {
-    colour = new RGB(
-      Math.random() * 255,
-      Math.random() * 255,
-      Math.random() * 255
-    );
-  }
-  return colour;
-};
-
-/**
  * DICOM (mask) segment: item of a SegmentSequence (0062,0002).
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.20.4.html}.
  */
 export class MaskSegment {
   /**
@@ -141,6 +103,18 @@ export class MaskSegment {
    * @type {string|undefined}
    */
   trackingId;
+  /**
+   * RT ROI interpreted type (3006,00A4), only used for RTSTRUCT segments.
+   *
+   * @type {string|undefined}
+   */
+  interpretedType;
+  /**
+   * RT ROI interpreter name (3006,00A6), only used for RTSTRUCT segments.
+   *
+   * @type {string|undefined}
+   */
+  roiInterpreter;
 
   /**
    * @param {number} number The segment number.
@@ -157,7 +131,7 @@ export class MaskSegment {
 /**
  * Get a segment object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {MaskSegment} A segment object.
  */
 export function getSegment(dataElements) {
@@ -308,7 +282,7 @@ export function isSimilarSegment(seg1, seg2) {
  * Get a dicom simple tag from a segment object.
  *
  * @param {MaskSegment} segment The segment object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomSegmentItem(segment) {
   let algoType = segment.algorithmType;

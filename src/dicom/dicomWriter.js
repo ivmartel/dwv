@@ -1,11 +1,11 @@
 import {
   is32bitVLVR,
   isCharSetStringVR,
-  vrTypes
+  vrTypes,
+  tagGroups
 } from './dictionary.js';
 import {
   Tag,
-  getTagFromDictionary,
   getTagFromKey,
   getItemTag,
   getItemDelimitationItemTag,
@@ -16,6 +16,11 @@ import {
   isItemDelimitationItemTag,
   tagCompareFunction
 } from './dicomTag.js';
+import {
+  getDicomTagInfo,
+  getDicomTagGroupName,
+  getTagFromDictionary,
+} from './dicomTagInfo.js';
 import {
   getDwvUIDPrefix,
   getImplementationClassUID,
@@ -33,24 +38,37 @@ import {logger} from '../utils/logger.js';
 let _uidCount = 0;
 
 /**
+ * Writer rule actions.
+ */
+export const WriterRuleActions = {
+  copy: 'copy',
+  remove: 'remove',
+  clear: 'clear',
+  replace: 'replace'
+};
+
+/**
  * Writer rule.
  */
 export class WriterRule {
   /**
-   * Rule action: `copy`, `remove`, `clear` or `replace`.
+   * Rule action, one of the `WriterRuleActions` values.
    *
    * @type {string}
    */
   action;
   /**
    * Optional value to use for replace action.
+   * A single value or an array of values for multi-valued
+   * elements (for example `['A', 'B']` or a list of sequence items).
    *
    * @type {any|undefined}
    */
   value;
 
   /**
-   * @param {string} action The rule action.
+   * @param {string} action The rule action, one of the
+   *   `WriterRuleActions` values.
    */
   constructor(action) {
     this.action = action;
@@ -60,40 +78,207 @@ export class WriterRule {
 /**
  * Possible writer actions.
  *
- * @type {Object<string, Function>}
+ * @type {Record<string, Function>}
  */
 const writerActions = {
-  copy: function (item) {
+  [WriterRuleActions.copy](item) {
     return item;
   },
-  remove: function () {
+  [WriterRuleActions.remove]() {
     return null;
   },
-  clear: function (item) {
+  [WriterRuleActions.clear](item) {
     item.value = [];
     return item;
   },
-  replace: function (item, value) {
-    item.value = [value];
+  [WriterRuleActions.replace](item, value) {
+    item.value = getRuleElementValue(value);
     return item;
   }
 };
 
 /**
+ * Get the element value from a replace rule value: an array value is
+ * used as the element value list, a single value is put in an array.
+ * The value is cloned to not modify the rule value when writing.
+ *
+ * @param {any} value The rule value.
+ * @returns {Array} The element value.
+ */
+function getRuleElementValue(value) {
+  const clone = cloneRuleValue(value);
+  return Array.isArray(clone) ? clone : [clone];
+}
+
+/**
+ * Deep clone a writer rule value: arrays, typed arrays, data elements
+ * and plain objects (for example sequence items) are cloned,
+ * other values (strings, numbers, tags...) are returned as is.
+ *
+ * @param {any} value The value to clone.
+ * @returns {any} The cloned value.
+ */
+function cloneRuleValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(cloneRuleValue);
+  }
+  if (ArrayBuffer.isView(value) && !(value instanceof DataView)) {
+    // typed array
+    return /** @type {Uint8Array} */ (value).slice();
+  }
+  if (value instanceof DataElement ||
+    (value !== null &&
+      typeof value === 'object' &&
+      Object.getPrototypeOf(value) === Object.prototype)) {
+    const clone = value instanceof DataElement
+      ? new DataElement(value.vr) : {};
+    for (const key of Object.keys(value)) {
+      clone[key] = cloneRuleValue(value[key]);
+    }
+    return clone;
+  }
+  return value;
+}
+
+/**
  * Get simple (non official) DICOM anonymisation rules.
  *
- * @returns {Object<string, WriterRule>} The rules.
+ * @returns {Record<string, WriterRule>} The rules.
  */
 export function getDefaultAnonymisationRules() {
   return {
-    default: {action: 'copy', value: null},
-    PatientName: {action: 'replace', value: 'Anonymized'}, // tag
-    'Meta Element': {action: 'copy', value: null}, // group '0002'
-    Acquisition: {action: 'copy', value: null}, // group '0018'
-    'Image Presentation': {action: 'copy', value: null}, // group '0028'
-    Procedure: {action: 'copy', value: null}, // group '0040'
-    'Pixel Data': {action: 'copy', value: null} // group '7fe0'
+    default: {action: WriterRuleActions.copy, value: null},
+    // PatientName
+    '00100010': {action: WriterRuleActions.replace, value: 'Anonymized'}
   };
+}
+
+/**
+ * Translate writer rules indexed by tag or group name into
+ * rules indexed by tag or group key, as expected by the writer.
+ * A group name is translated into all the groups that have it
+ * (for example 'Curve' gives '5000', '5002'...).
+ * Warning: group names are not defined by the DICOM standard, they come
+ * from the GDCM group name list (see `tagGroups`), which does not cover
+ * all groups. Prefer group keys.
+ * Rules already indexed by key (or `default`) are kept as is and
+ * take precedence over translated ones. Unknown names are dropped.
+ *
+ * @param {Record<string, WriterRule>} rules The name based rules.
+ * @returns {Record<string, WriterRule>} The key based rules.
+ */
+export function translateWriterRules(rules) {
+  /** @type {Record<string, WriterRule>} */
+  const translated = {};
+  /** @type {Record<string, WriterRule>} */
+  const keyRules = {};
+  for (const name of Object.keys(rules)) {
+    const rule = rules[name];
+    if (name === 'default') {
+      keyRules[name] = rule;
+      continue;
+    }
+    if (isWriterRuleKey(name)) {
+      keyRules[normaliseWriterRuleKey(name)] = rule;
+      continue;
+    }
+    // tag name
+    const tag = getTagFromDictionary(name);
+    if (typeof tag !== 'undefined') {
+      translated[tag.getKey()] = rule;
+      continue;
+    }
+    // group name
+    const groups = Object.keys(tagGroups).filter(
+      (group) => tagGroups[group] === name);
+    if (groups.length !== 0) {
+      for (const group of groups) {
+        translated[group] = rule;
+      }
+      continue;
+    }
+    logger.warn(`Cannot translate unknown writer rule name: ${name}`);
+  }
+  return {...translated, ...keyRules};
+}
+
+/**
+ * Check if a writer rule index is a tag key ('########')
+ *   or a group key ('####'), possibly a range using 'x'
+ *   as any hex digit (for example '60xx3000').
+ *
+ * @param {string} key The rule index.
+ * @returns {boolean} True if the index is a tag or group key.
+ */
+function isWriterRuleKey(key) {
+  return /^([0-9A-FX]{4}){1,2}$/i.test(key);
+}
+
+/**
+ * Normalise a writer rule key: upper case hex digits
+ *   and lower case 'x'.
+ *
+ * @param {string} key The rule key.
+ * @returns {string} The normalised key.
+ */
+function normaliseWriterRuleKey(key) {
+  return key.toUpperCase().replaceAll('X', 'x');
+}
+
+/**
+ * Check if a writer rule key is a range (contains 'x').
+ *
+ * @param {string} key The rule key.
+ * @returns {boolean} True if the key is a range.
+ */
+function isWriterRuleRange(key) {
+  return key.toLowerCase().includes('x');
+}
+
+/**
+ * Writer range rule.
+ *
+ * @typedef {object} WriterRangeRule
+ * @property {string} range The normalised range key.
+ * @property {WriterRule} rule The rule.
+ */
+
+/**
+ * Get the range rules of a given key length, sorted by specificity:
+ *   the ones with less 'x' first.
+ *
+ * @param {Record<string, WriterRule>} rules The rules.
+ * @param {number} length The key length: 8 for tags, 4 for groups.
+ * @returns {WriterRangeRule[]} The sorted range rules.
+ */
+function getWriterRangeRules(rules, length) {
+  const countX = (str) => str.split('x').length - 1;
+  return Object.keys(rules)
+    .filter((key) => key.length === length &&
+      isWriterRuleKey(key) &&
+      isWriterRuleRange(key))
+    .map((key) => ({range: normaliseWriterRuleKey(key), rule: rules[key]}))
+    // stable sort: keeps input order for same specificity
+    .sort((a, b) => countX(a.range) - countX(b.range));
+}
+
+/**
+ * Find the first range rule matching a key.
+ *
+ * @param {WriterRangeRule[]} rangeRules The sorted range rules.
+ * @param {string} key The tag or group key.
+ * @returns {WriterRule|undefined} The matching rule if found.
+ */
+function findWriterRangeRule(rangeRules, key) {
+  const match = (range) => {
+    for (let i = 0; i < range.length; ++i) {
+      if (range[i] !== 'x' && range[i] !== key[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+  return rangeRules.find((item) => match(item.range))?.rule;
 }
 
 /**
@@ -102,7 +287,7 @@ export function getDefaultAnonymisationRules() {
  * Note: Use {@link https://github.com/uuidjs/uuid}?
  *
  * Ref:
- * - {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_9.html},
+ * - {@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_9.html},
  * - {@link http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html},
  * - {@link https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid}.
  *
@@ -110,13 +295,13 @@ export function getDefaultAnonymisationRules() {
  * @returns {string} The corresponding UID.
  */
 export function getUID(tagName) {
-  const prefix = getDwvUIDPrefix() + '.';
+  const prefix = `${getDwvUIDPrefix()}.`;
   // date (only numbers), do not keep milliseconds
   const date = (new Date()).toISOString().replace(/\D/g, '');
-  const datePart = '.' + date.substring(0, 14);
+  const datePart = `.${ date.substring(0, 14)}`;
   // count
   _uidCount += 1;
-  const countPart = '.' + _uidCount;
+  const countPart = `.${_uidCount}`;
 
   // uid = prefix . tag . date . count
   let uid = prefix;
@@ -176,7 +361,7 @@ function isStringVr(vr) {
 /**
  * Is the input VR a VR that could need padding.
  *
- * See {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html}.
+ * See {@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_6.2.html}.
  *
  * @param {string} vr The element VR.
  * @returns {boolean} True if the VR needs padding.
@@ -239,10 +424,8 @@ function padOBValue(value) {
         value[value.length - 1] = uint8ArrayPush(
           value[value.length - 1], [0]);
       }
-    } else {
-      if (!isEven(value.length)) {
-        value = uint8ArrayPush(value, [0]);
-      }
+    } else if (!isEven(value.length)) {
+      value = uint8ArrayPush(value, [0]);
     }
   } else {
     throw new Error('Cannot pad undefined or null OB value.');
@@ -359,20 +542,44 @@ export class DicomWriter {
   #fixUnknownVR = true;
 
   /**
+   * Keys of the private tags (odd group number) to write, including
+   * their private creators. If undefined (default), all private
+   * tags are written. If defined, all other private tags are removed,
+   * including the ones in sequence items, whatever the writing rules.
+   *
+   * @type {Set<string>|undefined}
+   */
+  #privateTagsWhitelist;
+
+  /**
    * Default rules: just copy.
    *
-   * @type {Object<string, WriterRule>}
+   * @type {Record<string, WriterRule>}
    */
   #defaultRules = {
-    default: {action: 'copy', value: null}
+    default: {action: WriterRuleActions.copy, value: null}
   };
 
   /**
    * Writing rules.
    *
-   * @type {Object<string, WriterRule>}
+   * @type {Record<string, WriterRule>}
    */
   #rules = this.#defaultRules;
+
+  /**
+   * Tag range rules (for example '60xx3000'), sorted by specificity.
+   *
+   * @type {WriterRangeRule[]}
+   */
+  #tagRangeRules = [];
+
+  /**
+   * Group range rules (for example '60xx'), sorted by specificity.
+   *
+   * @type {WriterRangeRule[]}
+   */
+  #groupRangeRules = [];
 
   /**
    * List of compulsory tags keys.
@@ -414,20 +621,92 @@ export class DicomWriter {
   }
 
   /**
+   * Set the list of private tags (odd group number) to write.
+   * All other private tags are not written, including the ones
+   * in sequence items. Takes precedence over the writing rules,
+   * whitelisted tags still go through them.
+   * The private creator of each whitelisted tag is also kept:
+   * for example, whitelisting '0019100C' also keeps '00190010'.
+   * Use an empty list to remove all private tags and undefined
+   * to keep them all (default).
+   *
+   * @param {string[]|undefined} keys The list of private tag keys
+   *   (as '########').
+   */
+  setPrivateTagsWhitelist(keys) {
+    if (typeof keys === 'undefined') {
+      this.#privateTagsWhitelist = undefined;
+      return;
+    }
+    this.#privateTagsWhitelist = new Set();
+    for (const key of keys) {
+      this.#privateTagsWhitelist.add(key);
+      // private data elements (gggg,xxee) with xx in [10,FF]
+      // are reserved by the private creator (gggg,00xx)
+      const tag = getTagFromKey(key);
+      const element = tag.getElement();
+      if (parseInt(element, 16) >= 0x1000) {
+        this.#privateTagsWhitelist.add(
+          `${tag.getGroup()}00${element.substring(0, 2)}`);
+      }
+    }
+  }
+
+  /**
    * Set the writing rules.
    * List of writer rules indexed by either `default`,
-   *   tagKey, tagName or groupName.
+   *   tag key (for example '00100010') or group key (for example '0010').
+   * Keys can be ranges using 'x' as any hex digit, as in the DICOM
+   *   standard repeating groups notation: for example '60xx3000'
+   *   (tag range) or '50xx' (group range). Note that 'x' matches any
+   *   hex digit: '60xx' also matches odd (private) groups.
    * Each DICOM element will be checked to see if a rule is applicable.
-   * First checked by tagKey, tagName and then by groupName,
-   * if nothing is found the default rule is applied.
+   * First checked by tag key, tag range, group key and then group range,
+   * if nothing is found the default rule is applied. If several ranges
+   * match, the most specific one (with less 'x') is used, and, for same
+   * specificity, the first one in the rules order.
+   * Rules are also applied to the elements of sequence items.
+   * Use `translateWriterRules` to convert tag or group name based rules.
+   * Rules with an unknown action are ignored (with a warning), the
+   * next matching rule is then used. If there is no valid default
+   * rule, the default is to copy.
    *
-   * @param {Object<string, WriterRule>} rules The input rules.
+   * @param {Record<string, WriterRule>} rules The input rules.
    * @param {boolean} [addMissingTags] If true, explicit tags that
    *   have replace rule and a value will be
    *   added if missing. Defaults to false.
    */
   setRules(rules, addMissingTags) {
+    // warn about rules that will never apply
+    const nonKeyIndices = Object.keys(rules).filter(
+      (key) => key !== 'default' && !isWriterRuleKey(key));
+    if (nonKeyIndices.length !== 0) {
+      logger.warn(`Writer rules not indexed by tag or group key: ${
+        nonKeyIndices.join(', ')} (they will be ignored, ` +
+        'use translateWriterRules for name based rules)');
+    }
+    // remove rules with an unknown action
+    const actions = Object.values(WriterRuleActions);
+    /** @type {Record<string, WriterRule>} */
+    const validRules = {};
+    const unknownActionIndices = [];
+    for (const key of Object.keys(rules)) {
+      if (actions.includes(rules[key]?.action)) {
+        validRules[key] = rules[key];
+      } else {
+        unknownActionIndices.push(key);
+      }
+    }
+    if (unknownActionIndices.length !== 0) {
+      logger.warn(`Writer rules with unknown action: ${
+        unknownActionIndices.join(', ')} (they will be ignored, ` +
+        `expected one of: ${actions.join(', ')})`);
+    }
+    rules = validRules;
+
     this.#rules = rules;
+    this.#tagRangeRules = getWriterRangeRules(rules, 8);
+    this.#groupRangeRules = getWriterRangeRules(rules, 4);
 
     // default compulsory list is empty
     this.#compulsoryTags = [];
@@ -437,29 +716,17 @@ export class DicomWriter {
       const keys = Object.keys(rules);
       for (const key of keys) {
         const rule = rules[key];
-        if (rule.action === 'replace' &&
+        if (rule.action === WriterRuleActions.replace &&
           typeof rule.value !== 'undefined' &&
           rule.value !== null) {
-          // check if key really exists
-          let isKey = false;
-          if (key.length === 8) {
-            const tag = getTagFromKey(key);
-            isKey = typeof tag.getNameFromDictionary() !== 'undefined';
-          }
-          // get tag key, rules can use key or tag name
-          let tagKey;
-          if (isKey) {
-            tagKey = key;
-          } else {
-            // try tag name
-            const tag = getTagFromDictionary(key);
-            if (typeof tag !== 'undefined') {
-              tagKey = tag.getKey();
+          // only add tags that are in the dictionary
+          if (key.length === 8 &&
+            isWriterRuleKey(key) &&
+            !isWriterRuleRange(key)) {
+            const tagInfo = getDicomTagInfo(getTagFromKey(key));
+            if (typeof tagInfo !== 'undefined') {
+              this.#compulsoryTags.push(key);
             }
-          }
-          // add to list
-          if (typeof tagKey !== 'undefined') {
-            this.#compulsoryTags.push(tagKey);
           }
         }
       }
@@ -502,34 +769,84 @@ export class DicomWriter {
 
   /**
    * Get the element to write according to the class rules.
-   * Priority order: tagName, groupName, default.
+   * Priority order: tag key, tag range, group key, group range, default.
+   * Non whitelisted private tags are removed if a whitelist
+   * is set, whatever the rules.
+   * For sequences, rules are also applied to the item elements.
    *
    * @param {DataElement} element The element to check.
    * @returns {DataElement|null} The element to write, can be null.
    */
   getElementToWrite(element) {
-    // get group and tag string name
-    const groupName = element.tag.getGroupName();
-    const tagName = element.tag.getNameFromDictionary();
+    // remove non whitelisted private tags
+    if (typeof this.#privateTagsWhitelist !== 'undefined' &&
+      element.tag.isPrivate() &&
+      !this.#privateTagsWhitelist.has(element.tag.getKey())) {
+      return null;
+    }
 
     // apply rules:
-    let rule;
-    if (typeof this.#rules[element.tag.getKey()] !== 'undefined') {
-      // 1. tag itself
-      rule = this.#rules[element.tag.getKey()];
-    } else if (typeof tagName !== 'undefined' &&
-      typeof this.#rules[tagName] !== 'undefined') {
-      // 2. tag name
-      rule = this.#rules[tagName];
-    } else if (typeof this.#rules[groupName] !== 'undefined') {
-      // 3. group name
-      rule = this.#rules[groupName];
-    } else {
-      // 4. default
-      rule = this.#rules['default'];
+    const key = element.tag.getKey();
+    const group = element.tag.getGroup();
+    // 1. tag
+    let rule = this.#rules[key];
+    if (typeof rule === 'undefined') {
+      // 2. tag range
+      rule = findWriterRangeRule(this.#tagRangeRules, key);
     }
-    // apply action on element and return
-    return writerActions[rule.action](element, rule.value);
+    if (typeof rule === 'undefined') {
+      // 3. group
+      rule = this.#rules[group];
+    }
+    if (typeof rule === 'undefined') {
+      // 4. group range
+      rule = findWriterRangeRule(this.#groupRangeRules, group);
+    }
+    if (typeof rule === 'undefined') {
+      // 5. default
+      rule = this.#rules.default ?? this.#defaultRules.default;
+    }
+    // apply action on element
+    const elementToWrite = writerActions[rule.action](element, rule.value);
+
+    // apply rules to sequence items
+    if (elementToWrite !== null &&
+      elementToWrite.vr === 'SQ' &&
+      Array.isArray(elementToWrite.value)) {
+      elementToWrite.value = elementToWrite.value.map(
+        (item) => this.#getItemToWrite(item));
+    }
+
+    return elementToWrite;
+  }
+
+  /**
+   * Get the sequence item to write according to the class rules.
+   *
+   * @param {Record<string, DataElement>} item The sequence item.
+   * @returns {Record<string, DataElement>} The item to write.
+   */
+  #getItemToWrite(item) {
+    // check data
+    if (item === null || typeof item !== 'object') {
+      return item;
+    }
+    /** @type {Record<string, DataElement>} */
+    const newItem = {};
+    for (const key of Object.keys(item)) {
+      const element = item[key];
+      element.tag = getTagFromKey(key);
+      // keep item tags as is
+      if (isItemTag(element.tag)) {
+        newItem[key] = element;
+        continue;
+      }
+      const elementToWrite = this.getElementToWrite(element);
+      if (elementToWrite !== null) {
+        newItem[key] = elementToWrite;
+      }
+    }
+    return newItem;
   }
 
   /**
@@ -632,6 +949,10 @@ export class DicomWriter {
       byteOffset = writer.writeUint32Array(byteOffset, value);
     } else if (value instanceof Int32Array) {
       byteOffset = writer.writeInt32Array(byteOffset, value);
+    } else if (value instanceof Float32Array) {
+      byteOffset = writer.writeFloat32Array(byteOffset, value);
+    } else if (value instanceof Float64Array) {
+      byteOffset = writer.writeFloat64Array(byteOffset, value);
     } else if (value instanceof BigUint64Array) {
       byteOffset = writer.writeUint64Array(byteOffset, value);
     } else if (value instanceof BigInt64Array) {
@@ -661,14 +982,14 @@ export class DicomWriter {
         } else if (vrType === 'string') {
           byteOffset = writer.writeUint8Array(byteOffset, value);
         } else {
-          throw new Error('Unknown VR type: ' + vrType);
+          throw new Error(`Unknown VR type: ${vrType}`);
         }
       } else if (element.vr === 'SQ') {
         byteOffset = this.#writeDataElementItems(
           writer, byteOffset, value, isImplicit);
       } else if (element.vr === 'AT') {
         for (const valueItem of value) {
-          const hexString = valueItem + '';
+          const hexString = String(valueItem);
           const hexString1 = hexString.substring(1, 5);
           const hexString2 = hexString.substring(6, 10);
           const dec1 = parseInt(hexString1, 16);
@@ -684,20 +1005,20 @@ export class DicomWriter {
           byteOffset = writer.writeUint16Array(byteOffset, value);
         }
       } else {
-        logger.warn('Unknown VR: ' + element.vr);
+        logger.warn(`Unknown VR: ${element.vr}`);
       }
     }
 
     if (element.vr !== 'SQ' && element.vr !== 'NONE') {
       const diff = byteOffset - startOffset;
       if (diff !== element.vl) {
-        let message = 'Offset difference and VL are not equal: ' +
-          diff + ' != ' + element.vl;
+        let message = `Offset difference and VL are not equal: ${
+          diff } != ${element.vl}`;
         message += ' (';
         if (typeof element.tag !== 'undefined') {
-          message += element.tag + ', ';
+          message += `${element.tag}, `;
         }
-        message += 'vr:' + element.vr + ')';
+        message += `vr:${element.vr})`;
         logger.warn(message);
       }
     }
@@ -856,7 +1177,7 @@ export class DicomWriter {
   /**
    * Get the ArrayBuffer corresponding to input DICOM elements.
    *
-   * @param {Object<string, DataElement>} dataElements The elements to write.
+   * @param {Record<string, DataElement>} dataElements The elements to write.
    * @returns {ArrayBuffer} The elements as a buffer.
    */
   getBuffer(dataElements) {
@@ -869,7 +1190,7 @@ export class DicomWriter {
       const oldscs = dataElements[TagKeys.SpecificCharacterSet].value[0];
       // force UTF-8 if not default character set
       if (typeof oldscs !== 'undefined' && oldscs !== 'ISO-IR 6') {
-        logger.debug('Change charset to UTF, was: ' + oldscs);
+        logger.debug(`Change charset to UTF, was: ${oldscs}`);
         this.useSpecialTextEncoder();
         dataElements[TagKeys.SpecificCharacterSet].value = ['ISO_IR 192'];
       }
@@ -882,7 +1203,7 @@ export class DicomWriter {
 
     // calculate buffer size and split elements (meta and non meta)
     let totalSize = 128 + 4; // DICM
-    let localSize = 0;
+    let localSize;
     const metaElements = [];
     const rawElements = [];
     let element;
@@ -933,7 +1254,7 @@ export class DicomWriter {
           element, element.value, isImplicit, bitsAllocated);
 
         // tag group name
-        groupName = element.tag.getGroupName();
+        groupName = getDicomTagGroupName(element.tag);
 
         // prefix
         if (groupName === 'Meta Element') {
@@ -962,19 +1283,13 @@ export class DicomWriter {
     // add compulsory tags to output data if not present
     for (const key of missingTags) {
       const tag = getTagFromKey(key);
-      const dataElement = new DataElement(tag.getVrFromDictionary());
+      const tagInfo = getDicomTagInfo(tag);
+      const dataElement = new DataElement(tagInfo?.getVr());
       dataElement.tag = tag;
-      // rules are indexed by key or tag name
-      let value;
-      if (typeof this.#rules[key] !== 'undefined') {
-        value = this.#rules[key].value;
-      } else {
-        const name = tag.getNameFromDictionary();
-        value = this.#rules[name].value;
-      }
+      const value = getRuleElementValue(this.#rules[key].value);
       // add element
       let size = getDataElementPrefixByteSize(dataElement.vr, isImplicit);
-      size += this.#setElementValue(dataElement, [value], isImplicit);
+      size += this.#setElementValue(dataElement, value, isImplicit);
       rawElements.push(dataElement);
       totalSize += size;
     }
@@ -1037,9 +1352,9 @@ export class DicomWriter {
     const preambleSize = 128 + 4;
     const metaOffset = preambleSize + fmiglSize + metaLength;
     if (offset !== metaOffset) {
-      logger.warn('Bad size calculation... meta offset: ' + offset +
-        ', calculated size:' + metaOffset +
-        ' (diff:' + (offset - metaOffset) + ')');
+      logger.warn(`Bad size calculation... meta offset: ${offset
+      }, calculated size:${ metaOffset
+      } (diff:${offset - metaOffset})`);
     }
 
     // write non meta
@@ -1050,9 +1365,9 @@ export class DicomWriter {
 
     // check final position
     if (offset !== totalSize) {
-      logger.warn('Bad size calculation... final offset: ' + offset +
-        ', calculated size:' + totalSize +
-        ' (diff:' + (offset - totalSize) + ')');
+      logger.warn(`Bad size calculation... final offset: ${ offset
+      }, calculated size:${ totalSize
+      } (diff:${offset - totalSize})`);
     }
     // return
     return buffer;
@@ -1187,7 +1502,6 @@ export class DicomWriter {
       }
 
       // calculate byte size
-      size = 0;
       if (element.vr === 'AT') {
         size = 4 * value.length;
       } else if (element.vr === 'xs') {
@@ -1215,17 +1529,19 @@ export class DicomWriter {
             size += itemPrefixSize * value.length;
             // add sequence delimitation size
             size += itemPrefixSize;
-          } else {
+          } else if (typeof bitsAllocated !== 'undefined') {
             // use bitsAllocated for pixel data
             // no need to multiply for 8 bits
-            if (typeof bitsAllocated !== 'undefined') {
-              if (bitsAllocated === 1) {
-                // binary data
-                // (ceil to get integer)
-                size = Math.ceil(size / 8);
-              } else if (bitsAllocated === 16) {
-                size *= Uint16Array.BYTES_PER_ELEMENT;
-              }
+            if (bitsAllocated === 1) {
+              // binary data
+              // (ceil to get integer)
+              size = Math.ceil(size / 8);
+            } else if (bitsAllocated === 16) {
+              size *= Uint16Array.BYTES_PER_ELEMENT;
+            } else if (bitsAllocated === 32) {
+              size *= Uint32Array.BYTES_PER_ELEMENT;
+            } else if (bitsAllocated === 64) {
+              size *= Float64Array.BYTES_PER_ELEMENT;
             }
           }
         } else if (typeof vrType !== 'undefined') {
@@ -1233,10 +1549,10 @@ export class DicomWriter {
           if (typeof bpe !== 'undefined') {
             size *= bpe;
           } else {
-            throw new Error('Unknown bytes per element for VR type: ' + vrType);
+            throw new Error(`Unknown bytes per element for VR type: ${vrType}`);
           }
         } else {
-          throw new Error('Unsupported element: ' + element.vr);
+          throw new Error(`Unsupported element: ${element.vr}`);
         }
       } else {
         size = value.length;
@@ -1262,7 +1578,7 @@ export class DicomWriter {
  */
 function checkAndFixUnknownVR(element, isLittleEndian) {
   if (element.vr === 'UN') {
-    const dictVr = element.tag.getVrFromDictionary();
+    const dictVr = getDicomTagInfo(element.tag)?.getVr();
     if (typeof dictVr !== 'undefined' && element.vr !== dictVr) {
       element.vr = dictVr;
       // cast typed array value from Uint8 to vr type
@@ -1276,9 +1592,9 @@ function checkAndFixUnknownVR(element, isLittleEndian) {
           element.value = data;
         }
       }
-      logger.info('Element ' + element.tag.getGroup() +
-        ' ' + element.tag.getElement() +
-        ' VR changed from UN to ' + element.vr);
+      logger.info(`Element ${ element.tag.getGroup()
+      } ${ element.tag.getElement()
+      } VR changed from UN to ${element.vr}`);
     }
   }
 }
@@ -1329,7 +1645,8 @@ function getUint8ToVrValue(value, vr, isLittleEndian) {
  */
 function getDataElement(tagName) {
   const tag = getTagFromDictionary(tagName);
-  const element = new DataElement(tag.getVrFromDictionary());
+  const tagInfo = getDicomTagInfo(tag);
+  const element = new DataElement(tagInfo?.getVr());
   element.tag = tag;
   return element;
 }
@@ -1364,61 +1681,3 @@ function getBpeForVrType(vrType) {
   return bpe;
 }
 
-/**
- * Get the DICOM elements from a 'simple' DICOM tags object.
- * The input object is a simplified version of the oficial DICOM json with
- * tag names instead of keys and direct values (no value property) for
- * simple tags. See synthetic test data (in tests/dicom) for examples.
- *
- * @param {Object<string, any>} simpleTags The 'simple' DICOM
- *   tags object.
- * @returns {Object<string, DataElement>} The DICOM elements.
- */
-export function getElementsFromJSONTags(simpleTags) {
-  const keys = Object.keys(simpleTags);
-  const dataElements = {};
-  for (const key of keys) {
-    // get the DICOM element definition from its name
-    const tag = getTagFromDictionary(key);
-    if (typeof tag === 'undefined') {
-      continue;
-    }
-    const vr = tag.getVrFromDictionary();
-    // tag value
-    let value;
-    let undefinedLength = false;
-    const simpleTag = simpleTags[key];
-    if (vr === 'SQ') {
-      const items = [];
-      if (typeof simpleTag.undefinedLength !== 'undefined') {
-        undefinedLength = simpleTag.undefinedLength;
-      }
-      if (Array.isArray(simpleTag.value)) {
-        for (const item of simpleTag.value) {
-          items.push(getElementsFromJSONTags(item));
-        }
-      } else {
-        logger.debug('Non array simpleTag SQ value');
-      }
-      value = items;
-    } else {
-      if (Array.isArray(simpleTag)) {
-        value = simpleTag;
-      } else {
-        value = [simpleTag];
-      }
-    }
-    // create element
-    const dataElement = new DataElement(vr);
-    dataElement.tag = tag;
-    dataElement.value = value;
-    if (undefinedLength) {
-      dataElement.undefinedLength = undefinedLength;
-    }
-    // store
-    dataElements[tag.getKey()] = dataElement;
-  }
-  // return
-  // @ts-expect-error
-  return dataElements;
-}

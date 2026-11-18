@@ -1,7 +1,12 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {WindowLevel} from '../image/windowLevel.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {WindowLevel} from '../image/windowLevel.js';
+ * @import Konva from 'konva';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {
+ *   PrivateBValueRule,
+ *   VolumeIdCandidate
+ * } from '../dicom/types.js';
+ */
 
 /**
  * Overridalbe custom object for client defined items.
@@ -13,7 +18,7 @@ export const custom = {
    * No need to redefine all, just overrides is enough. Defaults
    * are used if `custom.wlPresets[modality]` is undefined.
    *
-   * @type {Object.<string, Object.<string, WindowLevel>>}
+   * @type {Record<string, Record<string, WindowLevel>>}
    */
   wlPresets: undefined,
 
@@ -23,16 +28,18 @@ export const custom = {
    * No need to redefine all, just overrides is enough. Defaults
    * are used if `custom.labelTexts[shapeName]` is undefined.
    *
-   * @type {Object.<string, Object.<string, string>>}
+   * @type {Record<string, Record<string, string>>}
    */
   labelTexts: undefined,
 
   /**
-   * List of private diffusion b-value rules. Rules are either
-   * `{manufacturer, key}` or `{uidPrefix, key}`. For example:
-   * `{manufacturer: 'GE', key: '00431039'}`.
+   * List of private diffusion b-value rules, tested in order. Rules
+   * are either `{manufacturer, key}` or `{uidPrefix, key}`. For example:
+   * `{manufacturer: 'GE', key: '00431039'}`. Overrides the default list
+   * from `dicomVolume.js` (exported as `defaultPrivateBValueRules`),
+   * which can be used to extend it.
    *
-   * @type {object[]}
+   * @type {PrivateBValueRule[]}
    */
   privateBValueRules: undefined,
 
@@ -45,26 +52,79 @@ export const custom = {
   openRoiDialog: undefined,
 
   /**
+   * Highlight an annotation shape group. Defaults to a pulse dimming
+   *   the group opacity. The draw layer ensures only one annotation is
+   *   highlighted at a time by calling the returned reset function
+   *   before a new highlight.
+   *
+   * @param {Konva.Group} group The annotation shape group.
+   * @param {Konva.Layer} layer The konva layer containing the group.
+   * @param {number} duration The highlight duration in milliseconds.
+   * @returns {Function|undefined} A function to reset the highlight
+   *   before its end.
+   */
+  highlightAnnotation: undefined,
+
+  /**
+   * Highlight a segment of a segmentation view layer. Defaults to a
+   *   pulse dimming the segment opacity (see
+   *   `ViewController.setSegmentHighlight`). The view layer ensures
+   *   only one segment is highlighted at a time by calling the
+   *   returned reset function before a new highlight.
+   *
+   * @param {ViewLayer} viewLayer The segmentation view layer.
+   * @param {number} segmentNumber The segment number.
+   * @param {number} duration The highlight duration in milliseconds.
+   * @returns {Function|undefined} A function to reset the highlight
+   *   before its end.
+   */
+  highlightSegment: undefined,
+
+  /**
    * Get the volume id from a list of dicom tags.
    *
-   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {number|undefined} The id value if available.
+   * @deprecated Since v0.37, please use volumeIdCandidates with
+   *   a `preLoad` candidate, for example:
+   *   `[{name: 'custom', getter: fn, preLoad: true},
+   *   ...defaultVolumeIdCandidates]`, the getter returning a sourced
+   *   number value (`{value}`) instead of a number.
    */
   getVolumeIdTagValue: undefined,
 
   /**
    * Get the volume id from a list of dicom tags parsed after load finishes.
    *
-   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {number|undefined} The id value if available.
+   * @deprecated Since v0.37, please use volumeIdCandidates, for example:
+   *   `[{name: 'custom', getter: fn}, ...defaultVolumeIdCandidates]`,
+   *   the getter returning a sourced number value (`{value}`) instead
+   *   of a number.
    */
   getPostLoadVolumeIdTagValue: undefined,
+
+  /**
+   * Ordered list of candidate volume id getters, tried in order until
+   * one produces a valid per-volume grouping of the files of a series
+   * or of the frames of a multi-frame file. Candidates flagged with
+   * `preLoad` are also used while loading: they must not vary between
+   * the slices of a single volume. Overrides the default list from
+   * `dicomVolume.js` (exported as `defaultVolumeIdCandidates`), which can
+   * be used to extend it. Candidate getters return the id as a sourced
+   * number value (`{value, tagKey, unit}`), an id without unit is an
+   * index: its associated value is guessed once all data is loaded.
+   *
+   * @type {VolumeIdCandidate[]}
+   */
+  volumeIdCandidates: undefined,
 
   /**
    * Get the pixel data unit from a list of dicom tags.
    * Not used for PET data with SUV values.
    *
-   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @param {Record<string, DataElement>} elements The DICOM elements.
    * @returns {string|undefined} The unit value if available.
    */
   getTagPixelUnit: undefined,

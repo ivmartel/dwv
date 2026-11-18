@@ -7,7 +7,7 @@ DWV (DICOM Web Viewer) is an open source zero footprint medical image viewer lib
 
 Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more information on the [docs](https://ivmartel.github.io/dwv/doc/stable/index.html) (such as [examples](https://ivmartel.github.io/dwv/doc/stable/tutorial-examples.html), [dicom conformance](https://ivmartel.github.io/dwv/doc/stable/tutorial-conformance.html), [pacs integrations](https://ivmartel.github.io/dwv/doc/stable/tutorial-integrations.html)). You can also check out the [wiki](https://github.com/ivmartel/dwv/wiki).
 
-- All coding/implementation contributions and comments are welcome.
+- All coding/implementation contributions and comments are welcome, see the [contributing guidelines](.github/contributing.md).
 - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>
 - Released under GNU GPL-3.0 license (see [license.txt](license.txt)).
 
@@ -23,8 +23,12 @@ If you have questions, please [open an issue](https://www.github.com/ivmartel/dw
 - `doc`: create documentation
 
 I'm using `yarn` as the main package manager. Best to use it to install since
-the lock file (that contains the exact dependency tree) is a yarn file. No need
-to install it, just run `corepack enable` should be enough.
+the lock file (that contains the exact dependency tree) is a yarn file. Run `corepack enable` to install `yarn` shims that read the
+`packageManager` field of `package.json` and download and run that exact yarn
+version. Without enabling it, `corepack yarn <script>` (for ex
+`corepack yarn start`) does the same for a single command.
+Corepack is bundled with Node up to v24 only; from Node 25, install it first
+with `npm install -g corepack`.
 All scripts also work with `npm`.
 
 ## Steps to run the viewer from scratch

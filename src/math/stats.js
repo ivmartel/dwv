@@ -22,7 +22,7 @@ export class Statistics {
    */
   mean;
   /**
-   * Standard deviation.
+   * Standard deviation (population: divided by the number of values).
    *
    * @type {number}
    */
@@ -48,7 +48,7 @@ export class Statistics {
 
   /**
    * @param {number} min The minimum.
-   * @param {number} max The maxnimum.
+   * @param {number} max The maximum.
    * @param {number} mean The mean.
    * @param {number} stdDev The standard deviation.
    */
@@ -65,21 +65,21 @@ export class Statistics {
  * Note: could use {@link https://github.com/tmcw/simple-statistics}.
  *
  * @param {number[]} values The array of values to extract stats from.
- * @param {string[]} flags A list of stat value names to calculate.
- * @returns {Statistics} A statistics object.
+ * @param {string[]} [flags] A list of stat value names to calculate.
+ * @returns {Statistics|undefined} A statistics object, undefined if
+ *   the input array is empty.
  */
 export function getStats(values, flags) {
   if (includesFullStatsFlags(flags)) {
     return getFullStats(values);
-  } else {
-    return getBasicStats(values);
   }
+  return getBasicStats(values);
 }
 
 /**
  * Does the input flag list contain a full stat element?
  *
- * @param {string[]} flags A list of stat values to calculate.
+ * @param {string[]} [flags] A list of stat values to calculate.
  * @returns {boolean} True if one of the flags is a full stat flag.
  */
 function includesFullStatsFlags(flags) {
@@ -95,33 +95,37 @@ function includesFullStatsFlags(flags) {
  * of an array of values.
  *
  * @param {number[]} values The array of values to extract stats from.
- * @returns {Statistics} Simple statistics (no median, p25 nor p75).
+ * @returns {Statistics|undefined} Simple statistics (no median, p25
+ *   nor p75), undefined if the input array is empty.
  */
 export function getBasicStats(values) {
+  const length = values.length;
+  if (length === 0) {
+    return undefined;
+  }
+
   let min = values[0];
   let max = min;
   let sum = 0;
-  let sumSqr = 0;
-  let val = 0;
-  const length = values.length;
-  for (let i = 0; i < length; ++i) {
-    val = values[i];
+  for (const val of values) {
     if (val < min) {
       min = val;
     } else if (val > max) {
       max = val;
     }
     sum += val;
-    sumSqr += val * val;
   }
-
   const mean = sum / length;
-  // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-  let variance = sumSqr / length - mean * mean;
-  if (variance < 0) {
-    variance = 0;
+
+  // two pass algorithm to avoid the precision loss of
+  // 'sum of squares minus squared mean' with large values, see
+  // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+  let sumSqrDiff = 0;
+  for (const val of values) {
+    const diff = val - mean;
+    sumSqrDiff += diff * diff;
   }
-  const stdDev = Math.sqrt(variance);
+  const stdDev = Math.sqrt(sumSqrDiff / length);
 
   return new Statistics(min, max, mean, stdDev);
 }
@@ -130,21 +134,26 @@ export function getBasicStats(values) {
  * Get full stats: minimum, maximum, mean, standard deviation, median, 25%
  * and 75% percentile of an array of values.
  *
- * @param {number[]} values The array of values to extract stats from.
- * @returns {Statistics} Complete statistics (includes median, p25 and p75).
+ * @param {number[]} values The array of values to extract stats from,
+ *   left unchanged.
+ * @returns {Statistics|undefined} Complete statistics (includes median,
+ *   p25 and p75), undefined if the input array is empty.
  */
 function getFullStats(values) {
   // get basic stats
   const stats = getBasicStats(values);
+  if (typeof stats === 'undefined') {
+    return undefined;
+  }
 
-  // sort array... can get slow...
-  values.sort(function (a, b) {
+  // sort a copy to not modify the input... can get slow...
+  const sorted = values.slice().sort(function (a, b) {
     return a - b;
   });
 
-  stats.median = getPercentile(values, 0.5);
-  stats.p25 = getPercentile(values, 0.25);
-  stats.p75 = getPercentile(values, 0.75);
+  stats.median = getPercentile(sorted, 0.5);
+  stats.p25 = getPercentile(sorted, 0.25);
+  stats.p75 = getPercentile(sorted, 0.75);
 
   return stats;
 }
@@ -165,18 +174,17 @@ function getPercentile(values, ratio) {
   }
   if (ratio < 0 || ratio > 1) {
     throw new Error(
-      'Invalid ratio provided for percentile calculation: ' + ratio);
+      `Invalid ratio provided for percentile calculation: ${ratio}`);
   }
-  // return min for ratio=0 amd max for ratio=1
-  if (ratio === 0) {
-    return values[0];
-  } else if (ratio === 1) {
-    return values[values.length - 1];
-  }
-  // general case: interpolate between indices if needed
+  // interpolate between indices if needed
   const i = (values.length - 1) * ratio;
   const i0 = Math.floor(i);
   const v0 = values[i0];
+  // no interpolation for an exact index (includes ratio 0 and 1,
+  // and single value arrays)
+  if (i === i0) {
+    return v0;
+  }
   const v1 = values[i0 + 1];
   return v0 + (v1 - v0) * (i - i0);
 }
@@ -191,26 +199,4 @@ function getPercentile(values, ratio) {
  */
 export function guid() {
   return Math.random().toString(36).substring(2, 15);
-}
-
-/**
- * Number range.
- */
-export class NumberRange {
-  /**
-   * @type {number}
-   */
-  min;
-  /**
-   * @type {number}
-   */
-  max;
-  /**
-   * @param {number} min The minimum.
-   * @param {number} max The maximum.
-   */
-  constructor(min, max) {
-    this.min = min;
-    this.max = max;
-  }
 }

@@ -1,38 +1,40 @@
-import {startsWith} from '../utils/string.js';
 import {parseMultipart} from '../utils/array.js';
 import {MemoryLoader} from './memoryLoader.js';
 import {fileContentTypes} from './filesLoader.js';
 import {urlContentTypes} from './urlsLoader.js';
+import {LoaderBase} from './loaderBase.js';
 
 /**
  * Multipart data loader.
+ *
+ * Accumulates parsed parts from every `load()` call (one per URL) and
+ * hands them all to a single {@link MemoryLoader} once the last expected
+ * URL has arrived. This lets N multipart URLs – each containing M DICOM
+ * slices – be assembled correctly with `numberOfItems = N × M`.
  */
-export class MultipartLoader {
+export class MultipartLoader extends LoaderBase {
 
   /**
-   * Loading flag.
+   * Total number of `load()` calls expected (= number of URLs in the
+   * batch, taken from `options.numberOfItems` on the first call).
    *
-   * @type {boolean}
+   * @type {number}
    */
-  #isLoading = false;
+  #expectedCalls = 0;
 
   /**
-   * Set the loader options.
+   * Number of `load()` calls received so far in the current batch.
    *
-   * @param {object} _opt The input options.
+   * @type {number}
    */
-  setOptions(_opt) {
-    // does nothing
-  }
+  #receivedCalls = 0;
 
   /**
-   * Is the load ongoing?
+   * Accumulated parts from every parsed multipart buffer.
    *
-   * @returns {boolean} True if loading.
+   * @type {object[]}
    */
-  isLoading() {
-    return this.#isLoading;
-  }
+  #allParts = [];
 
   /**
    * Load data.
@@ -42,13 +44,27 @@ export class MultipartLoader {
    * @param {number} index The data index.
    */
   load(buffer, origin, index) {
-    // send start event
-    this.onloadstart({
-      source: origin
-    });
-    // set loading flag
-    this.#isLoading = true;
+    // initialise on the first call of a new batch
+    if (this.#receivedCalls === 0) {
+      this.#expectedCalls = this.getOptions().numberOfItems ?? 1;
+      this.#allParts = [];
+      this.setLoading(true);
+      this.onloadstart({
+        source: origin
+      });
+    }
 
+    // parse and accumulate parts from this URL
+    const parts = parseMultipart(buffer);
+    this.#allParts.push(...parts);
+    this.#receivedCalls++;
+
+    // wait until every expected URL has been parsed
+    if (this.#receivedCalls < this.#expectedCalls) {
+      return;
+    }
+
+    // all buffers received – hand all parts to one MemoryLoader
     const memoryIO = new MemoryLoader();
     // memoryIO.onloadstart: nothing to do
     memoryIO.onprogress = (progress) => {
@@ -59,83 +75,62 @@ export class MultipartLoader {
       this.onprogress(progress);
     };
     memoryIO.onloaditem = this.onloaditem;
-    memoryIO.onload = this.onload;
+    memoryIO.onload = (event) => {
+      // fire onload once per original URL so that the
+      // orchestrator (UrlsLoader/FilesLoader)
+      // gets the N completions it expects
+      for (let i = 0; i < this.#expectedCalls; i++) {
+        this.onload(event);
+      }
+    };
     memoryIO.onloadend = (event) => {
-      // reset loading flag
-      this.#isLoading = false;
-      // call listeners
-      this.onloadend(event);
+      // reset loading flag and batch state before firing callbacks
+      this.setLoading(false);
+      this.#receivedCalls = 0;
+      // fire onloadend once per original URL so that the
+      // orchestrator (UrlsLoader/FilesLoader)
+      // gets the N completions it expects
+      const count = this.#expectedCalls;
+      for (let i = 0; i < count; i++) {
+        this.onloadend(event);
+      }
     };
     memoryIO.onerror = this.onerror;
     memoryIO.onabort = this.onabort;
     // launch
-    memoryIO.load(parseMultipart(buffer));
+    memoryIO.load(this.#allParts);
   }
 
   /**
    * Abort load: pass to listeners.
    */
   abort() {
-    // reset loading flag
-    this.#isLoading = false;
+    // reset loading flag and batch state
+    this.setLoading(false);
+    this.#receivedCalls = 0;
     // call listeners
     this.onabort({});
     this.onloadend({});
   }
 
   /**
-   * Check if the loader can load the provided file.
-   * Always returns false.
+   * Check if the input is the loader name.
    *
-   * @param {File} _file The file to check.
-   * @returns {boolean} True if the file can be loaded.
+   * @param {string} value The test name.
+   * @returns {boolean} True if input is the loader name.
    */
-  canLoadFile(_file) {
-    return false;
+  isLoaderName(value) {
+    return value === 'multipart';
   }
 
   /**
-   * Check if the loader can load the provided url.
-   * True if one of the folowing conditions is true:
-   * - the `options.forceLoader` is 'multipart',
-   * - the `options.requestHeaders` contains a 'Accept: multipart/related'.
+   * Check if the loader supports the input media type.
    *
-   * @param {string} url The url to check.
-   * @param {object} [options] Optional url request options.
-   * @returns {boolean} True if the url can be loaded.
+   * @param {string} value The media type.
+   * @returns {boolean} True if it can be loaded.
    */
-  canLoadUrl(url, options) {
-    // check options
-    if (typeof options !== 'undefined') {
-      // check options.forceLoader
-      if (typeof options.forceLoader !== 'undefined' &&
-        options.forceLoader === 'multipart') {
-        return true;
-      }
-      // check options.requestHeaders for 'Accept'
-      if (typeof options.requestHeaders !== 'undefined') {
-        const isNameAccept = function (element) {
-          return element.name === 'Accept';
-        };
-        const acceptHeader = options.requestHeaders.find(isNameAccept);
-        if (typeof acceptHeader !== 'undefined') {
-          // starts with 'multipart/related'
-          return startsWith(acceptHeader.value, 'multipart/related');
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Check if the loader can load the provided memory object.
-   *
-   * @param {object} _mem The memory object.
-   * @returns {boolean} True if the url can be loaded.
-   */
-  canLoadMemory(_mem) {
-    return false;
+  canLoadMediaType(value) {
+    return value === 'multipart/related';
   }
 
   /**
@@ -155,64 +150,5 @@ export class MultipartLoader {
   loadUrlAs() {
     return urlContentTypes.ArrayBuffer;
   }
-
-  /**
-   * Handle a load start event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load start event.
-   */
-  onloadstart(_event) {}
-
-  /**
-   * Handle a load progress event.
-   * Default does nothing.
-   *
-   * @param {object} _event The progress event.
-   */
-  onprogress(_event) {}
-
-  /**
-   * Handle a load item event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load item event fired
-   *   when a file item has been loaded successfully.
-   */
-  onloaditem(_event) {}
-
-  /**
-   * Handle a load event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when a file has been loaded successfully.
-   */
-  onload(_event) {}
-
-  /**
-   * Handle an load end event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load end event fired
-   *  when a file load has completed, successfully or not.
-   */
-  onloadend(_event) {}
-
-  /**
-   * Handle an error event.
-   * Default does nothing.
-   *
-   * @param {object} _event The error event.
-   */
-  onerror(_event) {}
-
-  /**
-   * Handle an abort event.
-   * Default does nothing.
-   *
-   * @param {object} _event The abort event.
-   */
-  onabort(_event) {}
 
 } // class MultipartLoader

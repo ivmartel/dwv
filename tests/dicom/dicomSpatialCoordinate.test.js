@@ -15,6 +15,7 @@ import {ROI} from '../../src/math/roi.js';
 import {Circle} from '../../src/math/circle.js';
 import {Ellipse} from '../../src/math/ellipse.js';
 import {Rectangle} from '../../src/math/rectangle.js';
+import {BidimensionalLine} from '../../src/math/bidimensionalLine.js';
 
 /**
  * Related DICOM tag keys.
@@ -37,7 +38,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate} undefined.
      *
-     * @function module:tests/dicom~spatialcoordinate-undefined
+     * @function module:tests/dicom~spatialcoordinateUndefined
      */
     test('undefined', () => {
       const coord = new SpatialCoordinate();
@@ -50,7 +51,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate} toString with POINT.
      *
-     * @function module:tests/dicom~spatialcoordinate-tostring-point
+     * @function module:tests/dicom~spatialcoordinateTostringPoint
      */
     test('toString POINT', () => {
       const coord = new SpatialCoordinate();
@@ -64,7 +65,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate} toString with POLYLINE.
      *
-     * @function module:tests/dicom~spatialcoordinate-tostring-polyline
+     * @function module:tests/dicom~spatialcoordinateTostringPolyline
      */
     test('toString POLYLINE', () => {
       const coord = new SpatialCoordinate();
@@ -78,7 +79,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link SpatialCoordinate} round trip.
      *
-     * @function module:tests/dicom~spatialcoordinate-round-trip
+     * @function module:tests/dicom~spatialcoordinateRoundTrip
      */
     test('round trip',
       () => {
@@ -135,7 +136,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate}.
      *
-     * @function module:tests/dicom~getspatialcoordinate-good-input
+     * @function module:tests/dicom~getspatialcoordinateGoodInput
      */
     test('good input', () => {
       const deGraphicData = new DataElement('IS');
@@ -168,7 +169,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate} with minimum input.
      *
-     * @function module:tests/dicom~getspatialcoordinate-minimum-input
+     * @function module:tests/dicom~getspatialcoordinateMinimumInput
      */
     test('minimum input', () => {
       const deGraphicData = new DataElement('IS');
@@ -193,7 +194,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate} with empty input.
      *
-     * @function module:tests/dicom~getspatialcoordinate-empty-input
+     * @function module:tests/dicom~getspatialcoordinateEmptyInput
      */
     test('empty input', () => {
       const result = getSpatialCoordinate({});
@@ -207,7 +208,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getSpatialCoordinate} with multiple input.
      *
-     * @function module:tests/dicom~getspatialcoordinate-multiple-input
+     * @function module:tests/dicom~getspatialcoordinateMultipleInput
      */
     test('multiple input', () => {
       const deGraphicType = new DataElement('CS');
@@ -229,7 +230,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSpatialCoordinateItem}.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinateitem-good-input
+     * @function module:tests/dicom~getdicomspatialcoordinateitemGoodInput
      */
     test('good input', () => {
       const coord = new SpatialCoordinate();
@@ -249,7 +250,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSpatialCoordinateItem} with incomplete input.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinateitem-incomplete
+     * @function module:tests/dicom~getdicomspatialcoordinateitemIncomplete
      */
     test('incomplete', () => {
       const coord = new SpatialCoordinate();
@@ -268,7 +269,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomSpatialCoordinateItem} with undefined input.
      *
-     * @function module:tests/dicom~getdicomspatialcoordinateitem-undefined
+     * @function module:tests/dicom~getdicomspatialcoordinateitemUndefined
      */
     test('undefined', () => {
       const coord = new SpatialCoordinate();
@@ -284,7 +285,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getScoordFromShape} with Point2D.
      *
-     * @function module:tests/dicom~getscoordfromshape-point2d
+     * @function module:tests/dicom~getscoordfromshapePoint2d
      */
     test('Point2D', () => {
       const point = new Point2D(10, 20);
@@ -299,7 +300,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getScoordFromShape} with Line.
      *
-     * @function module:tests/dicom~getscoordfromshape-line
+     * @function module:tests/dicom~getscoordfromshapeLine
      */
     test('Line', () => {
       const line = new Line(new Point2D(10, 20), new Point2D(30, 40));
@@ -316,7 +317,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getScoordFromShape} with Circle.
      *
-     * @function module:tests/dicom~getscoordfromshape-circle
+     * @function module:tests/dicom~getscoordfromshapeCircle
      */
     test('Circle', () => {
       const circle = new Circle(new Point2D(50, 50), 25);
@@ -335,7 +336,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getScoordFromShape} with Protractor.
      *
-     * @function module:tests/dicom~getscoordfromshape-protractor
+     * @function module:tests/dicom~getscoordfromshapeProtractor
      */
     test('Protractor', () => {
       const protractor = new Protractor([
@@ -359,7 +360,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getScoordFromShape} with ROI.
      *
-     * @function module:tests/dicom~getscoordfromshape-roi
+     * @function module:tests/dicom~getscoordfromshapeRoi
      */
     test('ROI', () => {
       const roi = new ROI();
@@ -384,7 +385,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getScoordFromShape} with Ellipse.
      *
-     * @function module:tests/dicom~getscoordfromshape-ellipse
+     * @function module:tests/dicom~getscoordfromshapeEllipse
      */
     test('Ellipse', () => {
       const ellipse = new Ellipse(new Point2D(50, 50), 30, 20);
@@ -410,7 +411,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getScoordFromShape} with Rectangle.
      *
-     * @function module:tests/dicom~getscoordfromshape-rectangle
+     * @function module:tests/dicom~getscoordfromshapeRectangle
      */
     test('Rectangle', () => {
       const rectangle = new Rectangle(
@@ -439,14 +440,78 @@ describe('dicom', () => {
       assert.equal(scoord.graphicData[9], '10');
     });
 
+    /**
+     * Tests for {@link getScoordFromShape} with BidimensionalLine.
+     *
+     * @function module:tests/dicom~getscoordfromshapeBidimensionalline
+     */
+    test('BidimensionalLine', () => {
+      // Main axis: (10,10)-(30,10), short axis center: (20,20), length: 10
+      const mainStart = new Point2D(10, 10);
+      const mainEnd = new Point2D(30, 10);
+      const shortAxisCenter = {x: 20, y: 20};
+      const shortAxisLength = 10;
+      const bline = new BidimensionalLine(mainStart, mainEnd);
+      bline.shortAxisCenter = shortAxisCenter;
+      bline.shortAxisLength = shortAxisLength;
+
+      const scoord = getScoordFromShape(bline);
+      assert.equal(scoord.graphicType, GraphicTypes.polyline);
+      assert.equal(scoord.graphicData.length, 8);
+      // Main axis
+      assert.equal(scoord.graphicData[0], '10');
+      assert.equal(scoord.graphicData[1], '10');
+      assert.equal(scoord.graphicData[2], '30');
+      assert.equal(scoord.graphicData[3], '10');
+      // Short axis endpoints (should be symmetric about shortAxisCenter)
+      // Just check they are numbers
+      assert.ok(!isNaN(Number(scoord.graphicData[4])));
+      assert.ok(!isNaN(Number(scoord.graphicData[5])));
+      assert.ok(!isNaN(Number(scoord.graphicData[6])));
+      assert.ok(!isNaN(Number(scoord.graphicData[7])));
+    });
+
   });
 
   describe('getShapeFromScoord', () => {
+    /**
+     * Tests for {@link getShapeFromScoord} with BidimensionalLine polyline.
+     *
+     * @function module:tests/dicom~getshapefromscoordBidimensionalline
+     */
+    test('BidimensionalLine polyline', () => {
+      // 4 points: main axis (10,10)-(30,10), short axis endpoints
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.polyline;
+      // Use getScoordFromShape to generate valid data
+      const mainStart = new Point2D(10, 10);
+      const mainEnd = new Point2D(30, 10);
+      const shortAxisCenter = {x: 20, y: 20};
+      const shortAxisLength = 10;
+      const bline = new BidimensionalLine(mainStart, mainEnd);
+      bline.shortAxisCenter = shortAxisCenter;
+      bline.shortAxisLength = shortAxisLength;
+      const scoordData = getScoordFromShape(bline);
+      scoord.graphicData = scoordData.graphicData;
+
+      const shape = getShapeFromScoord(scoord);
+      assert.ok(shape instanceof BidimensionalLine);
+      assert.equal(shape.getBegin().getX(), 10);
+      assert.equal(shape.getBegin().getY(), 10);
+      assert.equal(shape.getEnd().getX(), 30);
+      assert.equal(shape.getEnd().getY(), 10);
+      // Check short axis properties
+      assert.ok(typeof shape.shortAxisLength === 'number');
+      assert.ok(typeof shape.shortAxisT === 'number');
+      assert.ok(typeof shape.shortAxisL1 === 'number');
+      assert.ok(typeof shape.shortAxisL2 === 'number');
+      assert.ok(typeof shape.shortAxisCenter === 'object');
+    });
 
     /**
      * Tests for {@link getShapeFromScoord} with no data.
      *
-     * @function module:tests/dicom~getshapefromscoord-no-data
+     * @function module:tests/dicom~getshapefromscoordNoData
      */
     test('no data', () => {
       const scoord = new SpatialCoordinate();
@@ -460,7 +525,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with no coord.
      *
-     * @function module:tests/dicom~getshapefromscoord-no-coord
+     * @function module:tests/dicom~getshapefromscoordNoCoord
      */
     test('no coord', () => {
       const scoord = new SpatialCoordinate();
@@ -475,7 +540,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with odd coord.
      *
-     * @function module:tests/dicom~getshapefromscoord-odd-coord
+     * @function module:tests/dicom~getshapefromscoordOddCoord
      */
     test('odd coord', () => {
       const scoord = new SpatialCoordinate();
@@ -490,7 +555,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with point.
      *
-     * @function module:tests/dicom~getshapefromscoord-point
+     * @function module:tests/dicom~getshapefromscoordPoint
      */
     test('point', () => {
       const scoord = new SpatialCoordinate();
@@ -507,7 +572,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with polyline 2 points.
      *
-     * @function module:tests/dicom~getshapefromscoord-polyline-2-points
+     * @function module:tests/dicom~getshapefromscoordPolyline2Points
      */
     test('polyline 2 points', () => {
       const scoord = new SpatialCoordinate();
@@ -526,7 +591,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with circle.
      *
-     * @function module:tests/dicom~getshapefromscoord-circle
+     * @function module:tests/dicom~getshapefromscoordCircle
      */
     test('circle', () => {
       const scoord = new SpatialCoordinate();
@@ -544,7 +609,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with bad circle.
      *
-     * @function module:tests/dicom~getshapefromscoord-bad-circle
+     * @function module:tests/dicom~getshapefromscoordBadCircle
      */
     test('bad circle', () => {
       const scoord = new SpatialCoordinate();
@@ -559,7 +624,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with ellipse.
      *
-     * @function module:tests/dicom~getshapefromscoord-ellipse
+     * @function module:tests/dicom~getshapefromscoordEllipse
      */
     test('ellipse', () => {
       const scoord = new SpatialCoordinate();
@@ -579,7 +644,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with bad ellipse.
      *
-     * @function module:tests/dicom~getshapefromscoord-bad-ellipse
+     * @function module:tests/dicom~getshapefromscoordBadEllipse
      */
     test('bad ellipse', () => {
       const scoord = new SpatialCoordinate();
@@ -594,7 +659,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with polyline 3 points.
      *
-     * @function module:tests/dicom~getshapefromscoord-polyline-3-points
+     * @function module:tests/dicom~getshapefromscoordPolyline3Points
      */
     test('polyline 3 points', () => {
       const scoord = new SpatialCoordinate();
@@ -616,7 +681,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with polyline 4 points.
      *
-     * @function module:tests/dicom~getshapefromscoord-polyline-4-points
+     * @function module:tests/dicom~getshapefromscoordPolyline4Points
      */
     test('polyline 4 points',
       () => {
@@ -646,7 +711,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with polyline 6 points.
      *
-     * @function module:tests/dicom~getshapefromscoord-polyline-6-points
+     * @function module:tests/dicom~getshapefromscoordPolyline6Points
      */
     test('polyline 6 points',
       () => {
@@ -684,7 +749,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getShapeFromScoord} with mulitpoint.
      *
-     * @function module:tests/dicom~getshapefromscoord-multipoint
+     * @function module:tests/dicom~getshapefromscoordMultipoint
      */
     test('multipoint', () => {
       const scoord = new SpatialCoordinate();

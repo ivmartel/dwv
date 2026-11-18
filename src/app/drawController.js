@@ -2,13 +2,12 @@ import {AnnotationGroup} from '../image/annotationGroup.js';
 import {
   RemoveAnnotationCommand,
   UpdateAnnotationCommand
-} from '../tools/drawCommands.js';
+} from '../command/drawCommands.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Annotation} from '../image/annotation.js';
+ */
 
 /**
  * Draw controller.
@@ -99,7 +98,7 @@ export class DrawController {
     const annotation = this.getAnnotation(uid);
     if (typeof annotation === 'undefined') {
       logger.warn(
-        'Cannot create remove command for undefined annotation: ' + uid);
+        `Cannot create remove command for undefined annotation: ${uid}`);
       return;
     }
     // create remove annotation command
@@ -124,7 +123,7 @@ export class DrawController {
     const annotation = this.getAnnotation(uid);
     if (typeof annotation === 'undefined') {
       logger.warn(
-        'Cannot create update command for undefined annotation: ' + uid);
+        `Cannot create update command for undefined annotation: ${uid}`);
       return;
     }
     // create remove annotation command
@@ -142,7 +141,7 @@ export class DrawController {
    * @param {Function} exeCallback The undo stack callback.
    */
   removeAllAnnotationsWithCommand(exeCallback) {
-    for (const annotation of this.#annotationGroup.getList()) {
+    for (const annotation of [...this.#annotationGroup.getList()]) {
       this.removeAnnotationWithCommand(annotation.trackingUid, exeCallback);
     }
   }

@@ -26,7 +26,7 @@ self.addEventListener('message', function (event) {
       res = new Uint16Array(decodedBuffer);
     }
   }
-  // post result
-  self.postMessage([res]);
+  // post result, transfer its buffer to avoid a copy
+  self.postMessage([res], res ? [res.buffer] : []);
 
 }, false);

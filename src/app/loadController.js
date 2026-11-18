@@ -3,9 +3,25 @@ import {MemoryLoader} from '../io/memoryLoader.js';
 import {UrlsLoader} from '../io/urlsLoader.js';
 
 /**
+ * List of load event names.
+ *
+ * @type {string[]}
+ */
+export const loadEventNames = [
+  'loadstart',
+  'loadprogress',
+  'loaditem',
+  'load',
+  'loadend',
+  'error',
+  'abort',
+  'timeout'
+];
+
+/**
  * Load controller.
  */
-export class LoadController {
+export class LoadController extends EventTarget {
 
   /**
    * The default character set.
@@ -25,27 +41,22 @@ export class LoadController {
    * @param {string} defaultCharacterSet The default character set.
    */
   constructor(defaultCharacterSet) {
+    super();
     this.#defaultCharacterSet = defaultCharacterSet;
   }
 
   /**
-   * Load a list of files. Can be image files or a state file.
+   * Load a list of image files.
    *
    * @param {File[]} files The list of files to load.
    * @param {string} dataId The data Id.
    */
   loadFiles(files, dataId) {
-    // has been checked for emptiness.
-    const ext = files[0].name.split('.').pop().toLowerCase();
-    if (ext === 'json') {
-      this.#loadStateFile(files[0], dataId);
-    } else {
-      this.#loadImageFiles(files, dataId);
-    }
+    this.#loadImageFiles(files, dataId);
   }
 
   /**
-   * Load a list of URLs. Can be image files or a state file.
+   * Load a list of image URLs.
    *
    * @param {string[]} urls The list of urls to load.
    * @param {string} dataId The data Id.
@@ -53,15 +64,8 @@ export class LoadController {
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
-
   loadURLs(urls, dataId, options) {
-    // has been checked for emptiness.
-    const ext = urls[0].split('.').pop().toLowerCase();
-    if (ext === 'json') {
-      this.#loadStateUrl(urls[0], dataId, options);
-    } else {
-      this.#loadImageUrls(urls, dataId, options);
-    }
+    this.#loadImageUrls(urls, dataId, options);
   }
 
   /**
@@ -75,7 +79,7 @@ export class LoadController {
     // create IO
     const memoryIO = new MemoryLoader();
     // load data
-    this.#loadData(data, memoryIO, 'image', dataId);
+    this.#loadData(data, memoryIO, dataId);
   }
 
   /**
@@ -112,7 +116,7 @@ export class LoadController {
     const fileIO = new FilesLoader();
     fileIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    this.#loadData(files, fileIO, 'image', dataId);
+    this.#loadData(files, fileIO, dataId);
   }
 
   /**
@@ -129,37 +133,7 @@ export class LoadController {
     const urlIO = new UrlsLoader();
     urlIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    this.#loadData(urls, urlIO, 'image', dataId, options);
-  }
-
-  /**
-   * Load a State file.
-   *
-   * @param {File} file The state file to load.
-   * @param {string} dataId The data Id.
-   */
-  #loadStateFile(file, dataId) {
-    // create IO
-    const fileIO = new FilesLoader();
-    // load data
-    this.#loadData([file], fileIO, 'state', dataId);
-  }
-
-
-  /**
-   * Load a State url.
-   *
-   * @param {string} url The state url to load.
-   * @param {string} [dataId] The data Id.
-   * @param {object} [options] The load options:
-   * - requestHeaders: an array of {name, value} to use as request headers.
-   * - withCredentials: credentials flag to pass to the request.
-   */
-  #loadStateUrl(url, dataId, options) {
-    // create IO
-    const urlIO = new UrlsLoader();
-    // load data
-    this.#loadData([url], urlIO, 'state', dataId, options);
+    this.#loadData(urls, urlIO, dataId, options);
   }
 
   /**
@@ -167,13 +141,11 @@ export class LoadController {
    *
    * @param {string[]|File[]|Array} data Array of data to load.
    * @param {object} loader The data loader.
-   * @param {string} loadType The data load type: 'image' or 'state'.
    * @param {string} dataId The data id.
    * @param {object} [options] Options passed to the final loader.
    */
-  #loadData(data, loader, loadType, dataId, options) {
+  #loadData(data, loader, dataId, options) {
     const eventInfo = {
-      loadtype: loadType,
       dataid: dataId
     };
 
@@ -181,140 +153,71 @@ export class LoadController {
     loader.onloadstart = (event) => {
       // store loader to allow abort
       this.#currentLoaders[dataId] = {
-        loader: loader,
+        loader,
         isFirstItem: true
       };
       // callback
-      this.#augmentCallbackEvent(this.onloadstart, eventInfo)(event);
+      this.#getFireEvent('loadstart', eventInfo)(event);
     };
-    loader.onprogress = this.#augmentCallbackEvent(this.onprogress, eventInfo);
+    loader.onprogress = this.#getFireEvent('loadprogress', eventInfo);
     loader.onloaditem = (event) => {
       const eventInfoItem = {
-        loadtype: loadType,
         dataid: dataId
       };
       if (typeof this.#currentLoaders[dataId] !== 'undefined') {
         eventInfoItem.isfirstitem = this.#currentLoaders[dataId].isFirstItem;
       }
       // callback
-      this.#augmentCallbackEvent(this.onloaditem, eventInfoItem)(event);
+      this.#getFireEvent('loaditem', eventInfoItem)(event);
       // update loader
       if (typeof this.#currentLoaders[dataId] !== 'undefined' &&
         this.#currentLoaders[dataId].isFirstItem) {
         this.#currentLoaders[dataId].isFirstItem = false;
       }
     };
-    loader.onload = this.#augmentCallbackEvent(this.onload, eventInfo);
+    loader.onload = this.#getFireEvent('load', eventInfo);
     loader.onloadend = (event) => {
       // reset current loader
       delete this.#currentLoaders[dataId];
       // callback
-      this.#augmentCallbackEvent(this.onloadend, eventInfo)(event);
+      this.#getFireEvent('loadend', eventInfo)(event);
     };
-    loader.onerror = this.#augmentCallbackEvent(this.onerror, eventInfo);
-    loader.onabort = this.#augmentCallbackEvent(this.onabort, eventInfo);
+    loader.onerror = this.#getFireEvent('error', eventInfo);
+    loader.onabort = this.#getFireEvent('abort', eventInfo);
     if (typeof loader.ontimeout !== 'undefined') {
-      loader.ontimeout = this.#augmentCallbackEvent(this.ontimeout, eventInfo);
+      loader.ontimeout = this.#getFireEvent('timeout', eventInfo);
     }
     // launch load
     try {
       loader.load(data, options);
     } catch (error) {
-      this.onerror({
-        error: error,
-        dataid: dataId
-      });
-      this.onloadend({
-        dataid: dataId
-      });
-      return;
+      this.dispatchEvent(new CustomEvent('error', {
+        detail: {
+          dataid: dataId,
+          error
+        }
+      }));
+      this.dispatchEvent(new CustomEvent('loadend', {
+        detail: {
+          dataid: dataId
+        }
+      }));
     }
   }
 
   /**
-   * Augment a callback event: adds loadtype to the event
-   *  passed to a callback.
+   * Get a fireEvent function that adds local information
+   * to the event value.
    *
-   * @param {object} callback The callback to update.
-   * @param {object} info Info object to append to the event.
-   * @returns {object} A function representing the modified callback.
+   * @param {string} type The event type to fire.
+   * @param {object} detail Local information.
+   * @returns {EventListener} A fireEvent function.
    */
-  #augmentCallbackEvent(callback, info) {
-    return function (event) {
-      const keys = Object.keys(info);
-      for (let i = 0; i < keys.length; ++i) {
-        const key = keys[i];
-        event[key] = info[key];
-      }
-      callback(event);
-    };
+  #getFireEvent(type, detail) {
+    return ((/** @type {CustomEvent} */ event) => {
+      const allDetail = Object.assign({}, event, detail);
+      this.dispatchEvent(new CustomEvent(type, {detail: allDetail}));
+    });
   }
-
-  /**
-   * Handle a load start event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load start event.
-   */
-  onloadstart(_event) {}
-
-  /**
-   * Handle a load progress event.
-   * Default does nothing.
-   *
-   * @param {object} _event The progress event.
-   */
-  onprogress(_event) {}
-
-  /**
-   * Handle a load event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when a file has been loaded successfully.
-   */
-  onload(_event) {}
-
-  /**
-   * Handle a load item event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load event fired
-   *   when an item has been loaded successfully.
-   */
-  onloaditem(_event) {}
-
-  /**
-   * Handle a load end event.
-   * Default does nothing.
-   *
-   * @param {object} _event The load end event fired
-   *  when a file load has completed, successfully or not.
-   */
-  onloadend(_event) {}
-
-  /**
-   * Handle an error event.
-   * Default does nothing.
-   *
-   * @param {object} _event The error event.
-   */
-  onerror(_event) {}
-
-  /**
-   * Handle a timeout event.
-   * Default does nothing.
-   *
-   * @param {object} _event The timeout event.
-   */
-  ontimeout(_event) {}
-
-  /**
-   * Handle an abort event.
-   * Default does nothing.
-   *
-   * @param {object} _event The abort event.
-   */
-  onabort(_event) {}
 
 } // class LoadController

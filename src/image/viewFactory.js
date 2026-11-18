@@ -1,17 +1,17 @@
 import {custom} from '../app/custom.js';
 import {View} from './view.js';
 import {WindowLevel} from './windowLevel.js';
+import {WindowPreset} from './windowPreset.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Image} from './image.js';
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Image} from './image.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ */
 
 /**
  * List of default window level presets.
  *
- * @type {Object.<string, Object.<string, WindowLevel>>}
+ * @type {Record<string, Record<string, WindowLevel>>}
  */
 const defaultWlPresets = {
   CT: {
@@ -31,7 +31,7 @@ export class ViewFactory {
   /**
    * Get an View object from the read DICOM file.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @param {Image} image The associated image.
    * @returns {View} The new View.
    */
@@ -45,6 +45,9 @@ export class ViewFactory {
     }
 
     // window level presets
+    /**
+     * @type {Record<string, WindowPreset>}
+     */
     let windowPresets = {};
     // image presets
     if (typeof image.getMeta().windowPresets !== 'undefined') {
@@ -52,10 +55,10 @@ export class ViewFactory {
     }
     // min/max
     // Not filled yet since it is stil too costly to calculate min/max
-    // for each slice... It will be filled at first use
+    // for each slice... It will be filled at each use
     // (see view.setWindowLevelPreset).
     // Order is important, if no wl from DICOM, this will be the default.
-    windowPresets.minmax = {name: 'minmax'};
+    windowPresets.minmax = new WindowPreset('minmax');
     // optional modality presets
     const modality = image.getMeta().Modality;
     let wlPresets;
@@ -67,10 +70,10 @@ export class ViewFactory {
     }
     for (const key in wlPresets) {
       const preset = wlPresets[key];
-      windowPresets[key] = {
-        wl: [new WindowLevel(preset.center, preset.width)],
-        name: key
-      };
+      windowPresets[key] = new WindowPreset(
+        key,
+        [new WindowLevel(preset.center, preset.width)]
+      );
     }
 
     // store

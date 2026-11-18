@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D} from '../math/point.js';
+ */
 
 /**
  * Path shape.
@@ -50,11 +49,10 @@ export class Path {
    */
   isControlPoint(point) {
     const index = this.pointArray.indexOf(point);
-    if (index !== -1) {
-      return this.controlPointIndexArray.indexOf(index) !== -1;
-    } else {
+    if (index === -1) {
       throw new Error('Error: isControlPoint called with not in list point.');
     }
+    return this.controlPointIndexArray.indexOf(index) !== -1;
   }
 
   /**

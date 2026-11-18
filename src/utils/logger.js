@@ -22,7 +22,7 @@ export const logger = {
    *
    * @param {string} msg The message to log.
    */
-  trace: function (msg) {
+  trace(msg) {
     if (this.level <= this.levels.TRACE) {
       console.trace(msg);
     }
@@ -34,7 +34,7 @@ export const logger = {
    *
    * @param {string} msg The message to log.
    */
-  debug: function (msg) {
+  debug(msg) {
     if (this.level <= this.levels.DEBUG) {
       console.debug(msg);
     }
@@ -45,7 +45,7 @@ export const logger = {
    *
    * @param {string} msg The message to log.
    */
-  info: function (msg) {
+  info(msg) {
     if (this.level <= this.levels.INFO) {
       console.info(msg);
     }
@@ -56,7 +56,7 @@ export const logger = {
    *
    * @param {string} msg The message to log.
    */
-  warn: function (msg) {
+  warn(msg) {
     if (this.level <= this.levels.WARN) {
       console.warn(msg);
     }
@@ -67,7 +67,7 @@ export const logger = {
    *
    * @param {string} msg The message to log.
    */
-  error: function (msg) {
+  error(msg) {
     if (this.level <= this.levels.ERROR) {
       console.error(msg);
     }

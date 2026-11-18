@@ -12,7 +12,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size}.
    *
-   * @function module:tests/image~size-class
+   * @function module:tests/image~sizeClass
    */
   test('Size class', () => {
     // error cases
@@ -123,7 +123,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size.indexToOffset}.
    *
-   * @function module:tests/image~index-to-and-from-offset
+   * @function module:tests/image~indexToAndFromOffset
    */
   test('Index to and from offset', () => {
     const size00 = new Size([4, 3, 2]);
@@ -158,14 +158,14 @@ describe('image', () => {
       const index = new Index(values);
       const offset = testData00[i].offset;
       assert.equal(
-        size00.indexToOffset(index), offset, 'indexToOffset #' + i);
+        size00.indexToOffset(index), offset, `indexToOffset #${i}`);
       assert.ok(
-        size00.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
+        size00.offsetToIndex(offset).equals(index), `offsetToIndex #${i}`);
       // index wiht less dims than size
       if (values[2] === 0) {
         const index1 = new Index(values.slice(0, 2));
         assert.equal(
-          size00.indexToOffset(index1), offset, 'indexToOffset small #' + i);
+          size00.indexToOffset(index1), offset, `indexToOffset small #${i}`);
       }
     }
 
@@ -225,7 +225,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size.normalisePoint}.
    *
-   * @function module:tests/image~index-normalise-point
+   * @function module:tests/image~indexNormalisePoint
    */
   test('Index normalise Point', () => {
     const size00 = new Size([4, 3, 2]);
@@ -284,7 +284,7 @@ describe('image', () => {
   /**
    * Tests for {@link Size.normaliseIndex}.
    *
-   * @function module:tests/image~size-normalise-index
+   * @function module:tests/image~sizeNormaliseIndex
    */
   test('Size normalise Index', () => {
     const size00 = new Size([4, 3, 2]);

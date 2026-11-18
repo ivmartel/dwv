@@ -1,7 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -14,7 +14,7 @@ const TagKeys = {
 /**
  * DICOM sop instance reference.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_10.8.html#table_10-11}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_10.8.html#table_10-11}.
  */
 export class SopInstanceReference {
   /**
@@ -33,15 +33,15 @@ export class SopInstanceReference {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.referencedSOPInstanceUID + ' (class: ' +
-      this.referencedSOPClassUID + ')';
+    return `${this.referencedSOPInstanceUID } (class: ${
+      this.referencedSOPClassUID })`;
   };
 };
 
 /**
  * Get a SOP reference object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {SopInstanceReference} A SOP reference object.
  */
 export function getSopInstanceReference(dataElements) {
@@ -63,10 +63,11 @@ export function getSopInstanceReference(dataElements) {
  * Get a simple dicom element item from a SOP reference object.
  *
  * @param {SopInstanceReference} ref The SOP reference object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomSopInstanceReferenceItem(ref) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleTagValues} */
   const item = {};
 
   if (typeof ref.referencedSOPClassUID !== 'undefined') {

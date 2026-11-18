@@ -1,11 +1,26 @@
 import {InteractionEventNames} from '../gui/generic.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawLayer} from '../gui/drawLayer.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {DrawLayer} from '../gui/drawLayer.js';
+ */
+
+/**
+ * Check if an event target is an editable element (input, select,
+ *   text area or content editable): keys typed in it are not shortcuts.
+ *
+ * @param {EventTarget|null} target The event target.
+ * @returns {boolean} True if editable.
+ */
+function isEditable(target) {
+  if (target === null || typeof target !== 'object') {
+    return false;
+  }
+  const element = /** @type {HTMLElement} */ (target);
+  return element.isContentEditable === true ||
+    ['INPUT', 'SELECT', 'TEXTAREA'].includes(element.tagName);
+}
 
 /**
  * Toolbox controller.
@@ -41,10 +56,41 @@ export class ToolboxController {
   #boundLayers = {};
 
   /**
-   * @param {object} toolList The list of tool objects.
+   * Ids of the layers with a touch in progress.
+   *
+   * @type {Set<string>}
    */
-  constructor(toolList) {
+  #touchedLayerIds = new Set();
+
+  /**
+   * Layers that are not active anymore but stay bound until the end
+   * of their touch, indexed by layer id: touch events keep going to
+   * the element where the touch started.
+   *
+   * @type {Record<string, ViewLayer|DrawLayer>}
+   */
+  #pendingUnbindLayers = {};
+
+  /**
+   * Root document, listened to for keyboard shortcuts.
+   * Undefined if there is no DOM.
+   *
+   * @type {EventTarget|undefined}
+   */
+  #rootDocument;
+
+  /**
+   * @param {object} toolList The list of tool objects.
+   * @param {DocumentFragment} [rootDocument] Optional root document
+   *   to listen to for keyboard shortcuts, defaults to `document`.
+   */
+  constructor(toolList, rootDocument) {
     this.#toolList = toolList;
+    this.#rootDocument = rootDocument;
+    if (typeof this.#rootDocument === 'undefined' &&
+      typeof document !== 'undefined') {
+      this.#rootDocument = document;
+    }
   }
 
   /**
@@ -62,17 +108,38 @@ export class ToolboxController {
    * Enable or disable shortcuts. The 'init' methods enables shortcuts
    *  by default. Call this method after init to disable shortcuts.
    *
+   * Shortcuts are keydown events listened to on the root document
+   *   in the bubbling phase and passed to the selected tool. Events
+   *   with a prevented default or coming from editable elements
+   *   (input, select, text area, content editable) are ignored.
+   *
    * @param {boolean} flag True to enable shortcuts.
    */
   enableShortcuts(flag) {
+    if (typeof this.#rootDocument === 'undefined') {
+      return;
+    }
     if (flag) {
-      window.addEventListener('keydown',
-        this.#getCallback('window', 'keydown'), true);
+      this.#rootDocument.addEventListener('keydown', this.#onKeydown);
     } else {
-      window.removeEventListener('keydown',
-        this.#getCallback('window', 'keydown'), true);
+      this.#rootDocument.removeEventListener('keydown', this.#onKeydown);
     }
   }
+
+  /**
+   * Keydown handler: passes the event to the selected tool.
+   *
+   * @param {KeyboardEvent} event The keydown event.
+   */
+  #onKeydown = (event) => {
+    if (event.defaultPrevented || isEditable(event.target)) {
+      return;
+    }
+    const func = this.#selectedTool?.keydown;
+    if (func) {
+      func(event);
+    }
+  };
 
   /**
    * Get the tool list.
@@ -107,9 +174,13 @@ export class ToolboxController {
    *
    * @param {string} eventType The event type, for example
    *   mousedown, touchstart...
-   * @returns {Function} The event handler.
+   * @returns {EventListener|undefined} The event handler, undefined
+   *   if no tool is selected.
    */
   getSelectedToolEventHandler(eventType) {
+    if (!this.getSelectedTool()) {
+      return undefined;
+    }
     return this.getSelectedTool()[eventType];
   }
 
@@ -121,7 +192,7 @@ export class ToolboxController {
   setSelectedTool(name) {
     // check if we have it
     if (!this.hasTool(name)) {
-      throw new Error('Unknown tool: \'' + name + '\'');
+      throw new Error(`Unknown tool: '${name}'`);
     }
     // de-activate previous
     if (this.#selectedTool) {
@@ -167,28 +238,58 @@ export class ToolboxController {
    */
   #internalBindLayerGroup(layerGroupDivId, layer) {
     // remove from local list if preset
-    if (typeof this.#boundLayers[layerGroupDivId] !== 'undefined') {
-      this.#unbindLayer(this.#boundLayers[layerGroupDivId]);
+    const previous = this.#boundLayers[layerGroupDivId];
+    if (typeof previous !== 'undefined') {
+      if (this.#touchedLayerIds.has(previous.getId())) {
+        // keep it bound until the end of its touch
+        this.#pendingUnbindLayers[previous.getId()] = previous;
+      } else {
+        this.#unbindLayer(previous);
+      }
     }
     // replace layer in local list
     this.#boundLayers[layerGroupDivId] = layer;
-    // bind layer
-    this.#bindLayer(layer);
+    // bind layer if not still bound
+    if (typeof this.#pendingUnbindLayers[layer.getId()] !== 'undefined') {
+      delete this.#pendingUnbindLayers[layer.getId()];
+    } else {
+      this.#bindLayer(layer);
+    }
+  }
+
+  /**
+   * End the touch of a layer and unbind it if it is not active anymore.
+   *
+   * @param {string} layerId The layer id.
+   * @param {TouchEvent} event The touch end or cancel event.
+   */
+  #endTouch(layerId, event) {
+    // other touches started on the same target are still in progress
+    if (event.targetTouches?.length > 0) {
+      return;
+    }
+    this.#touchedLayerIds.delete(layerId);
+    const pending = this.#pendingUnbindLayers[layerId];
+    if (typeof pending !== 'undefined') {
+      delete this.#pendingUnbindLayers[layerId];
+      this.#unbindLayer(pending);
+    }
   }
 
   /**
    * Get an active layer change handler.
    *
    * @param {string} divId The associated layer group div id.
-   * @returns {Function} The event handler.
+   * @returns {EventListener} The event handler.
    */
   #getActiveLayerChangeHandler(divId) {
-    return (event) => {
-      const layer = event.value[0];
+    return ((/** @type {CustomEvent} */ event) => {
+      const value = event.detail?.value;
+      const layer = value?.[0];
       if (typeof layer !== 'undefined') {
         this.#internalBindLayerGroup(divId, layer);
       }
-    };
+    });
   }
 
   /**
@@ -237,12 +338,21 @@ export class ToolboxController {
 
     if (typeof this.#callbackStore[layerId][eventType] === 'undefined') {
       const applySelectedTool = (event) => {
+        // store the touch before the tool handles it: the tool can
+        // change the active layer (for ex the draw tool creating a draw
+        // layer), the layer is then kept bound until the end of its touch
+        if (event.type === 'touchstart') {
+          this.#touchedLayerIds.add(layerId);
+        }
         // make sure we have a tool
         if (this.#selectedTool) {
           const func = this.#selectedTool[event.type];
           if (func) {
             func(event);
           }
+        }
+        if (event.type === 'touchend' || event.type === 'touchcancel') {
+          this.#endTouch(layerId, event);
         }
       };
       // store callback

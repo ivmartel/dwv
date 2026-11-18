@@ -1,4 +1,4 @@
-import {isSimilar} from './matrix.js';
+import {isSimilar} from './number.js';
 import {Vector3D} from './vector.js';
 
 /**
@@ -66,6 +66,17 @@ export class Point2D {
   }
 
   /**
+   * Check if a point is at this point, within a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance, defaults to 0.
+   * @returns {boolean} True if the point is within tolerance.
+   */
+  contains(point, tolerance = 0) {
+    return this.getDistance(point) <= tolerance;
+  }
+
+  /**
    * Check for Point2D equality.
    *
    * @param {Point2D} rhs The other point to compare to.
@@ -84,7 +95,7 @@ export class Point2D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.#x + ', ' + this.#y + ')';
+    return `(${this.#x}, ${this.#y})`;
   }
 
   /**
@@ -208,9 +219,9 @@ export class Point3D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.#x +
-      ', ' + this.#y +
-      ', ' + this.#z + ')';
+    return `(${ this.#x
+    }, ${ this.#y
+    }, ${this.#z})`;
   }
 
   /**
@@ -276,13 +287,37 @@ export class Point3D {
  * Get an array find callback for an equal input point.
  *
  * @param {Point3D} point The point to compare to.
- * @returns {Function} A function that compares, using `equals`,
- *   its input point to the one given as input to this function.
+ * @returns {function(Point3D): boolean} A function that compares,
+ *   using `equals`, its input point to the one given as input to
+ *   this function.
  */
 export function getEqualPoint3DFunction(point) {
   return function (element) {
     return element.equals(point);
   };
+}
+
+/**
+ * Check if an array of Point3D includes a given one.
+ *
+ * @param {Point3D[]} arr The array of Point3D.
+ * @param {Point3D} val The Point3D to look for.
+ * @returns {boolean} True if included.
+ */
+export function includesPoint3D(arr, val) {
+  return arr.some(function (arrVal) {
+    return val.equals(arrVal);
+  });
+}
+
+/**
+ * Create a {@link Point3D} from an array.
+ *
+ * @param {number[]} arr The input array.
+ * @returns {Point3D} The point.
+ */
+export function point3DFromArray(arr) {
+  return new Point3D(arr[0], arr[1], arr[2]);
 }
 
 /**
@@ -343,7 +378,7 @@ export class Point {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.#values.toString() + ')';
+    return `(${this.#values.toString()})`;
   }
 
   /**

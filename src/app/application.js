@@ -1,51 +1,48 @@
-import {viewEventNames} from '../image/view.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
-import {dataEventNames} from '../app/dataController.js';
-import {ViewFactory} from '../image/viewFactory.js';
-import {
-  getMatrixFromName,
-  getOrientationStringLPS,
-  Orientation,
-  getViewOrientation
-} from '../math/orientation.js';
-import {Point3D} from '../math/point.js';
-import {Stage} from '../gui/stage.js';
 import {Style} from '../gui/style.js';
-import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
-import {ListenerHandler} from '../utils/listen.js';
-import {State} from '../io/state.js';
 import {logger} from '../utils/logger.js';
 import {getUriQuery, decodeQuery} from '../utils/uri.js';
-import {UndoStack} from '../utils/undoStack.js';
 import {ToolboxController} from './toolboxController.js';
-import {LoadController} from './loadController.js';
-import {DataController} from './dataController.js';
+import {
+  loadEventNames,
+  LoadController
+} from './loadController.js';
+import {
+  undoEventNames,
+  UndoController
+} from './undoController.js';
+import {
+  dataEventNames,
+  DataController
+} from './dataController.js';
 import {InfoData} from '../gui/infoData.js';
 import {
   toolList,
   defaultToolList,
+} from '../tools/toolList.js';
+import {
   toolOptions,
   defaultToolOptions
-} from '../tools/index.js';
-import {binderList} from '../gui/stage.js';
-import {WindowLevel} from '../image/windowLevel.js';
-import {PlaneHelper} from '../image/planeHelper.js';
+} from '../tools/toolOptions.js';
+import {binderList} from '../gui/binders.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
-import {konvaToAnnotation} from '../gui/drawLayer.js';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {LayerGroup} from '../gui/layerGroup.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {DrawLayer} from '../gui/drawLayer.js';
-import {Image} from '../image/image.js';
-import {Matrix33} from '../math/matrix.js';
-import {DataElement} from '../dicom/dataElement.js';
-import {Scalar3D} from '../math/scalar.js';
 import {DicomData} from './dataController.js';
-import {Command} from '../utils/undoStack.js';
-/* eslint-enable no-unused-vars */
+import {
+  StageController,
+  stageControllerEventNames,
+} from './stageController.js';
+
+/**
+ * @import {LayerGroup} from '../gui/layerGroup.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {DrawLayer} from '../gui/drawLayer.js';
+ * @import {Image} from '../image/image.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {Scalar3D} from '../math/scalar.js';
+ * @import {Command} from '../command/undoStack.js';
+ */
 
 /**
  * View configuration: mainly defines the ´divId´
@@ -146,13 +143,13 @@ export class AppOptions {
   /**
    * DataId indexed object containing the data view configurations.
    *
-   * @type {Object<string, ViewConfig[]>|undefined}
+   * @type {Record<string, ViewConfig[]>|undefined}
    */
   dataViewConfigs;
   /**
    * Tool name indexed object containing individual tool configurations.
    *
-   * @type {Object<string, ToolConfig>|undefined}
+   * @type {Record<string, ToolConfig>|undefined}
    */
   tools;
   /**
@@ -191,7 +188,7 @@ export class AppOptions {
   rootDocument;
 
   /**
-   * @param {Object<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
+   * @param {Record<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
    *   indexed object containing the data view configurations.
    */
   constructor(dataViewConfigs) {
@@ -202,7 +199,7 @@ export class AppOptions {
 /**
  * List of ViewConfigs indexed by dataIds.
  *
- * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
+ * @typedef {Record<string, ViewConfig[]>} DataViewConfigs
  */
 
 /**
@@ -222,7 +219,7 @@ export class AppOptions {
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  */
-export class App {
+export class App extends EventTarget {
 
   /**
    * App options.
@@ -253,18 +250,18 @@ export class App {
   #loadController = null;
 
   /**
-   * Stage.
+   * Stage controller.
    *
-   * @type {Stage}
+   * @type {StageController}
    */
-  #stage = null;
+  #stageController = null;
 
   /**
-   * Undo stack.
+   * Undo controller.
    *
-   * @type {UndoStack}
+   * @type {UndoController}
    */
-  #undoStack = null;
+  #undoController = null;
 
   /**
    * Style.
@@ -276,24 +273,31 @@ export class App {
   /**
    * Info datas.
    *
-   * @type {Object<string, InfoData>}
+   * @type {Record<string, InfoData>}
    */
   #infoDatas = {};
 
   /**
-   * Listener handler.
+   * Get the data controller.
    *
-   * @type {ListenerHandler}
+   * @returns {DataController} The data controller.
    */
-  #listenerHandler = new ListenerHandler();
+  getDataController() {
+    return this.#dataController;
+  }
 
   /**
    * Get a DicomData.
    *
    * @param {string} dataId The data id.
    * @returns {DicomData|undefined} The data.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getData(dataId) {
+    logger.debug(
+      'App.getData: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.get(dataId);
   }
 
@@ -305,9 +309,12 @@ export class App {
    * @deprecated Since v0.34, please use the getData method.
    */
   getImage(dataId) {
+    logger.debug(
+      'App.getImage: deprecated since v0.34, please use the getData method.'
+    );
     let res;
-    if (typeof this.getData(dataId) !== 'undefined') {
-      res = this.getData(dataId).image;
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      res = this.#dataController.get(dataId).image;
     }
     return res;
   }
@@ -317,8 +324,13 @@ export class App {
    *
    * @param {string} dataId The data id.
    * @param {Image} img The associated image.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   setImage(dataId, img) {
+    logger.debug(
+      'App.setImage: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     this.#dataController.setImage(dataId, img);
   }
 
@@ -326,8 +338,13 @@ export class App {
    * Get the next data id.
    *
    * @returns {string} The data id.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getNextDataId() {
+    logger.debug(
+      'App.getNextDataId: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getNextDataId();
   }
 
@@ -337,8 +354,13 @@ export class App {
    * @param {string} dataId The data id.
    * @param {DicomData} data The new data.
    * @returns {boolean} False if the data cannot be added.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   addData(dataId, data) {
+    logger.debug(
+      'App.addData: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.add(dataId, data);
   }
 
@@ -346,9 +368,14 @@ export class App {
    * Get the meta data.
    *
    * @param {string} dataId The data id.
-   * @returns {Object<string, DataElement>|undefined} The list of meta data.
+   * @returns {Record<string, DataElement>|undefined} The list of meta data.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getMetaData(dataId) {
+    logger.debug(
+      'App.getMetaData: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     let res;
     if (typeof this.#dataController.get(dataId) !== 'undefined') {
       res = this.#dataController.get(dataId).meta;
@@ -360,8 +387,13 @@ export class App {
    * Get the list of ids in the data storage.
    *
    * @returns {string[]} The list of data ids.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getDataIds() {
+    logger.debug(
+      'App.getDataIds: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getDataIds();
   }
 
@@ -370,8 +402,13 @@ export class App {
    *
    * @param {string[]} uids A list of UIDs.
    * @returns {string[]} The list of dataIds that contain the UIDs.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getDataIdsFromSopUids(uids) {
+    logger.debug(
+      'App.getDataIdsFromSopUids: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getDataIdsFromSopUids(uids);
   }
 
@@ -380,8 +417,13 @@ export class App {
    *
    * @param {string} uid The SeriesInstanceUID.
    * @returns {string} The data id.
+   * @deprecated Since v0.37, please use via app.getDataController.
    */
   getDataIdFromSeriesUid(uid) {
+    logger.debug(
+      'App.getDataIdFromSeriesUid: deprecated since v0.37,' +
+      ' please use via app.getDataController.'
+    );
     return this.#dataController.getDataIdFromSeriesUid(uid);
   }
 
@@ -393,7 +435,11 @@ export class App {
    *   equivalent directly instead.
    */
   canScroll() {
-    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    logger.debug(
+      'App.canScroll: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
+    const viewLayer =
+      this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     const controller = viewLayer.getViewController();
     return controller.canScroll();
   }
@@ -407,7 +453,11 @@ export class App {
    *   equivalent directly instead.
    */
   canWindowLevel() {
-    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    logger.debug(
+      'App.canWindowLevel: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
+    const viewLayer =
+      this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     const controller = viewLayer.getViewController();
     return controller.canWindowLevel();
   }
@@ -416,27 +466,39 @@ export class App {
    * Get the active layer group scale on top of the base scale.
    *
    * @returns {Scalar3D} The scale as {x,y,z}.
+   * @deprecated Since v0.37, please access from the active layer group.
    */
   getAddedScale() {
-    return this.#stage.getActiveLayerGroup().getAddedScale();
+    logger.debug(
+      'App.getAddedScale: deprecated since v0.37, ' +
+      'please access from the active layer group.');
+    return this.#stageController.getAddedScale();
   }
 
   /**
    * Get the base scale of the active layer group.
    *
    * @returns {Scalar3D} The scale as {x,y,z}.
+   * @deprecated Since v0.37, please access from the active layer group.
    */
   getBaseScale() {
-    return this.#stage.getActiveLayerGroup().getBaseScale();
+    logger.debug(
+      'App.getBaseScale: deprecated since v0.37, ' +
+      'please access from the active layer group.');
+    return this.#stageController.getBaseScale();
   }
 
   /**
    * Get the layer offset of the active layer group.
    *
    * @returns {Scalar3D} The offset as {x,y,z}.
+   * @deprecated Since v0.37, please access from the active layer group.
    */
   getOffset() {
-    return this.#stage.getActiveLayerGroup().getOffset();
+    logger.debug(
+      'App.getOffset: deprecated since v0.37, ' +
+      'please access from the active layer group.');
+    return this.#stageController.getOffset();
   }
 
   /**
@@ -449,22 +511,50 @@ export class App {
   }
 
   /**
+   * Get the stage controller.
+   *
+   * @returns {StageController} The stage controller.
+   */
+  getStageController() {
+    return this.#stageController;
+  }
+
+  /**
+   * Get the undo controller.
+   *
+   * @returns {UndoController} The undo controller.
+   */
+  getUndoController() {
+    return this.#undoController;
+  }
+
+  /**
    * Get the active layer group.
    * The layer is available after the first loaded item.
    *
    * @returns {LayerGroup|undefined} The layer group.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getActiveLayerGroup()` instead.
    */
   getActiveLayerGroup() {
-    return this.#stage.getActiveLayerGroup();
+    logger.debug(
+      'App.getActiveLayerGroup: deprecated since v0.37, ' +
+      'use app.getStageController().getActiveLayerGroup()');
+    return this.#stageController.getActiveLayerGroup();
   }
 
   /**
    * Set the active layer group.
    *
    * @param {number} index The layer group index.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().setActiveLayerGroup()` instead.
    */
   setActiveLayerGroup(index) {
-    this.#stage.setActiveLayerGroup(index);
+    logger.debug(
+      'App.setActiveLayerGroup: deprecated since v0.37, ' +
+      'use app.getStageController().setActiveLayerGroup()');
+    this.#stageController.setActiveLayerGroup(index);
   }
 
   /**
@@ -473,9 +563,14 @@ export class App {
    *
    * @param {string} dataId The data id.
    * @returns {ViewLayer[]} The layers.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getViewLayersByDataId()` instead.
    */
   getViewLayersByDataId(dataId) {
-    return this.#stage.getViewLayersByDataId(dataId);
+    logger.debug(
+      'App.getViewLayersByDataId: deprecated since v0.37, ' +
+      'use app.getStageController().getViewLayersByDataId()');
+    return this.#stageController.getViewLayersByDataId(dataId);
   }
 
   /**
@@ -486,9 +581,14 @@ export class App {
    *   returns all view layers.
    * @returns {ViewLayer[]} The layers that
    *   satisfy the callbackFn.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getViewLayers()` instead.
    */
   getViewLayers(callbackFn) {
-    return this.#stage.getViewLayers(callbackFn);
+    logger.debug(
+      'App.getViewLayers: deprecated since v0.37, ' +
+      'use app.getStageController().getViewLayers()');
+    return this.#stageController.getViewLayers(callbackFn);
   }
 
   /**
@@ -497,9 +597,14 @@ export class App {
    *
    * @param {string} dataId The data id.
    * @returns {DrawLayer[]} The layers.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getDrawLayersByDataId()` instead.
    */
   getDrawLayersByDataId(dataId) {
-    return this.#stage.getDrawLayersByDataId(dataId);
+    logger.debug(
+      'App.getDrawLayersByDataId: deprecated since v0.37, ' +
+      'use app.getStageController().getDrawLayersByDataId()');
+    return this.#stageController.getDrawLayersByDataId(dataId);
   }
 
   /**
@@ -510,9 +615,14 @@ export class App {
    *   returns all draw layers.
    * @returns {DrawLayer[]} The layers that
    *   satisfy the callbackFn.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getDrawLayers()` instead.
    */
   getDrawLayers(callbackFn) {
-    return this.#stage.getDrawLayers(callbackFn);
+    logger.debug(
+      'App.getDrawLayers: deprecated since v0.37, ' +
+      'use app.getStageController().getDrawLayers()');
+    return this.#stageController.getDrawLayers(callbackFn);
   }
 
   /**
@@ -521,18 +631,28 @@ export class App {
    *
    * @param {string} divId The div id.
    * @returns {LayerGroup|undefined} The layer group.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getLayerGroupByDivId()` instead.
    */
   getLayerGroupByDivId(divId) {
-    return this.#stage.getLayerGroupByDivId(divId);
+    logger.debug(
+      'App.getLayerGroupByDivId: deprecated since v0.37, ' +
+      'use app.getStageController().getLayerGroupByDivId()');
+    return this.#stageController.getLayerGroupByDivId(divId);
   }
 
   /**
    * Get the number of layer groups.
    *
    * @returns {number} The number of groups.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getNumberOfLayerGroups()` instead.
    */
   getNumberOfLayerGroups() {
-    return this.#stage.getNumberOfLayerGroups();
+    logger.debug(
+      'App.getNumberOfLayerGroups: deprecated since v0.37, ' +
+      'use app.getStageController().getNumberOfLayerGroups()');
+    return this.#stageController.getNumberOfLayerGroups();
   }
 
   /**
@@ -549,11 +669,16 @@ export class App {
    *
    * @param {Command} cmd The command to add.
    * @fires UndoStack#undoadd
+   * @deprecated Since v0.37, please use via app.getUndoController.
    * @function
    */
   addToUndoStack = (cmd) => {
-    if (this.#undoStack !== null) {
-      this.#undoStack.add(cmd);
+    logger.debug(
+      'App.addToUndoStack: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    if (this.#undoController !== null) {
+      this.#undoController.addToUndoStack(cmd);
     }
   };
 
@@ -563,12 +688,17 @@ export class App {
    * @param {string} name The name of the command to remove.
    * @returns {boolean} True if the command was found and removed.
    * @fires UndoStack#undoremove
+   * @deprecated Since v0.37, please use via app.getUndoController.
    * @function
    */
   removeFromUndoStack = (name) => {
+    logger.debug(
+      'App.removeFromUndoStack: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
     let res = false;
-    if (this.#undoStack !== null) {
-      res = this.#undoStack.remove(name);
+    if (this.#undoController !== null) {
+      res = this.#undoController.removeFromUndoStack(name);
     }
     return res;
   };
@@ -598,7 +728,7 @@ export class App {
    *   button.disabled = false;
    *   button.onclick = function () {
    *     // render data #0
-   *     app.render(0);
+   *     app.getStageController().render(0);
    *   };
    * });
    * // load dicom data
@@ -622,13 +752,58 @@ export class App {
       this.#options.rootDocument = document;
     }
 
-    // undo stack
-    this.#undoStack = new UndoStack();
-    this.#undoStack.addEventListener('undoadd', this.#fireEvent);
-    this.#undoStack.addEventListener('undo', this.#fireEvent);
-    this.#undoStack.addEventListener('redo', this.#fireEvent);
+    // create load controller
+    this.#loadController =
+      new LoadController(this.#options.defaultCharacterSet);
+    // handle locally
+    this.#loadController.addEventListener('loadstart', this.#onloadstart);
+    this.#loadController.addEventListener('loaditem', this.#onloaditem);
+    this.#loadController.addEventListener('load', this.#onload);
+    // propagate load events
+    for (const eventName of loadEventNames) {
+      if (eventName !== 'loadstart' &&
+        eventName !== 'loaditem' &&
+        eventName !== 'load') {
+        this.#loadController.addEventListener(eventName, this.#fireEvent);
+      }
+    }
 
-    // tools
+    // data controller
+    this.#dataController = new DataController();
+    // propagate data events
+    for (const eventName of dataEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propagate image events
+    for (const eventName of imageEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propagate annotation events
+    for (const eventName of annotationGroupEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+
+    // undo controller
+    this.#undoController = new UndoController();
+    for (const name of undoEventNames) {
+      this.#undoController.addEventListener(name, this.#fireEvent);
+    }
+
+    // stage controller
+    this.#stageController = new StageController(
+      this.#dataController, this.#options);
+    this.#stageController.setAddToUndoStack(
+      (cmd) => this.#undoController.addToUndoStack(cmd)
+    );
+    this.#stageController.setGetInfoData(
+      (id) => this.getInfoData(id)
+    );
+    // propagate stage controller events
+    for (const name of stageControllerEventNames) {
+      this.#stageController.addEventListener(name, this.#fireEvent);
+    }
+
+    // tools (after controllers as tools may need them)
     if (typeof this.#options.tools !== 'undefined') {
       // setup the tool list
       const appToolList = {};
@@ -686,8 +861,8 @@ export class App {
                 if (typeof optionClass !== 'undefined') {
                   appToolOptions[optionName] = optionClass;
                 } else {
-                  logger.warn('Could not find option class for: ' +
-                    optionName);
+                  logger.warn(`Could not find option class for: ${
+                    optionName }`);
                 }
               }
             } else {
@@ -696,43 +871,14 @@ export class App {
             appToolList[toolName].setOptions(appToolOptions);
           }
         } else {
-          logger.warn('Could not initialise unknown tool: ' + toolName);
+          logger.warn(`Could not initialise unknown tool: ${toolName}`);
         }
       }
       // add tools to the controller
-      this.#toolboxController = new ToolboxController(appToolList);
-    }
+      this.#toolboxController = new ToolboxController(
+        appToolList, this.#options.rootDocument);
 
-    // create load controller
-    this.#loadController =
-      new LoadController(this.#options.defaultCharacterSet);
-    this.#loadController.onloadstart = this.#onloadstart;
-    this.#loadController.onprogress = this.#onloadprogress;
-    this.#loadController.onloaditem = this.#onloaditem;
-    this.#loadController.onload = this.#onload;
-    this.#loadController.onloadend = this.#onloadend;
-    this.#loadController.onerror = this.#onloaderror;
-    this.#loadController.ontimeout = this.#onloadtimeout;
-    this.#loadController.onabort = this.#onloadabort;
-
-    // create data controller
-    this.#dataController = new DataController();
-    // propagate data events
-    for (const eventName of dataEventNames) {
-      this.#dataController.addEventListener(eventName, this.#fireEvent);
-    }
-    // propage image events
-    for (const eventName of imageEventNames) {
-      this.#dataController.addEventListener(eventName, this.#fireEvent);
-    }
-    // propage annotation events
-    for (const eventName of annotationGroupEventNames) {
-      this.#dataController.addEventListener(eventName, this.#fireEvent);
-    }
-    // create stage
-    this.#stage = new Stage();
-    if (typeof this.#options.binders !== 'undefined') {
-      this.#stage.setBinders(this.#options.binders);
+      this.#stageController.setToolboxController(this.#toolboxController);
     }
   }
 
@@ -741,14 +887,11 @@ export class App {
    */
   reset() {
     // clear objects
-    this.#stage.empty();
+    this.#stageController.empty();
     this.#infoDatas = {};
     // reset undo/redo
-    if (this.#undoStack) {
-      this.#undoStack = new UndoStack();
-      this.#undoStack.addEventListener('undoadd', this.#fireEvent);
-      this.#undoStack.addEventListener('undo', this.#fireEvent);
-      this.#undoStack.addEventListener('redo', this.#fireEvent);
+    if (this.#undoController) {
+      this.#undoController.reset();
     }
   }
 
@@ -758,51 +901,137 @@ export class App {
    * @deprecated Since v0.35, prefer resetZoomPan.
    */
   resetLayout() {
-    this.#stage.reset();
-    this.#stage.draw();
+    logger.debug(
+      'App.resetLayout: deprecated since v0.35, prefer resetZoomPan.');
+    this.#stageController.resetLayout();
   }
 
   /**
    * Reset the zoom and pan of the stage.
+   *
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().resetZoomPan()` instead.
    */
   resetZoomPan() {
-    this.#stage.resetZoomPan();
-    this.#stage.draw();
+    logger.debug(
+      'App.resetZoomPan: deprecated since v0.37, ' +
+      'use app.getStageController().resetZoomPan()');
+    this.#stageController.resetZoomPan();
   }
 
   /**
    * Reset the position and window level of the stage.
+   *
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().resetViews()` instead.
    */
   resetViews() {
-    this.#stage.resetViews();
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
+    logger.debug(
+      'App.resetViews: deprecated since v0.37, ' +
+      'use app.getStageController().resetViews()');
+    this.#stageController.resetViews();
   }
 
   // load API [begin] -------------------------------------------------------
 
   /**
-   * Load a list of files. Can be image files or a state file.
+   * Load start event.
+   *
+   * @event App#loadstart
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
+
+  /**
+   * Load progress event.
+   *
+   * @event App#loadprogress
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   * @property {number} detail.loaded The loaded percentage.
+   * @property {number} detail.total The total percentage.
+   */
+
+  /**
+   * Load item event: fired when an item has been successfully loaded.
+   *
+   * @event App#loaditem
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   * @property {object} detail.data The loaded meta data.
+   * @property {boolean} detail.isfirstitem True if the item is the first
+   *  one loaded for the data id.
+   */
+
+  /**
+   * Load event: fired when a load finishes successfully.
+   *
+   * @event App#load
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
+
+  /**
+   * Load end event: fired when the load finishes,
+   *   successfully or not.
+   *
+   * @event App#loadend
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
+
+  /**
+   * Load error event.
+   *
+   * @event App#error
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   * @property {object} detail.error The error.
+   * @property {object} detail.target The event target.
+   */
+
+  /**
+   * Load timeout event.
+   *
+   * @event App#timeout
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: an url as a string.
+   * @property {object} detail.target The event target.
+   */
+
+  /**
+   * Load abort event.
+   *
+   * @event App#abort
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.dataid The data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
+   */
+
+  /**
+   * Load a list of image files.
    *
    * @param {File[]} files The list of files to load.
    * @returns {string} The data ID, '-1' if problem.
@@ -825,7 +1054,7 @@ export class App {
   };
 
   /**
-   * Load a list of URLs. Can be image files or a state file.
+   * Load a list of image URLs.
    *
    * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The options object, can contain:
@@ -861,6 +1090,9 @@ export class App {
    * @function
    */
   loadFromUri = (uri, options) => {
+    logger.debug(
+      'App.loadFromUri: deprecated since v0.36, ' +
+      'please extract the file list and pass it to loadURLs.');
     const query = getUriQuery(uri);
     // check query
     if (query && typeof query.input !== 'undefined') {
@@ -911,7 +1143,7 @@ export class App {
     // remove data
     this.#dataController.remove(dataId);
     // clean up stage
-    this.#stage.removeLayersByDataId(dataId);
+    this.#stageController.removeLayersByDataId(dataId);
   }
 
   // load API [end] ---------------------------------------------------------
@@ -919,9 +1151,15 @@ export class App {
   /**
    * Fit the display to the data of each layer group.
    * To be called once the image is loaded.
+   *
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().fitToContainer()` instead.
    */
   fitToContainer() {
-    this.#stage.fitToContainer();
+    logger.debug(
+      'App.fitToContainer: deprecated since v0.37, ' +
+      'use app.getStageController().fitToContainer()');
+    this.#stageController.fitToContainer();
   }
 
   /**
@@ -932,7 +1170,11 @@ export class App {
    *   of the desired view layer directly.
    */
   initWLDisplay() {
-    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    logger.debug(
+      'App.initWLDisplay: deprecated since v0.33, ' +
+      'please set the opacity of the desired view layer directly.');
+    const viewLayer =
+      this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     const controller = viewLayer.getViewController();
     controller.initialise();
   }
@@ -941,10 +1183,14 @@ export class App {
    * Set the imageSmoothing flag value. Default is false.
    *
    * @param {boolean} flag True to enable smoothing.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().setImageSmoothing()` instead.
    */
   setImageSmoothing(flag) {
-    this.#stage.setImageSmoothing(flag);
-    this.#stage.draw();
+    logger.debug(
+      'App.setImageSmoothing: deprecated since v0.37, ' +
+      'use app.getStageController().setImageSmoothing()');
+    this.#stageController.setImageSmoothing(flag);
   }
 
   /**
@@ -954,66 +1200,63 @@ export class App {
    * @param {boolean} [excludeStarConfig] Exclude the star config
    *  (default to false).
    * @returns {ViewConfig[]} The list of associated configs.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getViewConfigs()` instead.
    */
   getViewConfigs(dataId, excludeStarConfig) {
-    if (typeof excludeStarConfig === 'undefined') {
-      excludeStarConfig = false;
-    }
-    // check options
-    if (this.#options.dataViewConfigs === null ||
-      typeof this.#options.dataViewConfigs === 'undefined') {
-      throw new Error('No available data view configuration');
-    }
-    let configs = [];
-    if (typeof this.#options.dataViewConfigs[dataId] !== 'undefined') {
-      configs = this.#options.dataViewConfigs[dataId];
-    } else if (!excludeStarConfig &&
-      typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
-      configs = this.#options.dataViewConfigs['*'];
-    }
-    return configs;
+    logger.debug(
+      'App.getViewConfigs: deprecated since v0.37, ' +
+      'use app.getStageController().getViewConfigs()');
+    return this.#stageController.getViewConfigs(dataId, excludeStarConfig);
   }
 
   /**
-   * Get the layer group configuration for a data id and group
-   * div id.
+   * Get the layer group configuration for a data id and group div id.
    *
    * @param {string} dataId The data id.
    * @param {string} groupDivId The layer group div id.
    * @param {boolean} [excludeStarConfig] Exclude the star config
    *  (default to false).
    * @returns {ViewConfig|undefined} The associated config.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getViewConfig()` instead.
    */
   getViewConfig(dataId, groupDivId, excludeStarConfig) {
-    const configs = this.getViewConfigs(dataId, excludeStarConfig);
-    return configs.find(function (item) {
-      return item.divId === groupDivId;
-    });
+    logger.debug(
+      'App.getViewConfig: deprecated since v0.37, ' +
+      'use app.getStageController().getViewConfig()');
+    return this.#stageController.getViewConfig(
+      dataId, groupDivId, excludeStarConfig);
   }
 
   /**
    * Get the data view config.
-   * Carefull, returns a reference, do not modify without resetting.
+   * Careful, returns a reference; do not modify without resetting.
    *
-   * @returns {Object<string, ViewConfig[]>} The configuration list.
+   * @returns {Record<string, ViewConfig[]>} The configuration list.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().getDataViewConfigs()` instead.
    */
   getDataViewConfigs() {
-    return this.#options.dataViewConfigs;
+    logger.debug(
+      'App.getDataViewConfigs: deprecated since v0.37, ' +
+      'use app.getStageController().getDataViewConfigs()');
+    return this.#stageController.getDataViewConfigs();
   }
 
   /**
    * Set the data view configuration.
    * Resets the stage and recreates all the views.
    *
-   * @param {Object<string, ViewConfig[]>} configs The configuration list.
+   * @param {Record<string, ViewConfig[]>} configs The configuration list.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().setDataViewConfigs()` instead.
    */
   setDataViewConfigs(configs) {
-    // clean up
-    this.#stage.empty();
-    // set new
-    this.#options.dataViewConfigs = configs;
-    // create layer groups
-    this.#createLayerGroups(configs);
+    logger.debug(
+      'App.setDataViewConfigs: deprecated since v0.37, ' +
+      'use app.getStageController().setDataViewConfigs()');
+    this.#stageController.setDataViewConfigs(configs);
   }
 
   /**
@@ -1023,37 +1266,14 @@ export class App {
    * @param {ViewConfig} config The view configuration.
    * @param {boolean} [doRender] Render data after configuration
    *   add. Defaults to true.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().addDataViewConfig()` instead.
    */
   addDataViewConfig(dataId, config, doRender) {
-    if (typeof doRender === 'undefined') {
-      doRender = true;
-    }
-    // add to list
-    const configs = this.#options.dataViewConfigs;
-    if (typeof configs[dataId] === 'undefined') {
-      configs[dataId] = [];
-    }
-    const equalDivId = function (item) {
-      return item.divId === config.divId;
-    };
-    const itemIndex = configs[dataId].findIndex(equalDivId);
-    if (itemIndex === -1) {
-      this.#options.dataViewConfigs[dataId].push(config);
-    } else {
-      throw new Error('Duplicate view config for data ' + dataId +
-        ' and div ' + config.divId);
-    }
-
-    // add layer group if not done
-    if (typeof this.#stage.getLayerGroupByDivId(config.divId) === 'undefined') {
-      this.#createLayerGroup(config);
-    }
-
-    // render (will create layers)
-    if (typeof this.#dataController.get(dataId) !== 'undefined' &&
-      doRender) {
-      this.render(dataId, [config]);
-    }
+    logger.debug(
+      'App.addDataViewConfig: deprecated since v0.37, ' +
+      'use app.getStageController().addDataViewConfig()');
+    this.#stageController.addDataViewConfig(dataId, config, doRender);
   }
 
   /**
@@ -1063,46 +1283,14 @@ export class App {
    *
    * @param {string} dataId The data id.
    * @param {string} divId The div id.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().removeDataViewConfig()` instead.
    */
   removeDataViewConfig(dataId, divId) {
-    // input checks
-    const configs = this.#options.dataViewConfigs;
-    if (typeof configs[dataId] === 'undefined') {
-      // no config for dataId
-      return;
-    }
-    const equalDivId = function (item) {
-      return item.divId === divId;
-    };
-    const itemIndex = configs[dataId].findIndex(equalDivId);
-    if (itemIndex === -1) {
-      // no config for divId
-      return;
-    }
-
-    // remove from config list
-    configs[dataId].splice(itemIndex, 1);
-    if (configs[dataId].length === 0) {
-      delete configs[dataId];
-    }
-
-    // update layer group
-    const layerGroup = this.#stage.getLayerGroupByDivId(divId);
-    if (typeof layerGroup !== 'undefined') {
-      // remove layer if possible
-      const vls = layerGroup.getViewLayersByDataId(dataId);
-      if (vls.length === 1) {
-        layerGroup.removeLayer(vls[0]);
-      }
-      const dls = layerGroup.getDrawLayersByDataId(dataId);
-      if (dls.length === 1) {
-        layerGroup.removeLayer(dls[0]);
-      }
-      // remove layer group if empty
-      if (layerGroup.getNumberOfLayers() === 0) {
-        this.#stage.removeLayerGroup(layerGroup);
-      }
-    }
+    logger.debug(
+      'App.removeDataViewConfig: deprecated since v0.37, ' +
+      'use app.getStageController().removeDataViewConfig()');
+    this.#stageController.removeDataViewConfig(dataId, divId);
   }
 
   /**
@@ -1112,85 +1300,14 @@ export class App {
    * @param {string} dataId The data id.
    * @param {string} divId The div id.
    * @param {ViewConfig} config The view configuration.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().updateDataViewConfig()` instead.
    */
   updateDataViewConfig(dataId, divId, config) {
-    // input checks
-    const configs = this.#options.dataViewConfigs;
-    // check data id
-    if (typeof configs[dataId] === 'undefined') {
-      throw new Error('No config for dataId: ' + dataId);
-    }
-    // check div id
-    const equalDivId = function (item) {
-      return item.divId === divId;
-    };
-    const itemIndex = configs[dataId].findIndex(equalDivId);
-    if (itemIndex === -1) {
-      throw new Error('No config for dataId: ' +
-        dataId + ' and divId: ' + divId);
-    }
-
-    // update config
-    const configToUpdate = configs[dataId][itemIndex];
-    for (const prop in config) {
-      configToUpdate[prop] = config[prop];
-    }
-
-    // update layer group
-    const layerGroup = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
-    if (typeof layerGroup !== 'undefined') {
-      // remove layer if possible
-      const vls = layerGroup.getViewLayersByDataId(dataId);
-      if (vls.length === 1) {
-        layerGroup.removeLayer(vls[0]);
-      }
-      const dls = layerGroup.getDrawLayersByDataId(dataId);
-      if (dls.length === 1) {
-        layerGroup.removeLayer(dls[0]);
-      }
-    }
-
-    // render (will create layer)
-    if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      this.render(dataId, [configToUpdate]);
-    }
-  }
-
-  /**
-   * Create layer groups according to a data view config:
-   * adds them to stage and binds them.
-   *
-   * @param {DataViewConfigs} dataViewConfigs The data view config.
-   */
-  #createLayerGroups(dataViewConfigs) {
-    const dataKeys = Object.keys(dataViewConfigs);
-    const divIds = [];
-    for (let i = 0; i < dataKeys.length; ++i) {
-      const viewConfigs = dataViewConfigs[dataKeys[i]];
-      for (let j = 0; j < viewConfigs.length; ++j) {
-        const viewConfig = viewConfigs[j];
-        // view configs can contain the same divIds, avoid duplicating
-        if (!divIds.includes(viewConfig.divId)) {
-          this.#createLayerGroup(viewConfig);
-          divIds.push(viewConfig.divId);
-        }
-      }
-    }
-  }
-
-  /**
-   * Create a layer group according to a view config:
-   * adds it to stage and binds it.
-   *
-   * @param {ViewConfig} viewConfig The view config.
-   */
-  #createLayerGroup(viewConfig) {
-    // create new layer group
-    const element = this.#options.rootDocument.getElementById(viewConfig.divId);
-    const withInfoOverlay = typeof this.#options.overlayConfig !== 'undefined';
-    const layerGroup = this.#stage.addLayerGroup(element, withInfoOverlay);
-    // bind events
-    this.#bindLayerGroupToApp(layerGroup);
+    logger.debug(
+      'App.updateDataViewConfig: deprecated since v0.37, ' +
+      'use app.getStageController().updateDataViewConfig()');
+    this.#stageController.updateDataViewConfig(dataId, divId, config);
   }
 
   /**
@@ -1199,48 +1316,13 @@ export class App {
    * @param {string[]} list The list of binder names.
    */
   setLayerGroupsBinders(list) {
-    // create instances
     const instances = [];
     for (let i = 0; i < list.length; ++i) {
       if (typeof binderList[list[i]] !== 'undefined') {
         instances.push(new binderList[list[i]]);
       }
     }
-    // pass to stage
-    this.#stage.setBinders(instances);
-  }
-
-  /**
-   * Check if a data can be rendered in a provided layer group.
-   * If the layer group contains data, only similar orientation
-   * are permited. If not, returns true.
-   *
-   * @param {string} dataId The id of the data to check.
-   * @param {LayerGroup} layerGroup The layer group where to render.
-   * @returns {boolean} True if the data can be rendered.
-   */
-  #canRenderData(dataId, layerGroup) {
-    let res = false;
-    const baseViewLayer = layerGroup.getBaseViewLayer();
-    if (typeof baseViewLayer !== 'undefined') {
-      // base view exists: render is possible if overlay data
-      // has similar geometry than base
-      const baseData = this.#dataController.get(baseViewLayer.getDataId());
-      const baseImage = baseData.image;
-      const newData = this.#dataController.get(dataId);
-      const newImage = newData.image;
-      if (typeof baseImage !== 'undefined' &&
-        typeof newImage !== 'undefined'
-      ) {
-        const baseOrientation = baseImage.getGeometry().getOrientation();
-        const newOrientation = newImage.getGeometry().getOrientation();
-        res = newOrientation.isSimilar(baseOrientation);
-      }
-    } else {
-      // no base view: can render
-      res = true;
-    }
-    return res;
+    this.#stageController.setBinders(instances);
   }
 
   /**
@@ -1248,70 +1330,14 @@ export class App {
    *
    * @param {string} dataId The data id to render.
    * @param {ViewConfig[]} [viewConfigs] The list of configs to render.
+   * @deprecated Since v0.37, use
+   *   `app.getStageController().render()` instead.
    */
   render(dataId, viewConfigs) {
-    if (typeof dataId === 'undefined' || dataId === null) {
-      throw new Error('Cannot render without data id');
-    }
-    const data = this.getData(dataId);
-
-    // guess data type
-    const isImage = typeof data !== 'undefined' &&
-      typeof data.image !== 'undefined';
-    const isMeasurement = typeof data !== 'undefined' &&
-      typeof data.annotationGroup !== 'undefined';
-
-    // create layer groups if not done yet
-    // (create all to allow for ratio sync)
-    if (this.#stage.getNumberOfLayerGroups() === 0) {
-      this.#createLayerGroups(this.#options.dataViewConfigs);
-    }
-
-    // use options list if non provided
-    if (typeof viewConfigs === 'undefined') {
-      viewConfigs = this.getViewConfigs(dataId);
-    }
-
-    // nothing to do if no view config
-    if (viewConfigs.length === 0) {
-      logger.info('Not rendering data: ' + dataId +
-        ' (no data view config)');
-      return;
-    }
-
-    // loop on configs
-    for (let i = 0; i < viewConfigs.length; ++i) {
-      const config = viewConfigs[i];
-      const layerGroup =
-        this.#stage.getLayerGroupByDivId(config.divId);
-      // layer group must exist
-      if (!layerGroup) {
-        throw new Error('No layer group for ' + config.divId);
-      }
-      // check compatibility
-      if (isImage && !this.#canRenderData(dataId, layerGroup)) {
-        // fire render error
-        this.#fireEvent({
-          type: 'error',
-          error: new Error('Render error: incompatible geometries for overlay'),
-          dataid: dataId
-        });
-        continue;
-      }
-      // create layer if needed
-      // warn: needs a loaded DOM
-      if (isImage &&
-        layerGroup.getViewLayersByDataId(dataId).length === 0
-      ) {
-        this.#addViewLayer(dataId, config);
-      } else if (isMeasurement &&
-        layerGroup.getDrawLayersByDataId(dataId).length === 0
-      ) {
-        this.addDrawLayer(dataId, config);
-      }
-      // draw
-      layerGroup.draw();
-    }
+    logger.debug(
+      'App.render: deprecated since v0.37, ' +
+      'use app.getStageController().render()');
+    this.#stageController.render(dataId, viewConfigs);
   }
 
   /**
@@ -1320,14 +1346,13 @@ export class App {
    * @param {number} step The step to add to the current zoom.
    * @param {number} cx The zoom center X coordinate.
    * @param {number} cy The zoom center Y coordinate.
+   * @deprecated Since v0.37, please access from the active layer group.
    */
   zoom(step, cx, cy) {
-    const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewController = layerGroup.getBaseViewLayer().getViewController();
-    const k = viewController.getCurrentScrollPosition();
-    const center = new Point3D(cx, cy, k);
-    layerGroup.addScale(step, center);
-    layerGroup.draw();
+    logger.debug(
+      'App.zoom: deprecated since v0.37, ' +
+      'please access from the active layer group.');
+    this.#stageController.zoom(step, cx, cy);
   }
 
   /**
@@ -1335,11 +1360,13 @@ export class App {
    *
    * @param {number} tx The translation along X.
    * @param {number} ty The translation along Y.
+   * @deprecated Since v0.37, please access from the active layer group.
    */
   translate(tx, ty) {
-    const layerGroup = this.#stage.getActiveLayerGroup();
-    layerGroup.addTranslation({x: tx, y: ty, z: 0});
-    layerGroup.draw();
+    logger.debug(
+      'App.translate: deprecated since v0.37, ' +
+      'please access from the active layer group.');
+    this.#stageController.translate(tx, ty);
   }
 
   /**
@@ -1354,28 +1381,28 @@ export class App {
     const targetData = this.#dataController.get(dataIdTarget);
     if (typeof targetData === 'undefined') {
       logger.debug(
-        'Cannot resample match, target data \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample match, target data '${
+          dataIdTarget}' is undefined`);
       return;
     }
     if (typeof targetData.image === 'undefined') {
       logger.debug(
-        'Cannot resample match, target image \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample match, target image '${
+          dataIdTarget}' is undefined`);
       return;
     }
     // source
     const sourceData = this.#dataController.get(dataIdSource);
     if (typeof sourceData === 'undefined') {
       logger.debug(
-        'Cannot resample match, source data \'' +
-        dataIdSource + '\' is undefined');
+        `Cannot resample match, source data '${
+          dataIdSource}' is undefined`);
       return;
     }
     if (typeof sourceData.image === 'undefined') {
       logger.debug(
-        'Cannot resample match, source image \'' +
-        dataIdSource + '\' is undefined');
+        `Cannot resample match, source image '${
+          dataIdSource}' is undefined`);
       return;
     }
     // check orientation
@@ -1385,8 +1412,8 @@ export class App {
       sourceData.image.getGeometry().getOrientation();
     if (targetOrientation.equals(sourceOrientation)) {
       logger.info(
-        'Same orientation, no resample match for data \'' +
-        dataIdTarget + '\' and \'' + dataIdSource + '\'');
+        `Same orientation, no resample match for data '${
+          dataIdTarget }' and '${dataIdSource}'`);
       return;
     }
     // resample
@@ -1404,14 +1431,14 @@ export class App {
     const targetData = this.#dataController.get(dataIdTarget);
     if (typeof targetData === 'undefined') {
       logger.debug(
-        'Cannot resample, target data \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample, target data '${
+          dataIdTarget }' is undefined`);
       return;
     }
     if (typeof targetData.image === 'undefined') {
       logger.debug(
-        'Cannot resample, target image \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot resample, target image '${
+          dataIdTarget }' is undefined`);
       return;
     }
     // check orientation
@@ -1419,8 +1446,8 @@ export class App {
       targetData.image.getGeometry().getOrientation();
     if (targetOrientation.equals(orientation)) {
       logger.info(
-        'Same orientation, no resample for data \'' +
-        dataIdTarget + '\'');
+        `Same orientation, no resample for data '${
+          dataIdTarget }'`);
       return;
     }
 
@@ -1446,11 +1473,12 @@ export class App {
     // Only updating the configs of the affected images can cause
     // layers to inherit some configs from their segmentation layers
     // for some unknown reason. For now we just update all of them.
-    this.setDataViewConfigs(configs);
+    const stgCtrl = this.getStageController();
+    stgCtrl.setDataViewConfigs(configs);
     // render data (creates layers)
     const newDataIds = this.#dataController.getDataIds();
     for (let i = 0; i < newDataIds.length; ++i) {
-      this.render(newDataIds[i]);
+      stgCtrl.render(newDataIds[i]);
     }
   }
 
@@ -1463,21 +1491,21 @@ export class App {
     const targetData = this.#dataController.get(dataIdTarget);
     if (typeof targetData === 'undefined') {
       logger.debug(
-        'Cannot revert resample, target data \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot revert resample, target data '${
+          dataIdTarget }' is undefined`);
       return;
     }
     if (typeof targetData.image === 'undefined') {
       logger.debug(
-        'Cannot revert resample, target image \'' +
-        dataIdTarget + '\' is undefined');
+        `Cannot revert resample, target image '${
+          dataIdTarget }' is undefined`);
       return;
     }
     // exit if not resampled
     if (!targetData.image.isResampled()) {
       logger.info(
-        'No revert resample needed for data \'' +
-        dataIdTarget + '\'');
+        `No revert resample needed for data '${
+          dataIdTarget }'`);
       return;
     }
 
@@ -1503,11 +1531,12 @@ export class App {
     // Only updating the configs of the affected images can cause
     // layers to inherit some configs from their segmentation layers
     // for some unknown reason. For now we just update all of them.
-    this.setDataViewConfigs(configs);
+    const stgCtrl = this.getStageController();
+    stgCtrl.setDataViewConfigs(configs);
     // render data (creates layers)
     const newDataIds = this.#dataController.getDataIds();
     for (let i = 0; i < newDataIds.length; ++i) {
-      this.render(newDataIds[i]);
+      stgCtrl.render(newDataIds[i]);
     }
   }
 
@@ -1519,54 +1548,13 @@ export class App {
    *   of the desired view layer directly.
    */
   setOpacity(alpha) {
-    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    logger.debug(
+      'App.setOpacity: deprecated since v0.33, ' +
+      'please set the opacity of the desired view layer directly.');
+    const viewLayer =
+      this.#stageController.getActiveLayerGroup().getActiveViewLayer();
     viewLayer.setOpacity(alpha);
     viewLayer.draw();
-  }
-
-  /**
-   * Set the drawings of the active layer group.
-   *
-   * @deprecated Since v0.34, please switch to DICOM SR annotations.
-   * @param {Array} drawings An array of drawings.
-   * @param {Array} drawingsDetails An array of drawings details.
-   * @param {string} dataId The converted data id.
-   */
-  setDrawings(drawings, drawingsDetails, dataId) {
-    const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewLayer = layerGroup.getBaseViewLayer();
-    const refDataId = viewLayer.getDataId();
-    const refData = this.getData(refDataId);
-    const viewController = viewLayer.getViewController();
-
-    // convert konva to annotation
-    // (assume current image is ref image)
-    const annotations = konvaToAnnotation(
-      drawings, drawingsDetails, refData.image);
-    // create data
-    const data = this.createAnnotationData(refDataId);
-    // add annotations to data
-    for (const annotation of annotations) {
-      annotation.setViewController(viewController);
-      data.annotationGroup.add(annotation);
-    }
-    // add to data controller
-    this.#dataController.add(dataId, data);
-    // render
-    this.render(dataId);
-  }
-
-  /**
-   * Apply a JSON state to this app.
-   *
-   * @deprecated Since v0.34, please switch to DICOM SR
-   *   for annotations.
-   * @param {string} jsonState The state of the app as a JSON string.
-   * @param {string} dataId The state data id.
-   */
-  applyJsonState(jsonState, dataId) {
-    const state = new State(dataId);
-    state.apply(this, state.fromJSON(jsonState));
   }
 
   // Handler Methods -----------------------------------------------------------
@@ -1579,13 +1567,14 @@ export class App {
    * @function
    */
   onResize = () => {
-    this.fitToContainer();
+    this.getStageController().fitToContainer();
   };
 
   /**
    * Key down callback. Meant to be used in tools.
    *
-   * @param {KeyboardEvent} event The key down event.
+   * @param {object} event The KeyboardEvent down event
+   * augmented with a context.
    * @fires App#keydown
    * @function
    */
@@ -1594,11 +1583,25 @@ export class App {
      * Key down event.
      *
      * @event App#keydown
-     * @type {KeyboardEvent}
-     * @property {string} type The event type: keydown.
-     * @property {string} context The tool where the event originated.
+     * @type {CustomEvent}
+     * @property {object} detail The event detail.
+     * @property {string} detail.key The key value.
+     * @property {string} detail.code The code value.
+     * @property {boolean} detail.ctrlKey True if ctrl key is down.
+     * @property {boolean} detail.altKey True if alt key is down.
+     * @property {boolean} detail.shiftKey True if shift key is down.
+     * @property {string} detail.context The tool where the event originated.
      */
-    this.#fireEvent(event);
+    this.dispatchEvent(new CustomEvent('keydown', {
+      detail: {
+        key: event.key,
+        code: event.code,
+        ctrlKey: event.ctrlKey,
+        altKey: event.altKey,
+        shiftKey: event.shiftKey,
+        context: event.context,
+      }
+    }));
   };
 
   /**
@@ -1620,7 +1623,7 @@ export class App {
   defaultOnKeydown = (event) => {
     if (event.ctrlKey) {
       if (event.shiftKey) {
-        const layerGroup = this.#stage.getActiveLayerGroup();
+        const layerGroup = this.#stageController.getActiveLayerGroup();
         const positionHelper = layerGroup.getPositionHelper();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
           if (layerGroup.moreThanOne(3)) {
@@ -1640,13 +1643,14 @@ export class App {
           }
         }
       } else if (event.key === 'y') { // crtl-y
-        this.#undoStack.redo();
+        this.#undoController.redo();
       } else if (event.key === 'z') { // crtl-z
-        this.#undoStack.undo();
+        this.#undoController.undo();
       } else if (event.key === ' ') { // crtl-space
-        for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
-          this.#stage.getLayerGroup(i).setShowCrosshair(
-            !this.#stage.getLayerGroup(i).getShowCrosshair()
+        const nGroups = this.#stageController.getNumberOfLayerGroups();
+        for (let i = 0; i < nGroups; ++i) {
+          this.#stageController.getLayerGroup(i).setShowCrosshair(
+            !this.#stageController.getLayerGroup(i).getShowCrosshair()
           );
         }
       }
@@ -1678,8 +1682,11 @@ export class App {
    *   equivalent directly instead.
    */
   setColourMap(name) {
+    logger.debug(
+      'App.setColourMap: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
     const viewController =
-      this.#stage.getActiveLayerGroup()
+      this.#stageController.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
     viewController.setColourMap(name);
   }
@@ -1692,8 +1699,11 @@ export class App {
    *   equivalent directly instead.
    */
   setWindowLevelPreset(preset) {
+    logger.debug(
+      'App.setWindowLevelPreset: deprecated since v0.33, ' +
+      'please use the ViewController equivalent directly instead.');
     const viewController =
-      this.#stage.getActiveLayerGroup()
+      this.#stageController.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
     viewController.setWindowLevelPreset(preset);
   }
@@ -1705,8 +1715,8 @@ export class App {
    */
   setTool(tool) {
     // bind tool to active layer
-    for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
-      const layerGroup = this.#stage.getLayerGroup(i);
+    for (let i = 0; i < this.#stageController.getNumberOfLayerGroups(); ++i) {
+      const layerGroup = this.#stageController.getLayerGroup(i);
       const layer = layerGroup.getActiveLayer();
       if (typeof layer !== 'undefined') {
         this.#toolboxController.bindLayerGroup(layerGroup, layer);
@@ -1729,36 +1739,56 @@ export class App {
    * Undo the last action.
    *
    * @fires UndoStack#undo
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   undo() {
-    this.#undoStack.undo();
+    logger.debug(
+      'App.undo: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    this.#undoController.undo();
   }
 
   /**
    * Redo the last action.
    *
    * @fires UndoStack#redo
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   redo() {
-    this.#undoStack.redo();
+    logger.debug(
+      'App.redo: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    this.#undoController.redo();
   }
 
   /**
    * Get the undo stack size.
    *
    * @returns {number} The size of the stack.
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   getStackSize() {
-    return this.#undoStack.getStackSize();
+    logger.debug(
+      'App.getStackSize: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    return this.#undoController.getStackSize();
   }
 
   /**
    * Get the current undo stack index.
    *
    * @returns {number} The stack index.
+   * @deprecated Since v0.37, please use via app.getUndoController.
    */
   getCurrentStackIndex() {
-    return this.#undoStack.getCurrentStackIndex();
+    logger.debug(
+      'App.getCurrentStackIndex: deprecated since v0.37,' +
+      ' please use via app.getUndoController.'
+    );
+    return this.#undoController.getCurrentStackIndex();
   }
 
   /**
@@ -1799,7 +1829,7 @@ export class App {
    * @returns {DicomData} The new data.
    */
   createAnnotationData(refDataId) {
-    const refData = this.getData(refDataId);
+    const refData = this.#dataController.get(refDataId);
     const refMeta = refData.image.getMeta();
 
     const data = new DicomData({});
@@ -1848,13 +1878,14 @@ export class App {
    */
   addAndRenderAnnotationData(data, divId, refDataId) {
     // add new data
-    const dataId = this.getNextDataId();
-    const added = this.addData(dataId, data);
+    const dataCtrl = this.#dataController;
+    const dataId = dataCtrl.getNextDataId();
+    const added = dataCtrl.add(dataId, data);
     if (!added) {
       throw new Error('Cannot add annotation data');
     }
     // add data view config based on reference data
-    const refDataViewConfigs = this.getViewConfigs(refDataId);
+    const refDataViewConfigs = this.#stageController.getViewConfigs(refDataId);
     const refDataViewConfig = refDataViewConfigs.find(
       element => element.divId === divId);
     if (typeof refDataViewConfig === 'undefined') {
@@ -1862,27 +1893,27 @@ export class App {
     }
     const drawDataViewConfig = new ViewConfig(divId);
     drawDataViewConfig.orientation = refDataViewConfig.orientation;
-    this.addDataViewConfig(dataId, drawDataViewConfig);
+    this.#stageController.addDataViewConfig(dataId, drawDataViewConfig);
     // render (will create draw layer)
-    this.render(dataId);
+    this.#stageController.render(dataId);
   }
 
   // Private Methods -----------------------------------------------------------
 
   /**
    * Fire an event: call all associated listeners with the input event object.
+   * Collects detail from CustomEvents and top-level plain object properties,
+   * then dispatches a new CustomEvent with the flattened detail on this App.
    *
-   * @param {object} event The event to fire.
+   * @param {CustomEvent} event The event to fire.
    */
   #fireEvent = (event) => {
-    let propagate = true;
-    if (typeof event.propagate !== 'undefined') {
-      propagate = event.propagate;
-      delete event.propagate;
+    if (event.detail?.propagate === false) {
+      return;
     }
-    if (propagate) {
-      this.#listenerHandler.fireEvent(event);
-    }
+    const detail = Object.assign({}, event.detail);
+    delete detail.propagate;
+    this.dispatchEvent(new CustomEvent(event.type, {detail}));
   };
 
   /**
@@ -1892,43 +1923,14 @@ export class App {
    */
   #onloadstart = (event) => {
     // create info data
-    if (typeof this.#options.overlayConfig !== 'undefined') {
-      this.#infoDatas[event.dataid] = new InfoData(
-        this, event.dataid, this.#options.overlayConfig);
+    if (typeof this.#options.overlayConfig !== 'undefined' &&
+      Object.keys(this.#infoDatas).length === 0
+    ) {
+      this.#infoDatas[event.detail.dataid] = new InfoData(
+        this, event.detail.dataid, this.#options.overlayConfig);
     }
-    /**
-     * Load start event.
-     *
-     * @event App#loadstart
-     * @type {object}
-     * @property {string} type The event type: loadstart.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
-     *   File for a file.
-     */
-    event.type = 'loadstart';
-    this.#fireEvent(event);
-  };
 
-  /**
-   * Data load progress callback.
-   *
-   * @param {object} event The progress event.
-   */
-  #onloadprogress = (event) => {
-    /**
-     * Load progress event.
-     *
-     * @event App#loadprogress
-     * @type {object}
-     * @property {string} type The event type: loadprogress.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
-     *   File for a file.
-     * @property {number} loaded The loaded percentage.
-     * @property {number} total The total percentage.
-     */
-    event.type = 'loadprogress';
+    // propagate
     this.#fireEvent(event);
   };
 
@@ -1939,77 +1941,51 @@ export class App {
    */
   #onloaditem = (event) => {
     // check event
-    if (typeof event.data === 'undefined') {
+    if (typeof event.detail.data === 'undefined') {
       logger.error('Missing loaditem event data.');
     }
-    if (typeof event.loadtype === 'undefined') {
-      logger.error('Missing loaditem event load type.');
-    }
 
-    let eventMetaData;
-    if (event.loadtype === 'image') {
-      eventMetaData = event.data.meta;
-    } else if (event.loadtype === 'state') {
-      eventMetaData = 'state';
-    }
+    const isFirstLoadItem = event.detail.isfirstitem;
 
-    const isFirstLoadItem = event.isfirstitem;
-
-    if (event.loadtype === 'image') {
-      try {
-        if (isFirstLoadItem) {
-          this.#dataController.add(event.dataid, event.data);
-        } else {
-          this.#dataController.update(event.dataid, event.data);
-        }
-      } catch (error) {
-        this.#onloaderror({
-          dataid: event.dataid,
-          error: error,
-          source: event.source
-        });
-        this.#onloadend({
-          dataid: event.dataid,
-          source: event.source
-        });
-        return;
+    try {
+      if (isFirstLoadItem) {
+        this.#dataController.add(event.detail.dataid, event.detail.data);
+      } else {
+        this.#dataController.update(event.detail.dataid, event.detail.data);
       }
-    } else if (event.loadtype === 'state') {
-      this.applyJsonState(event.data, event.dataid);
+    } catch (error) {
+      this.dispatchEvent(new CustomEvent('error', {
+        detail: {
+          dataid: event.detail.dataid,
+          source: event.detail.source,
+          error
+        }
+      }));
+      // stop the load: following items would fail the same way
+      // (for example all frames of a multi-frame data)
+      this.abortLoad(event.detail.dataid);
+      this.dispatchEvent(new CustomEvent('loadend', {
+        detail: {
+          dataid: event.detail.dataid,
+          source: event.detail.source
+        }
+      }));
+      return;
     }
 
-    /**
-     * Load item event: fired when an item has been successfully loaded.
-     *
-     * @event App#loaditem
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
-     *   File for a file.
-     * @property {object} data The loaded meta data.
-     */
-    this.#fireEvent({
-      type: 'loaditem',
-      data: eventMetaData,
-      source: event.source,
-      loadtype: event.loadtype,
-      dataid: event.dataid,
-      isfirstitem: event.isfirstitem,
-      warn: event.warn
-    });
+    // propagate (before display)
+    this.#fireEvent(event);
 
     // update info data if present
     if (typeof this.#infoDatas !== 'undefined' &&
-      typeof this.#infoDatas[event.dataid] !== 'undefined') {
-      this.#infoDatas[event.dataid].addItemMeta(eventMetaData);
+      typeof this.#infoDatas[event.detail.dataid] !== 'undefined') {
+      this.#infoDatas[event.detail.dataid].addItemMeta(event.detail.data.meta);
     }
 
     // render if first and flag allows
-    if (event.loadtype === 'image' &&
-      this.getViewConfigs(event.dataid).length !== 0 &&
-      isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
-      this.render(event.dataid);
+    if (isFirstLoadItem && this.#options.viewOnFirstLoadItem &&
+      this.#stageController.getViewConfigs(event.detail.dataid).length !== 0) {
+      this.#stageController.render(event.detail.dataid);
     }
   };
 
@@ -2020,696 +1996,17 @@ export class App {
    */
   #onload = (event) => {
     // mark data as complete
-    const res = this.#dataController.markDataAsComplete(event.dataid);
+    const res = this.#dataController.markDataAsComplete(event.detail.dataid);
 
     // render if image has changed
     if (this.#options.viewOnFirstLoadItem &&
       typeof res.imageHasChanged !== 'undefined' &&
       res.imageHasChanged) {
-      this.render(event.dataid);
+      this.#stageController.render(event.detail.dataid);
     }
 
-    /**
-     * Load event: fired when a load finishes successfully.
-     *
-     * @event App#load
-     * @type {object}
-     * @property {string} type The event type: load.
-     * @property {string} loadType The load type: image or state.
-     */
-    event.type = 'load';
+    // propagate
     this.#fireEvent(event);
   };
-
-  /**
-   * Data load end callback.
-   *
-   * @param {object} event The load end event.
-   */
-  #onloadend = (event) => {
-    /**
-     * Main load end event: fired when the load finishes,
-     *   successfully or not.
-     *
-     * @event App#loadend
-     * @type {object}
-     * @property {string} type The event type: loadend.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
-     *   File for a file.
-     */
-    event.type = 'loadend';
-    this.#fireEvent(event);
-  };
-
-  /**
-   * Data load error callback.
-   *
-   * @param {object} event The error event.
-   */
-  #onloaderror = (event) => {
-    /**
-     * Load error event.
-     *
-     * @event App#error
-     * @type {object}
-     * @property {string} type The event type: error.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
-     *   File for a file.
-     * @property {object} error The error.
-     * @property {object} target The event target.
-     */
-    if (typeof event.type === 'undefined') {
-      event.type = 'error';
-    }
-    this.#fireEvent(event);
-  };
-
-  /**
-   * Data load timeout callback.
-   *
-   * @param {object} event The timeout event.
-   */
-  #onloadtimeout = (event) => {
-    /**
-     * Load timeout event.
-     *
-     * @event App#timeout
-     * @type {object}
-     * @property {string} type The event type: timeout.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: an url as a string.
-     * @property {object} target The event target.
-     */
-    if (typeof event.type === 'undefined') {
-      event.type = 'timeout';
-    }
-    this.#fireEvent(event);
-  };
-
-  /**
-   * Data load abort callback.
-   *
-   * @param {object} event The abort event.
-   */
-  #onloadabort = (event) => {
-    /**
-     * Load abort event.
-     *
-     * @event App#abort
-     * @type {object}
-     * @property {string} type The event type: abort.
-     * @property {string} loadType The load type: image or state.
-     * @property {*} source The load source: string for an url,
-     *   File for a file.
-     */
-    if (typeof event.type === 'undefined') {
-      event.type = 'abort';
-    }
-    this.#fireEvent(event);
-  };
-
-  /**
-   * Bind layer group events to app.
-   *
-   * @param {LayerGroup} group The layer group.
-   */
-  #bindLayerGroupToApp(group) {
-    // propagate layer group events
-    group.addEventListener('zoomchange', this.#fireEvent);
-    group.addEventListener('offsetchange', this.#fireEvent);
-    group.addEventListener('layerremove', this.#fireEvent);
-    group.addEventListener('outofrange', this.#fireEvent);
-    // propagate viewLayer events
-    group.addEventListener('renderstart', this.#fireEvent);
-    group.addEventListener('renderend', this.#fireEvent);
-    // propagate view events
-    for (const eventName of viewEventNames) {
-      group.addEventListener(eventName, this.#fireEvent);
-    }
-    // updata data view config
-    group.addEventListener('wlchange', (event) => {
-      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
-      const groupId = layerDetails.groupDivId;
-      const config = this.getViewConfig(event.dataid, groupId, true);
-      if (typeof config !== 'undefined') {
-        // reset previous values
-        config.windowCenter = undefined;
-        config.windowWidth = undefined;
-        config.wlPresetName = undefined;
-        // window width, center and name
-        if (event.value.length === 3) {
-          config.windowCenter = event.value[0];
-          config.windowWidth = event.value[1];
-          config.wlPresetName = event.value[2];
-        }
-      }
-    });
-    group.addEventListener('opacitychange', (event) => {
-      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
-      const groupId = layerDetails.groupDivId;
-      const config = this.getViewConfig(event.dataid, groupId, true);
-      if (typeof config !== 'undefined') {
-        config.opacity = event.value[0];
-      }
-    });
-    group.addEventListener('colourmapchange', (event) => {
-      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
-      const groupId = layerDetails.groupDivId;
-      const config = this.getViewConfig(event.dataid, groupId, true);
-      if (typeof config !== 'undefined') {
-        config.colourMap = event.value[0];
-      }
-    });
-  }
-
-  /**
-   * Add a view layer.
-   *
-   * @param {string} dataId The data id.
-   * @param {ViewConfig} viewConfig The data view config.
-   */
-  #addViewLayer(dataId, viewConfig) {
-    const data = this.#dataController.get(dataId);
-    if (!data) {
-      throw new Error('Cannot initialise layer with missing data, id: ' +
-        dataId);
-    }
-    const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
-    if (!layerGroup) {
-      throw new Error('Cannot initialise layer with missing group, id: ' +
-        viewConfig.divId);
-    }
-    const imageGeometry = data.image.getGeometry();
-
-    // un-bind
-    this.#stage.unbindLayerGroups();
-
-    // create and setup view
-    const viewFactory = new ViewFactory();
-    const view = viewFactory.create(data.meta, data.image);
-    const viewOrientation = getViewOrientation(
-      imageGeometry.getOrientation(),
-      getMatrixFromName(viewConfig.orientation)
-    );
-    view.setOrientation(viewOrientation);
-
-    // segmentation settings
-    if (view.isMask()) {
-      data.image.initializeContour();
-      // possible presets
-      if (typeof viewConfig.fillOpacity !== 'undefined') {
-        view.setFillOpacity(viewConfig.fillOpacity);
-      }
-      if (typeof viewConfig.contourThickness !== 'undefined') {
-        view.setContourThickness(viewConfig.contourThickness);
-      }
-    }
-
-    // do we have more than one layer
-    // (the layer has not been added to the layer group yet)
-    const isBaseLayer = layerGroup.getNumberOfViewLayers() === 0;
-
-    // opacity
-    let opacity = 1;
-    if (typeof viewConfig.opacity !== 'undefined') {
-      opacity = viewConfig.opacity;
-    } else {
-      if (!isBaseLayer) {
-        if (view.isMask()) {
-          // Assuming contours are enabled be default
-          opacity = 0.8;
-        } else {
-          opacity = 0.5;
-        }
-      }
-    }
-
-    // view layer
-    const viewLayer = layerGroup.addViewLayer();
-    viewLayer.setView(view, dataId);
-    const size2D = imageGeometry.getSize(viewOrientation).get2D();
-    const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
-    viewLayer.initialise(size2D, spacing2D, opacity);
-
-    // view controller
-    const viewController = viewLayer.getViewController();
-    // window/level
-    if (typeof viewConfig.wlPresetName !== 'undefined') {
-      viewController.setWindowLevelPreset(viewConfig.wlPresetName);
-    } else if (typeof viewConfig.windowCenter !== 'undefined' &&
-      typeof viewConfig.windowWidth !== 'undefined') {
-      const wl = new WindowLevel(
-        viewConfig.windowCenter, viewConfig.windowWidth);
-      viewController.setWindowLevel(wl);
-    }
-    // colour map
-    if (typeof viewConfig.colourMap !== 'undefined') {
-      viewController.setColourMap(viewConfig.colourMap);
-    } else {
-      if (!isBaseLayer) {
-        if (data.image.getMeta().Modality === 'PT') {
-          viewController.setColourMap('hot');
-        } else {
-          viewController.setColourMap('rainbow');
-        }
-      }
-    }
-
-    // listen to image set
-    this.#dataController.addEventListener(
-      'dataimageset', viewLayer.onimageset);
-
-    // bind overlay data
-    if (typeof this.#options.overlayConfig !== 'undefined') {
-      layerGroup.addInfoData(this.getInfoData(dataId), dataId);
-      layerGroup.bindInfoData(dataId);
-    }
-
-    // sync layers position
-    const value = [
-      viewController.getCurrentIndex().getValues(),
-      viewController.getCurrentPosition().getValues()
-    ];
-    layerGroup.updateLayersToPositionChange({
-      value: value,
-      srclayerid: viewLayer.getId()
-    });
-
-    // sync layer groups
-    this.#stage.fitToContainer();
-
-    // layer offset (done before scale)
-    viewLayer.setOffset(layerGroup.getOffset());
-
-    // get and apply flip flags
-    const flipFlags = this.#getViewFlipFlags(
-      imageGeometry.getOrientation(),
-      viewConfig.orientation);
-    this.#applyFlipFlags(flipFlags, viewLayer);
-
-    // layer scale (done after possible flip)
-    if (!isBaseLayer) {
-      // use zoom offset of base layer
-      const baseViewLayer = layerGroup.getBaseViewLayer();
-      viewLayer.initScale(
-        layerGroup.getScale(),
-        baseViewLayer.getAbsoluteZoomOffset()
-      );
-    } else {
-      viewLayer.setScale(layerGroup.getScale());
-    }
-
-    // bind
-    this.#stage.bindLayerGroups();
-    if (this.#toolboxController) {
-      this.#toolboxController.bindLayerGroup(layerGroup, viewLayer);
-    }
-
-    /**
-     * Add view layer event.
-     *
-     * @event App#viewlayeradd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} layerid The layer id.
-     * @property {string} layergroupid The layer group id.
-     * @property {string} dataid The data id.
-     */
-    this.#fireEvent({
-      type: 'viewlayeradd',
-      layerid: viewLayer.getId(),
-      layergroupid: layerGroup.getDivId(),
-      dataid: dataId
-    });
-
-    // initialise the toolbox for base
-    if (isBaseLayer) {
-      if (this.#toolboxController) {
-        this.#toolboxController.init();
-      }
-    }
-  }
-
-  /**
-   * Get the reference layer of an annotation group.
-   *
-   * @param {AnnotationGroup} annotationGroup The annotation group to attach.
-   * @param {LayerGroup} layerGroup The group where to find the reference.
-   * @returns {ViewLayer} The reference view layer.
-   */
-  #getReferenceLayer(annotationGroup, layerGroup) {
-    let refViewLayer;
-
-    // use meta
-    // -> will match empty groups created with createAnnotationData
-    const evidenceSeq =
-      annotationGroup.getMetaValue('CurrentRequestedProcedureEvidenceSequence');
-    if (typeof evidenceSeq !== 'undefined') {
-      const evidenceSeqItem0 = evidenceSeq.value[0];
-      const refSeriesSeq = evidenceSeqItem0?.ReferencedSeriesSequence;
-      const refSeriesSeqItem0 = refSeriesSeq?.value[0];
-      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
-      const metaSearch = {
-        SeriesInstanceUID: refSeriesInstanceUID
-      };
-      const viewLayers = layerGroup.searchViewLayers(metaSearch);
-      if (viewLayers.length !== 0) {
-        refViewLayer = viewLayers[0];
-      }
-    }
-
-    // dwv034 wrongly uses ReferencedSeriesSequence tag at root
-    // and does not set the SOPClassUID of annotation reference...
-    const refSeriesSeq =
-      annotationGroup.getMetaValue('ReferencedSeriesSequence');
-    if (typeof refSeriesSeq !== 'undefined') {
-      const refSeriesSeqItem0 = refSeriesSeq.value[0];
-      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
-      const metaSearch = {
-        SeriesInstanceUID: refSeriesInstanceUID
-      };
-      const viewLayers = layerGroup.searchViewLayers(metaSearch);
-      if (viewLayers.length !== 0) {
-        refViewLayer = viewLayers[0];
-      }
-    }
-
-    // if no meta, go through annotations
-    if (typeof refViewLayer === 'undefined') {
-      for (const annotation of annotationGroup.getList()) {
-        const metaSearch = {
-          SOPInstanceUID: annotation.referencedSopInstanceUID,
-          SOPClassUID: annotation.referencedSopClassUID
-        };
-        const viewLayers = layerGroup.searchViewLayers(metaSearch);
-        if (viewLayers.length !== 0) {
-          // exit at first match
-          refViewLayer = viewLayers[0];
-          break;
-        }
-      }
-    }
-
-    return refViewLayer;
-  }
-
-  /**
-   * Add a draw layer.
-   *
-   * @param {string} dataId The data id.
-   * @param {ViewConfig} viewConfig The data view config.
-   */
-  addDrawLayer(dataId, viewConfig) {
-    const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
-    if (!layerGroup) {
-      throw new Error('Cannot initialise layer with missing group, id: ' +
-        viewConfig.divId);
-    }
-
-    const data = this.#dataController.get(dataId);
-    if (!data) {
-      throw new Error('Cannot initialise layer with missing data, id: ' +
-        dataId);
-    }
-    const annotationGroup = data.annotationGroup;
-
-    // find referenced view layer
-    const refViewLayer = this.#getReferenceLayer(annotationGroup, layerGroup);
-    if (typeof refViewLayer === 'undefined') {
-      console.warn(
-        'No loaded data that matches the measurements reference series UID');
-      return;
-    }
-    const refDataId = refViewLayer.getDataId();
-
-    // un-bind
-    this.#stage.unbindLayerGroups();
-
-    // set annotation view controller (allows quantification)
-    const refViewController = refViewLayer.getViewController();
-    data.annotationGroup.setViewController(refViewController);
-
-    // reference data to use as base for layer properties
-    const refData = this.#dataController.get(refDataId);
-    if (!refData) {
-      throw new Error(
-        'Cannot initialise layer without reference data, id: ' +
-        refDataId);
-    }
-    const imageGeometry = refData.image.getGeometry();
-
-    const viewOrientation = getViewOrientation(
-      imageGeometry.getOrientation(),
-      getMatrixFromName(viewConfig.orientation)
-    );
-    const size2D = imageGeometry.getSize(viewOrientation).get2D();
-    const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
-
-    const drawLayer = layerGroup.addDrawLayer();
-    drawLayer.initialise(size2D, spacing2D, refViewLayer.getId());
-
-    const planeHelper = new PlaneHelper(
-      imageGeometry,
-      viewOrientation
-    );
-    drawLayer.setPlaneHelper(planeHelper);
-
-    // sync layers position
-    const value = [
-      refViewController.getCurrentIndex().getValues(),
-      refViewController.getCurrentPosition().getValues()
-    ];
-    layerGroup.updateLayersToPositionChange({
-      value: value,
-      srclayerid: drawLayer.getId()
-    });
-
-    // sync layer groups
-    this.#stage.fitToContainer();
-
-    // layer offset (done before scale)
-    drawLayer.setOffset(layerGroup.getOffset());
-
-    // get and apply flip flags
-    const flipFlags = this.#getViewFlipFlags(
-      imageGeometry.getOrientation(),
-      viewConfig.orientation);
-    this.#applyFlipFlags(flipFlags, drawLayer);
-
-    // layer scale (done after possible flip)
-    // use zoom offset of ref layer
-    drawLayer.initScale(
-      layerGroup.getScale(),
-      refViewLayer.getAbsoluteZoomOffset()
-    );
-
-    // add possible existing data
-    drawLayer.setAnnotationGroup(
-      data.annotationGroup,
-      dataId,
-      this.addToUndoStack);
-
-    drawLayer.setCurrentPosition(
-      refViewController.getCurrentPosition(),
-      refViewController.getCurrentIndex()
-    );
-
-    // bind
-    this.#stage.bindLayerGroups();
-    if (this.#toolboxController) {
-      this.#toolboxController.bindLayerGroup(layerGroup, drawLayer);
-    }
-
-    /**
-     * Add draw layer event.
-     *
-     * @event App#drawlayeradd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} layerid The layer id.
-     * @property {string} layergroupid The layer group id.
-     * @property {string} dataid The data id.
-     */
-    this.#fireEvent({
-      type: 'drawlayeradd',
-      layerid: drawLayer.getId(),
-      layergroupid: layerGroup.getDivId(),
-      dataid: dataId
-    });
-  }
-
-  /**
-   * Get the view flip flags: offset (x, y) and scale (x, y, z) flags.
-   *
-   * @param {Matrix33} imageOrientation The image orientation.
-   * @param {string} viewConfigOrientation The view config orientation.
-   * @returns {object} Offset and scale flip flags.
-   */
-  #getViewFlipFlags(imageOrientation, viewConfigOrientation) {
-    // 'simple' orientation code (does not take into account angles)
-    const orientationCode =
-      getOrientationStringLPS(imageOrientation.asOneAndZeros());
-    if (typeof orientationCode === 'undefined') {
-      throw new Error('Unsupported undefined orientation code');
-    }
-
-    // view orientation flags
-    const isViewUndefined = typeof viewConfigOrientation === 'undefined';
-    const isViewAxial = !isViewUndefined &&
-      viewConfigOrientation === Orientation.Axial;
-    const isViewCoronal = !isViewUndefined &&
-      viewConfigOrientation === Orientation.Coronal;
-    const isViewSagittal = !isViewUndefined &&
-      viewConfigOrientation === Orientation.Sagittal;
-
-    // default flags
-    const flipOffset = {
-      x: false,
-      y: false
-    };
-    const flipScale = {
-      x: false,
-      y: false,
-      z: false
-    };
-
-    if (orientationCode === 'LPS') {
-      // axial
-      if (isViewCoronal || isViewSagittal) {
-        flipScale.z = true;
-        flipOffset.y = true;
-      }
-    } else if (orientationCode === 'LAI') {
-      // axial
-      if (isViewUndefined || isViewAxial) {
-        flipOffset.y = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-      } else if (isViewSagittal) {
-        flipScale.z = true;
-        flipOffset.x = true;
-      }
-    } else if (orientationCode === 'RPI') {
-      // axial
-      if (isViewUndefined || isViewAxial) {
-        flipOffset.x = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-        flipOffset.x = true;
-      } else if (isViewSagittal) {
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'RAS') {
-      // axial
-      flipOffset.x = true;
-      flipOffset.y = true;
-      if (isViewCoronal || isViewSagittal) {
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'LSA') {
-      // coronal
-      flipOffset.y = true;
-      if (isViewUndefined || isViewCoronal) {
-        flipScale.z = true;
-      } else if (isViewAxial) {
-        flipScale.y = true;
-      } else if (isViewSagittal) {
-        flipOffset.x = true;
-        flipScale.y = true;
-        flipScale.z = true;
-      }
-    // } else if (orientationCode === 'LIP') { // nothing to do
-    } else if (orientationCode === 'RSP') {
-      // coronal
-      if (isViewUndefined || isViewCoronal) {
-        flipOffset.x = true;
-        flipOffset.y = true;
-        flipScale.x = true;
-        flipScale.z = true;
-      } else if (isViewAxial) {
-        flipOffset.x = true;
-        flipScale.x = true;
-      } else if (isViewSagittal) {
-        flipOffset.y = true;
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'RIA') {
-      // coronal
-      flipOffset.x = true;
-      if (isViewUndefined || isViewCoronal) {
-        flipScale.x = true;
-      } else if (isViewAxial) {
-        flipOffset.y = true;
-        flipScale.x = true;
-        flipScale.y = true;
-      } else if (isViewSagittal) {
-        flipScale.y = true;
-      }
-    } else if (orientationCode === 'PSL') {
-      // sagittal
-      flipScale.z = true;
-      if (isViewUndefined || isViewSagittal) {
-        flipOffset.y = true;
-      } else if (isViewCoronal) {
-        flipOffset.y = true;
-      }
-    } else if (orientationCode === 'PIR') {
-      // sagittal
-      flipScale.z = true;
-      if (isViewAxial || isViewCoronal) {
-        flipOffset.x = true;
-      }
-    } else if (orientationCode === 'ASR') {
-      // sagittal
-      flipOffset.x = true;
-      flipOffset.y = true;
-      if (isViewUndefined || isViewSagittal) {
-        flipScale.z = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-      }
-    } else if (orientationCode === 'AIL') {
-      // sagittal
-      if (isViewUndefined || isViewSagittal) {
-        flipOffset.x = true;
-        flipScale.z = true;
-      } else if (isViewAxial) {
-        flipOffset.y = true;
-      } else if (isViewCoronal) {
-        flipScale.z = true;
-      }
-    } else {
-      // LIP uses default scale and offset
-      if (orientationCode !== 'LIP') {
-        logger.warn('Unsupported orientation code: ' +
-          orientationCode + ', display could be incorrect');
-      }
-    }
-
-    return {
-      scale: flipScale,
-      offset: flipOffset
-    };
-  }
-
-  #applyFlipFlags(flipFlags, layer) {
-    if (flipFlags.offset.x) {
-      layer.addFlipOffsetX();
-    }
-    if (flipFlags.offset.y) {
-      layer.addFlipOffsetY();
-    }
-    if (flipFlags.scale.x) {
-      layer.flipScaleX();
-    }
-    if (flipFlags.scale.y) {
-      layer.flipScaleY();
-    }
-    if (flipFlags.scale.z) {
-      layer.flipScaleZ();
-    }
-  }
 
 } // class App

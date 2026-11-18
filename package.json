@@ -1,6 +1,6 @@
 {
   "name": "dwv",
-  "version": "0.36.2",
+  "version": "0.37.0",
   "description": "DICOM Web Viewer.",
   "keywords": [
     "DICOM",
@@ -24,40 +24,39 @@
     "default": "./dist/dwv.min.js"
   },
   "engines": {
-    "node": ">= 14.0.0"
+    "node": ">= 18.0.0"
   },
   "browserslist": [
     ">1%, last 2 versions, not dead"
   ],
   "dependencies": {
+    "dcmstdtojs": "0.2.0",
     "jszip": "^3.10.1",
-    "konva": "~10.2.0",
+    "konva": "~10.9.0",
     "magic-wand-tool": "~1.1.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
-    "@eslint/js": "^9.39.2",
-    "@microsoft/api-extractor": "^7.55.1",
-    "@stylistic/eslint-plugin": "^5.7.0",
-    "@vitest/coverage-v8": "^4.0.17",
-    "babel-loader": "^10.0.0",
-    "babel-plugin-istanbul": "^7.0.1",
+    "@eslint/js": "^10.0.1",
+    "@microsoft/api-extractor": "^7.59.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@vitest/coverage-v8": "^5.1.0",
     "benchmark": "^2.1.4",
-    "canvas": "^3.2.1",
-    "clean-jsdoc-theme": "^4.3.0",
-    "eslint": "^9.39.2",
-    "eslint-plugin-jsdoc": "^62.0.0",
-    "github-release-notes": "0.17.2",
-    "globals": "^17.0.0",
-    "html-webpack-plugin": "^5.6.5",
+    "canvas": "^3.2.3",
+    "clean-jsdoc-theme": "^5.2.0",
+    "diff": "^9.0.0",
+    "diff2html": "^3.4.56",
+    "eslint": "^10.10.0",
+    "eslint-plugin-jsdoc": "^65.0.2",
+    "globals": "^17.12.0",
+    "html-webpack-plugin": "^5.6.8",
     "jsdoc": "^4.0.5",
-    "jsdom": "^28.0.0",
+    "jsdom": "^30.0.1",
     "typescript": "5.6.3",
-    "vitest": "^4.0.17",
-    "webpack": "^5.104.1",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.1.0",
+    "webpack": "^5.110.3",
+    "webpack-cli": "^7.2.3",
+    "webpack-dev-server": "^6.0.0",
     "webpack-merge": "^6.0.1"
   },
   "scripts": {
@@ -65,15 +64,16 @@
     "pack": "webpack --config config/webpack.prod.js",
     "pack-node": "webpack --config config/webpack.node.js",
     "build": "yarn run pack && yarn run types && yarn run api",
+    "build-ci": "yarn run pack && yarn run types && yarn run api-ci",
     "build-all": "yarn run build && yarn run pack-node",
     "build-demo": "webpack --config config/webpack.demo.js",
     "lint": "eslint -c config/eslint.config-full.js 'src/**/*.js' 'tests/**/*.js' '*.js'",
     "test": "vitest",
     "test-ci": "vitest --coverage --watch false --reporter default --reporter json",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
-    "gren": "gren",
     "types": "tsc -p resources/api/tsconfig.json",
-    "api": "api-extractor run -c resources/api/api-extractor.json --local"
+    "api": "api-extractor run -c resources/api/api-extractor.json --local",
+    "api-ci": "api-extractor run -c resources/api/api-extractor.json"
   },
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.18.0"
 }

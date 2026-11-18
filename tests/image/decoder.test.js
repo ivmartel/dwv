@@ -1,0 +1,309 @@
+import {describe, test, assert, vi, beforeEach} from 'vitest';
+
+// ---------------------------------------------------------------------------
+// Mock ThreadPool so no real Web Worker is ever created.
+// The mock exposes spy functions for every method the decoder touches.
+// vi.mock is hoisted by Vitest so it runs before any import.
+// ---------------------------------------------------------------------------
+vi.mock('../../src/utils/thread.js', () => {
+  /**
+   * Minimal WorkerTask base class used by the internal decoder task classes.
+   */
+  class WorkerTask {
+    /**
+     * @param {object} message The start message.
+     * @param {object} info Task information.
+     */
+    constructor(message, info) {
+      this.startMessage = message;
+      this.info = info;
+    }
+    /** @returns {undefined} No worker in tests. */
+    getWorker() {
+      return undefined;
+    }
+  }
+
+  /**
+   * Mock ThreadPool constructor.
+   * Uses a regular function (not arrow) so it can be called with `new`.
+   * Each instance gets its own spy methods.
+   */
+
+  const ThreadPool = vi.fn(function () {
+    this.addWorkerTask = vi.fn();
+    this.abort = vi.fn();
+    this.onworkstart = undefined;
+    this.onworkitem = undefined;
+    this.onwork = undefined;
+    this.onworkend = undefined;
+    this.onerror = undefined;
+    this.onabort = undefined;
+  });
+
+  return {ThreadPool, WorkerTask};
+});
+
+import {PixelBufferDecoder} from '../../src/image/decoder.js';
+import {ThreadPool} from '../../src/utils/thread.js';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the ThreadPool mock instance created by the last PixelBufferDecoder
+ * constructor call.
+ *
+ * @returns {object} The mock pool instance.
+ */
+function lastPool() {
+  const instances = ThreadPool.mock.instances;
+  return instances[instances.length - 1];
+}
+
+describe('image', () => {
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // -------------------------------------------------------------------------
+  // Constructor
+  // -------------------------------------------------------------------------
+
+  /**
+   * Tests for {@link PixelBufferDecoder} constructor.
+   *
+   * @function module:tests/image~decoderConstructor
+   */
+  test('PixelBufferDecoder constructor creates a ThreadPool with ' +
+    'the default size',
+  () => {
+    new PixelBufferDecoder('jpeg-baseline');
+    assert.equal(ThreadPool.mock.calls.length, 1,
+      'ThreadPool constructed once');
+    assert.isUndefined(ThreadPool.mock.calls[0][0], 'default pool size');
+  }
+  );
+
+  // -------------------------------------------------------------------------
+  // Default event handlers
+  // -------------------------------------------------------------------------
+
+  /**
+   * Tests that all default event handlers are no-ops.
+   *
+   * @function module:tests/image~decoderDefaultHandlers
+   */
+  test('PixelBufferDecoder default event handlers exist and do not throw',
+    () => {
+      const dec = new PixelBufferDecoder('jpeg-baseline');
+      assert.doesNotThrow(() => dec.ondecodestart({}));
+      assert.doesNotThrow(() => dec.ondecodeditem({}));
+      assert.doesNotThrow(() => dec.ondecoded({}));
+      assert.doesNotThrow(() => dec.ondecodeend({}));
+      assert.doesNotThrow(() => dec.onerror({}));
+      assert.doesNotThrow(() => dec.onabort({}));
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // decode() — lazy callback wiring
+  // -------------------------------------------------------------------------
+
+  /**
+   * Tests that the first decode() call wires the decoder's event handlers
+   * onto the pool.
+   *
+   * @function module:tests/image~decoderCallbackWiring
+   */
+  test('PixelBufferDecoder decode wires event handlers to pool on first call',
+    () => {
+      const dec = new PixelBufferDecoder('jpeg-baseline');
+      const pool = lastPool();
+
+      dec.decode(new Uint8Array([0]), {}, {});
+
+      assert.equal(pool.onworkstart, dec.ondecodestart, 'onworkstart');
+      assert.equal(pool.onworkitem, dec.ondecodeditem, 'onworkitem');
+      assert.equal(pool.onwork, dec.ondecoded, 'onwork');
+      assert.equal(pool.onworkend, dec.ondecodeend, 'onworkend');
+      assert.equal(pool.onerror, dec.onerror, 'onerror');
+      assert.equal(pool.onabort, dec.onabort, 'onabort');
+    }
+  );
+
+  /**
+   * Tests that pool callbacks are assigned only once across multiple decode
+   * calls.
+   *
+   * @function module:tests/image~decoderCallbackWiringOnce
+   */
+  test('PixelBufferDecoder decode wires callbacks only on the first call',
+    () => {
+      const dec = new PixelBufferDecoder('jpeg-baseline');
+
+      // Replace one handler after the first decode wires it up
+      dec.decode(new Uint8Array([0]), {}, {});
+      const pool = lastPool();
+      const originalHandler = pool.onworkstart;
+
+      // A second decode call must NOT overwrite the already-set handler
+      dec.decode(new Uint8Array([1]), {}, {});
+      assert.equal(pool.onworkstart, originalHandler,
+        'handler not overwritten on second call');
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // decode() — algorithm routing
+  // -------------------------------------------------------------------------
+
+  /**
+   * Tests that decode() routes 'jpeg-baseline' to the correct worker task.
+   *
+   * @function module:tests/image~decoderRouteJpegBaseline
+   */
+  test('PixelBufferDecoder decode routes jpeg-baseline to correct task', () => {
+    const dec = new PixelBufferDecoder('jpeg-baseline');
+    const pool = lastPool();
+    dec.decode(new Uint8Array([0xFF, 0xD8]), {bitsAllocated: 8}, {index: 0});
+
+    assert.equal(pool.addWorkerTask.mock.calls.length, 1);
+    const task = pool.addWorkerTask.mock.calls[0][0];
+    assert.equal(task.constructor.name, 'JpegBaselineWorkerTask');
+  });
+
+  /**
+   * Tests that decode() routes 'jpeg-lossless' to the correct worker task.
+   *
+   * @function module:tests/image~decoderRouteJpegLossless
+   */
+  test('PixelBufferDecoder decode routes jpeg-lossless to correct task',
+    () => {
+      const dec = new PixelBufferDecoder('jpeg-lossless');
+      const pool = lastPool();
+      dec.decode(new Uint8Array([0]), {}, {});
+
+      const task = pool.addWorkerTask.mock.calls[0][0];
+      assert.equal(task.constructor.name, 'JpegLosslessWorkerTask');
+    }
+  );
+
+  /**
+   * Tests that decode() routes 'jpeg2000' to the correct worker task.
+   *
+   * @function module:tests/image~decoderRouteJpeg2000
+   */
+  test('PixelBufferDecoder decode routes jpeg2000 to correct task', () => {
+    const dec = new PixelBufferDecoder('jpeg2000');
+    const pool = lastPool();
+    dec.decode(new Uint8Array([0]), {}, {});
+
+    const task = pool.addWorkerTask.mock.calls[0][0];
+    assert.equal(task.constructor.name, 'Jpeg2000WorkerTask');
+  });
+
+  /**
+   * Tests that decode() routes 'rle' to the correct worker task.
+   *
+   * @function module:tests/image~decoderRouteRle
+   */
+  test('PixelBufferDecoder decode routes rle to correct task', () => {
+    const dec = new PixelBufferDecoder('rle');
+    const pool = lastPool();
+    dec.decode(new Uint8Array([0]), {}, {});
+
+    const task = pool.addWorkerTask.mock.calls[0][0];
+    assert.equal(task.constructor.name, 'RleWorkerTask');
+  });
+
+  // -------------------------------------------------------------------------
+  // decode() — task payload
+  // -------------------------------------------------------------------------
+
+  /**
+   * Tests that the worker task receives the correct buffer, meta and info.
+   *
+   * @function module:tests/image~decoderTaskPayload
+   */
+  test('PixelBufferDecoder decode passes buffer, meta and info to task', () => {
+    const dec = new PixelBufferDecoder('rle');
+    const pool = lastPool();
+    const buf = new Uint8Array([1, 2, 3]);
+    const meta = {bitsAllocated: 16, isSigned: true};
+    const info = {frameIndex: 2, numberOfFrames: 10};
+
+    dec.decode(buf, meta, info);
+
+    const task = pool.addWorkerTask.mock.calls[0][0];
+    assert.equal(task.startMessage.buffer, buf, 'buffer forwarded');
+    assert.equal(task.startMessage.meta, meta, 'meta forwarded');
+    assert.equal(task.info, info, 'info forwarded');
+  });
+
+  /**
+   * Tests that the decoder task start message holds a compact copy of the
+   * input buffer and transfers it.
+   *
+   * @function module:tests/image~decoderTaskStartMessage
+   */
+  test('PixelBufferDecoder task posts a compact transferred copy', () => {
+    const dec = new PixelBufferDecoder('rle');
+    const pool = lastPool();
+    // view on a bigger buffer, as a pixel data fragment on a file buffer
+    const fileBuffer = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7]);
+    const fragment = fileBuffer.subarray(2, 5);
+    const meta = {bitsAllocated: 8};
+
+    dec.decode(fragment, meta, {});
+
+    const task = pool.addWorkerTask.mock.calls[0][0];
+    const {message, transfer} = task.getStartMessage();
+    assert.notEqual(message.buffer, fragment, 'buffer is a copy');
+    assert.deepEqual(Array.from(message.buffer), [2, 3, 4], 'same values');
+    assert.equal(message.buffer.buffer.byteLength, 3,
+      'copy only holds the view data');
+    assert.equal(message.meta, meta, 'meta forwarded');
+    assert.equal(transfer.length, 1, 'one transferred object');
+    assert.equal(transfer[0], message.buffer.buffer,
+      'copy buffer transferred');
+    assert.equal(fragment.buffer.byteLength, 8, 'input left untouched');
+  });
+
+  // -------------------------------------------------------------------------
+  // decode() — unknown algorithm
+  // -------------------------------------------------------------------------
+
+  /**
+   * Tests that decode() does not add a task for an unrecognised algorithm.
+   *
+   * @function module:tests/image~decoderUnknownAlgo
+   */
+  test('PixelBufferDecoder decode ignores unknown algorithm names', () => {
+    const dec = new PixelBufferDecoder('unknown-codec');
+    const pool = lastPool();
+    dec.decode(new Uint8Array([0]), {}, {});
+
+    assert.equal(pool.addWorkerTask.mock.calls.length, 0,
+      'no task added for unknown algorithm');
+  });
+
+  // -------------------------------------------------------------------------
+  // abort()
+  // -------------------------------------------------------------------------
+
+  /**
+   * Tests that abort() delegates to the underlying thread pool.
+   *
+   * @function module:tests/image~decoderAbort
+   */
+  test('PixelBufferDecoder abort delegates to pool.abort', () => {
+    const dec = new PixelBufferDecoder('jpeg-baseline');
+    const pool = lastPool();
+    dec.abort();
+    assert.equal(pool.abort.mock.calls.length, 1, 'pool.abort called once');
+  });
+
+});

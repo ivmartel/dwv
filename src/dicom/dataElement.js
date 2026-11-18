@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Tag} from './dicomTag.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Tag} from './dicomTag.js';
+ */
 
 /**
  * DICOM data element.
@@ -93,7 +92,7 @@ function hasValue(element) {
 /**
  * Safely get an elements' first value from a list of elements.
  *
- * @param {Object<string, DataElement>} dataElements A list of data elements.
+ * @param {Record<string, DataElement>} dataElements A list of data elements.
  * @param {string} key The tag key as for example '00100020'.
  * @returns {any|undefined} The elements' value or undefined.
  */
@@ -108,7 +107,7 @@ export function safeGet(dataElements, key) {
 /**
  * Safely get all of an elements' values from a list of elements.
  *
- * @param {Object<string, DataElement>} dataElements A list of data elements.
+ * @param {Record<string, DataElement>} dataElements A list of data elements.
  * @param {string} key The tag key as for example '00100020'.
  * @returns {any[]|undefined} The elements' values or undefined.
  */
@@ -135,20 +134,19 @@ export function safeGetAll(dataElements, key) {
 export function checkDataElement(element, name, values) {
   let warning = '';
   if (typeof element === 'undefined') {
-    warning += ' ' + name + ' is undefined,';
+    warning += ` ${name} is undefined,`;
   } else if (typeof element.value === 'undefined') {
-    warning += ' ' + name + ' has undefined value,';
+    warning += ` ${name} has undefined value,`;
   } else if (element.value.length === 0) {
-    warning += ' ' + name + ' is empty,';
-  } else {
-    if (typeof values !== 'undefined') {
-      for (let i = 0; i < values.length; ++i) {
-        if (!element.value.includes(values[i])) {
-          warning += ' ' + name + ' does not contain ' + values[i] +
-            ' (value: ' + element.value + '),';
-        }
+    warning += ` ${name} is empty,`;
+  } else if (typeof values !== 'undefined') {
+    for (let i = 0; i < values.length; ++i) {
+      if (!element.value.includes(values[i])) {
+        warning += ` ${name} does not contain ${ values[i]
+        } (value: ${element.value}),`;
       }
     }
   }
   return warning;
 }
+

@@ -14,12 +14,9 @@ import {
   getURLsFromKeyValueUri,
   handleURLsFromWeasisXMLManifest
 } from './uri.js';
-import {precisionRound} from './string.js';
-import {Command} from './undoStack.js';
 
 export {
   BooleanResult,
-  Command,
   RGB,
   i18n,
   logger,
@@ -29,7 +26,6 @@ export {
   labToUintLab,
   getURLsFromKeyValueUri,
   handleURLsFromWeasisXMLManifest,
-  precisionRound,
   rgbToHex,
   srgbToCielab
 };

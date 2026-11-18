@@ -31,8 +31,11 @@ import {
 } from '../dicom/dicomParser.js';
 import {MeasuredValue} from '../dicom/dicomMeasuredValue.js';
 import {NumericMeasurement} from '../dicom/dicomNumericMeasurement.js';
-import {getAsSimpleElements} from '../dicom/dicomTag.js';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {
+  getAsSimpleTagValues,
+  getElementsFromSimpleTagValues,
+  mergeTagValues
+} from '../dicom/simpleTagValues.js';
 import {ImageReference} from '../dicom/dicomImageReference.js';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference.js';
 import {
@@ -42,17 +45,16 @@ import {
   SpatialCoordinate
 } from '../dicom/dicomSpatialCoordinate.js';
 import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D.js';
-import {BIG_EPSILON_EXPONENT} from '../math/matrix.js';
-import {precisionRound} from '../utils/string.js';
+import {BIG_EPSILON_EXPONENT, precisionRound} from '../math/number.js';
 import {logger} from '../utils/logger.js';
 import {Annotation} from './annotation.js';
 import {AnnotationGroup} from './annotationGroup.js';
 import {Point2D, Point3D} from '../math/point.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from '../dicom/dataElement.js';
+ * @import {SimpleTagValues} from '../dicom/types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -70,22 +72,6 @@ const TagKeys = {
   PatientSex: '00100040',
   CurrentRequestedProcedureEvidenceSequence: '0040A375'
 };
-
-/**
- * Merge two tag lists.
- *
- * @param {object} tags1 Base list, will be modified.
- * @param {object} tags2 List to merge.
- */
-function mergeTags(tags1, tags2) {
-  const keys2 = Object.keys(tags2);
-  for (const tagName2 of keys2) {
-    if (tags1[tagName2] !== undefined) {
-      logger.debug('Overwritting tag: ' + tagName2);
-    }
-    tags1[tagName2] = tags2[tagName2];
-  }
-}
 
 /**
  * Response evaluation class.
@@ -138,6 +124,14 @@ export class AnnotationGroupFactory {
   #warning;
 
   /**
+   * Flag to know if the referenced frame numbers of the
+   * input data are 0-based.
+   *
+   * @type {boolean}
+   */
+  #isZeroBasedFrameNumber = false;
+
+  /**
    * Get a warning string if elements are not as expected.
    * Created by checkElements.
    *
@@ -150,7 +144,7 @@ export class AnnotationGroupFactory {
   /**
    * Check if input elements contain a dwv 0.34 annotation.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a dwv 0.34 annotation.
    */
   #isDwv034AnnotationDicomSR(dataElements) {
@@ -178,10 +172,28 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Check if input elements contain a TID 1500 annotation.
-   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1500}.
+   * Check if input elements were written by a dwv version that used
+   * 0-based referenced frame numbers (up to v0.37.0-beta.17).
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
+   * @returns {boolean} True if the frame numbers are 0-based.
+   */
+  #hasZeroBasedFrameNumber(dataElements) {
+    const classUID =
+      safeGet(dataElements, TagKeys.ImplementationClassUID);
+    let dwvVersion;
+    if (typeof classUID !== 'undefined') {
+      dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    }
+    return typeof dwvVersion !== 'undefined' &&
+      isVersionInBounds(dwvVersion, '0.34.0', '0.37.0-beta.17');
+  }
+
+  /**
+   * Check if input elements contain a TID 1500 annotation.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1500}.
+   *
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 1500 annotation.
    */
   #isTid1500AnnotationDicomSR(dataElements) {
@@ -231,9 +243,9 @@ export class AnnotationGroupFactory {
 
   /**
    * Check if input elements contain a TID 4100 template.
-   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_4100}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/sect_ChestCADSRIODTemplates.html#sect_TID_4100}.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 4100 template.
    */
   #isTid4100DicomSR(dataElements) {
@@ -245,7 +257,7 @@ export class AnnotationGroupFactory {
   /**
    * Check dicom elements.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
    */
   checkElements(dataElements) {
@@ -275,8 +287,12 @@ export class AnnotationGroupFactory {
       annotation.referencedSopInstanceUID =
         content.value.referencedSOPSequence.referencedSOPInstanceUID;
       if (typeof content.value.referencedFrameNumber !== 'undefined') {
-        annotation.referencedFrameNumber =
-          parseInt(content.value.referencedFrameNumber, 10);
+        let frameNumber = parseInt(content.value.referencedFrameNumber, 10);
+        // backwards compatibility: 0-based frame number
+        if (this.#isZeroBasedFrameNumber) {
+          frameNumber += 1;
+        }
+        annotation.referencedFrameNumber = frameNumber;
       }
     }
   }
@@ -431,8 +447,7 @@ export class AnnotationGroupFactory {
     }
     if (content.valueType === ValueTypes.num &&
       content.relationshipType === relation) {
-      const quantifName =
-        getQuantificationName(content.conceptNameCode);
+      const quantifName = getQuantificationName(content.conceptNameCode);
       if (typeof quantifName !== 'undefined') {
         const measuredValue = content.value.measuredValue;
         const quantifUnit = getQuantificationUnit(
@@ -603,7 +618,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is a measurement group follows TID 1410:
    * it must contain an image region.
-   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1410}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1410}.
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {boolean} True if an image region was found.
@@ -654,7 +669,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is an SR content follows TID 300: it must be
    *   a 'contains' numeric value with an 'inferred from' scoord.
-   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_300}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_300}.
    *
    * @param {DicomSRContent} item The SR content.
    * @returns {boolean} True if TID 300 measure.
@@ -678,7 +693,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is an SR content follows TID 1400: it must be
    *   a 'has properties' numeric value with an 'inferred from' scoord.
-   * Ref: {@link https://dicom.nema.org/medical/Dicom/current/output/chtml/part16/chapter_A.html#sect_TID_1400}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1400}.
    *
    * @param {DicomSRContent} item The SR content.
    * @returns {boolean} True if TID 300 measure.
@@ -702,7 +717,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is a measurement group follows TID 1501:
    * it must contain a measure.
-   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1501}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1501}.
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {boolean} True if a measure was found.
@@ -875,12 +890,10 @@ export class AnnotationGroupFactory {
     let annotationGroup;
     if (!hasMeasGroup) {
       logger.warn('No measurement groups in TID 1500 SR');
+    } else if (annotations.length !== 0) {
+      annotationGroup = new AnnotationGroup(annotations);
     } else {
-      if (annotations.length !== 0) {
-        annotationGroup = new AnnotationGroup(annotations);
-      } else {
-        logger.warn('No valid measurement groups in TID 1500 SR');
-      }
+      logger.warn('No valid measurement groups in TID 1500 SR');
     }
     return annotationGroup;
   }
@@ -912,12 +925,10 @@ export class AnnotationGroupFactory {
     const annotationGroups = [];
     if (!hasMeasGroup) {
       logger.warn('No image findings in TID 4100 SR');
+    } else if (annotations.length !== 0) {
+      annotationGroups.push(new AnnotationGroup(annotations));
     } else {
-      if (annotations.length !== 0) {
-        annotationGroups.push(new AnnotationGroup(annotations));
-      } else {
-        logger.warn('No valid measurement groups in TID 4100 SR');
-      }
+      logger.warn('No valid measurement groups in TID 4100 SR');
     }
     return annotationGroups;
   }
@@ -1039,7 +1050,7 @@ export class AnnotationGroupFactory {
    * Add root meta data to an annotation group.
    *
    * @param {AnnotationGroup} annotationGroup The group to add meta to.
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    */
   #addMetaToAnnotationGroup(annotationGroup, dataElements) {
     const safeGetLocal = function (key) {
@@ -1076,7 +1087,7 @@ export class AnnotationGroupFactory {
       const evidenceSqElement = {
         [evidenceTagKey]: evidenceSq
       };
-      const evidences = getAsSimpleElements(evidenceSqElement);
+      const evidences = getAsSimpleTagValues(evidenceSqElement);
       annotationGroup.setMetaValue(
         'CurrentRequestedProcedureEvidenceSequence',
         evidences.CurrentRequestedProcedureEvidenceSequence
@@ -1087,11 +1098,13 @@ export class AnnotationGroupFactory {
   /**
    * Get an {@link AnnotationGroup} object from the read DICOM file.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @returns {AnnotationGroup} A new annotation group.
    * @throws {Error} Error for missing or wrong data.
    */
   create(dataElements) {
+    this.#isZeroBasedFrameNumber =
+      this.#hasZeroBasedFrameNumber(dataElements);
     const srContent = getSRContent(dataElements);
 
     let annotationGroup;
@@ -1118,7 +1131,7 @@ export class AnnotationGroupFactory {
     }
 
     if (typeof annotationGroup === 'undefined') {
-      throw new Error('Cannot create annotation group from ' + srType);
+      throw new Error(`Cannot create annotation group from ${srType}`);
     }
 
     // add dicom meta
@@ -1130,10 +1143,12 @@ export class AnnotationGroupFactory {
   /**
    * Get an {@link CADReport} object from the read DICOM file.
    *
-   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @returns {CADReport|undefined} A new CAD report.
    */
   createCADReport(dataElements) {
+    this.#isZeroBasedFrameNumber =
+      this.#hasZeroBasedFrameNumber(dataElements);
     const srContent = getSRContent(dataElements);
 
     // get the summary
@@ -1414,8 +1429,8 @@ export class AnnotationGroupFactory {
    * TID 1500 template.
    *
    * @param {AnnotationGroup} annotationGroup The annotation group.
-   * @param {Object<string, any>} [extraTags] Optional list of extra tags.
-   * @returns {Object<string, DataElement>} A list of dicom elements.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
+   * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(annotationGroup, extraTags) {
     let tags = annotationGroup.getMeta();
@@ -1423,7 +1438,7 @@ export class AnnotationGroupFactory {
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     // class: Comprehensive 3D SR Storage
-    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_A.35.13.html
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.35.13.html
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.CompletionFlag = 'PARTIAL';
@@ -1486,10 +1501,10 @@ export class AnnotationGroupFactory {
 
     // merge extra tags if provided
     if (typeof extraTags !== 'undefined') {
-      mergeTags(tags, extraTags);
+      mergeTagValues(tags, extraTags);
     }
 
-    return getElementsFromJSONTags(tags);
+    return getElementsFromSimpleTagValues(tags);
   }
 
   /**
@@ -1670,8 +1685,8 @@ export class AnnotationGroupFactory {
    *   the TID 4100 template.
    *
    * @param {CADReport} report The CAD report.
-   * @param {Object<string, any>} [extraTags] Optional list of extra tags.
-   * @returns {Object<string, DataElement>} A list of dicom elements.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
+   * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicomCADReport(report, extraTags) {
     // first group as tag base
@@ -1680,7 +1695,7 @@ export class AnnotationGroupFactory {
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     // class: Comprehensive 3D SR Storage
-    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_A.35.13.html
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.35.13.html
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.CompletionFlag = 'PARTIAL';
@@ -1783,10 +1798,10 @@ export class AnnotationGroupFactory {
 
     // merge extra tags if provided
     if (typeof extraTags !== 'undefined') {
-      mergeTags(tags, extraTags);
+      mergeTagValues(tags, extraTags);
     }
 
-    return getElementsFromJSONTags(tags);
+    return getElementsFromSimpleTagValues(tags);
   }
 
 }

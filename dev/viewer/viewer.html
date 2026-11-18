@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DWV Test Viewer</title>
+<meta charset="UTF-8">
+<meta name="description" content="DICOM Web Viewer (DWV) simple version">
+<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<!-- Style -->
+<style type="text/css">
+body {
+  font-family: 'Courier New', monospace;
+  font-size: small;
+}
+button, input, select, textarea {
+  font: inherit;
+}
+html, body {
+  height: 99%;
+}
+table {
+  margin: 0 5px;
+}
+td, th {
+  border: 1px solid #aaa;
+  padding: 10px;
+}
+th {
+  background: #ddd;
+}
+thead {
+  position: sticky;
+  top: 0;
+}
+progress {
+  width: 40%;
+}
+span {
+  font-style: italic;
+}
+button {
+  margin: 0 3px;
+  padding: 2px 3px;
+  /* fixed line height so fallback fonts (e.g. for the split
+    button toggle glyph) do not change the button height */
+  line-height: 1.2;
+}
+input[type=number] {
+  width: 75px;
+}
+input[type=color] {
+  margin: 0 3px;
+  width: 24px;
+  height: 23px;
+}
+select {
+  width: 90px;
+}
+fieldset {
+  legend {
+    font-style: italic;
+  }
+}
+fieldset ul {
+  padding-left: 20px;
+  margin: 0;
+}
+#fileinput {
+  width: 50%;
+  border: 1px dotted gray;
+}
+#about {
+  font-style: italic;
+}
+#layersdetails {
+  max-height: 200px;
+  overflow: auto;
+  background-color: #E8E8E8;
+  margin: 5px 0;
+}
+.line {
+  padding: 5px;
+  background-color: #E8E8E8;
+}
+.split-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+/* each div takes half of the line, its content wraps inside
+  (growing vertically) instead of moving the divs to a new line */
+.split-line > div {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.split-line > div:last-child {
+  justify-content: flex-end;
+}
+/* temporal position on its own line, hidden when empty */
+#temporalpositionspan {
+  flex-basis: 100%;
+}
+#temporalpositionspan:empty {
+  display: none;
+}
+.toolFeatures {
+  margin: 0 5px;
+}
+.ctrl-range {
+  width: 100px;
+  margin: 0px 10px;
+}
+/* special dwv */
+#dwv {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 200px;
+  height: 40%;
+  /* compensate for layer absolute position */
+  margin-bottom: 10px;
+}
+.layerGroup {
+  flex: 1 1;
+  min-width: 30%;
+  margin: 5px 0;
+  background-color: limeGreen;
+  /* allow child centering */
+  position: relative;
+}
+.layer {
+  /* needed for overlay */
+  position: absolute;
+  /* center */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.vertical-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  margin: 5px 5px 5px 0;
+  width: 10px;
+  -webkit-appearance: none;
+}
+/** slider vertical settings*/
+input.vertical-slider[type=range]::-webkit-slider-runnable-track {
+  width: 10px;
+  cursor: pointer;
+  background: lightgray;
+  border: 0;
+}
+input.vertical-slider[type=range]::-webkit-slider-thumb {
+  width: 10px;
+  height: 15px;
+  background: #2F3C4A;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: 0px;
+  border: 0;
+}
+input.vertical-slider[type=range]:disabled::-webkit-slider-thumb {
+  background: lightgray;
+}
+input.vertical-slider[type=range]:focus::-webkit-slider-runnable-track {
+  background: lightgray;
+}
+input.vertical-slider[type=range]::-moz-range-track {
+  width: 10px;
+  cursor: pointer;
+  background: lightgray;
+  border: 0;
+}
+input.vertical-slider[type=range]::-moz-range-thumb {
+  width: 10px;
+  height: 15px;
+  background: #2F3C4A;
+  cursor: pointer;
+  border: 0;
+}
+input.vertical-slider[type=range]:disabled::-moz-range-thumb {
+  background: lightgray;
+}
+
+canvas {
+  /* avoid parent auto-resize */
+  vertical-align: middle;
+}
+/** tooltip */
+.layerGroup span {
+  display: none;
+  background-color: palegreen;
+  padding: 2px;
+}
+.layerGroup:hover span {
+  display: inline-block;
+  position: absolute;
+  overflow: hidden;
+}
+/** crossshair */
+.layerGroup hr {
+  pointer-events: none;
+  border: none;
+  position: absolute;
+  margin: 0;
+}
+hr.horizontal {
+  border-top: 2px dashed lime;
+}
+hr.vertical {
+  border-top: 2px dashed lime;
+  transform-origin: left;
+  transform: rotate(90deg);
+}
+#brushCursor {
+  pointer-events: none;
+  position: absolute;
+  z-index: 100;
+
+  width: 10px;
+  height: 10px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
+#overlap-checker * {
+  margin-right: 0.5em;
+  width: auto;
+}
+
+/** collapse span */
+.collapse-main {
+  cursor: pointer;
+}
+.collapse-details {
+  display: none;
+}
+
+/* Info layer */
+.infoLayer {
+  position: absolute;
+  pointer-events: none;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+}
+.infoLayer ul {
+  margin: 0;
+  padding: 2px;
+  list-style-type: none;
+}
+.infoLayer li {
+  margin-top: 0;
+}
+.infoLayer canvas {
+  margin: 0;
+  padding: 2px;
+}
+.info {
+  color: #cde;
+  text-shadow: 1px 1px #000;
+  font-size: 0.8rem;
+  max-width: 50%;
+  max-height: 50%;
+  overflow: auto;
+}
+/* position indicators (c, tl, tc, bl...)
+  need to be in sync with those defined
+  in the overlay.json file */
+/* center */
+.info-c {
+  color: #ff0;
+  text-shadow: 1px 1px #000;
+  font-size: 1.2rem;
+}
+/* top left */
+.info-tl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: left;
+}
+/* top center */
+.info-tc {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: 50%;
+  text-align: center;
+}
+/* top right */
+.info-tr {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+}
+/* center left */
+.info-cl {
+  position: absolute;
+  bottom: 50%;
+  left: 0;
+  text-align: left;
+}
+/* center right */
+.info-cr {
+  position: absolute;
+  bottom: 50%;
+  right: 2px;
+  text-align: right;
+}
+/* bottom left */
+.info-bl {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  text-align: left;
+}
+/* bottom center */
+.info-bc {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+  text-align: center;
+}
+/* bottom right */
+.info-br {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  text-align: right;
+}
+
+/* annotation */
+.data-item-header, .data-item-content,
+.data-item-name, .data-item-actions,
+.data-item-list-item,
+.data-item-list-item-content, .data-item-list-item-actions,
+.data-item-list, .data-item-content > span
+{
+  display: inline-block;
+}
+#tools button.selected {
+  background-color: #dde;
+  border: 1px solid #4a5bb9;
+}
+.tool-split-button {
+  position: relative;
+  display: inline-block;
+  button[name="tools"] {
+    margin-right: 0;
+  }
+  .tool-menu-toggle {
+    margin-left: 0;
+    padding: 2px 1px;
+  }
+}
+.tool-menu {
+  position: absolute;
+  z-index: 10;
+  left: 3px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 2px 0;
+  list-style-type: none;
+  background-color: #fff;
+  border: 1px solid #aaa;
+  li {
+    padding: 2px 8px;
+    cursor: pointer;
+  }
+  li:hover,
+  li:focus {
+    background-color: #ccc;
+  }
+}
+.tool-menu[hidden] {
+  display: none;
+}
+.data-item-list {
+  list-style-type: none;
+  padding: 0;
+}
+.data-item-list li:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+.data-item-list li {
+  background-color: #E8E8E8;
+  border: 1px dashed transparent;
+}
+.data-item-list .selected {
+  background-color: #dde;
+  border: 1px dashed #4a5bb9;
+}
+.data-item-list-item-details {
+  max-width: 400px;
+  margin: 2px 3px;
+  padding-top: 2px;
+  border-top: 1px solid #aaa;
+  cursor: default;
+  font-size: small;
+
+  /* group title and values on one line, wrap if needed */
+  .quantification-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 1em;
+    row-gap: 2px;
+    margin-top: 3px;
+  }
+  .quantification-group:first-child {
+    margin-top: 0;
+  }
+  .quantification-title {
+    font-weight: bold;
+  }
+  /* pairs flow in the group line (avoids the title alone on a line) */
+  .quantification {
+    display: contents;
+    div {
+      display: flex;
+      gap: 0.3em;
+    }
+    dt {
+      opacity: 0.75;
+    }
+    dt::after {
+      content: ':';
+    }
+    dd {
+      margin: 0;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+  .quantification-empty {
+    font-style: italic;
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="line">
+  <label for="fileinput">Input:</label>
+  <input type="file" id="fileinput" multiple>
+  <progress id="loadprogress" max="100" value="0"></progress>
+</div>
+
+<!-- DWV -->
+<div id="dwv" tabindex="0"></div>
+
+<div class="line split-line">
+  <div id="position-line">
+    <label for="position">Position:</label>
+    <input type="text" id="position" autocomplete="off" >
+    <span id="positionspan"></span>
+    <span id="temporalpositionspan"></span>
+  </div>
+  <div id="layout-line">
+    <label for="changelayout">Layout:</label>
+    <select name="layout" id="changelayout" autocomplete="off" disabled>
+    </select>
+    <button id="resetviews" disabled>Reset views</button>
+    <input type="checkbox" id="changesmoothing">
+    <label for="changesmoothing">Smoothing</label>
+  </div>
+</div>
+
+<div id="tools-line" class="line">
+  <fieldset id="tools" disabled>
+    <legend>Tools</legend>
+  </fieldset>
+</div>
+
+<div id="layersdetails"></div>
+
+<div id="binders-line" class="line">
+  <fieldset id="binders">
+    <legend>Binders</legend>
+  </fieldset>
+</div>
+
+<div id="extra-line" class="line">
+  <fieldset id="extra">
+    <legend>Extra</legend>
+    <div id="rotate-line" class="line">
+      <label for="rotate-x">Resample:</label>
+      <button id="rotate-x">X+</button>
+      <button id="rotate-y">Y+</button>
+      <button id="rotate-z">Z+</button>
+      <button id="rotate-match">Match</button>
+      <button id="rotate-reset">Reset</button>
+    </div>
+    <div class="line" id="tests">Tests:</div>
+  </fieldset>
+</div>
+
+<br>
+
+<div class="line" id="about">About: </div>
+
+</body>
+</html>

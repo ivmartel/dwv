@@ -11,7 +11,7 @@ describe('math', () => {
   /**
    * Tests for {@link Protractor}.
    *
-   * @function module:tests/math~protractor-class
+   * @function module:tests/math~protractorClass
    */
   test('Protractor class - #DWV-REQ-UI-07-005 Draw protractor',
     () => {
@@ -35,7 +35,7 @@ describe('math', () => {
   /**
    * Tests for {@link Rectangle} quantification.
    *
-   * @function module:tests/math~protractor-quantification
+   * @function module:tests/math~protractorQuantification
    */
   test('Protractor quantification - #DWV-REQ-UI-07-005 Draw protractor',
     () => {
@@ -52,4 +52,17 @@ describe('math', () => {
     }
   );
 
+});
+
+describe('math protractor contains', () => {
+  test('Protractor contains', () => {
+    const p0 = new Protractor([
+      new Point2D(0, 10),
+      new Point2D(0, 0),
+      new Point2D(10, 0)
+    ]);
+    assert.ok(p0.contains(new Point2D(0, 5)), 'on first line');
+    assert.ok(p0.contains(new Point2D(5, 1), 1), 'near second line');
+    assert.notOk(p0.contains(new Point2D(5, 5), 1), 'inside the angle');
+  });
 });

@@ -1,9 +1,16 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, afterEach} from 'vitest';
 import {Point3D, Point} from '../../src/math/point.js';
 import {Index} from '../../src/math/index.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
-import {Geometry} from '../../src/image/geometry.js';
+import {
+  Geometry,
+  getSliceGeometrySpacing,
+  mergeGeometries
+} from '../../src/image/geometry.js';
+import {logger} from '../../src/utils/logger.js';
+import {Matrix33, getIdentityMat33} from '../../src/math/matrix.js';
+import {getOrientationFromCosines} from '../../src/math/orientation.js';
 
 /**
  * Tests for the 'image/geometry.js' file.
@@ -15,7 +22,7 @@ describe('image', () => {
   /**
    * Tests for {@link Geometry}.
    *
-   * @function module:tests/image~geometry-class
+   * @function module:tests/image~geometryClass
    */
   test('Geometry class', () => {
     // case #0: simple, index and points are equal
@@ -51,9 +58,9 @@ describe('image', () => {
         testData0[i].vals[0], testData0[i].vals[1], testData0[i].vals[2]
       ]);
       const resPoint = imgGeometry0.indexToWorld(index);
-      assert.ok(theoPoint.equals(resPoint), 'indexToWorld #0-' + i);
+      assert.ok(theoPoint.equals(resPoint), `indexToWorld #0-${i}`);
       const resPoint2 = imgGeometry0.worldToIndex(theoPoint);
-      assert.ok(index.equals(resPoint2), 'worldToIndex #0-' + i);
+      assert.ok(index.equals(resPoint2), `worldToIndex #0-${i}`);
     }
 
     // case #1
@@ -89,10 +96,892 @@ describe('image', () => {
         testData1[i].pvals[0], testData1[i].pvals[1], testData1[i].pvals[2]
       ]);
       const resPoint = imgGeometry1.indexToWorld(index);
-      assert.ok(theoPoint.equals(resPoint), 'indexToWorld #1-' + i);
+      assert.ok(theoPoint.equals(resPoint), `indexToWorld #1-${i}`);
       const resPoint2 = imgGeometry1.worldToIndex(theoPoint);
-      assert.ok(index.equals(resPoint2), 'worldToIndex #1-' + i);
+      assert.ok(index.equals(resPoint2), `worldToIndex #1-${i}`);
     }
+  });
+
+  /**
+   * Tests for {@link Geometry#isSimilar}.
+   *
+   * @function module:tests/image~geometryIsSimilar
+   */
+  test('Geometry isSimilar', () => {
+    const size = new Size([3, 3, 2]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origin = new Point3D(0, 0, 0);
+    const orientation = getIdentityMat33();
+    const geom = new Geometry([origin], size, spacing, orientation);
+
+    // identical geometry is similar
+    const geomSame = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing, getIdentityMat33());
+    assert.ok(geom.isSimilar(geomSame), 'identical geometries are similar');
+
+    // origin within default tolerance (Number.EPSILON) is similar
+    const eps = Number.EPSILON / 2;
+    const geomOriginClose = new Geometry(
+      [new Point3D(eps, eps, eps)], size, spacing, getIdentityMat33());
+    assert.ok(
+      geom.isSimilar(geomOriginClose), 'origin within epsilon is similar');
+
+    // origin outside tolerance is not similar
+    const geomOriginFar = new Geometry(
+      [new Point3D(0.1, 0, 0)], size, spacing, getIdentityMat33());
+    assert.notOk(
+      geom.isSimilar(geomOriginFar), 'origin outside tolerance is not similar');
+
+    // origin outside default but within custom tolerance is similar
+    assert.ok(
+      geom.isSimilar(geomOriginFar, 0.2),
+      'origin within custom tolerance is similar');
+
+    // different size is not similar
+    const geomDiffSize = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([4, 3, 2]), spacing, getIdentityMat33());
+    assert.notOk(
+      geom.isSimilar(geomDiffSize), 'different size is not similar');
+
+    // different spacing is not similar
+    const geomDiffSpacing = new Geometry(
+      [new Point3D(0, 0, 0)], size, new Spacing([2, 1, 1]), getIdentityMat33());
+    assert.notOk(
+      geom.isSimilar(geomDiffSpacing), 'different spacing is not similar');
+
+    // different orientation is not similar
+    const rotValues = [0, -1, 0, 1, 0, 0, 0, 0, 1];
+    const rotOrientation = new Matrix33(rotValues);
+    const geomDiffOrient = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing, rotOrientation);
+    assert.notOk(
+      geom.isSimilar(geomDiffOrient), 'different orientation is not similar');
+
+    // null/undefined are not similar
+    assert.notOk(geom.isSimilar(null), 'null is not similar');
+    assert.notOk(geom.isSimilar(undefined), 'undefined is not similar');
+  });
+
+  /**
+   * Test that {@link Geometry#worldToIndex} resolves the correct
+   * slice for an irregularly spaced grid, instead of naively
+   * extrapolating from origin #0 with a single rounded spacing value
+   * (which gives an out-of-range index for this data).
+   *
+   * @function module:tests/image~geometryWorldToIndexIrregularSpacing
+   */
+  test('Geometry worldToIndex resolves the correct slice for ' +
+    'irregular spacing', () => {
+    const size = new Size([1, 1, 3]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origins = [
+      new Point3D(0, 0, 0),
+      new Point3D(0, 0, 1),
+      new Point3D(0, 0, 5)
+    ];
+    const geometry = new Geometry(origins, size, spacing);
+
+    const point = new Point([0, 0, 5]);
+
+    // naive arithmetic relative to origin #0 would give (5 - 0) / 1 = 5,
+    // out of the origins range; worldToIndex must instead match the
+    // real (irregularly placed) origin at index #2
+    assert.equal(
+      geometry.worldToIndex(point).get(2), 2,
+      'worldToIndex finds the correct slice regardless of spacing');
+  });
+
+  /**
+   * Test that {@link Geometry#worldToIndex} falls back to the naive
+   * arithmetic result (and so stays correctly out of range) for a
+   * position that isn't actually close to any real origin, instead of
+   * spuriously snapping to whichever origin happens to be closest.
+   *
+   * @function module:tests/image~geometryWorldToIndexOutOfRange
+   */
+  test('Geometry worldToIndex falls back to arithmetic for ' +
+    'out-of-range positions', () => {
+    const size = new Size([1, 1, 3]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origins = [
+      new Point3D(0, 0, 0),
+      new Point3D(0, 0, 1),
+      new Point3D(0, 0, 5)
+    ];
+    const geometry = new Geometry(origins, size, spacing);
+
+    // well past the last origin (#2, at z=5): closest origin is still
+    // #2, but far outside half a slice spacing away, so this must not
+    // resolve to 2 - it should fall back to the (also out-of-range)
+    // naive arithmetic result
+    const point = new Point([0, 0, 20]);
+    const index = geometry.worldToIndex(point).get(2);
+    assert.equal(index, 20, 'falls back to naive arithmetic');
+    assert.ok(
+      index < 0 || index >= size.get(2),
+      'result is correctly out of the geometry bounds');
+  });
+
+  /**
+   * Regression test for a real gantry-tilted CT geometry (tilted
+   * ImageOrientationPatient, so consecutive origins shift in Y as
+   * well as Z): {@link Geometry#worldToIndex} and
+   * {@link Geometry#getSliceIndex} must both resolve every real
+   * slice's own position back to its own index - including for
+   * points away from the slice corner (eg. A click anywhere else in
+   * the image), since the in-plane offset must not leak into the
+   * slice decision. The naive uniform-grid formula worldToIndex used
+   * to fall back on gets this systematically wrong for this data
+   * (verified separately: it returned [0,0,-1]..[0,0,-11] for slices
+   * 1..10, not merely off-by-one)..
+   *
+   * @function module:tests/image~geometryWorldToIndexGantryTilt
+   */
+  test('Geometry worldToIndex and getSliceIndex resolve the correct ' +
+    'slice for a real gantry-tilted geometry', () => {
+    const cosines = [1.0, -0.0, 0.0, -0.0, 0.98687, 0.16151];
+    const orientation = getOrientationFromCosines(cosines);
+    const rowVec = [cosines[0], cosines[1], cosines[2]];
+    const colVec = [cosines[3], cosines[4], cosines[5]];
+
+    // real ImagePositionPatient values from a tilted-gantry CT series
+    const ipp = [
+      [-87.4287872314, -72.7681121826, -28.2764186859],
+      [-87.4287872314, -72.2835693359, -31.2370319366],
+      [-87.4287872314, -71.7990264893, -34.1976394653],
+      [-87.4287872314, -71.3144912720, -37.1582527161],
+      [-87.4287872314, -70.8299484253, -40.1188621521],
+      [-87.4287872314, -70.3454055786, -43.0794754028],
+      [-87.4287872314, -69.8608703613, -46.0400848389],
+      [-87.4287872314, -69.3763275146, -49.0006980896],
+      [-87.4287872314, -68.8917846680, -51.9613113403],
+      [-87.4287872314, -68.4072418213, -54.9219245911],
+      [-87.4287872314, -67.9226989746, -57.8825378418]
+    ];
+    const origins = ipp.map((v) => new Point3D(v[0], v[1], v[2]));
+
+    const size = new Size([512, 512, 1]);
+    const spacing = new Spacing([0.1758, 0.1758, 3]);
+    // built the same way dicomGeometry#getFramesGeometry does: origins
+    // appended in raw per-frame order, no re-sorting
+    const geometry = new Geometry([origins[0]], size, spacing, orientation);
+    for (let m = 1; m < origins.length; ++m) {
+      geometry.appendOrigin(origins[m], m);
+    }
+
+    // exact slice corners
+    for (let i = 0; i < origins.length; ++i) {
+      const point = new Point(origins[i].getValues());
+      assert.equal(
+        geometry.worldToIndex(point).get(2), i,
+        `worldToIndex at slice #${i}`);
+      assert.equal(
+        geometry.getSliceIndex(origins[i]), i,
+        `getSliceIndex at slice #${i}`);
+    }
+
+    // same slices, but clicked away from the corner: the in-plane
+    // offset (along row/col) must not affect which slice worldToIndex
+    // finds. Only worldToIndex is checked here, not getSliceIndex:
+    // getSliceIndex's codirectional refinement is a sign check (not a
+    // magnitude/tolerance one like worldToIndex's half-spacing gate),
+    // so it stays sensitive to the same float noise this whole test
+    // is otherwise working around - harmless for its one real caller
+    // (Image#appendSlice, always comparing exact origins with no
+    // in-plane offset), but not something to assert here.
+    const pixelOffsets = [[0, 0], [100, 50], [300, 250], [500, 500]];
+    for (let i = 0; i < origins.length; ++i) {
+      for (const [rowOff, colOff] of pixelOffsets) {
+        const offsetPoint3D = new Point3D(
+          origins[i].getX() +
+          rowOff * spacing.get(0) * rowVec[0] +
+          colOff * spacing.get(1) * colVec[0],
+          origins[i].getY() +
+          rowOff * spacing.get(0) * rowVec[1] +
+          colOff * spacing.get(1) * colVec[1],
+          origins[i].getZ() +
+          rowOff * spacing.get(0) * rowVec[2] +
+          colOff * spacing.get(1) * colVec[2]
+        );
+        assert.equal(
+          geometry.worldToIndex(new Point(offsetPoint3D.getValues())).get(2),
+          i, `worldToIndex at slice #${i}, pixel offset [${rowOff},${colOff}]`);
+      }
+    }
+  });
+
+  /**
+   * Regression test for a real DICOM SEG-on-reference-series scenario
+   * (mask geometry covers only a few slices out of a larger, tilted
+   * reference series): {@link Geometry#worldToIndex} must not duplicate
+   * the mask's last real slice onto the reference slice just past it.
+   * The queried position isn't a stored origin, it's reconstructed via
+   * the reference geometry's own indexToWorld (origin + spacing*index),
+   * same as App/ViewController do when syncing a scroll position across
+   * layers of different geometries - that reconstruction carries a few
+   * 1e-6 mm of float drift for a tilted (multi-matrix-multiply)
+   * orientation, which used to land just under the exact slice
+   * boundary and get floored down one slice too far, right back into
+   * the mask's valid range.
+   *
+   * @function module:tests/image~geometryWorldToIndexNoBoundaryDuplicate
+   */
+  test('Geometry worldToIndex does not duplicate the mask\'s last ' +
+    'slice at the reference slice just past it', () => {
+    const cosines = [1.0, -0.0, 0.0, -0.0, 0.98687, 0.16151];
+    const orientation = getOrientationFromCosines(cosines);
+
+    // real ImagePositionPatient values from a tilted-gantry CT series,
+    // in ascending-index order along the orientation's normal (ie the
+    // order Image#appendSlice's getSliceIndex insertion would produce -
+    // required here since, unlike the corner-position test above, this
+    // test reconstructs positions via indexToWorld's index*spacing
+    // arithmetic, which only lines up with the origins array when the
+    // array is in that arithmetic's own direction)
+    const ipp = [
+      [-87.4287872314, -67.9226989746, -57.8825378418],
+      [-87.4287872314, -68.4072418213, -54.9219245911],
+      [-87.4287872314, -68.8917846680, -51.9613113403],
+      [-87.4287872314, -69.3763275146, -49.0006980896],
+      [-87.4287872314, -69.8608703613, -46.0400848389],
+      [-87.4287872314, -70.3454055786, -43.0794754028],
+      [-87.4287872314, -70.8299484253, -40.1188621521],
+      [-87.4287872314, -71.3144912720, -37.1582527161],
+      [-87.4287872314, -71.7990264893, -34.1976394653],
+      [-87.4287872314, -72.2835693359, -31.2370319366],
+      [-87.4287872314, -72.7681121826, -28.2764186859]
+    ];
+    const origins = ipp.map((v) => new Point3D(v[0], v[1], v[2]));
+
+    const size = new Size([512, 512, 1]);
+    const spacing = new Spacing([0.1758, 0.1758, 3]);
+
+    // full reference series geometry, as DataController builds it
+    const refGeometry = new Geometry(
+      [origins[0]], size, spacing, orientation);
+    for (let m = 1; m < origins.length; ++m) {
+      refGeometry.appendOrigin(origins[m], m);
+    }
+
+    // a mask covering only 3 of the reference's slices (#3, #4, #5),
+    // as MaskFactory#create builds a SEG loaded on top of this series
+    const maskOrigins = [origins[3], origins[4], origins[5]];
+    const maskGeometry = new Geometry(
+      [maskOrigins[0]], size, spacing, orientation);
+    for (let m = 1; m < maskOrigins.length; ++m) {
+      maskGeometry.appendOrigin(maskOrigins[m], m);
+    }
+
+    // the shared scroll position, reconstructed via the reference
+    // geometry's own indexToWorld - not the stored origin Point3D
+    // directly - to reproduce the same float drift the app carries
+    // between layers of different geometries
+    for (let refIndex = 0; refIndex < origins.length; ++refIndex) {
+      const worldPos = refGeometry.indexToWorld(new Index([0, 0, refIndex]));
+      const maskIndex = maskGeometry.worldToIndex(worldPos).get(2);
+      if (refIndex >= 3 && refIndex <= 5) {
+        assert.equal(
+          maskIndex, refIndex - 3,
+          `ref slice #${refIndex} resolves to its matching mask slice`);
+      } else {
+        assert.ok(
+          maskIndex < 0 || maskIndex >= maskOrigins.length,
+          `ref slice #${refIndex} (outside the mask's range) must not ` +
+          `resolve into the mask's valid slice indices, got ${maskIndex}`);
+      }
+    }
+  });
+
+  /**
+   * Tests for {@link Geometry#getSliceIndex}.
+   *
+   * @function module:tests/image~geometryGetSliceIndex
+   */
+  test('Geometry getSliceIndex', () => {
+    // irregular Z spacing on purpose: getSliceIndex must not assume
+    // a uniform grid (unlike worldToIndex's naive arithmetic
+    // fallback, which only applies when no origin is close enough)
+    const size = new Size([1, 1, 4]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origins = [
+      new Point3D(0, 0, 0),
+      new Point3D(0, 0, 1),
+      new Point3D(0, 0, 3),
+      new Point3D(0, 0, 7)
+    ];
+    const geometry = new Geometry(origins, size, spacing);
+
+    // a point at an origin returns that origin's own index
+    for (let i = 0; i < origins.length; ++i) {
+      assert.equal(
+        geometry.getSliceIndex(origins[i]), i,
+        `getSliceIndex at origin #${i}`);
+    }
+
+    const testData = [
+      // closest to origin #0, above it -> falls in slice #1
+      {z: 0.4, expected: 1},
+      // closest to origin #1, below it -> still slice #1
+      {z: 0.6, expected: 1},
+      // closest to origin #1, above it -> falls in slice #2
+      {z: 1.5, expected: 2},
+      // closest to origin #2, below it -> still slice #2
+      {z: 2.5, expected: 2},
+      // closest to origin #2, above it -> falls in slice #3
+      {z: 4, expected: 3},
+      // closest to origin #3, below it -> still slice #3
+      {z: 6, expected: 3},
+      // beyond the last origin: one past the last slice, not clamped
+      // (this is a valid insertion index, used by appendOrigin)
+      {z: 10, expected: 4},
+      // before the first origin: clamped to the first slice
+      {z: -1, expected: 0}
+    ];
+    for (const data of testData) {
+      const point = new Point3D(0, 0, data.z);
+      assert.equal(
+        geometry.getSliceIndex(point), data.expected,
+        `getSliceIndex at z=${data.z}`);
+    }
+  });
+
+  /**
+   * Test {@link Geometry#getSliceIndex} with the optional time argument.
+   *
+   * @function module:tests/image~geometryGetSliceIndexTime
+   */
+  test('Geometry getSliceIndex with time', () => {
+    const size = new Size([1, 1, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origin0 = new Point3D(0, 0, 0);
+    const origin1 = new Point3D(0, 0, 1);
+    const geometry = new Geometry([origin0], size, spacing);
+    // 2 slices for time 0, as Image#appendSlice would build it
+    geometry.appendOrigin(origin1, 1);
+    geometry.setInitialTime({id: {value: 0}});
+
+    // second time point has a different (irregular) slice layout,
+    // but the same slice count as time 0
+    geometry.appendFrame(new Point3D(0, 0, 0), {id: {value: 1}});
+    geometry.appendOrigin(new Point3D(0, 0, 4), 1, 1);
+
+    assert.equal(
+      geometry.getSliceIndex(new Point3D(0, 0, 4), 1), 1,
+      'getSliceIndex uses the origins of the given time point');
+    assert.equal(
+      geometry.getSliceIndex(new Point3D(0, 0, 0), 1), 0,
+      'getSliceIndex uses the origins of the given time point (start)');
+  });
+
+  /**
+   * Tests for {@link Geometry#checkTimeOrigins}.
+   *
+   * @function module:tests/image~geometryCheckTimeOrigins
+   */
+  test('Geometry checkTimeOrigins', () => {
+    const size = new Size([1, 1, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    const origin0 = new Point3D(0, 0, 0);
+    const origin1 = new Point3D(0, 0, 1);
+
+    // no time
+    const geometry0 = new Geometry([origin0], size, spacing);
+    assert.ok(geometry0.checkTimeOrigins().success,
+      'checkTimeOrigins no time');
+
+    // consistent time points
+    const geometry1 = new Geometry([origin0], size, spacing);
+    geometry1.appendOrigin(origin1, 1);
+    geometry1.setInitialTime({id: {value: 0}});
+    geometry1.appendFrame(origin0, {id: {value: 1}});
+    geometry1.appendOrigin(origin1, 1, 1);
+    assert.ok(geometry1.checkTimeOrigins().success,
+      'checkTimeOrigins consistent');
+
+    // different slice count
+    const geometry2 = new Geometry([origin0], size, spacing);
+    geometry2.appendOrigin(origin1, 1);
+    geometry2.setInitialTime({id: {value: 0}});
+    geometry2.appendFrame(origin0, {id: {value: 1}});
+    assert.notOk(geometry2.checkTimeOrigins().success,
+      'checkTimeOrigins different slice count');
+
+    // different origin
+    const geometry3 = new Geometry([origin0], size, spacing);
+    geometry3.appendOrigin(origin1, 1);
+    geometry3.setInitialTime({id: {value: 0}});
+    geometry3.appendFrame(origin0, {id: {value: 1}});
+    geometry3.appendOrigin(new Point3D(0, 0, 4), 1, 1);
+    assert.notOk(geometry3.checkTimeOrigins().success,
+      'checkTimeOrigins different origin');
+  });
+
+  /**
+   * Create a 2 slices geometry with volumes, appended as
+   * Image#appendSlice would.
+   *
+   * @param {number[]} values The time id values, in append order.
+   * @param {object} [volumeIdInfo] The volume id info (volume id
+   *   without value), times are frame indices if undefined.
+   * @returns {Geometry} The geometry.
+   */
+  function createVolumesGeometry(values, volumeIdInfo) {
+    const times = typeof volumeIdInfo !== 'undefined'
+      ? values.map(value => ({id: {...volumeIdInfo, value}}))
+      : values.map(value => ({id: {value}}));
+    const origin0 = new Point3D(0, 0, 0);
+    const origin1 = new Point3D(0, 0, 1);
+    const geometry = new Geometry(
+      [origin0], new Size([1, 1, 1]), new Spacing([1, 1, 1]),
+      undefined, times[0]);
+    geometry.appendOrigin(origin1, 1, values[0]);
+    for (let i = 1; i < values.length; ++i) {
+      geometry.appendFrame(origin0, times[i]);
+      geometry.appendOrigin(origin1, 1, values[i]);
+    }
+    return geometry;
+  }
+
+  /**
+   * Tests for {@link Geometry} times that are not positive integers.
+   *
+   * @function module:tests/image~geometryNonIntegerTimes
+   */
+  test('Geometry non integer times', () => {
+    const info = {source: 'EchoTime', tagKey: '00180081'};
+    // out of order, fractional and negative
+    const geometry = createVolumesGeometry([12.5, 3.2, -1], info);
+
+    assert.equal(geometry.getCurrentTotalNumberOfSlices(), 6, 'total');
+    assert.ok(geometry.hasSlicesAtTime(3.2), 'has slices at 3.2');
+    assert.notOk(geometry.hasSlicesAtTime(3), 'no slices at 3');
+    // slices before: in ascending time order
+    assert.equal(
+      geometry.getCurrentNumberOfSlicesBeforeTime(-1), 0, 'before -1');
+    assert.equal(
+      geometry.getCurrentNumberOfSlicesBeforeTime(3.2), 2, 'before 3.2');
+    assert.equal(
+      geometry.getCurrentNumberOfSlicesBeforeTime(12.5), 4, 'before 12.5');
+
+    assert.deepEqual(geometry.getVolumeIds(),
+      [-1, 3.2, 12.5].map(value => ({id: {...info, value}})), 'volume ids');
+    assert.equal(geometry.getVolumeIndex(3.2), 1, 'index of 3.2');
+    assert.equal(geometry.getVolumeIndex(3.3), -1, 'index of 3.3');
+    assert.ok(geometry.checkTimeOrigins().success, 'consistent times');
+    assert.equal(
+      geometry.getSliceIndex(new Point3D(0, 0, 1), 3.2), 1, 'slice index');
+
+    // clone keeps the initial volume id
+    const clone = geometry.clone();
+    assert.deepEqual(clone.getInitialTime(), {id: {...info, value: 12.5}},
+      'clone initial time');
+
+    // set initial time sets (or resets) the volume id
+    const geometry1 = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1]));
+    assert.isUndefined(geometry1.getVolumeIds(), 'no times: no ids');
+    geometry1.setInitialTime({id: {...info, value: 4.6}});
+    assert.deepEqual(
+      geometry1.getVolumeIds(), [{id: {...info, value: 4.6}}], 'set time id');
+    geometry1.setInitialTime({id: {value: 1}});
+    assert.isUndefined(geometry1.getVolumeIds(), 'frame index: no ids');
+  });
+
+  /**
+   * Tests for {@link Geometry#indexToWorld} and
+   * {@link Geometry#worldToIndex} with volume ids.
+   *
+   * @function module:tests/image~geometryVolumeIdPosition
+   */
+  test('Geometry volume id position', () => {
+    const info = {source: 'DiffusionBValue'};
+    const geometry = createVolumesGeometry([1000, 0, 500], info);
+    assert.deepEqual(
+      geometry.getSize().getValues(), [1, 1, 2, 3], 'size');
+
+    // round trip
+    const volumeIds = [0, 500, 1000];
+    for (let v = 0; v < volumeIds.length; ++v) {
+      const position = geometry.indexToWorld(new Index([0, 0, 1, v]));
+      assert.equal(position.get(3), volumeIds[v], `volume ${v} position`);
+      assert.equal(position.get(2), 1, `volume ${v} slice position`);
+      assert.equal(
+        geometry.worldToIndex(position).get(3), v, `volume ${v} index`);
+    }
+
+    // out of range: extrapolated, out of bounds
+    const before = geometry.indexToWorld(new Index([0, 0, 0, -1]));
+    assert.equal(before.get(3), -500, 'before first position');
+    const beforeIndex = geometry.worldToIndex(before);
+    assert.equal(beforeIndex.get(3), -1, 'before first index');
+    assert.notOk(geometry.isIndexInBounds(beforeIndex), 'before first bounds');
+    const after = geometry.indexToWorld(new Index([0, 0, 0, 3]));
+    assert.equal(after.get(3), 1500, 'after last position');
+    const afterIndex = geometry.worldToIndex(after);
+    assert.equal(afterIndex.get(3), 3, 'after last index');
+    assert.notOk(geometry.isIndexInBounds(afterIndex), 'after last bounds');
+
+    // in between: closest
+    assert.equal(
+      geometry.worldToIndex(new Point([0, 0, 0, 300])).get(3), 1,
+      'closest index');
+
+    // range
+    const range = geometry.getRange();
+    assert.equal(range[0].get(3), 0, 'range min');
+    assert.equal(range[1].get(3), 1500, 'range max');
+
+    // single volume id: unit step
+    const single = createVolumesGeometry([7], info);
+    const singlePosition = single.indexToWorld(new Index([0, 0, 0, 1]));
+    assert.equal(singlePosition.get(3), 1, 'single id: no 4D size');
+
+    // no volume id info (frame indices): identity
+    const frames = createVolumesGeometry([0, 1, 2]);
+    assert.isUndefined(frames.getVolumeIds(), 'frames: no ids');
+    assert.equal(
+      frames.indexToWorld(new Index([0, 0, 0, 2])).get(3), 2,
+      'frames: index to world identity');
+    assert.equal(
+      frames.worldToIndex(new Point([0, 0, 0, 2])).get(3), 2,
+      'frames: world to index identity');
+
+    // ids set on a geometry without times (resampled)
+    const resampled = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([1, 1, 1, 3]),
+      new Spacing([1, 1, 1, 1]));
+    const fullVolumeIds = volumeIds.map(value => ({id: {...info, value}}));
+    resampled.setVolumeIds(fullVolumeIds);
+    assert.deepEqual(resampled.getVolumeIds(), fullVolumeIds, 'set ids');
+    assert.equal(
+      resampled.indexToWorld(new Index([0, 0, 0, 2])).get(3), 1000,
+      'set ids: index to world');
+  });
+
+  /**
+   * Tests for {@link Geometry} volume ids with large values.
+   *
+   * @function module:tests/image~geometryLargeVolumeIds
+   */
+  test('Geometry large volume ids', () => {
+    // acquisition times with date (seconds), volumes 60s apart
+    const t0 = Date.UTC(2026, 0, 1) / 1000 + 36000;
+    const values = [t0, t0 + 60, t0 + 120];
+    const geometry = createVolumesGeometry(
+      values, {source: 'AcquisitionTime'});
+
+    for (let v = 0; v < values.length; ++v) {
+      assert.equal(geometry.getVolumeIndex(values[v]), v, `index ${v}`);
+      const position = geometry.indexToWorld(new Index([0, 0, 0, v]));
+      assert.equal(
+        geometry.worldToIndex(position).get(3), v, `round trip ${v}`);
+    }
+    assert.equal(geometry.getVolumeIndex(t0 + 20), -1, 'no match');
+
+    // out of range positions stay out of bounds
+    const before = geometry.worldToIndex(
+      geometry.indexToWorld(new Index([0, 0, 0, -1])));
+    assert.equal(before.get(3), -1, 'before first index');
+    assert.notOk(geometry.isIndexInBounds(before), 'before first bounds');
+    const after = geometry.worldToIndex(
+      geometry.indexToWorld(new Index([0, 0, 0, 3])));
+    assert.equal(after.get(3), 3, 'after last index');
+    assert.notOk(geometry.isIndexInBounds(after), 'after last bounds');
+  });
+
+  /**
+   * Tests for {@link Geometry#canSyncVolume}.
+   *
+   * @function module:tests/image~geometryCanSyncVolume
+   */
+  test('Geometry canSyncVolume', () => {
+    const info = {source: 'TemporalPositionIdentifier', tagKey: '00200100'};
+    const target = createVolumesGeometry([2, 3], info);
+
+    // same volume id origin
+    const source = createVolumesGeometry([1, 2], info);
+    assert.ok(target.canSyncVolume(source, 2), 'value in target');
+    assert.notOk(target.canSyncVolume(source, 1), 'value not in target');
+
+    // different volume id origin
+    const otherSource = createVolumesGeometry(
+      [2, 3], {source: 'DiffusionBValue', tagKey: '00189087'});
+    assert.notOk(target.canSyncVolume(otherSource, 2), 'other source');
+    const otherTagKey = createVolumesGeometry(
+      [2, 3], {source: 'TemporalPositionIdentifier', tagKey: '00209128'});
+    assert.notOk(target.canSyncVolume(otherTagKey, 2), 'other tag key');
+
+    // no volume ids (frame indices)
+    const frames = createVolumesGeometry([2, 3]);
+    assert.notOk(target.canSyncVolume(frames, 2), 'source without ids');
+    assert.notOk(frames.canSyncVolume(source, 2), 'target without ids');
+  });
+
+  /**
+   * Tests for {@link Geometry} time checks and volume ids updates.
+   *
+   * @function module:tests/image~geometryTimeUpdates
+   */
+  test('Geometry time checks and updates', () => {
+    const origin = new Point3D(0, 0, 0);
+    const size = new Size([1, 1, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+
+    // times must be objects with a number id
+    assert.throws(() => {
+      new Geometry([origin], size, spacing, undefined, 2);
+    }, Error, 'Geometry time must be an object');
+    const geometry = new Geometry([origin], size, spacing);
+    assert.throws(() => {
+      geometry.setInitialTime(1);
+    }, Error, 'Geometry time must be an object');
+    assert.throws(() => {
+      geometry.appendFrame(origin, {id: {value: '1'}});
+    }, Error, 'Geometry time must be an object');
+
+    // volume ids follow time changes
+    const info = {source: 'EchoTime'};
+    geometry.setInitialTime({id: {...info, value: 10}});
+    assert.deepEqual(
+      geometry.getVolumeIds(), [{id: {...info, value: 10}}], 'initial');
+    geometry.appendFrame(origin, {id: {...info, value: 5}});
+    assert.deepEqual(geometry.getVolumeIds(),
+      [{id: {...info, value: 5}}, {id: {...info, value: 10}}], 'after append');
+    geometry.appendFrame(origin, {id: {value: 20}});
+    assert.isUndefined(geometry.getVolumeIds(), 'after unnamed append');
+
+    // returned array is a copy
+    const geometry1 = createVolumesGeometry([1, 2], info);
+    geometry1.getVolumeIds().pop();
+    assert.equal(geometry1.getVolumeIds().length, 2, 'copy');
+  });
+
+  /**
+   * Tests for {@link Geometry#setVolumeValues}.
+   *
+   * @function module:tests/image~geometrySetVolumeValues
+   */
+  test('Geometry setVolumeValues', () => {
+    const info = {source: 'TemporalPositionIdentifier'};
+    // volumes appended out of order
+    const geometry = createVolumesGeometry([2, 1], info);
+    const initialTime = geometry.getInitialTime();
+    const values = [
+      {value: 0, unit: 'unit.s', source: 'AcquisitionTime'},
+      {value: 10, unit: 'unit.s', source: 'AcquisitionTime'}
+    ];
+    geometry.setVolumeValues(values);
+    assert.deepEqual(geometry.getVolumeIds(), [
+      {id: {...info, value: 1}, value: values[0]},
+      {id: {...info, value: 2}, value: values[1]}
+    ], 'volume ids');
+    assert.deepEqual(geometry.getInitialTime(),
+      {id: {...info, value: 2}, value: values[1]}, 'initial time');
+    assert.isUndefined(initialTime.value, 'input not modified');
+    assert.equal(geometry.getVolumeIndex(2), 1, 'index');
+    assert.ok(geometry.checkTimeOrigins().success, 'origins kept');
+
+    assert.throws(() => {
+      geometry.setVolumeValues([values[0]]);
+    }, Error, 'Expected one value per volume id');
+    const noIds = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1]));
+    assert.throws(() => {
+      noIds.setVolumeValues([]);
+    }, Error, 'Expected one value per volume id');
+  });
+
+  /**
+   * Tests for {@link Geometry#sortOrigins}.
+   *
+   * @function module:tests/image~geometrySortOrigins
+   */
+  test('Geometry sortOrigins', () => {
+    const size = new Size([1, 1, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    // append out of (Z) order
+    const geometry = new Geometry([new Point3D(0, 0, 5)], size, spacing);
+    geometry.appendOrigin(new Point3D(0, 0, 1), 1);
+    geometry.appendOrigin(new Point3D(0, 0, 8), 2);
+    geometry.appendOrigin(new Point3D(0, 0, -2), 3);
+
+    geometry.sortOrigins();
+
+    const sortedZ = geometry.getOrigins().map((origin) => origin.getZ());
+    assert.deepEqual(
+      sortedZ, [-2, 1, 5, 8], 'origins sorted ascending along Z');
+  });
+
+  /**
+   * Test that {@link Geometry#sortOrigins} sorts along the
+   * orientation's normal, not raw world Z, for a tilted geometry.
+   *
+   * @function module:tests/image~geometrySortOriginsTilted
+   */
+  test('Geometry sortOrigins orders origins along a tilted normal', () => {
+    const cosines = [1.0, -0.0, 0.0, -0.0, 0.98687, 0.16151];
+    const orientation = getOrientationFromCosines(cosines);
+    const size = new Size([1, 1, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+
+    // real, but scrambled, ImagePositionPatient values
+    const scrambled = [
+      new Point3D(-87.4287872314, -70.3454055786, -43.0794754028),
+      new Point3D(-87.4287872314, -72.7681121826, -28.2764186859),
+      new Point3D(-87.4287872314, -68.4072418213, -54.9219245911),
+      new Point3D(-87.4287872314, -71.7990264893, -34.1976394653)
+    ];
+    const geometry = new Geometry(
+      [scrambled[0]], size, spacing, orientation);
+    for (let i = 1; i < scrambled.length; ++i) {
+      geometry.appendOrigin(scrambled[i], i);
+    }
+
+    geometry.sortOrigins();
+
+    // consecutive origins must now be strictly increasing along the
+    // orientation's normal (3rd column) - not necessarily along raw
+    // world Z, X or Y taken alone
+    const normal = [
+      orientation.get(0, 2), orientation.get(1, 2), orientation.get(2, 2)
+    ];
+    const projectOnNormal = (point) => point.getX() * normal[0] +
+      point.getY() * normal[1] + point.getZ() * normal[2];
+    const sorted = geometry.getOrigins();
+    for (let i = 1; i < sorted.length; ++i) {
+      assert.ok(
+        projectOnNormal(sorted[i]) > projectOnNormal(sorted[i - 1]),
+        `origin #${i} is further along the normal than #${i - 1}`);
+    }
+  });
+
+  /**
+   * Test that {@link Geometry#canAppendSlice} tolerates orientation
+   * rounding differences between slices of the same series.
+   *
+   * @function module:tests/image~geometryCanAppendSlice
+   */
+  test('Geometry canAppendSlice orientation tolerance', () => {
+    const size = new Size([64, 64, 1]);
+    const spacing = new Spacing([1, 1, 1]);
+    // real ImageOrientationPatient values (5 decimals DS) of
+    // consecutive slices of the same series
+    const orientation0 = getOrientationFromCosines(
+      [1.0, -0.0, 0.0, -0.0, 0.99996, 0.00928]);
+    const orientation1 = getOrientationFromCosines(
+      [1.0, -0.0, 0.0, -0.0, 0.99996, 0.00929]);
+    const geometry0 = new Geometry(
+      [new Point3D(-105.5271530151, -77.7085952759, 65.0604629517)],
+      size, spacing, orientation0);
+    const geometry1 = new Geometry(
+      [new Point3D(-105.5271530151, -77.6807403564, 62.0605888367)],
+      size, spacing, orientation1);
+    assert.ok(geometry0.canAppendSlice(geometry1).success,
+      'can append slice with rounded orientation');
+
+    // really different orientation
+    const orientation2 = getOrientationFromCosines(
+      [1.0, 0.0, 0.0, 0.0, 0.98687, 0.16151]);
+    const geometry2 = new Geometry(
+      [new Point3D(-105.5271530151, -77.6807403564, 62.0605888367)],
+      size, spacing, orientation2);
+    assert.notOk(geometry0.canAppendSlice(geometry2).success,
+      'cannot append slice with different orientation');
+  });
+
+});
+
+describe('getSliceGeometrySpacing', () => {
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /**
+   * @param {number[]} zValues The origins Z coordinates.
+   * @returns {Point3D[]} The origins.
+   */
+  function makeOrigins(zValues) {
+    return zValues.map(z => new Point3D(0, 0, z));
+  }
+
+  test('undefined for less than two origins', () => {
+    assert.isUndefined(getSliceGeometrySpacing([]));
+    assert.isUndefined(getSliceGeometrySpacing(makeOrigins([0])));
+  });
+
+  test('throws for zero slice spacing', () => {
+    assert.throws(() => {
+      getSliceGeometrySpacing(makeOrigins([0, 1, 1]));
+    }, /Zero slice spacing/);
+  });
+
+  test('constant spacing, no warning', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    assert.equal(getSliceGeometrySpacing(makeOrigins([0, 2, 4, 6])), 2);
+    assert.equal(warnSpy.mock.calls.length, 0, 'no warning');
+  });
+
+  test('varying spacing: rounded mean and warning', () => {
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    // spacings: 1, 2, 4 -> mean 2.3333...
+    assert.equal(getSliceGeometrySpacing(makeOrigins([0, 1, 3, 7])), 2.3333);
+    assert.equal(warnSpy.mock.calls.length, 1, 'one warning');
+    assert.match(warnSpy.mock.calls[0][0], /^Varying slice spacing/);
+  });
+
+});
+
+describe('mergeGeometries', () => {
+
+  const size = new Size([2, 2, 1]);
+  const spacing = new Spacing([1, 1, 1]);
+
+  test('rounded orientation', () => {
+    // Image Orientation (Patient) written with 5 decimals:
+    // rounding differences of 1e-5
+    const geometry0 = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing,
+      getOrientationFromCosines([0.99999, 0, 0.00367, 0, 1, 0]));
+    const geometry1 = new Geometry(
+      [new Point3D(0, 0, 1)], size, spacing,
+      getOrientationFromCosines([0.99999, 0, 0.00366, 0, 1, 0]));
+    const merged = mergeGeometries(geometry0, geometry1);
+    assert.equal(merged.getSize().get(2), 2,
+      'merge geometries with rounded orientation');
+  });
+
+  test('different orientation', () => {
+    const geometry0 = new Geometry(
+      [new Point3D(0, 0, 0)], size, spacing,
+      getIdentityMat33());
+    const geometry1 = new Geometry(
+      [new Point3D(0, 0, 1)], size, spacing,
+      getOrientationFromCosines([1, 0, 0, 0, 0.98687, 0.16151]));
+    assert.throws(() => {
+      mergeGeometries(geometry0, geometry1);
+    }, /different orientation/);
+  });
+
+  test('4D volume ids survive a merge with a 3D geometry', () => {
+    const info = {source: 'DiffusionBValue'};
+    const origin0 = new Point3D(0, 0, 0);
+    const origin1 = new Point3D(0, 0, 1);
+    const underlay = new Geometry(
+      [origin0], new Size([1, 1, 1]), new Spacing([1, 1, 1]),
+      undefined, {id: {...info, value: 0}});
+    underlay.appendOrigin(origin1, 1, 0);
+    underlay.appendFrame(origin0, {id: {...info, value: 17}});
+    underlay.appendOrigin(origin1, 1, 17);
+    const overlay = new Geometry(
+      [origin0, origin1], new Size([1, 1, 2]), new Spacing([1, 1, 1]));
+
+    const merged = mergeGeometries(underlay, overlay);
+    const position = underlay.indexToWorld(new Index([0, 0, 0, 1]));
+    assert.equal(position.get(3), 17, 'world stores the volume id');
+    assert.equal(
+      merged.worldToIndex(position).get(3), 1, 'volume index');
+    assert.equal(merged.getSize().get(3), 2, 'volume count');
   });
 
 });

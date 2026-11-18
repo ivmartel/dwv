@@ -29,7 +29,10 @@ export const webpackCommon = {
     splitChunks: {
       // Stop webpack from trying to use importScript inside webworkers
       // if any webworkers share imports.
-      chunks: 'initial'
+      chunks: 'initial',
+      cacheGroups: {
+        defaultVendors: false
+      }
     }
   },
   experiments: {

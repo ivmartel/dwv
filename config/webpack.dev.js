@@ -12,23 +12,38 @@ export default merge(webpackCommon, {
     workerPublicPath: '/'
   },
   entry: {
-    viewer: './tests/pacs/viewer.js',
-    dcmweb: './tests/pacs/dcmweb.js',
-    raw: './tests/visual/index.js',
-    jpeg: './tests/visual/index-jpeg.js',
-    jpeg2000: './tests/visual/index-jpeg2000.js',
-    rle: './tests/visual/index-rle.js',
-    anonymiser: './tests/dicom/pages/anonymiser.js',
-    generator: './tests/dicom/pages/generator.js',
-    synthetic: './tests/dicom/pages/synthetic-data.js',
-    colourmaps: './tests/image/pages/colourmaps.js'
+    viewer: './dev/viewer/viewer.js',
+    pacs: './dev/pacs/index.js',
+    dcmweb: './dev/pacs/dcmweb.js',
+    raw: './dev/visual/index.js',
+    jpeg: './dev/visual/index-jpeg.js',
+    jpeg2000: './dev/visual/index-jpeg2000.js',
+    rle: './dev/visual/index-rle.js',
+    orientation: './dev/visual/orientation.js',
+    anonymiser: './dev/dicom/pages/anonymiser.js',
+    generator: './dev/dicom/pages/generator.js',
+    synthetic: './dev/dicom/pages/synthetic-data.js',
+    diff: './dev/dicom/pages/diff.js',
+    colourmaps: './dev/image/pages/colourmaps.js'
   },
   devServer: {
-    open: '/tests',
+    open: '/dev',
+    proxy: [
+      {
+        context: ['/dicom-web'],
+        target: 'http://localhost:8042',
+        changeOrigin: true,
+        auth: 'orthanc:orthanc', // Orthanc username:password
+      },
+    ],
     static: [
       {
-        directory: './tests',
-        publicPath: '/tests'
+        directory: './dev',
+        publicPath: '/dev'
+      },
+      {
+        directory: './tests/data',
+        publicPath: '/tests/data'
       },
       {
         directory: './node_modules/jszip',
@@ -41,71 +56,94 @@ export default merge(webpackCommon, {
       {
         directory: './node_modules/benchmark',
         publicPath: '/node_modules/benchmark'
+      },
+      {
+        directory: './node_modules/diff2html',
+        publicPath: '/node_modules/diff2html'
       }
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './tests/dicom/pages/anonymiser.html',
-      filename: 'tests/dicom/pages/anonymiser.html',
+      template: './dev/dicom/pages/anonymiser.html',
+      filename: 'dev/dicom/pages/anonymiser.html',
       scriptLoading: 'module',
       chunks: ['anonymiser']
     }),
     new HtmlWebpackPlugin({
-      template: './tests/dicom/pages/generator.html',
-      filename: 'tests/dicom/pages/generator.html',
+      template: './dev/dicom/pages/generator.html',
+      filename: 'dev/dicom/pages/generator.html',
       scriptLoading: 'module',
       chunks: ['generator']
     }),
     new HtmlWebpackPlugin({
-      template: './tests/dicom/pages/synthetic-data.html',
-      filename: 'tests/dicom/pages/synthetic-data.html',
+      template: './dev/dicom/pages/synthetic-data.html',
+      filename: 'dev/dicom/pages/synthetic-data.html',
       scriptLoading: 'module',
       chunks: ['synthetic']
     }),
     new HtmlWebpackPlugin({
-      template: './tests/image/pages/colourmaps.html',
-      filename: 'tests/image/pages/colourmaps.html',
+      template: './dev/dicom/pages/diff.html',
+      filename: 'dev/dicom/pages/diff.html',
+      scriptLoading: 'module',
+      chunks: ['diff']
+    }),
+    new HtmlWebpackPlugin({
+      template: './dev/image/pages/colourmaps.html',
+      filename: 'dev/image/pages/colourmaps.html',
       scriptLoading: 'module',
       chunks: ['colourmaps']
     }),
     new HtmlWebpackPlugin({
-      template: './tests/pacs/dcmweb.html',
-      filename: 'tests/pacs/dcmweb.html',
+      template: './dev/pacs/dcmweb.html',
+      filename: 'dev/pacs/dcmweb.html',
       scriptLoading: 'module',
       chunks: ['dcmweb']
     }),
     new HtmlWebpackPlugin({
-      template: './tests/pacs/viewer.html',
-      filename: 'tests/pacs/viewer.html',
+      template: './dev/pacs/index.html',
+      filename: 'dev/pacs/index.html',
+      scriptLoading: 'module',
+      chunks: ['pacs'],
+    }),
+    new HtmlWebpackPlugin({
+      template: './dev/viewer/viewer.html',
+      filename: 'dev/viewer/viewer.html',
+      favicon: './dev/favicon.ico',
       scriptLoading: 'module',
       chunks: ['viewer'],
     }),
     new HtmlWebpackPlugin({
       title: 'DWV jpeg DICOM check',
-      template: './tests/visual/index.html',
-      filename: 'tests/visual/index-jpeg.html',
+      template: './dev/visual/index.html',
+      filename: 'dev/visual/index-jpeg.html',
       scriptLoading: 'module',
       chunks: ['jpeg']
     }),
     new HtmlWebpackPlugin({
       title: 'DWV jpeg2000 DICOM check',
-      template: './tests/visual/index.html',
-      filename: 'tests/visual/index-jpeg2000.html',
+      template: './dev/visual/index.html',
+      filename: 'dev/visual/index-jpeg2000.html',
       scriptLoading: 'module',
       chunks: ['jpeg2000']
     }),
     new HtmlWebpackPlugin({
       title: 'DWV rle DICOM check',
-      template: './tests/visual/index.html',
-      filename: 'tests/visual/index-rle.html',
+      template: './dev/visual/index.html',
+      filename: 'dev/visual/index-rle.html',
       scriptLoading: 'module',
       chunks: ['rle']
     }),
     new HtmlWebpackPlugin({
+      template: './dev/visual/orientation.html',
+      filename: 'dev/visual/orientation.html',
+      scriptLoading: 'module',
+      chunks: ['orientation']
+    }),
+    new HtmlWebpackPlugin({
       title: 'DWV raw DICOM check',
-      template: './tests/visual/index.html',
-      filename: 'tests/visual/index.html',
+      template: './dev/visual/index.html',
+      filename: 'dev/visual/index.html',
       scriptLoading: 'module',
       chunks: ['raw'],
     }),
@@ -115,10 +153,6 @@ export default merge(webpackCommon, {
       {
         test: /\.png/,
         type: 'asset/resource'
-      },
-      {
-        test: /\.json/,
-        type: 'asset/source'
       },
       {
         test: /\.dcm/,

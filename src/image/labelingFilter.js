@@ -90,7 +90,7 @@ export class LabelingFilter {
   /**
    * Label the buffer using the Hoshen–Kopelman algorithm.
    *
-   * @param {TypedArray} buffer The image buffer to regenerate the labels for.
+   * @param {Uint8Array} buffer The image buffer to regenerate the labels for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} sizes The image dimensions.
@@ -270,7 +270,7 @@ export class LabelingFilter {
   #offsetToIndex(offset, unitVectors) {
     const values = new Array(unitVectors.length);
     let off = offset;
-    let dimSize = 0;
+    let dimSize;
     for (let i = unitVectors.length - 1; i > 0; --i) {
       dimSize = unitVectors[i];
       values[i] = Math.floor(off / dimSize);
@@ -283,7 +283,7 @@ export class LabelingFilter {
   /**
    * Quantify labels: count items, calculate centroid, and calculate height.
    *
-   * @param {TypedArray} buffer The image buffer to quantify the labels for.
+   * @param {Uint8Array} buffer The image buffer to quantify the labels for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} spacing The pixel spacing of the image.
@@ -312,7 +312,7 @@ export class LabelingFilter {
             id: buffer[o],
             sum: index,
             count: 1,
-            sliceCounts: sliceCounts,
+            sliceCounts,
             maxZ: index[2],
             minZ: index[2]
           };
@@ -351,21 +351,21 @@ export class LabelingFilter {
               ) => {
                 if (currentCount > largestCount) {
                   return [currentSlice, currentCount];
-                } else {
-                  return [largestSlice, largestCount];
                 }
+                return [largestSlice, largestCount];
               })[0];
           return Number(largest);
-        } else {
-          return Number(sliceCounts[0][0]);
         }
+        return Number(sliceCounts[0][0]);
       })();
 
       labelsInfo[label] = {
         id: detailledInfo.id,
         centroidIndex: index,
         count: detailledInfo.count,
-        largestSliceZ: largestSliceZ,
+        largestSliceZ,
+        minZ: detailledInfo.minZ,
+        maxZ: detailledInfo.maxZ,
         height: (detailledInfo.maxZ - detailledInfo.minZ + 1) * spacing[2]
       };
     }
@@ -385,8 +385,8 @@ export class LabelingFilter {
    * @returns {Point2D} Point on the slice, scaled.
    */
   #sliceOffsetToSliceWorld(sliceOffset, unitVectors, spacing) {
-    let x = 0;
-    let y = 0;
+    let x;
+    let y;
     if (unitVectors[0] > unitVectors[1]) {
       y = (sliceOffset % unitVectors[0]) / unitVectors[1];
       x = Math.floor(sliceOffset / unitVectors[0]);
@@ -415,7 +415,7 @@ export class LabelingFilter {
   /**
    * Calculate the major and minor (perpendicular) diameters of each segment.
    *
-   * @param {TypedArray} buffer The image buffer to calculate diameters for.
+   * @param {Uint8Array} buffer The image buffer to calculate diameters for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    * @param {number[]} sizes The image dimensions.
@@ -484,8 +484,8 @@ export class LabelingFilter {
                   major: {
                     diameter: distance,
                     line: sliceLine,
-                    offset1: offset1,
-                    offset2: offset2,
+                    offset1,
+                    offset2,
                   },
                   zIndex: z
                 };
@@ -579,8 +579,8 @@ export class LabelingFilter {
               diameter.minor = {
                 diameter: distance,
                 line: sliceLine,
-                offset1: offset1,
-                offset2: offset2,
+                offset1,
+                offset2,
                 angleDiff: angleDifference
               };
             }
@@ -600,7 +600,7 @@ export class LabelingFilter {
    * Run the filter.
    *
    * @param {object} data The input data.
-   * @returns {object[]} The list of quantified labels.
+   * @returns {object} The list of quantified labels.
    */
   run(data) {
     const imageBuffer = data.imageBuffer;

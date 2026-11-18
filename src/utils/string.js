@@ -49,7 +49,7 @@ export function endsWith(str, search) {
 }
 
 /**
- * Split key/value string: `key0=val00&key0=val01&key1=val10
+ * Split key/value string: `key0=val00&key0=val01&key1=val10`
  *   will return `{key0 : [val00, val01], key1 : val1}`.
  *
  * @param {string} inputStr The string to split.
@@ -144,7 +144,7 @@ export function replaceFlags(inputStr, values) {
         valueStr += i18n.t(valueObj.unit);
       }
       // flag to replace
-      const flag = '{' + keys[i] + '}';
+      const flag = `{${keys[i]}}`;
       // replace
       res = res.replace(flag, valueStr);
     }
@@ -170,10 +170,11 @@ export function getRootPath(path) {
  * Extensions are expected to contain at least one letter.
  *
  * @param {string} filePath The file path containing the file name.
- * @returns {string} The lower case file extension or null for none.
+ * @returns {string|undefined} The lower case file extension or
+ * undefined for none.
  */
 export function getFileExtension(filePath) {
-  let ext = null;
+  let ext;
   if (typeof filePath !== 'undefined' &&
     filePath !== null &&
     filePath[0] !== '.') {
@@ -183,7 +184,7 @@ export function getFileExtension(filePath) {
       // extension should contain at least one letter and no slash
       const regExp = /[a-z]/;
       if (!regExp.test(ext) || ext.includes('/')) {
-        ext = null;
+        ext = undefined;
       }
     }
   }
@@ -204,29 +205,3 @@ export function stringToUint8Array(str) {
   return arr;
 }
 
-/**
- * Round a float number to a given precision.
- *
- * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
- *
- * `toPrecision` uses all non zero digits of the number:
- * (123.009).toPrecision(4) = "123.0";
- * (0.09).toPrecision(4) = "0.09000".
- *
- * `toFixed` does not always behave as expected:
- * (123.009).toFixed(2) = "123.01";
- * (0.009).toFixed(2) = "0.01";
- * but
- * (-0.005).toFixed(2) = "-0.01" (expecting 0);
- * (1.005).toFixed(2) = "1" (expecting 1.01).
- *
- * @param {number} number The number to round.
- * @param {number} precision The rounding precision, ie the result number
- *   of digits after the comma.
- * @returns {number} The rounded number.
- */
-export function precisionRound(number, precision) {
-  const factor = Math.pow(10, precision);
-  const delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
-  return Math.round(number * factor + delta) / factor;
-}

@@ -5,7 +5,7 @@ export class RleDecoder {
 
   /**
    * Decode a RLE buffer.
-   * Ref: {@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_G.3.html}.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_G.3.html}.
    *
    * @param {Array} buffer The buffer to decode.
    * @param {number} bitsAllocated The bits allocated per element in the buffer.
@@ -51,8 +51,8 @@ export class RleDecoder {
 
     // loop on segments
     let outputIndex = 0;
-    let inputIndex = 0;
-    let remainder = 0;
+    let inputIndex;
+    let remainder;
     let maxOutputIndex = 0;
     let groupOutputIndex = 0;
     for (let segment = 0; segment < numberOfSegments; ++segment) {
@@ -81,7 +81,7 @@ export class RleDecoder {
       }
       // decode segment
       inputIndex = segmentStartIndex;
-      let count = 0;
+      let count;
       while (inputIndex < nextSegmentStartIndex) {
         // get the count value
         count = inputArray[inputIndex];

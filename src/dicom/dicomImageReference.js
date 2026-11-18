@@ -3,11 +3,11 @@ import {
   getDicomSopInstanceReferenceItem
 } from './dicomSopInstanceReference.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-import {SopInstanceReference} from './dicomSopInstanceReference.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {SopInstanceReference} from './dicomSopInstanceReference.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -21,7 +21,7 @@ const TagKeys = {
 /**
  * DICOM image reference: item of a SR content sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.4.html#table_C.18.4-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.4.html#table_C.18.4-1}.
  */
 export class ImageReference {
   /**
@@ -47,7 +47,7 @@ export class ImageReference {
   toString() {
     let res = this.referencedSOPSequence.toString();
     if (typeof this.referencedFrameNumber !== 'undefined') {
-      res += ', frame: ' + this.referencedFrameNumber;
+      res += `, frame: ${this.referencedFrameNumber}`;
     }
     return res;
   };
@@ -56,7 +56,7 @@ export class ImageReference {
 /**
  * Get a reference object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {ImageReference} A reference object.
  */
 export function getImageReference(dataElements) {
@@ -82,10 +82,11 @@ export function getImageReference(dataElements) {
  * Get a simple dicom element item from a reference object.
  *
  * @param {ImageReference} ref The reference object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomImageReferenceItem(ref) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleTagValues} */
   const item = {};
 
   if (typeof ref.referencedFrameNumber !== 'undefined') {

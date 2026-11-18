@@ -1,7 +1,7 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -16,7 +16,7 @@ const TagKeys = {
 /**
  * DICOM spatial coordinate 3D (SCOORD3D): item of a SR content sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.9.html#table_C.18.9-1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.9.html#table_C.18.9-1}.
  */
 export class SpatialCoordinate3D {
   /**
@@ -45,15 +45,14 @@ export class SpatialCoordinate3D {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.graphicType +
-      ' {' + this.graphicData + '}';
+    return `${this.graphicType} {${this.graphicData}}`;
   };
 };
 
 /**
  * Get a scoord3d object from a dicom element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {SpatialCoordinate3D} A scoord3d object.
  */
 export function getSpatialCoordinate3D(dataElements) {
@@ -80,10 +79,11 @@ export function getSpatialCoordinate3D(dataElements) {
  * Get a simple dicom element item from a scoord3d object.
  *
  * @param {SpatialCoordinate3D} scoord The scoord3d object.
- * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ * @returns {SimpleTagValues} The item as a list of (key, value) pairs.
  */
 export function getDicomSpatialCoordinate3DItem(scoord) {
   // dicom item (tags are in group/element order)
+  /** @type {SimpleTagValues} */
   const item = {};
 
   if (typeof scoord.graphicData !== 'undefined') {

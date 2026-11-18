@@ -9,11 +9,11 @@ import {getOrientationFromCosines} from '../math/orientation.js';
 import {Spacing} from '../image/spacing.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix.js';
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {DataElement} from './dataElement.js';
+ * @import {SimpleTagValues} from './types.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -23,6 +23,10 @@ const TagKeys = {
   SOPClassUID: '00080016',
   Modality: '00080060',
   ReferencedSeriesSequence: '00081115',
+  // RT Structure Set series reference
+  ReferencedFrameOfReferenceSequence: '30060010',
+  RTReferencedStudySequence: '30060012',
+  RTReferencedSeriesSequence: '30060014',
   SeriesInstanceUID: '0020000E',
   Rows: '00280010',
   Columns: '00280011',
@@ -47,7 +51,7 @@ const TagKeys = {
 /**
  * Extract the 2D size from dicom elements.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The sizes as [columns, rows] or
  *   undefined if not present.
  */
@@ -65,7 +69,7 @@ export function getImage2DSize(elements) {
 /**
  * Get the 2D spacing values.
  *
- * @param {Object<string, DataElement>} elements The dicom element.
+ * @param {Record<string, DataElement>} elements The dicom element.
  * @param {string} tagKey The tag key.
  * @returns {number[]|undefined} The values if present.
  */
@@ -86,7 +90,7 @@ function get2DSpacingValues(elements, tagKey) {
 /**
  * Get the 2D spacing values from a functional group.
  *
- * @param {Object<string, DataElement>} funcGroupElements The dicom elements.
+ * @param {Record<string, DataElement>} funcGroupElements The dicom elements.
  * @returns {number[]|undefined} The values if present.
  */
 function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
@@ -104,7 +108,7 @@ function get2DSpacingValuesFromFuncGroup(funcGroupElements) {
 /**
  * Get the pixel spacing for projection data.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 function getProjection2DSpacingValues(elements) {
@@ -138,7 +142,7 @@ function getProjection2DSpacingValues(elements) {
 /**
  * Get the pixel spacing for secondary capture data.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 function getSecondaryCapture2DSpacingValues(elements) {
@@ -153,7 +157,7 @@ function getSecondaryCapture2DSpacingValues(elements) {
 /**
  * Get the pixel spacing for multi-frame data.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 function getMultiFrame2DSpacingValues(elements) {
@@ -186,7 +190,7 @@ function getMultiFrame2DSpacingValues(elements) {
 /**
  * Get the pixel spacing from the different spacing tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The spacing as [columnSapcing, rowSpacing] or
  *   undefined if not present.
  */
@@ -213,7 +217,7 @@ export function getPixelSpacing(elements) {
 /**
  * Get the pixel aspect ratio.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {number[]|undefined} The values if present.
  */
 export function getPixelAspectRatio(elements) {
@@ -223,7 +227,7 @@ export function getPixelAspectRatio(elements) {
 /**
  * Get a spacing object from a dicom measure element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {Spacing|undefined} A spacing object.
  */
 export function getSpacingFromMeasure(dataElements) {
@@ -243,21 +247,20 @@ export function getSpacingFromMeasure(dataElements) {
 /**
  * Get pixel data unit from a list of tags.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {string|undefined} The unit value if available.
  */
 export function getTagPixelUnit(elements) {
   if (typeof custom.getTagPixelUnit !== 'undefined') {
     return custom.getTagPixelUnit(elements);
-  } else {
-    return defaultGetTagPixelUnit(elements);
   }
+  return defaultGetTagPixelUnit(elements);
 }
 
 /**
  * Default get pixel data unit.
  *
- * @param {Object<string, DataElement>} elements The DICOM elements.
+ * @param {Record<string, DataElement>} elements The DICOM elements.
  * @returns {string|undefined} The unit value if available.
  */
 function defaultGetTagPixelUnit(elements) {
@@ -282,7 +285,7 @@ function defaultGetTagPixelUnit(elements) {
 /**
  * Get an orientation matrix from a dicom orientation element.
  *
- * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @param {Record<string, DataElement>} dataElements The dicom element.
  * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationMatrix(dataElements) {
@@ -290,7 +293,7 @@ export function getOrientationMatrix(dataElements) {
     safeGetAll(dataElements, TagKeys.ImageOrientationPatient);
   let orientationMatrix;
   // slice orientation (cosines are matrices' columns)
-  // http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
+  // http://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
   if (typeof imageOrientationPatient !== 'undefined') {
     orientationMatrix =
       getOrientationFromCosines(
@@ -304,7 +307,7 @@ export function getOrientationMatrix(dataElements) {
  * Get a dicom item from a measure sequence.
  *
  * @param {Spacing} spacing The spacing object.
- * @returns {object} The dicom item.
+ * @returns {SimpleTagValues} The dicom item.
  */
 export function getDicomMeasureItem(spacing) {
   return {
@@ -317,7 +320,7 @@ export function getDicomMeasureItem(spacing) {
  * Get a dicom element from a plane orientation sequence.
  *
  * @param {Matrix33} orientation The image orientation.
- * @returns {object} The dicom element.
+ * @returns {SimpleTagValues} The dicom element.
  */
 export function getDicomPlaneOrientationItem(orientation) {
   return {
@@ -335,7 +338,7 @@ export function getDicomPlaneOrientationItem(orientation) {
 /**
  * Get the photometric interpretation from the data elements.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @returns {string|undefined} The photometric interpretation value.
  */
 export function getPhotometricInterpretation(dataElements) {
@@ -393,7 +396,7 @@ export function isSecondatyCapture(SOPClassUID) {
 /**
  * Get the referenced series UID from the data elements.
  *
- * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {Record<string, DataElement>} dataElements The data elements.
  * @returns {string|undefined} The referenced series UID.
  */
 export function getReferencedSeriesUID(dataElements) {
@@ -404,4 +407,34 @@ export function getReferencedSeriesUID(dataElements) {
     res = safeGet(refSeriesSq[0], TagKeys.SeriesInstanceUID);
   }
   return res;
+}
+
+/**
+ * Get the referenced series UID from an RT Structure Set.
+ *
+ * Path: ReferencedFrameOfReferenceSequence (3006,0010) →
+ *   RTReferencedStudySequence (3006,0012) →
+ *   RTReferencedSeriesSequence (3006,0014) →
+ *   SeriesInstanceUID (0020,000E).
+ *
+ * @param {Record<string, DataElement>} dataElements The data elements.
+ * @returns {string|undefined} The referenced series UID.
+ */
+export function getReferencedSeriesUIDFromRTStruct(dataElements) {
+  const refForSeq = safeGetAll(
+    dataElements, TagKeys.ReferencedFrameOfReferenceSequence);
+  if (typeof refForSeq === 'undefined') {
+    return undefined;
+  }
+  const rtRefStudySeq = safeGetAll(
+    refForSeq[0], TagKeys.RTReferencedStudySequence);
+  if (typeof rtRefStudySeq === 'undefined') {
+    return undefined;
+  }
+  const rtRefSeriesSeq = safeGetAll(
+    rtRefStudySeq[0], TagKeys.RTReferencedSeriesSequence);
+  if (typeof rtRefSeriesSeq === 'undefined') {
+    return undefined;
+  }
+  return safeGet(rtRefSeriesSeq[0], TagKeys.SeriesInstanceUID);
 }

@@ -68,7 +68,7 @@ function getDefaultImage(
   const meta = {};
   meta.BitsStored = 8;
   if (typeof numberOfFrames !== 'undefined') {
-    meta.numberOfFiles = numberOfFrames;
+    meta.sliceCapacity = numberOfFrames;
   }
   image.setMeta(meta);
   // return
@@ -90,7 +90,7 @@ export function getViewFromDOMImage(domImage, origin, index) {
   const height = domImage.height;
 
   // draw the image in the canvas in order to get its data
-  const canvas = document.createElement('canvas');
+  const canvas = domImage.ownerDocument.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
@@ -102,22 +102,22 @@ export function getViewFromDOMImage(domImage, origin, index) {
   const info = {};
   let seriesUID;
   if (typeof origin === 'string') {
-    info['origin'] = {value: [origin]};
+    info.origin = {value: [origin]};
     seriesUID = toUID(origin);
   } else {
-    info['fileName'] = {value: [origin.name]};
+    info.fileName = {value: [origin.name]};
     seriesUID = toUID(origin.name);
-    info['fileType'] = {value: [origin.type]};
-    info['fileLastModifiedDate'] = {value: [origin.lastModified]};
+    info.fileType = {value: [origin.type]};
+    info.fileLastModifiedDate = {value: [origin.lastModified]};
   }
-  info['imageWidth'] = {value: [width]};
-  info['imageHeight'] = {value: [height]};
+  info.imageWidth = {value: [width]};
+  info.imageHeight = {value: [height]};
 
   // image identifier (~UID like)
   const sliceIndex = index ? index : 0;
-  info['imageUid'] = {value: [sliceIndex]};
+  info.imageUid = {value: [sliceIndex]};
   // series identifier (~UID like)
-  info['seriesUid'] = {value: [seriesUID]};
+  info.seriesUid = {value: [seriesUID]};
 
   // create view
   const imageBuffer = imageDataToBuffer(imageData);
@@ -130,7 +130,7 @@ export function getViewFromDOMImage(domImage, origin, index) {
   image.setMeta(meta);
 
   // create data
-  // @ts-expect-error
+  // @ts-expect-error -- info is not shaped as Record<string, DataElement>
   const data = new DicomData(info);
   data.image = image;
 
@@ -168,25 +168,25 @@ export function getViewFromDOMVideo(
   const info = {};
   let seriesUID;
   if (typeof origin === 'string') {
-    info['origin'] = {value: [origin]};
+    info.origin = {value: [origin]};
     seriesUID = toUID(origin);
   } else {
-    info['fileName'] = {value: [origin.name]};
+    info.fileName = {value: [origin.name]};
     seriesUID = toUID(origin.name);
-    info['fileType'] = {value: [origin.type]};
-    info['fileLastModifiedDate'] = {value: [origin.lastModified]};
+    info.fileType = {value: [origin.type]};
+    info.fileLastModifiedDate = {value: [origin.lastModified]};
   }
-  info['imageWidth'] = {value: [width]};
-  info['imageHeight'] = {value: [height]};
-  info['numberOfFrames'] = {value: [numberOfFrames]};
+  info.imageWidth = {value: [width]};
+  info.imageHeight = {value: [height]};
+  info.numberOfFrames = {value: [numberOfFrames]};
 
   // image identifier (~UID like)
-  info['imageUid'] = {value: [0]};
+  info.imageUid = {value: [0]};
   // series identifier (~UID like)
-  info['seriesUid'] = {value: [seriesUID]};
+  info.seriesUid = {value: [seriesUID]};
 
   // draw the image in the canvas in order to get its data
-  const canvas = document.createElement('canvas');
+  const canvas = video.ownerDocument.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
@@ -225,7 +225,7 @@ export function getViewFromDOMVideo(
       meta.SeriesInstanceUID = seriesUID;
       image.setMeta(meta);
       // create data
-      // @ts-expect-error
+      // @ts-expect-error -- info is not shaped as Record<string, DataElement>
       const data = new DicomData(info);
       data.image = image;
       // call callback

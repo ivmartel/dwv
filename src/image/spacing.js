@@ -1,7 +1,6 @@
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Scalar2D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Scalar2D} from '../math/scalar.js';
+ */
 
 /**
  * Immutable Spacing class.
@@ -61,7 +60,7 @@ export class Spacing {
    * @returns {string} The spacing as a string.
    */
   toString() {
-    return '(' + this.#values.toString() + ')';
+    return `(${this.#values.toString()})`;
   }
 
   /**

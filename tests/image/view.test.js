@@ -4,6 +4,7 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Image} from '../../src/image/image.js';
+import {MaskImage} from '../../src/image/maskImage.js';
 import {View} from '../../src/image/view.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 import {WindowLevel} from '../../src/image/windowLevel.js';
@@ -17,7 +18,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} listeners.
    *
-   * @function module:tests/image~view-wlchange-event
+   * @function module:tests/image~viewWlchangeEvent
    */
   test('View wlchange event - #DWV-REQ-UI-03-001 Change image window/level',
     () => {
@@ -38,10 +39,10 @@ describe('image', () => {
 
       // listeners
       const listener1 = function (event) {
-        assert.equal(event.wc, 0, 'Expected call to listener1.');
+        assert.equal(event.detail.wc, 0, 'Expected call to listener1.');
       };
       const listener2 = function (event) {
-        assert.equal(event.ww, 1, 'Expected call to listener2.');
+        assert.equal(event.detail.ww, 1, 'Expected call to listener2.');
       };
         // with two listeners
       view0.addEventListener('wlchange', listener1);
@@ -59,7 +60,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} getImage meta.
    *
-   * @function module:tests/image~playback-milliseconds
+   * @function module:tests/image~playbackMilliseconds
    */
   test('Playback milliseconds', () => {
     // create an image
@@ -101,7 +102,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} generateImageData MONO.
    *
-   * @function module:tests/image~generate-data-mono
+   * @function module:tests/image~generateDataMono
    */
   test('Generate data MONO - #DWV-REQ-UI-02-001 Display image',
     () => {
@@ -161,7 +162,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} generateImageData MONO with RSI.
    *
-   * @function module:tests/image~generate-data-mono-with-rsi
+   * @function module:tests/image~generateDataMonoWithRsi
    */
   test('Generate data MONO with RSI - #DWV-REQ-UI-02-001 Display image',
     () => {
@@ -221,9 +222,194 @@ describe('image', () => {
   );
 
   /**
+   * Tests for {@link View} generateImageData MONO with float data.
+   *
+   * @function module:tests/image~generateDataMonoFloat
+   */
+  test('Generate data MONO float - #DWV-REQ-UI-02-001 Display image',
+    () => {
+      // create an image
+      const size0 = 2;
+      const imgSize0 = new Size([size0, size0, 1]);
+      const imgSpacing0 = new Spacing([1, 1, 1]);
+      const imgOrigin0 = new Point3D(0, 0, 0);
+      const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
+      const buffer0 = new Float32Array([-1.5, 0.25, 2, 3.75]);
+      const image0 = new Image(imgGeometry0, buffer0);
+      // float data: no bits stored
+      image0.setMeta({BitsAllocated: 32});
+      image0.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 0));
+      // create a view
+      const view0 = new View(image0);
+      // create the image data
+      const imageData = {
+        width: size0,
+        height: size0,
+        data: new Uint8ClampedArray(size0 * size0 * 4)
+      };
+
+      // default window level
+      view0.setWindowLevelMinMax();
+      // call generate data
+      view0.generateImageData(imageData);
+      // rescaled values: [-3, 0.5, 4, 7.5]
+      // float data defaults to LINEAR_EXACT: evenly spaced values
+      // map to 1/3 and 2/3 of 255 (84.99... is truncated to 84)
+      const theoData0 = [
+        0,
+        0,
+        0,
+        255,
+        84,
+        84,
+        84,
+        255,
+        170,
+        170,
+        170,
+        255,
+        255,
+        255,
+        255,
+        255
+      ];
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data');
+    }
+  );
+
+  /**
+   * Tests for {@link View} generateImageData MONO with 32 bits
+   *   integer data.
+   *
+   * @function module:tests/image~generateDataMonoInt32
+   */
+  test('Generate data MONO int32 - #DWV-REQ-UI-02-001 Display image',
+    () => {
+      // create an image
+      const size0 = 2;
+      const imgSize0 = new Size([size0, size0, 1]);
+      const imgSpacing0 = new Spacing([1, 1, 1]);
+      const imgOrigin0 = new Point3D(0, 0, 0);
+      const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
+      const buffer0 = new Int32Array([-100000, 0, 100000, 200000]);
+      const image0 = new Image(imgGeometry0, buffer0);
+      image0.setMeta({
+        BitsAllocated: 32,
+        BitsStored: 32,
+        PixelRepresentation: 1
+      });
+      image0.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 0));
+      // create a view
+      const view0 = new View(image0);
+      // create the image data
+      const imageData = {
+        width: size0,
+        height: size0,
+        data: new Uint8ClampedArray(size0 * size0 * 4)
+      };
+
+      // default window level
+      view0.setWindowLevelMinMax();
+      // call generate data
+      view0.generateImageData(imageData);
+      // rescaled values: [-200000, 0, 200000, 400000]
+      const theoData0 = [
+        0,
+        0,
+        0,
+        255,
+        85,
+        85,
+        85,
+        255,
+        170,
+        170,
+        170,
+        255,
+        255,
+        255,
+        255,
+        255
+      ];
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data');
+    }
+  );
+
+  /**
+   * Tests for {@link View} generateImageData MONO with integer data
+   *   and no bits stored.
+   *
+   * @function module:tests/image~generateDataMonoNoBitsStored
+   */
+  test('Generate data MONO no bits stored - #DWV-REQ-UI-02-001 Display image',
+    () => {
+      // create an image
+      const size0 = 2;
+      const imgSize0 = new Size([size0, size0, 1]);
+      const imgSpacing0 = new Spacing([1, 1, 1]);
+      const imgOrigin0 = new Point3D(0, 0, 0);
+      const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
+      const buffer0 = new Uint16Array([0, 100, 200, 300]);
+      const image0 = new Image(imgGeometry0, buffer0);
+      // no bits stored
+      image0.setMeta({
+        BitsAllocated: 16,
+        PixelRepresentation: 0
+      });
+      image0.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 0));
+      // create a view
+      const view0 = new View(image0);
+      // create the image data
+      const imageData = {
+        width: size0,
+        height: size0,
+        data: new Uint8ClampedArray(size0 * size0 * 4)
+      };
+
+      // default window level
+      view0.setWindowLevelMinMax();
+      // call generate data
+      view0.generateImageData(imageData);
+      // rescaled values: [0, 200, 400, 600]
+      const theoData0 = [
+        0,
+        0,
+        0,
+        255,
+        85,
+        85,
+        85,
+        255,
+        170,
+        170,
+        170,
+        255,
+        255,
+        255,
+        255,
+        255
+      ];
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data');
+
+      // update meta: data can now use lookup tables
+      image0.setMeta({
+        BitsAllocated: 16,
+        BitsStored: 16,
+        PixelRepresentation: 0
+      });
+      view0.generateImageData(imageData);
+      assert.deepEqual(Array.from(imageData.data), theoData0,
+        'check image data after meta update');
+    }
+  );
+
+  /**
    * Tests for {@link View} generateImageData RGB.
    *
-   * @function module:tests/image~generate-data-rgb
+   * @function module:tests/image~generateDataRgb
    */
   test('Generate data RGB - #DWV-REQ-UI-02-001 Display image',
     () => {
@@ -235,10 +421,9 @@ describe('image', () => {
       const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
       const buffer0 = [];
       let index = 0;
-      let value = 0;
       // 0, 85, 170, 255
       for (let i = 0; i < size0 * size0; ++i) {
-        value = i * 255 / ((size0 * size0) - 1);
+        const value = i * 255 / ((size0 * size0) - 1);
         buffer0[index] = value;
         buffer0[index + 1] = value;
         buffer0[index + 2] = value;
@@ -324,7 +509,7 @@ describe('image', () => {
   /**
    * Tests for {@link View} generateImageData timing.
    *
-   * @function module:tests/image~generate-data-timing
+   * @function module:tests/image~generateDataTiming
    */
   test('Generate data timing - #DWV-REQ-UI-02-001 Display image',
     () => {
@@ -359,7 +544,7 @@ describe('image', () => {
       // time taken
       const time0 = (new Date()) - start0;
       // check time taken
-      assert.ok(time0 < 90, 'First generateImageData: ' + time0 + 'ms.');
+      assert.ok(time0 < 90, `First generateImageData: ${time0}ms.`);
 
       // Change the window level
       view0.setWindowLevel(new WindowLevel(4000, 200));
@@ -371,8 +556,87 @@ describe('image', () => {
       // time taken
       const time1 = (new Date()).getMilliseconds() - start1;
       // check time taken
-      assert.ok(time1 < 90, 'Second generateImageData: ' + time1 + 'ms.');
+      assert.ok(time1 < 90, `Second generateImageData: ${time1}ms.`);
     }
   );
+
+  /**
+   * Tests for {@link View} initial index.
+   *
+   * @function module:tests/image~viewInitialIndex
+   */
+  test('View initial index', () => {
+    const imgSpacing = new Spacing([1, 1, 1]);
+    const imgOrigin = new Point3D(0, 0, 0);
+
+    // 4D (frames along fourth dimension)
+    const imgSize0 = new Size([4, 4, 1, 5]);
+    const imgGeometry0 = new Geometry([imgOrigin], imgSize0, imgSpacing);
+    const buffer0 = new Uint8Array(imgSize0.getTotalSize());
+    // middle index, first frame
+    const image0 = new Image(imgGeometry0, buffer0);
+    const view0 = new View(image0);
+    assert.deepEqual(view0.getCurrentIndex().getValues(), [2, 2, 0, 0],
+      '4D initial index');
+
+    // 3D (frames along third dimension)
+    const imgSize1 = new Size([4, 4, 5]);
+    const origins = [];
+    for (let k = 0; k < 5; ++k) {
+      origins.push(new Point3D(0, 0, k));
+    }
+    const imgGeometry1 = new Geometry(origins, imgSize1, imgSpacing);
+    const buffer1 = new Uint8Array(imgSize1.getTotalSize());
+    // middle index
+    const image1 = new Image(imgGeometry1, buffer1);
+    const view1 = new View(image1);
+    assert.deepEqual(view1.getCurrentIndex().getValues(), [2, 2, 2],
+      '3D initial index');
+  });
+
+  test('View segment highlight', () => {
+    const size = new Size([2, 2, 1]);
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0)], size, new Spacing([1, 1, 1]));
+    const buffer = new Uint8Array([0, 1, 2, 1]);
+    const mask = new MaskImage(geometry, buffer, ['0']);
+    const view = new View(mask);
+    view.setContourThickness(0);
+    view.setFillOpacity(0.5);
+
+    let nEvents = 0;
+    view.addEventListener('segmenthighlightchange', () => {
+      ++nEvents;
+    });
+
+    const fill = 0xff * 0.5;
+    assert.isUndefined(view.getSegmentHighlight());
+    assert.equal(view.getAlphaFunction()(1, 1), fill);
+
+    view.setSegmentHighlight(1, 0.5);
+    assert.equal(nEvents, 1);
+    assert.deepEqual(view.getSegmentHighlight(),
+      {segmentNumber: 1, opacity: 0.5});
+    const alpha = view.getAlphaFunction();
+    // highlighted segment
+    assert.equal(alpha(1, 1), fill * 0.5);
+    // other segment and background are not affected
+    assert.equal(alpha(2, 2), fill);
+    assert.equal(alpha(0, 0), 0);
+
+    // default and clamped opacity
+    view.setSegmentHighlight(2);
+    assert.equal(view.getSegmentHighlight().opacity, 1);
+    view.setSegmentHighlight(2, 2);
+    assert.equal(view.getSegmentHighlight().opacity, 1);
+    view.setSegmentHighlight(2, -1);
+    assert.equal(alpha(2, 2), 0);
+
+    // reset
+    view.setSegmentHighlight();
+    assert.equal(nEvents, 5);
+    assert.isUndefined(view.getSegmentHighlight());
+    assert.equal(alpha(2, 2), fill);
+  });
 
 });

@@ -3,19 +3,19 @@ import {Point3D, Point2D} from '../math/point.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {
   getCosinesFromOrientation,
-  getTargetOrientation
+  getTargetOrientation,
+  getLegacyTargetOrientation
 } from '../math/orientation.js';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point} from '../math/point.js';
-import {Index} from '../math/index.js';
-import {Geometry} from '../image/geometry.js';
-import {Matrix33} from '../math/matrix.js';
-import {Spacing} from './spacing.js';
-import {Scalar2D, Scalar3D} from '../math/scalar.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point} from '../math/point.js';
+ * @import {Index} from '../math/index.js';
+ * @import {Geometry} from '../image/geometry.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {Spacing} from './spacing.js';
+ * @import {Scalar2D, Scalar3D} from '../math/scalar.js';
+ */
 
 /**
  * Plane geometry helper.
@@ -312,6 +312,17 @@ export class PlaneHelper {
   }
 
   /**
+   * Get the cosines of this plane as saved in annotations by
+   *   previous versions, see getLegacyTargetOrientation.
+   *
+   * @returns {number[]} The 2 cosines vectors (3D).
+   */
+  getLegacyCosines() {
+    return getCosinesFromOrientation(getLegacyTargetOrientation(
+      this.#imageOrientation, this.#targetOrientation));
+  }
+
+  /**
    * Get a list of points that define the plane at input position,
    *   given this classes orientation.
    *
@@ -405,7 +416,7 @@ export class PlaneHelper {
    * @returns {number} The index.
    */
   getScrollDimIndex() {
-    let index = null;
+    let index;
     if (typeof this.#viewOrientation !== 'undefined') {
       index = this.#viewOrientation.getThirdColMajorDirection();
     } else {
@@ -420,7 +431,7 @@ export class PlaneHelper {
    * @returns {number} The index.
    */
   getNativeScrollDimIndex() {
-    let index = null;
+    let index;
     if (typeof this.#imageOrientation !== 'undefined') {
       index = this.#imageOrientation.getThirdColMajorDirection();
     } else {

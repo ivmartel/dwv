@@ -1,10 +1,9 @@
 import {DicomParser} from './dicomParser.js';
 import {logger} from '../utils/logger.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {DataElement} from './dataElement.js';
+ */
 
 /**
  * Related DICOM tag keys.
@@ -18,7 +17,7 @@ const TagKeys = {
 /**
  * DICOM record types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.3.2.2.html#table_F.3-3}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_F.3.2.2.html#table_F.3-3}.
  */
 const DirectoryRecordTypes = {
   study: 'STUDY',
@@ -43,7 +42,7 @@ export function getFileListFromDicomDir(data) {
 /**
  * Get a DICOMDIR file list.
  *
- * @param {Object<string, DataElement>} dicomElements The dicom elements.
+ * @param {Record<string, DataElement>} dicomElements The dicom elements.
  * @returns {Array|undefined} The file list as an array ordered by
  *   STUDY > SERIES > IMAGES.
  */

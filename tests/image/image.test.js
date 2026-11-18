@@ -1,5 +1,5 @@
-import {describe, test, assert} from 'vitest';
-import {Point3D} from '../../src/math/point.js';
+import {describe, test, assert, vi} from 'vitest';
+import {Point, Point3D} from '../../src/math/point.js';
 import {Index} from '../../src/math/index.js';
 import {getStats} from '../../src/math/stats.js';
 import {arrayEquals} from '../../src/utils/array.js';
@@ -9,7 +9,30 @@ import {Geometry} from '../../src/image/geometry.js';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
 import {Image} from '../../src/image/image.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
+import {WindowLevel, equalWl} from '../../src/image/windowLevel.js';
+import {WindowPreset} from '../../src/image/windowPreset.js';
+import {ResamplingFilter} from '../../src/image/resamplingFilter.js';
 import {Matrix33} from '../../src/math/matrix.js';
+
+/**
+ * Fake web worker that runs the resampling filter as the
+ * resampling worker does (see 'image/resampling.worker.js').
+ */
+class FakeResamplingWorker {
+  onmessage;
+  onerror;
+
+  /**
+   * @param {object} message The worker message.
+   */
+  postMessage(message) {
+    setTimeout(() => {
+      this.onmessage({data: new ResamplingFilter().run(message)});
+    });
+  }
+
+  terminate() {}
+}
 
 /**
  * Tests for the 'image/image.js' file.
@@ -69,7 +92,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} getValue.
    *
-   * @function module:tests/image~image-getvalue
+   * @function module:tests/image~imageGetvalue
    */
   test('Image getValue', () => {
     const zeroStats = {min: 0, max: 0, mean: 0, stdDev: 0};
@@ -146,7 +169,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} histogram.
    *
-   * @function module:tests/image~image-histogram
+   * @function module:tests/image~imageHistogram
    */
   test('Image histogram', () => {
     // create a simple image
@@ -162,26 +185,46 @@ describe('image', () => {
     const image0 = new Image(imgGeometry0, buffer0);
 
     // histogram
-    const histogram = image0.getHistogram();
-    assert.equal(histogram.length, size0 * size0, 'histogram size');
+    const entries =
+      image0.getHistogram().getRescaledHistogram().getEntries();
+    assert.equal(entries.length, size0 * size0, 'histogram size');
     let histoContentTest = true;
     for (let j = 0; j < size0 * size0; ++j) {
-      if (histogram[j][0] !== j) {
+      if (entries[j].value !== j) {
         histoContentTest = false;
         break;
       }
-      if (histogram[j][1] !== 1) {
+      if (entries[j].count !== 1) {
         histoContentTest = false;
         break;
       }
     }
     assert.equal(histoContentTest, true, 'histogram content');
+    assert.deepEqual(
+      image0.getDataRange(), {min: 0, max: 15}, 'data range');
+
+    // image with rsi
+    const imgGeometry1 = new Geometry(
+      [imgOrigin0], new Size([2, 2, 1]), imgSpacing0);
+    const image1 = new Image(imgGeometry1, [-2, -1, 0, 1]);
+    image1.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(0.5, 10));
+    const entries1 =
+      image1.getHistogram().getRescaledHistogram().getEntries();
+    assert.deepEqual(entries1, [
+      {value: 9, count: 1},
+      {value: 9.5, count: 1},
+      {value: 10, count: 1},
+      {value: 10.5, count: 1}
+    ], 'rescaled histogram content');
+    assert.deepEqual(
+      image1.getRescaledDataRange(), {min: 9, max: 10.5},
+      'rescaled data range');
   });
 
   /**
    * Tests for {@link Image} append.
    *
-   * @function module:tests/image~image-append-slice
+   * @function module:tests/image~imageAppendSlice
    */
   test('Image append slice', () => {
     /**
@@ -224,7 +267,7 @@ describe('image', () => {
       [imgOrigin], imgSizeMinusOne, imgSpacing);
     imgGeometry0.appendOrigin(new Point3D(0, 0, 1), 1);
     const image0 = new Image(imgGeometry0, buffer, ['0']);
-    image0.setMeta({numberOfFiles: 3});
+    image0.setMeta({sliceCapacity: 3});
     // append null
     assert.throws(function () {
       image0.appendSlice(null);
@@ -236,7 +279,7 @@ describe('image', () => {
     const sliceGeometry = new Geometry(
       [sliceOrigin], sliceSize, imgSpacing);
     const slice0 = new Image(sliceGeometry, sliceBuffer, ['1']);
-    slice0.setMeta({numberOfFiles: 3});
+    slice0.setMeta({sliceCapacity: 3});
     // append slice before
     image0.appendSlice(slice0);
     // test its values
@@ -260,12 +303,12 @@ describe('image', () => {
       [imgOrigin], imgSizeMinusOne, imgSpacing);
     imgGeometry1.appendOrigin(new Point3D(0, 0, 1), 1);
     const image1 = new Image(imgGeometry1, buffer, ['0']);
-    image1.setMeta({numberOfFiles: 3});
+    image1.setMeta({sliceCapacity: 3});
     const sliceOrigin1 = new Point3D(0, 0, 2);
     const sliceGeometry1 = new Geometry(
       [sliceOrigin1], sliceSize, imgSpacing);
     const slice1 = new Image(sliceGeometry1, sliceBuffer, ['1']);
-    slice1.setMeta({numberOfFiles: 3});
+    slice1.setMeta({sliceCapacity: 3});
     // append slice before
     image1.appendSlice(slice1);
     // test its values
@@ -289,12 +332,12 @@ describe('image', () => {
       [imgOrigin], imgSizeMinusOne, imgSpacing);
     imgGeometry2.appendOrigin(new Point3D(0, 0, 1), 1);
     const image2 = new Image(imgGeometry2, buffer, ['0']);
-    image2.setMeta({numberOfFiles: 3});
+    image2.setMeta({sliceCapacity: 3});
     const sliceOrigin2 = new Point3D(0, 0, 0.4);
     const sliceGeometry2 = new Geometry(
       [sliceOrigin2], sliceSize, imgSpacing);
     const slice2 = new Image(sliceGeometry2, sliceBuffer, ['1']);
-    slice2.setMeta({numberOfFiles: 3});
+    slice2.setMeta({sliceCapacity: 3});
     // append slice before
     image2.appendSlice(slice2);
     // test its values
@@ -321,9 +364,73 @@ describe('image', () => {
   });
 
   /**
+   * Tests for {@link Image} append slice window presets merge.
+   *
+   * @function module:tests/image~imageAppendSliceWindowPresets
+   */
+  test('Image append slice window presets', () => {
+    const size = 2;
+    const sliceSize = new Size([size, size, 1]);
+    const sliceSpacing = new Spacing([1, 1, 1]);
+    const numberOfFiles = 4;
+
+    /**
+     * Create a single slice image with a 'Default' window preset.
+     *
+     * @param {number} z The slice z origin.
+     * @param {WindowLevel} wl The slice window level.
+     * @returns {Image} The created image.
+     */
+    function createSliceWithPreset(z, wl) {
+      const geometry = new Geometry(
+        [new Point3D(0, 0, z)], sliceSize, sliceSpacing);
+      const buffer = new Int16Array(size * size);
+      const image = new Image(geometry, buffer, [`${z}`]);
+      image.setMeta({
+        sliceCapacity: numberOfFiles,
+        windowPresets: {
+          Default: new WindowPreset('Default', [wl])
+        }
+      });
+      return image;
+    }
+
+    // slice window levels: same value for 0 and 1, diverging after
+    const wl0 = new WindowLevel(100, 200);
+    const wl1 = new WindowLevel(100, 200);
+    const wl2 = new WindowLevel(150, 250);
+    const wl3 = new WindowLevel(300, 400);
+    const wls = [wl0, wl1, wl2, wl3];
+
+    // base image (first loaded slice)
+    const image = createSliceWithPreset(0, wl0);
+
+    // append remaining slices, in order
+    for (let z = 1; z < numberOfFiles; ++z) {
+      image.appendSlice(createSliceWithPreset(z, wls[z]));
+    }
+
+    const preset = image.getMeta().windowPresets.Default;
+    assert.equal(preset.perslice, true,
+      'preset flagged as perslice after a diverging slice');
+    assert.equal(preset.wl.length, numberOfFiles,
+      'wl array has one entry per slice');
+    // slice 0 (base) and slices from the first detected divergence (2)
+    // onward have their own tracked window level; slice 1 was merged
+    // while still indistinguishable from slice 0
+    assert.ok(equalWl(preset.wl[0], wls[0]), 'slice 0 kept its own value');
+    assert.equal(preset.wl[1], wls[0],
+      'slice 1 merged before divergence was detected, set as wl[0]');
+    for (let z = 2; z < numberOfFiles; ++z) {
+      assert.ok(equalWl(preset.wl[z], wls[z]),
+        `slice ${z} kept its own window level`);
+    }
+  });
+
+  /**
    * Tests for {@link Image} convolute2D.
    *
-   * @function module:tests/image~image-convolute2d
+   * @function module:tests/image~imageConvolute2d
    */
   test('Image convolute2D', () => {
     // create a simple image
@@ -365,7 +472,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} transform.
    *
-   * @function module:tests/image~image-transform
+   * @function module:tests/image~imageTransform
    */
   test('Image transform', () => {
     // create a simple image
@@ -384,9 +491,8 @@ describe('image', () => {
     const func0 = function (value) {
       if (value < 3 || value > 5) {
         return 0;
-      } else {
-        return value;
       }
+      return value;
     };
     const resImage0 = image0.transform(func0);
     const theoResImage0 = [0, 0, 0, 3, 4, 5, 0, 0, 0];
@@ -421,7 +527,7 @@ describe('image', () => {
   /**
    * Tests for {@link Image} compose.
    *
-   * @function module:tests/image~image-compose
+   * @function module:tests/image~imageCompose
    */
   test('Image compose', () => {
     // create two simple images
@@ -516,9 +622,9 @@ describe('image', () => {
   /**
    * Tests for {@link Image} hasValues and getOffsets.
    *
-   * @function module:tests/image~hasvalues-getoffsets
+   * @function module:tests/image~hasvaluesGetoffsets
    */
-  test('hasValues getOffsets', () => {
+  test('hasValues', () => {
     const size0 = 3;
     const imgSize0 = new Size([size0, size0, 1]);
     const imgSpacing0 = new Spacing([1, 1, 1]);
@@ -532,8 +638,6 @@ describe('image', () => {
     for (let i1 = 2 * size0; i1 < size0 * size0; ++i1) {
       buffer0[i1] = 1;
     }
-    const theoOffset0 = [1, 2, 3, 4, 5];
-    const theoOffset1 = [0, 6, 7, 8];
 
     // create the image
     const image0 = new Image(imgGeometry0, buffer0);
@@ -570,104 +674,6 @@ describe('image', () => {
     assert.ok(
       arrayEquals(image0.hasValues([2, 1, 0]), [false, true, true]),
       'Image has values 2,1,0'
-    );
-
-    // test offsets list
-    const off00 = image0.getOffsets(0);
-    const off01 = image0.getOffsets(1);
-    assert.ok(arrayEquals(off00, theoOffset0), 'Image offsets 0');
-    assert.ok(arrayEquals(off01, theoOffset1), 'Image offsets 1');
-  });
-
-  /**
-   * Tests for {@link Image} getContourDistance.
-   *
-   * @function module:tests/image~image-getcontourdistance
-   */
-  test('Image getContourDistance', () => {
-
-    const imgOrigins = new Point3D(0, 0, 0);
-    const imgSpacing = new Spacing([1, 1, 1]);
-    const imgSize0 = new Size([6, 6, 3]);
-    const imgGeometry0 =
-      new Geometry(
-        imgOrigins,
-        imgSize0,
-        imgSpacing
-      );
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const imgBuffer0 = new Uint8Array([
-      0, 0, 0, 0, 0, 0,
-      0, 0, 1, 0, 1, 0,
-      0, 0, 1, 0, 1, 0,
-      0, 0, 0, 0, 1, 0,
-      0, 0, 0, 0, 1, 0,
-      0, 0, 0, 0, 0, 0,
-
-      0, 0, 0, 0, 0, 0,
-      1, 1, 1, 1, 1, 0,
-      1, 1, 1, 1, 1, 0,
-      1, 1, 1, 1, 1, 0,
-      1, 1, 1, 1, 1, 0,
-      1, 1, 1, 1, 1, 0,
-
-      0, 0, 0, 0, 0, 0,
-      0, 1, 1, 1, 1, 0,
-      0, 1, 1, 1, 1, 0,
-      0, 0, 0, 1, 1, 0,
-      0, 0, 0, 1, 1, 0,
-      0, 0, 0, 0, 0, 0,
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
-
-    const image0 = new Image(imgGeometry0, imgBuffer0);
-
-    image0.initializeContour();
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const o00 = [
-      1, 0, 0,
-      0, 1, 0,
-      0, 0, 1,
-    ];
-    /* eslint-enable @stylistic/js/array-element-newline */
-    const orientation00 = new Matrix33(o00);
-
-    const distance00 = image0.getContourDistance(57, orientation00);
-    assert.equal(
-      distance00,
-      2,
-      'Expected distance from contour 0'
-    );
-
-    const distance01 = image0.getContourDistance(52, orientation00);
-    assert.equal(
-      distance01,
-      1,
-      'Expected distance from contour 1'
-    );
-
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const o01 = [
-      1, 0, 0,
-      0, 0, 1,
-      0, 1, 0,
-    ];
-    /* eslint-enable @stylistic/js/array-element-newline */
-    const orientation01 = new Matrix33(o01);
-
-    const distance02 = image0.getContourDistance(52, orientation01);
-    assert.equal(
-      distance02,
-      1,
-      'Expected distance from contour 2'
-    );
-
-    const distance03 = image0.getContourDistance(50, orientation01);
-    assert.equal(
-      distance03,
-      1,
-      'Expected distance from contour 3'
     );
   });
 
@@ -728,6 +734,166 @@ describe('image', () => {
     assert.equal(image0.getMeta().Modality, modality0, 'Image modality #1');
     assert.equal(image1.getMeta().Modality, modality1,
       'Clone image modality #1');
+  });
+
+
+  /**
+   * Tests for {@link Image#resample} of an image with volume ids.
+   *
+   * @function module:tests/image~imageResampleVolumeIds
+   */
+  test('Image resample keeps volume ids', async () => {
+    vi.stubGlobal('Worker', FakeResamplingWorker);
+    try {
+      // 2 slices, 2 volumes with ids 50 and 1000
+      const volumeIds = [50, 1000].map(value => ({id: {
+        source: 'DiffusionBValue',
+        value,
+        tagKey: '00189087',
+        unit: 'unit.smm2'
+      }}));
+      const geometry = new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]),
+        undefined, volumeIds[0]);
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1, 50);
+      geometry.appendFrame(new Point3D(0, 0, 0), volumeIds[1]);
+      geometry.appendOrigin(new Point3D(0, 0, 1), 1, 1000);
+      // volume values: 1 then 2
+      const buffer = new Uint8Array(16);
+      buffer.fill(1, 0, 8);
+      buffer.fill(2, 8);
+      const image = new Image(geometry, buffer);
+      image.setMeta({PixelRepresentation: 0});
+
+      // 90 degrees rotation around Z
+      /* eslint-disable @stylistic/js/array-element-newline */
+      const orientation = new Matrix33([
+        0, -1, 0,
+        1, 0, 0,
+        0, 0, 1
+      ]);
+      /* eslint-enable @stylistic/js/array-element-newline */
+      const complete = new Promise(resolve => {
+        image.addEventListener('imageresamplingcomplete', resolve);
+      });
+      image.resample(orientation, false);
+      await complete;
+
+      assert.ok(image.isResampled(), 'is resampled');
+      assert.ok(
+        image.getGeometry().getOrientation().equals(orientation),
+        'resampled orientation');
+      assert.deepEqual(
+        image.getGeometry().getVolumeIds(), volumeIds, 'volume ids');
+      const position = image.getGeometry().indexToWorld(
+        new Index([0, 0, 0, 1]));
+      assert.equal(position.get(3), 1000, 'volume 1 position');
+      for (let v = 0; v < 2; ++v) {
+        for (let k = 0; k < 2; ++k) {
+          assert.equal(image.getValue(0, 0, k, v), v + 1,
+            `value of slice ${k} of volume ${v}`);
+        }
+      }
+
+      // revert: back to the original geometry
+      image.revert();
+      assert.notOk(image.isResampled(), 'is not resampled');
+      assert.deepEqual(
+        image.getGeometry().getVolumeIds(), volumeIds, 'reverted volume ids');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  /**
+   * Tests for {@link Image#getRescaledValuesAtPosition}.
+   *
+   * @function module:tests/image~getRescaledValuesAtPosition
+   */
+  test('Image getRescaledValuesAtPosition', () => {
+    // 2x2x2 image, 2 volumes with ids 50 and 1000
+    const volumeIds = [50, 1000].map(value => ({id: {
+      source: 'DiffusionBValue',
+      value,
+      tagKey: '00189087',
+      unit: 'unit.smm2'
+    }}));
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1]),
+      undefined, volumeIds[0]);
+    geometry.appendOrigin(new Point3D(0, 0, 1), 1, 50);
+    geometry.appendFrame(new Point3D(0, 0, 0), volumeIds[1]);
+    geometry.appendOrigin(new Point3D(0, 0, 1), 1, 1000);
+    // value: offset
+    const buffer = new Uint8Array(16);
+    for (let i = 0; i < buffer.length; ++i) {
+      buffer[i] = i;
+    }
+    const image = new Image(geometry, buffer);
+    image.setMeta({PixelRepresentation: 0, pixelUnit: 'HU'});
+    image.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 1));
+
+    // (1, 0, 1): offset 5 in volume 0, 13 in volume 1
+    const res0 = image.getRescaledValuesAtPosition(new Point([1, 0, 1]));
+    assert.deepEqual(res0, [
+      {volumeId: volumeIds[0], pixValue: {value: 11, unit: 'HU'}},
+      {volumeId: volumeIds[1], pixValue: {value: 27, unit: 'HU'}}
+    ], 'values');
+    // a volume id in the position is ignored
+    const res1 = image.getRescaledValuesAtPosition(
+      new Point([1, 0, 1, 1000]));
+    assert.deepEqual(res1, res0, 'values with volume id');
+    // returned volume ids are copies
+    res0[0].volumeId.id = {value: 0};
+    assert.equal(geometry.getVolumeIds()[0].id.value, 50, 'volume id copy');
+
+    // out of bounds
+    const res2 = image.getRescaledValuesAtPosition(new Point([3, 0, 0]));
+    assert.deepEqual(res2, [], 'out of bounds');
+    const res3 = image.getRescaledValuesAtPosition(new Point([0, 0, 5]));
+    assert.deepEqual(res3, [], 'out of bounds z');
+
+    // 3D image: one value, volume index as id, no unit
+    const image3d = new Image(
+      new Geometry(
+        [new Point3D(0, 0, 0)], new Size([2, 2, 1]), new Spacing([1, 1, 1])),
+      new Uint8Array([1, 2, 3, 4]));
+    image3d.setMeta({PixelRepresentation: 0});
+    const res4 = image3d.getRescaledValuesAtPosition(new Point([0, 1, 0]));
+    assert.deepEqual(res4, [
+      {volumeId: {id: {value: 0}}, pixValue: {value: 3, unit: undefined}}
+    ], '3d values');
+
+    // frames without volume ids: volume index as id
+    const frames = new Image(
+      new Geometry(
+        [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1]),
+        undefined, {id: {value: 0}}),
+      new Uint8Array([3]));
+    frames.setMeta({PixelRepresentation: 0, sliceCapacity: 2});
+    frames.appendFrameBuffer(new Uint8Array([7]), 1);
+    const res5 = frames.getRescaledValuesAtPosition(new Point([0, 0, 0]));
+    assert.deepEqual(res5, [
+      {volumeId: {id: {value: 0}}, pixValue: {value: 3, unit: undefined}},
+      {volumeId: {id: {value: 1}}, pixValue: {value: 7, unit: undefined}}
+    ], 'frame values');
+
+    // volume ids not matching the number of volumes: volume index as id
+    image.getGeometry().setVolumeIds([volumeIds[0]]);
+    const res6 = image.getRescaledValuesAtPosition(new Point([1, 0, 1]));
+    assert.deepEqual(res6, [
+      {volumeId: {id: {value: 0}}, pixValue: {value: 11, unit: 'HU'}},
+      {volumeId: {id: {value: 1}}, pixValue: {value: 27, unit: 'HU'}}
+    ], 'mismatched volume ids');
+
+    // more than one component: no values
+    const rgb = new Image(
+      new Geometry(
+        [new Point3D(0, 0, 0)], new Size([1, 1, 1]), new Spacing([1, 1, 1])),
+      new Uint8Array([1, 2, 3]));
+    rgb.setMeta({PixelRepresentation: 0});
+    const res7 = rgb.getRescaledValuesAtPosition(new Point([0, 0, 0]));
+    assert.deepEqual(res7, [], 'rgb');
   });
 
 });

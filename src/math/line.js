@@ -2,14 +2,13 @@ import {Point2D} from './point.js';
 import {
   isSimilar,
   REAL_WORLD_EPSILON,
-} from './matrix.js';
+} from './number.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController.js';
-import {Scalar2D} from './scalar.js';
-import {Value} from './value.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {ViewController} from '../app/viewController.js';
+ * @import {Scalar2D} from './scalar.js';
+ * @import {NumberValue} from './types.js';
+ */
 
 /**
  * Line shape.
@@ -140,6 +139,19 @@ export class Line {
   }
 
   /**
+   * Check if a point is on the line, within a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the line,
+   *   defaults to 0.
+   * @returns {boolean} True if the point is on the line.
+   */
+  contains(point, tolerance = 0) {
+    return getDistanceToSegment(
+      point, this.getBegin(), this.getEnd()) <= tolerance;
+  }
+
+  /**
    * Get the slope of the line.
    *
    * @returns {number} The slope of the line.
@@ -186,7 +198,7 @@ export class Line {
    * Quantify a line according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(viewController) {
     // length
@@ -263,6 +275,31 @@ export function isPointInLineRange(point, line) {
 }
 
 /**
+ * Get the distance between a point and a line segment.
+ *
+ * @param {Point2D} point The input point.
+ * @param {Point2D} begin The segment begin point.
+ * @param {Point2D} end The segment end point.
+ * @returns {number} The distance to the closest point of the segment.
+ */
+export function getDistanceToSegment(point, begin, end) {
+  const dx = end.getX() - begin.getX();
+  const dy = end.getY() - begin.getY();
+  const length2 = dx * dx + dy * dy;
+  // projection of the point on the segment, clamped to [0, 1]
+  let t = 0;
+  if (length2 !== 0) {
+    t = ((point.getX() - begin.getX()) * dx +
+      (point.getY() - begin.getY()) * dy) / length2;
+    t = Math.max(0, Math.min(1, t));
+  }
+  return Math.hypot(
+    point.getX() - (begin.getX() + t * dx),
+    point.getY() - (begin.getY() + t * dy)
+  );
+}
+
+/**
  * Get a perpendicular line to an input one at a given point.
  *
  * @param {Line} line The line to be perpendicular to.
@@ -331,11 +368,11 @@ export function getLineFromEquation(slope, intercept, point, length, spacing) {
     spacing = {x: 1, y: 1};
   }
   // begin point
-  let beginX = 0;
-  let beginY = 0;
+  let beginX;
+  let beginY;
   // end point
-  let endX = 0;
-  let endY = 0;
+  let endX;
+  let endY;
 
   if (isSimilar(slope, 0, REAL_WORLD_EPSILON)) {
     // slope = ~0 -> horizontal input line

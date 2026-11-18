@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {describe, test, assert, vi, expect} from 'vitest';
 import {MemoryLoader} from '../../src/io/memoryLoader.js';
 import {b64urlToArrayBuffer} from '../dicom/utils.js';
@@ -23,13 +24,18 @@ describe('io', () => {
    * @param {Array} data The data to load as a string array.
    * @param {number} nData The theoretical number of data.
    * @param {number} nDataOk The theoretical number of data with no error.
+   * @param {number} [nItems] The theoretical number of load items,
+   *   defaults to nDataOk (multi-frame data sends one item per frame).
    * @returns {Promise} The load promise.
    */
-  async function checkLoad(id, data, nData, nDataOk) {
+  async function checkLoad(id, data, nData, nDataOk, nItems) {
+    if (typeof nItems === 'undefined') {
+      nItems = nDataOk;
+    }
 
     return new Promise((resolve) => {
 
-      const prefix = '[' + id + '] ';
+      const prefix = `[${id}] `;
       const nDataError = nData - nDataOk;
 
       // checks
@@ -59,54 +65,52 @@ describe('io', () => {
       loader.onloadend = function (/*event*/) {
         const loadEndDate = new Date();
         assert.notOk(gotLoadEnd,
-          prefix + 'Received first load end.');
+          `${prefix}Received first load end.`);
         gotLoadEnd = true;
 
         // check number of events
         assert.equal(loadStartDates.length, 1,
-          prefix + 'Received one load start.');
+          `${prefix}Received one load start.`);
         if (nDataOk !== 0) {
           assert.ok(progressDates.length > 0,
-            prefix + 'Received at least one progress.');
+            `${prefix}Received at least one progress.`);
         }
-        assert.equal(loadItemDates.length, nDataOk,
-          prefix + 'Received loaditem.');
+        assert.equal(loadItemDates.length, nItems,
+          `${prefix}Received loaditem.`);
         const nLoad = nDataError === 0 ? 1 : 0;
         assert.equal(loadDates.length, nLoad,
-          prefix + 'Received load.');
+          `${prefix}Received load.`);
         assert.equal(errorDates.length, nDataError,
-          prefix + 'Received error(s).');
+          `${prefix}Received error(s).`);
         assert.equal(abortDates.length, 0,
-          prefix + 'Received abort(s).');
+          `${prefix}Received abort(s).`);
 
         // check start/end sequence
         const loadStartDate = loadStartDates[0];
         assert.ok(loadStartDate <= loadEndDate,
-          prefix + 'Received start before load end.');
+          `${prefix}Received start before load end.`);
 
-        let firstProgressDate = null;
         let lastProgressDate = null;
-        let firstLoadItemDate = null;
         let lastLoadItemDate = null;
 
         if (nDataOk !== 0) {
           // check progress sequence
           progressDates.sort();
-          firstProgressDate = progressDates[0];
+          const firstProgressDate = progressDates[0];
           lastProgressDate = progressDates[progressDates.length - 1];
           assert.ok(loadStartDate <= firstProgressDate,
-            prefix + 'Received start before first progress.');
+            `${prefix}Received start before first progress.`);
           assert.ok(loadEndDate >= lastProgressDate,
-            prefix + 'Received end after last progress.');
+            `${prefix}Received end after last progress.`);
 
           // check load item sequence
           loadItemDates.sort();
-          firstLoadItemDate = loadItemDates[0];
+          const firstLoadItemDate = loadItemDates[0];
           lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
           assert.ok(loadStartDate <= firstLoadItemDate,
-            prefix + 'Received start before first load item.');
+            `${prefix}Received start before first load item.`);
           assert.ok(loadEndDate >= lastLoadItemDate,
-            prefix + 'Received end after last load item.');
+            `${prefix}Received end after last load item.`);
         }
 
         // check load or error event sequence
@@ -114,21 +118,21 @@ describe('io', () => {
           // load is sent if no error happened
           const loadDate = loadDates[0];
           assert.ok(loadStartDate <= loadDate,
-            prefix + 'Received start before load.');
+            `${prefix}Received start before load.`);
           assert.ok(loadDate >= lastProgressDate,
-            prefix + 'Received load after last progress.');
+            `${prefix}Received load after last progress.`);
           assert.ok(loadDate >= lastLoadItemDate,
-            prefix + 'Received load after last load item.');
+            `${prefix}Received load after last load item.`);
           assert.ok(loadEndDate >= loadDate,
-            prefix + 'Received end after load.');
+            `${prefix}Received end after load.`);
         } else {
           errorDates.sort();
           const firstErrorDate = errorDates[0];
           const lastErrorDate = errorDates[errorDates.length - 1];
           assert.ok(loadStartDate <= firstErrorDate,
-            prefix + 'Received start before first error.');
+            `${prefix}Received start before first error.`);
           assert.ok(loadEndDate >= lastErrorDate,
-            prefix + 'Received end after last error.');
+            `${prefix}Received end after last error.`);
         }
         resolve(true);
       };
@@ -147,7 +151,7 @@ describe('io', () => {
   /**
    * Tests for {@link MemoryLoader} events with single frame data.
    *
-   * @function module:tests/io~memoryloader-events-single-frame
+   * @function module:tests/io~memoryloaderEventsSingleFrame
    */
   test(
     // eslint-disable-next-line @stylistic/js/max-len
@@ -209,7 +213,7 @@ describe('io', () => {
         1, 'Invalid DICM prefix (DIMC), trying to guess tansfer syntax.');
       const vr = String.fromCharCode(0, 0);
       expect(consoleSpy).toHaveBeenNthCalledWith(
-        2, 'Unknown VR: ' + vr + ' (for tag 00000000), treating as \'UN\'');
+        2, `Unknown VR: ${vr} (for tag 00000000), treating as 'UN'`);
       // reset spy
       consoleSpy.mockReset();
     }
@@ -218,7 +222,7 @@ describe('io', () => {
   /**
    * Tests for {@link MemoryLoader} events with multi frame data.
    *
-   * @function module:tests/io~memoryloader-events-multi-frame
+   * @function module:tests/io~memoryloaderEventsMultiFrame
    */
   test(
     'MemoryLoader events multi frame - ' +
@@ -233,7 +237,9 @@ describe('io', () => {
       ];
       const nData0 = data0.length;
       const nDataOk0 = nData0;
-      await checkLoad('0', data0, nData0, nDataOk0);
+      // one item per frame
+      const nItems0 = 16;
+      await checkLoad('0', data0, nData0, nDataOk0, nItems0);
 
       // #1: encoded multi frame
       // TODO seems to cause problems to phantomjs...
@@ -250,7 +256,7 @@ describe('io', () => {
    * Tests for {@link MemoryLoader} events with zipped data.
    * TODO check all good...
    *
-   * @function module:tests/io~memoryloader-events-zip
+   * @function module:tests/io~memoryloaderEventsZip
    */
   test(
     'MemoryLoader events zip - #DWV-REQ-IO-04-001 DICOM load start event',
@@ -299,7 +305,7 @@ describe('io', () => {
   /**
    * Tests for {@link UrlsLoader} events with DCMDIR data.
    *
-   * @function module:tests/io~urlsloader-events
+   * @function module:tests/io~urlsloaderEvents
    */
   // TODO...
   // test('Test UrlsLoader events for DCMDIR data.', () => {

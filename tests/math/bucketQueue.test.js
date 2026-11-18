@@ -11,7 +11,7 @@ describe('math', () => {
   /**
    * Tests for {@link BucketQueue}.
    *
-   * @function module:tests/math~bucketqueue-class
+   * @function module:tests/math~bucketqueueClass
    */
   test('BucketQueue class', () => {
     const queue00 = new BucketQueue();

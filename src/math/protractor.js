@@ -1,11 +1,10 @@
-import {Line, getAngle} from './line.js';
+import {Line, getAngle, getDistanceToSegment} from './line.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point.js';
-import {Value} from './value.js';
-import {ViewController} from '../app/viewController.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {Point2D} from '../math/point.js';
+ * @import {NumberValue} from './types.js';
+ * @import {ViewController} from '../app/viewController.js';
+ */
 
 /**
  * Protractor shape: 3 points from which to calculate an angle.
@@ -60,11 +59,29 @@ export class Protractor {
   }
 
   /**
+   * Check if a point is on one of the protractor lines, within a tolerance.
+   *
+   * @param {Point2D} point The point to check.
+   * @param {number} [tolerance] Optional maximum distance to the lines,
+   *   defaults to 0.
+   * @returns {boolean} True if the point is on the protractor.
+   */
+  contains(point, tolerance = 0) {
+    for (let i = 0; i < this.#points.length - 1; ++i) {
+      if (getDistanceToSegment(
+        point, this.#points[i], this.#points[i + 1]) <= tolerance) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Quantify a path according to view information.
    *
    * @param {ViewController} _viewController The associated view controller.
    * @param {string[]} _flags A list of stat values to calculate.
-   * @returns {Object<string, Value>} A quantification object.
+   * @returns {Record<string, NumberValue>} A quantification object.
    */
   quantify(_viewController, _flags) {
     let angle;

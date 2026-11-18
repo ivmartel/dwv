@@ -1,10 +1,12 @@
 import {Index} from '../math/index.js';
 import {Vector3D} from '../math/vector.js';
+import {Point2D} from '../math/point.js';
 import {Point3D} from '../math/point.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {Size} from '../image/size.js';
 import {Spacing} from '../image/spacing.js';
 import {Image} from '../image/image.js';
+import {MaskImage} from '../image/maskImage.js';
 import {Geometry} from '../image/geometry.js';
 import {PlaneHelper} from '../image/planeHelper.js';
 import {
@@ -15,16 +17,16 @@ import {
 } from '../image/iterator.js';
 import {PositionHelper} from '../image/positionHelper.js';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {View} from '../image/view.js';
-import {WindowLevel} from '../image/windowLevel.js';
-import {Point, Point2D} from '../math/point.js';
-import {Scalar2D} from '../math/scalar.js';
-import {Matrix33} from '../math/matrix.js';
-import {ViewLayer} from '../gui/viewLayer.js';
-import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
-/* eslint-enable no-unused-vars */
+/**
+ * @import {View} from '../image/view.js';
+ * @import {WindowLevel} from '../image/windowLevel.js';
+ * @import {WindowPreset} from '../image/windowPreset.js';
+ * @import {Point} from '../math/point.js';
+ * @import {Scalar2D} from '../math/scalar.js';
+ * @import {Matrix33} from '../math/matrix.js';
+ * @import {ViewLayer} from '../gui/viewLayer.js';
+ * @import {MaskSegmentViewHelper} from '../image/maskSegmentViewHelper.js';
+ */
 
 /**
  * View controller.
@@ -48,7 +50,7 @@ export class ViewController {
   /**
    * Third dimension player ID (created by setInterval).
    *
-   * @type {number|undefined}
+   * @type {ReturnType<typeof setInterval>|undefined}
    */
   #playerID;
 
@@ -156,7 +158,7 @@ export class ViewController {
   /**
    * Add window/level presets to the view.
    *
-   * @param {object} presets A preset object.
+   * @param {Record<string, WindowPreset>} presets A preset object.
    * @returns {object} The list of presets.
    */
   addWindowLevelPresets(presets) {
@@ -216,6 +218,18 @@ export class ViewController {
    */
   getCurrentIndex() {
     return this.#view.getCurrentIndex();
+  }
+
+  /**
+   * Check if the volume of this view can follow the one of another view.
+   *
+   * @param {ViewController} viewController The view controller to follow.
+   * @param {number} value The volume id value to follow.
+   * @returns {boolean} True if the volume can follow.
+   */
+  canSyncVolume(viewController, value) {
+    return this.#view.getImage().getGeometry().canSyncVolume(
+      viewController.#view.getImage().getGeometry(), value);
   }
 
   /**
@@ -387,6 +401,26 @@ export class ViewController {
   }
 
   /**
+   * Get the numbers of the mask segments at the input position.
+   *
+   * @param {Point} position The input position.
+   * @returns {number[]} The list of segment numbers, empty if the image
+   *   is not a mask, for background or if out of bounds.
+   */
+  getSegmentNumbersAtPosition(position) {
+    const image = this.#view.getImage();
+    if (!(image instanceof MaskImage)) {
+      return [];
+    }
+    const geometry = image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    if (!geometry.isIndexInBounds(index)) {
+      return [];
+    }
+    return image.getSegmentNumbersAtIndex(index);
+  }
+
+  /**
    * Get the image pixel unit.
    *
    * @returns {string} The unit.
@@ -436,7 +470,7 @@ export class ViewController {
     const sliceGeometry =
       new Geometry([sliceOrigin], sliceSize, sliceSpacing);
     // slice image
-    // @ts-ignore
+    // @ts-expect-error -- sliceValues is a number[], Image expects a TypedArray
     return new Image(sliceGeometry, sliceValues);
   }
 
@@ -711,6 +745,17 @@ export class ViewController {
   }
 
   /**
+   * Get the world position of an index.
+   *
+   * @param {Index} index The index.
+   * @returns {Point} The position.
+   */
+  getPositionFromIndex(index) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(index);
+  }
+
+  /**
    * Set the current index.
    *
    * @param {Index} index The index.
@@ -771,8 +816,8 @@ export class ViewController {
       const canScroll3D = size.canScroll3D();
       const helper = this.getPositionHelper();
 
-      this.#playerID = window.setInterval(() => {
-        let canDoMore = false;
+      this.#playerID = setInterval(() => {
+        let canDoMore;
         if (canScroll3D) {
           canDoMore = helper.incrementPositionAlongScroll();
         } else {
@@ -877,6 +922,31 @@ export class ViewController {
    */
   setMaskViewHelper(helper) {
     this.#view.setMaskViewHelper(helper);
+  }
+
+  /**
+   * Get the segment highlight.
+   *
+   * @returns {{segmentNumber: number, opacity: number}|undefined}
+   *   The highlighted segment number and its opacity factor.
+   */
+  getSegmentHighlight() {
+    return this.#view.getSegmentHighlight();
+  }
+
+  /**
+   * Set the segment highlight: the opacity of the given segment
+   *   is multiplied by the input factor. Only one segment can be
+   *   highlighted at a time.
+   * This only has an effect on segmentation views.
+   *
+   * @param {number} [segmentNumber] The segment number,
+   *   undefined to remove the highlight.
+   * @param {number} [opacity] The opacity factor (between 0 and 1),
+   *   defaults to 1.
+   */
+  setSegmentHighlight(segmentNumber, opacity) {
+    this.#view.setSegmentHighlight(segmentNumber, opacity);
   }
 
   /**

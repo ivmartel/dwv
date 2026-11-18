@@ -32,7 +32,7 @@ describe('dicom', () => {
     /**
      * Tests for empty {@link MeasuredValue}.
      *
-     * @function module:tests/dicom~measuredvalue-empty
+     * @function module:tests/dicom~measuredvalueEmpty
      */
     test('empty', () => {
       const value = new MeasuredValue();
@@ -46,7 +46,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link MeasuredValue} toString.
      *
-     * @function module:tests/dicom~measuredvalue-tostring
+     * @function module:tests/dicom~measuredvalueTostring
      */
     test('toString', () => {
       const code = new DicomCode('millimeter');
@@ -64,7 +64,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link MeasuredValue} round trip.
      *
-     * @function module:tests/dicom~measuredvalue-round-trip
+     * @function module:tests/dicom~measuredvalueRoundTrip
      */
     test('round trip', () => {
       const deNum = new DataElement('DS');
@@ -120,7 +120,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getMeasuredValue} numeric.
      *
-     * @function module:tests/dicom~getmeasuredvalue-numeric
+     * @function module:tests/dicom~getmeasuredvalueNumeric
      */
     test('numeric', () => {
       const de = new DataElement('DS');
@@ -150,7 +150,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getMeasuredValue} float.
      *
-     * @function module:tests/dicom~getmeasuredvalue-float
+     * @function module:tests/dicom~getmeasuredvalueFloat
      */
     test('float', () => {
       const de = new DataElement('FD');
@@ -168,7 +168,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getMeasuredValue} rational.
      *
-     * @function module:tests/dicom~getmeasuredvalue-rational
+     * @function module:tests/dicom~getmeasuredvalueRational
      */
     test('rational', () => {
       const de0 = new DataElement('IS');
@@ -204,7 +204,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getMeasuredValue} code.
      *
-     * @function module:tests/dicom~getmeasuredvalue-code
+     * @function module:tests/dicom~getmeasuredvalueCode
      */
     test('code', () => {
       const deCodeMeaning = new DataElement('LO');
@@ -236,7 +236,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getMeasuredValue} all.
      *
-     * @function module:tests/dicom~getmeasuredvalue-all
+     * @function module:tests/dicom~getmeasuredvalueAll
      */
     test('all', () => {
       const deNum = new DataElement('DS');
@@ -288,7 +288,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getMeasuredValue} no tag.
      *
-     * @function module:tests/dicom~getmeasuredvalue-no-tag
+     * @function module:tests/dicom~getmeasuredvalueNoTag
      */
     test('no tag', () => {
       const result = getMeasuredValue({});
@@ -306,7 +306,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomMeasuredValueItem} numeric.
      *
-     * @function module:tests/dicom~getdicommeasuredvalueitem-numeric
+     * @function module:tests/dicom~getdicommeasuredvalueitemNumeric
      */
     test('numeric', () => {
       const value = new MeasuredValue();
@@ -323,7 +323,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomMeasuredValueItem} float.
      *
-     * @function module:tests/dicom~getdicommeasuredvalueitem-float
+     * @function module:tests/dicom~getdicommeasuredvalueitemFloat
      */
     test('float', () => {
       const value = new MeasuredValue();
@@ -337,7 +337,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomMeasuredValueItem} rational.
      *
-     * @function module:tests/dicom~getdicommeasuredvalueitem-rational
+     * @function module:tests/dicom~getdicommeasuredvalueitemRational
      */
     test('rational', () => {
       const value = new MeasuredValue();
@@ -353,7 +353,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomMeasuredValueItem} code.
      *
-     * @function module:tests/dicom~getdicommeasuredvalueitem-code
+     * @function module:tests/dicom~getdicommeasuredvalueitemCode
      */
     test('code', () => {
       const code = new DicomCode('millimeter');
@@ -374,7 +374,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomMeasuredValueItem} all.
      *
-     * @function module:tests/dicom~getdicommeasuredvalueitem-all
+     * @function module:tests/dicom~getdicommeasuredvalueitemAll
      */
     test('all', () => {
       const code = new DicomCode('millimeter');
@@ -399,7 +399,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomMeasuredValueItem} undefined.
      *
-     * @function module:tests/dicom~getdicommeasuredvalueitem-undefined
+     * @function module:tests/dicom~getdicommeasuredvalueitemUndefined
      */
     test('undefined', () => {
       const value = new MeasuredValue();
@@ -417,7 +417,7 @@ describe('dicom', () => {
     /**
      * Tests for {@link getDicomMeasuredValueItem} empty.
      *
-     * @function module:tests/dicom~getdicommeasuredvalueitem-empty
+     * @function module:tests/dicom~getdicommeasuredvalueitemEmpty
      */
     test('empty', () => {
       const value = new MeasuredValue();
