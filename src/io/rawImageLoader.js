@@ -5,8 +5,6 @@ import {LoaderBase} from './loaderBase.js';
 
 /**
  * Raw image loader.
- *
- * Warning; not compatible with a node usage.
  */
 export class RawImageLoader extends LoaderBase {
 

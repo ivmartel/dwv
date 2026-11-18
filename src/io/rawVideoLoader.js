@@ -6,8 +6,6 @@ import {LoaderBase} from './loaderBase.js';
 /**
  * Raw video loader.
  *
- * Warning; not compatible with a node usage.
- *
  * Url example (cors enabled):
  *   {@link https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4}.
  */
