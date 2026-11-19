@@ -21,6 +21,14 @@ option (`AppOptions.rootDocument`, defaults to `document`) to find elements
 and register document-level events (for ex keyboard events in
 `ToolboxController`), and attach other listeners to the app's own elements.
 
+DWV is focused on image display and manipulation. Network interactions with
+remote servers (for ex DICOMweb QIDO-RS search or STOW-RS storage, DIMSE
+services) are not part of the library and must be kept separate: they belong
+to the embedding application (see the `dev/pacs` demo for an example). The
+library only retrieves the data to display, through its URL loaders
+(WADO-URI, WADO-RS), and takes already-loaded data as files or memory
+buffers.
+
 Package manager is `yarn` (yarn v4, `packageManager` pinned in package.json).
 Run `corepack enable` to install `yarn`
 shims that read the `packageManager` field and download and run that exact
@@ -211,8 +219,9 @@ recommended API.
    → `MemoryLoader` → `loaderList` → `MultipartLoader`). The orchestrators
    `FilesLoader`/`UrlsLoader`/`MemoryLoader` pick the first matching loader,
    read the raw bytes (`FileReader`/`XMLHttpRequest`), and call `loader.load()`.
-   DWV is a DICOMweb User Agent only (WADO-URI, WADO-RS, STOW-RS) — QIDO-RS
-   only exists in the `dev/pacs` demo, not core `src/` — and has no DIMSE
+   DWV is a DICOMweb User Agent for retrieval only (WADO-URI, WADO-RS) —
+   QIDO-RS and STOW-RS only exist in the `dev/pacs` demo, not core `src/`
+   (see *Project* above) — and has no DIMSE
    networking (no C-STORE/C-FIND/C-MOVE/PDU/Association handling); it's
    HTTP/DICOMweb only.
 2. **DICOM parsing** (`src/dicom/`): `DicomParser.parse()` reads the preamble,
