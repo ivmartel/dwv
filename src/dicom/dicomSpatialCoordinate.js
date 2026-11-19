@@ -128,7 +128,13 @@ export function getDicomSpatialCoordinateItem(scoord) {
 /**
  * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
  * Supports all standard shapes, including BidimensionalLine (exported as a
- * polyline with 4 points).
+ * polyline with 4 points, deprecated: use
+ * {@link getScoordsFromBidimensional}).
+ *
+ * The shape coordinates are image plane coordinates in pixel units where
+ * pixel i covers [i, i+1): 0,0 is the top left corner of the top left pixel,
+ * which is the SCOORD Graphic Data convention, so no offset is applied.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.1}.
  *
  * @param {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|
  *   BidimensionalLine} shape
@@ -187,16 +193,24 @@ export function getScoordFromShape(shape) {
     const center = shape.getCenter();
     const radiusX = shape.getA();
     const radiusY = shape.getB();
-    scoord.graphicData = [
-      (center.getX() - radiusX).toString(),
-      center.getY().toString(),
-      (center.getX() + radiusX).toString(),
-      center.getY().toString(),
-      center.getX().toString(),
-      (center.getY() - radiusY).toString(),
-      center.getX().toString(),
-      (center.getY() + radiusY).toString()
+    const xAxis = [
+      center.getX() - radiusX,
+      center.getY(),
+      center.getX() + radiusX,
+      center.getY()
     ];
+    const yAxis = [
+      center.getX(),
+      center.getY() - radiusY,
+      center.getX(),
+      center.getY() + radiusY
+    ];
+    // major axis first (C.18.6.1.2)
+    const axes = radiusY > radiusX
+      ? yAxis.concat(xAxis) : xAxis.concat(yAxis);
+    scoord.graphicData = axes.map(function (value) {
+      return value.toString();
+    });
     scoord.graphicType = GraphicTypes.ellipse;
   } else if (shape instanceof Rectangle) {
     const begin = shape.getBegin();
@@ -216,49 +230,9 @@ export function getScoordFromShape(shape) {
     ];
     scoord.graphicType = GraphicTypes.polyline;
   } else if (shape instanceof BidimensionalLine) {
-    let perpUnitX = 0;
-    let perpUnitY = 0;
-    const mainAxisStart = shape.getBegin();
-    const mainAxisEnd = shape.getEnd();
-
-    // Use the actual short axis center if available, otherwise use centroid
-    const shortAxisCenter =
-      shape.shortAxisCenter instanceof Point2D
-        ? shape.shortAxisCenter
-        : shape.getCentroid();
-
-    const mainDx = mainAxisEnd.getX() - mainAxisStart.getX();
-    const mainDy = mainAxisEnd.getY() - mainAxisStart.getY();
-    const mainLength = Math.sqrt(mainDx * mainDx + mainDy * mainDy);
-
-    // Perpendicular unit vector to main axis
-    if (mainLength !== 0) {
-      perpUnitX = -mainDy / mainLength;
-      perpUnitY = mainDx / mainLength;
-    }
-
-    const shortAxisL1 = shape.shortAxisL1 ?? (shape.shortAxisLength / 2);
-    const shortAxisL2 = shape.shortAxisL2 ?? (shape.shortAxisLength / 2);
-
-    const shortAxisEnd1 = new Point2D(
-      shortAxisCenter.getX() + perpUnitX * shortAxisL1,
-      shortAxisCenter.getY() + perpUnitY * shortAxisL1
-    );
-    const shortAxisEnd2 = new Point2D(
-      shortAxisCenter.getX() - perpUnitX * shortAxisL2,
-      shortAxisCenter.getY() - perpUnitY * shortAxisL2
-    );
-
-    scoord.graphicData = [
-      mainAxisStart.getX().toString(),
-      mainAxisStart.getY().toString(),
-      mainAxisEnd.getX().toString(),
-      mainAxisEnd.getY().toString(),
-      shortAxisEnd1.getX().toString(),
-      shortAxisEnd1.getY().toString(),
-      shortAxisEnd2.getX().toString(),
-      shortAxisEnd2.getY().toString()
-    ];
+    const scoords = getScoordsFromBidimensional(shape);
+    scoord.graphicData =
+      scoords.longAxis.graphicData.concat(scoords.shortAxis.graphicData);
     scoord.graphicType = GraphicTypes.polyline;
   }
   return scoord;
@@ -327,14 +301,7 @@ export function getShapeFromScoord(scoord) {
     if (points.length > 4) {
       logger.warn(`Expecting 4 points for ellipses, got ${numberOfPoints}`);
     }
-    // TODO: make more generic
-    const radiusX = points[0].getDistance(points[1]) / 2;
-    const radiusY = points[2].getDistance(points[3]) / 2;
-    const center = new Point2D(
-      points[0].getX() + radiusX,
-      points[0].getY()
-    );
-    shape = new Ellipse(center, radiusX, radiusY);
+    shape = getEllipseFromPoints(points);
   } else if (scoord.graphicType === GraphicTypes.polyline) {
     if (!isClosed) {
       if (points.length === 2) {
@@ -343,50 +310,8 @@ export function getShapeFromScoord(scoord) {
         shape = new Protractor([points[0], points[1], points[2]]);
       } else if (points.length === 4) {
         // BidimensionalLine: points 0,1 = main axis; 2,3 = short axis
-        const mainAxisStart = points[0];
-        const mainAxisEnd = points[1];
-        const shortAxisEnd1 = points[2];
-        const shortAxisEnd2 = points[3];
-        let projection = 0.5;
-
-        shape = new BidimensionalLine(mainAxisStart, mainAxisEnd);
-
-        const shortAxisCenterX =
-          (shortAxisEnd1.getX() + shortAxisEnd2.getX()) / 2;
-        const shortAxisCenterY =
-          (shortAxisEnd1.getY() + shortAxisEnd2.getY()) / 2;
-
-        const l1Dx = shortAxisEnd1.getX() - shortAxisCenterX;
-        const l1Dy = shortAxisEnd1.getY() - shortAxisCenterY;
-        const l2Dx = shortAxisCenterX - shortAxisEnd2.getX();
-        const l2Dy = shortAxisCenterY - shortAxisEnd2.getY();
-
-        const shortAxisL1 = Math.sqrt(l1Dx * l1Dx + l1Dy * l1Dy);
-        const shortAxisL2 = Math.sqrt(l2Dx * l2Dx + l2Dy * l2Dy);
-        const shortAxisLength = shortAxisL1 + shortAxisL2;
-
-        const mainDx = mainAxisEnd.getX() - mainAxisStart.getX();
-        const mainDy = mainAxisEnd.getY() - mainAxisStart.getY();
-        const mainLength = Math.sqrt(mainDx * mainDx + mainDy * mainDy);
-
-        let shortAxisT = 0.5;
-        if (mainLength > 0) {
-          const centerVx = shortAxisCenterX - mainAxisStart.getX();
-          const centerVy = shortAxisCenterY - mainAxisStart.getY();
-          const numerator = centerVx * mainDx + centerVy * mainDy;
-          const denominator = mainLength * mainLength;
-          if (denominator !== 0) {
-            projection = numerator / denominator;
-          }
-          shortAxisT = Math.max(0, Math.min(1, projection));
-        }
-
-        shape.shortAxisLength = shortAxisLength;
-        shape.shortAxisT = shortAxisT;
-        shape.shortAxisL1 = shortAxisL1;
-        shape.shortAxisL2 = shortAxisL2;
-        shape.shortAxisCenter = new Point2D(shortAxisCenterX, shortAxisCenterY);
-        shape.hasShortAxisInteraction = true;
+        // (dwv up to v0.37)
+        shape = getBidimensionalFromPoints(points);
       }
     } else if (points.length === 5) {
       const line0 = new Line(points[0], points[1]);
@@ -409,3 +334,156 @@ export function getShapeFromScoord(scoord) {
 
   return shape;
 };
+/**
+ * Get an ellipse from the 4 points of a SCOORD ELLIPSE: the end points of
+ * the major axis followed by the end points of the minor axis.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2}.
+ *
+ * Only axis aligned ellipses are supported: a rotated ellipse
+ * is approximated with the axis closest to horizontal as x axis.
+ *
+ * @param {Point2D[]} points The 4 points.
+ * @returns {Ellipse} The ellipse.
+ */
+function getEllipseFromPoints(points) {
+  const axis1Dx = points[1].getX() - points[0].getX();
+  const axis1Dy = points[1].getY() - points[0].getY();
+  const radius1 = points[0].getDistance(points[1]) / 2;
+  const radius2 = points[2].getDistance(points[3]) / 2;
+  const center = new Point2D(
+    (points[0].getX() + points[1].getX()) / 2,
+    (points[0].getY() + points[1].getY()) / 2
+  );
+  const isAxis1Horizontal = Math.abs(axis1Dx) >= Math.abs(axis1Dy);
+  const tolerance = 1e-6 * Math.max(radius1, 1);
+  if (Math.min(Math.abs(axis1Dx), Math.abs(axis1Dy)) > tolerance) {
+    logger.warn('Rotated ellipses are not supported, ' +
+      'using an axis aligned approximation');
+  }
+  let radiusX = radius1;
+  let radiusY = radius2;
+  if (!isAxis1Horizontal) {
+    radiusX = radius2;
+    radiusY = radius1;
+  }
+  return new Ellipse(center, radiusX, radiusY);
+}
+
+/**
+ * Get the long and short axis SCOORDs of a bidimensional line:
+ * each axis is a 2 points POLYLINE.
+ *
+ * @param {BidimensionalLine} shape The bidimensional line.
+ * @returns {{longAxis: SpatialCoordinate, shortAxis: SpatialCoordinate}}
+ *   The long and short axis SCOORDs.
+ */
+export function getScoordsFromBidimensional(shape) {
+  let perpUnitX = 0;
+  let perpUnitY = 0;
+  const mainAxisStart = shape.getBegin();
+  const mainAxisEnd = shape.getEnd();
+
+  // use the actual short axis center if available, otherwise the centroid
+  const shortAxisCenter =
+    shape.shortAxisCenter instanceof Point2D
+      ? shape.shortAxisCenter
+      : shape.getCentroid();
+
+  const mainDx = mainAxisEnd.getX() - mainAxisStart.getX();
+  const mainDy = mainAxisEnd.getY() - mainAxisStart.getY();
+  const mainLength = Math.sqrt(mainDx * mainDx + mainDy * mainDy);
+
+  // perpendicular unit vector to main axis
+  if (mainLength !== 0) {
+    perpUnitX = -mainDy / mainLength;
+    perpUnitY = mainDx / mainLength;
+  }
+
+  const shortAxisL1 = shape.shortAxisL1 ?? (shape.shortAxisLength / 2);
+  const shortAxisL2 = shape.shortAxisL2 ?? (shape.shortAxisLength / 2);
+
+  const shortAxisEnd1 = new Point2D(
+    shortAxisCenter.getX() + perpUnitX * shortAxisL1,
+    shortAxisCenter.getY() + perpUnitY * shortAxisL1
+  );
+  const shortAxisEnd2 = new Point2D(
+    shortAxisCenter.getX() - perpUnitX * shortAxisL2,
+    shortAxisCenter.getY() - perpUnitY * shortAxisL2
+  );
+
+  const longAxis = getScoordFromShape(new Line(mainAxisStart, mainAxisEnd));
+  const shortAxis = getScoordFromShape(new Line(shortAxisEnd1, shortAxisEnd2));
+  return {longAxis, shortAxis};
+}
+
+/**
+ * Get a bidimensional line from its long axis end points
+ * followed by its short axis end points.
+ *
+ * @param {Point2D[]} points The 4 points.
+ * @returns {BidimensionalLine} The bidimensional line.
+ */
+function getBidimensionalFromPoints(points) {
+  const mainAxisStart = points[0];
+  const mainAxisEnd = points[1];
+  const shortAxisEnd1 = points[2];
+  const shortAxisEnd2 = points[3];
+
+  const shape = new BidimensionalLine(mainAxisStart, mainAxisEnd);
+
+  const mainDx = mainAxisEnd.getX() - mainAxisStart.getX();
+  const mainDy = mainAxisEnd.getY() - mainAxisStart.getY();
+  const mainLength2 = mainDx * mainDx + mainDy * mainDy;
+
+  // short axis center: projection of the short axis on the main axis
+  // (the axes are perpendicular), midpoint if the main axis is empty
+  let shortAxisT = 0.5;
+  let shortAxisCenter = new Point2D(
+    (shortAxisEnd1.getX() + shortAxisEnd2.getX()) / 2,
+    (shortAxisEnd1.getY() + shortAxisEnd2.getY()) / 2
+  );
+  if (mainLength2 !== 0) {
+    const centerVx = shortAxisCenter.getX() - mainAxisStart.getX();
+    const centerVy = shortAxisCenter.getY() - mainAxisStart.getY();
+    const projection = (centerVx * mainDx + centerVy * mainDy) / mainLength2;
+    shortAxisT = Math.max(0, Math.min(1, projection));
+    shortAxisCenter = new Point2D(
+      mainAxisStart.getX() + projection * mainDx,
+      mainAxisStart.getY() + projection * mainDy
+    );
+  }
+
+  const shortAxisL1 = shortAxisEnd1.getDistance(shortAxisCenter);
+  const shortAxisL2 = shortAxisEnd2.getDistance(shortAxisCenter);
+
+  shape.shortAxisLength = shortAxisL1 + shortAxisL2;
+  shape.shortAxisT = shortAxisT;
+  shape.shortAxisL1 = shortAxisL1;
+  shape.shortAxisL2 = shortAxisL2;
+  shape.shortAxisCenter = shortAxisCenter;
+  shape.hasShortAxisInteraction = true;
+
+  return shape;
+}
+
+/**
+ * Get a bidimensional line from its long and short axis SCOORDs
+ * (2 points POLYLINEs).
+ *
+ * @param {SpatialCoordinate} longAxis The long axis SCOORD.
+ * @param {SpatialCoordinate} shortAxis The short axis SCOORD.
+ * @returns {BidimensionalLine} The bidimensional line.
+ */
+export function getBidimensionalFromScoords(longAxis, shortAxis) {
+  const longShape = getShapeFromScoord(longAxis);
+  const shortShape = getShapeFromScoord(shortAxis);
+  if (!(longShape instanceof Line) || !(shortShape instanceof Line)) {
+    throw new Error('Expecting 2 points polylines for bidimensional axes');
+  }
+  return getBidimensionalFromPoints([
+    longShape.getBegin(),
+    longShape.getEnd(),
+    shortShape.getBegin(),
+    shortShape.getEnd()
+  ]);
+}

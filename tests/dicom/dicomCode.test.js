@@ -7,7 +7,16 @@ import {
   getDicomCodeItem,
   getSegmentationCode,
   getConceptNameCode,
-  getMeasurementUnitsCode
+  getMeasurementUnitsCode,
+  getQuantificationName,
+  getDerivationCode,
+  getDerivationQuantificationName,
+  isDerivationQuantification,
+  getIntensityConceptCode,
+  getDwvDicomCode,
+  DwvCodes,
+  getEnglishLanguageCode,
+  getImagingProcedureCode
 } from '../../src/dicom/dicomCode.js';
 import {
   getElementsFromSimpleTagValues
@@ -149,6 +158,88 @@ describe('dicom', () => {
     theoCode1.value = '103339001';
     theoCode1.schemeDesignator = 'SCT';
     assert.ok(isEqualCode(code1, theoCode1), 'getConceptNameCode #1');
+    assert.equal(code1.meaning, 'Long Axis', 'getConceptNameCode #1 meaning');
+
+    // DCM code: meaning from the DICOM definition, not the name
+    const code2 = getConceptNameCode('height');
+    assert.equal(code2.value, '121207', 'getConceptNameCode #2 value');
+    assert.equal(code2.schemeDesignator, 'DCM', 'getConceptNameCode #2 scheme');
+    assert.equal(code2.meaning, 'Height', 'getConceptNameCode #2 meaning');
+
+    // legacy statistic code
+    const code3 = getConceptNameCode('min');
+    assert.equal(code3.meaning, 'Pixel by pixel Minimum',
+      'getConceptNameCode #3 meaning');
+    assert.equal(getQuantificationName(code3), 'min',
+      'getQuantificationName #3');
+  });
+
+  /**
+   * Tests for {@link getDerivationCode}.
+   *
+   * @function module:tests/dicom~getderivationcode
+   */
+  test('getDerivationCode', () => {
+    assert.equal(getDerivationCode('test'), undefined,
+      'getDerivationCode #0');
+    assert.notOk(isDerivationQuantification('length'),
+      'isDerivationQuantification length');
+
+    const names = {
+      min: {value: '255605001', meaning: 'Minimum'},
+      max: {value: '56851009', meaning: 'Maximum'},
+      mean: {value: '373098007', meaning: 'Mean'},
+      median: {value: '373099004', meaning: 'Median'},
+      stdDev: {value: '386136009', meaning: 'Standard Deviation'}
+    };
+    for (const name in names) {
+      assert.ok(isDerivationQuantification(name),
+        `isDerivationQuantification ${name}`);
+      const code = getDerivationCode(name);
+      assert.equal(code.schemeDesignator, 'SCT', `${name} scheme`);
+      assert.equal(code.value, names[name].value, `${name} value`);
+      assert.equal(code.meaning, names[name].meaning, `${name} meaning`);
+      assert.equal(getDerivationQuantificationName(code), name,
+        `${name} reverse`);
+    }
+  });
+
+  /**
+   * Tests for {@link getIntensityConceptCode}.
+   *
+   * @function module:tests/dicom~getintensityconceptcode
+   */
+  test('getIntensityConceptCode', () => {
+    const ct = getIntensityConceptCode('CT');
+    assert.equal(ct.value, '112031', 'CT value');
+    assert.equal(ct.meaning, 'Attenuation Coefficient', 'CT meaning');
+    const mr = getIntensityConceptCode('MR');
+    assert.equal(mr.value, '110852', 'MR value');
+    assert.equal(getIntensityConceptCode('PT'), undefined, 'PT');
+    assert.equal(getIntensityConceptCode('XA'), undefined, 'XA');
+  });
+
+  /**
+   * Tests for report level codes.
+   *
+   * @function module:tests/dicom~reportcodes
+   */
+  test('report codes', () => {
+    const colour = getDwvDicomCode(DwvCodes.Colour);
+    assert.equal(colour.schemeDesignator, '99DWV', 'dwv scheme');
+    assert.equal(colour.value, 'COLOUR', 'dwv value');
+
+    const language = getEnglishLanguageCode();
+    assert.equal(language.schemeDesignator, 'RFC5646', 'language scheme');
+    assert.equal(language.value, 'en-US', 'language value');
+
+    const procedure = getImagingProcedureCode();
+    assert.equal(procedure.schemeDesignator, 'SCT', 'procedure scheme');
+    assert.equal(procedure.value, '363679005', 'procedure value');
+    assert.equal(procedure.meaning, 'Imaging procedure', 'procedure meaning');
+
+    assert.equal(DcmCodes.ProcedureReported.meaning, 'Procedure reported',
+      'procedure reported meaning');
   });
 
   /**
@@ -168,6 +259,10 @@ describe('dicom', () => {
     theoCode1.value = 'mm';
     theoCode1.schemeDesignator = 'UCUM';
     assert.ok(isEqualCode(code1, theoCode1), 'getMeasurementUnitsCode #1');
+    assert.equal(code1.meaning, 'millimeter',
+      'getMeasurementUnitsCode #1 meaning');
+    assert.equal(code0.meaning, 'no units',
+      'getMeasurementUnitsCode #0 meaning');
   });
 
 });

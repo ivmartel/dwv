@@ -1,11 +1,13 @@
-import {describe, test, assert} from 'vitest';
+import {describe, test, assert, vi, expect} from 'vitest';
 import {
   SpatialCoordinate,
   GraphicTypes,
   getSpatialCoordinate,
   getDicomSpatialCoordinateItem,
   getScoordFromShape,
-  getShapeFromScoord
+  getShapeFromScoord,
+  getScoordsFromBidimensional,
+  getBidimensionalFromScoords
 } from '../../src/dicom/dicomSpatialCoordinate.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
 import {Point2D} from '../../src/math/point.js';
@@ -409,6 +411,79 @@ describe('dicom', () => {
     });
 
     /**
+     * Tests for {@link getScoordFromShape} with a vertical Ellipse:
+     * the major axis (y) comes first.
+     *
+     * @function module:tests/dicom~getscoordfromshapeVerticalEllipse
+     */
+    test('Vertical ellipse', () => {
+      const ellipse = new Ellipse(new Point2D(50, 50), 20, 30);
+      const scoord = getScoordFromShape(ellipse);
+
+      assert.equal(scoord.graphicType, GraphicTypes.ellipse);
+      assert.deepEqual(scoord.graphicData,
+        ['50', '20', '50', '80', '30', '50', '70', '50']);
+
+      // round trip
+      const shape = getShapeFromScoord(scoord);
+      assert.ok(shape instanceof Ellipse);
+      assert.equal(shape.getCenter().getX(), 50);
+      assert.equal(shape.getCenter().getY(), 50);
+      assert.equal(shape.getA(), 20);
+      assert.equal(shape.getB(), 30);
+    });
+
+    /**
+     * Tests for {@link getScoordsFromBidimensional}.
+     *
+     * @function module:tests/dicom~getscoordsfrombidimensional
+     */
+    test('BidimensionalLine axes', () => {
+      // main axis (10,10)-(30,10), short axis centre (16,10),
+      // asymmetric short axis
+      const bline = new BidimensionalLine(
+        new Point2D(10, 10), new Point2D(30, 10));
+      bline.shortAxisCenter = new Point2D(16, 10);
+      bline.shortAxisL1 = 7;
+      bline.shortAxisL2 = 5;
+      bline.shortAxisLength = 12;
+
+      const scoords = getScoordsFromBidimensional(bline);
+      assert.equal(scoords.longAxis.graphicType, GraphicTypes.polyline);
+      assert.deepEqual(scoords.longAxis.graphicData,
+        ['10', '10', '30', '10']);
+      assert.equal(scoords.shortAxis.graphicType, GraphicTypes.polyline);
+      assert.deepEqual(scoords.shortAxis.graphicData,
+        ['16', '17', '16', '5']);
+
+      // round trip
+      const shape = getBidimensionalFromScoords(
+        scoords.longAxis, scoords.shortAxis);
+      assert.ok(shape instanceof BidimensionalLine);
+      assert.ok(shape.getBegin().equals(bline.getBegin()), 'begin');
+      assert.ok(shape.getEnd().equals(bline.getEnd()), 'end');
+      assert.ok(shape.shortAxisCenter.equals(new Point2D(16, 10)), 'center');
+      assert.equal(shape.shortAxisL1, 7);
+      assert.equal(shape.shortAxisL2, 5);
+      assert.equal(shape.shortAxisLength, 12);
+      assert.equal(shape.shortAxisT, 0.3);
+    });
+
+    /**
+     * Tests for {@link getBidimensionalFromScoords} with bad input.
+     *
+     * @function module:tests/dicom~getbidimensionalfromscoordsBad
+     */
+    test('BidimensionalLine bad axes', () => {
+      const point = new SpatialCoordinate();
+      point.graphicType = GraphicTypes.point;
+      point.graphicData = ['1', '2'];
+      assert.throws(() => {
+        getBidimensionalFromScoords(point, point);
+      }, 'Expecting 2 points polylines for bidimensional axes');
+    });
+
+    /**
      * Tests for {@link getScoordFromShape} with Rectangle.
      *
      * @function module:tests/dicom~getscoordfromshapeRectangle
@@ -639,6 +714,52 @@ describe('dicom', () => {
       assert.equal(shape.getCenter().getY(), 50);
       assert.equal(shape.getA(), 30);
       assert.equal(shape.getB(), 20);
+    });
+
+    /**
+     * Tests for {@link getShapeFromScoord} with an ellipse with
+     * the major axis on y.
+     *
+     * @function module:tests/dicom~getshapefromscoordVerticalEllipse
+     */
+    test('vertical ellipse', () => {
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.ellipse;
+      // top, bottom, left, right points
+      scoord.graphicData = ['50', '20', '50', '80', '30', '50', '70', '50'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      assert.ok(shape instanceof Ellipse);
+      assert.equal(shape.getCenter().getX(), 50);
+      assert.equal(shape.getCenter().getY(), 50);
+      assert.equal(shape.getA(), 20);
+      assert.equal(shape.getB(), 30);
+    });
+
+    /**
+     * Tests for {@link getShapeFromScoord} with a rotated ellipse.
+     *
+     * @function module:tests/dicom~getshapefromscoordRotatedEllipse
+     */
+    test('rotated ellipse', () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const scoord = new SpatialCoordinate();
+      scoord.graphicType = GraphicTypes.ellipse;
+      // major axis at 45 degrees
+      scoord.graphicData = ['0', '0', '30', '30', '20', '10', '10', '20'];
+
+      const shape = getShapeFromScoord(scoord);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Rotated ellipses are not supported, ' +
+        'using an axis aligned approximation');
+      consoleSpy.mockRestore();
+
+      assert.ok(shape instanceof Ellipse);
+      assert.equal(shape.getCenter().getX(), 15);
+      assert.equal(shape.getCenter().getY(), 15);
     });
 
     /**
