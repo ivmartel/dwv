@@ -9,6 +9,7 @@ Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more informati
 
 - All coding/implementation contributions and comments are welcome, see the [contributing guidelines](.github/contributing.md).
 - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>
+- DWV focuses on image display and manipulation: it only retrieves the data to display (local files or WADO urls). Other network interactions, such as searching (QIDO-RS) or storing (STOW-RS) data on a PACS, are not part of it and are left to the embedding application.
 - Released under GNU GPL-3.0 license (see [license.txt](license.txt)).
 
 If you have questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).

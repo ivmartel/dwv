@@ -1049,4 +1049,38 @@ describe('dicom', () => {
     }
   );
 
+
+  /**
+   * Tests for {@link DicomWriter} Decimal String (DS) length.
+   *
+   * @function module:tests/dicom~writeDecimalStringLength
+   */
+  test('Write DS length', () => {
+    const parser = new DicomParser();
+    parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+    const elements = parser.getDicomElements();
+    // SliceThickness (DS), multi valued PixelSpacing (DS)
+    const thickness = new DataElement('DS');
+    thickness.value = [2137.121212121212];
+    elements['00180050'] = thickness;
+    const spacing = new DataElement('DS');
+    spacing.value = [1 / 3, '12.5'];
+    elements['00280030'] = spacing;
+
+    const newParser = new DicomParser();
+    newParser.parse(new DicomWriter().getBuffer(elements));
+    const tags = newParser.getDicomElements();
+
+    assert.equal(tags['00180050'].value[0], '2137.12121212121',
+      'slice thickness length');
+    assert.closeTo(Number(tags['00180050'].value[0]), 2137.121212121212,
+      1e-10, 'slice thickness value');
+    assert.ok(tags['00280030'].value[0].length <= 16,
+      'pixel spacing length');
+    assert.closeTo(Number(tags['00280030'].value[0]), 1 / 3, 1e-14,
+      'pixel spacing value 0');
+    assert.equal(Number(tags['00280030'].value[1]), 12.5,
+      'pixel spacing value 1');
+  });
+
 });
