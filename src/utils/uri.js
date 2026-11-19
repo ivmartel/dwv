@@ -214,8 +214,10 @@ export function decodeKeyValueUri(uri, replaceMode) {
  */
 export function decodeWeasisXMLManifest(manifestUri, nslices, callback) {
   let uri = '';
-  if (manifestUri[0] === '/') {
-    uri = `${window.location.protocol}//${window.location.host}`;
+  if (manifestUri[0] === '/' &&
+    typeof location !== 'undefined' &&
+    location.origin !== 'null') {
+    uri = location.origin;
   }
   // TODO: needs to be decoded (decodeURIComponent?
   uri += manifestUri;

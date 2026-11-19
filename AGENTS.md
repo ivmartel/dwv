@@ -70,14 +70,20 @@ When upgrading to a newer edition, update together:
   via `resources/api/tsconfig.json`) + `api` (api-extractor, checked against
   `resources/api/dwv.api.md`).
 - `yarn build-all` — `build` + `pack-node` (Node-targeted bundle,
-  `config/webpack.node.js`).
+  `config/webpack.node.js`, output `dist/dwv.node.min.js`, the package's
+  `node` export). The Node bundle is limited, mainly for DICOM parsing
+  (`DicomParser`, tags, dictionary) and writing (`DicomWriter`): no URL or
+  file loading (the loaders rely on browser `XMLHttpRequest`/`FileReader`),
+  so pass the raw bytes (`ArrayBuffer`) yourself; no web-worker based
+  decompression of compressed pixel data, and no rendering (canvas, Konva).
 - `yarn build-demo` — builds the demo pages (`config/webpack.demo.js`), used
   by CI to publish to `gh-pages`.
 - `yarn doc` — generates jsdoc site (`resources/doc/jsdoc.conf.json`).
 
 Tests live in `tests/<area>/*.test.js` mirroring `src/<area>/`, using vitest
 with `environment: 'node'` (jsdom pulled in as needed) and DICOM/zip/DICOMDIR
-fixtures under `tests/data`.
+fixtures under `tests/data`. Tests must run without printing logs: silence
+expected console or `logger` output with a spy.
 
 ### What CI checks
 
@@ -108,9 +114,9 @@ publishes the demo to `gh-pages` (`demo/trunk` or `demo/stable`). To
 reproduce CI locally, run `yarn lint && yarn test-ci && yarn build-ci`.
 
 The `verify` skill (`.agents/skills/verify/SKILL.md`) wraps these steps with
-the repo-specific checks CI does not do: reporting `dwv.api.md` changes and
-reviewing the diff against the conventions below. Use it before reporting a
-change as done.
+the repo-specific checks CI does not do: clean test output (no logs),
+reporting `dwv.api.md` changes and reviewing the diff against the
+conventions below. Use it before reporting a change as done.
 
 ## Requirements traceability
 

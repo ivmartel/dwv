@@ -49,29 +49,6 @@ export function getLayerDetailsFromLayerDivId(idString) {
 }
 
 /**
- * Get the info layer div id.
- * For example: 'layerGroup0-infoLayer'.
- *
- * @param {string} groupDivId The layer group div id.
- * @returns {string} A string id.
- */
-export function getInfoLayerDivId(groupDivId) {
-  return `${groupDivId}-infolayer`;
-}
-
-/**
- * Get the layer details from an info layer div id
- * created by getInfoLayerDivId.
- *
- * @param {string} idString The layer div id.
- * @returns {object} The layer details as {groupDivId}.
- */
-export function getLayerDetailsFromInfoLayerDivId(idString) {
-  const groupDivId = idString.substring(0, idString.length - 10);
-  return {groupDivId};
-}
-
-/**
  * Get the layer details from a mouse event.
  *
  * @param {object} event The event to get the layer div id from. Expecting
@@ -288,10 +265,9 @@ export class LayerGroup extends EventTarget {
       withInfoLayer === true
     ) {
       const layerDiv = doc.createElement('div');
-      layerDiv.id = getInfoLayerDivId(containerDiv.id);
       layerDiv.className = 'infoLayer';
       containerDiv.appendChild(layerDiv);
-      this.#infoLayer = new InfoLayer(layerDiv);
+      this.#infoLayer = new InfoLayer(layerDiv, containerDiv.id);
     }
   }
 
@@ -1127,7 +1103,6 @@ export class LayerGroup extends EventTarget {
     // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
       const lineH = doc.createElement('hr');
-      lineH.id = `${this.getDivId()}-scroll-crosshair-horizontal`;
       lineH.className = 'horizontal';
       lineH.style.width = `${this.#containerDiv.offsetWidth}px`;
       lineH.style.left = '0px';
@@ -1141,7 +1116,6 @@ export class LayerGroup extends EventTarget {
     // vertical line
     if (typeof displayPos.getX() !== 'undefined') {
       const lineV = doc.createElement('hr');
-      lineV.id = `${this.getDivId()}-scroll-crosshair-vertical`;
       lineV.className = 'vertical';
       lineV.style.width = `${this.#containerDiv.offsetHeight}px`;
       lineV.style.left = `${displayPos.getX()}px`;
@@ -1183,7 +1157,7 @@ export class LayerGroup extends EventTarget {
     // create
     if (typeof value !== 'undefined') {
       const span = doc.createElement('span');
-      span.id = 'scroll-tooltip';
+      span.className = 'scroll-tooltip';
       // tooltip position
       span.style.left = `${point.getX() + 10}px`;
       span.style.top = `${point.getY() + 10}px`;

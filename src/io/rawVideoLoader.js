@@ -41,6 +41,7 @@ export class RawVideoLoader extends LoaderBase {
   load(buffer, origin, index) {
     this.setLoading(true);
     // create a DOM video
+    // note: uses the global document, not compatible with a node usage
     const video = document.createElement('video');
     if (typeof origin === 'string') {
       // url case

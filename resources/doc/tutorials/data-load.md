@@ -8,7 +8,7 @@ Summary:
 
 ## Load classes
 
-Data can come from 3 types of source: url (via a [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)), file (via a [FileReader](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)) or directly as a memory buffer. The 3 'meta' loaders responsible for each source are: [UrlsLoader](../urlsloader/), [FilesLoader](../filesloader/) and [MemoryLoader](../memoryloader/).
+Data can come from 3 types of source: url (via a [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)), file (via a [FileReader](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)) or directly as a memory buffer. The 3 'meta' loaders responsible for each source are: {@link UrlsLoader}, {@link FilesLoader} and {@link MemoryLoader}.
 
 ![classes-io](classes-io.png)
 
@@ -16,17 +16,17 @@ Data can come from 3 types of source: url (via a [XMLHttpRequest](https://develo
 
 Each 'meta' loader retrieves the data and passes it to a specialised loader according
 to its answer to the `canLoadUrl` or `canLoadFile` call. Specialised loaders will
-typically convert the binary retrieved data into a local class, for example an [Image](../image/).
+typically convert the binary retrieved data into a local class, for example an {@link Image}.
 
 The current specialised loaders are:
 
-- [DicomDataLoader](../dicomdataloader/): for DICOM data
-- [RawImageLoader](../rawimageloader/): for image formats supported by the browser
-- [RawVideoLoader](../rawvideoloader/): for video formats supported by the browser
-- [ZipLoader](../ziploader/): for data compressed in a ZIP file
+- {@link DicomDataLoader}: for DICOM data
+- {@link RawImageLoader}: for image formats supported by the browser
+- {@link RawVideoLoader}: for video formats supported by the browser
+- {@link ZipLoader}: for data compressed in a ZIP file
 
-The main specialised loader, the [DicomDataLoader](../dicomdataloader/), parses the binary dicom file
-to extract all the meta data and then creates an [Image](../image/), at first with only one slice.
+The main specialised loader, the {@link DicomDataLoader}, parses the binary dicom file
+to extract all the meta data and then creates an {@link Image}, at first with only one slice.
 When multiple items are loaded, it will append the extracted data to the first image to create a multi slice
 image. Note that the dicom image data can be stored in a compressed format, in that case the DICOM loader will
 decompress the data to create the image.

@@ -7,9 +7,9 @@ import {i18n} from '../../../src/utils/i18n.js';
 
 import {DataTableUI} from './dataTableUI.js';
 import {AnnotationService} from './annotationService.js';
-import {AnnotationComponent} from './annotationComponent.js';
+import {AnnotationList} from './annotationList.js';
 import {SegmentationService} from './segmentationService.js';
-import {SegmentationComponent} from './segmentationComponent.js';
+import {SegmentationList} from './segmentationList.js';
 import {SegmentationExtraUI} from './segmentExtra.js';
 import {DrawToolUI} from './drawToolUI.js';
 import {BrushToolUI} from './brushToolUI.js';
@@ -337,13 +337,13 @@ export class ViewerUI {
     // annotation
     const annotService = new AnnotationService(this.#dwvAppService);
     annotService.connect();
-    const annotUI = new AnnotationComponent(annotService);
+    const annotUI = new AnnotationList(annotService);
     annotUI.registerListeners();
 
     // segmentation
     const segService = new SegmentationService(this.#dwvAppService);
     segService.connect();
-    const segUI = new SegmentationComponent(segService);
+    const segUI = new SegmentationList(segService);
     segUI.registerListeners();
 
     // segmentation extra (overlap check and merge)

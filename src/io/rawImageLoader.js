@@ -36,6 +36,8 @@ export class RawImageLoader extends LoaderBase {
   load(buffer, origin, index) {
     this.setLoading(true);
     // create a DOM image
+    // note: uses the global Image constructor, not compatible
+    //   with a node usage
     const image = new Image();
     // triggered by ctx.drawImage
     image.onload = (/*event*/) => {
