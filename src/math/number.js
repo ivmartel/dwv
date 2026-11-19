@@ -106,3 +106,52 @@ export function precisionRound(number, precision) {
   const delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
   return Math.round(number * factor + delta) / factor;
 }
+
+/**
+ * Get the string representation of a number with a maximum length:
+ * a number (or numeric string) that is too long loses significant
+ * digits, using exponential notation when it keeps more digits or
+ * when the plain notation cannot fit (for ex large integers).
+ *
+ * Unlike {@link precisionRound} that rounds to a number of decimals,
+ * this rounds to a number of significant digits.
+ *
+ * @param {number|string} value The input value.
+ * @param {number} maxLength The maximum string length.
+ * @returns {string} The string, unchanged if it fits or if the input
+ *   is not a finite number.
+ */
+export function toMaxLengthString(value, maxLength) {
+  const str = value.toString();
+  if (str.length <= maxLength) {
+    return str;
+  }
+  const number = typeof value === 'number' ? value : parseFloat(str);
+  if (!Number.isFinite(number)) {
+    return str;
+  }
+  /**
+   * Check if a candidate string fits and is a finite number
+   * (rounding can overflow to infinity, for ex Number.MAX_VALUE).
+   *
+   * @param {string} candidate The candidate string.
+   * @returns {boolean} True if valid.
+   */
+  const isValid = function (candidate) {
+    return candidate.length <= maxLength &&
+      Number.isFinite(Number(candidate));
+  };
+  for (let precision = maxLength - 1; precision > 0; --precision) {
+    const fixed = Number(number.toPrecision(precision)).toString();
+    if (isValid(fixed)) {
+      return fixed;
+    }
+    // without trailing zeros
+    const exponential =
+      number.toExponential(precision - 1).replace(/\.?0+e/, 'e');
+    if (isValid(exponential)) {
+      return exponential;
+    }
+  }
+  return str;
+}

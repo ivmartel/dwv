@@ -1,3 +1,4 @@
+import {toMaxLengthString} from '../math/number.js';
 import {
   is32bitVLVR,
   isCharSetStringVR,
@@ -345,6 +346,12 @@ function isTypedArrayVr(vr) {
   return typeof vrType !== 'undefined' &&
     vrType !== 'string';
 }
+
+/**
+ * Maximum length of a Decimal String (DS) value, in bytes.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
+ */
+const DS_MAX_LENGTH = 16;
 
 /**
  * Is the input VR a string VR.
@@ -1485,6 +1492,12 @@ export class DicomWriter {
         // encode string
         // TODO: not sure for UN...
         if (isStringVr(element.vr)) {
+          if (element.vr === 'DS') {
+            value = value.map(function (item) {
+              return typeof item === 'undefined' || item === null
+                ? item : toMaxLengthString(item, DS_MAX_LENGTH);
+            });
+          }
           let pad;
           if (isCharSetStringVR(element.vr)) {
             value = this.#encodeSpecialString(value.join('\\'));

@@ -3,7 +3,8 @@ import {
   REAL_WORLD_EPSILON,
   isSimilar,
   isAboveEpsilon,
-  precisionRound
+  precisionRound,
+  toMaxLengthString
 } from '../../src/math/number.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
@@ -115,6 +116,45 @@ describe('math', () => {
     assert.equal(precisionRound(0.009, 2), 0.01, 'test #51');
     assert.equal(precisionRound(0.092, 2), 0.09, 'test #52');
     assert.equal(precisionRound(0.095, 2), 0.1, 'test #53');
+  });
+
+  /**
+   * Tests for {@link toMaxLengthString}.
+   *
+   * @function module:tests/math~tomaxlengthstring
+   */
+  test('toMaxLengthString', () => {
+    // short values are kept
+    assert.equal(toMaxLengthString(1.5, 16), '1.5', 'short number');
+    assert.equal(toMaxLengthString('-12.25', 16), '-12.25', 'short string');
+    assert.equal(toMaxLengthString(1e21, 16), '1e+21', 'short exponent');
+    // long values lose significant digits
+    assert.equal(toMaxLengthString(2137.121212121212, 16), '2137.12121212121',
+      'long number');
+    assert.equal(toMaxLengthString('2137.121212121212', 16), '2137.12121212121',
+      'long numeric string');
+    assert.equal(toMaxLengthString(-0.00012345678901234, 16),
+      '-1.2345678901e-4', 'long negative number');
+    assert.equal(toMaxLengthString(1.2345678901234e-20, 16),
+      '1.2345678901e-20', 'long exponent');
+    for (const value of [
+      Math.PI * 1e10,
+      -Math.PI * 1e-10,
+      -123456789012345680,
+      Number.MAX_VALUE
+    ]) {
+      const str = toMaxLengthString(value, 16);
+      assert.ok(str.length <= 16, `length of ${str}`);
+      // at least 8 significant digits (3 digit exponents)
+      assert.closeTo(Number(str) / value, 1, 1e-7, `value of ${str}`);
+    }
+    // other maximum length
+    assert.equal(toMaxLengthString(Math.PI, 8), '3.141593', 'length 8');
+    assert.equal(toMaxLengthString(123456789, 8), '1.235e+8',
+      'length 8 integer');
+    // non numbers are kept
+    assert.equal(toMaxLengthString('not a number but long', 16),
+      'not a number but long', 'long non number');
   });
 
 });
