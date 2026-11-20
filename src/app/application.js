@@ -1060,7 +1060,10 @@ export class App extends EventTarget {
    * @param {object} [options] The options object, can contain:
    * - requestHeaders: an array of {name, value} to use as request headers,
    * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
-   * - batchSize: the size of the request url batch.
+   * - batchSize: the size of the request url batch,
+   * - timeout: the request timeout in milliseconds (default 0, no timeout),
+   * - timeoutRetries: the number of retries of a timed out request
+   *   (default 0).
    * @returns {string} The data ID, '-1' if problem.
    * @fires App#loadstart
    * @fires App#loadprogress

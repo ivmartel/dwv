@@ -18,6 +18,7 @@ class MockXMLHttpRequest {
   async = true;
   requestHeaders = [];
   withCredentials = false;
+  timeout = 0;
   responseType = '';
   response = null;
   status = 200;
@@ -78,7 +79,11 @@ class MockXMLHttpRequest {
       });
     }
 
-    const behavior = MockXMLHttpRequest.behaviorByUrl[this.url] || 'success';
+    // a behavior list is consumed one item per send
+    let behavior = MockXMLHttpRequest.behaviorByUrl[this.url] || 'success';
+    if (Array.isArray(behavior)) {
+      behavior = behavior.length > 1 ? behavior.shift() : behavior[0];
+    }
     if (behavior === 'pending') {
       return;
     }
@@ -295,6 +300,164 @@ describe('io', () => {
     assert.ok(MockIoLoader.instances[0].abortCalled);
     assert.ok(abortEvent);
     assert.equal(abortEvent.source, urls[1]);
+  });
+
+  test('timeout option sets the request timeout', () => {
+    const loader = new UrlsLoader();
+    const urls = ['https://host/a.ok', 'https://host/b.ok'];
+
+    loader.load(urls, {timeout: 5000});
+
+    assert.equal(MockXMLHttpRequest.instances.length, 2);
+    assert.equal(MockXMLHttpRequest.instances[0].timeout, 5000);
+    assert.equal(MockXMLHttpRequest.instances[1].timeout, 5000);
+  });
+
+  test('timeout retry with a new request loads normally', () => {
+    const loader = new UrlsLoader();
+    const urls = ['https://host/a.ok', 'https://host/b.ok'];
+    MockXMLHttpRequest.behaviorByUrl[urls[0]] = ['timeout', 'success'];
+    MockIoLoader.readAsType = urlContentTypes.ArrayBuffer;
+
+    let nTimeout = 0;
+    let gotLoad = false;
+    let nLoadEnd = 0;
+    loader.ontimeout = () => {
+      ++nTimeout;
+    };
+    loader.onload = () => {
+      gotLoad = true;
+    };
+    loader.onloadend = () => {
+      ++nLoadEnd;
+    };
+
+    loader.load(urls, {
+      timeout: 100,
+      timeoutRetries: 2,
+      batchSize: 1,
+      withCredentials: true,
+      requestHeaders: [{name: 'Accept', value: 'application/dicom'}]
+    });
+
+    // one retry for the first url, no extra send for the second one
+    assert.deepEqual(
+      MockXMLHttpRequest.sentUrls, [urls[0], urls[0], urls[1]]);
+    assert.equal(MockXMLHttpRequest.instances.length, 3);
+    // retry uses a fresh request with the same setup
+    const retry = MockXMLHttpRequest.instances[2];
+    assert.notEqual(retry, MockXMLHttpRequest.instances[0]);
+    assert.equal(retry.url, urls[0]);
+    assert.equal(retry.timeout, 100);
+    assert.equal(retry.withCredentials, true);
+    assert.equal(retry.responseType, 'arraybuffer');
+    assert.deepEqual(retry.requestHeaders,
+      [{name: 'Accept', value: 'application/dicom'}]);
+    // same index for the load
+    assert.deepEqual(
+      MockIoLoader.instances[0].loaded.map((call) => call.index),
+      [0, 1]);
+
+    assert.equal(nTimeout, 0);
+    assert.ok(gotLoad);
+    assert.equal(nLoadEnd, 1);
+  });
+
+  test('timeout fires once retries are exhausted', () => {
+    const loader = new UrlsLoader();
+    const url = 'https://host/a.ok';
+    MockXMLHttpRequest.behaviorByUrl[url] = 'timeout';
+
+    const timeoutEvents = [];
+    let gotLoad = false;
+    let nLoadEnd = 0;
+    loader.ontimeout = (event) => {
+      timeoutEvents.push(event);
+    };
+    loader.onload = () => {
+      gotLoad = true;
+    };
+    loader.onloadend = () => {
+      ++nLoadEnd;
+    };
+
+    loader.load([url], {timeout: 100, timeoutRetries: 2});
+
+    // first try plus 2 retries
+    assert.equal(MockXMLHttpRequest.sentUrls.length, 3);
+    assert.equal(timeoutEvents.length, 1);
+    assert.equal(timeoutEvents[0].source, url);
+    assert.notOk(gotLoad);
+    assert.equal(nLoadEnd, 1);
+  });
+
+  test('timeout without retries fires ontimeout', () => {
+    const loader = new UrlsLoader();
+    const url = 'https://host/a.ok';
+    MockXMLHttpRequest.behaviorByUrl[url] = 'timeout';
+
+    let nTimeout = 0;
+    loader.ontimeout = () => {
+      ++nTimeout;
+    };
+
+    loader.load([url], {timeout: 100});
+
+    assert.equal(MockXMLHttpRequest.sentUrls.length, 1);
+    assert.equal(nTimeout, 1);
+  });
+
+  test('abort stops a timeout retry', () => {
+    const loader = new UrlsLoader();
+    const urls = ['https://host/a.ok', 'https://host/b.ok'];
+    MockXMLHttpRequest.behaviorByUrl[urls[0]] = ['timeout', 'pending'];
+    MockXMLHttpRequest.behaviorByUrl[urls[1]] = 'pending';
+
+    let nTimeout = 0;
+    let nAbort = 0;
+    let nLoadEnd = 0;
+    loader.ontimeout = () => {
+      ++nTimeout;
+    };
+    loader.onabort = () => {
+      ++nAbort;
+    };
+    loader.onloadend = () => {
+      ++nLoadEnd;
+    };
+
+    loader.load(urls, {timeout: 100, timeoutRetries: 1});
+    // first url retried, now pending
+    assert.equal(MockXMLHttpRequest.instances.length, 3);
+    loader.abort();
+
+    // the retry request is the one aborted
+    assert.notOk(MockXMLHttpRequest.instances[0].aborted);
+    assert.ok(MockXMLHttpRequest.instances[1].aborted);
+    assert.ok(MockXMLHttpRequest.instances[2].aborted);
+    assert.equal(nTimeout, 0);
+    assert.equal(nAbort, 2);
+    assert.equal(nLoadEnd, 1);
+  });
+
+  test('no timeout retry while aborting', () => {
+    const loader = new UrlsLoader();
+    const url = 'https://host/a.ok';
+    MockXMLHttpRequest.behaviorByUrl[url] = 'pending';
+
+    let nTimeout = 0;
+    loader.ontimeout = () => {
+      ++nTimeout;
+    };
+
+    loader.load([url], {timeout: 100, timeoutRetries: 1});
+    const request = MockXMLHttpRequest.instances[0];
+    loader.abort();
+    // late timeout event after abort
+    request.ontimeout({target: request});
+
+    assert.equal(MockXMLHttpRequest.instances.length, 1);
+    assert.equal(nTimeout, 1);
   });
 
   test('DICOMDIR request error forwards source and ends load', () => {

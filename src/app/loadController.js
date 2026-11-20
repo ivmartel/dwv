@@ -63,6 +63,9 @@ export class LoadController extends EventTarget {
    * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
+   * - timeout: the request timeout in milliseconds (default 0, no timeout).
+   * - timeoutRetries: the number of retries of a timed out request
+   *   (default 0).
    */
   loadURLs(urls, dataId, options) {
     this.#loadImageUrls(urls, dataId, options);
@@ -127,6 +130,9 @@ export class LoadController extends EventTarget {
    * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
+   * - timeout: the request timeout in milliseconds (default 0, no timeout).
+   * - timeoutRetries: the number of retries of a timed out request
+   *   (default 0).
    */
   #loadImageUrls(urls, dataId, options) {
     // create IO
