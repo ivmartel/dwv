@@ -75,6 +75,15 @@ describe('dicom', () => {
     assert.include(s, 'Length');
     assert.include(s, '12 mm');
 
+    // depth: one indent level per nesting
+    const grandChild = new DicomSRContent(ValueTypes.text);
+    grandChild.value = {toString: () => 'grand child'};
+    child.contentSequence.push(grandChild);
+    const lines = content.toString().split('\n');
+    assert.equal(lines.length, 3, 'one line per content');
+    assert.equal(lines[1], '- TEXT:  = child', 'child line');
+    assert.equal(lines[2], '  - TEXT:  = grand child', 'grand child line');
+
     assert.ok(content.hasHeader(
       ValueTypes.text,
       code,
