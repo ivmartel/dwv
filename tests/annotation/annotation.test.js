@@ -17,6 +17,9 @@ import {
   getScoordFromShape,
   getShapeFromScoord
 } from '../../src/dicom/dicomSpatialCoordinate.js';
+import {
+  getElementsFromSimpleTagValues
+} from '../../src/dicom/simpleTagValues.js';
 
 /**
  * @import {AnnotationGroup} from '../../src/image/annotationGroup.js';
@@ -38,6 +41,7 @@ import tid1500v0Rectangle from './tid1500-0/sr-rectangle.dcm?inline';
 import tid1500v0Roi from './tid1500-0/sr-roi.dcm?inline';
 import tid1500v0Ruler from './tid1500-0/sr-ruler.dcm?inline';
 import tid1500v0Bidimensional from './tid1500-0/sr-bidimensional.dcm?inline';
+import syntheticSrData from '/tests/data/synthetic-sr.json';
 
 /**
  * Tests for the annotation I/O.
@@ -660,6 +664,98 @@ describe('annotation', () => {
       const annotationGroup = getAnnotationGroup(tid1500v0Bidimensional);
       checkGroupCommonProperties(annotationGroup, 'bidimensional');
       checkBidimensionalGroup(annotationGroup);
+    });
+
+  /**
+   * Tests for {@link Annotation} from the synthetic SR data
+   * (tests/data/synthetic-sr.json).
+   *
+   * @function module:tests/annotation~readSyntheticSr
+   */
+  test(
+    'Read synthetic SR - #DWV-REQ-IO-06-003 Load DICOM SR annotations',
+    () => {
+      const refSopUid = '1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1';
+      const getElements = function (name) {
+        const config = syntheticSrData.find((item) => item.name === name);
+        return getElementsFromSimpleTagValues(structuredClone(config.tags));
+      };
+      const getGroup = function (name) {
+        const elements = getElements(name);
+        const fac = new AnnotationGroupFactory();
+        assert.isUndefined(fac.checkElements(elements), `${name} check`);
+        return fac.create(elements);
+      };
+      const checkCommon = function (annotations, labels, prefix) {
+        assert.equal(annotations.length, labels.length, `${prefix} length`);
+        for (let i = 0; i < annotations.length; ++i) {
+          const annotation = annotations[i];
+          assert.equal(annotation.trackingId, `annotation-${i + 1}`,
+            `${prefix} ${i} trackingId`);
+          assert.ok(typeof annotation.trackingUid !== 'undefined',
+            `${prefix} ${i} trackingUid`);
+          if (typeof labels[i] !== 'undefined') {
+            assert.equal(annotation.textExpr, labels[i],
+              `${prefix} ${i} textExpr`);
+          }
+        }
+      };
+
+      // TID 1410 planar ROIs
+      const annotations00 = getGroup('test-sr-00').getList();
+      checkCommon(annotations00,
+        ['rectangle', 'circle', 'ellipse', 'polygon', 'point'], 'sr-00');
+      const shapes00 = [Rectangle, Circle, Ellipse, ROI, Point2D];
+      for (let i = 0; i < annotations00.length; ++i) {
+        const annotation = annotations00[i];
+        assert.ok(annotation.mathShape instanceof shapes00[i],
+          `sr-00 ${i} shape`);
+        assert.equal(annotation.referencedSopInstanceUID, refSopUid,
+          `sr-00 ${i} referenced SOP instance`);
+      }
+      assert.deepEqual(annotations00[0].quantification, {
+        surface: {value: 0.36, unit: 'unit.cm2'},
+        mean: {value: 100, unit: 'NONE'}
+      }, 'sr-00 rectangle quantification');
+
+      // TID 1501 measurements
+      const annotations01 = getGroup('test-sr-01').getList();
+      checkCommon(annotations01,
+        ['length', 'angle', 'bidimensional'], 'sr-01');
+      const shapes01 = [Line, Protractor, BidimensionalLine];
+      for (let i = 0; i < annotations01.length; ++i) {
+        assert.ok(annotations01[i].mathShape instanceof shapes01[i],
+          `sr-01 ${i} shape`);
+      }
+      assert.deepEqual(annotations01[0].quantification,
+        {length: {value: 10, unit: 'unit.mm'}}, 'sr-01 length');
+      assert.deepEqual(annotations01[1].quantification,
+        {angle: {value: 90, unit: 'unit.degree'}}, 'sr-01 angle');
+      assert.deepEqual(annotations01[2].quantification, {
+        longAxis: {value: 10, unit: 'unit.mm'},
+        shortAxis: {value: 6, unit: 'unit.mm'}
+      }, 'sr-01 bidimensional');
+
+      // SCOORD3D: patient geometry, no math shape until a view is set
+      const annotations02 = getGroup('test-sr-02').getList();
+      checkCommon(annotations02, ['region 3d', 'length 3d'], 'sr-02');
+      const graphicTypes02 = ['POLYGON', 'POLYLINE'];
+      for (let i = 0; i < annotations02.length; ++i) {
+        const annotation = annotations02[i];
+        assert.isUndefined(annotation.mathShape, `sr-02 ${i} no shape`);
+        assert.equal(annotation.patientGeometry.shape.graphicType,
+          graphicTypes02[i], `sr-02 ${i} graphic type`);
+      }
+
+      // TID 4100 chest CAD
+      const fac = new AnnotationGroupFactory();
+      const report = fac.createCADReport(getElements('test-sr-03'));
+      assert.equal(report.comment, 'synthetic CAD finding', 'sr-03 comment');
+      const annotations03 = report.annotationGroups[0].getList();
+      checkCommon(annotations03, [undefined], 'sr-03');
+      assert.ok(annotations03[0].mathShape instanceof Line, 'sr-03 shape');
+      assert.deepEqual(annotations03[0].quantification,
+        {longAxis: {value: 8, unit: 'unit.mm'}}, 'sr-03 long axis');
     });
 
 });

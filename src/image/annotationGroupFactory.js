@@ -314,7 +314,10 @@ export class AnnotationGroupFactory {
     // version
     const classUID =
       safeGet(dataElements, TagKeys.ImplementationClassUID);
-    const dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    let dwvVersion;
+    if (typeof classUID !== 'undefined') {
+      dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    }
     const isDwv034 = typeof dwvVersion !== 'undefined' &&
       isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.21');
 

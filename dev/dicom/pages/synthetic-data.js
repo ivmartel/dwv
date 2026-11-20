@@ -18,7 +18,8 @@ function setup() {
     'synthetic-img',
     'synthetic-seg',
     'synthetic-rtss',
-    'synthetic-kos'
+    'synthetic-kos',
+    'synthetic-sr'
   ]);
 }
 
