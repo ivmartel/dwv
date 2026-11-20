@@ -116,9 +116,9 @@ describe('dicom', () => {
         if (typeof item.GraphicType !== 'undefined') {
           coord2.graphicType = item.GraphicType;
         }
-        if (typeof item.ReferencedFrameofReferenceUID !== 'undefined') {
+        if (typeof item.ReferencedFrameOfReferenceUID !== 'undefined') {
           coord2.referencedFrameofReferenceUID =
-            item.ReferencedFrameofReferenceUID;
+            item.ReferencedFrameOfReferenceUID;
         }
         if (typeof item.FiducialUID !== 'undefined') {
           coord2.fiducialUID = item.FiducialUID;
@@ -315,7 +315,7 @@ describe('dicom', () => {
 
       assert.deepEqual(item.GraphicData, ['1.0', '2.0', '3.0']);
       assert.equal(item.GraphicType, 'POINT');
-      assert.equal(item.ReferencedFrameofReferenceUID, '1.2.3.4.5');
+      assert.equal(item.ReferencedFrameOfReferenceUID, '1.2.3.4.5');
       assert.equal(item.FiducialUID, '1.2.3.4.6');
     });
 
@@ -333,7 +333,7 @@ describe('dicom', () => {
 
       assert.deepEqual(item.GraphicData, ['1.0', '2.0', '3.0']);
       assert.equal(item.GraphicType, 'POLYLINE');
-      assert.isUndefined(item.ReferencedFrameofReferenceUID);
+      assert.isUndefined(item.ReferencedFrameOfReferenceUID);
       assert.isUndefined(item.FiducialUID);
     });
 
@@ -351,7 +351,7 @@ describe('dicom', () => {
 
       assert.isUndefined(item.GraphicData);
       assert.equal(item.GraphicType, 'POINT');
-      assert.isUndefined(item.ReferencedFrameofReferenceUID);
+      assert.isUndefined(item.ReferencedFrameOfReferenceUID);
       assert.equal(item.FiducialUID, '1.2.3.4.6');
     });
 

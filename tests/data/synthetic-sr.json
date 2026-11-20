@@ -1,0 +1,2464 @@
+[
+  {
+    "name": "test-sr-00",
+    "tags": {
+      "Modality": "SR",
+      "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.33",
+      "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.33",
+      "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.30",
+      "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.30",
+      "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.30",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "SR test data: TID 1500 with TID 1410 planar ROIs (ref test-img-00)",
+      "SeriesNumber": 30,
+      "PatientID": "0123456",
+      "PatientName": "dwv^PatientName",
+      "ContentDate": "20210401",
+      "ContentTime": "120000",
+      "CompletionFlag": "COMPLETE",
+      "VerificationFlag": "UNVERIFIED",
+      "CurrentRequestedProcedureEvidenceSequence": {
+        "value": [
+          {
+            "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+            "ReferencedSeriesSequence": {
+              "value": [
+                {
+                  "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                  "ReferencedSOPSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "ContentTemplateSequence": {
+        "value": [
+          {
+            "MappingResource": "DCMR",
+            "TemplateIdentifier": "1500"
+          }
+        ]
+      },
+      "ValueType": "CONTAINER",
+      "ConceptNameCodeSequence": {
+        "value": [
+          {
+            "CodeValue": "126000",
+            "CodingSchemeDesignator": "DCM",
+            "CodeMeaning": "Imaging Measurement Report"
+          }
+        ]
+      },
+      "ContinuityOfContent": "SEPARATE",
+      "ContentSequence": {
+        "value": [
+          {
+            "RelationshipType": "HAS CONCEPT MOD",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121049",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Language of Content Item and Descendants"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "en-US",
+                  "CodingSchemeDesignator": "RFC5646",
+                  "CodeMeaning": "English (United States)"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "HAS OBS CONTEXT",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121005",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Observer Type"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121007",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Device"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "HAS OBS CONTEXT",
+            "ValueType": "UIDREF",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121012",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Device Observer UID"
+                }
+              ]
+            },
+            "UID": "1.2.826.0.1.3680043.9.7278.1.5555.20210401120000.1"
+          },
+          {
+            "RelationshipType": "HAS CONCEPT MOD",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121058",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Procedure reported"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "363679005",
+                  "CodingSchemeDesignator": "SCT",
+                  "CodeMeaning": "Imaging procedure"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "CONTAINS",
+            "ValueType": "CONTAINER",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "111028",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Image Library"
+                }
+              ]
+            },
+            "ContinuityOfContent": "SEPARATE",
+            "ContentSequence": {
+              "value": [
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "126200",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Image Library Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "IMAGE",
+                        "ReferencedSOPSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "CONTAINS",
+            "ValueType": "CONTAINER",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "126010",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Imaging Measurements"
+                }
+              ]
+            },
+            "ContinuityOfContent": "SEPARATE",
+            "ContentSequence": {
+              "value": [
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-1"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.1"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "SCOORD",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "111030",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Image Region"
+                            }
+                          ]
+                        },
+                        "GraphicType": "POLYLINE",
+                        "GraphicData": [
+                          4,
+                          4,
+                          10,
+                          4,
+                          10,
+                          10,
+                          4,
+                          10,
+                          4,
+                          4
+                        ],
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "SELECTED FROM",
+                              "ValueType": "IMAGE",
+                              "ReferencedSOPSequence": {
+                                "value": [
+                                  {
+                                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                    "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "42798000",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Area"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 0.36,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "cm2",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "square centimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "110852",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "MR signal intensity"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 100,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "1",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "no units"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "HAS CONCEPT MOD",
+                              "ValueType": "CODE",
+                              "ConceptNameCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "121401",
+                                    "CodingSchemeDesignator": "DCM",
+                                    "CodeMeaning": "Derivation"
+                                  }
+                                ]
+                              },
+                              "ConceptCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "373098007",
+                                    "CodingSchemeDesignator": "SCT",
+                                    "CodeMeaning": "Mean"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "rectangle"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-2"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.2"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "SCOORD",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "111030",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Image Region"
+                            }
+                          ]
+                        },
+                        "GraphicType": "CIRCLE",
+                        "GraphicData": [
+                          20,
+                          8,
+                          23,
+                          8
+                        ],
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "SELECTED FROM",
+                              "ValueType": "IMAGE",
+                              "ReferencedSOPSequence": {
+                                "value": [
+                                  {
+                                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                    "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "42798000",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Area"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 0.2827,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "cm2",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "square centimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "110852",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "MR signal intensity"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 110,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "1",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "no units"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "HAS CONCEPT MOD",
+                              "ValueType": "CODE",
+                              "ConceptNameCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "121401",
+                                    "CodingSchemeDesignator": "DCM",
+                                    "CodeMeaning": "Derivation"
+                                  }
+                                ]
+                              },
+                              "ConceptCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "373098007",
+                                    "CodingSchemeDesignator": "SCT",
+                                    "CodeMeaning": "Mean"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "circle"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-3"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.3"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "SCOORD",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "111030",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Image Region"
+                            }
+                          ]
+                        },
+                        "GraphicType": "ELLIPSE",
+                        "GraphicData": [
+                          16,
+                          20,
+                          26,
+                          20,
+                          21,
+                          17,
+                          21,
+                          23
+                        ],
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "SELECTED FROM",
+                              "ValueType": "IMAGE",
+                              "ReferencedSOPSequence": {
+                                "value": [
+                                  {
+                                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                    "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "42798000",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Area"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 0.4712,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "cm2",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "square centimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "ellipse"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-4"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.4"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "SCOORD",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "111030",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Image Region"
+                            }
+                          ]
+                        },
+                        "GraphicType": "POLYLINE",
+                        "GraphicData": [
+                          5,
+                          18,
+                          10,
+                          16,
+                          12,
+                          22,
+                          6,
+                          26,
+                          5,
+                          18
+                        ],
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "SELECTED FROM",
+                              "ValueType": "IMAGE",
+                              "ReferencedSOPSequence": {
+                                "value": [
+                                  {
+                                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                    "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "polygon"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-5"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.5"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "SCOORD",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "111030",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Image Region"
+                            }
+                          ]
+                        },
+                        "GraphicType": "POINT",
+                        "GraphicData": [
+                          28,
+                          28
+                        ],
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "SELECTED FROM",
+                              "ValueType": "IMAGE",
+                              "ReferencedSOPSequence": {
+                                "value": [
+                                  {
+                                    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                    "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "point"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "test-sr-01",
+    "tags": {
+      "Modality": "SR",
+      "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.33",
+      "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.33",
+      "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.31",
+      "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.31",
+      "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.31",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "SR test data: TID 1500 with TID 1501 measurements (ref test-img-00)",
+      "SeriesNumber": 31,
+      "PatientID": "0123456",
+      "PatientName": "dwv^PatientName",
+      "ContentDate": "20210401",
+      "ContentTime": "120000",
+      "CompletionFlag": "COMPLETE",
+      "VerificationFlag": "UNVERIFIED",
+      "CurrentRequestedProcedureEvidenceSequence": {
+        "value": [
+          {
+            "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+            "ReferencedSeriesSequence": {
+              "value": [
+                {
+                  "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                  "ReferencedSOPSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "ContentTemplateSequence": {
+        "value": [
+          {
+            "MappingResource": "DCMR",
+            "TemplateIdentifier": "1500"
+          }
+        ]
+      },
+      "ValueType": "CONTAINER",
+      "ConceptNameCodeSequence": {
+        "value": [
+          {
+            "CodeValue": "126000",
+            "CodingSchemeDesignator": "DCM",
+            "CodeMeaning": "Imaging Measurement Report"
+          }
+        ]
+      },
+      "ContinuityOfContent": "SEPARATE",
+      "ContentSequence": {
+        "value": [
+          {
+            "RelationshipType": "HAS CONCEPT MOD",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121049",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Language of Content Item and Descendants"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "en-US",
+                  "CodingSchemeDesignator": "RFC5646",
+                  "CodeMeaning": "English (United States)"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "HAS OBS CONTEXT",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121005",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Observer Type"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121007",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Device"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "HAS OBS CONTEXT",
+            "ValueType": "UIDREF",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121012",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Device Observer UID"
+                }
+              ]
+            },
+            "UID": "1.2.826.0.1.3680043.9.7278.1.5555.20210401120000.1"
+          },
+          {
+            "RelationshipType": "HAS CONCEPT MOD",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121058",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Procedure reported"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "363679005",
+                  "CodingSchemeDesignator": "SCT",
+                  "CodeMeaning": "Imaging procedure"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "CONTAINS",
+            "ValueType": "CONTAINER",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "111028",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Image Library"
+                }
+              ]
+            },
+            "ContinuityOfContent": "SEPARATE",
+            "ContentSequence": {
+              "value": [
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "126200",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Image Library Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "IMAGE",
+                        "ReferencedSOPSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "CONTAINS",
+            "ValueType": "CONTAINER",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "126010",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Imaging Measurements"
+                }
+              ]
+            },
+            "ContinuityOfContent": "SEPARATE",
+            "ContentSequence": {
+              "value": [
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-1"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.1"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "410668003",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Length"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 10,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "mm",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "millimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "INFERRED FROM",
+                              "ValueType": "SCOORD",
+                              "ConceptNameCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "121112",
+                                    "CodingSchemeDesignator": "DCM",
+                                    "CodeMeaning": "Source of Measurement"
+                                  }
+                                ]
+                              },
+                              "GraphicType": "POLYLINE",
+                              "GraphicData": [
+                                4,
+                                20,
+                                14,
+                                20
+                              ],
+                              "ContentSequence": {
+                                "value": [
+                                  {
+                                    "RelationshipType": "SELECTED FROM",
+                                    "ValueType": "IMAGE",
+                                    "ReferencedSOPSequence": {
+                                      "value": [
+                                        {
+                                          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                          "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "length"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-2"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.2"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "1483009",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Angle"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 90,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "deg",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "degree"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "INFERRED FROM",
+                              "ValueType": "SCOORD",
+                              "ConceptNameCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "121112",
+                                    "CodingSchemeDesignator": "DCM",
+                                    "CodeMeaning": "Source of Measurement"
+                                  }
+                                ]
+                              },
+                              "GraphicType": "POLYLINE",
+                              "GraphicData": [
+                                20,
+                                4,
+                                20,
+                                10,
+                                26,
+                                10
+                              ],
+                              "ContentSequence": {
+                                "value": [
+                                  {
+                                    "RelationshipType": "SELECTED FROM",
+                                    "ValueType": "IMAGE",
+                                    "ReferencedSOPSequence": {
+                                      "value": [
+                                        {
+                                          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                          "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "angle"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-3"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.3"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "103339001",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Long Axis"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 10,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "mm",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "millimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "INFERRED FROM",
+                              "ValueType": "SCOORD",
+                              "ConceptNameCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "121112",
+                                    "CodingSchemeDesignator": "DCM",
+                                    "CodeMeaning": "Source of Measurement"
+                                  }
+                                ]
+                              },
+                              "GraphicType": "POLYLINE",
+                              "GraphicData": [
+                                16,
+                                20,
+                                26,
+                                20
+                              ],
+                              "ContentSequence": {
+                                "value": [
+                                  {
+                                    "RelationshipType": "SELECTED FROM",
+                                    "ValueType": "IMAGE",
+                                    "ReferencedSOPSequence": {
+                                      "value": [
+                                        {
+                                          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                          "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "103340004",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Short Axis"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 6,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "mm",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "millimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "INFERRED FROM",
+                              "ValueType": "SCOORD",
+                              "ConceptNameCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "121112",
+                                    "CodingSchemeDesignator": "DCM",
+                                    "CodeMeaning": "Source of Measurement"
+                                  }
+                                ]
+                              },
+                              "GraphicType": "POLYLINE",
+                              "GraphicData": [
+                                21,
+                                17,
+                                21,
+                                23
+                              ],
+                              "ContentSequence": {
+                                "value": [
+                                  {
+                                    "RelationshipType": "SELECTED FROM",
+                                    "ValueType": "IMAGE",
+                                    "ReferencedSOPSequence": {
+                                      "value": [
+                                        {
+                                          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                          "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "bidimensional"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "test-sr-02",
+    "tags": {
+      "Modality": "SR",
+      "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.34",
+      "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.34",
+      "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.32",
+      "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.32",
+      "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.32",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "SR test data: TID 1500 with SCOORD3D (ref test-img-00)",
+      "SeriesNumber": 32,
+      "PatientID": "0123456",
+      "PatientName": "dwv^PatientName",
+      "ContentDate": "20210401",
+      "ContentTime": "120000",
+      "CompletionFlag": "COMPLETE",
+      "VerificationFlag": "UNVERIFIED",
+      "CurrentRequestedProcedureEvidenceSequence": {
+        "value": [
+          {
+            "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+            "ReferencedSeriesSequence": {
+              "value": [
+                {
+                  "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                  "ReferencedSOPSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "ContentTemplateSequence": {
+        "value": [
+          {
+            "MappingResource": "DCMR",
+            "TemplateIdentifier": "1500"
+          }
+        ]
+      },
+      "ValueType": "CONTAINER",
+      "ConceptNameCodeSequence": {
+        "value": [
+          {
+            "CodeValue": "126000",
+            "CodingSchemeDesignator": "DCM",
+            "CodeMeaning": "Imaging Measurement Report"
+          }
+        ]
+      },
+      "ContinuityOfContent": "SEPARATE",
+      "ContentSequence": {
+        "value": [
+          {
+            "RelationshipType": "HAS CONCEPT MOD",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121049",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Language of Content Item and Descendants"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "en-US",
+                  "CodingSchemeDesignator": "RFC5646",
+                  "CodeMeaning": "English (United States)"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "HAS OBS CONTEXT",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121005",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Observer Type"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121007",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Device"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "HAS OBS CONTEXT",
+            "ValueType": "UIDREF",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121012",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Device Observer UID"
+                }
+              ]
+            },
+            "UID": "1.2.826.0.1.3680043.9.7278.1.5555.20210401120000.1"
+          },
+          {
+            "RelationshipType": "HAS CONCEPT MOD",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "121058",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Procedure reported"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "363679005",
+                  "CodingSchemeDesignator": "SCT",
+                  "CodeMeaning": "Imaging procedure"
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "CONTAINS",
+            "ValueType": "CONTAINER",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "111028",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Image Library"
+                }
+              ]
+            },
+            "ContinuityOfContent": "SEPARATE",
+            "ContentSequence": {
+              "value": [
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "126200",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Image Library Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "IMAGE",
+                        "ReferencedSOPSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "RelationshipType": "CONTAINS",
+            "ValueType": "CONTAINER",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "126010",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "Imaging Measurements"
+                }
+              ]
+            },
+            "ContinuityOfContent": "SEPARATE",
+            "ContentSequence": {
+              "value": [
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-1"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.1"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "SCOORD3D",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "111030",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Image Region"
+                            }
+                          ]
+                        },
+                        "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+                        "GraphicType": "POLYGON",
+                        "GraphicData": [
+                          4,
+                          4,
+                          0,
+                          10,
+                          4,
+                          0,
+                          10,
+                          10,
+                          0,
+                          4,
+                          10,
+                          0,
+                          4,
+                          4,
+                          0
+                        ]
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "42798000",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Area"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 0.36,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "cm2",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "square centimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "region 3d"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "CONTAINER",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "125007",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Measurement Group"
+                      }
+                    ]
+                  },
+                  "ContinuityOfContent": "SEPARATE",
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-2"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.2"
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "CODE",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "121071",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Finding"
+                            }
+                          ]
+                        },
+                        "ConceptCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "52988006",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Lesion"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "410668003",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Length"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 10,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "mm",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "millimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "INFERRED FROM",
+                              "ValueType": "SCOORD3D",
+                              "ConceptNameCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "121112",
+                                    "CodingSchemeDesignator": "DCM",
+                                    "CodeMeaning": "Source of Measurement"
+                                  }
+                                ]
+                              },
+                              "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+                              "GraphicType": "POLYLINE",
+                              "GraphicData": [
+                                4,
+                                20,
+                                0,
+                                14,
+                                20,
+                                0
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "RelationshipType": "CONTAINS",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "125309",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Short Label"
+                            }
+                          ]
+                        },
+                        "TextValue": "length 3d"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "test-sr-03",
+    "tags": {
+      "Modality": "SR",
+      "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.65",
+      "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.65",
+      "SOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.33",
+      "MediaStorageSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.33",
+      "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+      "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.33",
+      "StudyDescription": "dwv generated study",
+      "SeriesDescription": "SR test data: TID 4100 chest CAD (ref test-img-00)",
+      "SeriesNumber": 33,
+      "PatientID": "0123456",
+      "PatientName": "dwv^PatientName",
+      "ContentDate": "20210401",
+      "ContentTime": "120000",
+      "CompletionFlag": "COMPLETE",
+      "VerificationFlag": "UNVERIFIED",
+      "CurrentRequestedProcedureEvidenceSequence": {
+        "value": [
+          {
+            "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
+            "ReferencedSeriesSequence": {
+              "value": [
+                {
+                  "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                  "ReferencedSOPSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "ContentTemplateSequence": {
+        "value": [
+          {
+            "MappingResource": "DCMR",
+            "TemplateIdentifier": "4100"
+          }
+        ]
+      },
+      "ValueType": "CONTAINER",
+      "ConceptNameCodeSequence": {
+        "value": [
+          {
+            "CodeValue": "112000",
+            "CodingSchemeDesignator": "DCM",
+            "CodeMeaning": "Chest CAD Report"
+          }
+        ]
+      },
+      "ContinuityOfContent": "SEPARATE",
+      "ContentSequence": {
+        "value": [
+          {
+            "RelationshipType": "CONTAINS",
+            "ValueType": "CODE",
+            "ConceptNameCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "111017",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "CAD Processing and Findings Summary"
+                }
+              ]
+            },
+            "ConceptCodeSequence": {
+              "value": [
+                {
+                  "CodeValue": "111242",
+                  "CodingSchemeDesignator": "DCM",
+                  "CodeMeaning": "All algorithms succeeded; with findings"
+                }
+              ]
+            },
+            "ContentSequence": {
+              "value": [
+                {
+                  "RelationshipType": "INFERRED FROM",
+                  "ValueType": "CODE",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "111059",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Single Image Finding"
+                      }
+                    ]
+                  },
+                  "ConceptCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "27925004",
+                        "CodingSchemeDesignator": "SCT",
+                        "CodeMeaning": "Nodule"
+                      }
+                    ]
+                  },
+                  "ContentSequence": {
+                    "value": [
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "TEXT",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112039",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Identifier"
+                            }
+                          ]
+                        },
+                        "TextValue": "annotation-1"
+                      },
+                      {
+                        "RelationshipType": "HAS OBS CONTEXT",
+                        "ValueType": "UIDREF",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "112040",
+                              "CodingSchemeDesignator": "DCM",
+                              "CodeMeaning": "Tracking Unique Identifier"
+                            }
+                          ]
+                        },
+                        "UID": "1.2.826.0.1.3680043.9.7278.1.4444.20210401120000.1"
+                      },
+                      {
+                        "RelationshipType": "HAS PROPERTIES",
+                        "ValueType": "NUM",
+                        "ConceptNameCodeSequence": {
+                          "value": [
+                            {
+                              "CodeValue": "103339001",
+                              "CodingSchemeDesignator": "SCT",
+                              "CodeMeaning": "Long Axis"
+                            }
+                          ]
+                        },
+                        "MeasuredValueSequence": {
+                          "value": [
+                            {
+                              "NumericValue": 8,
+                              "MeasurementUnitsCodeSequence": {
+                                "value": [
+                                  {
+                                    "CodeValue": "mm",
+                                    "CodingSchemeDesignator": "UCUM",
+                                    "CodeMeaning": "millimeter"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "ContentSequence": {
+                          "value": [
+                            {
+                              "RelationshipType": "INFERRED FROM",
+                              "ValueType": "SCOORD",
+                              "GraphicType": "POLYLINE",
+                              "GraphicData": [
+                                8,
+                                8,
+                                16,
+                                8
+                              ],
+                              "ContentSequence": {
+                                "value": [
+                                  {
+                                    "RelationshipType": "SELECTED FROM",
+                                    "ValueType": "IMAGE",
+                                    "ReferencedSOPSequence": {
+                                      "value": [
+                                        {
+                                          "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                          "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "RelationshipType": "CONTAINS",
+                  "ValueType": "TEXT",
+                  "ConceptNameCodeSequence": {
+                    "value": [
+                      {
+                        "CodeValue": "121106",
+                        "CodingSchemeDesignator": "DCM",
+                        "CodeMeaning": "Comment"
+                      }
+                    ]
+                  },
+                  "TextValue": "synthetic CAD finding"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+]

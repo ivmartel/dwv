@@ -379,7 +379,7 @@ export function getImageDataData(image) {
 export function isImageModality(modality) {
   let res = false;
   if (typeof modality !== 'undefined') {
-    res = modality !== 'KO' && modality !== 'RTSTRUCT';
+    res = modality !== 'KO' && modality !== 'RTSTRUCT' && modality !== 'SR';
   }
   return res;
 }

@@ -147,6 +147,26 @@ export class ViewController {
   }
 
   /**
+   * Get the image UID at a position.
+   *
+   * @param {Point} position The position.
+   * @returns {string} The UID.
+   */
+  getImageUidFromPosition(position) {
+    return this.#view.getImage().getImageUid(
+      this.getIndexFromPosition(position));
+  }
+
+  /**
+   * Get the image frame of reference UID.
+   *
+   * @returns {string|undefined} The uid.
+   */
+  getFrameOfReferenceUID() {
+    return this.#view.getImage().getMeta().FrameOfReferenceUID;
+  }
+
+  /**
    * Get the window/level presets names.
    *
    * @returns {string[]} The presets names.

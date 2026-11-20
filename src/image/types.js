@@ -8,6 +8,7 @@
  * @import {ImageHistogram} from './imageHistogram.js';
  * @import {Label} from './label.js';
  * @import {SourcedNumberValue} from '../math/types.js';
+ * @import {Point3D} from '../math/point.js';
  */
 
 /**
@@ -44,6 +45,30 @@
  * @typedef {object} VolumeId
  * @property {SourcedNumberValue} id The volume id.
  * @property {SourcedNumberValue} [value] The associated value.
+ */
+
+/**
+ * Coordinates in the patient coordinate system, as read from
+ * a DICOM SR SCOORD3D.
+ *
+ * @typedef {object} PatientCoordinates
+ * @property {string} graphicType The SCOORD3D graphic type, for ex
+ *   'POLYLINE'.
+ * @property {Point3D[]} points The points (mm).
+ * @property {string} frameOfReferenceUID The frame of reference UID.
+ */
+
+/**
+ * Geometry of an annotation in the patient coordinate system: used
+ * to set its plane shape once a view with a matching plane is set.
+ *
+ * @typedef {object} PatientGeometry
+ * @property {PatientCoordinates} shape The shape, the long axis
+ *   for a bidimensional line.
+ * @property {PatientCoordinates} [shortAxis] The short axis of a
+ *   bidimensional line.
+ * @property {PatientCoordinates} [labelPosition] The label position.
+ * @property {PatientCoordinates} [referencePoints] The reference points.
  */
 
 // ESM module marker

@@ -31,6 +31,31 @@ function getDefaultLabel(name) {
 }
 
 /**
+ * Display offset of the tail of an arrow without reference point.
+ */
+const DEFAULT_ARROW_TAIL_OFFSET = 10;
+
+/**
+ * Get the tail of an arrow: its first reference point, or, for a point
+ *   without reference point (for ex a DICOM SR POINT), a default tail
+ *   used for display only.
+ *
+ * @param {Annotation} annotation The arrow annotation.
+ * @returns {Point2D} The tail.
+ */
+export function getArrowTail(annotation) {
+  const tail = annotation.referencePoints?.[0];
+  if (typeof tail !== 'undefined') {
+    return tail;
+  }
+  const tip = annotation.mathShape;
+  return new Point2D(
+    tip.getX() + DEFAULT_ARROW_TAIL_OFFSET,
+    tip.getY() + DEFAULT_ARROW_TAIL_OFFSET
+  );
+}
+
+/**
  * Rectangle shape annotator.
  * Handles pure annotation logic (math shape ↔ anchor/translation updates)
  * for the rectangle tool — no Konva node creation.
@@ -817,7 +842,8 @@ export class RulerAnnotator {
 /**
  * Arrow shape annotator.
  * The math shape is the arrow tip (Point2D); the tail is stored in
- * annotation.referencePoints[0].
+ * annotation.referencePoints[0], see {@link getArrowTail} for a point
+ * without reference point.
  */
 export class ArrowAnnotator {
 
@@ -909,7 +935,7 @@ export class ArrowAnnotator {
    */
   updateAnnotationOnTranslation(annotation, translation) {
     const point = annotation.mathShape;
-    const endPoint = annotation.referencePoints[0];
+    const endPoint = getArrowTail(annotation);
     annotation.mathShape = new Point2D(
       point.getX() + translation.x, point.getY() + translation.y);
     annotation.referencePoints = [new Point2D(
@@ -942,7 +968,7 @@ export class ArrowAnnotator {
    */
   getAnchors(annotation) {
     const tip = annotation.mathShape;
-    const tail = annotation.referencePoints[0];
+    const tail = getArrowTail(annotation);
     return [
       Anchor.fromIndex(0, tip.getX(), tip.getY()),
       Anchor.fromIndex(1, tail.getX(), tail.getY())
@@ -957,7 +983,7 @@ export class ArrowAnnotator {
    */
   getConnectorPositions(annotation) {
     const tip = annotation.mathShape;
-    const tail = annotation.referencePoints[0];
+    const tail = getArrowTail(annotation);
     return [new Point2D(
       (tip.getX() + tail.getX()) / 2,
       (tip.getY() + tail.getY()) / 2
