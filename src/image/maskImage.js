@@ -1,5 +1,6 @@
 import {Index} from '../math/index.js';
 import {REAL_WORLD_EPSILON} from '../math/number.js';
+import {isMillimetreUnit} from '../math/units.js';
 import {Size} from './size.js';
 import {valueRange} from './iterator.js';
 import {LabelingThread} from './labelingThread.js';
@@ -426,7 +427,7 @@ export class MaskImage extends Image {
     const lengthUnit = this.getMeta().lengthUnit;
     let pixelVolume = 1;
     let volumeUnit = 'unit.pixel';
-    if (lengthUnit === 'unit.mm') {
+    if (isMillimetreUnit(lengthUnit)) {
       pixelVolume =
         spacing.get(0) *
         spacing.get(1) *

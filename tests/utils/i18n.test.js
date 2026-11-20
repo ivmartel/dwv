@@ -26,6 +26,12 @@ describe('utils', () => {
     assert.equal(i18n.t('unit.ms'), 'ms', 'milliseconds');
     assert.equal(i18n.t('unit.s'), 's', 'seconds');
     assert.equal(i18n.t('unit.smm2'), 's/mm²', 'b-value');
+
+    // projection radiography units at the detector plane
+    assert.equal(
+      i18n.t('unit.mmDetector'), 'mm (detector)', 'mm at detector');
+    assert.equal(
+      i18n.t('unit.cm2Detector'), 'cm² (detector)', 'cm2 at detector');
   });
 
 });

@@ -417,6 +417,9 @@ const QuantificationUnit2UcumKey = {
   'unit.mm': 'mm',
   'unit.cm2': 'cm2',
   'unit.degree': 'deg',
+  // after 'unit.mm' and 'unit.cm2' so that reading a code gives those
+  'unit.mmDetector': 'mm',
+  'unit.cm2Detector': 'cm2',
   // OD optical density
   HU: '[hnsf\'U]',
   // US: '1', // duplicates 'NONE'
