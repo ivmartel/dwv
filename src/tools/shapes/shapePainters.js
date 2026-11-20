@@ -6,6 +6,7 @@ import {
   getPerpendicularLineAtDistance
 } from '../../math/line.js';
 import {setLineHitFunc} from './lineHitFunc.js';
+import {getArrowTail} from './shapeAnnotators.js';
 import {logger} from '../../utils/logger.js';
 
 /**
@@ -319,7 +320,7 @@ class ArrowKonvaPainter extends KonvaShapePainter {
    */
   createShape(annotation, style) {
     const tip = annotation.mathShape;
-    const tail = annotation.referencePoints[0];
+    const tail = getArrowTail(annotation);
     const line = new Line(tip, tail);
     const kshape = new Konva.Line({
       points: [
@@ -344,7 +345,7 @@ class ArrowKonvaPainter extends KonvaShapePainter {
    */
   updateShape(node, annotation, style) {
     const tip = annotation.mathShape;
-    const tail = annotation.referencePoints[0];
+    const tail = getArrowTail(annotation);
     const line = new Line(tip, tail);
     // force Line position to 0 to store position with points
     node.position({x: 0, y: 0});
@@ -365,7 +366,7 @@ class ArrowKonvaPainter extends KonvaShapePainter {
    */
   createExtras(annotation, style) {
     const tip = annotation.mathShape;
-    const tail = annotation.referencePoints[0];
+    const tail = getArrowTail(annotation);
     const line = new Line(tip, tail);
     const tickLen = 20;
     const perpLine = getPerpendicularLineAtDistance(
@@ -396,7 +397,7 @@ class ArrowKonvaPainter extends KonvaShapePainter {
    */
   updateExtras(group, annotation, style) {
     const tip = annotation.mathShape;
-    const tail = annotation.referencePoints[0];
+    const tail = getArrowTail(annotation);
     const line = new Line(tip, tail);
     const tickLen = 20;
     const perpLine = getPerpendicularLineAtDistance(

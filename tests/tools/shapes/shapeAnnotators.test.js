@@ -7,6 +7,7 @@ import {
   ArrowAnnotator,
   RoiAnnotator,
   ProtractorAnnotator,
+  getArrowTail
 } from '../../../src/tools/shapes/shapeAnnotators.js';
 import {Anchor} from '../../../src/tools/shapes/anchor.js';
 import {Rectangle} from '../../../src/math/rectangle.js';
@@ -552,6 +553,30 @@ describe('tools', () => {
       assert.equal(anchors[0].getY(), 20);
       assert.equal(anchors[1].getX(), 50);
       assert.equal(anchors[1].getY(), 60);
+    });
+
+    test('point without reference point: default tail', () => {
+      const a = new ArrowAnnotator();
+      // for ex a DICOM SR POINT
+      const annotation = _makeAnnotation(p(10, 20));
+      const expectedTail = getArrowTail(annotation);
+      assert.equal(expectedTail.getX(), 20, 'default tail x');
+      assert.equal(expectedTail.getY(), 30, 'default tail y');
+      assert.isUndefined(annotation.referencePoints,
+        'default tail not stored');
+
+      const anchors = a.getAnchors(annotation);
+      assert.equal(anchors[1].getX(), 20);
+      assert.equal(anchors[1].getY(), 30);
+      const connectors = a.getConnectorPositions(annotation);
+      assert.equal(connectors[0].getX(), 15);
+      assert.equal(connectors[0].getY(), 25);
+
+      a.updateAnnotationOnTranslation(annotation, {x: 5, y: 10});
+      assert.equal(annotation.mathShape.getX(), 15);
+      assert.equal(annotation.referencePoints[0].getX(), 25,
+        'tail stored after edit');
+      assert.equal(annotation.referencePoints[0].getY(), 40);
     });
 
   }); // ArrowAnnotator
