@@ -275,6 +275,9 @@ export class Command {
     undo(): void;
 }
 
+// @public
+export function createDerivedVolumeFromSR(srElements: Record<string, DataElement>, code: string | DicomCode, sourceBuffers: ArrayBuffer[], extraTags?: SimpleTagValues): ArrayBuffer[];
+
 // @public (undocumented)
 export namespace custom {
     let // (undocumented)
@@ -665,6 +668,9 @@ export function getSegmentationCode(): DicomCode;
 
 // @public
 export function getSRContent(dataElements: Record<string, DataElement>): DicomSRContent;
+
+// @public
+export function getSRReferencedInstanceUIDs(content: DicomSRContent, code: string | DicomCode): string[];
 
 // @public
 export function getTagFromKey(key: string): Tag;

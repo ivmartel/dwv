@@ -6,11 +6,16 @@ import {
   getSRContent,
   getDicomSRContentItem,
   getSRContentFromValue,
+  getSRReferencedInstanceUIDs,
   RelationshipTypes,
   ValueTypes
 } from '../../src/dicom/dicomSRContent.js';
 import {DataElement} from '../../src/dicom/dataElement.js';
 import {DicomCode} from '../../src/dicom/dicomCode.js';
+import {ImageReference} from '../../src/dicom/dicomImageReference.js';
+import {
+  SopInstanceReference
+} from '../../src/dicom/dicomSopInstanceReference.js';
 
 // Tag keys used in tests (must match module TagKeys)
 const TagKeys = {
@@ -202,4 +207,141 @@ describe('dicom', () => {
     assert.equal(content.value.schemeDesignator, 'UCUM');
   });
 
+});
+
+/**
+ * Create a SR content item.
+ *
+ * @param {string} valueType The value type.
+ * @param {object} [code] The concept name code values.
+ * @param {string} [code.value] The code value.
+ * @param {string} [code.longValue] The long code value.
+ * @param {string} [code.schemeDesignator] The coding scheme designator.
+ * @param {object} [value] The item value.
+ * @param {DicomSRContent[]} [children] The child items.
+ * @returns {DicomSRContent} The content item.
+ */
+function createSearchItem(valueType, code, value, children) {
+  const item = new DicomSRContent(valueType);
+  if (typeof code !== 'undefined') {
+    item.conceptNameCode = new DicomCode('meaning');
+    item.conceptNameCode.value = code.value;
+    item.conceptNameCode.longValue = code.longValue;
+    item.conceptNameCode.schemeDesignator = code.schemeDesignator;
+  }
+  item.value = value;
+  item.contentSequence = children ?? [];
+  return item;
+}
+
+/**
+ * Create an IMAGE content item.
+ *
+ * @param {string} uid The referenced SOP Instance UID.
+ * @returns {DicomSRContent} The content item.
+ */
+function createImageItem(uid) {
+  const reference = new SopInstanceReference();
+  reference.referencedSOPClassUID = '1.2.840.10008.5.1.4.1.1.4';
+  reference.referencedSOPInstanceUID = uid;
+  const image = new ImageReference();
+  image.referencedSOPSequence = reference;
+  return createSearchItem(ValueTypes.image, {value: '121138'}, image);
+}
+
+describe('getSRReferencedInstanceUIDs', () => {
+  const container = createSearchItem(
+    ValueTypes.container, {longValue: 'LongCodeContainer'}, undefined, [
+      createImageItem('1.2.3.1'),
+      createSearchItem(ValueTypes.text, {value: '112002'}, '1.2.3.100'),
+      createImageItem('1.2.3.2')
+    ]);
+  const root = createSearchItem(ValueTypes.container, {value: 'root'},
+    undefined, [
+      createImageItem('1.2.3.9'),
+      createSearchItem(ValueTypes.container, {value: 'other'}, undefined, [
+        createSearchItem(ValueTypes.container, {value: 'code'}, undefined, [
+          createImageItem('1.2.3.3')
+        ])
+      ]),
+      container
+    ]);
+
+  test('long code value container', () => {
+    assert.deepEqual(getSRReferencedInstanceUIDs(root, 'LongCodeContainer'),
+      ['1.2.3.1', '1.2.3.2']);
+  });
+
+  test('code value container at any depth', () => {
+    assert.deepEqual(getSRReferencedInstanceUIDs(root, 'code'),
+      ['1.2.3.3']);
+  });
+
+  test('root container, direct IMAGE children only', () => {
+    assert.deepEqual(getSRReferencedInstanceUIDs(root, 'root'),
+      ['1.2.3.9']);
+  });
+
+  test('not found', () => {
+    assert.deepEqual(getSRReferencedInstanceUIDs(root, 'unknown'), []);
+    assert.deepEqual(getSRReferencedInstanceUIDs(container, 'root'), []);
+  });
+
+  test('skip IMAGE items without reference', () => {
+    const noReference = createSearchItem(
+      ValueTypes.container, {value: 'code'}, undefined, [
+        createSearchItem(ValueTypes.image, {value: '121138'}, undefined),
+        createImageItem('1.2.3.4')
+      ]);
+    assert.deepEqual(getSRReferencedInstanceUIDs(noReference, 'code'),
+      ['1.2.3.4']);
+  });
+
+  test('code with coding scheme', () => {
+    const schemes = createSearchItem(ValueTypes.container, {value: 'root'},
+      undefined, [
+        createSearchItem(ValueTypes.container,
+          {value: 'code', schemeDesignator: 'DCM'}, undefined,
+          [createImageItem('1.2.3.1')]),
+        createSearchItem(ValueTypes.container,
+          {value: 'code', schemeDesignator: 'TEST'}, undefined,
+          [createImageItem('1.2.3.2')])
+      ]);
+    // code value: any scheme
+    assert.deepEqual(getSRReferencedInstanceUIDs(schemes, 'code'),
+      ['1.2.3.1', '1.2.3.2']);
+    // code: same scheme
+    const code = new DicomCode('meaning');
+    code.value = 'code';
+    code.schemeDesignator = 'DCM';
+    assert.deepEqual(getSRReferencedInstanceUIDs(schemes, code), ['1.2.3.1']);
+    code.schemeDesignator = 'SCT';
+    assert.deepEqual(getSRReferencedInstanceUIDs(schemes, code), []);
+    // code: same long and URN values
+    code.schemeDesignator = 'DCM';
+    code.longValue = 'long';
+    assert.deepEqual(getSRReferencedInstanceUIDs(schemes, code), []);
+    code.longValue = undefined;
+    code.urnValue = 'urn';
+    assert.deepEqual(getSRReferencedInstanceUIDs(schemes, code), []);
+  });
+
+  test('IMAGE item with the code and duplicates', () => {
+    const imageWithCode = createImageItem('1.2.3.5');
+    imageWithCode.conceptNameCode.value = 'code';
+    const items = createSearchItem(ValueTypes.container, {value: 'root'},
+      undefined, [
+        createSearchItem(ValueTypes.container, {value: 'code'}, undefined, [
+          createImageItem('1.2.3.4'),
+          createImageItem('1.2.3.4')
+        ]),
+        imageWithCode
+      ]);
+    assert.deepEqual(getSRReferencedInstanceUIDs(items, 'code'),
+      ['1.2.3.4', '1.2.3.5']);
+    // items without concept name code
+    const noCode = createSearchItem(ValueTypes.container, undefined,
+      undefined, [createImageItem('1.2.3.6')]);
+    assert.deepEqual(getSRReferencedInstanceUIDs(noCode, 'code'), []);
+  });
 });

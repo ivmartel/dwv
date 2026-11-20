@@ -33,6 +33,7 @@ import {MeasuredValue} from './dicomMeasuredValue.js';
  * @import {DataElement} from './dataElement.js';
  * @import {DicomCode} from './dicomCode.js';
  * @import {SimpleTagValues} from './types.js';
+ * @import {ImageReference} from './dicomImageReference.js';
  */
 
 /**
@@ -422,4 +423,52 @@ export function getSRContentFromValue(
   content.value = numMeasure;
 
   return content;
+}
+
+/**
+ * Check if a content item concept name code has a code value or is
+ *   equal to a code.
+ *
+ * @param {DicomSRContent} content The content item.
+ * @param {string|DicomCode} code The code value, long code value or URN
+ *   code value, or the code.
+ * @returns {boolean} True if the concept name code matches.
+ */
+function hasConceptNameCode(content, code) {
+  const conceptNameCode = content.conceptNameCode;
+  if (typeof code !== 'string') {
+    return isEqualCode(conceptNameCode, code) &&
+      conceptNameCode.longValue === code.longValue &&
+      conceptNameCode.urnValue === code.urnValue;
+  }
+  return typeof conceptNameCode !== 'undefined' &&
+    (conceptNameCode.value === code ||
+      conceptNameCode.longValue === code ||
+      conceptNameCode.urnValue === code);
+}
+
+/**
+ * Get the SOP instance UIDs referenced by the IMAGE items with a concept
+ *   name code, or children of the content items with this code.
+ *
+ * @param {DicomSRContent} content The root content item.
+ * @param {string|DicomCode} code The code value or the code.
+ * @returns {string[]} The referenced SOP instance UIDs, in content order,
+ *   without duplicates.
+ */
+export function getSRReferencedInstanceUIDs(content, code) {
+  const uids = [];
+  const hasCode = hasConceptNameCode(content, code);
+  for (const child of content.contentSequence) {
+    if (child.valueType === ValueTypes.image &&
+      (hasCode || hasConceptNameCode(child, code))) {
+      const reference =
+        /** @type {ImageReference} */ (child.value)?.referencedSOPSequence;
+      if (typeof reference?.referencedSOPInstanceUID !== 'undefined') {
+        uids.push(reference.referencedSOPInstanceUID);
+      }
+    }
+    uids.push(...getSRReferencedInstanceUIDs(child, code));
+  }
+  return [...new Set(uids)];
 }
