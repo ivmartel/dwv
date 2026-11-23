@@ -896,4 +896,74 @@ describe('annotation', () => {
         'arrow reference point');
     });
 
+  /**
+   * Tests for the patient positions of annotations on a non acquisition
+   * plane: the center of a shape pixel (SCOORD convention, i + 0.5) is
+   * the center of the image voxel (Image Position (Patient) + i * spacing).
+   *
+   * @function module:tests/annotation~scoord3DPixelCenter
+   */
+  test('Non acquisition plane annotation pixel center', () => {
+    // axial volume, coronal view: plane x is image x (0.5mm),
+    // plane y is image z (2mm)
+    const identity = new Matrix33([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+    const imageGeometry = new Geometry(
+      [new Point3D(10, 20, 30)],
+      new Size([20, 20, 20]),
+      new Spacing([0.5, 0.5, 2]),
+      identity
+    );
+    const planeHelper = new PlaneHelper(
+      imageGeometry, getViewOrientation(identity, getCoronalMat33()));
+    const forUid = '1.2.3.4.300';
+    // coronal plane at image row 5: y = 20 + 5 * 0.5
+    const viewPosition = new Point([12, 22.5, 36]);
+    const viewController = {
+      getPlaneHelper: () => planeHelper,
+      getFrameOfReferenceUID: () => forUid,
+      getCurrentPosition: () => viewPosition,
+      getImageUidFromPosition: () => REF_UID,
+      getSopClassUid: () => CT_SOP_CLASS,
+      isAquisitionOrientation: () => false,
+      getPlanePoints: (position) => planeHelper.getPlanePoints(position),
+      includesImageUid: (uid) => uid === REF_UID,
+      getOriginForImageUid: () => new Point3D(10, 20, 30),
+      getIndexFromPosition: (position) =>
+        imageGeometry.worldToIndex(position)
+    };
+
+    // ruler from the center of the first pixel to the center
+    // of pixel (2, 1)
+    const ruler = getAnnotation(
+      new Line(new Point2D(0.5, 0.5), new Point2D(2.5, 1.5)));
+    ruler.planePoints = planeHelper.getPlanePoints(viewPosition);
+    ruler.setViewController(/** @type {object} */ (viewController));
+
+    // plane to patient: voxel centers
+    const expected = [new Point3D(10, 22.5, 30), new Point3D(11, 22.5, 32)];
+    const positions = ruler.getPlanePositions(
+      [ruler.mathShape.getBegin(), ruler.mathShape.getEnd()]);
+    for (let i = 0; i < expected.length; ++i) {
+      assert.ok(positions[i].isSimilar(expected[i], 1e-6),
+        `position ${i}: ${positions[i]}`);
+    }
+
+    // written SCOORD3D
+    const elements = writeAndParse(getAnnotationGroup([ruler]));
+    const groups = getMeasurementGroups(getSRContent(elements));
+    const scoord3d = findByConcept(groups[0], '121112')[0];
+    assert.equal(scoord3d.valueType, ValueTypes.scoord3d, 'SCOORD3D');
+    assert.deepEqual(scoord3d.value.graphicData.map(Number),
+      [10, 22.5, 30, 11, 22.5, 32], 'written patient points');
+
+    // patient to plane: back to pixel centers
+    const read = new AnnotationGroupFactory().create(elements).getList()[0];
+    read.setViewController(/** @type {object} */ (viewController));
+    assert.ok(read.mathShape instanceof Line, 'read ruler');
+    assertPointClose(read.mathShape.getBegin(), new Point2D(0.5, 0.5),
+      'read begin');
+    assertPointClose(read.mathShape.getEnd(), new Point2D(2.5, 1.5),
+      'read end');
+  });
+
 });

@@ -25,6 +25,22 @@ import {Circle} from '../math/circle.js';
  */
 
 /**
+ * Offset between annotation plane coordinates and image point
+ * coordinates, along the two in-plane axes.
+ *
+ * Annotation shapes use the SCOORD Graphic Data convention: pixel i
+ * covers [i, i+1), its center is i + 0.5
+ * (ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.1}).
+ * Image point coordinates (as used by Geometry.pointToWorld) have the
+ * center of pixel i at i, the Image Position (Patient) being the center
+ * of the first pixel
+ * (ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1}).
+ * The view orientation is an axis permutation (no flip), so the offset
+ * is the same for all views.
+ */
+const PIXEL_CENTER_OFFSET = 0.5;
+
+/**
  * Image annotation.
  */
 export class Annotation {
@@ -238,8 +254,12 @@ export class Annotation {
     const k = planeHelper.getPlanePointFromPosition(
       new Point([origin.getX(), origin.getY(), origin.getZ()])
     ).getZ();
+    // shape coordinates to image point coordinates
     return points.map(function (point) {
-      return planeHelper.getPositionFromPlanePoint(point, k);
+      return planeHelper.getPositionFromPlanePoint(new Point2D(
+        point.getX() - PIXEL_CENTER_OFFSET,
+        point.getY() - PIXEL_CENTER_OFFSET
+      ), k);
     });
   }
 
@@ -391,15 +411,22 @@ export class Annotation {
 
     const planeHelper = viewController.getPlaneHelper();
     /**
-     * Get the plane points (x, y, plane index) of patient coordinates.
+     * Get the plane points (x, y, plane index) of patient coordinates,
+     * x and y in the annotation shape coordinates.
      *
      * @param {PatientCoordinates} coords The patient coordinates.
      * @returns {Point3D[]} The plane points.
      */
     const toPlane = function (coords) {
       return coords.points.map(function (point) {
-        return planeHelper.getPlanePointFromPosition(
+        const planePoint = planeHelper.getPlanePointFromPosition(
           new Point([point.getX(), point.getY(), point.getZ()]));
+        // image point coordinates to shape coordinates
+        return new Point3D(
+          planePoint.getX() + PIXEL_CENTER_OFFSET,
+          planePoint.getY() + PIXEL_CENTER_OFFSET,
+          planePoint.getZ()
+        );
       });
     };
     const shapePoints = toPlane(geometry.shape);
