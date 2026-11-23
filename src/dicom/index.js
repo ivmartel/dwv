@@ -13,6 +13,7 @@ import {
   WriterRule,
   WriterRuleActions
 } from './dicomWriter.js';
+import {createDerivedVolumeFromSR} from './dicomDerivedVolume.js';
 import {addTagsToDictionary} from './dictionary.js';
 import {
   Tag,
@@ -40,7 +41,8 @@ import {
 import {
   DicomSRContent,
   getSRContent,
-  getDicomSRContentItem
+  getDicomSRContentItem,
+  getSRReferencedInstanceUIDs
 } from './dicomSRContent.js';
 import {MaskSegment} from './dicomSegment.js';
 import {
@@ -77,6 +79,7 @@ export {
   addTagsToDictionary,
   getDwvVersion,
   getUID,
+  createDerivedVolumeFromSR,
   getSegmentationCode,
   getTypedArray,
   getTagFromKey,
@@ -86,6 +89,7 @@ export {
   getReverseOrientation,
   getSRContent,
   getDicomSRContentItem,
+  getSRReferencedInstanceUIDs,
   getReferencedSeriesUID,
   getReferencedSeriesUIDFromRTStruct,
   getRTStructFromElements,
