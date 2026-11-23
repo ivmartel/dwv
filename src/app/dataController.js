@@ -9,7 +9,7 @@ import {AnnotationGroupFactory} from '../image/annotationGroupFactory.js';
 import {RtStructFactory} from '../image/rtStructFactory.js';
 import {imageEventNames} from '../image/image.js';
 import {annotationGroupEventNames} from '../image/annotationGroup.js';
-import {safeGet} from '../dicom/dataElement.js';
+import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getVolumeIdTagValue,
   getVolumeValues,
@@ -35,9 +35,60 @@ import {
  * Related DICOM tag keys.
  */
 const TagKeys = {
+  ImageType: '00080008',
   Modality: '00080060',
-  SOPInstanceUID: '00080018'
+  SOPInstanceUID: '00080018',
+  SeriesInstanceUID: '0020000E'
 };
+
+/**
+ * Get the key of the data a loaded item belongs to: items with the
+ * same key are part of the same data.
+ *
+ * - non DICOM items (for ex a list of JPEG files): a single data,
+ * - DICOM objects without pixel data (for ex SR, PR, RTSTRUCT, KO)
+ *   and segmentations: one data per instance,
+ * - images: one data per series, localizer images
+ *   (ImageType LOCALIZER) in their own data.
+ *
+ * The frames of a multi-frame file share the same key, and the
+ * volumes of a series are kept in the same data
+ * (see guessVolumeIndices).
+ *
+ * @param {Record<string, DataElement>} meta The item meta data.
+ * @returns {string} The data key.
+ */
+export function getDataGroupKey(meta) {
+  const sopInstanceUid = safeGet(meta, TagKeys.SOPInstanceUID);
+  if (typeof sopInstanceUid === 'undefined') {
+    return 'default';
+  }
+  const modality = safeGet(meta, TagKeys.Modality);
+  if (!hasAnyPixelDataElement(meta) || modality === 'SEG') {
+    return `instance-${sopInstanceUid}`;
+  }
+  let key = `series-${safeGet(meta, TagKeys.SeriesInstanceUID) ?? ''}`;
+  const imageType = safeGetAll(meta, TagKeys.ImageType);
+  if (Array.isArray(imageType) && imageType.includes('LOCALIZER')) {
+    key += '-localizer';
+  }
+  return key;
+}
+
+/**
+ * Check if a loaded item needs other data of the same load to create
+ * its content: a segmentation (SEG with pixel data) or an RT structure
+ * set uses the geometry of the series it references, so it has to wait
+ * for the end of the load.
+ *
+ * @param {Record<string, DataElement>} meta The item meta data.
+ * @returns {boolean} True if the item needs its referenced data.
+ */
+function needsReferencedData(meta) {
+  const modality = safeGet(meta, TagKeys.Modality);
+  return (modality === 'SEG' && hasAnyPixelDataElement(meta)) ||
+    modality === 'RTSTRUCT';
+}
 
 /**
  * List of data event names.
@@ -512,6 +563,16 @@ export class DataController extends EventTarget {
   #dataIdCounter = -1;
 
   /**
+   * Data of the current loads, indexed by load id: the data id of
+   * each data key (see getDataGroupKey), the data ids in creation
+   * order and the items waiting for their referenced data.
+   *
+   * @type {Record<string, {keys: Record<string, string>,
+   *   dataIds: string[], pendingItems: DicomData[]}>}
+   */
+  #loads = {};
+
+  /**
    * Get the next data id.
    *
    * @returns {string} The data id.
@@ -537,6 +598,89 @@ export class DataController extends EventTarget {
     this.#dataList = {};
     this.#tmpSliceList = {};
     this.#dataListStashed = {};
+    this.#loads = {};
+  }
+
+  /**
+   * Add a loaded item: the item is added to the data of the load
+   * with the same key (see getDataGroupKey), or to a new data.
+   * Items that need their referenced data (SEG, RTSTRUCT) are kept
+   * until {@link DataController#getPendingLoadItems} is called, at
+   * the end of the load.
+   *
+   * @param {string} loadId The load id.
+   * @param {DicomData} data The loaded item.
+   * @param {boolean} [canWait] False to add an item that needs its
+   *   referenced data now, defaults to true.
+   * @returns {{dataId: string, isNew: boolean}|undefined} The data id
+   *   and true if it was created for this item, undefined if the item
+   *   is kept for later.
+   */
+  addLoadItem(loadId, data, canWait = true) {
+    if (typeof this.#loads[loadId] === 'undefined') {
+      this.#loads[loadId] = {keys: {}, dataIds: [], pendingItems: []};
+    }
+    const load = this.#loads[loadId];
+    if (canWait && needsReferencedData(data.meta)) {
+      load.pendingItems.push(data);
+      return undefined;
+    }
+    const key = getDataGroupKey(data.meta);
+    let dataId = load.keys[key];
+    const isNew = typeof dataId === 'undefined';
+    if (isNew) {
+      dataId = this.getNextDataId();
+      try {
+        this.add(dataId, data);
+      } catch (error) {
+        // do not keep a data without content
+        delete this.#dataList[dataId];
+        delete this.#tmpSliceList[dataId];
+        throw error;
+      }
+      load.keys[key] = dataId;
+      load.dataIds.push(dataId);
+    } else {
+      this.update(dataId, data);
+    }
+    return {dataId, isNew};
+  }
+
+  /**
+   * Get the items of a load that were kept until the end of the load,
+   * see {@link DataController#addLoadItem}. The list is emptied.
+   *
+   * @param {string} loadId The load id.
+   * @returns {DicomData[]} The kept items.
+   */
+  getPendingLoadItems(loadId) {
+    const load = this.#loads[loadId];
+    if (typeof load === 'undefined') {
+      return [];
+    }
+    const items = load.pendingItems;
+    load.pendingItems = [];
+    return items;
+  }
+
+  /**
+   * Get the ids of the data created by a load, in creation order.
+   *
+   * @param {string} loadId The load id.
+   * @returns {string[]} The data ids.
+   */
+  getLoadDataIds(loadId) {
+    return this.#loads[loadId]?.dataIds.slice() ?? [];
+  }
+
+  /**
+   * End a load: forget its data keys, so that a new load creates
+   * new data.
+   *
+   * @param {string} loadId The load id.
+   */
+  endLoad(loadId) {
+    delete this.#loads[loadId];
   }
 
   /**
@@ -719,9 +863,11 @@ export class DataController extends EventTarget {
       typeof data.annotationGroup === 'undefined') {
       // create content
       this.#setDataContent(data);
-      // store data (slice or frame) for possible processing
-      // at complete time (see markDataAsComplete)
-      if (typeof data.numberOfItems !== 'undefined' &&
+      // store image data (slice or frame) for possible processing
+      // at complete time (see markDataAsComplete); the load
+      // can contain other data, for ex an SR
+      if (typeof data.image !== 'undefined' &&
+        typeof data.numberOfItems !== 'undefined' &&
         data.numberOfItems > 1) {
         this.#tmpSliceList[dataId] = new DicomSliceDataList();
         // add first data as clone since this data

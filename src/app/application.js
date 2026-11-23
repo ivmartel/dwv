@@ -759,11 +759,13 @@ export class App extends EventTarget {
     this.#loadController.addEventListener('loadstart', this.#onloadstart);
     this.#loadController.addEventListener('loaditem', this.#onloaditem);
     this.#loadController.addEventListener('load', this.#onload);
+    this.#loadController.addEventListener('loadend', this.#onloadend);
     // propagate load events
     for (const eventName of loadEventNames) {
       if (eventName !== 'loadstart' &&
         eventName !== 'loaditem' &&
-        eventName !== 'load') {
+        eventName !== 'load' &&
+        eventName !== 'loadend') {
         this.#loadController.addEventListener(eventName, this.#fireEvent);
       }
     }
@@ -940,7 +942,7 @@ export class App extends EventTarget {
    * @event App#loadstart
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -951,7 +953,7 @@ export class App extends EventTarget {
    * @event App#loadprogress
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {number} detail.loaded The loaded percentage.
@@ -964,12 +966,28 @@ export class App extends EventTarget {
    * @event App#loaditem
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
+   * @property {string} detail.dataid The id of the data the item
+   *   was added to.
    * @property {object} detail.data The loaded meta data.
    * @property {boolean} detail.isfirstitem True if the item is the first
    *  one loaded for the data id.
+   */
+
+  /**
+   * Load data event: fired when a load item starts a new data, before
+   *   its load item event. A load can create several data: for example
+   *   one per series, and one per derived object (SR, SEG...).
+   *
+   * @event App#loaddata
+   * @type {CustomEvent}
+   * @property {object} detail The event detail.
+   * @property {string} detail.loadid The load id.
+   * @property {string} detail.dataid The new data id.
+   * @property {*} detail.source The load source: string for an url,
+   *   File for a file.
    */
 
   /**
@@ -978,7 +996,8 @@ export class App extends EventTarget {
    * @event App#load
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
+   * @property {string[]} detail.dataids The ids of the loaded data.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -990,7 +1009,8 @@ export class App extends EventTarget {
    * @event App#loadend
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
+   * @property {string[]} detail.dataids The ids of the loaded data.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -1001,7 +1021,7 @@ export class App extends EventTarget {
    * @event App#error
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {object} detail.error The error.
@@ -1014,7 +1034,7 @@ export class App extends EventTarget {
    * @event App#timeout
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
    * @property {*} detail.source The load source: an url as a string.
    * @property {object} detail.target The event target.
    */
@@ -1025,7 +1045,7 @@ export class App extends EventTarget {
    * @event App#abort
    * @type {CustomEvent}
    * @property {object} detail The event detail.
-   * @property {string} detail.dataid The data id.
+   * @property {string} detail.loadid The load id.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -1034,9 +1054,11 @@ export class App extends EventTarget {
    * Load a list of image files.
    *
    * @param {File[]} files The list of files to load.
-   * @returns {string} The data ID, '-1' if problem.
+   * @returns {string} The load id, '-1' if problem. The ids of the
+   *   loaded data are given by the loaddata and load events.
    * @fires App#loadstart
    * @fires App#loadprogress
+   * @fires App#loaddata
    * @fires App#loaditem
    * @fires App#loadend
    * @fires App#error
@@ -1048,9 +1070,9 @@ export class App extends EventTarget {
       logger.warn('Ignoring empty input file list.');
       return '-1';
     }
-    const dataId = this.#dataController.getNextDataId();
-    this.#loadController.loadFiles(files, dataId);
-    return dataId;
+    const loadId = this.#loadController.getNextLoadId();
+    this.#loadController.loadFiles(files, loadId);
+    return loadId;
   };
 
   /**
@@ -1061,9 +1083,11 @@ export class App extends EventTarget {
    * - requestHeaders: an array of {name, value} to use as request headers,
    * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
    * - batchSize: the size of the request url batch.
-   * @returns {string} The data ID, '-1' if problem.
+   * @returns {string} The load id, '-1' if problem. The ids of the
+   *   loaded data are given by the loaddata and load events.
    * @fires App#loadstart
    * @fires App#loadprogress
+   * @fires App#loaddata
    * @fires App#loaditem
    * @fires App#loadend
    * @fires App#error
@@ -1075,9 +1099,9 @@ export class App extends EventTarget {
       logger.warn('Ignoring empty input url list.');
       return '-1';
     }
-    const dataId = this.#dataController.getNextDataId();
-    this.#loadController.loadURLs(urls, dataId, options);
-    return dataId;
+    const loadId = this.#loadController.getNextLoadId();
+    this.#loadController.loadURLs(urls, loadId, options);
+    return loadId;
   };
 
   /**
@@ -1107,9 +1131,11 @@ export class App extends EventTarget {
    *
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: "", filename: "", data: data}].
-   * @returns {string} The data ID.
+   * @returns {string} The load id. The ids of the loaded data are
+   *   given by the loaddata and load events.
    * @fires App#loadstart
    * @fires App#loadprogress
+   * @fires App#loaddata
    * @fires App#loaditem
    * @fires App#loadend
    * @fires App#error
@@ -1117,33 +1143,38 @@ export class App extends EventTarget {
    * @function
    */
   loadImageObject = (data) => {
-    const dataId = this.#dataController.getNextDataId();
-    this.#loadController.loadImageObject(data, dataId);
-    return dataId;
+    const loadId = this.#loadController.getNextLoadId();
+    this.#loadController.loadImageObject(data, loadId);
+    return loadId;
   };
 
   /**
    * Abort all the current loads.
    */
   abortAllLoads() {
-    const ids = this.#loadController.getLoadingDataIds();
+    const ids = this.#loadController.getCurrentLoadIds();
     for (const id of ids) {
       this.abortLoad(id);
     }
   }
 
   /**
-   * Abort an individual data load.
+   * Abort an individual load: stops the load and removes the
+   * data it created.
    *
-   * @param {string} dataId The data to stop loading.
+   * @param {string} loadId The load to stop, as returned by
+   *   the load methods.
    */
-  abortLoad(dataId) {
+  abortLoad(loadId) {
     // abort load
-    this.#loadController.abort(dataId);
-    // remove data
-    this.#dataController.remove(dataId);
-    // clean up stage
-    this.#stageController.removeLayersByDataId(dataId);
+    this.#loadController.abort(loadId);
+    // remove data and clean up stage
+    for (const dataId of this.#dataController.getLoadDataIds(loadId)) {
+      this.#dataController.remove(dataId);
+      this.#stageController.removeLayersByDataId(dataId);
+      delete this.#infoDatas[dataId];
+    }
+    this.#dataController.endLoad(loadId);
   }
 
   // load API [end] ---------------------------------------------------------
@@ -1922,22 +1953,14 @@ export class App extends EventTarget {
    * @param {object} event The load start event.
    */
   #onloadstart = (event) => {
-    // create info data
-    if (typeof this.#options.overlayConfig !== 'undefined' &&
-      Object.keys(this.#infoDatas).length === 0
-    ) {
-      this.#infoDatas[event.detail.dataid] = new InfoData(
-        this, event.detail.dataid, this.#options.overlayConfig);
-    }
-
     // propagate
     this.#fireEvent(event);
   };
 
   /**
-   * Data load callback.
+   * Data load item callback.
    *
-   * @param {object} event The load event.
+   * @param {object} event The load item event.
    */
   #onloaditem = (event) => {
     // check event
@@ -1945,49 +1968,98 @@ export class App extends EventTarget {
       logger.error('Missing loaditem event data.');
     }
 
-    const isFirstLoadItem = event.detail.isfirstitem;
-
+    const loadId = event.detail.loadid;
+    let res;
     try {
-      if (isFirstLoadItem) {
-        this.#dataController.add(event.detail.dataid, event.detail.data);
-      } else {
-        this.#dataController.update(event.detail.dataid, event.detail.data);
-      }
+      // items that need their referenced data wait for the load end
+      res = this.#dataController.addLoadItem(loadId, event.detail.data);
     } catch (error) {
       this.dispatchEvent(new CustomEvent('error', {
         detail: {
-          dataid: event.detail.dataid,
+          loadid: loadId,
           source: event.detail.source,
           error
         }
       }));
       // stop the load: following items would fail the same way
       // (for example all frames of a multi-frame data)
-      this.abortLoad(event.detail.dataid);
+      this.abortLoad(loadId);
       this.dispatchEvent(new CustomEvent('loadend', {
         detail: {
-          dataid: event.detail.dataid,
+          loadid: loadId,
+          dataids: [],
           source: event.detail.source
         }
       }));
       return;
     }
 
+    if (typeof res !== 'undefined') {
+      this.#onDataItem(event.detail, res.dataId, res.isNew);
+    }
+  };
+
+  /**
+   * Handle a load item added to a data: fire the loaddata event for
+   * a new data, then the loaditem event, update the info data and
+   * render.
+   *
+   * @param {object} detail The load item event detail.
+   * @param {string} dataId The data id.
+   * @param {boolean} isNew True if the data was created for this item.
+   */
+  #onDataItem(detail, dataId, isNew) {
+    if (isNew) {
+      // create info data for the first data
+      if (typeof this.#options.overlayConfig !== 'undefined' &&
+        Object.keys(this.#infoDatas).length === 0
+      ) {
+        this.#infoDatas[dataId] = new InfoData(
+          this, dataId, this.#options.overlayConfig);
+      }
+      this.dispatchEvent(new CustomEvent('loaddata', {
+        detail: {
+          loadid: detail.loadid,
+          dataid: dataId,
+          source: detail.source
+        }
+      }));
+    }
+
     // propagate (before display)
-    this.#fireEvent(event);
+    this.#fireEvent(new CustomEvent('loaditem', {
+      detail: Object.assign({}, detail, {
+        dataid: dataId,
+        isfirstitem: isNew
+      })
+    }));
 
     // update info data if present
-    if (typeof this.#infoDatas !== 'undefined' &&
-      typeof this.#infoDatas[event.detail.dataid] !== 'undefined') {
-      this.#infoDatas[event.detail.dataid].addItemMeta(event.detail.data.meta);
+    if (typeof this.#infoDatas[dataId] !== 'undefined') {
+      this.#infoDatas[dataId].addItemMeta(detail.data.meta);
     }
 
     // render if first and flag allows
-    if (isFirstLoadItem && this.#options.viewOnFirstLoadItem &&
-      this.#stageController.getViewConfigs(event.detail.dataid).length !== 0) {
-      this.#stageController.render(event.detail.dataid);
+    if (isNew && this.#options.viewOnFirstLoadItem &&
+      this.#stageController.getViewConfigs(dataId).length !== 0) {
+      this.#stageController.render(dataId);
     }
-  };
+  }
+
+  /**
+   * Mark a data as complete and render it if its image has changed.
+   *
+   * @param {string} dataId The data id.
+   */
+  #completeData(dataId) {
+    const res = this.#dataController.markDataAsComplete(dataId);
+    // render if image has changed
+    if (this.#options.viewOnFirstLoadItem &&
+      typeof res.imageHasChanged !== 'undefined' &&
+      res.imageHasChanged) {
+      this.#stageController.render(dataId);
+    }
+  }
 
   /**
    * Data load callback.
@@ -1995,18 +2067,67 @@ export class App extends EventTarget {
    * @param {object} event The load event.
    */
   #onload = (event) => {
-    // mark data as complete
-    const res = this.#dataController.markDataAsComplete(event.detail.dataid);
+    const loadId = event.detail.loadid;
+    for (const dataId of this.#dataController.getLoadDataIds(loadId)) {
+      this.#completeData(dataId);
+    }
 
-    // render if image has changed
-    if (this.#options.viewOnFirstLoadItem &&
-      typeof res.imageHasChanged !== 'undefined' &&
-      res.imageHasChanged) {
-      this.#stageController.render(event.detail.dataid);
+    // add the items that need their referenced data (SEG, RTSTRUCT)
+    // now that the other data of the load are complete
+    const pendingDataIds = [];
+    for (const data of this.#dataController.getPendingLoadItems(loadId)) {
+      try {
+        const res = this.#dataController.addLoadItem(loadId, data, false);
+        if (res.isNew) {
+          pendingDataIds.push(res.dataId);
+        }
+        this.#onDataItem({loadid: loadId, data}, res.dataId, res.isNew);
+      } catch (error) {
+        // only this item is lost: the other data are kept
+        this.dispatchEvent(new CustomEvent('error', {
+          detail: {loadid: loadId, error}
+        }));
+      }
+    }
+    for (const dataId of pendingDataIds) {
+      // the data can have been removed after an error
+      if (typeof this.#dataController.get(dataId) !== 'undefined') {
+        this.#completeData(dataId);
+      }
     }
 
     // propagate
-    this.#fireEvent(event);
+    this.#fireEvent(new CustomEvent('load', {
+      detail: Object.assign({}, event.detail, {
+        dataids: this.#getLoadedDataIds(loadId)
+      })
+    }));
   };
+
+  /**
+   * Data load end callback.
+   *
+   * @param {object} event The load end event.
+   */
+  #onloadend = (event) => {
+    const loadId = event.detail.loadid;
+    const dataIds = this.#getLoadedDataIds(loadId);
+    this.#dataController.endLoad(loadId);
+    // propagate
+    this.#fireEvent(new CustomEvent('loadend', {
+      detail: Object.assign({}, event.detail, {dataids: dataIds})
+    }));
+  };
+
+  /**
+   * Get the ids of the data of a load that are still stored.
+   *
+   * @param {string} loadId The load id.
+   * @returns {string[]} The data ids.
+   */
+  #getLoadedDataIds(loadId) {
+    return this.#dataController.getLoadDataIds(loadId).filter(
+      (dataId) => typeof this.#dataController.get(dataId) !== 'undefined');
+  }
 
 } // class App

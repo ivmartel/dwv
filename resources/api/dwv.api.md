@@ -74,7 +74,7 @@ export class AnnotationGroupFactory {
 // @public
 export class App extends EventTarget {
     abortAllLoads(): void;
-    abortLoad(dataId: string): void;
+    abortLoad(loadId: string): void;
     addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
     // @deprecated
     addData(dataId: string, data: DicomData): boolean;
@@ -302,11 +302,18 @@ export namespace custom {
 // @public
 export class DataController extends EventTarget {
     add(dataId: string, data: DicomData): boolean;
+    addLoadItem(loadId: string, data: DicomData, canWait?: boolean): {
+        dataId: string;
+        isNew: boolean;
+    } | undefined;
+    endLoad(loadId: string): void;
     get(dataId: string): DicomData | undefined;
     getDataIdFromSeriesUid(uid: string): string;
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
+    getLoadDataIds(loadId: string): string[];
     getNextDataId(): string;
+    getPendingLoadItems(loadId: string): DicomData[];
     getStashed(dataId: string): DicomData | undefined;
     getStashedDataIds(): string[];
     markDataAsComplete(dataId: string): {

@@ -213,7 +213,8 @@ describe('app', () => {
         'loadend'
       ]);
       for (const event of events) {
-        assert.equal(event.detail.dataid, 'id0', `${event.type} dataid`);
+        assert.equal(event.detail.loadid, 'id0', `${event.type} loadid`);
+        assert.isUndefined(event.detail.dataid, `${event.type} dataid`);
         assert.isUndefined(event.detail.loadtype, `${event.type} loadtype`);
       }
       // original event content is kept
@@ -228,8 +229,8 @@ describe('app', () => {
       const controller = new LoadController();
       const events = recordEvents(controller);
       controller.loadFiles([], 'id0');
-      lastLoader().onload({dataid: 'other'});
-      assert.equal(events[0].detail.dataid, 'id0');
+      lastLoader().onload({loadid: 'other'});
+      assert.equal(events[0].detail.loadid, 'id0');
     });
 
     test('no timeout callback if loader does not support it', () => {
@@ -239,29 +240,15 @@ describe('app', () => {
       assert.isUndefined(lastLoader().ontimeout);
     });
 
-    test('loaditem isfirstitem flag', () => {
+    test('getNextLoadId', () => {
       const controller = new LoadController();
-      const events = recordEvents(controller);
-      controller.loadFiles([], 'id0');
-      const loader = lastLoader();
-
-      loader.onloadstart({});
-      loader.onloaditem({});
-      loader.onloaditem({});
-      loader.onloaditem({});
-      loader.onloadend({});
-      // item after end: no current loader, no flag
-      loader.onloaditem({});
-
-      const items = events.filter((e) => e.type === 'loaditem');
-      assert.equal(items.length, 4);
-      assert.isTrue(items[0].detail.isfirstitem);
-      assert.isFalse(items[1].detail.isfirstitem);
-      assert.isFalse(items[2].detail.isfirstitem);
-      assert.isUndefined(items[3].detail.isfirstitem);
+      assert.equal(controller.getNextLoadId(), '0');
+      assert.equal(controller.getNextLoadId(), '1');
+      // ids are per controller
+      assert.equal(new LoadController().getNextLoadId(), '0');
     });
 
-    test('isfirstitem is per data id', () => {
+    test('loaditem events are tagged with their load id', () => {
       const controller = new LoadController();
       const events = recordEvents(controller);
       controller.loadFiles([], 'id0');
@@ -276,12 +263,13 @@ describe('app', () => {
       loader0.onloaditem({});
 
       const items = events.filter((e) => e.type === 'loaditem');
-      assert.equal(items[0].detail.dataid, 'id0');
-      assert.isTrue(items[0].detail.isfirstitem);
-      assert.equal(items[1].detail.dataid, 'id1');
-      assert.isTrue(items[1].detail.isfirstitem);
-      assert.equal(items[2].detail.dataid, 'id0');
-      assert.isFalse(items[2].detail.isfirstitem);
+      assert.deepEqual(
+        items.map((e) => e.detail.loadid), ['id0', 'id1', 'id0']);
+      // the data id and first item flag are set by the app
+      for (const item of items) {
+        assert.isUndefined(item.detail.dataid);
+        assert.isUndefined(item.detail.isfirstitem);
+      }
     });
 
     test('load throw sends error and loadend', () => {
@@ -293,11 +281,11 @@ describe('app', () => {
       });
 
       assert.deepEqual(events.map((e) => e.type), ['error', 'loadend']);
-      assert.equal(events[0].detail.dataid, 'id0');
+      assert.equal(events[0].detail.loadid, 'id0');
       assert.instanceOf(events[0].detail.error, Error);
       assert.equal(events[0].detail.error.message, 'load failed');
-      assert.equal(events[1].detail.dataid, 'id0');
-      assert.deepEqual(controller.getLoadingDataIds(), []);
+      assert.equal(events[1].detail.loadid, 'id0');
+      assert.deepEqual(controller.getCurrentLoadIds(), []);
     });
 
   });
@@ -307,26 +295,26 @@ describe('app', () => {
    */
   describe('LoadController loading state', () => {
 
-    test('getLoadingDataIds', () => {
+    test('getCurrentLoadIds', () => {
       const controller = new LoadController();
-      assert.deepEqual(controller.getLoadingDataIds(), []);
+      assert.deepEqual(controller.getCurrentLoadIds(), []);
 
       controller.loadFiles([], 'id0');
       const loader0 = lastLoader();
       // not stored before loadstart
-      assert.deepEqual(controller.getLoadingDataIds(), []);
+      assert.deepEqual(controller.getCurrentLoadIds(), []);
       loader0.onloadstart({});
-      assert.deepEqual(controller.getLoadingDataIds(), ['id0']);
+      assert.deepEqual(controller.getCurrentLoadIds(), ['id0']);
 
       controller.loadURLs([], 'id1');
       const loader1 = lastLoader();
       loader1.onloadstart({});
-      assert.deepEqual(controller.getLoadingDataIds(), ['id0', 'id1']);
+      assert.deepEqual(controller.getCurrentLoadIds(), ['id0', 'id1']);
 
       loader0.onloadend({});
-      assert.deepEqual(controller.getLoadingDataIds(), ['id1']);
+      assert.deepEqual(controller.getCurrentLoadIds(), ['id1']);
       loader1.onloadend({});
-      assert.deepEqual(controller.getLoadingDataIds(), []);
+      assert.deepEqual(controller.getCurrentLoadIds(), []);
     });
 
     test('abort', () => {
@@ -341,7 +329,7 @@ describe('app', () => {
       controller.abort('id0');
       assert.isTrue(loader0.abortCalled);
       assert.isFalse(loader1.abortCalled);
-      assert.deepEqual(controller.getLoadingDataIds(), ['id1']);
+      assert.deepEqual(controller.getCurrentLoadIds(), ['id1']);
 
       // second abort is a no-op
       loader0.abortCalled = false;
@@ -349,7 +337,7 @@ describe('app', () => {
       assert.isFalse(loader0.abortCalled);
     });
 
-    test('abort unknown or finished data id', () => {
+    test('abort unknown or finished load id', () => {
       const controller = new LoadController();
       assert.doesNotThrow(() => {
         controller.abort('unknown');
