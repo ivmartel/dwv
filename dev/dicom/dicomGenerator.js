@@ -490,7 +490,9 @@ function generateSingleFileDataElements(tags0, genOptions) {
     };
 
   } else {
-    tags.ImagePositionPatient = getIpp(genOptions.sliceNumber);
+    if (isImageModality(tags.Modality)) {
+      tags.ImagePositionPatient = getIpp(genOptions.sliceNumber);
+    }
     if (typeof genOptions.frameNumber !== 'undefined' &&
       typeof genOptions.numberOfFrames !== 'undefined' &&
       genOptions.numberOfFrames > 1
