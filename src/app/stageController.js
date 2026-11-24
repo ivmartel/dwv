@@ -784,10 +784,12 @@ export class StageController extends EventTarget {
       if (typeof baseImage !== 'undefined' &&
         typeof newImage !== 'undefined'
       ) {
-        const baseOrientation = baseImage.getGeometry().getOrientation();
-        const newOrientation = newImage.getGeometry().getOrientation();
-        res = newOrientation.isSimilar(
-          baseOrientation, DIRECTION_EPSILON);
+        const baseGeometry = baseImage.getGeometry();
+        const newGeometry = newImage.getGeometry();
+        // same orientation and common points
+        res = newGeometry.getOrientation().isSimilar(
+          baseGeometry.getOrientation(), DIRECTION_EPSILON) &&
+          newGeometry.intersects(baseGeometry);
       }
     } else {
       res = true;
