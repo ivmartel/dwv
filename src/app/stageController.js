@@ -900,16 +900,23 @@ export class StageController extends EventTarget {
       layerGroup.bindInfoData(dataId);
     }
 
-    // sync layers position
+    // sync layers position: the base layer defines the position
+    // of the group, a new layer is set at that position
+    // (instead of moving the group to the centre of the new layer)
+    let srcLayer = viewLayer;
+    if (!isBaseLayer) {
+      srcLayer = layerGroup.getBaseViewLayer();
+    }
+    const srcViewController = srcLayer.getViewController();
     const value = [
-      viewController.getCurrentIndex().getValues(),
-      viewController.getCurrentPosition().getValues()
+      srcViewController.getCurrentIndex().getValues(),
+      srcViewController.getCurrentPosition().getValues()
     ];
     layerGroup.updateLayersToPositionChange(
       new CustomEvent('positionchange', {
         detail: {
           value,
-          srclayerid: viewLayer.getId()
+          srclayerid: srcLayer.getId()
         }
       })
     );
