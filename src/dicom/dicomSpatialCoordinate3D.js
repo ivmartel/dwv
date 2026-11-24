@@ -32,7 +32,7 @@ export const GraphicTypes3D = {
 const TagKeys = {
   GraphicData: '00700022',
   GraphicType: '00700023',
-  ReferencedFrameofReferenceUID: '30060024',
+  ReferencedFrameOfReferenceUID: '30060024',
   FiducialUID: '0070031A'
 };
 
@@ -55,7 +55,7 @@ export class SpatialCoordinate3D {
   /**
    * @type {string}
    */
-  referencedFrameofReferenceUID;
+  referencedFrameOfReferenceUID;
 
   /**
    * @type {string}
@@ -87,10 +87,10 @@ export function getSpatialCoordinate3D(dataElements) {
   if (typeof dataElements[TagKeys.GraphicType] !== 'undefined') {
     scoord.graphicType = dataElements[TagKeys.GraphicType].value[0];
   }
-  if (typeof dataElements[TagKeys.ReferencedFrameofReferenceUID] !==
+  if (typeof dataElements[TagKeys.ReferencedFrameOfReferenceUID] !==
     'undefined') {
-    scoord.referencedFrameofReferenceUID =
-      dataElements[TagKeys.ReferencedFrameofReferenceUID].value[0];
+    scoord.referencedFrameOfReferenceUID =
+      dataElements[TagKeys.ReferencedFrameOfReferenceUID].value[0];
   }
   if (typeof dataElements[TagKeys.FiducialUID] !== 'undefined') {
     scoord.fiducialUID = dataElements[TagKeys.FiducialUID].value[0];
@@ -115,9 +115,9 @@ export function getDicomSpatialCoordinate3DItem(scoord) {
   if (typeof scoord.graphicType !== 'undefined') {
     item.GraphicType = scoord.graphicType;
   }
-  if (typeof scoord.referencedFrameofReferenceUID !== 'undefined') {
+  if (typeof scoord.referencedFrameOfReferenceUID !== 'undefined') {
     item.ReferencedFrameOfReferenceUID =
-      scoord.referencedFrameofReferenceUID;
+      scoord.referencedFrameOfReferenceUID;
   }
   if (typeof scoord.fiducialUID !== 'undefined') {
     item.FiducialUID = scoord.fiducialUID;
@@ -217,6 +217,6 @@ export function getScoord3DFromShape(shape, toPatient, frameOfReferenceUID) {
       point.getZ().toString()
     );
   }
-  scoord3d.referencedFrameofReferenceUID = frameOfReferenceUID;
+  scoord3d.referencedFrameOfReferenceUID = frameOfReferenceUID;
   return scoord3d;
 }

@@ -131,7 +131,7 @@ function checkConstraints(content, is3D, path) {
     assert.ok(is3D, `${path}: SCOORD3D only in Comprehensive 3D SR`);
     assert.equal(content.contentSequence.length, 0,
       `${path}: SCOORD3D has no children`);
-    assert.ok(typeof content.value.referencedFrameofReferenceUID !==
+    assert.ok(typeof content.value.referencedFrameOfReferenceUID !==
       'undefined', `${path}: SCOORD3D frame of reference`);
   }
   if (content.valueType === ValueTypes.scoord) {
@@ -549,7 +549,7 @@ describe('annotation', () => {
     assert.deepEqual(circleRegion.value.graphicData, [
       5, -10, 16, 5, -10, 24, 4, -10, 20, 6, -10, 20
     ], 'circle points');
-    assert.equal(circleRegion.value.referencedFrameofReferenceUID,
+    assert.equal(circleRegion.value.referencedFrameOfReferenceUID,
       '1.2.3.4.200', 'frame of reference');
     // label position as SCOORD3D
     const labelPosition = findByConcept(groups[0], '125309')[0]

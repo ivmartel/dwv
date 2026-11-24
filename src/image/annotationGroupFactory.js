@@ -926,7 +926,7 @@ export class AnnotationGroupFactory {
     return {
       graphicType: content.value.graphicType,
       points,
-      frameOfReferenceUID: content.value.referencedFrameofReferenceUID
+      frameOfReferenceUID: content.value.referencedFrameOfReferenceUID
     };
   }
 
@@ -1550,7 +1550,7 @@ export class AnnotationGroupFactory {
           point.getZ().toString()
         );
       }
-      scoord3d.referencedFrameofReferenceUID = shape.frameOfReferenceUID;
+      scoord3d.referencedFrameOfReferenceUID = shape.frameOfReferenceUID;
       content.value = scoord3d;
     } else if (typeof annotation.planePoints !== 'undefined') {
       content = new DicomSRContent(ValueTypes.scoord3d);
@@ -1569,7 +1569,7 @@ export class AnnotationGroupFactory {
             point.getZ().toString()
           );
         }
-        scoord3d.referencedFrameofReferenceUID = frameOfReferenceUID;
+        scoord3d.referencedFrameOfReferenceUID = frameOfReferenceUID;
         content.value = scoord3d;
       } else {
         content.value =

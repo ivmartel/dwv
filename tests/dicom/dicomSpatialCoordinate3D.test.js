@@ -12,7 +12,7 @@ import {DataElement} from '../../src/dicom/dataElement.js';
 const TagKeys = {
   GraphicData: '00700022',
   GraphicType: '00700023',
-  ReferencedFrameofReferenceUID: '30060024',
+  ReferencedFrameOfReferenceUID: '30060024',
   FiducialUID: '0070031A'
 };
 
@@ -33,7 +33,7 @@ describe('dicom', () => {
       const coord = new SpatialCoordinate3D();
       assert.isUndefined(coord.graphicData);
       assert.isUndefined(coord.graphicType);
-      assert.isUndefined(coord.referencedFrameofReferenceUID);
+      assert.isUndefined(coord.referencedFrameOfReferenceUID);
       assert.isUndefined(coord.fiducialUID);
     });
 
@@ -101,7 +101,7 @@ describe('dicom', () => {
         const dataElements = {
           [TagKeys.GraphicData]: deGraphicData,
           [TagKeys.GraphicType]: deGraphicType,
-          [TagKeys.ReferencedFrameofReferenceUID]: deFrameUID,
+          [TagKeys.ReferencedFrameOfReferenceUID]: deFrameUID,
           [TagKeys.FiducialUID]: deFiducialUID
         };
 
@@ -117,7 +117,7 @@ describe('dicom', () => {
           coord2.graphicType = item.GraphicType;
         }
         if (typeof item.ReferencedFrameOfReferenceUID !== 'undefined') {
-          coord2.referencedFrameofReferenceUID =
+          coord2.referencedFrameOfReferenceUID =
             item.ReferencedFrameOfReferenceUID;
         }
         if (typeof item.FiducialUID !== 'undefined') {
@@ -127,8 +127,8 @@ describe('dicom', () => {
         // verify round-trip
         assert.deepEqual(coord1.graphicData, coord2.graphicData);
         assert.equal(coord1.graphicType, coord2.graphicType);
-        assert.equal(coord1.referencedFrameofReferenceUID,
-          coord2.referencedFrameofReferenceUID);
+        assert.equal(coord1.referencedFrameOfReferenceUID,
+          coord2.referencedFrameOfReferenceUID);
         assert.equal(coord1.fiducialUID, coord2.fiducialUID);
       }
     );
@@ -157,7 +157,7 @@ describe('dicom', () => {
       const dataElements = {
         [TagKeys.GraphicData]: deGraphicData,
         [TagKeys.GraphicType]: deGraphicType,
-        [TagKeys.ReferencedFrameofReferenceUID]: deFrameUID,
+        [TagKeys.ReferencedFrameOfReferenceUID]: deFrameUID,
         [TagKeys.FiducialUID]: deFiducialUID
       };
 
@@ -165,7 +165,7 @@ describe('dicom', () => {
 
       assert.deepEqual(result.graphicData, ['1.0', '2.0', '3.0']);
       assert.equal(result.graphicType, 'POINT');
-      assert.equal(result.referencedFrameofReferenceUID, '1.2.3.4.5');
+      assert.equal(result.referencedFrameOfReferenceUID, '1.2.3.4.5');
       assert.equal(result.fiducialUID, '1.2.3.4.6');
     });
 
@@ -190,7 +190,7 @@ describe('dicom', () => {
 
       assert.deepEqual(result.graphicData, ['1.0', '2.0', '3.0']);
       assert.equal(result.graphicType, 'POLYLINE');
-      assert.isUndefined(result.referencedFrameofReferenceUID);
+      assert.isUndefined(result.referencedFrameOfReferenceUID);
       assert.isUndefined(result.fiducialUID);
     });
 
@@ -231,14 +231,14 @@ describe('dicom', () => {
       deFrameUID.value = ['1.2.3.4.5'];
 
       const dataElements = {
-        [TagKeys.ReferencedFrameofReferenceUID]: deFrameUID
+        [TagKeys.ReferencedFrameOfReferenceUID]: deFrameUID
       };
 
       const result = getSpatialCoordinate3D(dataElements);
 
       assert.isUndefined(result.graphicData);
       assert.isUndefined(result.graphicType);
-      assert.equal(result.referencedFrameofReferenceUID, '1.2.3.4.5');
+      assert.equal(result.referencedFrameOfReferenceUID, '1.2.3.4.5');
       assert.isUndefined(result.fiducialUID);
     });
 
@@ -259,7 +259,7 @@ describe('dicom', () => {
 
       assert.isUndefined(result.graphicData);
       assert.isUndefined(result.graphicType);
-      assert.isUndefined(result.referencedFrameofReferenceUID);
+      assert.isUndefined(result.referencedFrameOfReferenceUID);
       assert.equal(result.fiducialUID, '1.2.3.4.6');
     });
 
@@ -273,7 +273,7 @@ describe('dicom', () => {
 
       assert.isUndefined(result.graphicData);
       assert.isUndefined(result.graphicType);
-      assert.isUndefined(result.referencedFrameofReferenceUID);
+      assert.isUndefined(result.referencedFrameOfReferenceUID);
       assert.isUndefined(result.fiducialUID);
     });
 
@@ -308,7 +308,7 @@ describe('dicom', () => {
       const coord = new SpatialCoordinate3D();
       coord.graphicData = ['1.0', '2.0', '3.0'];
       coord.graphicType = 'POINT';
-      coord.referencedFrameofReferenceUID = '1.2.3.4.5';
+      coord.referencedFrameOfReferenceUID = '1.2.3.4.5';
       coord.fiducialUID = '1.2.3.4.6';
 
       const item = getDicomSpatialCoordinate3DItem(coord);
