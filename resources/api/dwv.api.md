@@ -586,6 +586,7 @@ export class Geometry {
     hasSlicesAtTime(time: number): boolean;
     includesOrigin(point3D: Point3D, tol?: number): boolean;
     indexToWorld(index: Index): Point;
+    intersects(rhs: Geometry, tol?: number): boolean;
     isInBounds(point: Point): boolean;
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
     isSimilar(rhs: Geometry, tol?: number): boolean;
