@@ -146,6 +146,17 @@ No significant change in the current edition (2025c).
 
 ---
 
+## Checking files written by dwv
+
+When validating DICOM files dwv wrote (for ex with `dciodvfy`), ignore an
+`ImplementationVersionName (0002,0013)` value longer than its VR (SH, 16
+characters) when it comes from a beta version (`DWV_<version>-beta.<n>`, from
+`getImplementationVersionName` in `src/dicom/dicomParser.js`): a beta should
+not be used to write official DICOM files. Only report it if a release
+version (`DWV_<version>`) would exceed 16 characters.
+
+---
+
 ## Important Notes
 
 - Only two editions are ever used: `/2024a/` (the answer) and `/current/` (the comparison). `/current/` always resolves to the latest edition; get its name from the landing page above.
