@@ -8,7 +8,11 @@ import {
 } from './annotationGroupFactory.js';
 import {Image} from './image.js';
 import {MaskImage} from './maskImage.js';
-import {demoCreateImage} from './imageFactory.js';
+import {
+  ImageFactory,
+  demoCreateImage,
+  eraseRegions
+} from './imageFactory.js';
 import {ImageContour} from './imageContour.js';
 import {
   View,
@@ -60,6 +64,7 @@ export {
   Diameters,
   Geometry,
   Image,
+  ImageFactory,
   ImageHistogram,
   MaskImage,
   ImageContour,
@@ -83,6 +88,7 @@ export {
   demoCreateMaskImage,
   demoCreateView,
   equalWl,
+  eraseRegions,
   getDefaultDicomSegJson,
   getDefaultDicomRTStructJson,
   mergeMaskImages,

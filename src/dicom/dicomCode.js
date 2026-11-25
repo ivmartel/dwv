@@ -208,6 +208,9 @@ export const DcmCodes = {
   Segmentation: {
     value: '113076', meaning: 'Segmentation'
   },
+  CleanPixelDataOption: {
+    value: '113101', meaning: 'Clean Pixel Data Option'
+  },
   Path: {
     value: '121055', meaning: 'Path'
   },

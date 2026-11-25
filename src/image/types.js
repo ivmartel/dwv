@@ -46,5 +46,17 @@
  * @property {SourcedNumberValue} [value] The associated value.
  */
 
+/**
+ * Rectangular region of an image slice, in pixel indices: the
+ * columns from `x` to `x + width - 1` and the rows from `y` to
+ * `y + height - 1`, the top left pixel being at (0, 0).
+ *
+ * @typedef {object} PixelRegion
+ * @property {number} x The index of the first column.
+ * @property {number} y The index of the first row.
+ * @property {number} width The number of columns.
+ * @property {number} height The number of rows.
+ */
+
 // ESM module marker
 export {};
