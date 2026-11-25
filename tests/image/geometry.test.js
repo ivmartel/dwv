@@ -163,6 +163,63 @@ describe('image', () => {
   });
 
   /**
+   * Tests for {@link Geometry#intersects}.
+   *
+   * @function module:tests/image~geometryIntersects
+   */
+  test('Geometry intersects', () => {
+    const spacing = new Spacing([1, 1, 1]);
+    const getOrigins = (z0, nSlices) => {
+      const origins = [];
+      for (let k = 0; k < nSlices; ++k) {
+        origins.push(new Point3D(0, 0, z0 + k));
+      }
+      return origins;
+    };
+    // base: 4x4x10, slices at z 0 to 9
+    const base = new Geometry(
+      getOrigins(0, 10), new Size([4, 4, 10]), spacing);
+
+    // itself
+    assert.ok(base.intersects(base), 'intersects itself');
+    // sub volume
+    const sub = new Geometry(
+      getOrigins(3, 2), new Size([4, 4, 2]), spacing);
+    assert.ok(base.intersects(sub), 'intersects sub volume');
+    assert.ok(sub.intersects(base), 'sub volume intersects');
+    // single slice inside
+    const single = new Geometry(
+      getOrigins(5, 1), new Size([4, 4, 1]), spacing);
+    assert.ok(base.intersects(single), 'intersects single slice');
+    // partial overlap along the slice axis
+    const partial = new Geometry(
+      getOrigins(8, 5), new Size([4, 4, 5]), spacing);
+    assert.ok(base.intersects(partial), 'intersects partial overlap');
+
+    // after the last slice: only touches
+    const after = new Geometry(
+      getOrigins(10, 5), new Size([4, 4, 5]), spacing);
+    assert.notOk(base.intersects(after), 'touching slices');
+    assert.notOk(after.intersects(base), 'touching slices (inverse)');
+    // far along the slice axis
+    const far = new Geometry(
+      getOrigins(50, 5), new Size([4, 4, 5]), spacing);
+    assert.notOk(base.intersects(far), 'far slices');
+    // same slice but shifted in plane
+    const shifted = new Geometry(
+      [new Point3D(10, 0, 0)], new Size([4, 4, 1]), spacing);
+    assert.notOk(base.intersects(shifted), 'in plane shift');
+
+    // other orientation, crossing the base
+    const crossing = new Geometry(
+      [new Point3D(1, 0, 0)],
+      new Size([4, 10, 1]),
+      spacing,
+      new Matrix33([0, 0, 1, 1, 0, 0, 0, 1, 0]));
+    assert.ok(base.intersects(crossing), 'crossing orientation');
+  });
+
+  /**
    * Test that {@link Geometry#worldToIndex} resolves the correct
    * slice for an irregularly spaced grid, instead of naively
    * extrapolating from origin #0 with a single rounded spacing value

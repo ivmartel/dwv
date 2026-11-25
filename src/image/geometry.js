@@ -875,6 +875,83 @@ export class Geometry {
   }
 
   /**
+   * Check if this geometry and the input one have common points,
+   *   ie if the volumes covered by their voxels overlap.
+   * The test is done on the bounds of both geometries expressed in
+   *   the frame of this geometry orientation: it is exact when both
+   *   orientations are similar, and an approximation otherwise.
+   * Geometries that only touch (ie overlap by less than the tolerance)
+   *   are not considered as intersecting.
+   *
+   * @param {Geometry} rhs The geometry to check.
+   * @param {number} [tol] Optional overlap tolerance (in mm),
+   *   defaults to REAL_WORLD_EPSILON.
+   * @returns {boolean} True if both geometries intersect.
+   */
+  intersects(rhs, tol) {
+    if (typeof tol === 'undefined') {
+      tol = REAL_WORLD_EPSILON;
+    }
+    const orientation = this.getOrientation();
+    const bounds = this.#getBounds(orientation);
+    const rhsBounds = rhs.#getBounds(orientation);
+    for (let i = 0; i < SPATIAL_DIMS; ++i) {
+      if (Math.min(bounds.max[i], rhsBounds.max[i]) -
+        Math.max(bounds.min[i], rhsBounds.min[i]) <= tol) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Get the bounds of the volume covered by the voxels of this
+   *   geometry (voxel corners, not centres), expressed in the frame
+   *   of the input orientation.
+   *
+   * @param {Matrix33} orientation The orientation of the frame.
+   * @returns {{min: number[], max: number[]}} The minimum and maximum
+   *   values along each axis of the frame.
+   */
+  #getBounds(orientation) {
+    const invOrientation = orientation.getInverse();
+    const ownOrientation = this.getOrientation();
+    const size = this.getSize();
+    const spacing = this.getSpacing();
+    // offsets from a slice origin to the corners of the slice
+    const offsets = [];
+    for (const i of [-0.5, size.get(0) - 0.5]) {
+      for (const j of [-0.5, size.get(1) - 0.5]) {
+        for (const k of [-0.5, 0.5]) {
+          offsets.push(ownOrientation.multiplyPoint3D(new Point3D(
+            i * spacing.get(0),
+            j * spacing.get(1),
+            k * spacing.get(2)
+          )));
+        }
+      }
+    }
+    // use all origins: slices are not necessarily regularly spaced
+    const min = new Array(SPATIAL_DIMS).fill(Infinity);
+    const max = new Array(SPATIAL_DIMS).fill(-Infinity);
+    for (const origin of this.getOrigins()) {
+      for (const offset of offsets) {
+        const corner = invOrientation.multiplyPoint3D(new Point3D(
+          origin.getX() + offset.getX(),
+          origin.getY() + offset.getY(),
+          origin.getZ() + offset.getZ()
+        ));
+        const values = [corner.getX(), corner.getY(), corner.getZ()];
+        for (let d = 0; d < SPATIAL_DIMS; ++d) {
+          min[d] = Math.min(min[d], values[d]);
+          max[d] = Math.max(max[d], values[d]);
+        }
+      }
+    }
+    return {min, max};
+  }
+
+  /**
    * Check that a point is within bounds.
    *
    * @param {Point} point The point to check.
