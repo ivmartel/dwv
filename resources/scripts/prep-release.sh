@@ -7,8 +7,9 @@ set -e
 # print usage information
 usage() {
   echo ""
-  echo "Usage: $0 -r releaseVersion"
-  echo -e "  -r The release version, format 'm.n.p'"
+  echo "Usage: $0 [-r releaseVersion]"
+  echo -e "  -r The release version, format 'm.n.p' (optional, defaults"
+  echo -e "     to the develop package.json version without its beta part)"
   echo -e "  -s The step at which to start (optional, [1,5])"
   echo -e "Example:"
   echo -e "> prep-release -r 0.28.0"
@@ -45,12 +46,8 @@ do
 done
 
 # check option content
-if [ -z "$releaseVersion" ]
-then
-   error "Empty release version";
-   usage
-fi
-if [[ ! "$releaseVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+if [ -n "$releaseVersion" ] &&
+  [[ ! "$releaseVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 then
    error "Bad release version format: '$releaseVersion'";
    usage
@@ -61,10 +58,23 @@ then
    usage
 fi
 
-info "Preparing release for '$releaseVersion'..."
-
 # run from the root of the repository
 cd "$(git rev-parse --show-toplevel)"
+
+# start from an up to date develop
+if [ $step -eq 1 ]
+then
+  git checkout develop
+  git pull
+fi
+
+# default version from package.json
+if [ -z "$releaseVersion" ]
+then
+  releaseVersion=$(node resources/scripts/update-version.js release --dry-run)
+fi
+
+info "Preparing release for '$releaseVersion'..."
 
 # branch name
 releaseBranch="v${releaseVersion}"
@@ -74,8 +84,6 @@ if [ $step -eq 1 ]
 then
   info "(1/5) create release branch"
 
-  git checkout develop
-  git pull
   git checkout -b $releaseBranch
 
   ((step++))
@@ -86,19 +94,7 @@ if [ $step -eq 2 ]
 then
   info "(2/5) update version number in files"
 
-  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+\","
-  b0="  \"version\": \"${releaseVersion}\","
-  sed -i -r "s/${a0}/${b0}/g" package.json
-  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+';"
-  b1="  return '${releaseVersion}';"
-  sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
-  # check the replacements happened
-  if ! grep -qF "\"version\": \"${releaseVersion}\"," package.json ||
-    ! grep -qF "return '${releaseVersion}';" src/dicom/dicomParser.js
-  then
-    error "Version number not updated, expected a beta or rc version"
-    exit 1
-  fi
+  node resources/scripts/update-version.js $releaseVersion
 
   ((step++))
 fi

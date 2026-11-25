@@ -7,8 +7,10 @@ set -e
 # print usage information
 usage() {
   echo ""
-  echo "Usage: $0 -b betaVersion"
-  echo -e "  -b The beta version, format 'm.n.p-beta.b'"
+  echo "Usage: $0 [-b betaVersion]"
+  echo -e "  -b The beta version, format 'm.n.p-beta.b' (optional,"
+  echo -e "     defaults to the package.json version with an incremented"
+  echo -e "     beta number, or to it as is when starting after step 1)"
   echo -e "  -s The step at which to start (optional, [1,4])"
   echo -e "Example:"
   echo -e "> create-beta -b 0.28.0-beta.2"
@@ -44,15 +46,19 @@ do
    esac
 done
 
-# check option content
-if [ -z "$betaVersion" ]
-then
-   error "Empty beta version";
-   usage
-fi
-
 # run from the root of the repository
 cd "$(git rev-parse --show-toplevel)"
+
+# default version from package.json
+if [ -z "$betaVersion" ]
+then
+  if [ $step -eq 1 ]
+  then
+    betaVersion=$(node resources/scripts/update-version.js pre --dry-run)
+  else
+    betaVersion=$(node resources/scripts/update-version.js current --dry-run)
+  fi
+fi
 
 info "Creating beta release for '$betaVersion'..."
 
@@ -61,12 +67,7 @@ if [ $step -eq 1 ]
 then
   info "(1/4) update version number in files"
 
-  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+\","
-  b0="  \"version\": \"${betaVersion}\","
-  sed -i -r "s/${a0}/${b0}/g" package.json
-  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+';"
-  b1="  return '${betaVersion}';"
-  sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
+  node resources/scripts/update-version.js $betaVersion
 
   ((step++))
 fi
