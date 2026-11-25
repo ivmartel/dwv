@@ -4,9 +4,10 @@ import {
 } from '../../src/dicom/simpleTagValues.js';
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
-import {safeGetAll} from '../../src/dicom/dataElement.js';
+import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {MaskFactory, mergeMaskImages} from '../../src/image/maskFactory.js';
+import {Image} from '../../src/image/image.js';
 import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {Geometry} from '../../src/image/geometry.js';
@@ -14,10 +15,6 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
-
-/**
- * @import {Image} from '../../src/image/image.js';
- */
 
 import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 
@@ -353,6 +350,124 @@ describe('MaskFactory', () => {
         );
       }
     });
+
+  test('toDicom: defaults to the image meta segments', () => {
+    const image = buildMaskImage('test-seg-00');
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, buildRefImage());
+    const outSegs = getSegmentsFromElements(outElements);
+    assert.deepEqual(
+      outSegs.map(seg => seg.number),
+      image.getMeta().custom.segments.map(seg => seg.number),
+      'output segments are the meta ones'
+    );
+  });
+
+  test('toDicom: throws without segments', () => {
+    const image = buildMaskImage('test-seg-00');
+    delete image.getMeta().custom.segments;
+    assert.throws(
+      () => new MaskFactory().toDicom(image, undefined, buildRefImage()),
+      'Cannot create DICOM SEG without segments'
+    );
+  });
+
+  test('toDicom: throws without source image', () => {
+    const image = buildMaskImage('test-seg-00');
+    assert.throws(
+      () => new MaskFactory().toDicom(image, undefined, undefined),
+      'Cannot create DICOM SEG without source image'
+    );
+  });
+
+  test('toDicom: does not modify the image meta', () => {
+    const image = buildMaskImage('test-seg-00');
+    const metaBefore = {...image.getMeta()};
+    new MaskFactory().toDicom(
+      image, undefined, buildRefImage(), {SOPInstanceUID: '1.2.3'});
+    const meta = image.getMeta();
+    assert.deepEqual(
+      Object.keys(meta), Object.keys(metaBefore), 'same meta keys');
+    for (const key of Object.keys(metaBefore)) {
+      assert.equal(meta[key], metaBefore[key], `same meta ${key}`);
+    }
+  });
+
+  test('toDicom: one position dimension index per position', () => {
+    // 3 slices, segment 1 on slices 0 and 2, segment 2 on slice 1
+    const geometry = new Geometry(
+      [
+        new Point3D(0, 0, 0),
+        new Point3D(0, 0, 1),
+        new Point3D(0, 0, 2)
+      ],
+      new Size([4, 4, 3]),
+      new Spacing([1, 1, 1])
+    );
+    const sliceSize = 16;
+    const buffer = new Uint8Array(sliceSize * 3);
+    buffer[0] = 1;
+    buffer[sliceSize + 1] = 2;
+    buffer[2 * sliceSize + 2] = 1;
+    const image = new MaskImage(geometry, buffer, ['0', '1', '2']);
+    image.setMeta({Modality: 'SEG'});
+    const segments = [
+      {number: 1, label: 's1', algorithmType: 'MANUAL'},
+      {number: 2, label: 's2', algorithmType: 'MANUAL'}
+    ];
+    // source image with the same geometry
+    const sourceUids = ['1.2.3.0', '1.2.3.1', '1.2.3.2'];
+    const sourceImage = new Image(
+      geometry, new Uint8Array(sliceSize * 3), sourceUids);
+    sourceImage.setMeta({
+      SOPClassUID: '1.2.840.10008.5.1.4.1.1.4',
+      SeriesInstanceUID: '1.2.3',
+      StudyInstanceUID: '1.2'
+    });
+    const outElements =
+      new MaskFactory().toDicom(image, segments, sourceImage);
+
+    const frames = safeGetAll(outElements, '52009230');
+    assert.equal(frames.length, 3, 'number of frames');
+    const zByIndex = new Map();
+    for (const frame of frames) {
+      const index = frame['00209111'].value[0]['00209157'].value[1];
+      const z = Number(frame['00209113'].value[0]['00200032'].value[2]);
+      // DerivationImageSequence > SourceImageSequence
+      const sourceUid = frame['00089124'].value[0]['00082112']
+        .value[0]['00081155'].value[0];
+      assert.equal(sourceUid, sourceUids[z], `source image for z ${z}`);
+      if (zByIndex.has(index)) {
+        assert.equal(z, zByIndex.get(index), `same z for index ${index}`);
+      } else {
+        zByIndex.set(index, z);
+      }
+    }
+    assert.equal(zByIndex.size, 3, 'one index per position');
+    assert.deepEqual(
+      Array.from(zByIndex.keys()).sort(), [1, 2, 3], 'indices from 1 to 3');
+  });
+
+  test('toDicom: slice thickness and lossy image compression', () => {
+    const factory = new MaskFactory();
+    const refImage = buildRefImage();
+    let outElements =
+      factory.toDicom(buildMaskImage('test-seg-00'), undefined, refImage);
+    const measures = safeGetAll(outElements, '52009229')[0]['00289110'];
+    assert.ok(
+      typeof measures.value[0]['00180050'] !== 'undefined',
+      'slice thickness is present'
+    );
+    assert.equal(
+      safeGet(outElements, '00282110'), '00', 'not lossy compressed');
+
+    // source image lossy compressed
+    refImage.getMeta().LossyImageCompression = '01';
+    outElements =
+      factory.toDicom(buildMaskImage('test-seg-00'), undefined, refImage);
+    assert.equal(
+      safeGet(outElements, '00282110'), '01', 'lossy from source');
+  });
 
 });
 

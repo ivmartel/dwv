@@ -464,9 +464,13 @@ export class MaskFactory {
   /**
    * Convert a mask image into a DICOM segmentation object.
    *
+   * The image meta is not modified.
+   *
    * @param {MaskImage} image The mask image.
-   * @param {MaskSegment[]} segments The mask segments.
-   * @param {Image} sourceImage The source image.
+   * @param {MaskSegment[]|undefined} segments The mask segments, defaults
+   *   to the image meta segments if undefined.
+   * @param {Image} sourceImage The source image, used for the references
+   *   to the segmented series and images.
    * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
@@ -476,12 +480,21 @@ export class MaskFactory {
     sourceImage,
     extraTags
   ) {
-    // original image tags
-    const tags = image.getMeta();
+    // the referenced series is needed to load the result
+    if (sourceImage === undefined) {
+      throw new Error('Cannot create DICOM SEG without source image');
+    }
+
+    // original image tags (shallow copy: only top level tags are set,
+    //   the image meta must not be modified)
+    const tags = {...image.getMeta()};
 
     // use image segments if not provided as input
     if (segments === undefined) {
-      segments = tags.segments;
+      segments = tags.custom?.segments;
+    }
+    if (segments === undefined) {
+      throw new Error('Cannot create DICOM SEG without segments');
     }
 
     const geometry = image.getGeometry();
@@ -496,8 +509,15 @@ export class MaskFactory {
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
 
     // keep source image StudyInstanceUID
-    if (sourceImage !== undefined) {
-      tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
+    tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
+
+    // segmentation is not lossy compression, but a segmentation
+    //   derived from lossy compressed images is marked as such
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.20.2.2.html
+    if (tags.LossyImageCompression !== '01') {
+      const isSourceLossy =
+        sourceImage.getMeta().LossyImageCompression === '01';
+      tags.LossyImageCompression = isSourceLossy ? '01' : '00';
     }
 
     // segments
@@ -517,7 +537,12 @@ export class MaskFactory {
             value: [getDicomPlaneOrientationItem(geometry.getOrientation())]
           },
           PixelMeasuresSequence: {
-            value: [getDicomMeasureItem(geometry.getSpacing())]
+            value: [{
+              ...getDicomMeasureItem(geometry.getSpacing()),
+              // required for SEG with a FrameOfReferenceUID
+              // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.16.2.html#sect_C.7.6.16.2.1
+              SliceThickness: geometry.getSpacing().get(2)
+            }]
           }
         }
       ]
@@ -527,6 +552,20 @@ export class MaskFactory {
     const roiBuffers = image.getSegmentCollection().getSegmentBuffers(segments);
 
     const funcGroups = [];
+
+    // position dimension index: the same position must have the same
+    //   index whatever the segment, so index the slices used by any
+    //   segment (in reverse slice order, as the frames)
+    const usedSlices = new Set();
+    for (const segment of segments) {
+      const segmentBuffers = roiBuffers[segment.number - 1];
+      if (segmentBuffers !== undefined) {
+        for (const key of Object.keys(segmentBuffers)) {
+          usedSlices.add(Number.parseInt(key, 10));
+        }
+      }
+    }
+    const positionSlices = Array.from(usedSlices).sort((a, b) => b - a);
 
     // flatten buffer array
     const finalBuffers = [];
@@ -547,37 +586,35 @@ export class MaskFactory {
         const posPat = image.getGeometry().getOrigins()[key1];
         const posPatArray = [posPat.getX(), posPat.getY(), posPat.getZ()];
         const funcGroup = new DicomFunctionalGroup(
-          [number40, keys1.length - k1],
+          [number40, positionSlices.indexOf(key1) + 1],
           posPatArray,
           undefined,
           number40
         );
         // derivation image info
-        if (sourceImage !== undefined) {
-          const sourceGeometry = sourceImage.getGeometry();
-          const sourceIndex = sourceGeometry.worldToIndex(
-            new Point([posPat.getX(), posPat.getY(), posPat.getZ()])
-          );
-          funcGroup.derivationImages = [
-            {
-              sourceImages: [
-                {
-                  referencedSOPInstanceUID:
-                    sourceImage.getImageUid(sourceIndex),
-                  referencedSOPClassUID:
-                    (sourceImage.getMeta()).SOPClassUID
-                }
-              ]
-            }
-          ];
-          // store as tag
-          referencedSOPs.push({
-            ReferencedSOPInstanceUID:
-              sourceImage.getImageUid(sourceIndex),
-            ReferencedSOPClassUID:
-              (sourceImage.getMeta()).SOPClassUID
-          });
-        }
+        const sourceGeometry = sourceImage.getGeometry();
+        const sourceIndex = sourceGeometry.worldToIndex(
+          new Point([posPat.getX(), posPat.getY(), posPat.getZ()])
+        );
+        funcGroup.derivationImages = [
+          {
+            sourceImages: [
+              {
+                referencedSOPInstanceUID:
+                  sourceImage.getImageUid(sourceIndex),
+                referencedSOPClassUID:
+                  (sourceImage.getMeta()).SOPClassUID
+              }
+            ]
+          }
+        ];
+        // store as tag
+        referencedSOPs.push({
+          ReferencedSOPInstanceUID:
+            sourceImage.getImageUid(sourceIndex),
+          ReferencedSOPClassUID:
+            (sourceImage.getMeta()).SOPClassUID
+        });
         funcGroups.push(funcGroup);
       }
     }
@@ -594,18 +631,16 @@ export class MaskFactory {
     };
 
     // also store referenced SOPs in ReferencedSeriesSequence
-    if (sourceImage !== undefined) {
-      const refSeriesTag = [];
-      refSeriesTag.push({
-        ReferencedInstanceSequence: {
-          value: referencedSOPs
-        },
-        SeriesInstanceUID: (sourceImage.getMeta()).SeriesInstanceUID
-      });
-      tags.ReferencedSeriesSequence = {
-        value: refSeriesTag
-      };
-    }
+    tags.ReferencedSeriesSequence = {
+      value: [
+        {
+          ReferencedInstanceSequence: {
+            value: referencedSOPs
+          },
+          SeriesInstanceUID: (sourceImage.getMeta()).SeriesInstanceUID
+        }
+      ]
+    };
 
     // merge extra tags if provided
     if (extraTags !== undefined) {
