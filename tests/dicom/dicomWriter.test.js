@@ -55,27 +55,21 @@ describe('dicom', () => {
    * @function module:tests/dicom~getuid
    */
   test('getUID', () => {
-    // check size
-    const uid00 = getUID('mytag');
-    assert.ok(uid00.length <= 64, 'uid length #0');
-    const uid01 = getUID('mysuperlongtagthatneverfinishes');
-    assert.ok(uid01.length <= 64, 'uid length #1');
+    // UUID derived UID: 2.25 root and 39 digits without leading zero
+    const uid = getUID();
+    assert.match(uid, /^2\.25\.[1-9]\d{38}$/, 'uid format');
+    assert.equal(uid.length, 44, 'uid length');
 
-    // consecutive for same tag are different
-    const uid10 = getUID('mytag');
-    const uid11 = getUID('mytag');
-    assert.notEqual(uid10, uid11, 'Consecutive getUID');
+    // consecutive are different
+    assert.notEqual(getUID(), getUID(), 'consecutive getUID');
 
-    // groups do not start with 0
-    const parts = uid10.split('.');
-    let count = 0;
-    for (let i = 0; i < parts.length; ++i) {
-      const part = parts[i];
-      if (part[0] === '0' && part.length !== 1) {
-        ++count;
-      }
+    // no duplicates in a batch
+    const nUids = 10000;
+    const uids = new Set();
+    for (let i = 0; i < nUids; ++i) {
+      uids.add(getUID());
     }
-    assert.ok(count === 0, 'Zero at start of part');
+    assert.equal(uids.size, nUids, 'no duplicates');
   });
 
   /**

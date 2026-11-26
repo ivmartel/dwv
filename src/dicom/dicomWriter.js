@@ -23,7 +23,6 @@ import {
   getTagFromDictionary,
 } from './dicomTagInfo.js';
 import {
-  getDwvUIDPrefix,
   getImplementationClassUID,
   getImplementationVersionName,
   isImplicitTransferSyntax,
@@ -34,9 +33,6 @@ import {DataElement} from './dataElement.js';
 import {DataWriter} from './dataWriter.js';
 import {DataReader} from './dataReader.js';
 import {logger} from '../utils/logger.js';
-
-// local generated uid counter
-let _uidCount = 0;
 
 /**
  * Writer rule actions.
@@ -283,44 +279,28 @@ function findWriterRangeRule(rangeRules, key) {
 }
 
 /**
- * Get a UID for a DICOM tag.
+ * Get a new unique UID.
  *
- * Note: Use {@link https://github.com/uuidjs/uuid}?
+ * The UID is a UUID derived UID: the '2.25' root followed by a
+ *   39 digits random number (without leading zero), 44 characters
+ *   in total. As for a UUID, the size of the random part makes
+ *   the chance of a collision negligible, even across sessions.
+ * The random digits are generated with `Math.random`: a UID needs
+ *   to be unique, not unpredictable, and `Math.random` is available
+ *   in any context (browser, secure or not, worker, node).
  *
  * Ref:
- * - {@link http://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_9.html},
- * - {@link http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html},
- * - {@link https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid}.
+ * - {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/chapter_9.html},
+ * - {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_B.2.html}.
  *
- * @param {string} tagName The input tag.
- * @returns {string} The corresponding UID.
+ * @returns {string} The UID.
  */
-export function getUID(tagName) {
-  const prefix = `${getDwvUIDPrefix()}.`;
-  // date (only numbers), do not keep milliseconds
-  const date = (new Date()).toISOString().replace(/\D/g, '');
-  const datePart = `.${ date.substring(0, 14)}`;
-  // count
-  _uidCount += 1;
-  const countPart = `.${_uidCount}`;
-
-  // uid = prefix . tag . date . count
-  let uid = prefix;
-
-  // limit tag part to not exceed 64 length
-  const nonTagLength = prefix.length + countPart.length + datePart.length;
-  const leni = Math.min(tagName.length, 64 - nonTagLength);
-  if (leni > 1) {
-    let tagNumber = '';
-    for (let i = 0; i < leni; ++i) {
-      tagNumber += tagName.charCodeAt(i);
-    }
-    uid += tagNumber.substring(0, leni);
+export function getUID() {
+  // first digit: not zero
+  let uid = `2.25.${Math.floor(1 + Math.random() * 9)}`;
+  for (let i = 0; i < 38; ++i) {
+    uid += Math.floor(Math.random() * 10);
   }
-
-  // finish
-  uid += datePart + countPart;
-
   return uid;
 }
 

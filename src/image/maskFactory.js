@@ -627,12 +627,12 @@ export class MaskFactory {
     }
 
     // instance: each call creates a new SOP instance
-    tags.SOPInstanceUID = getUID('SOPInstanceUID');
+    tags.SOPInstanceUID = getUID();
     // series: the mask one (for ex the one of a loaded SEG) or a new one,
     //   series number is type 1 for a segmentation
     if (typeof tags.SeriesInstanceUID === 'undefined' ||
       tags.SeriesInstanceUID === '') {
-      tags.SeriesInstanceUID = getUID('SeriesInstanceUID');
+      tags.SeriesInstanceUID = getUID();
     }
     if (typeof tags.SeriesNumber === 'undefined' ||
       tags.SeriesNumber === '') {

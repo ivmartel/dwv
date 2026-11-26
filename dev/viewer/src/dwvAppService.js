@@ -613,14 +613,14 @@ export class DwvAppService extends EventTarget {
       fac = new MaskFactory();
     }
     // new instance and series at each save
-    const sopUID = getUID('SOPInstanceUID');
+    const sopUID = getUID();
     const dicomElements = fac.toDicom(
       maskImage,
       maskImage.getMeta().custom.segments,
       sourceData.image,
       {
         MediaStorageSOPInstanceUID: sopUID,
-        SeriesInstanceUID: getUID('SeriesInstanceUID'),
+        SeriesInstanceUID: getUID(),
         SeriesNumber: '1',
         SOPInstanceUID: sopUID,
       }

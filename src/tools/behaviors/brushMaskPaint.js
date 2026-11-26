@@ -108,7 +108,7 @@ export function getBrushMaskMeta(sourceImage, sliceIndex) {
     firstSliceMeta[key] = tags[key];
   }
   // series: the mask has its own
-  firstSliceMeta.SeriesInstanceUID = getUID('SeriesInstanceUID');
+  firstSliceMeta.SeriesInstanceUID = getUID();
   if (typeof tags.FrameOfReferenceUID === 'undefined') {
     logger.warn('Mask source image has no FrameOfReferenceUID.');
   }

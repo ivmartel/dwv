@@ -689,11 +689,11 @@ describe('MaskFactory', () => {
     const factory = new MaskFactory();
     const outElements = factory.toDicom(image, undefined, refImage);
     const sopUID = safeGet(outElements, '00080018');
-    assert.ok(sopUID.startsWith(getDwvUIDPrefix()), 'dwv sop uid');
+    assert.ok(sopUID.startsWith('2.25.'), 'generated sop uid');
     assert.equal(
       safeGet(outElements, '00020003'), sopUID, 'media storage uid');
     const seriesUID = safeGet(outElements, '0020000E');
-    assert.ok(seriesUID.startsWith(getDwvUIDPrefix()), 'dwv series uid');
+    assert.ok(seriesUID.startsWith('2.25.'), 'generated series uid');
     assert.notEqual(seriesUID, sopUID, 'series and sop uids differ');
     assert.equal(
       Number(safeGet(outElements, '00200011')), 1, 'default series number');

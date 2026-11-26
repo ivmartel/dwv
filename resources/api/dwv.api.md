@@ -679,7 +679,7 @@ export function getTouchPoints(event: TouchEvent): Point2D[];
 export function getTypedArray(bitsAllocated: number, pixelRepresentation: number, size: number): IntTypedArray;
 
 // @public
-export function getUID(tagName: string): string;
+export function getUID(): string;
 
 // @public
 export function getURLsFromKeyValueUri(uri: string): string[] | undefined;
