@@ -15,7 +15,7 @@ import {
   getReferencedSeriesUID
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
-import {getDwvUIDPrefix} from '../dicom/dicomParser.js';
+import {getDwvUIDPrefix, getDwvVersion} from '../dicom/dicomParser.js';
 import {
   getElementsFromSimpleTagValues,
   mergeTagValues
@@ -566,7 +566,10 @@ export class MaskFactory {
    *   to the image meta segments if undefined.
    * @param {Image} sourceImage The source image, used for the references
    *   to the segmented series and images.
-   * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags,
+   *   for example the equipment tags (Manufacturer, ManufacturerModelName,
+   *   DeviceSerialNumber, SoftwareVersions) of the embedding application,
+   *   they default to dwv ones.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(
@@ -605,6 +608,15 @@ export class MaskFactory {
 
     // keep source image StudyInstanceUID
     tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
+
+    // equipment: the one that produces this instance, not the one
+    //   of an input mask, the embedding application can set its own
+    //   via the extra tags
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.5.2.html
+    tags.Manufacturer = 'dwv';
+    tags.ManufacturerModelName = 'DWV';
+    tags.DeviceSerialNumber = '1';
+    tags.SoftwareVersions = getDwvVersion();
 
     // frame of reference: shared with the source image,
     //   position reference indicator is type 2

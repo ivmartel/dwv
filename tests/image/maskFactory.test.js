@@ -5,7 +5,10 @@ import {
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
-import {DicomParser} from '../../src/dicom/dicomParser.js';
+import {
+  DicomParser,
+  getDwvVersion
+} from '../../src/dicom/dicomParser.js';
 import {DicomWriter} from '../../src/dicom/dicomWriter.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
 import {
@@ -663,6 +666,37 @@ describe('MaskFactory', () => {
       Number(safeGet(outElements, '00200013')), 3, 'mask instance number');
     assert.equal(
       safeGet(outElements, '00201040'), 'SN', 'mask position reference');
+  });
+
+  test('toDicom: dwv equipment, not the input one', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    // input mask equipment
+    const meta = image.getMeta();
+    meta.Manufacturer = 'other';
+    meta.ManufacturerModelName = 'other model';
+    meta.DeviceSerialNumber = '42';
+    meta.SoftwareVersions = '9.9';
+    let outElements = new MaskFactory().toDicom(image, undefined, refImage);
+    assert.equal(safeGet(outElements, '00080070'), 'dwv', 'manufacturer');
+    assert.equal(safeGet(outElements, '00081090'), 'DWV', 'model name');
+    assert.equal(safeGet(outElements, '00181000'), '1', 'serial number');
+    assert.equal(
+      safeGet(outElements, '00181020'), getDwvVersion(), 'software versions');
+
+    // application equipment via extra tags
+    outElements = new MaskFactory().toDicom(image, undefined, refImage, {
+      Manufacturer: 'app',
+      ManufacturerModelName: 'app model',
+      DeviceSerialNumber: 'A1',
+      SoftwareVersions: '1.0'
+    });
+    assert.equal(safeGet(outElements, '00080070'), 'app', 'app manufacturer');
+    assert.equal(
+      safeGet(outElements, '00081090'), 'app model', 'app model name');
+    assert.equal(safeGet(outElements, '00181000'), 'A1', 'app serial number');
+    assert.equal(
+      safeGet(outElements, '00181020'), '1.0', 'app software versions');
   });
 
   test('toDicom: keeps the input content label and description', () => {
