@@ -619,13 +619,16 @@ export function zipBuffers(
 }
 
 /**
- * Add the current date and time to input tags if not present:
+ * Add a date and time to input tags if not present:
  * study, series and content date and time.
  *
  * @param {Record<string, SimpleTagValue>} tags The tags.
+ * @param {Date} [now] Optional date to use, defaults to the current date.
  */
-export function addDates(tags) {
-  const now = new Date();
+export function addDates(tags, now) {
+  if (typeof now === 'undefined') {
+    now = new Date();
+  }
   const dateStr = now.getFullYear().toString() +
     (now.getMonth() + 1).toString().padStart(2, '0') +
     now.getDate().toString().padStart(2, '0');

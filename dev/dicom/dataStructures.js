@@ -156,10 +156,17 @@ export function getStructureNumberOfFiles(structure) {
 }
 
 /**
+ * Date used for the generated data, shared by all calls so that
+ * files generated separately for the same series have the same
+ * study, series and content date and time.
+ */
+const generationDate = new Date();
+
+/**
  * Generate the data elements of the files of a data structure.
  * Adds the default patient tags, instance ids and dates if not present
  * in the config, see {@link addPatientInfo}, {@link addInstanceIds}
- * and {@link addDates}.
+ * and {@link addDates} (with a date shared by all calls).
  *
  * @param {object} config The data configuration (tags, and optional
  *   segmentSquares for SEG), as in tests/data/synthetic-*.json.
@@ -174,7 +181,7 @@ export function getStructureElementsList(config, syntax, structure) {
   // default patient tags, instance ids and dates (not in the configs)
   addPatientInfo(tags);
   addInstanceIds(tags);
-  addDates(tags);
+  addDates(tags, generationDate);
   // per-frame functional groups are not part of the MR Image IOD:
   // use the Enhanced MR Image one
   if (structure.genOptions.frames3D &&
