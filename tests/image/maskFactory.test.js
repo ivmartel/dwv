@@ -5,8 +5,14 @@ import {
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
+import {DicomParser} from '../../src/dicom/dicomParser.js';
+import {DicomWriter} from '../../src/dicom/dicomWriter.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
-import {MaskFactory, mergeMaskImages} from '../../src/image/maskFactory.js';
+import {
+  MaskFactory,
+  mergeMaskImages,
+  getDicomSegDimensionOrganization
+} from '../../src/image/maskFactory.js';
 import {Image} from '../../src/image/image.js';
 import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
@@ -467,6 +473,149 @@ describe('MaskFactory', () => {
       factory.toDicom(buildMaskImage('test-seg-00'), undefined, refImage);
     assert.equal(
       safeGet(outElements, '00282110'), '01', 'lossy from source');
+  });
+
+  /**
+   * Check the dimension organization and indices of a DICOM SEG.
+   *
+   * @param {Record<string, object>} elements The DICOM SEG elements.
+   * @param {string} orgUID The expected organization UID.
+   * @param {string[]} labels The expected index labels.
+   */
+  function checkDimensions(elements, orgUID, labels) {
+    const orgs = safeGetAll(elements, '00209221');
+    assert.equal(orgs.length, 1, 'one dimension organization');
+    assert.equal(orgs[0]['00209164'].value[0], orgUID, 'organization uid');
+    const indices = safeGetAll(elements, '00209222');
+    assert.deepEqual(
+      indices.map(item => item['00209164'].value[0]),
+      [orgUID, orgUID],
+      'index organization uids'
+    );
+    // segment number then position, with their functional groups
+    assert.deepEqual(
+      indices.map(item => item['00209165'].value[0]),
+      ['(0062,000B)', '(0020,0032)'],
+      'dimension index pointers'
+    );
+    assert.deepEqual(
+      indices.map(item => item['00209167'].value[0]),
+      ['(0062,000A)', '(0020,9113)'],
+      'functional group pointers'
+    );
+    assert.deepEqual(
+      indices.map(item => item['00209421'].value[0]),
+      labels,
+      'dimension description labels'
+    );
+    for (const frame of safeGetAll(elements, '52009230')) {
+      const values = frame['00209111'].value[0]['00209157'].value;
+      assert.equal(values.length, indices.length, 'one value per index');
+    }
+  }
+
+  /**
+   * Write a DICOM SEG and read it back as a mask.
+   *
+   * @param {Record<string, object>} elements The DICOM SEG elements.
+   * @param {Image} refImage The reference image.
+   * @returns {MaskImage} The read mask.
+   */
+  function writeAndRead(elements, refImage) {
+    const buffer = new DicomWriter().getBuffer(elements);
+    const parser = new DicomParser();
+    parser.parse(buffer);
+    const parsed = parser.getDicomElements();
+    return new MaskFactory().create(
+      parsed, parsed['7FE00010'].value[0], refImage);
+  }
+
+  const dwvOrgUID = getDicomSegDimensionOrganization()
+    .organizations.value[0].DimensionOrganizationUID;
+  const dwvLabels = ['ReferencedSegmentNumber', 'ImagePositionPatient'];
+
+  test('toDicom: dwv dimensions without input indices', () => {
+    // test-seg-00 has no DimensionIndexSequence
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    checkDimensions(outElements, dwvOrgUID, dwvLabels);
+
+    const reloaded = writeAndRead(outElements, refImage);
+    assert.deepEqual(
+      Array.from(reloaded.getBuffer()),
+      Array.from(image.getBuffer()),
+      'same label map after reload'
+    );
+  });
+
+  test('toDicom: keeps the input segment and position indices', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const meta = image.getMeta();
+    const orgUID = '1.2.3.99';
+    meta.DimensionOrganizationSequence = {
+      value: [{DimensionOrganizationUID: orgUID}]
+    };
+    // no functional group pointers in input
+    meta.DimensionIndexSequence = {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0062,000B)',
+          DimensionDescriptionLabel: 'Segment'
+        },
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0020,0032)',
+          DimensionDescriptionLabel: 'Position'
+        }
+      ]
+    };
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    checkDimensions(outElements, orgUID, ['Segment', 'Position']);
+
+    // read back: indices are kept, with their functional groups
+    const reloaded = writeAndRead(outElements, refImage);
+    assert.deepEqual(
+      Array.from(reloaded.getBuffer()),
+      Array.from(image.getBuffer()),
+      'same label map after reload'
+    );
+    assert.deepEqual(
+      reloaded.getMeta().DimensionIndexSequence.value.map(
+        item => item.FunctionalGroupPointer),
+      ['(0062,000A)', '(0020,9113)'],
+      'read functional group pointers'
+    );
+  });
+
+  test('toDicom: dwv dimensions for other input indices', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const meta = image.getMeta();
+    const orgUID = '1.2.3.99';
+    meta.DimensionOrganizationSequence = {
+      value: [{DimensionOrganizationUID: orgUID}]
+    };
+    // stack id then position: not written by dwv
+    meta.DimensionIndexSequence = {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0020,9056)'
+        },
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0020,0032)'
+        }
+      ]
+    };
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    checkDimensions(outElements, dwvOrgUID, dwvLabels);
   });
 
 });

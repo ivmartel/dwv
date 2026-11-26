@@ -7,8 +7,10 @@ import {Size} from '../../image/size.js';
 import {Spacing} from '../../image/spacing.js';
 import {Geometry} from '../../image/geometry.js';
 import {ColourMap} from '../../image/luts.js';
-import {getDefaultDicomSegJson} from '../../image/maskFactory.js';
-import {getDwvUIDPrefix} from '../../dicom/dicomParser.js';
+import {
+  getDefaultDicomSegJson,
+  getDicomSegDimensionOrganization
+} from '../../image/maskFactory.js';
 import {getUID} from '../../dicom/dicomWriter.js';
 import {
   getElementsFromSimpleTagValues
@@ -75,41 +77,6 @@ function getIndexCompareFunction(direction) {
 }
 
 /**
- * Get a dimension organisation used to index a DICOM seg.
- *
- * @returns {object} The indices and organisations.
- */
-function getDimensionOrganization() {
-  // 681051091011101: first 15 of charCode('DimensionOrganizationUID')
-  const organizationUID = `${getDwvUIDPrefix()}681051091011101.1`;
-  return {
-    indices: {
-      value: [
-        {
-          DimensionOrganizationUID: organizationUID,
-          DimensionDescriptionLabel: 'ReferencedSegmentNumber',
-          DimensionIndexPointer: '(0062,000B)',
-          FunctionalGroupPointer: '(0062,000A)'
-        },
-        {
-          DimensionOrganizationUID: organizationUID,
-          DimensionDescriptionLabel: 'ImagePositionPatient',
-          DimensionIndexPointer: '(0020,0032)',
-          FunctionalGroupPointer: '(0020,9113)'
-        }
-      ]
-    },
-    organizations: {
-      value: [
-        {
-          DimensionOrganizationUID: organizationUID
-        }
-      ]
-    }
-  };
-}
-
-/**
  * Get the meta of a new brush mask: the DICOM SEG tags, the references
  *   to the source image and the first slice frame info.
  *
@@ -126,7 +93,7 @@ export function getBrushMaskMeta(sourceImage, sliceIndex) {
   /** @type {Record<string, any>} */
   const firstSliceMeta = getDefaultDicomSegJson();
   // dicom seg dimension
-  const dimension = getDimensionOrganization();
+  const dimension = getDicomSegDimensionOrganization();
   firstSliceMeta.DimensionOrganizationSequence = dimension.organizations;
   firstSliceMeta.DimensionIndexSequence = dimension.indices;
   // local

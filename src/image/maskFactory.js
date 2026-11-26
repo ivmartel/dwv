@@ -15,6 +15,7 @@ import {
   getReferencedSeriesUID
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
+import {getDwvUIDPrefix} from '../dicom/dicomParser.js';
 import {
   getElementsFromSimpleTagValues,
   mergeTagValues
@@ -236,6 +237,94 @@ export function getDefaultDicomSegJson() {
     tags[tag.name] = tag.enum[0];
   }
   return tags;
+}
+
+/**
+ * Get the dimension organisation of the DICOM SEG written by dwv:
+ *   frames are indexed by referenced segment number then by
+ *   image position (patient).
+ *
+ * @returns {object} The indices and organisations as
+ *   {indices, organizations}.
+ */
+export function getDicomSegDimensionOrganization() {
+  // 681051091011101: first 15 of charCode('DimensionOrganizationUID')
+  const organizationUID = `${getDwvUIDPrefix()}681051091011101.1`;
+  return {
+    indices: {
+      value: [
+        {
+          DimensionOrganizationUID: organizationUID,
+          DimensionDescriptionLabel: 'ReferencedSegmentNumber',
+          DimensionIndexPointer: '(0062,000B)',
+          FunctionalGroupPointer: '(0062,000A)'
+        },
+        {
+          DimensionOrganizationUID: organizationUID,
+          DimensionDescriptionLabel: 'ImagePositionPatient',
+          DimensionIndexPointer: '(0020,0032)',
+          FunctionalGroupPointer: '(0020,9113)'
+        }
+      ]
+    },
+    organizations: {
+      value: [
+        {
+          DimensionOrganizationUID: organizationUID
+        }
+      ]
+    }
+  };
+}
+
+/**
+ * Functional group pointers of the dimension index pointers
+ *   that dwv can write.
+ */
+const FunctionalGroupPointers = {
+  // ReferencedSegmentNumber -> SegmentIdentificationSequence
+  '(0062,000B)': '(0062,000A)',
+  // ImagePositionPatient -> PlanePositionSequence
+  '(0020,0032)': '(0020,9113)'
+};
+
+/**
+ * Get the dimension organisation to write for a mask: the input
+ *   one if its indices are the ones dwv writes (referenced segment
+ *   number then image position), the dwv one otherwise.
+ *
+ * @param {Record<string, any>} meta The mask meta.
+ * @returns {object} The indices and organisations as
+ *   {indices, organizations}.
+ */
+function getOutputDimensionOrganization(meta) {
+  const organizations = meta.DimensionOrganizationSequence?.value;
+  const indices = meta.DimensionIndexSequence?.value;
+  const pointers = Object.keys(FunctionalGroupPointers);
+  const isSupported = organizations?.length === 1 &&
+    indices?.length === pointers.length &&
+    indices.every((item, i) => {
+      const orgUID = organizations[0].DimensionOrganizationUID;
+      return item.DimensionIndexPointer === pointers[i] &&
+        item.DimensionOrganizationUID === orgUID;
+    });
+  if (!isSupported) {
+    return getDicomSegDimensionOrganization();
+  }
+  return {
+    indices: {
+      // the functional group pointer is required since
+      //   both index values are in functional groups
+      value: indices.map(item => ({
+        ...item,
+        FunctionalGroupPointer:
+          FunctionalGroupPointers[item.DimensionIndexPointer]
+      }))
+    },
+    organizations: {
+      value: [{...organizations[0]}]
+    }
+  };
 }
 
 /**
@@ -520,6 +609,13 @@ export class MaskFactory {
         sourceImage.getMeta().LossyImageCompression === '01';
       tags.LossyImageCompression = isSourceLossy ? '01' : '00';
     }
+
+    // dimension organisation: the frames are written with
+    //   [segment number, position] index values, keep the input
+    //   organisation if it defines these indices
+    const dimension = getOutputDimensionOrganization(tags);
+    tags.DimensionOrganizationSequence = dimension.organizations;
+    tags.DimensionIndexSequence = dimension.indices;
 
     // segments
     const segmentItems = [];
