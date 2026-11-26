@@ -182,6 +182,7 @@ describe('dicom', () => {
 
     // no modifier nor anatomic region
     const segment3 = new MaskSegment(1, 'Prostate', 'AUTOMATIC');
+    segment3.algorithmName = 'algo';
     segment3.displayValue = 1;
     segment3.propertyCategoryCode = categoryCode;
     segment3.propertyTypeCode = typeCode;
@@ -198,6 +199,33 @@ describe('dicom', () => {
       'no read modifier');
     assert.equal(segment4.anatomicRegionCodes, undefined,
       'no read anatomic region');
+  });
+
+  test('DICOM segment algorithm name', () => {
+    // manual: no name needed, none written
+    const manual = new MaskSegment(1, 'manual', 'MANUAL');
+    manual.algorithmName = 'ignored';
+    assert.equal(
+      getDicomSegmentItem(manual).SegmentAlgorithmName, undefined,
+      'no name for manual');
+
+    // automatic and semiautomatic: name required
+    for (const type of ['AUTOMATIC', 'SEMIAUTOMATIC']) {
+      const segment = new MaskSegment(2, 'auto', type);
+      assert.throws(
+        () => getDicomSegmentItem(segment),
+        `Segment 2: missing algorithm name for algorithm type ${type}`
+      );
+      segment.algorithmName = '';
+      assert.throws(
+        () => getDicomSegmentItem(segment),
+        `Segment 2: missing algorithm name for algorithm type ${type}`
+      );
+      segment.algorithmName = 'algo';
+      assert.equal(
+        getDicomSegmentItem(segment).SegmentAlgorithmName, 'algo',
+        `name for ${type}`);
+    }
   });
 
 });

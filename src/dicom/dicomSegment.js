@@ -338,8 +338,16 @@ export function getDicomSegmentItem(segment) {
   segmentItem.SegmentNumber = segment.number;
   segmentItem.SegmentLabel = segment.label;
   segmentItem.SegmentAlgorithmType = algoType;
-  // SegmentAlgorithmName
-  if (algoType !== 'MANUAL' && segment.algorithmName !== undefined) {
+  // SegmentAlgorithmName (type1C): required if the algorithm type
+  //   is not MANUAL
+  // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.20.2.html
+  if (algoType !== 'MANUAL') {
+    if (typeof segment.algorithmName === 'undefined' ||
+      segment.algorithmName === '') {
+      throw new Error(
+        `Segment ${segment.number}: missing algorithm name ` +
+        `for algorithm type ${algoType}`);
+    }
     segmentItem.SegmentAlgorithmName = segment.algorithmName;
   }
   // RecommendedDisplay value

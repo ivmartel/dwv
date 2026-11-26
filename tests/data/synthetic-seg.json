@@ -61,6 +61,7 @@
             "SegmentNumber": 1,
             "SegmentLabel": "Square1",
             "SegmentAlgorithmType": "AUTOMATIC",
+            "SegmentAlgorithmName": "dwv-test-algorithm",
             "RecommendedDisplayCIELabValue": [
               34886,
               53483,
@@ -89,6 +90,7 @@
             "SegmentNumber": 2,
             "SegmentLabel": "Square2",
             "SegmentAlgorithmType": "AUTOMATIC",
+            "SegmentAlgorithmName": "dwv-test-algorithm",
             "RecommendedDisplayCIELabValue": [
               57499,
               10746,
@@ -302,6 +304,7 @@
             "SegmentNumber": 1,
             "SegmentLabel": "Square1",
             "SegmentAlgorithmType": "AUTOMATIC",
+            "SegmentAlgorithmName": "dwv-test-algorithm",
             "RecommendedDisplayCIELabValue": [
               34886,
               53483,
@@ -330,6 +333,7 @@
             "SegmentNumber": 2,
             "SegmentLabel": "Square2",
             "SegmentAlgorithmType": "AUTOMATIC",
+            "SegmentAlgorithmName": "dwv-test-algorithm",
             "RecommendedDisplayCIELabValue": [
               57499,
               10746,
