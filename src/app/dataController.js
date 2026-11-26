@@ -565,10 +565,12 @@ export class DataController extends EventTarget {
   /**
    * Data of the current loads, indexed by load id: the data id of
    * each data key (see getDataGroupKey), the data ids in creation
-   * order and the items waiting for their referenced data.
+   * order, the ids of the removed data and the items waiting for
+   * their referenced data.
    *
    * @type {Record<string, {keys: Record<string, string>,
-   *   dataIds: string[], pendingItems: DicomData[]}>}
+   *   dataIds: string[], removedDataIds: string[],
+   *   pendingItems: DicomData[]}>}
    */
   #loads = {};
 
@@ -614,11 +616,17 @@ export class DataController extends EventTarget {
    *   referenced data now, defaults to true.
    * @returns {{dataId: string, isNew: boolean}|undefined} The data id
    *   and true if it was created for this item, undefined if the item
-   *   is kept for later.
+   *   is kept for later or if its data was removed from the load
+   *   (see {@link DataController#removeLoadData}).
    */
   addLoadItem(loadId, data, canWait = true) {
     if (typeof this.#loads[loadId] === 'undefined') {
-      this.#loads[loadId] = {keys: {}, dataIds: [], pendingItems: []};
+      this.#loads[loadId] = {
+        keys: {},
+        dataIds: [],
+        removedDataIds: [],
+        pendingItems: []
+      };
     }
     const load = this.#loads[loadId];
     if (canWait && needsReferencedData(data.meta)) {
@@ -627,18 +635,24 @@ export class DataController extends EventTarget {
     }
     const key = getDataGroupKey(data.meta);
     let dataId = load.keys[key];
+    if (load.removedDataIds.includes(dataId)) {
+      // the data of this key was removed: ignore its items
+      return undefined;
+    }
     const isNew = typeof dataId === 'undefined';
     if (isNew) {
       dataId = this.getNextDataId();
+      load.keys[key] = dataId;
       try {
         this.add(dataId, data);
       } catch (error) {
-        // do not keep a data without content
+        // do not keep a data without content, and ignore
+        // the next items of its key
         delete this.#dataList[dataId];
         delete this.#tmpSliceList[dataId];
+        load.removedDataIds.push(dataId);
         throw error;
       }
-      load.keys[key] = dataId;
       load.dataIds.push(dataId);
     } else {
       this.update(dataId, data);
@@ -671,6 +685,37 @@ export class DataController extends EventTarget {
    */
   getLoadDataIds(loadId) {
     return this.#loads[loadId]?.dataIds.slice() ?? [];
+  }
+
+  /**
+   * Get the id of the data of a load that an item belongs to.
+   *
+   * @param {string} loadId The load id.
+   * @param {DicomData} data The loaded item.
+   * @returns {string|undefined} The data id, also given for a data
+   *   that was removed, undefined if the load has no data for
+   *   this item.
+   */
+  getLoadItemDataId(loadId, data) {
+    const key = getDataGroupKey(data.meta);
+    return this.#loads[loadId]?.keys[key];
+  }
+
+  /**
+   * Remove a data created by a load: the next items of the load
+   * that belong to it are ignored, the other data of the load
+   * are kept.
+   *
+   * @param {string} loadId The load id.
+   * @param {string} dataId The data id.
+   */
+  removeLoadData(loadId, dataId) {
+    const load = this.#loads[loadId];
+    if (typeof load !== 'undefined') {
+      load.removedDataIds.push(dataId);
+      load.dataIds = load.dataIds.filter((id) => id !== dataId);
+    }
+    this.remove(dataId);
   }
 
   /**

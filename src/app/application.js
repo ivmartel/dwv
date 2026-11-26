@@ -1022,6 +1022,9 @@ export class App extends EventTarget {
    * @type {CustomEvent}
    * @property {object} detail The event detail.
    * @property {string} detail.loadid The load id.
+   * @property {string} [detail.dataid] For an error on a loaded item,
+   *   the id of its data: the data is removed and the next items
+   *   of the data are ignored.
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    * @property {object} detail.error The error.
@@ -1053,6 +1056,10 @@ export class App extends EventTarget {
   /**
    * Load a list of image files.
    *
+   * Each data of a load is created with room for all the items of
+   * the load: to avoid allocating more memory than needed, load
+   * different image series with separate loads when possible.
+   *
    * @param {File[]} files The list of files to load.
    * @returns {string} The load id, '-1' if problem. The ids of the
    *   loaded data are given by the loaddata and load events.
@@ -1077,6 +1084,10 @@ export class App extends EventTarget {
 
   /**
    * Load a list of image URLs.
+   *
+   * Each data of a load is created with room for all the items of
+   * the load: to avoid allocating more memory than needed, load
+   * different image series with separate loads when possible.
    *
    * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The options object, can contain:
@@ -1129,6 +1140,10 @@ export class App extends EventTarget {
   /**
    * Load a list of ArrayBuffers.
    *
+   * Each data of a load is created with room for all the items of
+   * the load: to avoid allocating more memory than needed, load
+   * different image series with separate loads when possible.
+   *
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: "", filename: "", data: data}].
    * @returns {string} The load id. The ids of the loaded data are
@@ -1160,21 +1175,40 @@ export class App extends EventTarget {
 
   /**
    * Abort an individual load: stops the load and removes the
-   * data it created.
+   * data it created. With a data id, only removes this data:
+   * the load continues and its other data are kept.
    *
    * @param {string} loadId The load to stop, as returned by
    *   the load methods.
+   * @param {string} [dataId] The id of the data of the load
+   *   to remove.
    */
-  abortLoad(loadId) {
+  abortLoad(loadId, dataId) {
+    if (typeof dataId !== 'undefined') {
+      if (this.#dataController.getLoadDataIds(loadId).includes(dataId)) {
+        this.#removeData(dataId);
+        this.#dataController.removeLoadData(loadId, dataId);
+      }
+      return;
+    }
     // abort load
     this.#loadController.abort(loadId);
     // remove data and clean up stage
-    for (const dataId of this.#dataController.getLoadDataIds(loadId)) {
-      this.#dataController.remove(dataId);
-      this.#stageController.removeLayersByDataId(dataId);
-      delete this.#infoDatas[dataId];
+    for (const id of this.#dataController.getLoadDataIds(loadId)) {
+      this.#removeData(id);
     }
     this.#dataController.endLoad(loadId);
+  }
+
+  /**
+   * Remove a data, its layers and its info data.
+   *
+   * @param {string} dataId The data id.
+   */
+  #removeData(dataId) {
+    this.#dataController.remove(dataId);
+    this.#stageController.removeLayersByDataId(dataId);
+    delete this.#infoDatas[dataId];
   }
 
   // load API [end] ---------------------------------------------------------
@@ -1974,21 +2008,20 @@ export class App extends EventTarget {
       // items that need their referenced data wait for the load end
       res = this.#dataController.addLoadItem(loadId, event.detail.data);
     } catch (error) {
+      // remove the data of the item: its following items are ignored
+      // (for example all frames of a multi-frame data), the other
+      // data of the load are kept
+      const dataId = this.#dataController.getLoadItemDataId(
+        loadId, event.detail.data);
+      if (typeof dataId !== 'undefined') {
+        this.abortLoad(loadId, dataId);
+      }
       this.dispatchEvent(new CustomEvent('error', {
         detail: {
           loadid: loadId,
+          dataid: dataId,
           source: event.detail.source,
           error
-        }
-      }));
-      // stop the load: following items would fail the same way
-      // (for example all frames of a multi-frame data)
-      this.abortLoad(loadId);
-      this.dispatchEvent(new CustomEvent('loadend', {
-        detail: {
-          loadid: loadId,
-          dataids: [],
-          source: event.detail.source
         }
       }));
       return;
@@ -2033,6 +2066,11 @@ export class App extends EventTarget {
         isfirstitem: isNew
       })
     }));
+
+    // a listener can have removed the data
+    if (typeof this.#dataController.get(dataId) === 'undefined') {
+      return;
+    }
 
     // update info data if present
     if (typeof this.#infoDatas[dataId] !== 'undefined') {

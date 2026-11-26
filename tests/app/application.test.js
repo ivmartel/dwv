@@ -28,7 +28,7 @@ describe('app', () => {
    *
    * @function module:tests/app~appLoadDataCreationError
    */
-  test('App load stops at data creation error', () => {
+  test('App load ignores the items of a data with an error', () => {
     // image creation fails, as for an unsupported geometry
     vi.spyOn(ImageFactory.prototype, 'create').mockImplementation(() => {
       throw new Error('Unsupported geometry');
@@ -39,8 +39,8 @@ describe('app', () => {
 
     const events = [];
     for (const type of ['loaditem', 'error', 'abort', 'load', 'loadend']) {
-      app.addEventListener(type, () => {
-        events.push(type);
+      app.addEventListener(type, (event) => {
+        events.push(event);
       });
     }
 
@@ -52,9 +52,11 @@ describe('app', () => {
     )[0];
     app.loadImageObject([{data: buffer, filename: 'mf.dcm'}]);
 
+    // the next frames are ignored
     assert.deepEqual(
-      events, ['error', 'abort', 'loadend'],
-      'one error, then abort and loadend');
+      events.map((event) => event.type), ['error', 'load', 'loadend'],
+      'one error, then load and loadend');
+    assert.equal(events[0].detail.dataid, '0', 'error dataid');
     assert.deepEqual(
       app.getDataController().getDataIds(), [], 'no data left');
   });
@@ -256,6 +258,68 @@ describe('app', () => {
       assert.deepEqual(events.at(-2).detail.dataids, ['0']);
       assert.deepEqual(app.getDataController().getDataIds(), ['0']);
     });
+
+  test('App load error removes only the data of the item', async () => {
+    const series = getConfig(syntheticImgData, 'test-img-00');
+    const otherSeries = getConfig(syntheticImgData, 'test-img-01');
+    // image creation fails for the first series only
+    const create = ImageFactory.prototype.create;
+    vi.spyOn(ImageFactory.prototype, 'create').mockImplementation(
+      function (dataElements, ...args) {
+        if (dataElements['0020000E'].value[0] ===
+          series.tags.SeriesInstanceUID) {
+          throw new Error('Unsupported geometry');
+        }
+        return create.call(this, dataElements, ...args);
+      });
+
+    const app = new App();
+    app.init({});
+    const events = recordLoadEvents(app);
+    await loadAndWait(app, getLoadInput([
+      [series, dataStructures.multipleSingleSlice],
+      [otherSeries, singleSliceStructure]
+    ]));
+
+    const types = events.map((event) => event.type);
+    assert.equal(types.filter((type) => type === 'error').length, 1);
+    assert.notInclude(types, 'abort');
+    assert.deepEqual(types.slice(-2), ['load', 'loadend']);
+    const dataIds = app.getDataController().getDataIds();
+    assert.equal(dataIds.length, 1);
+    assert.deepEqual(events.at(-2).detail.dataids, dataIds);
+    assert.equal(
+      app.getDataController().get(dataIds[0]).meta['0020000E'].value[0],
+      otherSeries.tags.SeriesInstanceUID);
+  });
+
+  test('App abortLoad with a data id keeps the other data', async () => {
+    const app = new App();
+    app.init({});
+    const events = recordLoadEvents(app);
+    // remove the first data as soon as it is created
+    app.addEventListener('loaddata', (event) => {
+      if (event.detail.dataid === '0') {
+        app.abortLoad(event.detail.loadid, event.detail.dataid);
+      }
+    });
+    const input = getLoadInput([
+      [getConfig(syntheticImgData, 'test-img-00'),
+        dataStructures.multipleSingleSlice],
+      [getConfig(syntheticImgData, 'test-img-01'), singleSliceStructure]
+    ]);
+    await loadAndWait(app, input);
+
+    const items = events.filter((event) => event.type === 'loaditem');
+    // the next slices of the removed data are ignored
+    assert.equal(
+      items.filter((item) => item.detail.dataid === '0').length, 1);
+    assert.equal(
+      items.filter((item) => item.detail.dataid === '1').length, 1);
+    assert.notInclude(events.map((event) => event.type), 'abort');
+    assert.deepEqual(events.at(-1).detail.dataids, ['1']);
+    assert.deepEqual(app.getDataController().getDataIds(), ['1']);
+  });
 
   test('App abortLoad after the load end keeps its data', async () => {
     const app = new App();

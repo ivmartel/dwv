@@ -262,9 +262,9 @@ export class DwvAppService extends EventTarget {
       const message = event.detail.error.message;
       const isRenderError = typeof message !== 'undefined' &&
         message.startsWith('Render error');
-      // abort load
+      // abort load, or only the data of the error if any
       if (!isRenderError) {
-        this.#app.abortLoad(event.detail.loadid);
+        this.#app.abortLoad(event.detail.loadid, event.detail.dataid);
       }
     });
     this.#app.addEventListener('loadstart', (event) => {

@@ -74,7 +74,7 @@ export class AnnotationGroupFactory {
 // @public
 export class App extends EventTarget {
     abortAllLoads(): void;
-    abortLoad(loadId: string): void;
+    abortLoad(loadId: string, dataId?: string): void;
     addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
     // @deprecated
     addData(dataId: string, data: DicomData): boolean;
@@ -312,6 +312,7 @@ export class DataController extends EventTarget {
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
     getLoadDataIds(loadId: string): string[];
+    getLoadItemDataId(loadId: string, data: DicomData): string | undefined;
     getNextDataId(): string;
     getPendingLoadItems(loadId: string): DicomData[];
     getStashed(dataId: string): DicomData | undefined;
@@ -320,6 +321,7 @@ export class DataController extends EventTarget {
         imageHasChanged: any;
     };
     remove(dataId: string): void;
+    removeLoadData(loadId: string, dataId: string): void;
     reset(): void;
     setImage(dataId: string, image: Image_2): void;
     stash(dataId: string): void;

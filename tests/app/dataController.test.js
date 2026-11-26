@@ -630,4 +630,25 @@ describe('app', () => {
       controller.get('0').image.getGeometry().getSize().get(2), 2);
   });
 
+  test('DataController removeLoadData ignores the next items', () => {
+    const controller = new DataController();
+    const sr0 = new DicomData(
+      makeObjectMeta({sop: '3.1', series: '3', modality: 'KO'}));
+    const sr1 = new DicomData(
+      makeObjectMeta({sop: '3.2', series: '3', modality: 'KO'}));
+    controller.addLoadItem('load0', sr0);
+    controller.addLoadItem('load0', sr1);
+    assert.equal(controller.getLoadItemDataId('load0', sr0), '0');
+    assert.isUndefined(controller.getLoadItemDataId('load1', sr0));
+
+    controller.removeLoadData('load0', '0');
+    assert.deepEqual(controller.getDataIds(), ['1']);
+    assert.deepEqual(controller.getLoadDataIds('load0'), ['1']);
+    // an item of the removed data is ignored
+    const sr0Again = new DicomData(
+      makeObjectMeta({sop: '3.1', series: '3', modality: 'KO'}));
+    assert.isUndefined(controller.addLoadItem('load0', sr0Again));
+    assert.deepEqual(controller.getDataIds(), ['1']);
+  });
+
 });
