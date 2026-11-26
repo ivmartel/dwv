@@ -85,6 +85,7 @@ const MetaTagKeys = {
   SeriesNumber: '00200011',
   // frame of reference
   FrameOfReferenceUID: '00200052',
+  PositionReferenceIndicator: '00201040',
   // general equipment
   Manufacturer: '00080070',
   ManufacturerModelName: '00081090',
@@ -93,6 +94,7 @@ const MetaTagKeys = {
   // general image
   LossyImageCompression: '00282110',
   // content identification
+  InstanceNumber: '00200013',
   ContentLabel: '00700080',
   ContentDescription: '00700081'
 };
@@ -604,6 +606,18 @@ export class MaskFactory {
     // keep source image StudyInstanceUID
     tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
 
+    // frame of reference: shared with the source image,
+    //   position reference indicator is type 2
+    if (typeof tags.PositionReferenceIndicator === 'undefined') {
+      tags.PositionReferenceIndicator =
+        sourceImage.getMeta().PositionReferenceIndicator ?? '';
+    }
+
+    // content identification: instance number is type 1
+    if (typeof tags.InstanceNumber === 'undefined' ||
+      tags.InstanceNumber === '') {
+      tags.InstanceNumber = '1';
+    }
     // content identification: label is type 1 (CS),
     //   description is type 2 (present, possibly empty)
     // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_10.9.html

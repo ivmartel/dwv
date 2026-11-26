@@ -86,6 +86,7 @@ const MetaTagKeys = {
   SeriesNumber: '00200011',
   // frame of reference
   FrameOfReferenceUID: '00200052',
+  PositionReferenceIndicator: '00201040',
   // general equipment
   Manufacturer: '00080070',
   ManufacturerModelName: '00081090',

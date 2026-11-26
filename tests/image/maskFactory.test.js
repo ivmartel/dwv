@@ -633,6 +633,38 @@ describe('MaskFactory', () => {
       safeGet(outElements, '00700081'), '', 'empty description');
   });
 
+  test('toDicom: instance number and position reference indicator', () => {
+    const refImage = buildRefImage();
+    // test-img-00 has no position reference indicator, remove the
+    //   generator instance number from test-seg-00
+    const noNumberImage = buildMaskImage('test-seg-00');
+    delete noNumberImage.getMeta().InstanceNumber;
+    let outElements =
+      new MaskFactory().toDicom(noNumberImage, undefined, refImage);
+    assert.equal(
+      Number(safeGet(outElements, '00200013')), 1, 'default instance number');
+    // type 2: present, empty
+    assert.equal(
+      safeGet(outElements, '00201040'), '', 'empty position reference');
+
+    // position reference indicator from the source image
+    refImage.getMeta().PositionReferenceIndicator = 'XY';
+    outElements = new MaskFactory().toDicom(
+      buildMaskImage('test-seg-00'), undefined, refImage);
+    assert.equal(
+      safeGet(outElements, '00201040'), 'XY', 'source position reference');
+
+    // mask values win
+    const image = buildMaskImage('test-seg-00');
+    image.getMeta().InstanceNumber = '3';
+    image.getMeta().PositionReferenceIndicator = 'SN';
+    outElements = new MaskFactory().toDicom(image, undefined, refImage);
+    assert.equal(
+      Number(safeGet(outElements, '00200013')), 3, 'mask instance number');
+    assert.equal(
+      safeGet(outElements, '00201040'), 'SN', 'mask position reference');
+  });
+
   test('toDicom: keeps the input content label and description', () => {
     const refImage = buildRefImage();
     const image = buildMaskImage('test-seg-00');
