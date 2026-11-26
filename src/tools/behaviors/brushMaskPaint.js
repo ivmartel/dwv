@@ -843,12 +843,16 @@ export class BrushMaskPaint extends EventTarget {
   }
 
   /**
+   * Paint during a stroke: only the mask pixels are changed, the
+   *   undoable command (with its segment changes) is created when
+   *   the stroke is finalized.
+   *
    * @param {number[]} offsets Mask offsets.
    * @returns {unknown|undefined} Original values chunk for undo.
    */
   #applyTemporaryPaint(offsets) {
-    const maskVl = this.#getMaskViewLayer();
-    const srclayerid = maskVl.getId();
+    // check the mask view layer exists
+    this.#getMaskViewLayer();
 
     if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskId);
@@ -860,21 +864,13 @@ export class BrushMaskPaint extends EventTarget {
         formatString(ERROR_MESSAGES.brush.noMaskImage, this.#maskDataId));
     }
 
-    const props = new DrawBrushCommandProperties();
-    props.mask = /** @type {MaskImage} */ (maskData.image);
-    props.dataId = this.#maskDataId;
-    props.offsetsLists = [offsets];
-    props.mode = this.#brushMode;
-    props.segmentNumber = this.#selectedSegmentNumber;
-    props.srclayerid = srclayerid;
-    const command = new DrawBrushCommand(props);
-    command.execute();
-
-    const originalValues = command.getOriginalValuesLists();
-    if (typeof originalValues !== 'undefined') {
-      return originalValues[0];
+    if (typeof this.#selectedSegmentNumber === 'undefined') {
+      return undefined;
     }
-    return undefined;
+    const value = this.#brushMode === BrushMode.Del
+      ? 0 : this.#selectedSegmentNumber;
+    const mask = /** @type {MaskImage} */ (maskData.image);
+    return mask.setAtOffsetsAndGetOriginals([offsets], value)[0];
   }
 
   /**
