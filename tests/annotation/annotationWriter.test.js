@@ -8,6 +8,11 @@ import {DicomWriter} from '../../src/dicom/dicomWriter.js';
 import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {safeGet} from '../../src/dicom/dataElement.js';
 import {
+  DicomCode,
+  DcmCodes,
+  getDcmDicomCode
+} from '../../src/dicom/dicomCode.js';
+import {
   getSRContent,
   ValueTypes,
   RelationshipTypes
@@ -964,6 +969,134 @@ describe('annotation', () => {
       'read begin');
     assertPointClose(read.mathShape.getEnd(), new Point2D(2.5, 1.5),
       'read end');
+  });
+
+
+  /**
+   * Get an annotation without shape: a finding with a label and
+   * a coded meta item.
+   *
+   * @param {string} trackingId The tracking id.
+   * @returns {Annotation} The annotation.
+   */
+  function getShapelessAnnotation(trackingId) {
+    const annotation = getAnnotation(undefined);
+    annotation.trackingId = trackingId;
+    annotation.textExpr = `pending ${trackingId}`;
+    annotation.referencedFrameNumber = 2;
+    const lesion = new DicomCode('Lesion');
+    lesion.value = '52988006';
+    lesion.schemeDesignator = 'SCT';
+    annotation.addMetaItem(getDcmDicomCode(DcmCodes.Finding), lesion);
+    return annotation;
+  }
+
+  /**
+   * Tests for {@link AnnotationGroupFactory} toDicom of an annotation
+   * without shape: TID 1501 group with a source image and no geometry.
+   *
+   * @function module:tests/annotation~writeShapelessAnnotation
+   */
+  test('Write annotation without shape', () => {
+    const shapeless = getShapelessAnnotation('lesion-1');
+    const point = getAnnotation(new Point2D(5, 6));
+    const elements = writeAndParse(getAnnotationGroup([shapeless, point]));
+    const root = getSRContent(elements);
+    checkConstraints(root, false, 'root');
+
+    const groups = getMeasurementGroups(root);
+    assert.equal(groups.length, 2, 'two measurement groups');
+    const group = groups[0];
+    // no geometry nor measurement
+    for (const item of group.contentSequence) {
+      assert.notOk(item.valueType === ValueTypes.scoord ||
+        item.valueType === ValueTypes.scoord3d ||
+        item.valueType === ValueTypes.num,
+      `no geometry: ${item.valueType}`);
+    }
+    // source image (TID 1501 row 10b)
+    const images = findByConcept(group, '121112');
+    assert.equal(images.length, 1, 'one source image');
+    assert.equal(images[0].valueType, ValueTypes.image, 'source IMAGE');
+    assert.equal(images[0].relationshipType, RelationshipTypes.contains,
+      'source relationship');
+    assert.equal(
+      images[0].value.referencedSOPSequence.referencedSOPInstanceUID,
+      REF_UID, 'source uid');
+    // ids, label and meta
+    assert.equal(findByConcept(group, '112039')[0].value, 'lesion-1',
+      'tracking id');
+    assert.equal(findByConcept(group, '125309')[0].value, 'pending lesion-1',
+      'label');
+    assert.equal(findByConcept(group, '121071')[0].value.value, '52988006',
+      'finding');
+  });
+
+  /**
+   * Tests for {@link AnnotationGroupFactory} toDicom of a group of
+   * annotations that all have no shape.
+   *
+   * @function module:tests/annotation~writeShapelessOnlyGroup
+   */
+  test('Write group of annotations without shape', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const inputs = [
+      getShapelessAnnotation('lesion-1'),
+      getShapelessAnnotation('lesion-2')
+    ];
+    // no referenced image
+    inputs[1].referencedSopClassUID = undefined;
+    inputs[1].referencedSopInstanceUID = undefined;
+    inputs[1].referencedFrameNumber = undefined;
+    const elements = writeAndParse(getAnnotationGroup(inputs));
+    const groups = getMeasurementGroups(getSRContent(elements));
+    assert.equal(groups.length, 2, 'two measurement groups');
+    assert.equal(findByConcept(groups[1], '121112').length, 0,
+      'no source image');
+
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  /**
+   * Tests for {@link AnnotationGroupFactory} round trip of annotations
+   * without shape.
+   *
+   * @function module:tests/annotation~roundTripShapelessAnnotation
+   */
+  test('Round trip annotation without shape', () => {
+    const shapeless = getShapelessAnnotation('lesion-1');
+    const noImage = getShapelessAnnotation('lesion-2');
+    noImage.referencedSopClassUID = undefined;
+    noImage.referencedSopInstanceUID = undefined;
+    noImage.referencedFrameNumber = undefined;
+    const point = getAnnotation(new Point2D(5, 6));
+    const inputs = [shapeless, noImage, point];
+
+    const list = roundTrip(getAnnotationGroup(inputs)).getList();
+    assert.equal(list.length, inputs.length, 'annotations');
+
+    for (let i = 0; i < 2; ++i) {
+      const input = inputs[i];
+      const output = list[i];
+      const prefix = `annotation ${i}`;
+      assert.isUndefined(output.mathShape, `${prefix} no shape`);
+      assert.equal(output.trackingId, input.trackingId, `${prefix} id`);
+      assert.equal(output.trackingUid, input.trackingUid, `${prefix} uid`);
+      assert.equal(output.textExpr, input.textExpr, `${prefix} label`);
+      assert.equal(output.referencedSopClassUID,
+        input.referencedSopClassUID, `${prefix} class`);
+      assert.equal(output.referencedSopInstanceUID,
+        input.referencedSopInstanceUID, `${prefix} instance`);
+      assert.equal(output.referencedFrameNumber,
+        input.referencedFrameNumber, `${prefix} frame`);
+      assert.deepEqual(output.getMetaConceptIds(), ['121071'],
+        `${prefix} meta ids`);
+      assert.equal(output.getMetaItem('121071').value.value, '52988006',
+        `${prefix} finding`);
+    }
+    assert.ok(list[2].mathShape instanceof Point2D, 'point shape');
   });
 
 });

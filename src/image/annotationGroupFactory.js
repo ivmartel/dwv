@@ -173,9 +173,10 @@ function isPatientCoordinates(obj) {
  *
  * @typedef {object} WriteGeometry
  * @property {string} type The geometry type: 'region' (TID 1410),
- *   'length', 'angle' or 'bidimensional' (TID 1501).
- * @property {object} shape The plane shape or patient coordinates,
- *   the long axis for a bidimensional line.
+ *   'length', 'angle' or 'bidimensional' (TID 1501), or 'none'
+ *   for an annotation without shape (TID 1501 without geometry).
+ * @property {object} [shape] The plane shape or patient coordinates,
+ *   the long axis for a bidimensional line, undefined for 'none'.
  * @property {object} [shortAxis] The short axis of a bidimensional line.
  * @property {object} [labelPosition] The label position.
  * @property {object} [referencePoints] The reference points.
@@ -187,7 +188,7 @@ function isPatientCoordinates(obj) {
  * been set on a view plane.
  *
  * @param {Annotation} annotation The annotation.
- * @returns {WriteGeometry|undefined} The geometry, undefined if
+ * @returns {WriteGeometry} The geometry, of type 'none' if
  *   the annotation has no shape.
  */
 function getWriteGeometry(annotation) {
@@ -195,7 +196,19 @@ function getWriteGeometry(annotation) {
   const patient = annotation.patientGeometry;
   if (typeof shape === 'undefined') {
     if (typeof patient === 'undefined') {
-      return undefined;
+      // no shape (for ex a finding without geometry)
+      let referencePoints;
+      if (typeof annotation.referencePoints !== 'undefined' &&
+        annotation.referencePoints.length !== 0) {
+        referencePoints = annotation.referencePoints;
+      }
+      return {
+        type: 'none',
+        shape: undefined,
+        shortAxis: undefined,
+        labelPosition: annotation.labelPosition,
+        referencePoints
+      };
     }
     let type = 'region';
     if (typeof patient.shortAxis !== 'undefined') {
@@ -432,10 +445,15 @@ export class AnnotationGroupFactory {
    *
    * @param {Annotation} annotation The annotation.
    * @param {DicomSRContent} content The content to add.
+   * @param {string} [relationshipType] The expected relationship type,
+   *   defaults to SELECTED FROM.
    */
-  #addSourceImageToAnnotation(annotation, content) {
+  #addSourceImageToAnnotation(annotation, content, relationshipType) {
+    if (typeof relationshipType === 'undefined') {
+      relationshipType = RelationshipTypes.selectedFrom;
+    }
     if (content.valueType === ValueTypes.image &&
-      content.relationshipType === RelationshipTypes.selectedFrom) {
+      content.relationshipType === relationshipType) {
       annotation.referencedSopClassUID =
         content.value.referencedSOPSequence.referencedSOPClassUID;
       annotation.referencedSopInstanceUID =
@@ -1050,19 +1068,34 @@ export class AnnotationGroupFactory {
    *
    * Shapes in patient coordinates (SCOORD3D) are kept as the annotation
    * patient geometry, they get a math shape once a view is set.
+   * A TID 1501 group without geometry gives an annotation without
+   * shape, its source image is read from an IMAGE item (row 10b).
    *
    * @param {DicomSRContent} group The measurement group.
-   * @returns {Annotation|undefined} The annotation.
+   * @returns {Annotation|undefined} The annotation, undefined if the group
+   *   is empty.
    */
   #measGroupToAnnotation(group) {
-    const geometry = this.#getGroupGeometry(group);
-    if (typeof geometry === 'undefined') {
+    if (group.contentSequence.length === 0) {
       return undefined;
     }
+    const geometry = this.#getGroupGeometry(group);
 
     const annotation = new Annotation();
-    const shapeItem = geometry.shape;
-    if (shapeItem.valueType === ValueTypes.scoord3d) {
+    const shapeItem = geometry?.shape;
+    if (typeof shapeItem === 'undefined') {
+      const sourceImage = group.contentSequence.find(function (item) {
+        return item.hasHeader(
+          ValueTypes.image,
+          getDcmDicomCode(DcmCodes.SourceOfMeasurement),
+          RelationshipTypes.contains
+        );
+      });
+      if (typeof sourceImage !== 'undefined') {
+        this.#addSourceImageToAnnotation(
+          annotation, sourceImage, RelationshipTypes.contains);
+      }
+    } else if (shapeItem.valueType === ValueTypes.scoord3d) {
       annotation.patientGeometry = {
         shape: this.#getPatientCoordinates(shapeItem)
       };
@@ -1815,7 +1848,8 @@ export class AnnotationGroupFactory {
 
   /**
    * Convert an annotation into a 'Measurement Group' SR content:
-   * TID 1410 for regions and points, TID 1501 for open shapes.
+   * TID 1410 for regions and points, TID 1501 for open shapes and
+   * annotations without shape.
    *
    * @param {Annotation} annotation The input annotation.
    * @returns {DicomSRContent|undefined} The result SR content, undefined
@@ -1823,11 +1857,6 @@ export class AnnotationGroupFactory {
    */
   #annotationToMeasGroup(annotation) {
     const geometry = getWriteGeometry(annotation);
-    if (typeof geometry === 'undefined') {
-      logger.warn(`Cannot export an annotation without shape: ${
-        annotation.trackingId}`);
-      return undefined;
-    }
 
     // non acquisition plane annotations need their view
     // to get patient coordinates
@@ -1867,7 +1896,16 @@ export class AnnotationGroupFactory {
     }
 
     // geometry and measurements
-    if (geometry.type === 'region') {
+    if (geometry.type === 'none') {
+      // no geometry, just the source image (TID 1501 row 10b)
+      if (typeof annotation.referencedSopInstanceUID !== 'undefined') {
+        const srcImage = this.#getAnnotationSourceImageContent(annotation);
+        srcImage.relationshipType = RelationshipTypes.contains;
+        srcImage.conceptNameCode =
+          getDcmDicomCode(DcmCodes.SourceOfMeasurement);
+        contentSequence.push(srcImage);
+      }
+    } else if (geometry.type === 'region') {
       contentSequence.push(...this.#getTid1410Content(annotation, geometry));
     } else {
       contentSequence.push(...this.#getTid1501Content(annotation, geometry));
