@@ -538,6 +538,15 @@ describe('MaskFactory', () => {
     .organizations.value[0].DimensionOrganizationUID;
   const dwvLabels = ['ReferencedSegmentNumber', 'ImagePositionPatient'];
 
+  test('getDicomSegDimensionOrganization: valid uid', () => {
+    assert.equal(
+      dwvOrgUID, `${getDwvUIDPrefix()}.681051091011101.1`, 'uid value');
+    // UI: max 64 chars, numeric components without leading zero
+    assert.ok(dwvOrgUID.length <= 64, 'uid length');
+    assert.ok(
+      /^(0|[1-9]\d*)(\.(0|[1-9]\d*))*$/.test(dwvOrgUID), 'uid format');
+  });
+
   test('toDicom: dwv dimensions without input indices', () => {
     // test-seg-00 has no DimensionIndexSequence
     const refImage = buildRefImage();

@@ -255,7 +255,7 @@ export function getDefaultDicomSegJson() {
  */
 export function getDicomSegDimensionOrganization() {
   // 681051091011101: first 15 of charCode('DimensionOrganizationUID')
-  const organizationUID = `${getDwvUIDPrefix()}681051091011101.1`;
+  const organizationUID = `${getDwvUIDPrefix()}.681051091011101.1`;
   return {
     indices: {
       value: [
