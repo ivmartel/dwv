@@ -78,6 +78,7 @@ const MetaTagKeys = {
   StudyID: '00200010',
   StudyDescription: '00081030',
   ReferringPhysicianName: '00080090',
+  AccessionNumber: '00080050',
   // general series
   SeriesDate: '00080021',
   SeriesTime: '00080031',
