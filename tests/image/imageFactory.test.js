@@ -13,6 +13,7 @@ import {
   unsortedMultiframeMultiVolumeStructure,
   unsortedMultiframeMultiVolumeBValueStructure
 } from '../../dev/dicom/dataStructures.js';
+import {defaultPatientInfo} from '../../dev/dicom/dicomGenerator.js';
 import {logger} from '../../src/utils/logger.js';
 import {getAnyPixelDataElement} from '../../src/dicom/dicomTag.js';
 
@@ -88,11 +89,14 @@ describe('ImageFactory', () => {
     let warning;
     let image;
     let buffer;
+    let sopInstanceUid;
 
     beforeAll(() => {
       const elements = getStructureElementsList(
         config, '1.2.840.10008.1.2.1', singleSliceStructure)[0];
       buffer = getAnyPixelDataElement(elements).value;
+      // SOPInstanceUID may be generated (not in the config)
+      sopInstanceUid = elements['00080018'].value[0];
 
       const factory = new ImageFactory();
       warning = factory.checkElements(elements);
@@ -148,7 +152,7 @@ describe('ImageFactory', () => {
         'StudyInstanceUID');
       assert.equal(meta.SeriesInstanceUID, tags.SeriesInstanceUID,
         'SeriesInstanceUID');
-      assert.equal(meta.PatientID, tags.PatientID, 'PatientID');
+      assert.equal(meta.PatientID, defaultPatientInfo.PatientID, 'PatientID');
       assert.equal(meta.sliceCapacity, 1, 'sliceCapacity');
     });
 
@@ -182,7 +186,7 @@ describe('ImageFactory', () => {
 
     test('create: SOPInstanceUID used as frame UID', () => {
       assert.ok(
-        image.includesImageUid(tags.SOPInstanceUID),
+        image.includesImageUid(sopInstanceUid),
         'SOPInstanceUID is in image UIDs'
       );
     });

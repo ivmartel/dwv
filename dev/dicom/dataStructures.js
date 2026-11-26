@@ -1,5 +1,8 @@
 import {addTagsToDictionary} from '../../src/dicom/dictionary.js';
 import {
+  addDates,
+  addInstanceIds,
+  addPatientInfo,
   generateDataElements,
   generateSliceBuffers
 } from './dicomGenerator.js';
@@ -154,6 +157,9 @@ export function getStructureNumberOfFiles(structure) {
 
 /**
  * Generate the data elements of the files of a data structure.
+ * Adds the default patient tags, instance ids and dates if not present
+ * in the config, see {@link addPatientInfo}, {@link addInstanceIds}
+ * and {@link addDates}.
  *
  * @param {object} config The data configuration (tags, and optional
  *   segmentSquares for SEG), as in tests/data/synthetic-*.json.
@@ -165,6 +171,10 @@ export function getStructureNumberOfFiles(structure) {
 export function getStructureElementsList(config, syntax, structure) {
   const tags = structuredClone(config.tags);
   tags.TransferSyntaxUID = syntax;
+  // default patient tags, instance ids and dates (not in the configs)
+  addPatientInfo(tags);
+  addInstanceIds(tags);
+  addDates(tags);
   // per-frame functional groups are not part of the MR Image IOD:
   // use the Enhanced MR Image one
   if (structure.genOptions.frames3D &&

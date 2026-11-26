@@ -9,7 +9,8 @@ import {
   getElementsFromSimpleTagValues
 } from '../../src/dicom/simpleTagValues.js';
 import {
-  DicomWriter
+  DicomWriter,
+  getUID
 } from '../../src/dicom/dicomWriter.js';
 import {transferSyntaxKeywords} from '../../src/dicom/dictionary.js';
 
@@ -618,12 +619,12 @@ export function zipBuffers(
 }
 
 /**
- * Add dates to input tags.
+ * Add the current date and time to input tags if not present:
+ * study, series and content date and time.
  *
  * @param {Record<string, SimpleTagValue>} tags The tags.
  */
 export function addDates(tags) {
-  // set study date
   const now = new Date();
   const dateStr = now.getFullYear().toString() +
     (now.getMonth() + 1).toString().padStart(2, '0') +
@@ -640,11 +641,75 @@ export function addDates(tags) {
     tags.StudyTime = timeStr;
   }
 
-  // study
+  // series
   if (typeof tags.SeriesDate === 'undefined') {
     tags.SeriesDate = dateStr;
   }
   if (typeof tags.SeriesTime === 'undefined') {
     tags.SeriesTime = timeStr;
+  }
+
+  // content
+  if (typeof tags.ContentDate === 'undefined') {
+    tags.ContentDate = dateStr;
+  }
+  if (typeof tags.ContentTime === 'undefined') {
+    tags.ContentTime = timeStr;
+  }
+}
+
+/**
+ * Default patient related tags: patient names, id, birth date and sex
+ * from the Patient Module
+ * {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.html#sect_C.7.1.1},
+ * and the referring physician name from the General Study Module
+ * {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.2.html#sect_C.7.2.1}.
+ */
+export const defaultPatientInfo = {
+  PatientName: 'dwv^PatientName',
+  PatientID: '0123456',
+  PatientBirthDate: '19700101',
+  PatientSex: 'O',
+  OtherPatientNames: 'dwv^PatientOtherName',
+  ReferringPhysicianName: 'dwv^ReferringPhysicianName'
+};
+
+/**
+ * Add default patient related tags to input tags if not present.
+ *
+ * @param {Record<string, SimpleTagValue>} tags The tags.
+ */
+export function addPatientInfo(tags) {
+  for (const [name, value] of Object.entries(defaultPatientInfo)) {
+    if (typeof tags[name] === 'undefined') {
+      tags[name] = value;
+    }
+  }
+}
+
+/**
+ * Add default instance identifiers to input tags if not present:
+ * a StudyID, a SeriesNumber, a new SOPInstanceUID and
+ * a MediaStorageSOPInstanceUID equal to it, and a MediaStorageSOPClassUID
+ * equal to the SOPClassUID.
+ *
+ * @param {Record<string, SimpleTagValue>} tags The tags.
+ */
+export function addInstanceIds(tags) {
+  if (typeof tags.StudyID === 'undefined') {
+    tags.StudyID = '1';
+  }
+  if (typeof tags.SeriesNumber === 'undefined') {
+    tags.SeriesNumber = 1;
+  }
+  if (typeof tags.SOPInstanceUID === 'undefined') {
+    tags.SOPInstanceUID = getUID();
+  }
+  if (typeof tags.MediaStorageSOPInstanceUID === 'undefined') {
+    tags.MediaStorageSOPInstanceUID = tags.SOPInstanceUID;
+  }
+  if (typeof tags.MediaStorageSOPClassUID === 'undefined' &&
+    typeof tags.SOPClassUID !== 'undefined') {
+    tags.MediaStorageSOPClassUID = tags.SOPClassUID;
   }
 }

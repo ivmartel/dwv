@@ -18,6 +18,9 @@ import {
   transferSyntaxKeywords
 } from '../../src/dicom/dictionary.js';
 import {
+  addDates,
+  addInstanceIds,
+  addPatientInfo,
   generateDataElements,
   generateSliceBuffers
 } from '../../dev/dicom/dicomGenerator.js';
@@ -838,6 +841,10 @@ describe('dicom', () => {
     }
     // pass tags clone to avoid modifications (for ex by padElement)
     const jsonTags = structuredClone(config.tags);
+    // default patient tags, instance ids and dates (not in the configs)
+    addPatientInfo(jsonTags);
+    addInstanceIds(jsonTags);
+    addDates(jsonTags);
 
     // generate buffer
     const genOptions = {};
