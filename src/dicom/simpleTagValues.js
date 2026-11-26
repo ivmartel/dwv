@@ -133,8 +133,10 @@ export function getElementsFromSimpleTagValues(simpleTags) {
         logger.debug('Non array simpleTag SQ value');
       }
       value = items;
-    } else if (Array.isArray(simpleTag)) {
-      value = simpleTag;
+    } else if (Array.isArray(simpleTag) || ArrayBuffer.isView(simpleTag)) {
+      // arrays and typed arrays are used as is (typed arrays are
+      //   stored in the element value as the parser does for 'O*' VRs)
+      value = /** @type {Array} */ (simpleTag);
     } else {
       value = [simpleTag];
     }

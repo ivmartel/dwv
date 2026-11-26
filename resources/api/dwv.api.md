@@ -1348,7 +1348,7 @@ export type SimpleSequenceValue = {
 };
 
 // @public
-export type SimpleTagValue = string | number | string[] | number[];
+export type SimpleTagValue = string | number | string[] | number[] | TypedArray;
 
 // @public
 export type SimpleTagValues = Record<string, SimpleTagValue | SimpleSequenceValue>;
