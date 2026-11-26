@@ -1083,4 +1083,50 @@ describe('dicom', () => {
       'pixel spacing value 1');
   });
 
+  /**
+   * Tests for {@link DicomWriter} and {@link DicomParser} float
+   *   'O*' VRs (OF, OD).
+   *
+   * @function module:tests/dicom~writeReadFloatOtherVr
+   */
+  test('Write-read OF and OD', () => {
+    const ofValues = [1.5, -2.25, 3.125, 1e-3];
+    const odValues = [1.5, -2.25, 1 / 3];
+
+    const syntaxes = [
+      transferSyntaxKeywords.ExplicitVRLittleEndian,
+      transferSyntaxKeywords.ImplicitVRLittleEndian,
+      transferSyntaxKeywords.ExplicitVRBigEndian
+    ];
+    for (const syntax of syntaxes) {
+      const parser = new DicomParser();
+      parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+      const elements = parser.getDicomElements();
+      elements['00020010'].value = [syntax];
+      // PointCoordinatesData (OF)
+      const pointCoords = new DataElement('OF');
+      pointCoords.tag = getTagFromKey('00660016');
+      pointCoords.value = new Float32Array(ofValues);
+      elements['00660016'] = pointCoords;
+      // DoublePointCoordinatesData (OD), as a number array
+      const doublePointCoords = new DataElement('OD');
+      doublePointCoords.tag = getTagFromKey('00660022');
+      doublePointCoords.value = odValues;
+      elements['00660022'] = doublePointCoords;
+
+      const newParser = new DicomParser();
+      newParser.parse(new DicomWriter().getBuffer(elements));
+      const tags = newParser.getDicomElements();
+
+      const ofRead = tags['00660016'].value;
+      assert.ok(ofRead instanceof Float32Array, `OF type (${syntax})`);
+      assert.deepEqual(Array.from(ofRead), Array.from(pointCoords.value),
+        `OF values (${syntax})`);
+      const odRead = tags['00660022'].value;
+      assert.ok(odRead instanceof Float64Array, `OD type (${syntax})`);
+      assert.deepEqual(Array.from(odRead), odValues,
+        `OD values (${syntax})`);
+    }
+  });
+
 });
