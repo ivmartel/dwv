@@ -194,8 +194,9 @@ export function getStructureElementsList(config, syntax, structure) {
     tags.NumberOfFrames = structure.numberOfFrames;
   }
   // generateDataElements modifies its options, use a copy
+  // (no pixel generator name: use the modality default, the binary
+  // squares for SEG)
   const genOptions = {
-    pixelGeneratorName: 'string',
     segmentSquares: config.segmentSquares,
     ...structuredClone(structure.genOptions)
   };
