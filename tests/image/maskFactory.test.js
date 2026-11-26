@@ -618,6 +618,48 @@ describe('MaskFactory', () => {
     checkDimensions(outElements, dwvOrgUID, dwvLabels);
   });
 
+  test('toDicom: default content label and description', () => {
+    // test-seg-00 has no content label or description
+    const outElements = new MaskFactory().toDicom(
+      buildMaskImage('test-seg-00'), undefined, buildRefImage());
+    assert.equal(
+      safeGet(outElements, '00700080'), 'SEGMENTATION', 'content label');
+    // type 2: present, empty
+    assert.ok(
+      typeof outElements['00700081'] !== 'undefined',
+      'content description is present'
+    );
+    assert.equal(
+      safeGet(outElements, '00700081'), '', 'empty description');
+  });
+
+  test('toDicom: keeps the input content label and description', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    image.getMeta().ContentLabel = 'LIVER_SEG';
+    image.getMeta().ContentDescription = 'Liver segmentation';
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    assert.equal(
+      safeGet(outElements, '00700080'), 'LIVER_SEG', 'content label');
+    assert.equal(
+      safeGet(outElements, '00700081'), 'Liver segmentation',
+      'content description');
+
+    // kept when read back
+    const meta = writeAndRead(outElements, refImage).getMeta();
+    assert.equal(meta.ContentLabel, 'LIVER_SEG', 'read content label');
+    assert.equal(
+      meta.ContentDescription, 'Liver segmentation',
+      'read content description');
+
+    // extra tags win
+    const extraElements = new MaskFactory().toDicom(
+      image, undefined, refImage, {ContentLabel: 'OTHER'});
+    assert.equal(
+      safeGet(extraElements, '00700080'), 'OTHER', 'extra content label');
+  });
+
 });
 
 // ---------------------------------------------------------------------------

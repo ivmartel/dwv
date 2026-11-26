@@ -91,7 +91,10 @@ const MetaTagKeys = {
   DeviceSerialNumber: '00181000',
   SoftwareVersions: '00181020',
   // general image
-  LossyImageCompression: '00282110'
+  LossyImageCompression: '00282110',
+  // content identification
+  ContentLabel: '00700080',
+  ContentDescription: '00700081'
 };
 
 /**
@@ -600,6 +603,16 @@ export class MaskFactory {
 
     // keep source image StudyInstanceUID
     tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
+
+    // content identification: label is type 1 (CS),
+    //   description is type 2 (present, possibly empty)
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_10.9.html
+    if (typeof tags.ContentLabel === 'undefined' || tags.ContentLabel === '') {
+      tags.ContentLabel = 'SEGMENTATION';
+    }
+    if (typeof tags.ContentDescription === 'undefined') {
+      tags.ContentDescription = '';
+    }
 
     // segmentation is not lossy compression, but a segmentation
     //   derived from lossy compressed images is marked as such
