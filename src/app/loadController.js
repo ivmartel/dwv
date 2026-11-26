@@ -38,6 +38,13 @@ export class LoadController extends EventTarget {
   #currentLoaders = {};
 
   /**
+   * Load counter.
+   *
+   * @type {number}
+   */
+  #loadIdCounter = -1;
+
+  /**
    * @param {string} defaultCharacterSet The default character set.
    */
   constructor(defaultCharacterSet) {
@@ -46,26 +53,36 @@ export class LoadController extends EventTarget {
   }
 
   /**
+   * Get the next load id.
+   *
+   * @returns {string} The load id.
+   */
+  getNextLoadId() {
+    ++this.#loadIdCounter;
+    return this.#loadIdCounter.toString();
+  }
+
+  /**
    * Load a list of image files.
    *
    * @param {File[]} files The list of files to load.
-   * @param {string} dataId The data Id.
+   * @param {string} loadId The load id.
    */
-  loadFiles(files, dataId) {
-    this.#loadImageFiles(files, dataId);
+  loadFiles(files, loadId) {
+    this.#loadImageFiles(files, loadId);
   }
 
   /**
    * Load a list of image URLs.
    *
    * @param {string[]} urls The list of urls to load.
-   * @param {string} dataId The data Id.
+   * @param {string} loadId The load id.
    * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
-  loadURLs(urls, dataId, options) {
-    this.#loadImageUrls(urls, dataId, options);
+  loadURLs(urls, loadId, options) {
+    this.#loadImageUrls(urls, loadId, options);
   }
 
   /**
@@ -73,33 +90,33 @@ export class LoadController extends EventTarget {
    *
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: '', filename: '', data: data}].
-   * @param {string} dataId The data Id.
+   * @param {string} loadId The load id.
    */
-  loadImageObject(data, dataId) {
+  loadImageObject(data, loadId) {
     // create IO
     const memoryIO = new MemoryLoader();
     // load data
-    this.#loadData(data, memoryIO, dataId);
+    this.#loadData(data, memoryIO, loadId);
   }
 
   /**
-   * Get the currently loaded data ids.
+   * Get the ids of the current loads.
    *
-   * @returns {string[]} The data ids.
+   * @returns {string[]} The load ids.
    */
-  getLoadingDataIds() {
+  getCurrentLoadIds() {
     return Object.keys(this.#currentLoaders);
   }
 
   /**
    * Abort an individual current loader.
    *
-   * @param {string} dataId The data to stop loading.
+   * @param {string} loadId The load to stop.
    */
-  abort(dataId) {
-    if (typeof this.#currentLoaders[dataId] !== 'undefined') {
-      this.#currentLoaders[dataId].loader.abort();
-      delete this.#currentLoaders[dataId];
+  abort(loadId) {
+    if (typeof this.#currentLoaders[loadId] !== 'undefined') {
+      this.#currentLoaders[loadId].abort();
+      delete this.#currentLoaders[loadId];
     }
   }
 
@@ -109,31 +126,31 @@ export class LoadController extends EventTarget {
    * Load a list of image files.
    *
    * @param {File[]} files The list of image files to load.
-   * @param {string} dataId The data Id.
+   * @param {string} loadId The load id.
    */
-  #loadImageFiles(files, dataId) {
+  #loadImageFiles(files, loadId) {
     // create IO
     const fileIO = new FilesLoader();
     fileIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    this.#loadData(files, fileIO, dataId);
+    this.#loadData(files, fileIO, loadId);
   }
 
   /**
    * Load a list of image URLs.
    *
    * @param {string[]} urls The list of urls to load.
-   * @param {string} [dataId] The data Id.
+   * @param {string} loadId The load id.
    * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
-  #loadImageUrls(urls, dataId, options) {
+  #loadImageUrls(urls, loadId, options) {
     // create IO
     const urlIO = new UrlsLoader();
     urlIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    this.#loadData(urls, urlIO, dataId, options);
+    this.#loadData(urls, urlIO, loadId, options);
   }
 
   /**
@@ -141,44 +158,27 @@ export class LoadController extends EventTarget {
    *
    * @param {string[]|File[]|Array} data Array of data to load.
    * @param {object} loader The data loader.
-   * @param {string} dataId The data id.
+   * @param {string} loadId The load id.
    * @param {object} [options] Options passed to the final loader.
    */
-  #loadData(data, loader, dataId, options) {
+  #loadData(data, loader, loadId, options) {
     const eventInfo = {
-      dataid: dataId
+      loadid: loadId
     };
 
     // set callbacks
     loader.onloadstart = (event) => {
       // store loader to allow abort
-      this.#currentLoaders[dataId] = {
-        loader,
-        isFirstItem: true
-      };
+      this.#currentLoaders[loadId] = loader;
       // callback
       this.#getFireEvent('loadstart', eventInfo)(event);
     };
     loader.onprogress = this.#getFireEvent('loadprogress', eventInfo);
-    loader.onloaditem = (event) => {
-      const eventInfoItem = {
-        dataid: dataId
-      };
-      if (typeof this.#currentLoaders[dataId] !== 'undefined') {
-        eventInfoItem.isfirstitem = this.#currentLoaders[dataId].isFirstItem;
-      }
-      // callback
-      this.#getFireEvent('loaditem', eventInfoItem)(event);
-      // update loader
-      if (typeof this.#currentLoaders[dataId] !== 'undefined' &&
-        this.#currentLoaders[dataId].isFirstItem) {
-        this.#currentLoaders[dataId].isFirstItem = false;
-      }
-    };
+    loader.onloaditem = this.#getFireEvent('loaditem', eventInfo);
     loader.onload = this.#getFireEvent('load', eventInfo);
     loader.onloadend = (event) => {
       // reset current loader
-      delete this.#currentLoaders[dataId];
+      delete this.#currentLoaders[loadId];
       // callback
       this.#getFireEvent('loadend', eventInfo)(event);
     };
@@ -193,13 +193,13 @@ export class LoadController extends EventTarget {
     } catch (error) {
       this.dispatchEvent(new CustomEvent('error', {
         detail: {
-          dataid: dataId,
+          loadid: loadId,
           error
         }
       }));
       this.dispatchEvent(new CustomEvent('loadend', {
         detail: {
-          dataid: dataId
+          loadid: loadId
         }
       }));
     }

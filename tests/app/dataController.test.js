@@ -2,7 +2,8 @@ import {describe, test, assert} from 'vitest';
 import {
   DicomData,
   DicomSliceDataList,
-  DataController
+  DataController,
+  getDataGroupKey
 } from '../../src/app/dataController.js';
 import {Point3D} from '../../src/math/point.js';
 import {Index} from '../../src/math/index.js';
@@ -497,6 +498,157 @@ describe('app', () => {
     assert.throws(function () {
       list0.buildData();
     }, Error, 'Cannot create image for multi-volume');
+  });
+
+  /**
+   * Create the meta of a DICOM object.
+   *
+   * @param {object} tags The tags: sop, series, modality, imageType
+   *   and pixelData (true to add a Pixel Data element).
+   * @returns {Record<string, DataElement>} The meta data.
+   */
+  function makeObjectMeta(tags) {
+    const meta = {
+      '00080018': makeDataElement('UI', [tags.sop]),
+      '0020000E': makeDataElement('UI', [tags.series]),
+      '00080060': makeDataElement('CS', [tags.modality])
+    };
+    if (typeof tags.imageType !== 'undefined') {
+      meta['00080008'] = makeDataElement('CS', tags.imageType);
+    }
+    if (tags.pixelData) {
+      meta['7FE00010'] = makeDataElement('OW', [new Uint16Array(4)]);
+    }
+    return meta;
+  }
+
+  /**
+   * Tests for {@link getDataGroupKey}.
+   *
+   * @function module:tests/app~getDataGroupKey
+   */
+  test('getDataGroupKey', () => {
+    const image0 = makeObjectMeta({
+      sop: '1.1',
+      series: '1',
+      modality: 'CT',
+      imageType: ['ORIGINAL', 'PRIMARY', 'AXIAL'],
+      pixelData: true
+    });
+    const image1 = makeObjectMeta({
+      sop: '1.2', series: '1', modality: 'CT', pixelData: true
+    });
+    const otherSeries = makeObjectMeta({
+      sop: '2.1', series: '2', modality: 'CT', pixelData: true
+    });
+    const localizer = makeObjectMeta({
+      sop: '1.3',
+      series: '1',
+      modality: 'CT',
+      imageType: ['ORIGINAL', 'PRIMARY', 'LOCALIZER'],
+      pixelData: true
+    });
+    const sr0 = makeObjectMeta({sop: '3.1', series: '3', modality: 'SR'});
+    const sr1 = makeObjectMeta({sop: '3.2', series: '3', modality: 'SR'});
+    const seg = makeObjectMeta({
+      sop: '4.1', series: '4', modality: 'SEG', pixelData: true
+    });
+
+    // images: per series
+    assert.equal(getDataGroupKey(image0), getDataGroupKey(image1));
+    assert.notEqual(getDataGroupKey(image0), getDataGroupKey(otherSeries));
+    // localizer: own data
+    assert.notEqual(getDataGroupKey(image0), getDataGroupKey(localizer));
+    // no pixel data: per instance, even in the same series
+    assert.notEqual(getDataGroupKey(sr0), getDataGroupKey(sr1));
+    // seg: per instance, not mixed with images
+    assert.equal(getDataGroupKey(seg), 'instance-4.1');
+    // non DICOM (no SOP instance UID): a single data
+    assert.equal(getDataGroupKey({imageUid: makeDataElement('UI', [0])}),
+      getDataGroupKey({imageUid: makeDataElement('UI', [1])}));
+  });
+
+  /**
+   * Tests for {@link DataController} load items.
+   *
+   * @function module:tests/app~dataControllerLoadItems
+   */
+  test('DataController addLoadItem groups the items of a load', () => {
+    const controller = new DataController();
+    const added = [];
+    controller.addEventListener('dataadd', (event) => {
+      added.push(event.detail.dataid);
+    });
+
+    const sr0 = new DicomData(
+      makeObjectMeta({sop: '3.1', series: '3', modality: 'KO'}));
+    const sr1 = new DicomData(
+      makeObjectMeta({sop: '3.2', series: '3', modality: 'KO'}));
+    const rtstruct = new DicomData(
+      makeObjectMeta({sop: '5.1', series: '5', modality: 'RTSTRUCT'}));
+
+    const res0 = controller.addLoadItem('load0', sr0);
+    assert.deepEqual(res0, {dataId: '0', isNew: true});
+    // RTSTRUCT waits for the end of the load
+    assert.isUndefined(controller.addLoadItem('load0', rtstruct));
+    const res1 = controller.addLoadItem('load0', sr1);
+    assert.deepEqual(res1, {dataId: '1', isNew: true});
+    assert.deepEqual(controller.getLoadDataIds('load0'), ['0', '1']);
+    assert.deepEqual(added, ['0', '1']);
+
+    // pending items are given once
+    assert.deepEqual(controller.getPendingLoadItems('load0'), [rtstruct]);
+    assert.deepEqual(controller.getPendingLoadItems('load0'), []);
+
+    // the same instance in another load is a new data
+    const sr0Again = new DicomData(
+      makeObjectMeta({sop: '3.1', series: '3', modality: 'KO'}));
+    assert.deepEqual(
+      controller.addLoadItem('load1', sr0Again), {dataId: '2', isNew: true});
+
+    // end load: keys are forgotten
+    controller.endLoad('load0');
+    assert.deepEqual(controller.getLoadDataIds('load0'), []);
+    assert.deepEqual(controller.getPendingLoadItems('load0'), []);
+    // data are kept
+    assert.deepEqual(controller.getDataIds(), ['0', '1', '2']);
+  });
+
+  test('DataController addLoadItem appends items of the same data', () => {
+    const controller = new DataController();
+    // non DICOM items: no SOP instance UID, same data
+    const data0 = makeSliceData(0, 'uid0', {});
+    data0.numberOfItems = 2;
+    const data1 = makeSliceData(1, 'uid1', {});
+    data1.numberOfItems = 2;
+
+    assert.deepEqual(
+      controller.addLoadItem('load0', data0), {dataId: '0', isNew: true});
+    assert.deepEqual(
+      controller.addLoadItem('load0', data1), {dataId: '0', isNew: false});
+    assert.equal(
+      controller.get('0').image.getGeometry().getSize().get(2), 2);
+  });
+
+  test('DataController removeLoadData ignores the next items', () => {
+    const controller = new DataController();
+    const sr0 = new DicomData(
+      makeObjectMeta({sop: '3.1', series: '3', modality: 'KO'}));
+    const sr1 = new DicomData(
+      makeObjectMeta({sop: '3.2', series: '3', modality: 'KO'}));
+    controller.addLoadItem('load0', sr0);
+    controller.addLoadItem('load0', sr1);
+    assert.equal(controller.getLoadItemDataId('load0', sr0), '0');
+    assert.isUndefined(controller.getLoadItemDataId('load1', sr0));
+
+    controller.removeLoadData('load0', '0');
+    assert.deepEqual(controller.getDataIds(), ['1']);
+    assert.deepEqual(controller.getLoadDataIds('load0'), ['1']);
+    // an item of the removed data is ignored
+    const sr0Again = new DicomData(
+      makeObjectMeta({sop: '3.1', series: '3', modality: 'KO'}));
+    assert.isUndefined(controller.addLoadItem('load0', sr0Again));
+    assert.deepEqual(controller.getDataIds(), ['1']);
   });
 
 });

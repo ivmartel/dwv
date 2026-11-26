@@ -397,7 +397,9 @@ function addSeriesRow(table, labels, orientation, index,
   app.init(options);
   app.addEventListener('load', function (event) {
     if (!viewOnFirstLoadItem) {
-      app.getStageController().render(event.detail.dataid);
+      for (const dataId of event.detail.dataids) {
+        app.getStageController().render(dataId);
+      }
     }
     // go to check position
     for (const viewConfig of viewConfigs) {
