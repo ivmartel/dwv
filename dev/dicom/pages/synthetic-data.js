@@ -60,19 +60,24 @@ function getViewUrl(buffers) {
 /**
  * Append the links of a data structure to a list element.
  *
- * For viewable images (not SEG, which needs its referenced image),
- * the structure short name (for ex 'mf') opens the data
- * in the test viewer and is followed by a download link; otherwise
- * the structure file name (for ex 'ss.dcm') is the download link.
+ * For viewable data, the structure short name (for ex 'mf') opens
+ * the data in the test viewer and is followed by a download link;
+ * otherwise the structure file name (for ex 'ss.dcm') is the
+ * download link. Images are viewable; derived data (SEG, RTSTRUCT)
+ * are viewable with the buffers of their referenced image, loaded
+ * with them in a single load: the app waits for the referenced
+ * image before creating the derived data.
  * The download is a dcm file for single file structures, a zip file
- * otherwise.
+ * otherwise. It only contains the data, not its reference.
  *
  * @param {HTMLLIElement} li The list element.
  * @param {object} config The data configuration.
  * @param {object} structure The data structure, see
  *   {@link singleSliceStructure} and {@link dataStructures}.
+ * @param {ArrayBuffer[]} [refBuffers] The buffers of the referenced
+ *   image of a derived data.
  */
-function appendStructureLinks(li, config, structure) {
+function appendStructureLinks(li, config, structure, refBuffers) {
   const isZip = getStructureNumberOfFiles(structure) !== 1;
   const linkText = `${structure.short}.${isZip ? 'zip' : 'dcm'}`;
   const fileName = `dwv-generated-${config.name}-${linkText}`;
@@ -97,12 +102,17 @@ function appendStructureLinks(li, config, structure) {
     console.error(error);
   }
 
-  if (typeof buffers !== 'undefined' &&
-    isMultiSliceModality(config.tags.Modality)) {
+  const isViewable = isMultiSliceModality(config.tags.Modality) ||
+    typeof refBuffers !== 'undefined';
+  if (typeof buffers !== 'undefined' && isViewable) {
+    const viewBuffers = typeof refBuffers !== 'undefined'
+      ? refBuffers.concat(buffers) : buffers;
     const viewLink = document.createElement('a');
-    viewLink.href = getViewUrl(buffers);
+    viewLink.href = getViewUrl(viewBuffers);
     viewLink.target = 'dwv-viewer';
-    viewLink.title = 'Open in the viewer';
+    viewLink.title = typeof refBuffers !== 'undefined'
+      ? 'Open in the viewer with its referenced image'
+      : 'Open in the viewer';
     viewLink.appendChild(document.createTextNode(structure.short));
     downloadLink.className = 'icon';
     downloadLink.appendChild(document.createTextNode('\u{1F4BE}'));
@@ -111,6 +121,61 @@ function appendStructureLinks(li, config, structure) {
     downloadLink.appendChild(document.createTextNode(linkText));
     li.append(downloadLink);
   }
+}
+
+/**
+ * Get the referenced series instance UID of a derived data
+ * (SEG or RTSTRUCT) configuration.
+ *
+ * @param {object} config The data configuration.
+ * @returns {string|undefined} The referenced series UID, undefined
+ *   for non derived data.
+ */
+function getReferencedSeriesUid(config) {
+  const tags = config.tags;
+  let res;
+  if (tags.Modality === 'SEG') {
+    res = tags.ReferencedSeriesSequence?.value[0]?.SeriesInstanceUID;
+  } else if (tags.Modality === 'RTSTRUCT') {
+    res = tags.ReferencedFrameOfReferenceSequence?.value[0]
+      ?.RTReferencedStudySequence?.value[0]
+      ?.RTReferencedSeriesSequence?.value[0]
+      ?.SeriesInstanceUID;
+  }
+  return res;
+}
+
+/**
+ * Get the single slice buffers of the image referenced by a derived
+ * data (SEG or RTSTRUCT) configuration.
+ *
+ * @param {object} config The data configuration.
+ * @param {Array} configs The list of configurations to search the
+ *   referenced image in.
+ * @returns {ArrayBuffer[]|undefined} The buffers of the referenced
+ *   image, undefined if not found or not derived data.
+ */
+function getReferencedBuffers(config, configs) {
+  const refUid = getReferencedSeriesUid(config);
+  if (typeof refUid === 'undefined') {
+    return undefined;
+  }
+  const refConfig = configs.find((item) =>
+    isMultiSliceModality(item.tags.Modality) &&
+    item.tags.SeriesInstanceUID === refUid);
+  if (typeof refConfig === 'undefined') {
+    console.warn(`No referenced image for ${config.name}`);
+    return undefined;
+  }
+  let res;
+  try {
+    res = getStructureBuffers(
+      refConfig, refConfig.tags.TransferSyntaxUID, singleSliceStructure);
+  } catch (error) {
+    console.log('data:', refConfig.name);
+    console.error(error);
+  }
+  return res;
 }
 
 /**
@@ -126,7 +191,8 @@ function getConfigsHtmlList(configs) {
     const li = document.createElement('li');
     li.appendChild(document.createTextNode(
       `${config.name}: ${config.tags.SeriesDescription}: `));
-    appendStructureLinks(li, config, singleSliceStructure);
+    appendStructureLinks(li, config, singleSliceStructure,
+      getReferencedBuffers(config, configs));
     if (isMultiSliceModality(config.tags.Modality)) {
       for (const structure of Object.values(dataStructures)) {
         li.appendChild(document.createTextNode(', '));
