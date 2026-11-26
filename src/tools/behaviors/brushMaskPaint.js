@@ -953,6 +953,9 @@ export class BrushMaskPaint extends EventTarget {
       this.dispatchEvent(event);
       this.#mask.recalculateLabels();
     };
+    // the stroke pixels are already painted, only update the
+    //   segment types (the command will restore them on undo)
+    command.updateSegmentTypes();
 
     const undoCtrl = this.#app.getUndoController();
     undoCtrl.addToUndoStack(command);

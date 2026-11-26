@@ -446,6 +446,7 @@ export class DrawBrushCommand extends Command {
     getOriginalValuesLists(): any[] | undefined;
     onExecute(_event: CustomEvent): void;
     onUndo(_event: CustomEvent): void;
+    updateSegmentTypes(): void;
 }
 
 // @public

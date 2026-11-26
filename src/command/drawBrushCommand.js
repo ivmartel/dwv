@@ -52,6 +52,14 @@ export class DrawBrushCommand extends Command {
   #isSilent;
 
   /**
+   * Segment algorithm types changed by this command, as
+   *   {number, previousType} items.
+   *
+   * @type {Array<{number: number, previousType: string}>}
+   */
+  #segmentTypeChanges = [];
+
+  /**
    * @type {string}
    */
   #exeType;
@@ -90,6 +98,68 @@ export class DrawBrushCommand extends Command {
    */
   getOriginalValuesLists() {
     return this.#originalValuesLists;
+  }
+
+  /**
+   * Get the numbers of the segments edited by this command: the drawn
+   *   segment and the segments that had pixels at the brush offsets.
+   *
+   * @returns {number[]} The segment numbers.
+   */
+  #getEditedSegmentNumbers() {
+    const newValue = this.#exeType === 'brushdraw' ? this.#segmentNumber : 0;
+    const numbers = new Set();
+    if (newValue !== 0) {
+      numbers.add(newValue);
+    }
+    for (const originalValues of this.#originalValuesLists ?? []) {
+      for (const item of originalValues) {
+        if (item.value !== 0 && item.value !== newValue) {
+          numbers.add(item.value);
+        }
+      }
+    }
+    return Array.from(numbers);
+  }
+
+  /**
+   * Update the algorithm type of the segments edited by this command:
+   *   an AUTOMATIC segment edited by the user becomes SEMIAUTOMATIC
+   *   (its algorithm name is kept). The change is reverted by undo.
+   *
+   * Called by execute; call it directly for a command whose
+   *   brush values were already applied to the mask.
+   */
+  updateSegmentTypes() {
+    const segments = this.#mask.getMeta()?.custom?.segments;
+    if (typeof segments === 'undefined') {
+      return;
+    }
+    for (const number of this.#getEditedSegmentNumbers()) {
+      const segment = segments.find(item => item.number === number);
+      if (typeof segment !== 'undefined' &&
+        segment.algorithmType === 'AUTOMATIC') {
+        this.#segmentTypeChanges.push({
+          number,
+          previousType: segment.algorithmType
+        });
+        segment.algorithmType = 'SEMIAUTOMATIC';
+      }
+    }
+  }
+
+  /**
+   * Revert the segment algorithm type changes of this command.
+   */
+  #revertSegmentTypes() {
+    const segments = this.#mask.getMeta()?.custom?.segments;
+    for (const change of this.#segmentTypeChanges) {
+      const segment = segments?.find(item => item.number === change.number);
+      if (typeof segment !== 'undefined') {
+        segment.algorithmType = change.previousType;
+      }
+    }
+    this.#segmentTypeChanges = [];
   }
 
   /**
@@ -142,6 +212,7 @@ export class DrawBrushCommand extends Command {
     } else {
       this.#mask.setAtOffsetsWithIterator(this.#offsetsLists, segNumber);
     }
+    this.updateSegmentTypes();
 
     // callback
     if (!this.#isSilent) {
@@ -171,6 +242,7 @@ export class DrawBrushCommand extends Command {
       this.#mask.setAtOffsetsWithIterator(
         this.#offsetsLists, this.#originalValuesLists);
     }
+    this.#revertSegmentTypes();
 
     // callback
     const number =
