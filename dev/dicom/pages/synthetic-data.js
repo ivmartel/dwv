@@ -23,62 +23,94 @@ function setup() {
 }
 
 /**
- * Get a single-slice link (dcm file).
+ * Get the object URL of a DICOM buffer.
  *
- * @param {object} config The data configuration.
- * @returns {HTMLLinkElement} The link.
+ * @param {ArrayBuffer} buffer The DICOM buffer.
+ * @returns {string} The object URL.
  */
-function getSingleSliceLink(config) {
-  const link = document.createElement('a');
-  try {
-    const buffer = getStructureBuffers(
-      config, config.tags.TransferSyntaxUID, singleSliceStructure)[0];
-    const blob = new Blob([buffer], {type: 'application/dicom'});
-    link.href = URL.createObjectURL(blob);
-  } catch (error) {
-    console.log('data:', config.name);
-    console.error(error);
-  }
-  const fileName = `dwv-generated-${config.name}.dcm`;
-  link.download = fileName;
-  link.appendChild(document.createTextNode('dcm'));
-  return link;
+function getDicomObjectUrl(buffer) {
+  const blob = new Blob([buffer], {type: 'application/dicom'});
+  return URL.createObjectURL(blob);
 }
 
 /**
- * Get a data structure link: dcm file for single file structures,
- * zip file otherwise.
+ * Get the test viewer url of DICOM buffers.
  *
- * @param {object} config The data configuration.
- * @param {object} structure The data structure,
- *   see {@link dataStructures}.
- * @returns {HTMLLinkElement} The link.
+ * The viewer runs in the page iframe (named 'dwv-viewer') and loads
+ * the object URLs of the buffers, which stay valid as long as this
+ * page is open.
+ *
+ * @param {ArrayBuffer[]} buffers The DICOM buffers.
+ * @returns {string} The viewer url.
  */
-function getStructureLink(config, structure) {
-  const link = document.createElement('a');
+function getViewUrl(buffers) {
+  const urls = buffers.map(getDicomObjectUrl);
+  // viewer input, see decodeKeyValueUri in src/utils/uri.js:
+  // single url or '?file=url0&file=url1' with a void replace mode
+  let input;
+  if (urls.length === 1) {
+    input = encodeURIComponent(urls[0]);
+  } else {
+    const query = urls.map((url) => `file=${url}`).join('&');
+    input = `${encodeURIComponent(`?${query}`)}&dwvReplaceMode=void`;
+  }
+  return `../../viewer/viewer.html?input=${input}`;
+}
+
+/**
+ * Append the links of a data structure to a list element.
+ *
+ * For viewable images (not SEG, which needs its referenced image),
+ * the structure short name (for ex 'mf') opens the data
+ * in the test viewer and is followed by a download link; otherwise
+ * the structure file name (for ex 'ss.dcm') is the download link.
+ * The download is a dcm file for single file structures, a zip file
+ * otherwise.
+ *
+ * @param {HTMLLIElement} li The list element.
+ * @param {object} config The data configuration.
+ * @param {object} structure The data structure, see
+ *   {@link singleSliceStructure} and {@link dataStructures}.
+ */
+function appendStructureLinks(li, config, structure) {
   const isZip = getStructureNumberOfFiles(structure) !== 1;
   const linkText = `${structure.short}.${isZip ? 'zip' : 'dcm'}`;
   const fileName = `dwv-generated-${config.name}-${linkText}`;
 
+  const downloadLink = document.createElement('a');
+  downloadLink.download = fileName;
+  downloadLink.title = `Download ${fileName}`;
+
+  let buffers;
   try {
-    const buffers = getStructureBuffers(
+    buffers = getStructureBuffers(
       config, config.tags.TransferSyntaxUID, structure);
     if (isZip) {
       zipBuffers(buffers, function (zipBlob) {
-        link.download = fileName;
-        link.href = URL.createObjectURL(zipBlob);
+        downloadLink.href = URL.createObjectURL(zipBlob);
       });
     } else {
-      const blob = new Blob([buffers[0]], {type: 'application/dicom'});
-      link.download = fileName;
-      link.href = URL.createObjectURL(blob);
+      downloadLink.href = getDicomObjectUrl(buffers[0]);
     }
   } catch (error) {
     console.log('data:', config.name);
     console.error(error);
   }
-  link.appendChild(document.createTextNode(linkText));
-  return link;
+
+  if (typeof buffers !== 'undefined' &&
+    isMultiSliceModality(config.tags.Modality)) {
+    const viewLink = document.createElement('a');
+    viewLink.href = getViewUrl(buffers);
+    viewLink.target = 'dwv-viewer';
+    viewLink.title = 'Open in the viewer';
+    viewLink.appendChild(document.createTextNode(structure.short));
+    downloadLink.className = 'icon';
+    downloadLink.appendChild(document.createTextNode('\u{1F4BE}'));
+    li.append(viewLink, ' ', downloadLink);
+  } else {
+    downloadLink.appendChild(document.createTextNode(linkText));
+    li.append(downloadLink);
+  }
 }
 
 /**
@@ -94,11 +126,11 @@ function getConfigsHtmlList(configs) {
     const li = document.createElement('li');
     li.appendChild(document.createTextNode(
       `${config.name}: ${config.tags.SeriesDescription}: `));
-    li.append(getSingleSliceLink(config));
+    appendStructureLinks(li, config, singleSliceStructure);
     if (isMultiSliceModality(config.tags.Modality)) {
       for (const structure of Object.values(dataStructures)) {
         li.appendChild(document.createTextNode(', '));
-        li.append(getStructureLink(config, structure));
+        appendStructureLinks(li, config, structure);
       }
     }
     // append to list
@@ -204,32 +236,38 @@ function displayConfigs(configs) {
     }
   ];
 
+  // transfer syntax select: one option per data group
+  const label = document.createElement('label');
+  label.appendChild(document.createTextNode('Transfer syntax: '));
+  const select = document.createElement('select');
   for (let index = 0; index < dataGroups.length; ++index) {
-    const dataGroup = dataGroups[index];
-
-    const content = document.getElementById('content');
-    const title = document.createElement('h2');
-    title.appendChild(document.createTextNode(dataGroup.name));
-    content.append(title);
-
-    if (index === 0) {
-      // generate the first group right away
-      content.append(renderDataGroup(configs, dataGroup));
-    } else {
-      // defer the other groups: only generate them on demand,
-      // triggered by a button, to avoid the upfront cost of
-      // creating data that may not be needed
-      const button = document.createElement('button');
-      button.appendChild(
-        document.createTextNode('Generate'));
-      button.addEventListener('click', function onClick() {
-        // replace the button in place so the list appears where the
-        // button was, not appended at the end of the shared content
-        button.replaceWith(renderDataGroup(configs, dataGroup));
-      });
-      content.append(button);
-    }
+    const option = document.createElement('option');
+    option.value = index.toString();
+    option.appendChild(document.createTextNode(dataGroups[index].name));
+    select.append(option);
   }
+  label.append(select);
+
+  const list = document.createElement('div');
+  const content = document.getElementById('content');
+  content.append(label, list);
+
+  // only generate a group when it is selected, to avoid the upfront
+  // cost of creating data that may not be needed; keep the generated
+  // lists so that switching back does not regenerate them
+  const groupLists = new Map();
+  /**
+   * Show the list of the selected data group.
+   */
+  function showSelectedGroup() {
+    const index = parseInt(select.value, 10);
+    if (!groupLists.has(index)) {
+      groupLists.set(index, renderDataGroup(configs, dataGroups[index]));
+    }
+    list.replaceChildren(groupLists.get(index));
+  }
+  select.addEventListener('change', showSelectedGroup);
+  showSelectedGroup();
 }
 
 // ---------------------------------------------
