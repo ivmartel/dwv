@@ -240,6 +240,100 @@ export class UrlsLoader extends LoadHandlers {
   }
 
   /**
+   * Create and open the request of a url.
+   * A request is not re-sent: a timeout retry uses a new one.
+   *
+   * @param {string} dataElement The url to load.
+   * @param {number} i The index of the url.
+   * @param {object} loader The associated loader.
+   * @param {object} options The load options.
+   * @param {MultiProgressHandler} mproghandler The progress handler.
+   * @param {eventFn} onLoadEnd The request load end callback.
+   * @param {number} nRetries The number of timeout retries left.
+   * @returns {XMLHttpRequest} The request.
+   */
+  #createRequest(
+    dataElement, i, loader, options, mproghandler, onLoadEnd, nRetries) {
+    /**
+     * The http request.
+     *
+     * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest}.
+     *
+     * @external XMLHttpRequest
+     */
+    const request = new XMLHttpRequest();
+    request.open('GET', dataElement, true);
+
+    // request options
+    if (typeof options !== 'undefined') {
+      // optional request headers
+      if (typeof options.requestHeaders !== 'undefined') {
+        const requestHeaders = options.requestHeaders;
+        for (let j = 0; j < requestHeaders.length; ++j) {
+          if (typeof requestHeaders[j].name !== 'undefined' &&
+            typeof requestHeaders[j].value !== 'undefined') {
+            request.setRequestHeader(
+              requestHeaders[j].name, requestHeaders[j].value);
+          }
+        }
+      }
+      // optional withCredentials
+      // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+      if (typeof options.withCredentials !== 'undefined') {
+        request.withCredentials = options.withCredentials;
+      }
+      // optional timeout
+      // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/timeout
+      if (typeof options.timeout !== 'undefined') {
+        request.timeout = options.timeout;
+      }
+    }
+
+    // set request callbacks
+    // request.onloadstart: nothing to do
+    request.onprogress = this.#augmentCallbackEvent(
+      mproghandler.getMonoProgressHandler(i, 0), dataElement);
+    request.onload = this.#getLoadHandler(loader, dataElement, i);
+    request.onloadend = onLoadEnd;
+    const errorCallback =
+      this.#augmentCallbackEvent(this.onerror, dataElement);
+    request.onerror = (event) => {
+      this.#addLoadend();
+      errorCallback(event);
+    };
+    const timeoutCallback =
+      this.#augmentCallbackEvent(this.ontimeout, dataElement);
+    request.ontimeout = (event) => {
+      if (nRetries > 0 && !this.#aborting) {
+        // the retry will launch the next request in queue
+        request.onloadend = null;
+        // retry with a new request stored at the same index
+        // (a request can not be safely re-sent)
+        const retry = this.#createRequest(
+          dataElement, i, loader, options, mproghandler, onLoadEnd,
+          nRetries - 1);
+        this.#requests[i] = retry;
+        retry.send(null);
+      } else {
+        this.#addLoadend();
+        timeoutCallback(event);
+      }
+    };
+    const abortCallback =
+      this.#augmentCallbackEvent(this.onabort, dataElement);
+    request.onabort = (event) => {
+      this.#addLoadend();
+      abortCallback(event);
+    };
+    // response type (default is 'text')
+    if (loader.loadUrlAs() === urlContentTypes.ArrayBuffer) {
+      request.responseType = 'arraybuffer';
+    }
+
+    return request;
+  }
+
+  /**
    * Load a list of urls.
    *
    * @param {string[]} data The list of urls to load.
@@ -247,7 +341,11 @@ export class UrlsLoader extends LoadHandlers {
    * - requestHeaders: an array of {name, value} to use as request headers,
    * - withCredentials: boolean xhr.withCredentials flag to pass
    *   to the request,
-   * - batchSize: the size of the request url batch.
+   * - batchSize: the size of the request url batch,
+   * - timeout: the request timeout in milliseconds
+   *   (xhr.timeout, default 0 meaning no timeout),
+   * - timeoutRetries: the number of times a timed out request
+   *   is retried with a new request (default 0).
    */
   #loadUrls(data, options) {
     // check input
@@ -309,6 +407,14 @@ export class UrlsLoader extends LoadHandlers {
       }
     };
 
+    // optional timeout retries
+    let nRetries = 0;
+    if (typeof options !== 'undefined' &&
+      Number.isInteger(options.timeoutRetries) &&
+      options.timeoutRetries > 0) {
+      nRetries = options.timeoutRetries;
+    }
+
     // loop on I/O elements
     for (let i = 0; i < data.length; ++i) {
       dataElement = data[i];
@@ -317,67 +423,11 @@ export class UrlsLoader extends LoadHandlers {
       if (!loader.canLoadUrl(dataElement, options)) {
         throw new Error(`Input url of different type: ${dataElement}`);
       }
-      /**
-       * The http request.
-       *
-       * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest}.
-       *
-       * @external XMLHttpRequest
-       */
-      const request = new XMLHttpRequest();
-      request.open('GET', dataElement, true);
-
-      // request options
-      if (typeof options !== 'undefined') {
-        // optional request headers
-        if (typeof options.requestHeaders !== 'undefined') {
-          const requestHeaders = options.requestHeaders;
-          for (let j = 0; j < requestHeaders.length; ++j) {
-            if (typeof requestHeaders[j].name !== 'undefined' &&
-              typeof requestHeaders[j].value !== 'undefined') {
-              request.setRequestHeader(
-                requestHeaders[j].name, requestHeaders[j].value);
-            }
-          }
-        }
-        // optional withCredentials
-        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
-        if (typeof options.withCredentials !== 'undefined') {
-          request.withCredentials = options.withCredentials;
-        }
-      }
-
-      // set request callbacks
-      // request.onloadstart: nothing to do
-      request.onprogress = this.#augmentCallbackEvent(
-        mproghandler.getMonoProgressHandler(i, 0), dataElement);
-      request.onload = this.#getLoadHandler(loader, dataElement, i);
-      request.onloadend = requestOnLoadEnd;
-      const errorCallback =
-        this.#augmentCallbackEvent(this.onerror, dataElement);
-      request.onerror = (event) => {
-        this.#addLoadend();
-        errorCallback(event);
-      };
-      const timeoutCallback =
-        this.#augmentCallbackEvent(this.ontimeout, dataElement);
-      request.ontimeout = (event) => {
-        this.#addLoadend();
-        timeoutCallback(event);
-      };
-      const abortCallback =
-        this.#augmentCallbackEvent(this.onabort, dataElement);
-      request.onabort = (event) => {
-        this.#addLoadend();
-        abortCallback(event);
-      };
-      // response type (default is 'text')
-      if (loader.loadUrlAs() === urlContentTypes.ArrayBuffer) {
-        request.responseType = 'arraybuffer';
-      }
 
       // store request
-      this.#storeRequest(request);
+      this.#storeRequest(this.#createRequest(
+        dataElement, i, loader, options, mproghandler, requestOnLoadEnd,
+        nRetries));
     }
 
     // launch requests in batch
