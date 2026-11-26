@@ -7,7 +7,8 @@ import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
 import {
   DicomParser,
-  getDwvVersion
+  getDwvVersion,
+  getDwvUIDPrefix
 } from '../../src/dicom/dicomParser.js';
 import {DicomWriter} from '../../src/dicom/dicomWriter.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
@@ -666,6 +667,49 @@ describe('MaskFactory', () => {
       Number(safeGet(outElements, '00200013')), 3, 'mask instance number');
     assert.equal(
       safeGet(outElements, '00201040'), 'SN', 'mask position reference');
+  });
+
+  test('toDicom: instance and series identification', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const meta = image.getMeta();
+    // no input series
+    delete meta.SeriesInstanceUID;
+    delete meta.SeriesNumber;
+
+    const factory = new MaskFactory();
+    const outElements = factory.toDicom(image, undefined, refImage);
+    const sopUID = safeGet(outElements, '00080018');
+    assert.ok(sopUID.startsWith(getDwvUIDPrefix()), 'dwv sop uid');
+    assert.equal(
+      safeGet(outElements, '00020003'), sopUID, 'media storage uid');
+    const seriesUID = safeGet(outElements, '0020000E');
+    assert.ok(seriesUID.startsWith(getDwvUIDPrefix()), 'dwv series uid');
+    assert.notEqual(seriesUID, sopUID, 'series and sop uids differ');
+    assert.equal(
+      Number(safeGet(outElements, '00200011')), 1, 'default series number');
+
+    // a new instance at each call
+    const outElements2 = factory.toDicom(image, undefined, refImage);
+    assert.notEqual(
+      safeGet(outElements2, '00080018'), sopUID, 'new sop uid');
+
+    // input series is kept
+    meta.SeriesInstanceUID = '1.2.3.77';
+    meta.SeriesNumber = '5';
+    const outElements3 = factory.toDicom(image, undefined, refImage);
+    assert.equal(
+      safeGet(outElements3, '0020000E'), '1.2.3.77', 'input series uid');
+    assert.equal(
+      Number(safeGet(outElements3, '00200011')), 5, 'input series number');
+
+    // extra tags win, media storage follows the sop instance uid
+    const outElements4 = factory.toDicom(
+      image, undefined, refImage, {SOPInstanceUID: '1.2.3.88'});
+    assert.equal(
+      safeGet(outElements4, '00080018'), '1.2.3.88', 'extra sop uid');
+    assert.equal(
+      safeGet(outElements4, '00020003'), '1.2.3.88', 'extra media uid');
   });
 
   test('toDicom: dwv equipment, not the input one', () => {

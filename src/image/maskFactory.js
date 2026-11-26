@@ -16,6 +16,7 @@ import {
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
 import {getDwvUIDPrefix, getDwvVersion} from '../dicom/dicomParser.js';
+import {getUID} from '../dicom/dicomWriter.js';
 import {
   getElementsFromSimpleTagValues,
   mergeTagValues
@@ -625,6 +626,19 @@ export class MaskFactory {
         sourceImage.getMeta().PositionReferenceIndicator ?? '';
     }
 
+    // instance: each call creates a new SOP instance
+    tags.SOPInstanceUID = getUID('SOPInstanceUID');
+    // series: the mask one (for ex the one of a loaded SEG) or a new one,
+    //   series number is type 1 for a segmentation
+    if (typeof tags.SeriesInstanceUID === 'undefined' ||
+      tags.SeriesInstanceUID === '') {
+      tags.SeriesInstanceUID = getUID('SeriesInstanceUID');
+    }
+    if (typeof tags.SeriesNumber === 'undefined' ||
+      tags.SeriesNumber === '') {
+      tags.SeriesNumber = '1';
+    }
+
     // content identification: instance number is type 1
     if (typeof tags.InstanceNumber === 'undefined' ||
       tags.InstanceNumber === '') {
@@ -782,6 +796,8 @@ export class MaskFactory {
     if (extraTags !== undefined) {
       mergeTagValues(tags, extraTags);
     }
+    // file meta: same instance as the dataset
+    tags.MediaStorageSOPInstanceUID = tags.SOPInstanceUID;
 
     // convert JSON to DICOM element object
     const dicomElements = getElementsFromSimpleTagValues(tags);

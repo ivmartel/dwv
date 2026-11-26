@@ -7,7 +7,7 @@ import {getSRContent} from '../../../src/dicom/dicomSRContent.js';
 import {custom} from '../../../src/app/custom.js';
 import {logger} from '../../../src/utils/logger.js';
 import {WindowLevel} from '../../../src/image/windowLevel.js';
-import {DicomWriter} from '../../../src/dicom/dicomWriter.js';
+import {DicomWriter, getUID} from '../../../src/dicom/dicomWriter.js';
 import {MaskFactory} from '../../../src/image/maskFactory.js';
 import {RtStructFactory} from '../../../src/image/rtStructFactory.js';
 
@@ -612,15 +612,17 @@ export class DwvAppService extends EventTarget {
     } else {
       fac = new MaskFactory();
     }
+    // new instance and series at each save
+    const sopUID = getUID('SOPInstanceUID');
     const dicomElements = fac.toDicom(
       maskImage,
       maskImage.getMeta().custom.segments,
       sourceData.image,
       {
-        MediaStorageSOPInstanceUID: '1.2.3.4.5.6.1000',
-        SeriesInstanceUID: '1.2.3.4.5.6',
+        MediaStorageSOPInstanceUID: sopUID,
+        SeriesInstanceUID: getUID('SeriesInstanceUID'),
         SeriesNumber: '1',
-        SOPInstanceUID: '1.2.3.4.5.6.1000',
+        SOPInstanceUID: sopUID,
       }
     );
     // create writer with default rules
