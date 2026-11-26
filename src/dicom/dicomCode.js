@@ -9,6 +9,7 @@
 const TagKeys = {
   CodeValue: '00080100',
   CodingSchemeDesignator: '00080102',
+  CodingSchemeVersion: '00080103',
   CodeMeaning: '00080104',
   LongCodeValue: '00080119',
   URNCodeValue: '00080120'
@@ -50,6 +51,12 @@ export class DicomCode {
    * @type {string|undefined}
    */
   schemeDesignator;
+  /**
+   * Coding scheme version, only used with a coding scheme designator.
+   *
+   * @type {string|undefined}
+   */
+  schemeVersion;
 
   /**
    * @param {string} meaning The code meaning.
@@ -118,6 +125,11 @@ export function getCode(dataElements) {
         'No coding sheme designator when code value or long value is present');
     }
   }
+  // schemeVersion -> CodingSchemeVersion (type1C, only with a designator)
+  if (typeof code.schemeDesignator !== 'undefined' &&
+    typeof dataElements[TagKeys.CodingSchemeVersion] !== 'undefined') {
+    code.schemeVersion = dataElements[TagKeys.CodingSchemeVersion].value[0];
+  }
   return code;
 }
 
@@ -142,6 +154,10 @@ export function getDicomCodeItem(code) {
   // CodingSchemeDesignator
   if (typeof code.schemeDesignator !== 'undefined') {
     item.CodingSchemeDesignator = code.schemeDesignator;
+    // CodingSchemeVersion: shall not be present without a designator
+    if (typeof code.schemeVersion !== 'undefined') {
+      item.CodingSchemeVersion = code.schemeVersion;
+    }
   }
   // CodeMeaning
   item.CodeMeaning = code.meaning;

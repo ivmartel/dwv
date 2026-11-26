@@ -384,6 +384,7 @@ export class DicomCode {
     longValue: string | undefined;
     meaning: string;
     schemeDesignator: string | undefined;
+    schemeVersion: string | undefined;
     toString(): string;
     urnValue: string | undefined;
     value: string | undefined;
@@ -989,6 +990,7 @@ export class MaskSegment {
     constructor(number: number, label: string, algorithmType: string);
     algorithmName: string | undefined;
     algorithmType: string;
+    anatomicRegionCodes: DicomCode[] | undefined;
     displayRGBValue: RGB | undefined;
     displayValue: number | undefined;
     interpretedType: string | undefined;
@@ -996,6 +998,7 @@ export class MaskSegment {
     number: number;
     propertyCategoryCode: DicomCode | undefined;
     propertyTypeCode: DicomCode | undefined;
+    propertyTypeModifierCodes: DicomCode[] | undefined;
     roiInterpreter: string | undefined;
     trackingId: string | undefined;
     trackingUid: string | undefined;
