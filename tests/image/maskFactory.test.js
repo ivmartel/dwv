@@ -542,9 +542,10 @@ describe('MaskFactory', () => {
   });
 
   test('toDicom: dwv dimensions without input indices', () => {
-    // test-seg-00 has no DimensionIndexSequence
+    // remove the DimensionIndexSequence of test-seg-00
     const refImage = buildRefImage();
     const image = buildMaskImage('test-seg-00');
+    delete image.getMeta().DimensionIndexSequence;
     const outElements =
       new MaskFactory().toDicom(image, undefined, refImage);
     checkDimensions(outElements, dwvOrgUID, dwvLabels);
@@ -626,9 +627,12 @@ describe('MaskFactory', () => {
   });
 
   test('toDicom: default content label and description', () => {
-    // test-seg-00 has no content label or description
+    // remove the content label and description of test-seg-00
+    const image = buildMaskImage('test-seg-00');
+    delete image.getMeta().ContentLabel;
+    delete image.getMeta().ContentDescription;
     const outElements = new MaskFactory().toDicom(
-      buildMaskImage('test-seg-00'), undefined, buildRefImage());
+      image, undefined, buildRefImage());
     assert.equal(
       safeGet(outElements, '00700080'), 'SEGMENTATION', 'content label');
     // type 2: present, empty
@@ -643,9 +647,11 @@ describe('MaskFactory', () => {
   test('toDicom: instance number and position reference indicator', () => {
     const refImage = buildRefImage();
     // test-img-00 has no position reference indicator, remove the
-    //   generator instance number from test-seg-00
+    //   generator instance number and the position reference
+    //   indicator from test-seg-00
     const noNumberImage = buildMaskImage('test-seg-00');
     delete noNumberImage.getMeta().InstanceNumber;
+    delete noNumberImage.getMeta().PositionReferenceIndicator;
     let outElements =
       new MaskFactory().toDicom(noNumberImage, undefined, refImage);
     assert.equal(
@@ -656,8 +662,10 @@ describe('MaskFactory', () => {
 
     // position reference indicator from the source image
     refImage.getMeta().PositionReferenceIndicator = 'XY';
+    const noPositionRefImage = buildMaskImage('test-seg-00');
+    delete noPositionRefImage.getMeta().PositionReferenceIndicator;
     outElements = new MaskFactory().toDicom(
-      buildMaskImage('test-seg-00'), undefined, refImage);
+      noPositionRefImage, undefined, refImage);
     assert.equal(
       safeGet(outElements, '00201040'), 'XY', 'source position reference');
 

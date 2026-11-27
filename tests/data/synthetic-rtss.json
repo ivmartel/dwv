@@ -7,8 +7,15 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.201",
       "StudyDescription": "dwv generated study",
+      "AccessionNumber": "",
       "SeriesDescription": "RTSTRUCT test data with no overlapping squares (ref test-00)",
+      "OperatorsName": "",
       "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "PositionReferenceIndicator": "",
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
       "StructureSetLabel": "RT Structure Set",
       "ReferencedFrameOfReferenceSequence": {
         "value": [
@@ -17,10 +24,20 @@
             "RTReferencedStudySequence": {
               "value": [
                 {
+                  "ReferencedSOPClassUID": "1.2.840.10008.3.1.2.3.1",
+                  "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
                   "RTReferencedSeriesSequence": {
                     "value": [
                       {
-                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                        "ContourImageSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
                       }
                     ]
                   }
@@ -34,22 +51,28 @@
         "value": [
           {
             "ROINumber": 1,
-            "ROIName": "Square1"
+            "ROIName": "Square1",
+            "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+            "ROIGenerationAlgorithm": "AUTOMATIC"
           },
           {
             "ROINumber": 2,
-            "ROIName": "Square2"
+            "ROIName": "Square2",
+            "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+            "ROIGenerationAlgorithm": "AUTOMATIC"
           }
         ]
       },
       "RTROIObservationsSequence": {
         "value": [
           {
+            "ObservationNumber": 1,
             "ReferencedROINumber": 1,
             "RTROIInterpretedType": "ORGAN",
             "ROIInterpreter": ""
           },
           {
+            "ObservationNumber": 2,
             "ReferencedROINumber": 2,
             "RTROIInterpretedType": "ORGAN",
             "ROIInterpreter": ""
@@ -68,6 +91,14 @@
             "ContourSequence": {
               "value": [
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSED_PLANAR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -98,6 +129,14 @@
             "ContourSequence": {
               "value": [
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSED_PLANAR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -130,8 +169,15 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.202",
       "StudyDescription": "dwv generated study",
+      "AccessionNumber": "",
       "SeriesDescription": "RTSTRUCT test data with overlapping squares (ref test-00)",
+      "OperatorsName": "",
       "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "PositionReferenceIndicator": "",
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
       "StructureSetLabel": "RT Structure Set",
       "ReferencedFrameOfReferenceSequence": {
         "value": [
@@ -140,10 +186,20 @@
             "RTReferencedStudySequence": {
               "value": [
                 {
+                  "ReferencedSOPClassUID": "1.2.840.10008.3.1.2.3.1",
+                  "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
                   "RTReferencedSeriesSequence": {
                     "value": [
                       {
-                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                        "ContourImageSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
                       }
                     ]
                   }
@@ -157,22 +213,28 @@
         "value": [
           {
             "ROINumber": 1,
-            "ROIName": "Square1"
+            "ROIName": "Square1",
+            "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+            "ROIGenerationAlgorithm": "AUTOMATIC"
           },
           {
             "ROINumber": 2,
-            "ROIName": "Square2"
+            "ROIName": "Square2",
+            "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+            "ROIGenerationAlgorithm": "AUTOMATIC"
           }
         ]
       },
       "RTROIObservationsSequence": {
         "value": [
           {
+            "ObservationNumber": 1,
             "ReferencedROINumber": 1,
             "RTROIInterpretedType": "ORGAN",
             "ROIInterpreter": ""
           },
           {
+            "ObservationNumber": 2,
             "ReferencedROINumber": 2,
             "RTROIInterpretedType": "ORGAN",
             "ROIInterpreter": ""
@@ -191,6 +253,14 @@
             "ContourSequence": {
               "value": [
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSED_PLANAR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -221,6 +291,14 @@
             "ContourSequence": {
               "value": [
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSED_PLANAR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -253,8 +331,15 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.203",
       "StudyDescription": "dwv generated study",
+      "AccessionNumber": "",
       "SeriesDescription": "RTSTRUCT test data with a square that has a hole (ref test-00)",
+      "OperatorsName": "",
       "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "PositionReferenceIndicator": "",
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
       "StructureSetLabel": "RT Structure Set",
       "ReferencedFrameOfReferenceSequence": {
         "value": [
@@ -263,10 +348,20 @@
             "RTReferencedStudySequence": {
               "value": [
                 {
+                  "ReferencedSOPClassUID": "1.2.840.10008.3.1.2.3.1",
+                  "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
                   "RTReferencedSeriesSequence": {
                     "value": [
                       {
-                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                        "ContourImageSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
                       }
                     ]
                   }
@@ -280,13 +375,16 @@
         "value": [
           {
             "ROINumber": 1,
-            "ROIName": "SquareWithHole"
+            "ROIName": "SquareWithHole",
+            "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+            "ROIGenerationAlgorithm": "AUTOMATIC"
           }
         ]
       },
       "RTROIObservationsSequence": {
         "value": [
           {
+            "ObservationNumber": 1,
             "ReferencedROINumber": 1,
             "RTROIInterpretedType": "ORGAN",
             "ROIInterpreter": ""
@@ -305,6 +403,14 @@
             "ContourSequence": {
               "value": [
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSED_PLANAR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -323,6 +429,14 @@
                   ]
                 },
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSED_PLANAR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -355,8 +469,15 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.204",
       "StudyDescription": "dwv generated study",
-      "SeriesDescription": "RTSTRUCT test data with a square that has a hole, contours explicitly tagged CLOSEDPLANAR_XOR (ref test-00)",
+      "AccessionNumber": "",
+      "SeriesDescription": "RTSTRUCT square with a hole, CLOSEDPLANAR_XOR (ref test-00)",
+      "OperatorsName": "",
       "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "PositionReferenceIndicator": "",
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
       "StructureSetLabel": "RT Structure Set",
       "ReferencedFrameOfReferenceSequence": {
         "value": [
@@ -365,10 +486,20 @@
             "RTReferencedStudySequence": {
               "value": [
                 {
+                  "ReferencedSOPClassUID": "1.2.840.10008.3.1.2.3.1",
+                  "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
                   "RTReferencedSeriesSequence": {
                     "value": [
                       {
-                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                        "ContourImageSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
                       }
                     ]
                   }
@@ -382,13 +513,16 @@
         "value": [
           {
             "ROINumber": 1,
-            "ROIName": "SquareWithHole"
+            "ROIName": "SquareWithHole",
+            "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+            "ROIGenerationAlgorithm": "AUTOMATIC"
           }
         ]
       },
       "RTROIObservationsSequence": {
         "value": [
           {
+            "ObservationNumber": 1,
             "ReferencedROINumber": 1,
             "RTROIInterpretedType": "ORGAN",
             "ROIInterpreter": ""
@@ -407,6 +541,14 @@
             "ContourSequence": {
               "value": [
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSEDPLANAR_XOR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -425,6 +567,14 @@
                   ]
                 },
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSEDPLANAR_XOR",
                   "NumberOfContourPoints": 4,
                   "ContourData": [
@@ -457,8 +607,15 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.205",
       "StudyDescription": "dwv generated study",
-      "SeriesDescription": "RTSTRUCT test data with a square that has a hole, encoded as a single self-touching 'keyhole' contour with a zero-width bridge instead of separate nested contours (ref test-00)",
+      "AccessionNumber": "",
+      "SeriesDescription": "RTSTRUCT square with a hole, keyhole contour (ref test-00)",
+      "OperatorsName": "",
       "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "PositionReferenceIndicator": "",
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
       "StructureSetLabel": "RT Structure Set",
       "ReferencedFrameOfReferenceSequence": {
         "value": [
@@ -467,10 +624,20 @@
             "RTReferencedStudySequence": {
               "value": [
                 {
+                  "ReferencedSOPClassUID": "1.2.840.10008.3.1.2.3.1",
+                  "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
                   "RTReferencedSeriesSequence": {
                     "value": [
                       {
-                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+                        "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+                        "ContourImageSequence": {
+                          "value": [
+                            {
+                              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                              "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                            }
+                          ]
+                        }
                       }
                     ]
                   }
@@ -484,13 +651,16 @@
         "value": [
           {
             "ROINumber": 1,
-            "ROIName": "SquareWithHoleKeyhole"
+            "ROIName": "SquareWithHoleKeyhole",
+            "ReferencedFrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+            "ROIGenerationAlgorithm": "AUTOMATIC"
           }
         ]
       },
       "RTROIObservationsSequence": {
         "value": [
           {
+            "ObservationNumber": 1,
             "ReferencedROINumber": 1,
             "RTROIInterpretedType": "ORGAN",
             "ROIInterpreter": ""
@@ -509,6 +679,14 @@
             "ContourSequence": {
               "value": [
                 {
+                  "ContourImageSequence": {
+                    "value": [
+                      {
+                        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                      }
+                    ]
+                  },
                   "ContourGeometricType": "CLOSED_PLANAR",
                   "NumberOfContourPoints": 12,
                   "ContourData": [

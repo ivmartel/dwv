@@ -7,11 +7,29 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.301",
       "StudyDescription": "dwv generated study",
+      "AccessionNumber": "",
       "SeriesDescription": "KOS test data (non image)",
+      "ReferencedPerformedProcedureStepSequence": {
+        "value": []
+      },
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
       "ReferencedRequestSequence": {
         "value": [
           {
             "StudyInstanceUID": "2.25.230835838210269490877844054010808345443",
+            "ReferencedStudySequence": {
+              "value": []
+            },
+            "AccessionNumber": "",
+            "PlacerOrderNumberImagingServiceRequest": "",
+            "FillerOrderNumberImagingServiceRequest": "",
+            "RequestedProcedureDescription": "",
+            "RequestedProcedureCodeSequence": {
+              "value": []
+            },
             "RequestedProcedureID": "dwv_test"
           }
         ]
@@ -111,7 +129,8 @@
                   "CodingSchemeDesignator": "DCM"
                 }
               ]
-            }
+            },
+            "TextValue": "dwv synthetic key object selection"
           },
           {
             "RelationshipType": "CONTAINS",

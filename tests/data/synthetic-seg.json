@@ -21,9 +21,22 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.101",
       "StudyDescription": "dwv generated study",
+      "AccessionNumber": "",
       "SeriesDescription": "SEG test data with no overlapping segments (ref test-00)",
       "PhotometricInterpretation": "MONOCHROME2",
       "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "PositionReferenceIndicator": "",
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
+      "ImageType": [
+        "DERIVED",
+        "PRIMARY"
+      ],
+      "ContentLabel": "SEGMENTATION",
+      "ContentDescription": "",
+      "LossyImageCompression": "00",
       "SamplesPerPixel": 1,
       "PixelRepresentation": 0,
       "Rows": 32,
@@ -42,10 +55,34 @@
           }
         ]
       },
+      "DimensionIndexSequence": {
+        "value": [
+          {
+            "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319",
+            "DimensionDescriptionLabel": "ReferencedSegmentNumber",
+            "DimensionIndexPointer": "(0062,000B)",
+            "FunctionalGroupPointer": "(0062,000A)"
+          },
+          {
+            "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319",
+            "DimensionDescriptionLabel": "ImagePositionPatient",
+            "DimensionIndexPointer": "(0020,0032)",
+            "FunctionalGroupPointer": "(0020,9113)"
+          }
+        ]
+      },
       "ReferencedSeriesSequence": {
         "value": [
           {
-            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+            "ReferencedInstanceSequence": {
+              "value": [
+                {
+                  "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                  "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                }
+              ]
+            }
           }
         ]
       },
@@ -121,7 +158,8 @@
                     1,
                     1
                   ],
-                  "SpacingBetweenSlices": 1
+                  "SpacingBetweenSlices": 1,
+                  "SliceThickness": 1
                 }
               ]
             },
@@ -180,7 +218,25 @@
                     "value": [
                       {
                         "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1",
+                        "PurposeOfReferenceCodeSequence": {
+                          "value": [
+                            {
+                              "CodeMeaning": "Source image for image processing operation",
+                              "CodeValue": "121322",
+                              "CodingSchemeDesignator": "DCM"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "DerivationCodeSequence": {
+                    "value": [
+                      {
+                        "CodeMeaning": "Segmentation",
+                        "CodeValue": "113076",
+                        "CodingSchemeDesignator": "DCM"
                       }
                     ]
                   }
@@ -224,7 +280,25 @@
                     "value": [
                       {
                         "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1",
+                        "PurposeOfReferenceCodeSequence": {
+                          "value": [
+                            {
+                              "CodeMeaning": "Source image for image processing operation",
+                              "CodeValue": "121322",
+                              "CodingSchemeDesignator": "DCM"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "DerivationCodeSequence": {
+                    "value": [
+                      {
+                        "CodeMeaning": "Segmentation",
+                        "CodeValue": "113076",
+                        "CodingSchemeDesignator": "DCM"
                       }
                     ]
                   }
@@ -258,9 +332,22 @@
       "StudyInstanceUID": "1.2.826.0.1.3680043.9.7278.1.1111.20210401120000.1",
       "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.102",
       "StudyDescription": "dwv generated study",
+      "AccessionNumber": "",
       "SeriesDescription": "SEG test data with overlapping segments (ref test-00)",
       "PhotometricInterpretation": "MONOCHROME2",
       "FrameOfReferenceUID": "1.2.826.0.1.3680043.9.7278.1.701149710910179102.20251202143714.1",
+      "PositionReferenceIndicator": "",
+      "Manufacturer": "dwv",
+      "ManufacturerModelName": "DWV",
+      "DeviceSerialNumber": "1",
+      "SoftwareVersions": "dwv-synthetic",
+      "ImageType": [
+        "DERIVED",
+        "PRIMARY"
+      ],
+      "ContentLabel": "SEGMENTATION",
+      "ContentDescription": "",
+      "LossyImageCompression": "00",
       "SamplesPerPixel": 1,
       "PixelRepresentation": 0,
       "Rows": 32,
@@ -279,10 +366,34 @@
           }
         ]
       },
+      "DimensionIndexSequence": {
+        "value": [
+          {
+            "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319",
+            "DimensionDescriptionLabel": "ReferencedSegmentNumber",
+            "DimensionIndexPointer": "(0062,000B)",
+            "FunctionalGroupPointer": "(0062,000A)"
+          },
+          {
+            "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319",
+            "DimensionDescriptionLabel": "ImagePositionPatient",
+            "DimensionIndexPointer": "(0020,0032)",
+            "FunctionalGroupPointer": "(0020,9113)"
+          }
+        ]
+      },
       "ReferencedSeriesSequence": {
         "value": [
           {
-            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1"
+            "SeriesInstanceUID": "1.2.826.0.1.3680043.9.7278.1.2222.20210401120000.1",
+            "ReferencedInstanceSequence": {
+              "value": [
+                {
+                  "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                  "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                }
+              ]
+            }
           }
         ]
       },
@@ -358,7 +469,8 @@
                     1,
                     1
                   ],
-                  "SpacingBetweenSlices": 1
+                  "SpacingBetweenSlices": 1,
+                  "SliceThickness": 1
                 }
               ]
             },
@@ -417,7 +529,25 @@
                     "value": [
                       {
                         "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1",
+                        "PurposeOfReferenceCodeSequence": {
+                          "value": [
+                            {
+                              "CodeMeaning": "Source image for image processing operation",
+                              "CodeValue": "121322",
+                              "CodingSchemeDesignator": "DCM"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "DerivationCodeSequence": {
+                    "value": [
+                      {
+                        "CodeMeaning": "Segmentation",
+                        "CodeValue": "113076",
+                        "CodingSchemeDesignator": "DCM"
                       }
                     ]
                   }
@@ -461,7 +591,25 @@
                     "value": [
                       {
                         "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1"
+                        "ReferencedSOPInstanceUID": "1.2.826.0.1.3680043.9.7278.1.3333.20210401120000.1",
+                        "PurposeOfReferenceCodeSequence": {
+                          "value": [
+                            {
+                              "CodeMeaning": "Source image for image processing operation",
+                              "CodeValue": "121322",
+                              "CodingSchemeDesignator": "DCM"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "DerivationCodeSequence": {
+                    "value": [
+                      {
+                        "CodeMeaning": "Segmentation",
+                        "CodeValue": "113076",
+                        "CodingSchemeDesignator": "DCM"
                       }
                     ]
                   }

@@ -491,7 +491,13 @@ function generateSingleFileDataElements(tags0, genOptions) {
     };
 
   } else {
-    tags.ImagePositionPatient = getIpp(genOptions.sliceNumber);
+    // non image data (for ex RTSTRUCT) has no position and enhanced
+    //   multi-frame data (for ex SEG) holds the positions in its
+    //   per-frame functional groups, a top level one is not in their IOD
+    if (isImageModality(tags.Modality) &&
+      typeof tags.PerFrameFunctionalGroupsSequence === 'undefined') {
+      tags.ImagePositionPatient = getIpp(genOptions.sliceNumber);
+    }
     if (typeof genOptions.frameNumber !== 'undefined' &&
       typeof genOptions.numberOfFrames !== 'undefined' &&
       genOptions.numberOfFrames > 1
@@ -620,7 +626,8 @@ export function zipBuffers(
 
 /**
  * Add a date and time to input tags if not present:
- * study, series and content date and time.
+ * study, series and content date and time (structure set date and
+ * time for an RTSTRUCT).
  *
  * @param {Record<string, SimpleTagValue>} tags The tags.
  * @param {Date} [now] Optional date to use, defaults to the current date.
@@ -652,12 +659,23 @@ export function addDates(tags, now) {
     tags.SeriesTime = timeStr;
   }
 
-  // content
-  if (typeof tags.ContentDate === 'undefined') {
-    tags.ContentDate = dateStr;
-  }
-  if (typeof tags.ContentTime === 'undefined') {
-    tags.ContentTime = timeStr;
+  // content: an RT structure set has no content date and time,
+  //   its own date and time are in the Structure Set Module
+  // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.8.5.html
+  if (tags.Modality === 'RTSTRUCT') {
+    if (typeof tags.StructureSetDate === 'undefined') {
+      tags.StructureSetDate = dateStr;
+    }
+    if (typeof tags.StructureSetTime === 'undefined') {
+      tags.StructureSetTime = timeStr;
+    }
+  } else {
+    if (typeof tags.ContentDate === 'undefined') {
+      tags.ContentDate = dateStr;
+    }
+    if (typeof tags.ContentTime === 'undefined') {
+      tags.ContentTime = timeStr;
+    }
   }
 }
 

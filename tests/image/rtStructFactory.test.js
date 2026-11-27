@@ -687,6 +687,8 @@ describe('RtStructFactory', () => {
     meta.PatientName = 'Doe^John';
     meta.InstanceNumber = '3';
     meta.StructureSetLabel = 'Label';
+    // use the source position reference indicator
+    delete meta.PositionReferenceIndicator;
     let outElements =
       new RtStructFactory().toDicom(image, undefined, refImage);
     assert.equal(
