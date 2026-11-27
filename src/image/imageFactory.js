@@ -5,7 +5,12 @@ import {Image} from './image.js';
 import {Size} from './size.js';
 import {Geometry} from './geometry.js';
 import {ColourMap} from './luts.js';
-import {safeGet, safeGetAll} from '../dicom/dataElement.js';
+import {MaskImage} from './maskImage.js';
+import {
+  DataElement,
+  safeGet,
+  safeGetAll
+} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
   getPixelSpacing,
@@ -14,17 +19,33 @@ import {
   isMonochrome,
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
-import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
+import {
+  getAllPixelDataTagKeys,
+  getTagFromKey,
+  hasAnyPixelDataElement
+} from '../dicom/dicomTag.js';
 import {
   getRootGeometry,
   getSortedFramesGeometry
 } from '../dicom/dicomGeometry.js';
+import {
+  isJpeg2000TransferSyntax,
+  isJpegBaselineTransferSyntax
+} from '../dicom/dicomParser.js';
+import {transferSyntaxKeywords} from '../dicom/dictionary.js';
+import {
+  DcmCodes,
+  getDcmDicomCode,
+  getDicomCodeItem
+} from '../dicom/dicomCode.js';
+import {getElementsFromSimpleTagValues} from '../dicom/simpleTagValues.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {logger} from '../utils/logger.js';
 
 /**
- * @import {DataElement} from '../dicom/dataElement.js';
  * @import {TypedArray} from '../math/types.js';
+ * @import {SimpleTagValues} from '../dicom/types.js';
+ * @import {PixelRegion} from './types.js';
  */
 
 /**
@@ -42,6 +63,16 @@ const TagKeys = {
   SamplesPerPixel: '00280002',
   PlanarConfiguration: '00280006',
   NumberOfFrames: '00280008',
+  Rows: '00280010',
+  Columns: '00280011',
+  SmallestImagePixelValue: '00280106',
+  LargestImagePixelValue: '00280107',
+  SmallestPixelValueInSeries: '00280108',
+  LargestPixelValueInSeries: '00280109',
+  LossyImageCompression: '00282110',
+  ExtendedOffsetTable: '7FE00001',
+  ExtendedOffsetTableLengths: '7FE00002',
+  EncapsulatedPixelDataValueTotalLength: '7FE00003',
   RescaleSlope: '00281053',
   RescaleIntercept: '00281052',
   MediaStorageSOPClassUID: '00020002',
@@ -287,6 +318,200 @@ function getFrameGeometry(dataElements, frameNumber) {
 }
 
 /**
+ * Deep copy a data element value: data elements, sequence items,
+ * arrays and typed arrays are copied, other values (strings,
+ * numbers, tags) are not modified by the writer and are shared.
+ *
+ * @param {any} value The value to copy.
+ * @returns {any} The copy.
+ */
+function copyElementValue(value) {
+  if (ArrayBuffer.isView(value) && !(value instanceof DataView)) {
+    return /** @type {TypedArray} */ (value).slice();
+  }
+  if (Array.isArray(value)) {
+    return value.map(copyElementValue);
+  }
+  if (value instanceof DataElement ||
+    (value !== null &&
+      typeof value === 'object' &&
+      Object.getPrototypeOf(value) === Object.prototype)) {
+    const copy = value instanceof DataElement
+      ? new DataElement(value.vr) : {};
+    for (const key of Object.keys(value)) {
+      copy[key] = copyElementValue(value[key]);
+    }
+    return copy;
+  }
+  return value;
+}
+
+/**
+ * Create a data element.
+ *
+ * @param {string} key The tag key, for example '00280004'.
+ * @param {string} vr The element VR.
+ * @param {Array} value The element value.
+ * @returns {DataElement} The data element.
+ */
+function createDataElement(key, vr, value) {
+  const element = new DataElement(vr);
+  element.tag = getTagFromKey(key);
+  element.value = value;
+  return element;
+}
+
+/**
+ * Get the number of 2D slices of an image (all dimensions above
+ * the second one, for example slices and volumes).
+ *
+ * @param {Image} image The image.
+ * @returns {number} The number of slices.
+ */
+function getNumberOfSlices(image) {
+  const size = image.getGeometry().getSize();
+  return size.getTotalSize() / size.getDimSize(2);
+}
+
+/**
+ * Check that the pixels of an image can be modified or written:
+ * not a mask, not resampled and with all its slices loaded.
+ *
+ * @param {Image} image The image to check.
+ * @throws {Error} If the image cannot be used.
+ */
+function checkImagePixels(image) {
+  if (image instanceof MaskImage) {
+    throw new Error('Mask images are not supported');
+  }
+  if (image.isResampled()) {
+    throw new Error('Resampled images are not supported, revert it first');
+  }
+  const sliceCapacity = image.getMeta().sliceCapacity;
+  if (typeof sliceCapacity !== 'undefined' &&
+    getNumberOfSlices(image) < sliceCapacity) {
+    throw new Error('The image is not complete, wait for the end of the load');
+  }
+}
+
+/**
+ * Get the photometric interpretation and planar configuration of
+ * the pixel buffer of an image created from data elements: the
+ * JPEG Baseline and JPEG 2000 decoders output colour data as RGB
+ * and all JPEG decoders output colour-by-pixel data
+ * (see the files in src/decoders), other data is not converted.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part05/sect_8.2.html}.
+ *
+ * @param {Record<string, DataElement>} dataElements The data elements.
+ * @returns {{photometricInterpretation: string,
+ *   planarConfiguration: number|undefined}} The buffer description.
+ * @throws {Error} For a photometric interpretation that cannot
+ *   be written uncompressed.
+ */
+function getBufferPhotometric(dataElements) {
+  const syntax = safeGet(dataElements, TagKeys.TransferSyntaxUID);
+  let photo = safeGet(dataElements, TagKeys.PhotometricInterpretation);
+  if (typeof photo === 'undefined') {
+    throw new Error('Missing PhotometricInterpretation');
+  }
+  photo = photo.trim().toUpperCase();
+  let samplesPerPixel = safeGet(dataElements, TagKeys.SamplesPerPixel);
+  if (typeof samplesPerPixel === 'undefined') {
+    samplesPerPixel = 1;
+  }
+  let planarConfiguration;
+  let supported;
+  if (samplesPerPixel === 1) {
+    supported = ['MONOCHROME1', 'MONOCHROME2', 'PALETTE COLOR'];
+  } else {
+    supported = ['RGB', 'YBR_FULL'];
+    planarConfiguration = safeGet(dataElements, TagKeys.PlanarConfiguration);
+    const isJpeg = typeof syntax !== 'undefined' &&
+      (isJpegBaselineTransferSyntax(syntax) ||
+        isJpeg2000TransferSyntax(syntax) ||
+        syntax === transferSyntaxKeywords.JPEGLossless ||
+        syntax === transferSyntaxKeywords.JPEGLosslessSV1);
+    if (isJpeg) {
+      planarConfiguration = 0;
+      if (isJpegBaselineTransferSyntax(syntax) ||
+        isJpeg2000TransferSyntax(syntax)) {
+        photo = 'RGB';
+      }
+    }
+  }
+  if (!supported.includes(photo)) {
+    throw new Error(`Unsupported PhotometricInterpretation: ${photo
+    } with SamplesPerPixel: ${samplesPerPixel}`);
+  }
+  return {photometricInterpretation: photo, planarConfiguration};
+}
+
+/**
+ * Get the image slice index of each frame of a file: frames are
+ * sorted by position and volume when they are appended to the
+ * image (see Image.appendSlice), so the image slice order can
+ * differ from the file frame order. The image volumes are in
+ * ascending volume id order and share the same origins
+ * (see Geometry.checkTimeOrigins).
+ *
+ * @param {Image} image The image created from the file.
+ * @param {Record<string, DataElement>} dataElements The file
+ *   data elements.
+ * @param {number} numberOfFrames The number of frames of the file.
+ * @returns {number[]} The image slice index of each frame.
+ * @throws {Error} If the frames do not match the image slices.
+ */
+function getFramesSliceIndex(image, dataElements, numberOfFrames) {
+  if (numberOfFrames === 1) {
+    return [0];
+  }
+  const origins = image.getGeometry().getOrigins();
+  const frameGeometries = [];
+  for (let f = 0; f < numberOfFrames; ++f) {
+    frameGeometries.push(getFrameGeometry(dataElements, f));
+  }
+  // frame volume ids (a frame index for frames without position),
+  // undefined for a single volume
+  const frameTimeIds = frameGeometries.map(
+    (geometry) => geometry.getInitialTime()?.id.value);
+  const timeIds = [...new Set(frameTimeIds)].sort((a, b) => a - b);
+  const res = [];
+  for (let f = 0; f < numberOfFrames; ++f) {
+    const frameOrigin = frameGeometries[f].getOrigin();
+    const sliceIndex = origins.findIndex((item) => item.equals(frameOrigin));
+    const volumeIndex = timeIds.indexOf(frameTimeIds[f]);
+    res.push(sliceIndex === -1
+      ? -1 : volumeIndex * origins.length + sliceIndex);
+  }
+  // each image slice should be used by one frame
+  const sorted = res.slice().sort((a, b) => a - b);
+  if (sorted.some((value, i) => value !== i)) {
+    throw new Error('Cannot match the image slices with the frames');
+  }
+  return res;
+}
+
+/**
+ * Get the tags of an image whose burned in annotation has been
+ * removed with the Clean Pixel Data Option.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part15/sect_E.3.html#sect_E.3.1}.
+ *
+ * @returns {SimpleTagValues} The tags.
+ */
+function getCleanPixelDataTags() {
+  return {
+    BurnedInAnnotation: 'NO',
+    DeidentificationMethodCodeSequence: {
+      value: [
+        getDicomCodeItem(getDcmDicomCode(DcmCodes.CleanPixelDataOption))
+      ]
+    }
+  };
+}
+
+/**
  * {@link Image} factory.
  */
 export class ImageFactory {
@@ -318,7 +543,8 @@ export class ImageFactory {
   /**
    * Check dicom elements.
    *
-   * @param {DataElements} dataElements The DICOM data elements.
+   * @param {Record<string, DataElement>} dataElements The DICOM data
+   *   elements.
    * @returns {string|undefined} A possible warning.
    * @throws {Error} Error for missing or wrong data.
    */
@@ -354,7 +580,7 @@ export class ImageFactory {
   /**
    * Get an {@link Image} object from the read DICOM file.
    *
-   * @param {DataElements} dataElements The DICOM tags.
+   * @param {Record<string, DataElement>} dataElements The DICOM tags.
    * @param {TypedArray} pixelBuffer The pixel buffer.
    * @param {number} numberOfItems The number of load items.
    * @param {number} [frameNumber] The frame number if the pixel buffer
@@ -523,6 +749,258 @@ export class ImageFactory {
     return image;
   }
 
+  /**
+   * Convert an image into DICOM data elements, for example to save
+   * it with a `DicomWriter` after {@link eraseRegions}.
+   *
+   * The result is a copy of the data elements the image was created
+   * from with the pixel data rebuilt from the image buffer,
+   * the input data elements are not modified. Pixel data is not
+   * encoded: compressed data (decoded when loaded) is written
+   * uncompressed with the Explicit VR Little Endian transfer syntax and
+   * the photometric interpretation and planar configuration of the
+   * decoded data; uncompressed data keeps its transfer syntax.
+   * The tags describing the pixel values range ((0028,0106) to
+   * (0028,0109)), that could be wrong for the new values, and
+   * the ones only used with compressed data are removed.
+   *
+   * Limitation: only supports images created from a single file,
+   * single or multi-frame, not a series of files.
+   *
+   * @param {Image} image The image, created from the data elements.
+   * @param {Record<string, DataElement>} dataElements The data elements
+   *   of the file the image was created from (`DicomData.meta`).
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags,
+   *   for example the ones returned by {@link eraseRegions}. They
+   *   replace the tags with the same name, apart from the pixel data
+   *   and its encoding tags (transfer syntax, photometric
+   *   interpretation...) that are set from the image.
+   * @returns {Record<string, DataElement>} A list of dicom elements.
+   * @throws {Error} If the image cannot be converted.
+   */
+  toDicom(image, dataElements, extraTags) {
+    checkImagePixels(image);
+    // single file data
+    if (typeof dataElements.mergeId !== 'undefined') {
+      throw new Error('Data elements of several files are not supported');
+    }
+    const pixelKey = getAllPixelDataTagKeys().find(
+      (key) => typeof dataElements[key] !== 'undefined');
+    if (typeof pixelKey === 'undefined') {
+      throw new Error('No pixel data in DICOM elements');
+    }
+    // check the image matches the data elements
+    const size = image.getGeometry().getSize();
+    if (size.get(0) !== safeGet(dataElements, TagKeys.Columns) ||
+      size.get(1) !== safeGet(dataElements, TagKeys.Rows)) {
+      throw new Error('The image and the elements have different sizes');
+    }
+    const sopInstanceUid = safeGet(dataElements, TagKeys.SOPInstanceUID);
+    if (!image.includesImageUid(sopInstanceUid)) {
+      throw new Error('The image was not created from the elements');
+    }
+    let numberOfFrames = parseInt(
+      safeGet(dataElements, TagKeys.NumberOfFrames), 10);
+    if (isNaN(numberOfFrames)) {
+      numberOfFrames = 1;
+    }
+    if (getNumberOfSlices(image) !== numberOfFrames) {
+      throw new Error(
+        'The image does not have one slice per frame of the elements, ' +
+        'only images of a single file are supported');
+    }
+    const photometric = getBufferPhotometric(dataElements);
+    let samplesPerPixel = safeGet(dataElements, TagKeys.SamplesPerPixel);
+    if (typeof samplesPerPixel === 'undefined') {
+      samplesPerPixel = 1;
+    }
+    if (image.getNumberOfComponents() !== samplesPerPixel) {
+      throw new Error('The image and the elements have different ' +
+        'samples per pixel');
+    }
+    const bitsAllocated = safeGet(dataElements, TagKeys.BitsAllocated);
+    const buffer = image.getBuffer();
+    const bufferBits = bitsAllocated === 1
+      ? 1 : buffer.BYTES_PER_ELEMENT * 8;
+    if (bufferBits !== bitsAllocated ||
+      (bitsAllocated === 1 && !(buffer instanceof Uint8Array))) {
+      throw new Error(`The image buffer does not have ${
+        bitsAllocated} bits allocated`);
+    }
+
+    // copy the elements apart from the pixel data and the tags
+    // that cannot be kept
+    const removedKeys = [
+      ...getAllPixelDataTagKeys(),
+      TagKeys.ExtendedOffsetTable,
+      TagKeys.ExtendedOffsetTableLengths,
+      TagKeys.EncapsulatedPixelDataValueTotalLength,
+      TagKeys.SmallestImagePixelValue,
+      TagKeys.LargestImagePixelValue,
+      TagKeys.SmallestPixelValueInSeries,
+      TagKeys.LargestPixelValueInSeries
+    ];
+    /** @type {Record<string, DataElement>} */
+    const elements = {};
+    for (const key of Object.keys(dataElements)) {
+      if (!removedKeys.includes(key)) {
+        elements[key] = copyElementValue(dataElements[key]);
+      }
+    }
+
+    // merge extra tags if provided
+    if (typeof extraTags !== 'undefined') {
+      const extraElements = getElementsFromSimpleTagValues(extraTags);
+      for (const key of Object.keys(extraElements)) {
+        elements[key] = extraElements[key];
+      }
+    }
+
+    // transfer syntax: encapsulated (compressed) data is written
+    // uncompressed with Explicit VR Little Endian
+    const syntax = safeGet(dataElements, TagKeys.TransferSyntaxUID);
+    const nativeSyntaxes = [
+      transferSyntaxKeywords.ImplicitVRLittleEndian,
+      transferSyntaxKeywords.ExplicitVRLittleEndian,
+      transferSyntaxKeywords.ExplicitVRBigEndian
+    ];
+    const outSyntax = nativeSyntaxes.includes(syntax)
+      ? syntax : transferSyntaxKeywords.ExplicitVRLittleEndian;
+    elements[TagKeys.TransferSyntaxUID] = createDataElement(
+      TagKeys.TransferSyntaxUID, 'UI', [outSyntax]);
+    // decoded data description
+    elements[TagKeys.PhotometricInterpretation] = createDataElement(
+      TagKeys.PhotometricInterpretation, 'CS',
+      [photometric.photometricInterpretation]);
+    if (typeof photometric.planarConfiguration !== 'undefined') {
+      elements[TagKeys.PlanarConfiguration] = createDataElement(
+        TagKeys.PlanarConfiguration, 'US',
+        [photometric.planarConfiguration]);
+    }
+    // once lossy compressed, an image stays lossy (see PS3.3 C.7.6.1.1.5)
+    if (typeof syntax !== 'undefined' &&
+      isJpegBaselineTransferSyntax(syntax)) {
+      elements[TagKeys.LossyImageCompression] = createDataElement(
+        TagKeys.LossyImageCompression, 'CS', ['01']);
+    }
+
+    // pixel data: frames in file order
+    const frameSize = size.getDimSize(2) * samplesPerPixel;
+    const slicesIndex =
+      getFramesSliceIndex(image, dataElements, numberOfFrames);
+    const pixelBuffer = buffer.slice(0, numberOfFrames * frameSize);
+    for (let f = 0; f < numberOfFrames; ++f) {
+      const offset = slicesIndex[f] * frameSize;
+      pixelBuffer.set(
+        buffer.subarray(offset, offset + frameSize), f * frameSize);
+    }
+    let pixelVr;
+    if (pixelKey === '7FE00008') {
+      pixelVr = 'OF';
+    } else if (pixelKey === '7FE00009') {
+      pixelVr = 'OD';
+    } else {
+      pixelVr = bitsAllocated > 8 ? 'OW' : 'OB';
+    }
+    elements[pixelKey] = createDataElement(pixelKey, pixelVr, [pixelBuffer]);
+
+    return elements;
+  }
+
+}
+
+/**
+ * Erase rectangular regions of an image, for example burned in
+ * annotation that identifies the patient: the stored pixel values
+ * inside the regions are set to 0 (black for MONOCHROME2 and RGB
+ * data) in every slice and frame of the image.
+ *
+ * The image buffer is replaced by an erased copy: the views of the
+ * image are updated and the data elements the image was created from
+ * are not modified. Clone the image before to keep the original one.
+ * Use {@link ImageFactory#toDicom} with the returned tags to get
+ * the DICOM data elements to write. Only the image pixel data is
+ * modified: other places that can contain identifying information
+ * such as the Icon Image Sequence (0088,0200) or overlays are not,
+ * they can be removed with `DicomWriter` rules.
+ *
+ * The returned tags are the ones of the Clean Pixel Data Option:
+ * Burned In Annotation (0028,0301) set to 'NO' and the
+ * De-identification Method Code Sequence (0012,0064) with the
+ * (113101, DCM, 'Clean Pixel Data Option') code. They state that
+ * no burned in annotation remains: only use them if the regions
+ * cover all of it. Patient Identity Removed (0012,0062) is not set,
+ * that is the role of the anonymisation of the other tags.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part15/sect_E.3.html#sect_E.3.1}.
+ *
+ * @param {Image} image The image to modify.
+ * @param {PixelRegion[]} regions The regions to erase, in pixel
+ *   indices. Regions must be inside the image: there is no
+ *   clipping, a region partly or fully outside throws an error and
+ *   the image is not modified.
+ * @returns {SimpleTagValues} The tags to add to the DICOM data, to
+ *   be passed as `extraTags` to {@link ImageFactory#toDicom}.
+ * @throws {Error} For an invalid region or an image that cannot be
+ *   modified (mask, resampled or not completely loaded image).
+ */
+export function eraseRegions(image, regions) {
+  checkImagePixels(image);
+  if (!Array.isArray(regions) || regions.length === 0) {
+    throw new Error('No region to erase');
+  }
+  const size = image.getGeometry().getSize();
+  const columns = size.get(0);
+  const rows = size.get(1);
+  // check all regions before modifying the image
+  for (let i = 0; i < regions.length; ++i) {
+    const region = regions[i];
+    for (const key of ['x', 'y', 'width', 'height']) {
+      if (!Number.isInteger(region?.[key])) {
+        throw new Error(`Region ${i}: ${key} is not an integer`);
+      }
+    }
+    if (region.width < 1 || region.height < 1) {
+      throw new Error(`Region ${i}: width and height must be at least 1`);
+    }
+    if (region.x < 0 || region.y < 0 ||
+      region.x + region.width > columns ||
+      region.y + region.height > rows) {
+      throw new Error(`Region ${i}: outside of the image (${
+        columns}x${rows})`);
+    }
+  }
+
+  // the image buffer can be the pixel data of the data elements
+  // (single frame data): modify a copy
+  const buffer = image.getBuffer().slice();
+  const sliceSize = size.getDimSize(2);
+  const numberOfComponents = image.getNumberOfComponents();
+  // RRR...GGG...BBB... for planar configuration 1
+  const isPlanar = numberOfComponents !== 1 &&
+    image.getPlanarConfiguration() === 1;
+  const numberOfSlices = getNumberOfSlices(image);
+  for (let s = 0; s < numberOfSlices; ++s) {
+    const sliceOffset = s * sliceSize * numberOfComponents;
+    for (const region of regions) {
+      for (let j = region.y; j < region.y + region.height; ++j) {
+        const rowOffset = j * columns + region.x;
+        if (isPlanar) {
+          for (let c = 0; c < numberOfComponents; ++c) {
+            const start = sliceOffset + c * sliceSize + rowOffset;
+            buffer.fill(0, start, start + region.width);
+          }
+        } else {
+          const start = sliceOffset + rowOffset * numberOfComponents;
+          buffer.fill(0, start, start + region.width * numberOfComponents);
+        }
+      }
+    }
+  }
+  // also fires imagecontentchange to update the views
+  image.replaceBuffer(buffer);
+
+  return getCleanPixelDataTags();
 }
 
 /**

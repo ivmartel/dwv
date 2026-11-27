@@ -568,6 +568,9 @@ export class Ellipse {
 export function equalWl(wl0: WindowLevel, wl1: WindowLevel): boolean;
 
 // @public
+export function eraseRegions(image: Image_2, regions: PixelRegion[]): SimpleTagValues;
+
+// @public
 export type FloatTypedArray = Float32Array | Float64Array;
 
 // @public
@@ -793,6 +796,14 @@ export class ImageContour {
     realloc(imageBuffer: Uint8Array, imageSize: Size): void;
     resetAroundOffset(offset: number): void;
     shiftSlice(contourIndexOffset: number, contourSliceSize: number, contourMaxOffset: number): void;
+}
+
+// @public
+export class ImageFactory {
+    checkElements(dataElements: Record<string, DataElement>): string | undefined;
+    create(dataElements: Record<string, DataElement>, pixelBuffer: TypedArray, numberOfItems: number, frameNumber?: number): Image_2;
+    getWarning(): string | undefined;
+    toDicom(image: Image_2, dataElements: Record<string, DataElement>, extraTags?: SimpleTagValues): Record<string, DataElement>;
 }
 
 // @public
@@ -1105,6 +1116,14 @@ export namespace Orientation {
     let // (undocumented)
     Sagittal: string;
 }
+
+// @public
+export type PixelRegion = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
 
 // @public
 export class PlaneHelper {
