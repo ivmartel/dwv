@@ -160,209 +160,32 @@ When adding a new requirement or wiring a test to one: edit
 
 ## Architecture
 
-Library entry point `src/index.js` re-exports each subsystem's own
-`index.js` (`app`, `command`, `dicom`, `gui`, `image`, `math`, `tools`,
-`utils`). Everything uses native `EventTarget`/`CustomEvent` for
-communication — controllers re-listen to their children's events and
-re-dispatch them upward, so most state changes eventually surface as an
-event on the top-level `App`.
+The architecture is described in the jsdoc tutorials: start at
+`resources/doc/tutorials/architecture.md` (overview, extensibility,
+utilities) and follow its links to the `arch-*.md` pages: `arch-app`
+(App and controllers), `arch-data-load` (loaders, DICOM parsing, pixel
+decompression, image construction, multi-volume data), `arch-layout`
+(stage, layer groups, layers), `arch-view-create` (LUTs and rendering),
+`arch-tools` (tools and commands), `arch-annotations` (annotations vs
+masks, DICOM SR). Read the relevant page before changing a subsystem, and
+update it when a change makes it outdated.
 
-Public typedefs (the ones that are part of the API) live in a single
-`<folder>/types.js` per source folder (currently `dicom`, `image`, `math`),
-re-exported by the folder's `index.js` with `export * from './types.js'`.
-Typedefs only used inside one module stay in that module. Keep `types.js`
-type only: typedefs and JSDoc `@import` only, no runtime import or code, so
-it stays a leaf of the module graph and cannot create circular dependencies.
+Conventions to follow when changing code:
 
-### App and its controllers (`src/app/`)
-
-`App` (`application.js`) is the public facade and central event bus, but it
-does not do the work itself: `App.init()` creates and wires five
-controllers, and most of `App`'s own methods are now thin,
-**deprecated-since-v0.37** forwarding wrappers — the controllers, reachable
-via `app.getLoadController()`/`getDataController()`/etc., are the current
-recommended API.
-
-- `LoadController` — picks `FilesLoader`/`UrlsLoader`/`MemoryLoader` based on
-  input type, re-dispatches their load events tagged with `{dataid,
-  isfirstitem}` (`isfirstitem` on `loaditem` only). The former `loadtype`
-  field was removed in v0.37 along with legacy `.json` state loading.
-- `DataController` — owns `#dataList: Record<dataId, DicomData>`. Its
-  `#setDataContent` inspects Modality/pixel-data presence to route parsed
-  data to `ImageFactory`, `MaskFactory` (Modality `SEG`), `AnnotationGroupFactory`
-  (Modality `SR`), or `RtStructFactory` (Modality `RTSTRUCT`, rasterizes
-  contours against an already-loaded reference series). Also handles
-  multi-volume/4D data via `DicomSliceDataList`, buffering same-origin slices
-  until load completes (see *Multi-volume / 4D data* below).
-- `StageController` — owns the single `Stage` (all `LayerGroup`s/layers).
-  Creates `View`s via `ViewFactory` at render time (one `View` per
-  layer/layer-group, even for a shared `Image`), builds `ViewLayer`/`DrawLayer`s,
-  and keeps each stored `ViewConfig` in sync with user-driven wl/opacity/
-  colourmap changes.
-- `ToolboxController` — holds `{name: toolInstance}`, tracks the selected
-  tool, binds a layer group's pointer/keyboard events to the active tool.
-- `UndoController` — thin wrapper around `UndoStack` (`src/command/undoStack.js`).
-- `ViewController` (per view layer, wraps one `View` + `PlaneHelper`) and
-  `DrawController` (per draw layer, wraps one `AnnotationGroup`, routes edits
-  through undoable commands) are created inside `ViewLayer`/`DrawLayer`
-  respectively, not by `App` directly.
-
-### Data flow: file/URL → pixels on screen
-
-1. **IO loaders** (`src/io/`): `LoaderBase` (extends `LoadHandlers`, the
-   on*-callback contract) is implemented by `DicomDataLoader`, `ZipLoader`,
-   `MultipartLoader` (WADO-RS multipart/related), `RawImageLoader`/
-   `RawVideoLoader` (non-DICOM). Loader
-   capability is queried via `canLoadFile`/`canLoadUrl`/`canLoadMemory`
-   (extension/media-type based). `getLoaderList()` (`loaderList.js`) is a
-   lazily-built singleton list to avoid a circular-import (`MultipartLoader`
-   → `MemoryLoader` → `loaderList` → `MultipartLoader`). The orchestrators
-   `FilesLoader`/`UrlsLoader`/`MemoryLoader` pick the first matching loader,
-   read the raw bytes (`FileReader`/`XMLHttpRequest`), and call `loader.load()`.
-   DWV is a DICOMweb User Agent for retrieval only (WADO-URI, WADO-RS) —
-   QIDO-RS and STOW-RS only exist in the `dev/pacs` demo, not core `src/`
-   (see *Project* above) — and has no DIMSE
-   networking (no C-STORE/C-FIND/C-MOVE/PDU/Association handling); it's
-   HTTP/DICOMweb only.
-2. **DICOM parsing** (`src/dicom/`): `DicomParser.parse()` reads the preamble,
-   File Meta group (incl. `TransferSyntaxUID`), then the dataset via
-   `DataReader` (endian/VR-aware), using `dictionary.js` for VR/transfer-syntax
-   tables, producing `Record<tagKey, DataElement>`.
-   `getSyntaxDecompressionName(syntax)` maps the transfer syntax to one of
-   `'jpeg2000'` / `'jpeg-baseline'` / `'jpeg-lossless'` / `'rle'` (or
-   undefined if uncompressed). Private tags (not in the dictionary) read
-   from implicit VR data come out as VR `UN` with raw byte values; callers
-   decode them as needed (e.g. `getPrivateTagValue` in `dicomVolume.js`).
-   `DicomWriter` (`dicomWriter.js`) writes data back
-   using per-tag writing rules; `setRemovePrivateTags(true)` drops all
-   odd-group tags (including inside sequences) and overrides the rules.
-3. **Pixel decompression** (`src/image/decoder.js`, `src/decoders/`): when a
-   decompression algo is needed, `DicomBufferToData` (`src/image/
-   dicomBufferToData.js`, called by `DicomDataLoader`) builds a
-   `PixelBufferDecoder` which dispatches to a `ThreadPool`
-   (`src/utils/thread.js`) of web workers — `decoders/pdfjs/` (vendored
-   Mozilla pdf.js, patched for 16-bit signed grayscale) handles JPEG
-   Baseline/JPEG2000, `decoders/rii-mango/` (vendored
-   rii-mango/JPEGLosslessDecoderJS) handles JPEG Lossless, `decoders/dwv/`
-   is dwv's own RLE decoder. The same `ThreadPool`/`WorkerTask` machinery is
-   reused for image labeling (`image/labelingThread.js`, e.g. flood fill) and
-   resampling (`image/resamplingThread.js`).
-4. **Image/AnnotationGroup construction** (`src/image/*Factory.js`, invoked
-   from `DataController`): `ImageFactory` builds an `Image` (pixel buffer +
-   `Geometry`/`Size`/`Spacing`, rescale slope/intercept via `rsi.js`, SUV
-   factor for PET, per-frame functional groups); `MaskFactory` builds a
-   `MaskImage` (a segmentation-specific subclass of `Image`, see below) from
-   DICOM SEG; `AnnotationGroupFactory` parses DICOM SR into an
-   `AnnotationGroup` of `Annotation`s; `RtStructFactory` rasterizes RTSTRUCT
-   contours into a `MaskImage`. The exported `demoCreateImage`/
-   `demoCreateMaskImage`/`demoCreateView` helpers (formerly `create*`) are
-   single-file shortcuts for demos only, not the app path.
-   Images are built progressively: the first load item creates the `Image`,
-   later items (slices, or frames of a multi-frame file) are added via
-   `appendSlice`/`appendFrameBuffer` into a buffer preallocated from
-   `meta.sliceCapacity` (load items × frames per item). Don't confuse it with
-   `numberOfItems` (loader option and `DicomData` property: how many
-   files/urls/buffers/multipart parts are in the load); `ImageFactory.create()`
-   is where the latter becomes the former.
-5. **View construction and rendering** (`src/image/view*.js`,
-   `src/gui/`, at render time via `StageController`): `ViewFactory` wraps an
-   `Image` in a `View` (orientation/position, `WindowLut`, colour map, window
-   presets — DICOM-provided, computed `'minmax'`, or app-supplied via
-   `custom.wlPresets`). `View.generateImageData()` dispatches on
-   `image.getPhotometricInterpretation()` to one of the pure pixel-fill
-   functions `generateImageDataMonochrome`/`Rgb`/`YbrFull`/`PaletteColor`
-   (each in its own `view*.js` file), which use `WindowLut` (= `ModalityLut`
-   + `VoiLut`, from `rsi.js`/`voiLut.js`) and a `ColourMap` (`luts.js`) to
-   produce an `ImageData`. `ViewLayer` (`src/gui/viewLayer.js`) draws that to
-   a plain HTML5 `<canvas>` (2D context) — no Konva involved.
-
-`Stage` (`src/gui/stage.js`) → multiple `LayerGroup`s (`layerGroup.js`) →
-each owns `ViewLayer`s (canvas pixel rendering), `DrawLayer`s (Konva-based
-vector annotation rendering, via `DrawController`), and an optional
-`InfoLayer` (overlay text, `infoData.js`). `binders.js` synchronises
-zoom/pan/window-level/etc. across multiple linked layer groups (e.g.
-axial/coronal/sagittal MPR views).
-
-### Tools (`src/tools/`)
-
-Every concrete tool (`WindowLevel`, `Scroll`, `ZoomAndPan`, `Opacity`, `Draw`,
-`Brush`, `Filter`, `Floodfill`, `Livewire` — registered in `toolList.js`)
-extends `LayerGroupPointer`, which normalises pointer/touch input into a
-drag lifecycle and is *composed* (not subclassed) from pluggable behaviors
-under `src/tools/behaviors/` (`dragBehavior`, `wheelBehavior`,
-`hoverBehavior`, `doubleClickBehavior`, `tapBehavior`, `twoTouchBehavior`,
-plus draw/brush/floodfill/livewire-specific variants). `src/tools/shapes/`
-holds the geometric shape classes and Konva renderers used by `Draw`/`Brush`
-(rectangle, ellipse, circle, arrow, ruler, protractor, ROI, bidimensional,
-plus label/anchor/editor helpers).
-
-Tools never mutate state directly — they create `Command` objects
-(`src/command/`: `AddAnnotationCommand`/`RemoveAnnotationCommand`/
-`UpdateAnnotationCommand`, `DrawBrushCommand`, `RunFilterCommand`,
-`DeleteSegmentCommand`, `ChangeSegmentColourCommand`) and push them through
-`UndoController.addToUndoStack()`, so all edits are undoable via
-`UndoStack` (`src/command/undoStack.js`).
-
-### Annotations vs. masks
-
-Two parallel models, both stored alongside regular pixel data on `DicomData`:
-
-- **Masks** (DICOM SEG/RTSTRUCT → `DicomData.image`): one label per voxel in
-  a `MaskImage` (`src/image/maskImage.js`, extends `Image`, split out from it
-  to keep segment-aware behavior — per-segment/per-slice bookkeeping, brush
-  offset-editing, per-segment volume/centroid/diameter labeling — off the
-  base pixel class), with a segment list (number/colour/name) managed by
-  `MaskSegmentHelper` (`src/image/maskSegmentHelper.js`, deliberately does
-  *not* touch pixels itself — pixel edits go through undoable commands).
-  `MaskImage` owns a `SegmentCollection` (per-segment ROI slice buffers) and
-  an `ImageContour` for outline-style rendering.
-- **Annotations** (DICOM SR, or drawing tools → `DicomData.annotationGroup`):
-  vector/graphic `Annotation` objects grouped in an `AnnotationGroup`,
-  rendered by `DrawLayer` (Konva).
-
-### Multi-volume / 4D data (`src/dicom/dicomVolume.js`)
-
-The tag that discriminates volumes is not known until all data is loaded, so
-`guessVolumeIndices` tries an ordered list of volume-id getters
-(`defaultVolumeIdCandidates`: TemporalPositionIdentifier,
-TemporalPositionIndex, DiffusionBValue (incl. private b-value tags via
-`defaultPrivateBValueRules`, VR `UN` values decoded as ASCII), …,
-AcquisitionTime last) and keeps the first
-that yields a valid, consistent per-volume grouping. Candidates flagged
-`preLoad` are also used while loading (`getVolumeIdTagValue`) and must not
-vary within a volume. The same logic serves both a series of files
-(`DicomSliceDataList` in `dataController.js`) and the frames of a single
-multi-frame file (`getSortedFramesGeometry` in `dicomGeometry.js`, used by
-`ImageFactory`).
-
-### Legacy state persistence (removed)
-
-The JSON app-state (`src/io/state.js`, `JSONTextLoader`,
-`App.applyJsonState()`, `App.setDrawings()`, `konvaToAnnotation`) was
-removed in v0.37; `.json` inputs are no longer loadable. Use the
-`Annotation`/`AnnotationGroup`/DICOM SR path.
-
-### Extensibility
-
-`src/app/custom.js` exports a single mutable `custom` object (window/level
-presets per modality, shape label texts, private b-value rules, volume-id
-candidates, pixel-unit getter, ROI dialog override) meant to be overridden by
-embedding applications — check it before adding new hardcoded
-modality-specific behavior. `custom.volumeIdCandidates` and
-`custom.privateBValueRules` replace the defaults; extend the exported
-`defaultVolumeIdCandidates`/`defaultPrivateBValueRules` (from `dicom/index.js`,
-typedefs in `dicom/types.js`) rather than rewriting them.
-`custom.getVolumeIdTagValue`/`getPostLoadVolumeIdTagValue` are deprecated
-since v0.37.
-
-### Cross-cutting utilities (`src/utils/`)
-
-- `logger.js` — global mutable `logger` singleton (`TRACE`..`ERROR`,
-  default `WARN`), used pervasively including to flag deprecated `App` calls.
-- `thread.js` — shared `ThreadPool`/`WorkerTask`/`WorkerThread` web-worker
-  infrastructure (see pixel decoding, labeling, resampling above).
-- `listen.js` — a manual `ListenerHandler` (non-`EventTarget`) used only by
-  `gui/viewLayer.js` and `gui/drawLayer.js`, distinct from the
-  `EventTarget`/`CustomEvent` pattern used everywhere else.
-- `i18n.js` — minimal translation namespace (currently unit symbols),
-  designed for override by the embedding app.
+- Communication uses native `EventTarget`/`CustomEvent`: controllers
+  re-dispatch their children's events upward to the `App`.
+- `App` methods are deprecated thin wrappers (since v0.37): put new
+  behaviour in the controllers (`app.getLoadController()`...).
+- Public typedefs go in the folder's `types.js`, which stays type only
+  (typedefs and JSDoc `@import`, no runtime import or code).
+- Tools never mutate state directly: they push `Command` objects through
+  `UndoController.addToUndoStack()` so every edit is undoable.
+- `MaskSegmentHelper` does not touch pixels: pixel edits go through
+  commands.
+- Check the `custom` object (`src/app/custom.js`) before adding hardcoded
+  modality-specific behaviour; extend the exported defaults
+  (`defaultVolumeIdCandidates`, `defaultPrivateBValueRules`) rather than
+  rewriting them.
+- The legacy JSON app state (`src/io/state.js`, `.json` loading,
+  `App.applyJsonState()`...) was removed in v0.37: use the
+  `Annotation`/`AnnotationGroup`/DICOM SR path.

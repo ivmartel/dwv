@@ -21,6 +21,12 @@ create its own HTML div with an id created by {@link getLayerDivId}. Layers
 will typically contain a HTML canvas to display its content. Use the {@link getLayerDetailsFromEvent} method to extract the layer details from an event generated from a layer canvas.
 You can then access the layer group object via the app `getLayerGroupByDivId` method.
 
+A layer group can also have an optional `InfoLayer` (overlay text, see
+`src/gui/infoData.js`). The {@link StageController} owns the stage, it
+builds the layers at render time. The binders (`src/gui/binders.js`)
+synchronise zoom, pan, window/level... across linked layer groups, for
+example the axial, coronal and sagittal MPR views.
+
 ![classes-layers-view](classes-layers-view.png)
 
 The View class contains a 2D view of the image that could be 3D + t. Layers follow the [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC) design. In the view case, the model is the View, the view the ViewLayer and the controller the ViewController.

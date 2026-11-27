@@ -33,3 +33,16 @@ canvas array data:
 *View generation sequence.*
 
 All this is materialised in the `generateImageData*` functions called from the {@link View} class.
+
+The {@link View} is created by the {@link ViewFactory} which wraps an
+{@link Image} and sets its orientation and position, its {@link WindowLut},
+colour map and window presets (DICOM provided, computed `minmax`, or
+application supplied via `custom.wlPresets`).
+[View::generateImageData]{@link View#generateImageData} dispatches on the
+image photometric interpretation to one of the pure pixel fill functions
+`generateImageDataMonochrome`, `generateImageDataRgb`,
+`generateImageDataYbrFull` or `generateImageDataPaletteColor` (each in its
+own `src/image/view*.js` file). They use the {@link WindowLut} (=
+{@link ModalityLut} + `VoiLut`) and a {@link ColourMap} to produce an
+[ImageData](https://developer.mozilla.org/en-US/docs/Web/API/ImageData).
+The {@link ViewLayer} draws it to a plain HTML5 canvas (2D context).

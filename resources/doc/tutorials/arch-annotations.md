@@ -3,7 +3,27 @@ describes the dwv annotations.
 
 Summary:
 
+- [Annotations and masks](#annotations-and-masks)
 - [DICOM SR](#dicom-sr)
+
+## Annotations and masks
+
+dwv has two parallel models, both stored alongside regular pixel data in
+{@link DicomData}:
+
+- **Masks** (DICOM SEG or RTSTRUCT, stored in `DicomData.image`): one label
+  per voxel in a {@link MaskImage}. It extends {@link Image} and holds the
+  segment aware behaviour: per segment and per slice bookkeeping, brush
+  offset editing, per segment volume, centroid and diameter labeling. Its
+  segment list (number, colour, name) is managed by the
+  {@link MaskSegmentHelper}, which does *not* touch pixels itself: pixel
+  edits go through undoable commands. A `MaskImage` owns a
+  {@link SegmentCollection} (per segment ROI slice buffers) and an
+  {@link ImageContour} for outline style rendering.
+- **Annotations** (DICOM SR or drawing tools, stored in
+  `DicomData.annotationGroup`): vector {@link Annotation}s grouped in an
+  {@link AnnotationGroup}, rendered by the {@link DrawLayer} using
+  [Konva](https://konvajs.org/).
 
 ## DICOM SR
 
