@@ -21,8 +21,29 @@ body {
 }
 .viewer {
   flex: 1;
+  min-width: 0;
   border: none;
+}
+/* draggable bar to resize the data / viewer split */
+.splitter {
+  flex: 0 0 6px;
+  cursor: col-resize;
+  background: #ddd;
   border-left: 1px solid #aaa;
+  border-right: 1px solid #aaa;
+  touch-action: none;
+}
+.splitter:hover,
+.splitter.dragging {
+  background: #bbb;
+}
+/* let the splitter get the pointer events above the iframe while dragging */
+.layout.resizing .viewer {
+  pointer-events: none;
+}
+.layout.resizing {
+  cursor: col-resize;
+  user-select: none;
 }
 /* icon links (download) */
 a.icon {
@@ -55,6 +76,9 @@ a.icon {
 <div id="content"></div>
 
 </div><!-- /data -->
+
+<div class="splitter" id="splitter" role="separator"
+  aria-orientation="vertical" title="Drag to resize"></div>
 
 <iframe class="viewer" name="dwv-viewer"
   title="DWV test viewer" src="../../viewer/viewer.html"></iframe>

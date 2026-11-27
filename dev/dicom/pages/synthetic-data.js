@@ -13,6 +13,7 @@ import {
  * Setup.
  */
 function setup() {
+  setupSplitter();
   // create lists
   getFileConfigsHtmlList([
     'synthetic-img',
@@ -337,6 +338,40 @@ function displayConfigs(configs) {
 }
 
 // ---------------------------------------------
+
+/**
+ * Setup the splitter bar that resizes the data list / viewer split.
+ */
+function setupSplitter() {
+  const splitter = document.getElementById('splitter');
+  const layout = splitter.parentElement;
+  const data = layout.querySelector('.data');
+  const minWidth = 100;
+
+  splitter.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    splitter.setPointerCapture(event.pointerId);
+    splitter.classList.add('dragging');
+    layout.classList.add('resizing');
+  });
+  splitter.addEventListener('pointermove', (event) => {
+    if (!splitter.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+    const layoutRect = layout.getBoundingClientRect();
+    const maxWidth = layoutRect.width - splitter.offsetWidth - minWidth;
+    const width = Math.min(
+      Math.max(event.clientX - layoutRect.left, minWidth), maxWidth);
+    data.style.flexBasis = `${width}px`;
+  });
+  const stopDrag = (event) => {
+    splitter.releasePointerCapture(event.pointerId);
+    splitter.classList.remove('dragging');
+    layout.classList.remove('resizing');
+  };
+  splitter.addEventListener('pointerup', stopDrag);
+  splitter.addEventListener('pointercancel', stopDrag);
+}
 
 // launch
 setup();
