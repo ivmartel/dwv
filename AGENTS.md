@@ -53,6 +53,13 @@ in the docs point to `/medical/dicom/2024a/`. The skill answers from that
 edition, compares it with the current one and reports significant changes (for
 ex a tag or VR added or changed since).
 
+When validating DICOM files dwv wrote (for ex with `dciodvfy`), ignore an
+`ImplementationVersionName (0002,0013)` value longer than its VR (SH, 16
+characters) when it comes from a beta version (`DWV_<version>-beta.<n>`, from
+`getImplementationVersionName` in `src/dicom/dicomParser.js`): a beta should
+not be used to write official DICOM files. Only report it if a release
+version (`DWV_<version>`) would exceed 16 characters.
+
 When upgrading to a newer edition, update together:
 
 - the `dcmstdtojs` asset path in `src/dicom/dictionary.js` (and its jsdoc);
