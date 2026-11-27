@@ -13,6 +13,8 @@ import {
   mergeTagValues
 } from '../dicom/simpleTagValues.js';
 import {transferSyntaxKeywords} from '../dicom/dictionary.js';
+import {getDwvVersion} from '../dicom/dicomParser.js';
+import {getUID} from '../dicom/dicomWriter.js';
 import {MaskImage} from './maskImage.js';
 import {ColourMap} from './luts.js';
 import {SegmentCollection} from './segmentCollection.js';
@@ -35,20 +37,75 @@ const TagKeys = {
 };
 
 /**
- * Patient/study/series tags to copy into mask meta.
+ * Meta tag keys: tags copied into the mask meta at load and
+ *   written back at save.
  */
 const MetaTagKeys = {
+  // patient
   PatientName: '00100010',
   PatientID: '00100020',
   PatientBirthDate: '00100030',
   PatientSex: '00100040',
+  // general study
   StudyDate: '00080020',
+  StudyTime: '00080030',
   StudyInstanceUID: '0020000D',
   StudyID: '00200010',
+  ReferringPhysicianName: '00080090',
+  AccessionNumber: '00080050',
+  // rt series
+  SeriesDate: '00080021',
+  SeriesTime: '00080031',
   SeriesInstanceUID: '0020000E',
   SeriesNumber: '00200011',
-  FrameOfReferenceUID: '00200052'
+  OperatorsName: '00081070',
+  // frame of reference
+  FrameOfReferenceUID: '00200052',
+  PositionReferenceIndicator: '00201040',
+  // general equipment
+  Manufacturer: '00080070',
+  ManufacturerModelName: '00081090',
+  DeviceSerialNumber: '00181000',
+  SoftwareVersions: '00181020',
+  // structure set
+  InstanceNumber: '00200013',
+  StructureSetLabel: '30060002',
+  StructureSetName: '30060004',
+  StructureSetDescription: '30060006'
 };
+
+/**
+ * Type 2 tags of the RT Structure Set IOD modules filled by dwv:
+ *   they are written with an empty value if not set.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.19.3.html}.
+ */
+const Type2TagNames = [
+  // patient
+  'PatientName',
+  'PatientID',
+  'PatientBirthDate',
+  'PatientSex',
+  // general study
+  'StudyDate',
+  'StudyTime',
+  'ReferringPhysicianName',
+  'StudyID',
+  'AccessionNumber',
+  // rt series
+  'SeriesNumber',
+  'OperatorsName',
+  // frame of reference
+  'PositionReferenceIndicator'
+];
+
+/**
+ * Detached Study Management SOP Class UID (retired), the study SOP class
+ *   used in the RT Referenced Study Sequence.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.8.5.4.html}.
+ */
+const StudySOPClassUID = '1.2.840.10008.3.1.2.3.1';
 
 /**
  * Get the referenced frame of reference UID from an RT Structure Set.
@@ -653,14 +710,26 @@ export class RtStructFactory {
    * contour tracing, simplifies with Ramer-Douglas-Peucker, then maps the
    * 2D pixel coordinates back to 3D patient-space coordinates.
    *
+   * The image meta is not modified.
+   *
    * @param {MaskImage} image The mask image.
-   * @param {MaskSegment[]} [segments] The mask segments; if omitted, taken
-   *   from image meta.
-   * @param {Image} [sourceImage] Source image (provides StudyInstanceUID).
-   * @param {SimpleTagValues} [extraTags] Optional extra tags to merge.
+   * @param {MaskSegment[]|undefined} segments The mask segments, defaults
+   *   to the image meta segments if undefined.
+   * @param {Image} sourceImage The source image, used for the references
+   *   to the contoured study, series and images.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags,
+   *   for example the equipment tags (Manufacturer, ManufacturerModelName,
+   *   DeviceSerialNumber, SoftwareVersions) of the embedding application,
+   *   they default to dwv ones.
    * @returns {Record<string, DataElement>} The DICOM data elements.
    */
   toDicom(image, segments, sourceImage, extraTags) {
+    // the referenced series is needed to load the result
+    if (typeof sourceImage === 'undefined') {
+      throw new Error('Cannot create DICOM RTSTRUCT without source image');
+    }
+    const sourceMeta = sourceImage.getMeta();
+
     const tags = getDefaultDicomRTStructJson();
 
     // copy patient/study/series tags from image meta
@@ -677,25 +746,54 @@ export class RtStructFactory {
       segments = meta.custom?.segments ?? [];
     }
 
-    // keep source image StudyInstanceUID and referenced series when available
-    if (typeof sourceImage !== 'undefined') {
-      const sourceMeta = sourceImage.getMeta();
-      tags.StudyInstanceUID = sourceMeta.StudyInstanceUID;
-      tags.ReferencedFrameOfReferenceSequence = {
-        value: [{
-          FrameOfReferenceUID: tags.FrameOfReferenceUID ?? '',
-          RTReferencedStudySequence: {
-            value: [{
-              ReferencedSOPInstanceUID: sourceMeta.StudyInstanceUID ?? '',
-              RTReferencedSeriesSequence: {
-                value: [{
-                  SeriesInstanceUID: sourceMeta.SeriesInstanceUID ?? ''
-                }]
-              }
-            }]
-          }
-        }]
-      };
+    // keep source image StudyInstanceUID
+    tags.StudyInstanceUID = sourceMeta.StudyInstanceUID;
+
+    // equipment: the one that produces this instance, not the one
+    //   of an input mask, the embedding application can set its own
+    //   via the extra tags
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.5.html#sect_C.7.5.1
+    tags.Manufacturer = 'dwv';
+    tags.ManufacturerModelName = 'DWV';
+    tags.DeviceSerialNumber = '1';
+    tags.SoftwareVersions = getDwvVersion();
+
+    // frame of reference: shared with the source image
+    if (typeof tags.PositionReferenceIndicator === 'undefined') {
+      tags.PositionReferenceIndicator = sourceMeta.PositionReferenceIndicator;
+    }
+
+    // instance: each call creates a new SOP instance
+    tags.SOPInstanceUID = getUID();
+    // series: the mask one if it is an RTSTRUCT one (for ex the one of
+    //   a loaded RTSTRUCT, a series has a single modality) or a new one
+    if (meta.Modality !== 'RTSTRUCT' ||
+      typeof tags.SeriesInstanceUID === 'undefined' ||
+      tags.SeriesInstanceUID === '') {
+      tags.SeriesInstanceUID = getUID();
+      tags.SeriesNumber = '1';
+    }
+    if (typeof tags.SeriesNumber === 'undefined' ||
+      tags.SeriesNumber === '') {
+      tags.SeriesNumber = '1';
+    }
+
+    // structure set: label is type 1, instance number type 3
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.8.5.html
+    if (typeof tags.StructureSetLabel === 'undefined' ||
+      tags.StructureSetLabel === '') {
+      tags.StructureSetLabel = getDefaultDicomRTStructJson().StructureSetLabel;
+    }
+    if (typeof tags.InstanceNumber === 'undefined' ||
+      tags.InstanceNumber === '') {
+      tags.InstanceNumber = '1';
+    }
+
+    // type 2: present, possibly empty
+    for (const name of Type2TagNames) {
+      if (typeof tags[name] === 'undefined') {
+        tags[name] = '';
+      }
     }
 
     // content date/time
@@ -704,6 +802,55 @@ export class RtStructFactory {
     tags.StructureSetTime = getDicomTime(dateToTimeObj(now));
 
     const geometry = image.getGeometry();
+    const sourceGeometry = sourceImage.getGeometry();
+
+    /**
+     * Get the source image SOP reference of a mask slice.
+     *
+     * @param {number} k The mask slice index.
+     * @returns {object} The SOP reference item.
+     */
+    const getSourceReference = function (k) {
+      const posPat = geometry.getOrigins()[k];
+      const sourceIndex = sourceGeometry.worldToIndex(
+        new Point([posPat.getX(), posPat.getY(), posPat.getZ()])
+      );
+      return {
+        ReferencedSOPClassUID: sourceMeta.SOPClassUID,
+        ReferencedSOPInstanceUID: sourceImage.getImageUid(sourceIndex)
+      };
+    };
+
+    // referenced study, series and images: the contour image sequence
+    //   lists all the source images
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.8.5.html
+    const contourImages = [];
+    const sourceSize = sourceGeometry.getSize();
+    for (let k = 0; k < sourceSize.get(2); ++k) {
+      contourImages.push({
+        ReferencedSOPClassUID: sourceMeta.SOPClassUID,
+        ReferencedSOPInstanceUID:
+          sourceImage.getImageUid(new Index([0, 0, k]))
+      });
+    }
+    tags.ReferencedFrameOfReferenceSequence = {
+      value: [{
+        FrameOfReferenceUID: tags.FrameOfReferenceUID ?? '',
+        RTReferencedStudySequence: {
+          value: [{
+            ReferencedSOPClassUID: StudySOPClassUID,
+            ReferencedSOPInstanceUID: sourceMeta.StudyInstanceUID ?? '',
+            RTReferencedSeriesSequence: {
+              value: [{
+                SeriesInstanceUID: sourceMeta.SeriesInstanceUID ?? '',
+                ContourImageSequence: {value: contourImages}
+              }]
+            }
+          }]
+        }
+      }]
+    };
+
     const size = geometry.getSize();
     const width = size.get(0);
     const height = size.get(1);
@@ -774,6 +921,7 @@ export class RtStructFactory {
             points3D.push(world.get(0), world.get(1), world.get(2));
           }
           contourSeq.push({
+            ContourImageSequence: {value: [getSourceReference(z)]},
             ContourGeometricType: geometricType,
             NumberOfContourPoints: simplified.length,
             ContourData: points3D
@@ -792,9 +940,12 @@ export class RtStructFactory {
     tags.ROIContourSequence = {value: contourItems};
     tags.RTROIObservationsSequence = {value: obsItems};
 
+    // merge extra tags if provided
     if (typeof extraTags !== 'undefined') {
       mergeTagValues(tags, extraTags);
     }
+    // file meta: same instance as the dataset
+    tags.MediaStorageSOPInstanceUID = tags.SOPInstanceUID;
 
     return getElementsFromSimpleTagValues(tags);
   }

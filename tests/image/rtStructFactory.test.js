@@ -6,6 +6,8 @@ import {getRTStructFromElements} from '../../src/dicom/dicomRTStruct.js';
 import {
   getReferencedSeriesUIDFromRTStruct
 } from '../../src/dicom/dicomImage.js';
+import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
+import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {RtStructFactory} from '../../src/image/rtStructFactory.js';
 import {Image} from '../../src/image/image.js';
 import {Geometry} from '../../src/image/geometry.js';
@@ -436,5 +438,184 @@ describe('RtStructFactory', () => {
         'ring pixel on the bridge row is filled, not leaked into the hole'
       );
     });
+
+  // -------------------------------------------------------------------------
+  // Output tags
+  // -------------------------------------------------------------------------
+
+  /**
+   * Build a mask image from a synthetic RTSS config.
+   *
+   * @param {string} name The config name.
+   * @returns {object} The mask image.
+   */
+  function buildMaskImage(name) {
+    const config = syntheticData.find(c => c.name === name);
+    return new RtStructFactory().create(
+      configToElements(config), buildRefImage());
+  }
+
+  test('toDicom: throws without source image', () => {
+    const image = buildMaskImage('test-rtss-00');
+    assert.throws(
+      () => new RtStructFactory().toDicom(image, undefined, undefined),
+      Error,
+      'Cannot create DICOM RTSTRUCT without source image'
+    );
+  });
+
+  test('toDicom: type 2 tags are present', () => {
+    // test-rtss-00 and test-img-00 have no patient tags
+    const outElements = new RtStructFactory().toDicom(
+      buildMaskImage('test-rtss-00'), undefined, buildRefImage());
+    const type2Keys = {
+      PatientName: '00100010',
+      PatientID: '00100020',
+      PatientBirthDate: '00100030',
+      PatientSex: '00100040',
+      StudyDate: '00080020',
+      StudyTime: '00080030',
+      ReferringPhysicianName: '00080090',
+      StudyID: '00200010',
+      AccessionNumber: '00080050',
+      OperatorsName: '00081070',
+      PositionReferenceIndicator: '00201040'
+    };
+    for (const [name, key] of Object.entries(type2Keys)) {
+      assert.ok(
+        typeof outElements[key] !== 'undefined', `${name} is present`);
+      assert.equal(safeGet(outElements, key), '', `${name} is empty`);
+    }
+  });
+
+  test('toDicom: input and source tags are kept', () => {
+    const refImage = buildRefImage();
+    refImage.getMeta().PositionReferenceIndicator = 'XY';
+    const image = buildMaskImage('test-rtss-00');
+    const meta = image.getMeta();
+    meta.PatientName = 'Doe^John';
+    meta.InstanceNumber = '3';
+    meta.StructureSetLabel = 'Label';
+    let outElements =
+      new RtStructFactory().toDicom(image, undefined, refImage);
+    assert.equal(
+      safeGet(outElements, '00100010'), 'Doe^John', 'mask patient name');
+    assert.equal(
+      Number(safeGet(outElements, '00200013')), 3, 'mask instance number');
+    assert.equal(
+      safeGet(outElements, '30060002'), 'Label', 'mask label');
+    assert.equal(
+      safeGet(outElements, '00201040'), 'XY', 'source position reference');
+
+    // defaults
+    delete meta.InstanceNumber;
+    delete meta.StructureSetLabel;
+    outElements = new RtStructFactory().toDicom(image, undefined, refImage);
+    assert.equal(
+      Number(safeGet(outElements, '00200013')), 1, 'default instance number');
+    assert.equal(
+      safeGet(outElements, '30060002'), 'RT Structure Set', 'default label');
+  });
+
+  test('toDicom: instance and series identification', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-rtss-00');
+    const meta = image.getMeta();
+    const factory = new RtStructFactory();
+
+    // loaded RTSTRUCT: series is kept
+    const outElements = factory.toDicom(image, undefined, refImage);
+    const sopUID = safeGet(outElements, '00080018');
+    assert.ok(sopUID.startsWith('2.25.'), 'generated sop uid');
+    assert.equal(
+      safeGet(outElements, '00020003'), sopUID, 'media storage uid');
+    assert.equal(
+      safeGet(outElements, '0020000E'), meta.SeriesInstanceUID,
+      'input series uid');
+    assert.equal(
+      Number(safeGet(outElements, '00200011')), 1, 'default series number');
+
+    // a new instance at each call
+    const outElements2 = factory.toDicom(image, undefined, refImage);
+    assert.notEqual(
+      safeGet(outElements2, '00080018'), sopUID, 'new sop uid');
+
+    // not an RTSTRUCT series (for ex a SEG or brush mask): new series
+    meta.Modality = 'SEG';
+    meta.SeriesNumber = '5';
+    const outElements3 = factory.toDicom(image, undefined, refImage);
+    const seriesUID = safeGet(outElements3, '0020000E');
+    assert.ok(seriesUID.startsWith('2.25.'), 'generated series uid');
+    assert.notEqual(seriesUID, meta.SeriesInstanceUID, 'new series uid');
+    assert.equal(
+      Number(safeGet(outElements3, '00200011')), 1, 'new series number');
+
+    // extra tags win, media storage follows the sop instance uid
+    const outElements4 = factory.toDicom(
+      image, undefined, refImage, {SOPInstanceUID: '1.2.3.88'});
+    assert.equal(
+      safeGet(outElements4, '00080018'), '1.2.3.88', 'extra sop uid');
+    assert.equal(
+      safeGet(outElements4, '00020003'), '1.2.3.88', 'extra media uid');
+  });
+
+  test('toDicom: equipment', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-rtss-00');
+    image.getMeta().Manufacturer = 'other';
+    let outElements =
+      new RtStructFactory().toDicom(image, undefined, refImage);
+    assert.equal(safeGet(outElements, '00080070'), 'dwv', 'manufacturer');
+    assert.equal(safeGet(outElements, '00081090'), 'DWV', 'model name');
+    assert.equal(safeGet(outElements, '00181000'), '1', 'serial number');
+    assert.equal(
+      safeGet(outElements, '00181020'), getDwvVersion(), 'software versions');
+
+    // application equipment via extra tags
+    outElements = new RtStructFactory().toDicom(image, undefined, refImage, {
+      Manufacturer: 'app'
+    });
+    assert.equal(safeGet(outElements, '00080070'), 'app', 'app manufacturer');
+  });
+
+  test('toDicom: source image references', () => {
+    const refImage = buildRefImage();
+    const refConfig = syntheticData.find(c => c.name === 'test-img-00');
+    refImage.setMeta({...refConfig.tags});
+    const refMeta = refImage.getMeta();
+    const outElements = new RtStructFactory().toDicom(
+      buildMaskImage('test-rtss-00'), undefined, refImage);
+
+    const forItem = safeGetAll(outElements, '30060010')[0];
+    const studyItem = safeGetAll(forItem, '30060012')[0];
+    assert.equal(
+      safeGet(studyItem, '00081150'), '1.2.840.10008.3.1.2.3.1',
+      'study sop class');
+    assert.equal(
+      safeGet(studyItem, '00081155'), refMeta.StudyInstanceUID,
+      'study sop instance');
+    const seriesItem = safeGetAll(studyItem, '30060014')[0];
+    assert.equal(
+      safeGet(seriesItem, '0020000E'), refMeta.SeriesInstanceUID,
+      'series uid');
+    const images = safeGetAll(seriesItem, '30060016');
+    assert.equal(images.length, 1, 'one contour image');
+    assert.equal(
+      safeGet(images[0], '00081150'), refMeta.SOPClassUID,
+      'image sop class');
+    assert.equal(
+      safeGet(images[0], '00081155'), refMeta.SOPInstanceUID,
+      'image sop instance');
+
+    // contour level reference
+    const roiContour = safeGetAll(outElements, '30060039')[0];
+    for (const contour of safeGetAll(roiContour, '30060040')) {
+      const contourImages = safeGetAll(contour, '30060016');
+      assert.equal(contourImages.length, 1, 'one contour image');
+      assert.equal(
+        safeGet(contourImages[0], '00081155'), refMeta.SOPInstanceUID,
+        'contour image sop instance');
+    }
+  });
 
 });

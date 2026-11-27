@@ -1304,7 +1304,7 @@ export class RtStructFactory {
     checkElements(_dataElements: Record<string, DataElement>): string | undefined;
     create(dataElements: Record<string, DataElement>, refImage: Image_2): MaskImage;
     getWarning(): string | undefined;
-    toDicom(image: MaskImage, segments?: MaskSegment[], sourceImage?: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
+    toDicom(image: MaskImage, segments: MaskSegment[] | undefined, sourceImage: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
 }
 
 // @public
