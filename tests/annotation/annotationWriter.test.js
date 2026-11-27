@@ -561,6 +561,21 @@ describe('annotation', () => {
       .contentSequence[0];
     assert.equal(labelPosition.valueType, ValueTypes.scoord3d,
       'label position SCOORD3D');
+    // source image (TID 1501 row 10b) and dwv plane
+    const sourceImage = findByConcept(groups[0], '121112')[0];
+    assert.equal(sourceImage.valueType, ValueTypes.image, 'source IMAGE');
+    assert.equal(sourceImage.relationshipType, RelationshipTypes.contains,
+      'source relationship');
+    assert.equal(
+      sourceImage.value.referencedSOPSequence.referencedSOPInstanceUID,
+      REF_UID, 'source uid');
+    const planePoints = findByConcept(groups[0], 'PLANE_POINTS')[0];
+    assert.equal(planePoints.valueType, ValueTypes.text, 'plane points TEXT');
+    assert.equal(planePoints.value, '0,-10,0,1,0,0,0,0,-1', 'plane points');
+    // only the shape as SCOORD3D at the group level
+    assert.equal(groups[0].contentSequence.filter(function (item) {
+      return item.valueType === ValueTypes.scoord3d;
+    }).length, 1, 'one group SCOORD3D');
 
     // rectangle: closed polyline as POLYGON
     const rectRegion = findByConcept(groups[1], '111030')[0];
@@ -841,12 +856,26 @@ describe('annotation', () => {
       const list = group.getList();
       assert.equal(list.length, inputs.length, 'annotations');
 
-      for (const annotation of list) {
-        assert.equal(annotation.mathShape, undefined, 'no shape before view');
+      for (let i = 0; i < list.length; ++i) {
+        const annotation = list[i];
+        const prefix = `annotation ${i}`;
+        assert.equal(annotation.mathShape, undefined,
+          `${prefix} no shape before view`);
         assert.ok(typeof annotation.patientGeometry !== 'undefined',
-          'patient geometry');
+          `${prefix} patient geometry`);
         assert.equal(annotation.patientGeometry.shape.frameOfReferenceUID,
-          forUid, 'frame of reference');
+          forUid, `${prefix} frame of reference`);
+        // referenced image and plane available before view
+        assert.equal(annotation.referencedSopInstanceUID, REF_UID,
+          `${prefix} referenced uid before view`);
+        assert.equal(annotation.referencedSopClassUID, CT_SOP_CLASS,
+          `${prefix} referenced class uid before view`);
+        assert.deepEqual(annotation.planePoints, inputs[i].planePoints,
+          `${prefix} plane points before view`);
+        assert.equal(annotation.getOrientationName(), 'coronal',
+          `${prefix} orientation before view`);
+        assert.equal(annotation.getMetaConceptIds().length, 0,
+          `${prefix} no meta`);
       }
 
       // a view with another frame of reference does not set the shape
@@ -856,11 +885,65 @@ describe('annotation', () => {
       }));
       assert.equal(list[0].mathShape, undefined, 'other frame of reference');
 
-      // write again without view: patient geometry written as is
+      // a view with another orientation does not set the shape,
+      // even if the shape points are on one of its planes
+      // (horizontal ruler: on a coronal and an axial plane)
+      const axialHelper = new PlaneHelper(
+        imageGeometry, getViewOrientation(identity, identity));
+      const horizontal = getCoronalAnnotation(
+        new Line(new Point2D(2, 3), new Point2D(10, 3)));
+      const readHorizontal =
+        roundTrip(getAnnotationGroup([horizontal])).getList()[0];
+      readHorizontal.setViewController(/** @type {object} */ ({
+        ...viewController,
+        getPlaneHelper: () => axialHelper,
+        isAquisitionOrientation: () => true
+      }));
+      assert.equal(readHorizontal.mathShape, undefined, 'other orientation');
+      assert.ok(typeof readHorizontal.patientGeometry !== 'undefined',
+        'other orientation keeps patient geometry');
+
+      // the read referenced image is kept: no shape on a view without
+      // it (for ex another series with the same frame of reference)...
+      const [readRuler, readNoRef] =
+        roundTrip(getAnnotationGroup([ruler, ruler])).getList();
+      readRuler.setViewController(/** @type {object} */ ({
+        ...viewController,
+        includesImageUid: () => false
+      }));
+      assert.equal(readRuler.mathShape, undefined, 'view without image');
+      assert.ok(typeof readRuler.patientGeometry !== 'undefined',
+        'view without image keeps patient geometry');
+      // ... and not replaced by the image at the view time position
+      readRuler.setViewController(/** @type {object} */ ({
+        ...viewController,
+        includesImageUid: () => true,
+        getImageUidFromPosition: () => '9.9.9'
+      }));
+      assert.ok(readRuler.mathShape instanceof Line, 'view with image');
+      assert.equal(readRuler.referencedSopInstanceUID, REF_UID,
+        'read referenced uid kept');
+      // without read referenced image (for ex from another application):
+      // the image at the view position
+      readNoRef.referencedSopInstanceUID = undefined;
+      readNoRef.referencedSopClassUID = undefined;
+      readNoRef.setViewController(/** @type {object} */ (viewController));
+      assert.ok(readNoRef.mathShape instanceof Line, 'no ref shape');
+      assert.equal(readNoRef.referencedSopInstanceUID, REF_UID,
+        'no ref referenced uid');
+      assert.equal(readNoRef.referencedSopClassUID, CT_SOP_CLASS,
+        'no ref referenced class uid');
+
+      // write again without view: patient geometry, referenced image
+      // and plane written as is
       const list2 = roundTrip(group).getList();
       assert.equal(list2.length, inputs.length, 'annotations 2');
       assert.deepEqual(list2[1].patientGeometry.shape.points,
         list[1].patientGeometry.shape.points, 'patient points kept');
+      assert.equal(list2[1].referencedSopInstanceUID, REF_UID,
+        'referenced uid kept');
+      assert.deepEqual(list2[1].planePoints, list[1].planePoints,
+        'plane points kept');
 
       // set on the view plane
       for (const annotation of list) {

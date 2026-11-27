@@ -1061,6 +1061,34 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Get the plane points of a measurement group from its dwv local
+   * plane points TEXT.
+   *
+   * @param {DicomSRContent} group The measurement group.
+   * @returns {Point3D[]|undefined} The plane points as
+   *   [origin, cosine1, cosine2], undefined if not present or invalid.
+   */
+  #getPlanePoints(group) {
+    const item = group.contentSequence.find((content) => {
+      return content.valueType === ValueTypes.text &&
+        content.relationshipType === RelationshipTypes.contains &&
+        this.#isDwvItem(content, DwvCodes.PlanePoints);
+    });
+    if (typeof item === 'undefined') {
+      return undefined;
+    }
+    const values = item.value.split(',').map(parseFloat);
+    if (values.length !== 9 || values.some(isNaN)) {
+      return undefined;
+    }
+    return [
+      new Point3D(values[0], values[1], values[2]),
+      new Point3D(values[3], values[4], values[5]),
+      new Point3D(values[6], values[7], values[8])
+    ];
+  }
+
+  /**
    * Convert a measurement group into an annotation: TID 1410
    * (image region and its measurements) or TID 1501 (TID 300
    * measurements inferred from a scoord, or a group level scoord).
@@ -1083,7 +1111,10 @@ export class AnnotationGroupFactory {
 
     const annotation = new Annotation();
     const shapeItem = geometry?.shape;
-    if (typeof shapeItem === 'undefined') {
+    if (typeof shapeItem === 'undefined' ||
+      shapeItem.valueType === ValueTypes.scoord3d) {
+      // source image of a group without geometry or with a
+      // geometry in patient coordinates
       const sourceImage = group.contentSequence.find(function (item) {
         return item.hasHeader(
           ValueTypes.image,
@@ -1095,7 +1126,8 @@ export class AnnotationGroupFactory {
         this.#addSourceImageToAnnotation(
           annotation, sourceImage, RelationshipTypes.contains);
       }
-    } else if (shapeItem.valueType === ValueTypes.scoord3d) {
+    }
+    if (shapeItem?.valueType === ValueTypes.scoord3d) {
       annotation.patientGeometry = {
         shape: this.#getPatientCoordinates(shapeItem)
       };
@@ -1103,7 +1135,11 @@ export class AnnotationGroupFactory {
         annotation.patientGeometry.shortAxis =
           this.#getPatientCoordinates(geometry.shortAxis);
       }
-    } else {
+      const planePoints = this.#getPlanePoints(group);
+      if (typeof planePoints !== 'undefined') {
+        annotation.planePoints = planePoints;
+      }
+    } else if (typeof shapeItem !== 'undefined') {
       if (typeof geometry.shortAxis !== 'undefined') {
         annotation.mathShape = getBidimensionalFromScoords(
           shapeItem.value, geometry.shortAxis.value);
@@ -1132,7 +1168,9 @@ export class AnnotationGroupFactory {
       this.#addNumToAnnotation(annotation, item);
       this.#addDwvContentToAnnotation(annotation, item);
       this.#addLegacyContentToAnnotation(annotation, item);
-      if (!isEqualCode(item.conceptNameCode, shortLabel)) {
+      // the label and dwv local content are not meta
+      if (!isEqualCode(item.conceptNameCode, shortLabel) &&
+        !this.#isDwvItem(item)) {
         this.#addMetaToAnnotation(annotation, item);
       }
     }
@@ -1847,6 +1885,50 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Get the source image and plane of an annotation whose geometry is
+   * written in patient coordinates (SCOORD3D, which has no SELECTED FROM
+   * image): the image as a 'Source of Measurement' IMAGE (TID 1501
+   * row 10b, an extension of the extensible TID 1410), the plane
+   * points (origin and cosines) as a dwv local TEXT of nine comma
+   * separated values: a backslash would be read as a value separator,
+   * a SCOORD3D would be read by other applications as a region of
+   * the group (TID 1501 row 10e) and is stored as 32-bit floats.
+   * They allow to get the image (and its time point) and the
+   * orientation of the annotation before it is set on a view.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {DicomSRContent[]} The SR content list.
+   */
+  #getPatientGeometryExtrasContent(annotation) {
+    const contentSequence = [];
+
+    if (typeof annotation.referencedSopInstanceUID !== 'undefined') {
+      const srcImage = this.#getAnnotationSourceImageContent(annotation);
+      srcImage.relationshipType = RelationshipTypes.contains;
+      srcImage.conceptNameCode =
+        getDcmDicomCode(DcmCodes.SourceOfMeasurement);
+      contentSequence.push(srcImage);
+    }
+
+    if (typeof annotation.planePoints !== 'undefined') {
+      const planePoints = new DicomSRContent(ValueTypes.text);
+      planePoints.relationshipType = RelationshipTypes.contains;
+      planePoints.conceptNameCode = getDwvDicomCode(DwvCodes.PlanePoints);
+      planePoints.value = annotation.planePoints
+        .flatMap(function (point) {
+          return point.getValues();
+        })
+        .map(function (value) {
+          return value.toString();
+        })
+        .join(',');
+      contentSequence.push(planePoints);
+    }
+
+    return contentSequence;
+  }
+
+  /**
    * Convert an annotation into a 'Measurement Group' SR content:
    * TID 1410 for regions and points, TID 1501 for open shapes and
    * annotations without shape.
@@ -1909,6 +1991,14 @@ export class AnnotationGroupFactory {
       contentSequence.push(...this.#getTid1410Content(annotation, geometry));
     } else {
       contentSequence.push(...this.#getTid1501Content(annotation, geometry));
+    }
+
+    // source image and plane of a geometry in patient coordinates
+    const isPatientGeometry = isPatientCoordinates(geometry.shape) ||
+      typeof annotation.planePoints !== 'undefined';
+    if (geometry.type !== 'none' && isPatientGeometry) {
+      contentSequence.push(
+        ...this.#getPatientGeometryExtrasContent(annotation));
     }
 
     // label, meta and dwv extras

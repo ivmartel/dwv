@@ -143,6 +143,10 @@ export class Annotation {
    * Geometry in patient coordinates, for annotations read from
    * a SCOORD3D: the math shape, plane points and referenced image
    * are set from it when a view with a matching plane is set.
+   * The referenced image and plane points written with it by dwv are
+   * read with it, they are available before a view is set and are
+   * kept: the annotation is only set on a view that includes its
+   * referenced image, with its plane orientation.
    *
    * @type {PatientGeometry|undefined}
    */
@@ -359,11 +363,22 @@ export class Annotation {
    * @param {ViewController} viewController The view controller.
    */
   setViewController(viewController) {
-    // annotation in patient coordinates: set its plane geometry
+    // annotation in patient coordinates: set its plane geometry,
+    // only on a view with its referenced image and plane orientation
+    // if they were read (the plane geometry depends on the view image)
     if (typeof this.mathShape === 'undefined' &&
-      typeof this.patientGeometry !== 'undefined' &&
-      !this.#setPlaneGeometry(viewController)) {
-      return;
+      typeof this.patientGeometry !== 'undefined') {
+      if (typeof this.referencedSopInstanceUID !== 'undefined' &&
+        !viewController.includesImageUid(this.referencedSopInstanceUID)) {
+        return;
+      }
+      if (typeof this.planePoints !== 'undefined' &&
+        !this.isCompatibleView(viewController.getPlaneHelper())) {
+        return;
+      }
+      if (!this.#setPlaneGeometry(viewController)) {
+        return;
+      }
     }
     // check uid
     if (!viewController.includesImageUid(this.referencedSopInstanceUID)) {
@@ -396,8 +411,9 @@ export class Annotation {
   }
 
   /**
-   * Set the math shape, plane points and referenced image from the
-   * patient geometry if all its points are on a plane of the input view.
+   * Set the math shape, plane points and, if not read with it, the
+   * referenced image from the patient geometry if all its points are
+   * on a plane of the input view.
    *
    * @param {ViewController} viewController The view controller.
    * @returns {boolean} True if the geometry is on a plane of the view.
@@ -496,17 +512,26 @@ export class Annotation {
         });
     }
 
-    // referenced image and plane: position of the first point at the
-    // current view time position
+    // plane and, if not read, referenced image: position of the
+    // first point at the current view time position
     const values = viewController.getCurrentPosition().getValues();
     const first = geometry.shape.points[0];
     values[0] = first.getX();
     values[1] = first.getY();
     values[2] = first.getZ();
     const position = new Point(values);
-    this.referencedSopInstanceUID =
-      viewController.getImageUidFromPosition(position);
-    this.referencedSopClassUID = viewController.getSopClassUid();
+    if (typeof this.referencedSopInstanceUID === 'undefined') {
+      this.referencedSopInstanceUID =
+        viewController.getImageUidFromPosition(position);
+      if (position.length() > 3) {
+        // the position can hold a volume id, use the index
+        this.referencedFrameNumber =
+          viewController.getIndexFromPosition(position).get(3) + 1;
+      }
+    }
+    if (typeof this.referencedSopClassUID === 'undefined') {
+      this.referencedSopClassUID = viewController.getSopClassUid();
+    }
     if (!viewController.isAquisitionOrientation()) {
       this.planePoints = viewController.getPlanePoints(position);
     }

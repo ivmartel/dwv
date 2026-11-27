@@ -387,6 +387,10 @@ export const DwvCodes = {
   ReferencePoints: {
     value: 'REFERENCE_POINTS', meaning: 'Reference points'
   },
+  // plane of an annotation drawn on a non acquisition plane
+  PlanePoints: {
+    value: 'PLANE_POINTS', meaning: 'Plane points'
+  },
   // intensity measured property when no CID 7180 concept fits
   // the referenced image
   PixelValue: {
