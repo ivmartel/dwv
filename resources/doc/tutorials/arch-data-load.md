@@ -66,8 +66,9 @@ an url, `File` for a file) in their detail:
 - `loadstart`: the load started,
 - `loadprogress`: the progress of the complete load (all items), with
   `loaded` and `total`,
-- `loaddata`: a load item starts a new data, with its `dataid`; fired
-  before the `loaditem` of that item,
+- `loaddata`: a load item starts a new data, with its `dataid` and, for
+  a derived data (SEG, RTSTRUCT, SR), the `refdataid` of the data it refers
+  to if loaded; fired before the `loaditem` of that item,
 - `loaditem`: an item finished loading (an item can be a url, a file, a
   buffer or a frame of a multi-frame data), with the `dataid` of the data it
   was added to, its meta `data` and `isfirstitem`, true if it is the first

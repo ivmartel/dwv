@@ -315,6 +315,7 @@ export class DataController extends EventTarget {
     getLoadItemDataId(loadId: string, data: DicomData): string | undefined;
     getNextDataId(): string;
     getPendingLoadItems(loadId: string): DicomData[];
+    getReferencedDataId(dataId: string): string | undefined;
     getStashed(dataId: string): DicomData | undefined;
     getStashedDataIds(): string[];
     markDataAsComplete(dataId: string): {
