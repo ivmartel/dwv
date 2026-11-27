@@ -89,14 +89,18 @@ export class LayoutProtocol {
   }
 
   /**
-   * Get the view configs for the given data id.
+   * Get the view configs for the given data id. A data that refers to
+   *   another data (for example a SEG and its series) is displayed
+   *   with it: it gets the view configs of the referenced data.
    *
    * @param {string} dataId The data id.
+   * @param {string} [refDataId] The id of the data it refers to.
    * @returns {ViewConfig[]} The view configs.
    */
-  getViewConfigsByDataId(dataId) {
+  getViewConfigsByDataId(dataId, refDataId) {
+    const selectedId = refDataId ?? dataId;
     const sets =
-      this.#displaySets.filter((elem) => elem.dataSelector(dataId));
+      this.#displaySets.filter((elem) => elem.dataSelector(selectedId));
     if (sets.length === 0) {
       console.warn(`Data not selected for display: ${dataId}`);
     }
@@ -111,12 +115,16 @@ export class LayoutProtocol {
    * Get the data view configs for the given data ids.
    *
    * @param {string[]} dataIds The data id.
+   * @param {Function} [getRefDataId] Function returning the id of the
+   *   data that a data refers to, if any.
    * @returns {Record<string, ViewConfig[]>} The data view configs.
    */
-  getDataViewConfigs(dataIds) {
+  getDataViewConfigs(dataIds, getRefDataId) {
     const res = {};
     for (const dataId of dataIds) {
-      res[dataId] = this.getViewConfigsByDataId(dataId);
+      const refDataId = typeof getRefDataId !== 'undefined'
+        ? getRefDataId(dataId) : undefined;
+      res[dataId] = this.getViewConfigsByDataId(dataId, refDataId);
     }
     return res;
   }
@@ -441,8 +449,10 @@ export class ViewerUI {
       }
     });
     this.#dwvAppService.addEventListener('loaddata', (event) => {
-      // add new data view config for new data
-      this.#addNewDataViewConfig(event.detail.dataid);
+      // add new data view config for new data, with the data
+      // it refers to if any
+      this.#addNewDataViewConfig(
+        event.detail.dataid, event.detail.refdataid);
     });
     this.#dwvAppService.addEventListener('loadprogress', () => {
       const progressElement = document.getElementById('loadprogress');
@@ -634,9 +644,11 @@ export class ViewerUI {
    * Add data view config for the input data.
    *
    * @param {string} dataId The data ID.
+   * @param {string} [refDataId] The ID of the data it refers to.
    */
-  #addNewDataViewConfig(dataId) {
-    const configs = this.#getSelectedLayout().getViewConfigsByDataId(dataId);
+  #addNewDataViewConfig(dataId, refDataId) {
+    const configs = this.#getSelectedLayout().getViewConfigsByDataId(
+      dataId, refDataId);
     const stgCtrl = this.#dwvAppService.getStageController();
     for (const config of configs) {
       stgCtrl.addDataViewConfig(dataId, config, false);
@@ -791,7 +803,8 @@ export class ViewerUI {
       // get configs
       const dataCtrl = this.#dwvAppService.getDataController();
       const dataIds = dataCtrl.getDataIds();
-      const dataViewConfigs = selectedLayout.getDataViewConfigs(dataIds);
+      const dataViewConfigs = selectedLayout.getDataViewConfigs(
+        dataIds, (dataId) => dataCtrl.getReferencedDataId(dataId));
 
       // merge app configs for possible extras (like window level)
       this.#mergeAppConfig(dataViewConfigs);

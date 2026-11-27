@@ -986,6 +986,9 @@ export class App extends EventTarget {
    * @property {object} detail The event detail.
    * @property {string} detail.loadid The load id.
    * @property {string} detail.dataid The new data id.
+   * @property {string} [detail.refdataid] The id of the data that the
+   *   new data refers to, for example the series of a SEG
+   *   (see {@link DataController#getReferencedDataId}).
    * @property {*} detail.source The load source: string for an url,
    *   File for a file.
    */
@@ -2054,6 +2057,7 @@ export class App extends EventTarget {
         detail: {
           loadid: detail.loadid,
           dataid: dataId,
+          refdataid: this.#dataController.getReferencedDataId(dataId),
           source: detail.source
         }
       }));

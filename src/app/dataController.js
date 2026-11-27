@@ -91,6 +91,27 @@ function needsReferencedData(meta) {
 }
 
 /**
+ * Get the SeriesInstanceUID referenced by an annotation group, from
+ * its CurrentRequestedProcedureEvidenceSequence or, for groups saved
+ * by older dwv versions, from a root ReferencedSeriesSequence.
+ *
+ * @param {AnnotationGroup} annotationGroup The annotation group.
+ * @returns {string|undefined} The SeriesInstanceUID.
+ */
+function getAnnotationGroupSeriesUID(annotationGroup) {
+  const evidenceSeq = annotationGroup.getMetaValue(
+    'CurrentRequestedProcedureEvidenceSequence');
+  const evidenceUid = evidenceSeq?.value?.[0]?.ReferencedSeriesSequence
+    ?.value?.[0]?.SeriesInstanceUID;
+  if (typeof evidenceUid !== 'undefined') {
+    return evidenceUid;
+  }
+  const refSeriesSeq =
+    annotationGroup.getMetaValue('ReferencedSeriesSequence');
+  return refSeriesSeq?.value?.[0]?.SeriesInstanceUID;
+}
+
+/**
  * List of data event names.
  *
  * @type {string[]}
@@ -779,6 +800,54 @@ export class DataController extends EventTarget {
           break;
         }
       }
+    }
+    return res;
+  }
+
+  /**
+   * Get the id of the data that a derived data refers to: the image
+   * series of a segmentation (SEG), of an RT structure set (RTSTRUCT)
+   * or of the annotations of a structured report (SR).
+   *
+   * @param {string} dataId The data id.
+   * @returns {string|undefined} The referenced data id, undefined if
+   *   the data does not refer to another data or if that data is not
+   *   loaded.
+   */
+  getReferencedDataId(dataId) {
+    const data = this.#dataList[dataId];
+    if (typeof data === 'undefined') {
+      return undefined;
+    }
+
+    let seriesUid;
+    let sopUids = [];
+    if (typeof data.annotationGroup !== 'undefined') {
+      seriesUid = getAnnotationGroupSeriesUID(data.annotationGroup);
+      sopUids = data.annotationGroup.getList().map(
+        (annotation) => annotation.referencedSopInstanceUID
+      ).filter((uid) => typeof uid !== 'undefined');
+    } else if (typeof data.meta !== 'undefined') {
+      const modality = safeGet(data.meta, TagKeys.Modality);
+      if (modality === 'SEG') {
+        seriesUid = getReferencedSeriesUID(data.meta);
+      } else if (modality === 'RTSTRUCT') {
+        seriesUid = getReferencedSeriesUIDFromRTStruct(data.meta);
+      }
+    }
+
+    let res;
+    if (typeof seriesUid !== 'undefined') {
+      res = this.getDataIdFromSeriesUid(seriesUid);
+    }
+    // annotations with no series reference: use their images
+    if (typeof res === 'undefined' && sopUids.length !== 0) {
+      res = this.getDataIdsFromSopUids(sopUids).find(
+        (id) => id !== dataId);
+    }
+    // a data does not refer to itself
+    if (res === dataId) {
+      res = undefined;
     }
     return res;
   }

@@ -2,6 +2,7 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
 import {App} from '../../src/app/application.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
+import {Annotation} from '../../src/image/annotation.js';
 import * as loggerModule from '../../src/utils/logger.js';
 import {
   dataStructures,
@@ -12,6 +13,7 @@ import {
 import syntheticImgData from '/tests/data/synthetic-img.json';
 import syntheticKosData from '/tests/data/synthetic-kos.json';
 import syntheticSegData from '/tests/data/synthetic-seg.json';
+import syntheticRtssData from '/tests/data/synthetic-rtss.json';
 
 /**
  * Tests for the 'app/application.js' file.
@@ -258,6 +260,77 @@ describe('app', () => {
       assert.deepEqual(events.at(-2).detail.dataids, ['0']);
       assert.deepEqual(app.getDataController().getDataIds(), ['0']);
     });
+
+  test('App load gives the referenced data of a SEG and an RTSTRUCT',
+    async () => {
+      // the synthetic segments are reported as overlapping
+      vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => {});
+      const app = new App();
+      app.init({});
+      const events = recordLoadEvents(app);
+
+      // both derived objects refer to test-img-00
+      await loadAndWait(app, getLoadInput([
+        [getConfig(syntheticImgData, 'test-img-01'), singleSliceStructure],
+        [getConfig(syntheticSegData, 'test-seg-00'), singleSliceStructure],
+        [getConfig(syntheticImgData, 'test-img-00'), singleSliceStructure],
+        [getConfig(syntheticRtssData, 'test-rtss-00'), singleSliceStructure]
+      ]));
+
+      assert.notInclude(events.map((event) => event.type), 'error');
+      const loadDataDetails = events.filter(
+        (event) => event.type === 'loaddata').map((event) => event.detail);
+      assert.deepEqual(
+        loadDataDetails.map((detail) => [detail.dataid, detail.refdataid]),
+        [['0', undefined], ['1', undefined], ['2', '1'], ['3', '1']],
+        'loaddata refdataid');
+
+      const dataController = app.getDataController();
+      assert.equal(
+        dataController.get('2').meta['00080060'].value[0], 'SEG');
+      assert.equal(
+        dataController.get('3').meta['00080060'].value[0], 'RTSTRUCT');
+      assert.equal(dataController.getReferencedDataId('2'), '1');
+      assert.equal(dataController.getReferencedDataId('3'), '1');
+      // images do not refer to another data
+      assert.isUndefined(dataController.getReferencedDataId('0'));
+      assert.isUndefined(dataController.getReferencedDataId('1'));
+      assert.isUndefined(dataController.getReferencedDataId('99'));
+    });
+
+  test('DataController getReferencedDataId for annotations', async () => {
+    const app = new App();
+    app.init({});
+    const image = getConfig(syntheticImgData, 'test-img-00');
+    await loadAndWait(app, getLoadInput([
+      [getConfig(syntheticImgData, 'test-img-01'), singleSliceStructure],
+      [image, singleSliceStructure]
+    ]));
+    const dataController = app.getDataController();
+
+    // series in CurrentRequestedProcedureEvidenceSequence
+    const data = app.createAnnotationData('1');
+    dataController.add('2', data);
+    assert.equal(dataController.getReferencedDataId('2'), '1', 'evidence');
+
+    // series in a root ReferencedSeriesSequence (older dwv versions)
+    const group = data.annotationGroup;
+    const evidence = group.getMetaValue(
+      'CurrentRequestedProcedureEvidenceSequence');
+    group.setMetaValue('CurrentRequestedProcedureEvidenceSequence',
+      undefined);
+    group.setMetaValue('ReferencedSeriesSequence',
+      evidence.value[0].ReferencedSeriesSequence);
+    assert.equal(dataController.getReferencedDataId('2'), '1', 'root');
+
+    // no series: use the images of the annotations
+    group.setMetaValue('ReferencedSeriesSequence', undefined);
+    assert.isUndefined(dataController.getReferencedDataId('2'), 'no ref');
+    const annotation = new Annotation();
+    annotation.referencedSopInstanceUID = image.tags.SOPInstanceUID;
+    group.add(annotation);
+    assert.equal(dataController.getReferencedDataId('2'), '1', 'image');
+  });
 
   test('App load error removes only the data of the item', async () => {
     const series = getConfig(syntheticImgData, 'test-img-00');
