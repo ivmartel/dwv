@@ -18,8 +18,9 @@ forwarding wrappers, deprecated since v0.37: the controllers, reachable via
 
 - `LoadController`: picks a {@link FilesLoader}, {@link UrlsLoader} or
   {@link MemoryLoader} based on the input type and re-dispatches their load
-  events tagged with `dataid` and `isfirstitem` (`isfirstitem` on `loaditem`
-  only). See [data load](/tutorials/arch-data-load).
+  events tagged with the `loadid`. The `App` then adds the items to the
+  data controller, adds the data ids to the events and fires `loaddata`
+  for each new data. See [data load](/tutorials/arch-data-load#load-sequence).
 - {@link DataController}: owns the `dataId` indexed list of {@link DicomData}.
   It inspects the Modality and pixel data presence to route parsed data to
   the `ImageFactory`, the {@link MaskFactory} (Modality `SEG`), the

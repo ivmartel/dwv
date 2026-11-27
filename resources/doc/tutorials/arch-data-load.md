@@ -52,24 +52,55 @@ decompress the data to create the image.
 
 ## Load sequence
 
-Here are the events triggered during the complete load process (meaning the load of all the items):
+The load methods ([App::loadFiles]{@link App#loadFiles},
+[App::loadURLs]{@link App#loadURLs}...) return a unique load id (string). A
+load can create several data, each with its own data id (string): the
+{@link DataController} groups the loaded items by series (a localizer
+being kept apart from the rest of its series), and creates one data per
+instance for derived objects (SR, SEG...).
 
-- `loadstart`: the load started!
-- `loadprogress`: the progress of the complete load (all items),
-- `loaditem`: an item finished loading, an item can be a url or a file,
-- `load`: all items were loaded successfully,
-- `error`: an error has occured during load,
+Here are the events triggered during the complete load process (meaning the
+load of all the items). They all have a `loadid` and a `source` (string for
+an url, `File` for a file) in their detail:
+
+- `loadstart`: the load started,
+- `loadprogress`: the progress of the complete load (all items), with
+  `loaded` and `total`,
+- `loaddata`: a load item starts a new data, with its `dataid`; fired
+  before the `loaditem` of that item,
+- `loaditem`: an item finished loading (an item can be a url, a file, a
+  buffer or a frame of a multi-frame data), with the `dataid` of the data it
+  was added to, its meta `data` and `isfirstitem`, true if it is the first
+  item of this data,
+- `load`: all items were loaded successfully, with the `dataids` of the
+  loaded data,
+- `error`: an error has occurred during load; for an error on a loaded
+  item, the `dataid` of its data, which is removed: the next items of this
+  data are ignored, the other data of the load are kept,
+- `timeout`: an url request timed out,
 - `abort`: the load process has been aborted,
-- `loadend`: the process has completed, whether successfully (after `load`) or unsuccessfully (after `abort` or `error`).
+- `loadend`: the process has completed, whether successfully (after `load`)
+  or unsuccessfully (after `abort` or `error`), with the `dataids` of the
+  data that are still loaded.
 
-Once the load is started a unique `dataId` (string) is associated to the data being loaded.
+Items that need the geometry of their referenced series (a SEG with pixel
+data, an RTSTRUCT) are kept until all the items are loaded: their
+`loaddata` and `loaditem` events are fired just before `load`.
+
+With `viewOnFirstLoadItem` (default true), a data is rendered on its first
+`loaditem` if it has a view config, and rendered again at `load` if its
+image has changed.
+
+[App::abortLoad]{@link App#abortLoad} stops a load and removes all its data;
+called with a data id, it only removes this data and the load continues.
+
+The {@link LoadController} re-dispatches the loader events tagged with the
+`loadid`; the {@link App} adds the data ids, fires `loaddata` and handles
+the pending items.
 
 ![sequence-load](sequence-load.png)
 
 *Example successful load sequence for loading a list of urls.*
-
-The {@link LoadController} re-dispatches these events tagged with the
-`dataid` and, for `loaditem`, an `isfirstitem` flag.
 
 ## DICOM parsing
 

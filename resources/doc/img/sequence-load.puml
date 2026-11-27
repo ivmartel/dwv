@@ -1,6 +1,7 @@
 @startuml
 
 User -> dwv: app::loadURLs
+dwv --> User : loadid
 dwv -> server: XML HTTP Request
 activate server
 server --> dwv : loadstart
@@ -22,11 +23,13 @@ loader --> dwv: progress
 dwv --> User : loadprogress
 loader --> dwv: load (+ loadend)
 deactivate loader
+dwv --> User : loaddata (only first item of a data)
 dwv --> User : loaditem
 
 note over dwv, server: Repeated for all urls
 
 ...
+dwv --> User : loaddata + loaditem (pending SEG, RTSTRUCT)
 dwv --> User : load (+ loadend)
 
 @enduml
