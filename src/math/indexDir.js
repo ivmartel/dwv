@@ -17,6 +17,7 @@ import {
 import {getEllipseIndices} from './ellipse.js';
 import {getRectangleIndices} from './rectangle.js';
 import {precisionRound} from './number.js';
+import {simplifyPolygon} from './polygon.js';
 
 // also export typedefs
 export * from './types.js';
@@ -42,4 +43,5 @@ export {
   getEllipseIndices,
   getRectangleIndices,
   precisionRound,
+  simplifyPolygon,
 };

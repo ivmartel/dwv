@@ -34,10 +34,9 @@ import {
 } from './maskFactory.js';
 import {
   RtStructFactory,
-  getDefaultDicomRTStructJson,
-  bufferToPolygons,
-  simplifyPolygon
+  getDefaultDicomRTStructJson
 } from './rtStructFactory.js';
+import {bufferToPolygons} from './maskPolygons.js';
 import {PositionHelper} from './positionHelper.js';
 import {PlaneHelper} from './planeHelper.js';
 import {MaskSegmentHelper} from './maskSegmentHelper.js';
@@ -87,5 +86,4 @@ export {
   getDefaultDicomRTStructJson,
   mergeMaskImages,
   bufferToPolygons,
-  simplifyPolygon,
 };

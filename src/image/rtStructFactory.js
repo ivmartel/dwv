@@ -18,6 +18,11 @@ import {getUID} from '../dicom/dicomWriter.js';
 import {MaskImage} from './maskImage.js';
 import {ColourMap} from './luts.js';
 import {SegmentCollection} from './segmentCollection.js';
+import {
+  bufferToPolygons,
+  findHolePolygons,
+  fillPolygons
+} from './maskPolygons.js';
 import {RGB} from '../utils/colour.js';
 import {Point} from '../math/point.js';
 import {Index} from '../math/index.js';
@@ -155,372 +160,6 @@ export function getDefaultDicomRTStructJson() {
     tags[tag.name] = tag.enum[0];
   }
   return tags;
-}
-
-// Moore neighborhood directions clockwise from W.
-const CW_DIRS = [
-  [-1, 0],
-  [-1, -1],
-  [0, -1],
-  [1, -1],
-  [1, 0],
-  [1, 1],
-  [0, 1],
-  [-1, 1]
-];
-
-// Map 'dx,dy' -> clockwise direction index.
-const DIR_IDX = {};
-for (let i = 0; i < 8; i++) {
-  DIR_IDX[`${CW_DIRS[i][0]},${CW_DIRS[i][1]}`] = i;
-}
-
-/**
- * BFS (Breadth-First Search) flood-fill: mark all 8-connected
- * pixels with `value` as visited.
- *
- * @param {Uint8Array} buffer The mask buffer.
- * @param {number} sliceOffset Byte offset of the slice in buffer.
- * @param {number} width Slice width.
- * @param {number} height Slice height.
- * @param {number} value Segment value.
- * @param {number} startIdx Flat index of the seed pixel.
- * @param {Uint8Array} visited Per-slice visited flags (length = width*height).
- */
-function bfsMarkVisited(
-  buffer, sliceOffset, width, height, value, startIdx, visited) {
-  const queue = [startIdx];
-  visited[startIdx] = 1;
-  while (queue.length > 0) {
-    const idx = queue.shift();
-    const x = idx % width;
-    const y = (idx / width) | 0;
-    const neighbors = [
-      x > 0 ? idx - 1 : -1,
-      x < width - 1 ? idx + 1 : -1,
-      y > 0 ? idx - width : -1,
-      y < height - 1 ? idx + width : -1,
-      x > 0 && y > 0 ? idx - width - 1 : -1,
-      x < width - 1 && y > 0 ? idx - width + 1 : -1,
-      x > 0 && y < height - 1 ? idx + width - 1 : -1,
-      x < width - 1 && y < height - 1 ? idx + width + 1 : -1
-    ];
-    for (const ni of neighbors) {
-      if (ni !== -1 && !visited[ni] && buffer[sliceOffset + ni] === value) {
-        visited[ni] = 1;
-        queue.push(ni);
-      }
-    }
-  }
-}
-
-/**
- * Trace the outer boundary of a connected foreground region using Moore
- * neighborhood tracing (Jacob's stopping criterion).
- *
- * @param {Uint8Array} buffer The mask buffer.
- * @param {number} sliceOffset Byte offset of the slice in buffer.
- * @param {number} width Slice width.
- * @param {number} height Slice height.
- * @param {number} value Segment value.
- * @param {number} sx X of the top-left pixel of the component.
- * @param {number} sy Y of the top-left pixel of the component.
- * @returns {Array.<{x: number, y: number}>} Ordered boundary vertices.
- */
-function mooreBoundary(buffer, sliceOffset, width, height, value, sx, sy) {
-  const boundary = [{x: sx, y: sy}];
-  let bx = sx;
-  let by = sy - 1; // conceptual pixel above start (may be out of bounds)
-  let cx = sx;
-  let cy = sy;
-
-  const maxIter = width * height * 2 + 1;
-  for (let iter = 0; iter < maxIter; iter++) {
-    const dIdx = DIR_IDX[`${bx - cx},${by - cy}`];
-    let foundX = -1;
-    let foundY = -1;
-    let newBx = bx;
-    let newBy = by;
-    for (let k = 1; k <= 8; k++) {
-      const idx = (dIdx + k) % 8;
-      const nx = cx + CW_DIRS[idx][0];
-      const ny = cy + CW_DIRS[idx][1];
-      if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
-        buffer[sliceOffset + ny * width + nx] === value) {
-        foundX = nx;
-        foundY = ny;
-        const prevIdx = (dIdx + k - 1) % 8;
-        newBx = cx + CW_DIRS[prevIdx][0];
-        newBy = cy + CW_DIRS[prevIdx][1];
-        break;
-      }
-    }
-    if (foundX === -1) {
-      // isolated pixel
-      break;
-    }
-    bx = newBx;
-    by = newBy;
-    cx = foundX;
-    cy = foundY;
-    // The start pixel is topmost-leftmost, so the trace can only return to it
-    // after completing one full loop — stop immediately on first return.
-    if (cx === sx && cy === sy) {
-      break;
-    }
-    boundary.push({x: cx, y: cy});
-  }
-  return boundary;
-}
-
-/**
- * Extract polygon contours from a mask slice using Moore neighborhood tracing.
- * Returns one polygon per connected region with the given segment value.
- *
- * @param {Uint8Array} buffer The mask buffer (all slices).
- * @param {number} sliceOffset Byte offset of the slice in buffer.
- * @param {number} width Slice width in pixels.
- * @param {number} height Slice height in pixels.
- * @param {number} value Segment value to trace.
- * @returns {Array.<Array.<{x: number, y: number}>>} One polygon per
- * connected region.
- */
-export function bufferToPolygons(buffer, sliceOffset, width, height, value) {
-  const n = width * height;
-  const visited = new Uint8Array(n);
-  const polygons = [];
-  for (let i = 0; i < n; i++) {
-    if (buffer[sliceOffset + i] === value && !visited[i]) {
-      const sx = i % width;
-      const sy = (i / width) | 0;
-      bfsMarkVisited(buffer, sliceOffset, width, height, value, i, visited);
-      const pts = mooreBoundary(
-        buffer, sliceOffset, width, height, value, sx, sy);
-      if (pts.length >= 3) {
-        polygons.push(pts);
-      }
-    }
-  }
-  return polygons;
-}
-
-/**
- * Perpendicular distance from a point to the line through a and b.
- *
- * @param {{x: number, y: number}} pt The point.
- * @param {{x: number, y: number}} a Line start.
- * @param {{x: number, y: number}} b Line end.
- * @returns {number} Distance in pixels.
- */
-function ptSegDist(pt, a, b) {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  if (dx === 0 && dy === 0) {
-    return Math.sqrt((pt.x - a.x) ** 2 + (pt.y - a.y) ** 2);
-  }
-  const t = ((pt.x - a.x) * dx + (pt.y - a.y) * dy) / (dx * dx + dy * dy);
-  return Math.sqrt((pt.x - a.x - t * dx) ** 2 + (pt.y - a.y - t * dy) ** 2);
-}
-
-/**
- * Simplify a polygon using the Ramer-Douglas-Peucker algorithm.
- * Ref: {@link https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm}.
- *
- * @param {Array.<{x: number, y: number}>} pts Input vertices.
- * @param {number} epsilon Max allowed deviation in pixels.
- * @returns {Array.<{x: number, y: number}>} Simplified vertices.
- */
-export function simplifyPolygon(pts, epsilon) {
-  if (pts.length <= 3) {
-    return pts;
-  }
-  /**
-   * Recursive function to perform RDP simplification.
-   *
-   * @param {number} start Start index of the segment.
-   * @param {number} end End index of the segment.
-   * @param {Array<{x: number, y: number}>} result Output array to
-   *   collect vertices.
-   * @returns {undefined}
-   */
-  function rdp(start, end, result) {
-    if (end <= start + 1) {
-      return;
-    }
-    let maxDist = 0;
-    let maxIdx = start;
-    for (let i = start + 1; i < end; i++) {
-      const d = ptSegDist(pts[i], pts[start], pts[end]);
-      if (d > maxDist) {
-        maxDist = d;
-        maxIdx = i;
-      }
-    }
-    if (maxDist > epsilon) {
-      rdp(start, maxIdx, result);
-      result.push(pts[maxIdx]);
-      rdp(maxIdx, end, result);
-    }
-  }
-
-  const result = [pts[0]];
-  rdp(0, pts.length - 1, result);
-  result.push(pts[pts.length - 1]);
-  return result;
-}
-
-/**
- * Fill one or more closed polygons into a flat Uint8Array slice using a
- * scanline even-odd rule applied across all of their edges together.
- * Passing an outer contour together with a nested inner contour therefore
- * punches a hole where the inner contour lies, matching how DICOM
- * CLOSEDPLANAR_XOR (and, by convention, plain CLOSED_PLANAR) contours on
- * the same ROI/slice combine (see PS3.3 C.8.8.6).
- * Ref: {@link https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule}.
- *
- * @param {Uint8Array} buffer The mask buffer (all slices).
- * @param {number} sliceOffset Byte offset of the current slice in buffer.
- * @param {number} width Slice width in pixels.
- * @param {number} height Slice height in pixels.
- * @param {Array.<Array.<{x: number, y: number}>>} polygonsList Polygons
- *   (outer and/or hole contours) in pixel coords, filled together.
- * @param {number} value Segment number to write.
- */
-function fillPolygons(buffer, sliceOffset, width, height, polygonsList, value) {
-  const polygons = polygonsList.filter((pts) => pts.length >= 3);
-  if (polygons.length === 0) {
-    return;
-  }
-
-  const allYs = polygons.flatMap((pts) => pts.map((p) => p.y));
-  const yMin = Math.max(0, Math.floor(Math.min(...allYs)));
-  const yMax = Math.min(height - 1, Math.ceil(Math.max(...allYs)));
-
-  for (let y = yMin; y <= yMax; ++y) {
-    // find x-intersections at scanline y across all polygons
-    const xs = [];
-    for (const pts of polygons) {
-      const n = pts.length;
-      for (let i = 0; i < n; ++i) {
-        const p1 = pts[i];
-        const p2 = pts[(i + 1) % n];
-        // Top-half-open rule for all rows except the last: edges firing at
-        // their lower endpoint but not their upper endpoint. For y=yMax the
-        // upper endpoint IS the polygon bottom, so switch to closed interval
-        // (and skip horizontal edges explicitly to avoid double-counting).
-        const inRange = y < yMax
-          ? (p1.y <= y && p2.y > y) || (p2.y <= y && p1.y > y)
-          : p1.y !== p2.y &&
-            ((p1.y <= y && p2.y >= y) || (p2.y <= y && p1.y >= y));
-        if (inRange) {
-          xs.push(p1.x + (y - p1.y) / (p2.y - p1.y) * (p2.x - p1.x));
-        }
-      }
-    }
-    xs.sort((a, b) => a - b);
-    // fill pairs
-    for (let k = 0; k + 1 < xs.length; k += 2) {
-      const xStart = Math.max(0, Math.ceil(xs[k]));
-      const xEnd = Math.min(width - 1, Math.floor(xs[k + 1]));
-      for (let x = xStart; x <= xEnd; ++x) {
-        buffer[sliceOffset + y * width + x] = value;
-      }
-    }
-  }
-}
-
-/**
- * Flood-fill background pixels reachable from the slice border without
- * crossing any `value`-valued foreground pixel. Used to tell apart plain
- * outside background from background fully enclosed by foreground (holes).
- *
- * @param {Uint8Array} buffer The mask buffer (all slices).
- * @param {number} sliceOffset Byte offset of the slice in buffer.
- * @param {number} width Slice width in pixels.
- * @param {number} height Slice height in pixels.
- * @param {number} value Segment value to treat as foreground.
- * @returns {Uint8Array} Per-slice flags, 1 where reachable from the border.
- */
-function markOutsideBackground(buffer, sliceOffset, width, height, value) {
-  const outside = new Uint8Array(width * height);
-  const queue = [];
-  /**
-   * @param {number} idx Flat pixel index.
-   */
-  function tryVisit(idx) {
-    if (!outside[idx] && buffer[sliceOffset + idx] !== value) {
-      outside[idx] = 1;
-      queue.push(idx);
-    }
-  }
-  for (let x = 0; x < width; ++x) {
-    tryVisit(x);
-    tryVisit((height - 1) * width + x);
-  }
-  for (let y = 0; y < height; ++y) {
-    tryVisit(y * width);
-    tryVisit(y * width + width - 1);
-  }
-  while (queue.length > 0) {
-    const idx = queue.shift();
-    const x = idx % width;
-    const y = (idx / width) | 0;
-    if (x > 0) {
-      tryVisit(idx - 1);
-    }
-    if (x < width - 1) {
-      tryVisit(idx + 1);
-    }
-    if (y > 0) {
-      tryVisit(idx - width);
-    }
-    if (y < height - 1) {
-      tryVisit(idx + width);
-    }
-    if (x > 0 && y > 0) {
-      tryVisit(idx - width - 1);
-    }
-    if (x < width - 1 && y > 0) {
-      tryVisit(idx - width + 1);
-    }
-    if (x > 0 && y < height - 1) {
-      tryVisit(idx + width - 1);
-    }
-    if (x < width - 1 && y < height - 1) {
-      tryVisit(idx + width + 1);
-    }
-  }
-  return outside;
-}
-
-/**
- * Find polygons for background regions fully enclosed by `value`-valued
- * foreground (ie holes), traced the same way as foreground regions.
- *
- * @param {Uint8Array} buffer The mask buffer (all slices).
- * @param {number} sliceOffset Byte offset of the slice in buffer.
- * @param {number} width Slice width in pixels.
- * @param {number} height Slice height in pixels.
- * @param {number} value Segment value to trace holes for.
- * @returns {Array.<Array.<{x: number, y: number}>>} One polygon per
- * enclosed hole region.
- */
-function findHolePolygons(buffer, sliceOffset, width, height, value) {
-  const n = width * height;
-  const outside = markOutsideBackground(
-    buffer, sliceOffset, width, height, value);
-  const holeBuffer = new Uint8Array(n);
-  let anyHole = false;
-  for (let i = 0; i < n; ++i) {
-    if (buffer[sliceOffset + i] !== value && !outside[i]) {
-      holeBuffer[i] = 1;
-      anyHole = true;
-    }
-  }
-  if (!anyHole) {
-    return [];
-  }
-  return bufferToPolygons(holeBuffer, 0, width, height, 1);
 }
 
 /**
@@ -706,9 +345,10 @@ export class RtStructFactory {
   /**
    * Convert a {@link MaskImage} into DICOM RT Structure Set elements.
    *
-   * Traces each segment's pixel regions per slice using Moore neighborhood
-   * contour tracing, simplifies with Ramer-Douglas-Peucker, then maps the
-   * 2D pixel coordinates back to 3D patient-space coordinates.
+   * Traces each segment's pixel regions (and their holes) per slice along
+   * the pixel edges, then maps the 2D pixel coordinates back to 3D
+   * patient-space coordinates. The contours go around the pixels: loading
+   * the result gives back the same mask.
    *
    * The image meta is not modified.
    *
@@ -900,27 +540,22 @@ export class RtStructFactory {
           ? findHolePolygons(sliceBuffer, sliceOffset, width, height, segNum)
           : [];
         const polygons = outerPolygons.concat(holePolygons);
-        for (let i = 0; i < polygons.length; ++i) {
-          const simplified = simplifyPolygon(polygons[i], 1.0);
-          if (simplified.length < 3) {
-            logger.warn(
-              'Saving RT Struct with thin contour, not well supported'
-            );
-            continue;
-          }
-          if (i >= outerPolygons.length) {
-            hasHole = true;
-          }
+        if (holePolygons.length > 0) {
+          hasHole = true;
+        }
+        // the polygons go around the pixels, they are exact:
+        //   no simplification
+        for (const polygon of polygons) {
           // convert 2D pixel coords to 3D patient-space coords
           const points3D = [];
-          for (const pt of simplified) {
+          for (const pt of polygon) {
             const world = geometry.indexToWorld(new Index([pt.x, pt.y, z]));
             points3D.push(world.get(0), world.get(1), world.get(2));
           }
           contourSeq.push({
             ContourImageSequence: {value: [getSourceReference(z)]},
             ContourGeometricType: undefined,
-            NumberOfContourPoints: simplified.length,
+            NumberOfContourPoints: polygon.length,
             ContourData: points3D
           });
         }

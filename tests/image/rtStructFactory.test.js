@@ -457,6 +457,126 @@ describe('RtStructFactory', () => {
       outBuffer[sliceSize + 7 * width + 7], 1, 'slice 1 square is segment 1');
   });
 
+  /**
+   * Save a single slice mask as RTSTRUCT and load it back.
+   *
+   * @param {string[]} rows The mask rows, one character per pixel
+   *   (the segment number, 0 for background).
+   * @returns {object} The output elements and the reloaded rows.
+   */
+  function maskRoundTrip(rows) {
+    const width = rows[0].length;
+    const height = rows.length;
+    const geometry = new Geometry(
+      [new Point3D(-10.5, 4, 2)],
+      new Size([width, height, 1]),
+      new Spacing([0.5, 0.8, 1])
+    );
+    const refImage = new Image(
+      geometry, new Uint16Array(width * height), ['1.2.3.1']);
+    refImage.setMeta({SeriesInstanceUID: '1.2.3'});
+    const buffer = new Uint8Array(rows.join('').split('').map(Number));
+    const image = new MaskImage(geometry, buffer, ['1.2.4.1']);
+    image.setMeta({Modality: 'RTSTRUCT'});
+    const maxValue = Math.max(...buffer);
+    const segments = [];
+    for (let i = 1; i <= maxValue; ++i) {
+      segments.push(new MaskSegment(i, `Segment${i}`, 'MANUAL'));
+    }
+    const factory = new RtStructFactory();
+    const outElements = factory.toDicom(image, segments, refImage);
+    const outBuffer = factory.create(outElements, refImage).getBuffer();
+    const outRows = [];
+    for (let y = 0; y < height; ++y) {
+      outRows.push(
+        Array.from(outBuffer.slice(y * width, (y + 1) * width)).join(''));
+    }
+    return {outElements, outRows};
+  }
+
+  test('toDicom: contours go around the pixels', () => {
+    const {outElements} = maskRoundTrip([
+      '0000',
+      '0110',
+      '0110',
+      '0000'
+    ]);
+    const rois = getRTStructFromElements(outElements);
+    assert.equal(rois[0].contours.length, 1, 'one contour');
+    // pixels 1 to 2, edges at 0.5 and 2.5;
+    //   origin (-10.5, 4, 2), spacing (0.5, 0.8)
+    assert.deepEqual(
+      rois[0].contours[0].points3D,
+      [
+        [-10.25, 4.4, 2],
+        [-9.25, 4.4, 2],
+        [-9.25, 6, 2],
+        [-10.25, 6, 2]
+      ].flat(),
+      'contour points on the pixel edges'
+    );
+  });
+
+  test('toDicom: lossless round-trip', () => {
+    const cases = {
+      'single pixel': [
+        '000',
+        '010',
+        '000'
+      ],
+      'one pixel line': [
+        '00000',
+        '01110',
+        '00000'
+      ],
+      'image border': [
+        '11',
+        '11'
+      ],
+      'corner contact': [
+        '0000',
+        '0100',
+        '0010',
+        '0000'
+      ],
+      'ring with a corner gap': [
+        '00000',
+        '01100',
+        '01010',
+        '00110',
+        '00000'
+      ],
+      'holes with a corner contact': [
+        '0000000',
+        '0111110',
+        '0110110',
+        '0101010',
+        '0110110',
+        '0111110',
+        '0000000'
+      ],
+      'island in a hole': [
+        '0000000',
+        '0111110',
+        '0100010',
+        '0101010',
+        '0100010',
+        '0111110',
+        '0000000'
+      ],
+      'touching segments': [
+        '000000',
+        '011220',
+        '011220',
+        '033330',
+        '000000'
+      ]
+    };
+    for (const [name, rows] of Object.entries(cases)) {
+      assert.deepEqual(maskRoundTrip(rows).outRows, rows, name);
+    }
+  });
+
   test('create: accepts CLOSEDPLANAR_XOR contours and punches out the hole',
     () => {
       const config = syntheticData.find(c => c.name === 'test-rtss-03');
