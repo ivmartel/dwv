@@ -37,13 +37,15 @@ import syntheticImgData from '/tests/data/synthetic-img.json';
 import syntheticSegData from '/tests/data/synthetic-seg.json';
 import syntheticRtssData from '/tests/data/synthetic-rtss.json';
 import syntheticKosData from '/tests/data/synthetic-kos.json';
+import syntheticSrData from '/tests/data/synthetic-sr.json';
 
 // this suite iterates over all synthetic entries regardless of modality
 const syntheticData = [
   ...syntheticImgData,
   ...syntheticSegData,
   ...syntheticRtssData,
-  ...syntheticKosData
+  ...syntheticKosData,
+  ...syntheticSrData
 ];
 
 /**

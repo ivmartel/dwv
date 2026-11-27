@@ -17,14 +17,17 @@ export class Annotation {
     contains(point: Point2D, tolerance?: number): boolean;
     getCentroid(): Point | undefined;
     getFactory(): object | undefined;
+    getFrameOfReferenceUID(): string | undefined;
     getMetaConceptIds(): string[];
     getMetaItem(conceptId: string): object | undefined;
     getOrientationName(): string | undefined;
+    getPlanePositions(points: Point2D[]): Point3D[] | undefined;
     getText(): string;
     init(viewController: ViewController): void;
     isCompatibleView(planeHelper: PlaneHelper): boolean;
     labelPosition: Point2D | undefined;
     mathShape: object;
+    patientGeometry: PatientGeometry | undefined;
     planeOrigin: Point3D | undefined;
     planePoints: Point3D[] | undefined;
     quantification: Record<string, NumberValue> | undefined;
@@ -1107,6 +1110,21 @@ export namespace Orientation {
 }
 
 // @public
+export type PatientCoordinates = {
+    graphicType: string;
+    points: Point3D[];
+    frameOfReferenceUID: string;
+};
+
+// @public
+export type PatientGeometry = {
+    shape: PatientCoordinates;
+    shortAxis?: PatientCoordinates;
+    labelPosition?: PatientCoordinates;
+    referencePoints?: PatientCoordinates;
+};
+
+// @public
 export class PlaneHelper {
     constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
     getCosines(): number[];
@@ -1624,10 +1642,12 @@ export class ViewController {
     getCurrentScrollPosition(): number;
     getCurrentWindowPresetName(): string;
     getFillOpacity(): number;
+    getFrameOfReferenceUID(): string | undefined;
     getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
     getImageSpacing(): Spacing;
+    getImageUidFromPosition(position: Point): string;
     getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     getImageWorldSize(): Scalar2D;
     getIndexFromPosition(point: Point): Index;

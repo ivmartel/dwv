@@ -19,7 +19,8 @@ function setup() {
     'synthetic-img',
     'synthetic-seg',
     'synthetic-rtss',
-    'synthetic-kos'
+    'synthetic-kos',
+    'synthetic-sr'
   ]);
 }
 
@@ -64,10 +65,10 @@ function getViewUrl(buffers) {
  * For viewable data, the structure short name (for ex 'mf') opens
  * the data in the test viewer and is followed by a download link;
  * otherwise the structure file name (for ex 'ss.dcm') is the
- * download link. Images are viewable; derived data (SEG, RTSTRUCT)
- * are viewable with the buffers of their referenced image, loaded
- * with them in a single load: the app waits for the referenced
- * image before creating the derived data.
+ * download link. Images are viewable; derived data
+ * (SEG, RTSTRUCT, SR) are viewable with the buffers of their
+ * referenced image, loaded with them in a single load: the app waits
+ * for the referenced image before creating SEG and RTSTRUCT data.
  * The download is a dcm file for single file structures, a zip file
  * otherwise. It only contains the data, not its reference.
  *
@@ -126,7 +127,7 @@ function appendStructureLinks(li, config, structure, refBuffers) {
 
 /**
  * Get the referenced series instance UID of a derived data
- * (SEG or RTSTRUCT) configuration.
+ * (SEG, RTSTRUCT or SR) configuration.
  *
  * @param {object} config The data configuration.
  * @returns {string|undefined} The referenced series UID, undefined
@@ -142,13 +143,17 @@ function getReferencedSeriesUid(config) {
       ?.RTReferencedStudySequence?.value[0]
       ?.RTReferencedSeriesSequence?.value[0]
       ?.SeriesInstanceUID;
+  } else if (tags.Modality === 'SR') {
+    res = tags.CurrentRequestedProcedureEvidenceSequence?.value[0]
+      ?.ReferencedSeriesSequence?.value[0]
+      ?.SeriesInstanceUID;
   }
   return res;
 }
 
 /**
  * Get the single slice buffers of the image referenced by a derived
- * data (SEG or RTSTRUCT) configuration.
+ * data (SEG, RTSTRUCT or SR) configuration.
  *
  * @param {object} config The data configuration.
  * @param {Array} configs The list of configurations to search the

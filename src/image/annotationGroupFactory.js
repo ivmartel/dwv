@@ -23,12 +23,24 @@ import {
   getQuantificationUnit,
   DicomCode,
   getMeasurementUnitsCode,
-  isEqualCode
+  isEqualCode,
+  DwvCodes,
+  getDwvDicomCode,
+  DWV_CODING_SCHEME_DESIGNATOR,
+  getEnglishLanguageCode,
+  getImagingProcedureCode,
+  getConceptNameCode,
+  getDerivationCode,
+  isDerivationQuantification,
+  getIntensityConceptCode,
+  getDerivationQuantificationName
 } from '../dicom/dicomCode.js';
 import {
   isVersionInBounds,
-  getDwvVersionFromImplementationClassUID
+  getDwvVersionFromImplementationClassUID,
+  getImplementationClassUID
 } from '../dicom/dicomParser.js';
+import {getUID} from '../dicom/dicomWriter.js';
 import {MeasuredValue} from '../dicom/dicomMeasuredValue.js';
 import {NumericMeasurement} from '../dicom/dicomNumericMeasurement.js';
 import {
@@ -42,9 +54,18 @@ import {
   GraphicTypes,
   getScoordFromShape,
   getShapeFromScoord,
+  getScoordsFromBidimensional,
+  getBidimensionalFromScoords,
   SpatialCoordinate
 } from '../dicom/dicomSpatialCoordinate.js';
-import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D.js';
+import {
+  SpatialCoordinate3D,
+  GraphicTypes3D,
+  getScoord3DFromShape
+} from '../dicom/dicomSpatialCoordinate3D.js';
+import {Line} from '../math/line.js';
+import {Protractor} from '../math/protractor.js';
+import {BidimensionalLine} from '../math/bidimensionalLine.js';
 import {BIG_EPSILON_EXPONENT, precisionRound} from '../math/number.js';
 import {logger} from '../utils/logger.js';
 import {Annotation} from './annotation.js';
@@ -54,6 +75,7 @@ import {Point2D, Point3D} from '../math/point.js';
 /**
  * @import {DataElement} from '../dicom/dataElement.js';
  * @import {SimpleTagValues} from '../dicom/types.js';
+ * @import {PatientCoordinates} from './types.js';
  */
 
 /**
@@ -72,6 +94,160 @@ const TagKeys = {
   PatientSex: '00100040',
   CurrentRequestedProcedureEvidenceSequence: '0040A375'
 };
+
+/**
+ * SR SOP class UIDs.
+ */
+const SopClassUIDs = {
+  comprehensiveSR: '1.2.840.10008.5.1.4.1.1.88.33',
+  comprehensive3DSR: '1.2.840.10008.5.1.4.1.1.88.34'
+};
+
+/**
+ * Type 2 tags of the SR modules (Patient, General Study,
+ * SR Document Series, SR Document General, General Equipment),
+ * written empty if unknown.
+ */
+const Type2TagNames = [
+  'PatientName',
+  'PatientID',
+  'PatientBirthDate',
+  'PatientSex',
+  'StudyDate',
+  'StudyTime',
+  'ReferringPhysicianName',
+  'StudyID',
+  'AccessionNumber'
+];
+
+/**
+ * Type 2 sequences of the SR modules, written empty if unknown.
+ */
+const Type2SequenceNames = [
+  'ReferencedPerformedProcedureStepSequence',
+  'PerformedProcedureCodeSequence'
+];
+
+/**
+ * Image storage SOP class UIDs (without the
+ * '1.2.840.10008.5.1.4.1.1.' prefix) per modality.
+ */
+const ModalitySopClassUIDs = {
+  CT: ['2', '2.1', '2.2'],
+  MR: ['4', '4.1', '4.3', '4.4']
+};
+
+/**
+ * Get the modality of an image storage SOP class.
+ *
+ * @param {string|undefined} uid The SOP class UID.
+ * @returns {string|undefined} The modality, for ex 'CT'.
+ */
+function getModalityFromSopClassUID(uid) {
+  const prefix = '1.2.840.10008.5.1.4.1.1.';
+  if (typeof uid === 'undefined' || !uid.startsWith(prefix)) {
+    return undefined;
+  }
+  const suffix = uid.substring(prefix.length);
+  return Object.keys(ModalitySopClassUIDs).find(function (modality) {
+    return ModalitySopClassUIDs[modality].includes(suffix);
+  });
+}
+
+/**
+ * Check if an object is patient coordinates.
+ *
+ * @param {object} obj The object to check.
+ * @returns {boolean} True if patient coordinates.
+ */
+function isPatientCoordinates(obj) {
+  return typeof obj === 'object' &&
+    obj !== null &&
+    !Array.isArray(obj) &&
+    Array.isArray(obj.points) &&
+    typeof obj.graphicType === 'string';
+}
+
+/**
+ * Annotation geometry to write.
+ *
+ * @typedef {object} WriteGeometry
+ * @property {string} type The geometry type: 'region' (TID 1410),
+ *   'length', 'angle' or 'bidimensional' (TID 1501), or 'none'
+ *   for an annotation without shape (TID 1501 without geometry).
+ * @property {object} [shape] The plane shape or patient coordinates,
+ *   the long axis for a bidimensional line, undefined for 'none'.
+ * @property {object} [shortAxis] The short axis of a bidimensional line.
+ * @property {object} [labelPosition] The label position.
+ * @property {object} [referencePoints] The reference points.
+ */
+
+/**
+ * Get the geometry to write of an annotation: from its math shape, or
+ * from its patient geometry if it was read from a SCOORD3D and has not
+ * been set on a view plane.
+ *
+ * @param {Annotation} annotation The annotation.
+ * @returns {WriteGeometry} The geometry, of type 'none' if
+ *   the annotation has no shape.
+ */
+function getWriteGeometry(annotation) {
+  const shape = annotation.mathShape;
+  const patient = annotation.patientGeometry;
+  if (typeof shape === 'undefined') {
+    if (typeof patient === 'undefined') {
+      // no shape (for ex a finding without geometry)
+      let referencePoints;
+      if (typeof annotation.referencePoints !== 'undefined' &&
+        annotation.referencePoints.length !== 0) {
+        referencePoints = annotation.referencePoints;
+      }
+      return {
+        type: 'none',
+        shape: undefined,
+        shortAxis: undefined,
+        labelPosition: annotation.labelPosition,
+        referencePoints
+      };
+    }
+    let type = 'region';
+    if (typeof patient.shortAxis !== 'undefined') {
+      type = 'bidimensional';
+    } else if (patient.shape.graphicType === GraphicTypes3D.polyline) {
+      type = patient.shape.points.length === 3 ? 'angle' : 'length';
+    }
+    return {
+      type,
+      shape: patient.shape,
+      shortAxis: patient.shortAxis,
+      labelPosition: patient.labelPosition,
+      referencePoints: patient.referencePoints
+    };
+  }
+
+  const geometry = {
+    type: 'region',
+    shape,
+    shortAxis: undefined,
+    labelPosition: annotation.labelPosition,
+    referencePoints: undefined
+  };
+  if (typeof annotation.referencePoints !== 'undefined' &&
+    annotation.referencePoints.length !== 0) {
+    geometry.referencePoints = annotation.referencePoints;
+  }
+  if (shape instanceof BidimensionalLine) {
+    const axes = getScoordsFromBidimensional(shape);
+    geometry.type = 'bidimensional';
+    geometry.shape = getShapeFromScoord(axes.longAxis);
+    geometry.shortAxis = getShapeFromScoord(axes.shortAxis);
+  } else if (shape instanceof Protractor) {
+    geometry.type = 'angle';
+  } else if (shape instanceof Line) {
+    geometry.type = 'length';
+  }
+  return geometry;
+}
 
 /**
  * Response evaluation class.
@@ -151,7 +327,10 @@ export class AnnotationGroupFactory {
     // version
     const classUID =
       safeGet(dataElements, TagKeys.ImplementationClassUID);
-    const dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    let dwvVersion;
+    if (typeof classUID !== 'undefined') {
+      dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    }
     const isDwv034 = typeof dwvVersion !== 'undefined' &&
       isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.21');
 
@@ -214,28 +393,16 @@ export class AnnotationGroupFactory {
     if (isTid1500Template && isImagingMeasurementReport) {
       // check for at least one:
       // ImagingMeasurements
-      //   - MeasurementGroup
-      //     - ImageRegion (SCOORD) OR TID 300 Measure
+      //   - MeasurementGroup with a geometry: ImageRegion (SCOORD or
+      //     SCOORD3D), TID 300 measure or group level SCOORD
       const imagingMeas = srContent.contentSequence.find(
         this.#isImagingMeasurementsItem
       );
       if (typeof imagingMeas !== 'undefined') {
-        const measGroup = imagingMeas.contentSequence.find(
-          this.#isMeasurementGroupItem
-        );
-        if (typeof measGroup !== 'undefined') {
-          const imageRegion = measGroup.contentSequence.find(
-            this.#isImageRegionItem
-          );
-          const measure = measGroup.contentSequence.find(
-            this.#isTid300Measurement
-          );
-          if (typeof imageRegion !== 'undefined' ||
-            typeof measure !== 'undefined'
-          ) {
-            res = true;
-          }
-        }
+        res = imagingMeas.contentSequence.some((item) => {
+          return this.#isMeasurementGroupItem(item) &&
+            typeof this.#getGroupGeometry(item) !== 'undefined';
+        });
       }
     }
     return res;
@@ -278,10 +445,15 @@ export class AnnotationGroupFactory {
    *
    * @param {Annotation} annotation The annotation.
    * @param {DicomSRContent} content The content to add.
+   * @param {string} [relationshipType] The expected relationship type,
+   *   defaults to SELECTED FROM.
    */
-  #addSourceImageToAnnotation(annotation, content) {
+  #addSourceImageToAnnotation(annotation, content, relationshipType) {
+    if (typeof relationshipType === 'undefined') {
+      relationshipType = RelationshipTypes.selectedFrom;
+    }
     if (content.valueType === ValueTypes.image &&
-      content.relationshipType === RelationshipTypes.selectedFrom) {
+      content.relationshipType === relationshipType) {
       annotation.referencedSopClassUID =
         content.value.referencedSOPSequence.referencedSOPClassUID;
       annotation.referencedSopInstanceUID =
@@ -352,6 +524,23 @@ export class AnnotationGroupFactory {
    * defaults to false.
    */
   #addContentToAnnotation(annotation, content, isDwv034) {
+    this.#addLegacyContentToAnnotation(annotation, content, isDwv034);
+    // quantification
+    this.#addQuantificationToAnnotation(annotation, content);
+    // meta
+    this.#addMetaToAnnotation(annotation, content);
+  }
+
+  /**
+   * Add content written by dwv up to v0.37 to an annotation: label,
+   * colour, reference and plane points.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   * @param {boolean} [isDwv034] True if the content was written using dwv 0.34,
+   * defaults to false.
+   */
+  #addLegacyContentToAnnotation(annotation, content, isDwv034) {
     if (typeof isDwv034 === 'undefined') {
       isDwv034 = false;
     }
@@ -425,11 +614,6 @@ export class AnnotationGroupFactory {
       }
       annotation.planePoints = points;
     }
-
-    // quantification
-    this.#addQuantificationToAnnotation(annotation, content);
-    // meta
-    this.#addMetaToAnnotation(annotation, content);
   }
 
   /**
@@ -441,10 +625,7 @@ export class AnnotationGroupFactory {
    *   to 'CONTAINS'.
    */
   #addQuantificationToAnnotation(annotation, content, relationshipType) {
-    let relation;
-    if (typeof relationshipType === 'undefined') {
-      relation = RelationshipTypes.contains;
-    }
+    const relation = relationshipType ?? RelationshipTypes.contains;
     if (content.valueType === ValueTypes.num &&
       content.relationshipType === relation) {
       const quantifName = getQuantificationName(content.conceptNameCode);
@@ -601,93 +782,72 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Check if a DicomSRContent is a SCOORD or a SCOORD3D.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item is a spatial coordinate.
+   */
+  #isScoordItem(item) {
+    return item.valueType === ValueTypes.scoord ||
+      item.valueType === ValueTypes.scoord3d;
+  }
+
+  /**
+   * Check if a DicomSRContent has a dwv local concept name.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @param {object} [code] Optional dwv code to check for.
+   * @returns {boolean} True if the item has a dwv concept name.
+   */
+  #isDwvItem(item, code) {
+    const concept = item.conceptNameCode;
+    if (typeof concept === 'undefined' ||
+      concept.schemeDesignator !== DWV_CODING_SCHEME_DESIGNATOR) {
+      return false;
+    }
+    return typeof code === 'undefined' || concept.value === code.value;
+  }
+
+  /**
    * Check if a DicomSRContent is an 'ImageRegion'.
    *
    * @param {DicomSRContent} item The item to check.
    * @returns {boolean} True if item has the properties:
-   *   (CONTAINS) SCOORD: (111030, DCM, 'Image Region').
+   *   (CONTAINS) SCOORD or SCOORD3D: (111030, DCM, 'Image Region').
    */
   #isImageRegionItem(item) {
-    return item.hasHeader(
-      ValueTypes.scoord,
-      getDcmDicomCode(DcmCodes.ImageRegion),
-      RelationshipTypes.contains
-    );
+    return this.#isScoordItem(item) &&
+      item.relationshipType === RelationshipTypes.contains &&
+      isEqualCode(item.conceptNameCode,
+        getDcmDicomCode(DcmCodes.ImageRegion));
   }
 
   /**
-   * Check is a measurement group follows TID 1410:
-   * it must contain an image region.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1410}.
+   * Get the 'inferred from' SCOORD or SCOORD3D of a measurement.
    *
-   * @param {DicomSRContent} content The SR content.
-   * @returns {boolean} True if an image region was found.
+   * @param {DicomSRContent} item The measurement.
+   * @returns {DicomSRContent|undefined} The spatial coordinate.
    */
-  #isTid1410MeasGroup(content) {
-    const scoord = content.contentSequence.find(
-      this.#isImageRegionItem
-    );
-    return typeof scoord !== 'undefined';
-  }
-
-  /**
-   * Convert a TID 1410 measurement group into an annotation.
-   *
-   * @param {DicomSRContent} content The SR content.
-   * @returns {Annotation|undefined} The annotation.
-   */
-  #tid1410MeasGroupToAnnotation(content) {
-    let annotation;
-
-    // get shape from scoord
-    const scoord = content.contentSequence.find(
-      this.#isImageRegionItem
-    );
-    if (typeof scoord !== 'undefined') {
-      annotation = new Annotation();
-      // shape
-      annotation.mathShape = getShapeFromScoord(scoord.value);
-      // shape source image
-      const fromImage = scoord.contentSequence.find(function (item) {
-        return item.valueType === ValueTypes.image &&
-          item.relationshipType === RelationshipTypes.selectedFrom;
-      });
-      if (typeof fromImage !== 'undefined') {
-        this.#addSourceImageToAnnotation(annotation, fromImage);
-      }
-
-      for (const item of content.contentSequence) {
-        // shape ids
-        this.#addIdsToAnnotation(annotation, item);
-        // shape extra
-        this.#addContentToAnnotation(annotation, item);
-      }
-    }
-    return annotation;
+  #getInferredFromScoord(item) {
+    return item.contentSequence.find((subItem) => {
+      return this.#isScoordItem(subItem) &&
+        subItem.relationshipType === RelationshipTypes.inferredFrom;
+    });
   }
 
   /**
    * Check is an SR content follows TID 300: it must be
-   *   a 'contains' numeric value with an 'inferred from' scoord.
+   *   a 'contains' numeric value with an 'inferred from' scoord
+   *   (TID 320 'Image or Spatial Coordinates').
    * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_300}.
    *
    * @param {DicomSRContent} item The SR content.
    * @returns {boolean} True if TID 300 measure.
    */
   #isTid300Measurement(item) {
-    // no specific concept
-    const isContainedNum =
-      item.valueType === ValueTypes.num &&
-      item.relationshipType === RelationshipTypes.contains;
-    let scoord;
-    if (isContainedNum) {
-      // no specific concept (?)
-      scoord = item.contentSequence.find(function (subItem) {
-        return subItem.valueType === ValueTypes.scoord &&
-          subItem.relationshipType === RelationshipTypes.inferredFrom;
-      });
-    }
-    return typeof scoord !== 'undefined';
+    return item.valueType === ValueTypes.num &&
+      item.relationshipType === RelationshipTypes.contains &&
+      typeof this.#getInferredFromScoord(item) !== 'undefined';
   }
 
   /**
@@ -715,55 +875,285 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Check is a measurement group follows TID 1501:
-   * it must contain a measure.
-   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1501}.
+   * Get the geometry items of a measurement group, in order:
+   * - TID 1410: the image region,
+   * - TID 1501: the scoord of the first TID 300 measurement, or the long
+   *   and short axis scoords of a bidimensional measurement,
+   * - TID 1501: a group level scoord (row 10c).
    *
-   * @param {DicomSRContent} content The SR content.
-   * @returns {boolean} True if a measure was found.
+   * @param {DicomSRContent} group The measurement group.
+   * @returns {{shape: DicomSRContent, shortAxis?: DicomSRContent}|undefined}
+   *   The geometry items.
    */
-  #isTid1501MeasGroup(content) {
-    const measure = content.contentSequence.find(
-      this.#isTid300Measurement
-    );
-    return typeof measure !== 'undefined';
+  #getGroupGeometry(group) {
+    const items = group.contentSequence;
+
+    const region = items.find((item) => this.#isImageRegionItem(item));
+    if (typeof region !== 'undefined') {
+      return {shape: region};
+    }
+
+    const measures = items.filter((item) => this.#isTid300Measurement(item));
+    if (measures.length !== 0) {
+      const findMeasure = function (name) {
+        return measures.find(function (item) {
+          return getQuantificationName(item.conceptNameCode) === name;
+        });
+      };
+      const longAxis = findMeasure('longAxis');
+      const shortAxis = findMeasure('shortAxis');
+      if (typeof longAxis !== 'undefined' &&
+        typeof shortAxis !== 'undefined') {
+        const longScoord = this.#getInferredFromScoord(longAxis);
+        const shortScoord = this.#getInferredFromScoord(shortAxis);
+        if (longScoord.valueType === shortScoord.valueType) {
+          return {shape: longScoord, shortAxis: shortScoord};
+        }
+      }
+      return {shape: this.#getInferredFromScoord(measures[0])};
+    }
+
+    const geometry = items.find((item) => {
+      return this.#isScoordItem(item) &&
+        item.relationshipType === RelationshipTypes.contains &&
+        !this.#isDwvItem(item);
+    });
+    if (typeof geometry !== 'undefined') {
+      return {shape: geometry};
+    }
+
+    return undefined;
   }
 
   /**
-   * Convert a TID 1501 measurement group into an annotation.
+   * Get patient coordinates from a SCOORD3D content.
    *
-   * @param {DicomSRContent} content The SR content.
-   * @returns {Annotation|undefined} The annotation.
+   * @param {DicomSRContent} content The SCOORD3D content.
+   * @returns {PatientCoordinates} The patient coordinates.
    */
-  #tid1501MeasGroupToAnnotation(content) {
-    let annotation;
+  #getPatientCoordinates(content) {
+    const data = content.value.graphicData;
+    const points = [];
+    for (let i = 0; i + 2 < data.length; i += 3) {
+      points.push(new Point3D(
+        parseFloat(data[i]),
+        parseFloat(data[i + 1]),
+        parseFloat(data[i + 2])
+      ));
+    }
+    return {
+      graphicType: content.value.graphicType,
+      points,
+      frameOfReferenceUID: content.value.referencedFrameOfReferenceUID
+    };
+  }
 
-    // just use the first measure to get the scoord
-    // (expecting all measures to refer to the same scoord)
-    const measure = content.contentSequence.find(
-      this.#isTid300Measurement
-    );
-    if (typeof measure !== 'undefined') {
-      annotation = new Annotation();
-      // shape
-      // no specific concept (?)
-      const scoord = measure.contentSequence.find(function (subItem) {
-        return subItem.valueType === ValueTypes.scoord &&
-          subItem.relationshipType === RelationshipTypes.inferredFrom;
+  /**
+   * Get the points of a SCOORD content.
+   *
+   * @param {DicomSRContent} content The SCOORD content.
+   * @returns {Point2D[]} The points.
+   */
+  #getScoordPoints(content) {
+    const data = content.value.graphicData;
+    const points = [];
+    for (let i = 0; i + 1 < data.length; i += 2) {
+      points.push(new Point2D(
+        parseFloat(data[i]),
+        parseFloat(data[i + 1])
+      ));
+    }
+    return points;
+  }
+
+  /**
+   * Add a measurement to the quantification of an annotation: a size
+   * measurement, or a statistic as derivation modifier of an intensity
+   * measurement (TID 1419), or a legacy dwv statistic code.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   */
+  #addNumToAnnotation(annotation, content) {
+    if (content.valueType !== ValueTypes.num ||
+      content.relationshipType !== RelationshipTypes.contains ||
+      typeof content.value?.measuredValue === 'undefined') {
+      return;
+    }
+    let name;
+    const derivation = content.contentSequence.find(function (item) {
+      return item.hasHeader(
+        ValueTypes.code,
+        getDcmDicomCode(DcmCodes.Derivation),
+        RelationshipTypes.hasConceptMod
+      );
+    });
+    if (typeof derivation !== 'undefined') {
+      name = getDerivationQuantificationName(derivation.value);
+    } else {
+      name = getQuantificationName(content.conceptNameCode);
+    }
+    if (typeof name === 'undefined') {
+      return;
+    }
+    const measuredValue = content.value.measuredValue;
+    if (typeof annotation.quantification === 'undefined') {
+      annotation.quantification = {};
+    }
+    annotation.quantification[name] = {
+      value: measuredValue.numericValue,
+      unit: getQuantificationUnit(measuredValue.measurementUnitsCode)
+    };
+  }
+
+  /**
+   * Add the label and dwv local content to an annotation:
+   * short label with label position, colour and reference points.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   */
+  #addDwvContentToAnnotation(annotation, content) {
+    const geometry = annotation.patientGeometry;
+
+    // label
+    if (content.hasHeader(
+      ValueTypes.text,
+      getDcmDicomCode(DcmCodes.ShortLabel),
+      RelationshipTypes.contains
+    )) {
+      annotation.textExpr = content.value;
+      const position = content.contentSequence.find((item) => {
+        return this.#isScoordItem(item) &&
+          item.relationshipType === RelationshipTypes.hasProperties &&
+          this.#isDwvItem(item, DwvCodes.LabelPosition);
       });
-      annotation.mathShape = getShapeFromScoord(scoord.value);
-      // special point/arrow case
-      // TODO: not very valid...
-      if (annotation.mathShape instanceof Point2D &&
-        scoord.value.graphicData.length >= 4
-      ) {
-        annotation.referencePoints = [
-          new Point2D(scoord.value.graphicData[2], scoord.value.graphicData[3])
-        ];
+      if (typeof position !== 'undefined') {
+        if (position.valueType === ValueTypes.scoord3d) {
+          if (typeof geometry !== 'undefined') {
+            geometry.labelPosition = this.#getPatientCoordinates(position);
+          }
+        } else {
+          annotation.labelPosition = this.#getScoordPoints(position)[0];
+        }
+      }
+    }
+
+    // colour
+    if (content.valueType === ValueTypes.text &&
+      content.relationshipType === RelationshipTypes.hasConceptMod &&
+      this.#isDwvItem(content, DwvCodes.Colour)) {
+      annotation.colour = content.value;
+    }
+
+    // reference points
+    if (this.#isScoordItem(content) &&
+      content.relationshipType === RelationshipTypes.contains &&
+      this.#isDwvItem(content, DwvCodes.ReferencePoints)) {
+      if (content.valueType === ValueTypes.scoord3d) {
+        if (typeof geometry !== 'undefined') {
+          geometry.referencePoints = this.#getPatientCoordinates(content);
+        }
+      } else {
+        annotation.referencePoints = this.#getScoordPoints(content);
+      }
+    }
+  }
+
+  /**
+   * Get the plane points of a measurement group from its dwv local
+   * plane points TEXT.
+   *
+   * @param {DicomSRContent} group The measurement group.
+   * @returns {Point3D[]|undefined} The plane points as
+   *   [origin, cosine1, cosine2], undefined if not present or invalid.
+   */
+  #getPlanePoints(group) {
+    const item = group.contentSequence.find((content) => {
+      return content.valueType === ValueTypes.text &&
+        content.relationshipType === RelationshipTypes.contains &&
+        this.#isDwvItem(content, DwvCodes.PlanePoints);
+    });
+    if (typeof item === 'undefined') {
+      return undefined;
+    }
+    const values = item.value.split(',').map(parseFloat);
+    if (values.length !== 9 || values.some(isNaN)) {
+      return undefined;
+    }
+    return [
+      new Point3D(values[0], values[1], values[2]),
+      new Point3D(values[3], values[4], values[5]),
+      new Point3D(values[6], values[7], values[8])
+    ];
+  }
+
+  /**
+   * Convert a measurement group into an annotation: TID 1410
+   * (image region and its measurements) or TID 1501 (TID 300
+   * measurements inferred from a scoord, or a group level scoord).
+   * Also reads groups written by dwv up to v0.37.
+   *
+   * Shapes in patient coordinates (SCOORD3D) are kept as the annotation
+   * patient geometry, they get a math shape once a view is set.
+   * A TID 1501 group without geometry gives an annotation without
+   * shape, its source image is read from an IMAGE item (row 10b).
+   *
+   * @param {DicomSRContent} group The measurement group.
+   * @returns {Annotation|undefined} The annotation, undefined if the group
+   *   is empty.
+   */
+  #measGroupToAnnotation(group) {
+    if (group.contentSequence.length === 0) {
+      return undefined;
+    }
+    const geometry = this.#getGroupGeometry(group);
+
+    const annotation = new Annotation();
+    const shapeItem = geometry?.shape;
+    if (typeof shapeItem === 'undefined' ||
+      shapeItem.valueType === ValueTypes.scoord3d) {
+      // source image of a group without geometry or with a
+      // geometry in patient coordinates
+      const sourceImage = group.contentSequence.find(function (item) {
+        return item.hasHeader(
+          ValueTypes.image,
+          getDcmDicomCode(DcmCodes.SourceOfMeasurement),
+          RelationshipTypes.contains
+        );
+      });
+      if (typeof sourceImage !== 'undefined') {
+        this.#addSourceImageToAnnotation(
+          annotation, sourceImage, RelationshipTypes.contains);
+      }
+    }
+    if (shapeItem?.valueType === ValueTypes.scoord3d) {
+      annotation.patientGeometry = {
+        shape: this.#getPatientCoordinates(shapeItem)
+      };
+      if (typeof geometry.shortAxis !== 'undefined') {
+        annotation.patientGeometry.shortAxis =
+          this.#getPatientCoordinates(geometry.shortAxis);
+      }
+      const planePoints = this.#getPlanePoints(group);
+      if (typeof planePoints !== 'undefined') {
+        annotation.planePoints = planePoints;
+      }
+    } else if (typeof shapeItem !== 'undefined') {
+      if (typeof geometry.shortAxis !== 'undefined') {
+        annotation.mathShape = getBidimensionalFromScoords(
+          shapeItem.value, geometry.shortAxis.value);
+      } else {
+        annotation.mathShape = getShapeFromScoord(shapeItem.value);
+        // point with an extra point (for ex cornerstone arrows)
+        if (annotation.mathShape instanceof Point2D &&
+          shapeItem.value.graphicData.length >= 4
+        ) {
+          annotation.referencePoints = [this.#getScoordPoints(shapeItem)[1]];
+        }
       }
       // shape source image
-      // no specific concept (?)
-      const fromImage = scoord.contentSequence.find(function (item) {
+      const fromImage = shapeItem.contentSequence.find(function (item) {
         return item.valueType === ValueTypes.image &&
           item.relationshipType === RelationshipTypes.selectedFrom;
       });
@@ -772,14 +1162,15 @@ export class AnnotationGroupFactory {
       }
     }
 
-    // shape extra
-    if (typeof annotation !== 'undefined') {
-      for (const item of content.contentSequence) {
-        // add ids
-        this.#addIdsToAnnotation(annotation, item);
-        // add quantification
-        this.#addQuantificationToAnnotation(annotation, measure);
-        // add meta
+    const shortLabel = getDcmDicomCode(DcmCodes.ShortLabel);
+    for (const item of group.contentSequence) {
+      this.#addIdsToAnnotation(annotation, item);
+      this.#addNumToAnnotation(annotation, item);
+      this.#addDwvContentToAnnotation(annotation, item);
+      this.#addLegacyContentToAnnotation(annotation, item);
+      // the label and dwv local content are not meta
+      if (!isEqualCode(item.conceptNameCode, shortLabel) &&
+        !this.#isDwvItem(item)) {
         this.#addMetaToAnnotation(annotation, item);
       }
     }
@@ -850,37 +1241,20 @@ export class AnnotationGroupFactory {
 
   /**
    * Convert an imaging measurement into an annotation group.
-   * Supports TID1500 > TID1410 ("Planar ROI Measurements
-   * and Qualitative Evaluations”) or TID1501 (“Measurement and
-   * Qualitative Evaluation Group”).
+   * Each measurement group can follow TID 1410 ("Planar ROI Measurements
+   * and Qualitative Evaluations") or TID 1501 ("Measurement and
+   * Qualitative Evaluation Group").
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {AnnotationGroup|undefined} The annotation group.
    */
   #imagingMeasToAnnotationGroup(content) {
-    if (content.contentSequence.length === 0) {
-      return undefined;
-    }
-    const item0 = content.contentSequence[0];
-    let isTid1410 = false;
-    let isTid1501 = false;
-    if (this.#isMeasurementGroupItem(item0)) {
-      isTid1410 = this.#isTid1410MeasGroup(item0);
-      isTid1501 = this.#isTid1501MeasGroup(item0);
-    }
-
     const annotations = [];
     let hasMeasGroup = false;
     for (const item of content.contentSequence) {
-      // measurement group content
       if (this.#isMeasurementGroupItem(item)) {
         hasMeasGroup = true;
-        let annotation;
-        if (isTid1410) {
-          annotation = this.#tid1410MeasGroupToAnnotation(item);
-        } else if (isTid1501) {
-          annotation = this.#tid1501MeasGroupToAnnotation(item);
-        }
+        const annotation = this.#measGroupToAnnotation(item);
         if (typeof annotation !== 'undefined') {
           annotations.push(annotation);
         }
@@ -1221,125 +1595,256 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Get the annotation meta as SR content list.
+   * Get an SR content for a plane shape: a SCOORD selected from the
+   * annotation source image, or a SCOORD3D in patient coordinates
+   * for annotations on a non acquisition plane (no SELECTED FROM child,
+   * SCOORD3D has no children).
    *
-   * @param {Annotation} annotation The input annotation.
+   * @param {Annotation} annotation The annotation.
+   * @param {object} shape The plane shape, a list of Point2D for
+   *   a MULTIPOINT, or patient coordinates (written as is).
+   * @param {DicomCode} conceptNameCode The content concept name code.
+   * @param {string} relationshipType The content relationship type.
+   * @returns {DicomSRContent} The SR content.
+   */
+  #getShapeContent(annotation, shape, conceptNameCode, relationshipType) {
+    let content;
+    if (isPatientCoordinates(shape)) {
+      content = new DicomSRContent(ValueTypes.scoord3d);
+      const scoord3d = new SpatialCoordinate3D();
+      scoord3d.graphicType = shape.graphicType;
+      scoord3d.graphicData = [];
+      for (const point of shape.points) {
+        scoord3d.graphicData.push(
+          point.getX().toString(),
+          point.getY().toString(),
+          point.getZ().toString()
+        );
+      }
+      scoord3d.referencedFrameOfReferenceUID = shape.frameOfReferenceUID;
+      content.value = scoord3d;
+    } else if (typeof annotation.planePoints !== 'undefined') {
+      content = new DicomSRContent(ValueTypes.scoord3d);
+      const toPatient = function (points) {
+        return annotation.getPlanePositions(points);
+      };
+      const frameOfReferenceUID = annotation.getFrameOfReferenceUID();
+      if (Array.isArray(shape)) {
+        const scoord3d = new SpatialCoordinate3D();
+        scoord3d.graphicType = GraphicTypes3D.multipoint;
+        scoord3d.graphicData = [];
+        for (const point of toPatient(shape)) {
+          scoord3d.graphicData.push(
+            point.getX().toString(),
+            point.getY().toString(),
+            point.getZ().toString()
+          );
+        }
+        scoord3d.referencedFrameOfReferenceUID = frameOfReferenceUID;
+        content.value = scoord3d;
+      } else {
+        content.value =
+          getScoord3DFromShape(shape, toPatient, frameOfReferenceUID);
+      }
+    } else {
+      content = new DicomSRContent(ValueTypes.scoord);
+      if (Array.isArray(shape)) {
+        const scoord = new SpatialCoordinate();
+        scoord.graphicType = GraphicTypes.multipoint;
+        scoord.graphicData = [];
+        for (const point of shape) {
+          scoord.graphicData.push(
+            point.getX().toString(),
+            point.getY().toString()
+          );
+        }
+        content.value = scoord;
+      } else {
+        content.value = getScoordFromShape(shape);
+      }
+      content.contentSequence =
+        [this.#getAnnotationSourceImageContent(annotation)];
+    }
+    content.relationshipType = relationshipType;
+    content.conceptNameCode = conceptNameCode;
+    return content;
+  }
+
+  /**
+   * Get a NUM SR content.
+   *
+   * @param {DicomCode} conceptNameCode The concept name code.
+   * @param {number} value The numeric value.
+   * @param {string} unit The quantification unit.
+   * @param {string} relationshipType The relationship type.
+   * @returns {DicomSRContent} The SR content.
+   */
+  #getNumContent(conceptNameCode, value, unit, relationshipType) {
+    const content = new DicomSRContent(ValueTypes.num);
+    content.relationshipType = relationshipType;
+    content.conceptNameCode = conceptNameCode;
+    const measure = new MeasuredValue();
+    measure.numericValue = precisionRound(value, BIG_EPSILON_EXPONENT);
+    measure.measurementUnitsCode = getMeasurementUnitsCode(unit);
+    const numMeasure = new NumericMeasurement();
+    numMeasure.measuredValue = measure;
+    content.value = numMeasure;
+    return content;
+  }
+
+  /**
+   * Get the intensity measured property of the ROI statistics of an
+   * annotation (CID 7180): from the pixel unit, or the modality of the
+   * referenced image, or a dwv local code if none fits.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {string} unit The statistics unit.
+   * @returns {DicomCode} The concept name code.
+   */
+  #getIntensityConcept(annotation, unit) {
+    let code;
+    if (unit === 'HU') {
+      code = getDcmDicomCode(DcmCodes.AttenuationCoefficient);
+    } else if (unit === 'SUV') {
+      code = getDcmDicomCode(DcmCodes.SUVbw);
+    } else {
+      code = getIntensityConceptCode(
+        getModalityFromSopClassUID(annotation.referencedSopClassUID));
+    }
+    if (typeof code === 'undefined') {
+      code = getDwvDicomCode(DwvCodes.PixelValue);
+    }
+    return code;
+  }
+
+  /**
+   * Get the TID 1410 'Planar ROI Measurements' content of an annotation:
+   * the image region and its TID 1419 'ROI Measurements'.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1410}.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {WriteGeometry} geometry The annotation geometry.
    * @returns {DicomSRContent[]} The SR content list.
    */
-  #getAnnotationContentSequence(annotation) {
+  #getTid1410Content(annotation, geometry) {
+    const contentSequence = [
+      this.#getShapeContent(
+        annotation,
+        geometry.shape,
+        getDcmDicomCode(DcmCodes.ImageRegion),
+        RelationshipTypes.contains
+      )
+    ];
+
+    const quantification = annotation.quantification ?? {};
+    for (const key in quantification) {
+      const value = quantification[key].value;
+      const unit = quantification[key].unit;
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        continue;
+      }
+      if (isDerivationQuantification(key)) {
+        // statistic: intensity measurement with a derivation modifier
+        const num = this.#getNumContent(
+          this.#getIntensityConcept(annotation, unit),
+          value,
+          unit,
+          RelationshipTypes.contains
+        );
+        const derivation = new DicomSRContent(ValueTypes.code);
+        derivation.relationshipType = RelationshipTypes.hasConceptMod;
+        derivation.conceptNameCode = getDcmDicomCode(DcmCodes.Derivation);
+        derivation.value = getDerivationCode(key);
+        num.contentSequence = [derivation];
+        contentSequence.push(num);
+      } else {
+        const concept = getConceptNameCode(key);
+        if (typeof concept !== 'undefined') {
+          contentSequence.push(this.#getNumContent(
+            concept, value, unit, RelationshipTypes.contains));
+        }
+      }
+    }
+
+    return contentSequence;
+  }
+
+  /**
+   * Get the TID 300 'Measurement' content of open shapes (line,
+   * protractor, bidimensional line): measurements inferred from their
+   * SCOORD, or the SCOORD alone if there is no measurement.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_300}.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {WriteGeometry} geometry The annotation geometry.
+   * @returns {DicomSRContent[]} The SR content list.
+   */
+  #getTid1501Content(annotation, geometry) {
+    const contentSequence = [];
+    const quantification = annotation.quantification ?? {};
+    const source = getDcmDicomCode(DcmCodes.SourceOfMeasurement);
+
+    const addMeasurement = (name, shape) => {
+      const quantif = quantification[name];
+      const concept = getConceptNameCode(name);
+      if (typeof quantif !== 'undefined' &&
+        typeof quantif.value === 'number' &&
+        Number.isFinite(quantif.value) &&
+        typeof concept !== 'undefined') {
+        const num = this.#getNumContent(
+          concept, quantif.value, quantif.unit, RelationshipTypes.contains);
+        num.contentSequence = [this.#getShapeContent(
+          annotation, shape, source, RelationshipTypes.inferredFrom)];
+        contentSequence.push(num);
+      } else {
+        // no measurement: keep the geometry (TID 1501 row 10c)
+        contentSequence.push(this.#getShapeContent(
+          annotation, shape, source, RelationshipTypes.contains));
+      }
+    };
+
+    if (geometry.type === 'bidimensional') {
+      addMeasurement('longAxis', geometry.shape);
+      addMeasurement('shortAxis', geometry.shortAxis);
+    } else if (geometry.type === 'angle') {
+      addMeasurement('angle', geometry.shape);
+    } else {
+      addMeasurement('length', geometry.shape);
+    }
+
+    return contentSequence;
+  }
+
+  /**
+   * Get the annotation label, meta and dwv specific properties
+   * as SR content list.
+   *
+   * @param {Annotation} annotation The input annotation.
+   * @param {WriteGeometry} geometry The annotation geometry.
+   * @returns {DicomSRContent[]} The SR content list.
+   */
+  #getAnnotationExtrasContent(annotation, geometry) {
     const contentSequence = [];
 
-    // annotation id
-    const srId = new DicomSRContent(ValueTypes.text);
-    srId.relationshipType = RelationshipTypes.hasObsContext;
-    srId.conceptNameCode = getDcmDicomCode(DcmCodes.TrackingIdentifier);
-    srId.value = annotation.trackingId;
-    contentSequence.push(srId);
-
-    // annotation uid
-    const srUid = new DicomSRContent(ValueTypes.uidref);
-    srUid.relationshipType = RelationshipTypes.hasObsContext;
-    srUid.conceptNameCode = getDcmDicomCode(DcmCodes.TrackingUniqueIdentifier);
-    srUid.value = annotation.trackingUid;
-    contentSequence.push(srUid);
-
-    // text expr
+    // label: free text qualitative evaluation (TID 1410 row 13,
+    // TID 1501 row 12)
     if (typeof annotation.textExpr !== 'undefined' &&
       annotation.textExpr.length !== 0
     ) {
       const shortLabel = new DicomSRContent(ValueTypes.text);
-      shortLabel.relationshipType = RelationshipTypes.hasConceptMod;
+      shortLabel.relationshipType = RelationshipTypes.contains;
       shortLabel.conceptNameCode = getDcmDicomCode(DcmCodes.ShortLabel);
       shortLabel.value = annotation.textExpr;
       // label position
-      if (typeof annotation.labelPosition !== 'undefined') {
-        const labelPosition = new DicomSRContent(ValueTypes.scoord);
-        labelPosition.relationshipType = RelationshipTypes.hasProperties;
-        labelPosition.conceptNameCode =
-          getDcmDicomCode(DcmCodes.ReferencePoints);
-        const labelPosScoord = new SpatialCoordinate();
-        labelPosScoord.graphicType = GraphicTypes.point;
-        const graphicData = [
-          annotation.labelPosition.getX().toString(),
-          annotation.labelPosition.getY().toString()
-        ];
-        labelPosScoord.graphicData = graphicData;
-        labelPosition.value = labelPosScoord;
-        const srcImage = this.#getAnnotationSourceImageContent(annotation);
-        labelPosition.contentSequence = [srcImage];
-
-        // add position to label sequence
-        shortLabel.contentSequence = [labelPosition];
+      if (typeof geometry.labelPosition !== 'undefined') {
+        shortLabel.contentSequence = [this.#getShapeContent(
+          annotation,
+          geometry.labelPosition,
+          getDwvDicomCode(DwvCodes.LabelPosition),
+          RelationshipTypes.hasProperties
+        )];
       }
       contentSequence.push(shortLabel);
-    }
-
-    // colour
-    const colour = new DicomSRContent(ValueTypes.text);
-    colour.relationshipType = RelationshipTypes.hasConceptMod;
-    colour.conceptNameCode = getColourCode();
-    colour.value = annotation.colour;
-    contentSequence.push(colour);
-
-    // reference points
-    if (typeof annotation.referencePoints !== 'undefined') {
-      const referencePoints = new DicomSRContent(ValueTypes.scoord);
-      referencePoints.relationshipType = RelationshipTypes.hasConceptMod;
-      referencePoints.conceptNameCode =
-        getDcmDicomCode(DcmCodes.ReferencePoints);
-      const refPointsScoord = new SpatialCoordinate();
-      refPointsScoord.graphicType = GraphicTypes.multipoint;
-      const graphicData = [];
-      for (const point of annotation.referencePoints) {
-        graphicData.push(point.getX().toString());
-        graphicData.push(point.getY().toString());
-      }
-      refPointsScoord.graphicData = graphicData;
-
-      referencePoints.value = refPointsScoord;
-      const srcImage = this.#getAnnotationSourceImageContent(annotation);
-      referencePoints.contentSequence = [srcImage];
-
-      contentSequence.push(referencePoints);
-    }
-
-    // plane points
-    if (typeof annotation.planePoints !== 'undefined') {
-      const planePoints = new DicomSRContent(ValueTypes.scoord3d);
-      planePoints.relationshipType = RelationshipTypes.contains;
-      planePoints.conceptNameCode = getDcmDicomCode(DcmCodes.ReferenceGeometry);
-      const pointsScoord = new SpatialCoordinate3D();
-      pointsScoord.graphicType = GraphicTypes.multipoint;
-      const graphicData = [];
-      for (const planePoint of annotation.planePoints) {
-        graphicData.push(planePoint.getX().toString());
-        graphicData.push(planePoint.getY().toString());
-        graphicData.push(planePoint.getZ().toString());
-      }
-      pointsScoord.graphicData = graphicData;
-
-      planePoints.value = pointsScoord;
-      const srcImage = this.#getAnnotationSourceImageContent(annotation);
-      planePoints.contentSequence = [srcImage];
-
-      contentSequence.push(planePoints);
-    }
-
-    // quantification
-    if (typeof annotation.quantification !== 'undefined') {
-      for (const key in annotation.quantification) {
-        const quantifContent = getSRContentFromValue(
-          key,
-          precisionRound(
-            annotation.quantification[key].value,
-            BIG_EPSILON_EXPONENT
-          ),
-          annotation.quantification[key].unit
-        );
-        if (typeof quantifContent !== 'undefined') {
-          contentSequence.push(quantifContent);
-        }
-      }
     }
 
     // meta
@@ -1357,90 +1862,362 @@ export class AnnotationGroupFactory {
       contentSequence.push(meta);
     }
 
+    // colour
+    if (typeof annotation.colour !== 'undefined') {
+      const colour = new DicomSRContent(ValueTypes.text);
+      colour.relationshipType = RelationshipTypes.hasConceptMod;
+      colour.conceptNameCode = getDwvDicomCode(DwvCodes.Colour);
+      colour.value = annotation.colour;
+      contentSequence.push(colour);
+    }
+
+    // reference points (for ex arrow tail)
+    if (typeof geometry.referencePoints !== 'undefined') {
+      contentSequence.push(this.#getShapeContent(
+        annotation,
+        geometry.referencePoints,
+        getDwvDicomCode(DwvCodes.ReferencePoints),
+        RelationshipTypes.contains
+      ));
+    }
+
     return contentSequence;
   }
 
   /**
-   * Convert an annotation into a 'Measurement Group' SR content.
+   * Get the source image and plane of an annotation whose geometry is
+   * written in patient coordinates (SCOORD3D, which has no SELECTED FROM
+   * image): the image as a 'Source of Measurement' IMAGE (TID 1501
+   * row 10b, an extension of the extensible TID 1410), the plane
+   * points (origin and cosines) as a dwv local TEXT of nine comma
+   * separated values: a backslash would be read as a value separator,
+   * a SCOORD3D would be read by other applications as a region of
+   * the group (TID 1501 row 10e) and is stored as 32-bit floats.
+   * They allow to get the image (and its time point) and the
+   * orientation of the annotation before it is set on a view.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {DicomSRContent[]} The SR content list.
+   */
+  #getPatientGeometryExtrasContent(annotation) {
+    const contentSequence = [];
+
+    if (typeof annotation.referencedSopInstanceUID !== 'undefined') {
+      const srcImage = this.#getAnnotationSourceImageContent(annotation);
+      srcImage.relationshipType = RelationshipTypes.contains;
+      srcImage.conceptNameCode =
+        getDcmDicomCode(DcmCodes.SourceOfMeasurement);
+      contentSequence.push(srcImage);
+    }
+
+    if (typeof annotation.planePoints !== 'undefined') {
+      const planePoints = new DicomSRContent(ValueTypes.text);
+      planePoints.relationshipType = RelationshipTypes.contains;
+      planePoints.conceptNameCode = getDwvDicomCode(DwvCodes.PlanePoints);
+      planePoints.value = annotation.planePoints
+        .flatMap(function (point) {
+          return point.getValues();
+        })
+        .map(function (value) {
+          return value.toString();
+        })
+        .join(',');
+      contentSequence.push(planePoints);
+    }
+
+    return contentSequence;
+  }
+
+  /**
+   * Convert an annotation into a 'Measurement Group' SR content:
+   * TID 1410 for regions and points, TID 1501 for open shapes and
+   * annotations without shape.
    *
    * @param {Annotation} annotation The input annotation.
-   * @returns {DicomSRContent} The result SR content.
+   * @returns {DicomSRContent|undefined} The result SR content, undefined
+   *   if the annotation cannot be exported.
    */
-  #annotationToTid1410MeasGroup(annotation) {
-    // measurement group
+  #annotationToMeasGroup(annotation) {
+    const geometry = getWriteGeometry(annotation);
+
+    // non acquisition plane annotations need their view
+    // to get patient coordinates
+    const canGetPatientPositions =
+      typeof annotation.getPlanePositions([]) !== 'undefined' &&
+      typeof annotation.getFrameOfReferenceUID() !== 'undefined';
+    if (typeof annotation.mathShape !== 'undefined' &&
+      typeof annotation.planePoints !== 'undefined' &&
+      !canGetPatientPositions) {
+      logger.warn('Cannot export an annotation on a non acquisition ' +
+        `plane without its view: ${annotation.trackingId}`);
+      return undefined;
+    }
+
     const srContent = new DicomSRContent(ValueTypes.container);
     srContent.relationshipType = RelationshipTypes.contains;
     srContent.conceptNameCode = getDcmDicomCode(DcmCodes.MeasurementGroup);
     srContent.value = ContinuityOfContents.separate;
 
-    // scoord
-    const srScoord = new DicomSRContent(ValueTypes.scoord);
-    srScoord.relationshipType = RelationshipTypes.contains;
-    srScoord.conceptNameCode = getDcmDicomCode(DcmCodes.ImageRegion);
-    srScoord.value = getScoordFromShape(annotation.mathShape);
-    const srcImage = this.#getAnnotationSourceImageContent(annotation);
-    srScoord.contentSequence = [srcImage];
+    const contentSequence = [];
 
-    // add extras
-    srContent.contentSequence = [srScoord].concat(
-      this.#getAnnotationContentSequence(annotation));
+    // tracking ids
+    if (typeof annotation.trackingId !== 'undefined') {
+      const srId = new DicomSRContent(ValueTypes.text);
+      srId.relationshipType = RelationshipTypes.hasObsContext;
+      srId.conceptNameCode = getDcmDicomCode(DcmCodes.TrackingIdentifier);
+      srId.value = annotation.trackingId;
+      contentSequence.push(srId);
+    }
+    if (typeof annotation.trackingUid !== 'undefined') {
+      const srUid = new DicomSRContent(ValueTypes.uidref);
+      srUid.relationshipType = RelationshipTypes.hasObsContext;
+      srUid.conceptNameCode =
+        getDcmDicomCode(DcmCodes.TrackingUniqueIdentifier);
+      srUid.value = annotation.trackingUid;
+      contentSequence.push(srUid);
+    }
 
+    // geometry and measurements
+    if (geometry.type === 'none') {
+      // no geometry, just the source image (TID 1501 row 10b)
+      if (typeof annotation.referencedSopInstanceUID !== 'undefined') {
+        const srcImage = this.#getAnnotationSourceImageContent(annotation);
+        srcImage.relationshipType = RelationshipTypes.contains;
+        srcImage.conceptNameCode =
+          getDcmDicomCode(DcmCodes.SourceOfMeasurement);
+        contentSequence.push(srcImage);
+      }
+    } else if (geometry.type === 'region') {
+      contentSequence.push(...this.#getTid1410Content(annotation, geometry));
+    } else {
+      contentSequence.push(...this.#getTid1501Content(annotation, geometry));
+    }
+
+    // source image and plane of a geometry in patient coordinates
+    const isPatientGeometry = isPatientCoordinates(geometry.shape) ||
+      typeof annotation.planePoints !== 'undefined';
+    if (geometry.type !== 'none' && isPatientGeometry) {
+      contentSequence.push(
+        ...this.#getPatientGeometryExtrasContent(annotation));
+    }
+
+    // label, meta and dwv extras
+    contentSequence.push(
+      ...this.#getAnnotationExtrasContent(annotation, geometry));
+
+    srContent.contentSequence = contentSequence;
     return srContent;
   }
 
   /**
-   * Convert an annotation group into a TID 1500 report SR content
-   * (internally using TID 1410).
+   * Get the TID 1600 'Image Library' of a list of annotations: one
+   * image library group with an entry per referenced image.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1600}.
+   *
+   * @param {Annotation[]} annotations The annotations.
+   * @returns {DicomSRContent} The SR content.
+   */
+  #getImageLibraryContent(annotations) {
+    const library = new DicomSRContent(ValueTypes.container);
+    library.relationshipType = RelationshipTypes.contains;
+    library.conceptNameCode = getDcmDicomCode(DcmCodes.ImageLibrary);
+    library.value = ContinuityOfContents.separate;
+
+    const entries = [];
+    const uids = [];
+    for (const annotation of annotations) {
+      const uid = annotation.referencedSopInstanceUID;
+      if (typeof uid === 'undefined' || uids.includes(uid)) {
+        continue;
+      }
+      uids.push(uid);
+      const entry = new DicomSRContent(ValueTypes.image);
+      entry.relationshipType = RelationshipTypes.contains;
+      const sopRef = new SopInstanceReference();
+      sopRef.referencedSOPClassUID = annotation.referencedSopClassUID;
+      sopRef.referencedSOPInstanceUID = uid;
+      const imageRef = new ImageReference();
+      imageRef.referencedSOPSequence = sopRef;
+      entry.value = imageRef;
+      entries.push(entry);
+    }
+
+    if (entries.length !== 0) {
+      const group = new DicomSRContent(ValueTypes.container);
+      group.relationshipType = RelationshipTypes.contains;
+      group.conceptNameCode = getDcmDicomCode(DcmCodes.ImageLibraryGroup);
+      group.value = ContinuityOfContents.separate;
+      group.contentSequence = entries;
+      library.contentSequence = [group];
+    }
+
+    return library;
+  }
+
+  /**
+   * Get the TID 1500 header content: language (TID 1204), observation
+   * context (TID 1001, dwv as device observer) and procedure reported.
+   *
+   * @returns {DicomSRContent[]} The SR content list.
+   */
+  #getTid1500HeaderContent() {
+    const language = new DicomSRContent(ValueTypes.code);
+    language.relationshipType = RelationshipTypes.hasConceptMod;
+    language.conceptNameCode =
+      getDcmDicomCode(DcmCodes.LanguageOfContentItemAndDescendants);
+    language.value = getEnglishLanguageCode();
+
+    // TID 1002 / 1004 (order is significant)
+    const observerType = new DicomSRContent(ValueTypes.code);
+    observerType.relationshipType = RelationshipTypes.hasObsContext;
+    observerType.conceptNameCode = getDcmDicomCode(DcmCodes.ObserverType);
+    observerType.value = getDcmDicomCode(DcmCodes.Device);
+
+    const observerUid = new DicomSRContent(ValueTypes.uidref);
+    observerUid.relationshipType = RelationshipTypes.hasObsContext;
+    observerUid.conceptNameCode =
+      getDcmDicomCode(DcmCodes.DeviceObserverUID);
+    observerUid.value = getImplementationClassUID();
+
+    const observerName = new DicomSRContent(ValueTypes.text);
+    observerName.relationshipType = RelationshipTypes.hasObsContext;
+    observerName.conceptNameCode =
+      getDcmDicomCode(DcmCodes.DeviceObserverName);
+    observerName.value = 'dwv';
+
+    const procedure = new DicomSRContent(ValueTypes.code);
+    procedure.relationshipType = RelationshipTypes.hasConceptMod;
+    procedure.conceptNameCode = getDcmDicomCode(DcmCodes.ProcedureReported);
+    procedure.value = getImagingProcedureCode();
+
+    return [language, observerType, observerUid, observerName, procedure];
+  }
+
+  /**
+   * Convert an annotation group into a TID 1500 'Measurement Report'
+   * SR content.
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part16/chapter_A.html#sect_TID_1500}.
    *
    * @param {AnnotationGroup} annotationGroup The input annotation group.
    * @returns {DicomSRContent|undefined} The result SR content.
    */
   #annotationGroupToTid1500(annotationGroup) {
-    let srContent;
-
-    if (annotationGroup.getList().length !== 0) {
-      // imaging measurements
-      const measContent = new DicomSRContent(ValueTypes.container);
-      measContent.conceptNameCode =
-        getDcmDicomCode(DcmCodes.ImagingMeasurements);
-      measContent.relationshipType = RelationshipTypes.contains;
-      measContent.value = ContinuityOfContents.separate;
-      const contentSequence = [];
-      for (const annotation of annotationGroup.getList()) {
-        contentSequence.push(
-          this.#annotationToTid1410MeasGroup(annotation)
-        );
+    const annotations = [];
+    const groups = [];
+    for (const annotation of annotationGroup.getList()) {
+      const group = this.#annotationToMeasGroup(annotation);
+      if (typeof group !== 'undefined') {
+        annotations.push(annotation);
+        groups.push(group);
       }
-      measContent.contentSequence = contentSequence;
-
-      // imaging measurements report
-      srContent = new DicomSRContent(ValueTypes.container);
-      srContent.conceptNameCode =
-        getDcmDicomCode(DcmCodes.ImagingMeasurementReport);
-      srContent.value = ContinuityOfContents.separate;
-      srContent.contentSequence = [measContent];
+    }
+    if (groups.length === 0) {
+      return undefined;
     }
 
+    // imaging measurements
+    const measContent = new DicomSRContent(ValueTypes.container);
+    measContent.conceptNameCode =
+      getDcmDicomCode(DcmCodes.ImagingMeasurements);
+    measContent.relationshipType = RelationshipTypes.contains;
+    measContent.value = ContinuityOfContents.separate;
+    measContent.contentSequence = groups;
+
+    // imaging measurements report
+    const srContent = new DicomSRContent(ValueTypes.container);
+    srContent.conceptNameCode =
+      getDcmDicomCode(DcmCodes.ImagingMeasurementReport);
+    srContent.value = ContinuityOfContents.separate;
+    srContent.contentSequence = [
+      ...this.#getTid1500HeaderContent(),
+      this.#getImageLibraryContent(annotations),
+      measContent
+    ];
+
     return srContent;
+  }
+
+  /**
+   * Check if an SR content tree contains SCOORD3D content.
+   *
+   * @param {DicomSRContent} content The SR content.
+   * @returns {boolean} True if a SCOORD3D was found.
+   */
+  #hasScoord3D(content) {
+    return content.valueType === ValueTypes.scoord3d ||
+      content.contentSequence.some((item) => this.#hasScoord3D(item));
   }
 
   /**
    * Convert an annotation group into a DICOM SR object using the
    * TID 1500 template.
    *
+   * The SOP class is Comprehensive SR, or Comprehensive 3D SR if some
+   * annotations are on a non acquisition plane (SCOORD3D content).
+   * Missing mandatory attributes (instance and series UID and number,
+   * manufacturer...) get default values, all can be overwritten via
+   * the extra tags.
+   *
    * @param {AnnotationGroup} annotationGroup The annotation group.
    * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(annotationGroup, extraTags) {
-    let tags = annotationGroup.getMeta();
+    const srContent = this.#annotationGroupToTid1500(annotationGroup);
+    if (typeof srContent === 'undefined') {
+      throw new Error('No annotation group SR content');
+    }
+
+    // copy meta to not modify the group
+    let tags = structuredClone(annotationGroup.getMeta());
+    // remove undefined values
+    for (const key of Object.keys(tags)) {
+      if (typeof tags[key] === 'undefined') {
+        delete tags[key];
+      }
+    }
 
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-    // class: Comprehensive 3D SR Storage
+    // class: Comprehensive SR or Comprehensive 3D SR
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.35.3.html
     // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_A.35.13.html
-    tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
-    tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
+    const sopClassUID = this.#hasScoord3D(srContent)
+      ? SopClassUIDs.comprehensive3DSR
+      : SopClassUIDs.comprehensiveSR;
+    tags.SOPClassUID = sopClassUID;
+    tags.MediaStorageSOPClassUID = sopClassUID;
+    tags.Modality = 'SR';
+
+    // instance and series (type 1)
+    if (typeof tags.SOPInstanceUID === 'undefined') {
+      tags.SOPInstanceUID = getUID();
+    }
+    tags.MediaStorageSOPInstanceUID = tags.SOPInstanceUID;
+    if (typeof tags.SeriesInstanceUID === 'undefined') {
+      tags.SeriesInstanceUID = getUID();
+    }
+    if (typeof tags.SeriesNumber === 'undefined') {
+      tags.SeriesNumber = 1;
+    }
+    if (typeof tags.InstanceNumber === 'undefined') {
+      tags.InstanceNumber = 1;
+    }
+    // type 2
+    if (typeof tags.Manufacturer === 'undefined') {
+      tags.Manufacturer = 'dwv';
+    }
+    for (const key of Type2TagNames) {
+      if (typeof tags[key] === 'undefined') {
+        tags[key] = '';
+      }
+    }
+    for (const key of Type2SequenceNames) {
+      if (typeof tags[key] === 'undefined') {
+        tags[key] = {value: []};
+      }
+    }
+
     tags.CompletionFlag = 'PARTIAL';
     tags.VerificationFlag = 'UNVERIFIED';
 
@@ -1449,35 +2226,16 @@ export class AnnotationGroupFactory {
     tags.ContentDate = getDicomDate(dateToDateObj(now));
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
 
-    // reference
-    const evidenceSq = tags.CurrentRequestedProcedureEvidenceSequence;
-    // hoping for just one element...
-    const evidenceSq0 = evidenceSq.value[0];
-    const refSeriesSq = evidenceSq0.ReferencedSeriesSequence;
-    // hoping for just one element...
-    const refSeriesSq0 = refSeriesSq.value[0];
-    let refSopSq = refSeriesSq0.ReferencedSOPSequence;
-    if (typeof refSopSq === 'undefined') {
-      refSeriesSq0.ReferencedSOPSequence = {
-        value: []
-      };
-      refSopSq = refSeriesSq0.ReferencedSOPSequence;
-    }
-    const refs = refSopSq.value;
-    // add reference if not yet present
-    for (const annotation of annotationGroup.getList()) {
-      const ref = {
-        ReferencedSOPInstanceUID: annotation.referencedSopInstanceUID,
-        ReferencedSOPClassUID: annotation.referencedSopClassUID
-      };
-      const isSameRef = function (item) {
-        return item.ReferencedSOPInstanceUID === ref.ReferencedSOPInstanceUID &&
-          item.ReferencedSOPClassUID === ref.ReferencedSOPClassUID;
-      };
-      if (typeof refs.find(isSameRef) === 'undefined') {
-        refs.push(ref);
-      }
-    }
+    // local coding scheme
+    tags.CodingSchemeIdentificationSequence = {
+      value: [{
+        CodingSchemeDesignator: DWV_CODING_SCHEME_DESIGNATOR,
+        CodingSchemeName: 'DWV local codes'
+      }]
+    };
+
+    // reference: required if instances are referenced in the content
+    this.#addEvidenceReferences(tags, annotationGroup.getList());
 
     // TID 1500
     tags.ContentTemplateSequence = {
@@ -1487,24 +2245,67 @@ export class AnnotationGroupFactory {
       }]
     };
 
-    const srContent = this.#annotationGroupToTid1500(annotationGroup);
-
     // main
-    if (typeof srContent !== 'undefined') {
-      tags = {
-        ...tags,
-        ...getDicomSRContentItem(srContent)
-      };
-    } else {
-      throw new Error('No annotation group SR content');
-    }
+    tags = {
+      ...tags,
+      ...getDicomSRContentItem(srContent)
+    };
 
     // merge extra tags if provided
     if (typeof extraTags !== 'undefined') {
       mergeTagValues(tags, extraTags);
     }
 
+    // character set: UTF-8 if not ASCII
+    // eslint-disable-next-line no-control-regex
+    if (/[^\x00-\x7F]/.test(JSON.stringify(tags))) {
+      tags.SpecificCharacterSet = 'ISO_IR 192';
+    }
+
     return getElementsFromSimpleTagValues(tags);
+  }
+
+  /**
+   * Add the annotations references to the
+   * CurrentRequestedProcedureEvidenceSequence of the tags.
+   *
+   * @param {Record<string, any>} tags The tags to update.
+   * @param {Annotation[]} annotations The annotations.
+   */
+  #addEvidenceReferences(tags, annotations) {
+    const evidenceSq = tags.CurrentRequestedProcedureEvidenceSequence;
+    // hoping for just one element...
+    const refSeriesSq0 =
+      evidenceSq?.value?.[0]?.ReferencedSeriesSequence?.value?.[0];
+    if (typeof refSeriesSq0 === 'undefined') {
+      logger.warn('No referenced series in annotation group meta');
+      return;
+    }
+    let refSopSq = refSeriesSq0.ReferencedSOPSequence;
+    if (typeof refSopSq === 'undefined') {
+      refSeriesSq0.ReferencedSOPSequence = {
+        value: []
+      };
+      refSopSq = refSeriesSq0.ReferencedSOPSequence;
+    }
+    const refs = refSopSq.value;
+    // add reference if not yet present
+    for (const annotation of annotations) {
+      if (typeof annotation.referencedSopInstanceUID === 'undefined') {
+        continue;
+      }
+      const ref = {
+        ReferencedSOPClassUID: annotation.referencedSopClassUID,
+        ReferencedSOPInstanceUID: annotation.referencedSopInstanceUID
+      };
+      const isSameRef = function (item) {
+        return item.ReferencedSOPInstanceUID === ref.ReferencedSOPInstanceUID &&
+          item.ReferencedSOPClassUID === ref.ReferencedSOPClassUID;
+      };
+      if (typeof refs.find(isSameRef) === 'undefined') {
+        refs.push(ref);
+      }
+    }
   }
 
   /**

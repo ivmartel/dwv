@@ -7,13 +7,38 @@ import {defaultToolOptions, toolOptions} from '../tools/toolOptions.js';
 import {guid} from '../math/stats.js';
 import {Index} from '../math/index.js';
 import {getUID} from '../dicom/dicomWriter.js';
+import {
+  SpatialCoordinate,
+  GraphicTypes,
+  getShapeFromScoord,
+  getBidimensionalFromScoords
+} from '../dicom/dicomSpatialCoordinate.js';
+import {Ellipse} from '../math/ellipse.js';
+import {Circle} from '../math/circle.js';
 
 /**
  * @import {NumberValue} from '../math/types.js';
  * @import {ViewController} from '../app/viewController.js';
  * @import {PlaneHelper} from './planeHelper.js';
  * @import {DicomCode} from '../dicom/dicomCode.js';
+ * @import {PatientGeometry, PatientCoordinates} from './types.js';
  */
+
+/**
+ * Offset between annotation plane coordinates and image point
+ * coordinates, along the two in-plane axes.
+ *
+ * Annotation shapes use the SCOORD Graphic Data convention: pixel i
+ * covers [i, i+1), its center is i + 0.5
+ * (ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.1}).
+ * Image point coordinates (as used by Geometry.pointToWorld) have the
+ * center of pixel i at i, the Image Position (Patient) being the center
+ * of the first pixel
+ * (ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1}).
+ * The view orientation is an axis permutation (no flip), so the offset
+ * is the same for all views.
+ */
+const PIXEL_CENTER_OFFSET = 0.5;
 
 /**
  * Image annotation.
@@ -115,6 +140,19 @@ export class Annotation {
   planePoints;
 
   /**
+   * Geometry in patient coordinates, for annotations read from
+   * a SCOORD3D: the math shape, plane points and referenced image
+   * are set from it when a view with a matching plane is set.
+   * The referenced image and plane points written with it by dwv are
+   * read with it, they are available before a view is set and are
+   * kept: the annotation is only set on a view that includes its
+   * referenced image, with its plane orientation.
+   *
+   * @type {PatientGeometry|undefined}
+   */
+  patientGeometry;
+
+  /**
    * Associated view controller: needed for quantification and label.
    *
    * @type {ViewController|undefined}
@@ -197,6 +235,46 @@ export class Annotation {
       res = getOrientationName(cosines);
     }
     return res;
+  }
+
+  /**
+   * Get the patient positions (mm) of points of the annotation plane.
+   * Only for annotations on a non acquisition plane (that have plane
+   * points) and an associated view controller.
+   *
+   * @param {Point2D[]} points The plane points, in the same coordinates
+   *   as the annotation math shape.
+   * @returns {Point3D[]|undefined} The patient positions, undefined if
+   *   not possible.
+   */
+  getPlanePositions(points) {
+    if (typeof this.planePoints === 'undefined' ||
+      typeof this.#viewController === 'undefined') {
+      return undefined;
+    }
+    const planeHelper = this.#viewController.getPlaneHelper();
+    // plane index of the annotation plane
+    const origin = this.planePoints[0];
+    const k = planeHelper.getPlanePointFromPosition(
+      new Point([origin.getX(), origin.getY(), origin.getZ()])
+    ).getZ();
+    // shape coordinates to image point coordinates
+    return points.map(function (point) {
+      return planeHelper.getPositionFromPlanePoint(new Point2D(
+        point.getX() - PIXEL_CENTER_OFFSET,
+        point.getY() - PIXEL_CENTER_OFFSET
+      ), k);
+    });
+  }
+
+  /**
+   * Get the frame of reference UID of the referenced image.
+   *
+   * @returns {string|undefined} The UID, undefined if there is no
+   *   associated view controller.
+   */
+  getFrameOfReferenceUID() {
+    return this.#viewController?.getFrameOfReferenceUID();
   }
 
   /**
@@ -285,6 +363,23 @@ export class Annotation {
    * @param {ViewController} viewController The view controller.
    */
   setViewController(viewController) {
+    // annotation in patient coordinates: set its plane geometry,
+    // only on a view with its referenced image and plane orientation
+    // if they were read (the plane geometry depends on the view image)
+    if (typeof this.mathShape === 'undefined' &&
+      typeof this.patientGeometry !== 'undefined') {
+      if (typeof this.referencedSopInstanceUID !== 'undefined' &&
+        !viewController.includesImageUid(this.referencedSopInstanceUID)) {
+        return;
+      }
+      if (typeof this.planePoints !== 'undefined' &&
+        !this.isCompatibleView(viewController.getPlaneHelper())) {
+        return;
+      }
+      if (!this.#setPlaneGeometry(viewController)) {
+        return;
+      }
+    }
     // check uid
     if (!viewController.includesImageUid(this.referencedSopInstanceUID)) {
       logger.warn(`Cannot view annotation with reference UID: ${
@@ -313,6 +408,137 @@ export class Annotation {
     // set plane origin (not saved with file)
     this.planeOrigin =
       viewController.getOriginForImageUid(this.referencedSopInstanceUID);
+  }
+
+  /**
+   * Set the math shape, plane points and, if not read with it, the
+   * referenced image from the patient geometry if all its points are
+   * on a plane of the input view.
+   *
+   * @param {ViewController} viewController The view controller.
+   * @returns {boolean} True if the geometry is on a plane of the view.
+   */
+  #setPlaneGeometry(viewController) {
+    const geometry = this.patientGeometry;
+    if (geometry.shape.frameOfReferenceUID !==
+      viewController.getFrameOfReferenceUID()) {
+      return false;
+    }
+
+    const planeHelper = viewController.getPlaneHelper();
+    /**
+     * Get the plane points (x, y, plane index) of patient coordinates,
+     * x and y in the annotation shape coordinates.
+     *
+     * @param {PatientCoordinates} coords The patient coordinates.
+     * @returns {Point3D[]} The plane points.
+     */
+    const toPlane = function (coords) {
+      return coords.points.map(function (point) {
+        const planePoint = planeHelper.getPlanePointFromPosition(
+          new Point([point.getX(), point.getY(), point.getZ()]));
+        // image point coordinates to shape coordinates
+        return new Point3D(
+          planePoint.getX() + PIXEL_CENTER_OFFSET,
+          planePoint.getY() + PIXEL_CENTER_OFFSET,
+          planePoint.getZ()
+        );
+      });
+    };
+    const shapePoints = toPlane(geometry.shape);
+    const allPoints = [shapePoints];
+    for (const coords of [
+      geometry.shortAxis,
+      geometry.labelPosition,
+      geometry.referencePoints
+    ]) {
+      if (typeof coords !== 'undefined') {
+        allPoints.push(toPlane(coords));
+      }
+    }
+    // all points on the same plane of the view
+    const planeIndex = shapePoints[0].getZ();
+    const tolerance = 1e-3;
+    for (const point of allPoints.flat()) {
+      if (Math.abs(point.getZ() - planeIndex) > tolerance) {
+        return false;
+      }
+    }
+
+    /**
+     * Get a SCOORD from patient coordinates on the view plane.
+     *
+     * @param {PatientCoordinates} coords The patient coordinates.
+     * @returns {SpatialCoordinate} The plane SCOORD.
+     */
+    const toScoord = function (coords) {
+      const scoord = new SpatialCoordinate();
+      // a closed 2D polyline is a 3D polygon
+      scoord.graphicType = coords.graphicType === 'POLYGON'
+        ? GraphicTypes.polyline : coords.graphicType;
+      scoord.graphicData = [];
+      for (const point of toPlane(coords)) {
+        scoord.graphicData.push(
+          point.getX().toString(), point.getY().toString());
+      }
+      return scoord;
+    };
+
+    // math shape
+    let shape;
+    if (typeof geometry.shortAxis !== 'undefined') {
+      shape = getBidimensionalFromScoords(
+        toScoord(geometry.shape), toScoord(geometry.shortAxis));
+    } else {
+      shape = getShapeFromScoord(toScoord(geometry.shape));
+      // a 3D circle is an ellipse with equal axes
+      if (shape instanceof Ellipse &&
+        Math.abs(shape.getA() - shape.getB()) <= tolerance * shape.getA()) {
+        shape = new Circle(shape.getCenter(), shape.getA());
+      }
+    }
+    if (typeof shape === 'undefined') {
+      return false;
+    }
+    this.mathShape = shape;
+    if (typeof geometry.labelPosition !== 'undefined') {
+      const point = toPlane(geometry.labelPosition)[0];
+      this.labelPosition = new Point2D(point.getX(), point.getY());
+    }
+    if (typeof geometry.referencePoints !== 'undefined') {
+      this.referencePoints = toPlane(geometry.referencePoints).map(
+        function (point) {
+          return new Point2D(point.getX(), point.getY());
+        });
+    }
+
+    // plane and, if not read, referenced image: position of the
+    // first point at the current view time position
+    const values = viewController.getCurrentPosition().getValues();
+    const first = geometry.shape.points[0];
+    values[0] = first.getX();
+    values[1] = first.getY();
+    values[2] = first.getZ();
+    const position = new Point(values);
+    if (typeof this.referencedSopInstanceUID === 'undefined') {
+      this.referencedSopInstanceUID =
+        viewController.getImageUidFromPosition(position);
+      if (position.length() > 3) {
+        // the position can hold a volume id, use the index
+        this.referencedFrameNumber =
+          viewController.getIndexFromPosition(position).get(3) + 1;
+      }
+    }
+    if (typeof this.referencedSopClassUID === 'undefined') {
+      this.referencedSopClassUID = viewController.getSopClassUid();
+    }
+    if (!viewController.isAquisitionOrientation()) {
+      this.planePoints = viewController.getPlanePoints(position);
+    }
+
+    // now in plane coordinates
+    this.patientGeometry = undefined;
+    return true;
   }
 
   /**
@@ -434,6 +660,7 @@ export class Annotation {
    */
   updateQuantification() {
     if (typeof this.#viewController !== 'undefined' &&
+      typeof this.mathShape !== 'undefined' &&
       typeof this.mathShape.quantify !== 'undefined') {
       this.quantification = this.mathShape.quantify(
         this.#viewController,

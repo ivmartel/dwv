@@ -274,6 +274,17 @@ describe('tools', () => {
         assert.equal(extras[0].name(), 'shape-triangle');
       });
 
+      test('point without reference point uses a default tail', () => {
+        const painter = getPainter('arrow');
+        // for ex a DICOM SR POINT
+        const ann = _makeAnnotation(p(10, 20));
+        const node = painter.createShape(ann, style);
+        assert.deepEqual(node.points(), [10, 20, 20, 30]);
+        const extras = painter.createExtras(ann, style);
+        assert.ok(extras[0].points().every(Number.isFinite),
+          'finite triangle points');
+      });
+
     }); // ArrowPainter
 
     // -----------------------------------------------------------------------

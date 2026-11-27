@@ -214,7 +214,7 @@ export class DicomSRContent {
     res += ` = ${this.value.toString()}`;
 
     for (const item of this.contentSequence) {
-      res += `\n${prefix}- ${item.toString(`${prefix}`)}  `;
+      res += `\n${prefix}- ${item.toString(`${prefix}  `)}`;
     }
 
     return res;
