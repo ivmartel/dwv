@@ -2101,11 +2101,11 @@ export class AnnotationGroupFactory {
 
     // instance and series (type 1)
     if (typeof tags.SOPInstanceUID === 'undefined') {
-      tags.SOPInstanceUID = getUID('SOPInstanceUID');
+      tags.SOPInstanceUID = getUID();
     }
     tags.MediaStorageSOPInstanceUID = tags.SOPInstanceUID;
     if (typeof tags.SeriesInstanceUID === 'undefined') {
-      tags.SeriesInstanceUID = getUID('SeriesInstanceUID');
+      tags.SeriesInstanceUID = getUID();
     }
     if (typeof tags.SeriesNumber === 'undefined') {
       tags.SeriesNumber = 1;
