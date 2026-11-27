@@ -18,6 +18,9 @@ import {
   transferSyntaxKeywords
 } from '../../src/dicom/dictionary.js';
 import {
+  addDates,
+  addInstanceIds,
+  addPatientInfo,
   generateDataElements,
   generateSliceBuffers
 } from '../../dev/dicom/dicomGenerator.js';
@@ -57,27 +60,21 @@ describe('dicom', () => {
    * @function module:tests/dicom~getuid
    */
   test('getUID', () => {
-    // check size
-    const uid00 = getUID('mytag');
-    assert.ok(uid00.length <= 64, 'uid length #0');
-    const uid01 = getUID('mysuperlongtagthatneverfinishes');
-    assert.ok(uid01.length <= 64, 'uid length #1');
+    // UUID derived UID: 2.25 root and 39 digits without leading zero
+    const uid = getUID();
+    assert.match(uid, /^2\.25\.[1-9]\d{38}$/, 'uid format');
+    assert.equal(uid.length, 44, 'uid length');
 
-    // consecutive for same tag are different
-    const uid10 = getUID('mytag');
-    const uid11 = getUID('mytag');
-    assert.notEqual(uid10, uid11, 'Consecutive getUID');
+    // consecutive are different
+    assert.notEqual(getUID(), getUID(), 'consecutive getUID');
 
-    // groups do not start with 0
-    const parts = uid10.split('.');
-    let count = 0;
-    for (let i = 0; i < parts.length; ++i) {
-      const part = parts[i];
-      if (part[0] === '0' && part.length !== 1) {
-        ++count;
-      }
+    // no duplicates in a batch
+    const nUids = 10000;
+    const uids = new Set();
+    for (let i = 0; i < nUids; ++i) {
+      uids.add(getUID());
     }
-    assert.ok(count === 0, 'Zero at start of part');
+    assert.equal(uids.size, nUids, 'no duplicates');
   });
 
   /**
@@ -846,6 +843,10 @@ describe('dicom', () => {
     }
     // pass tags clone to avoid modifications (for ex by padElement)
     const jsonTags = structuredClone(config.tags);
+    // default patient tags, instance ids and dates (not in the configs)
+    addPatientInfo(jsonTags);
+    addInstanceIds(jsonTags);
+    addDates(jsonTags);
 
     // generate buffer
     const genOptions = {};
@@ -1083,6 +1084,52 @@ describe('dicom', () => {
       'pixel spacing value 0');
     assert.equal(Number(tags['00280030'].value[1]), 12.5,
       'pixel spacing value 1');
+  });
+
+  /**
+   * Tests for {@link DicomWriter} and {@link DicomParser} float
+   *   'O*' VRs (OF, OD).
+   *
+   * @function module:tests/dicom~writeReadFloatOtherVr
+   */
+  test('Write-read OF and OD', () => {
+    const ofValues = [1.5, -2.25, 3.125, 1e-3];
+    const odValues = [1.5, -2.25, 1 / 3];
+
+    const syntaxes = [
+      transferSyntaxKeywords.ExplicitVRLittleEndian,
+      transferSyntaxKeywords.ImplicitVRLittleEndian,
+      transferSyntaxKeywords.ExplicitVRBigEndian
+    ];
+    for (const syntax of syntaxes) {
+      const parser = new DicomParser();
+      parser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+      const elements = parser.getDicomElements();
+      elements['00020010'].value = [syntax];
+      // PointCoordinatesData (OF)
+      const pointCoords = new DataElement('OF');
+      pointCoords.tag = getTagFromKey('00660016');
+      pointCoords.value = new Float32Array(ofValues);
+      elements['00660016'] = pointCoords;
+      // DoublePointCoordinatesData (OD), as a number array
+      const doublePointCoords = new DataElement('OD');
+      doublePointCoords.tag = getTagFromKey('00660022');
+      doublePointCoords.value = odValues;
+      elements['00660022'] = doublePointCoords;
+
+      const newParser = new DicomParser();
+      newParser.parse(new DicomWriter().getBuffer(elements));
+      const tags = newParser.getDicomElements();
+
+      const ofRead = tags['00660016'].value;
+      assert.ok(ofRead instanceof Float32Array, `OF type (${syntax})`);
+      assert.deepEqual(Array.from(ofRead), Array.from(pointCoords.value),
+        `OF values (${syntax})`);
+      const odRead = tags['00660022'].value;
+      assert.ok(odRead instanceof Float64Array, `OD type (${syntax})`);
+      assert.deepEqual(Array.from(odRead), odValues,
+        `OD values (${syntax})`);
+    }
   });
 
 });

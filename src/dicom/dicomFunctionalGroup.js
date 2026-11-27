@@ -30,6 +30,7 @@ const TagKeys = {
   DimensionOrganizationUID: '00209164',
   DimensionIndexSequence: '00209222',
   DimensionIndexPointer: '00209165',
+  FunctionalGroupPointer: '00209167',
   DimensionDescriptionLabel: '00209421',
   SegmentIdentificationSequence: '0062000A',
   ReferencedSegmentNumber: '0062000B',
@@ -85,6 +86,11 @@ export function getDimensionOrganization(dataElements) {
         indexSq[i][TagKeys.DimensionDescriptionLabel];
       if (typeof descriptionLabelEl !== 'undefined') {
         index.DimensionDescriptionLabel = descriptionLabelEl.value[0];
+      }
+      // Functional Group Pointer (conditional)
+      const groupPointerEl = indexSq[i][TagKeys.FunctionalGroupPointer];
+      if (typeof groupPointerEl !== 'undefined') {
+        index.FunctionalGroupPointer = groupPointerEl.value[0];
       }
       // store
       indices.push(index);

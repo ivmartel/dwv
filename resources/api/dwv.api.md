@@ -77,7 +77,7 @@ export class AnnotationGroupFactory {
 // @public
 export class App extends EventTarget {
     abortAllLoads(): void;
-    abortLoad(dataId: string): void;
+    abortLoad(loadId: string, dataId?: string): void;
     addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
     // @deprecated
     addData(dataId: string, data: DicomData): boolean;
@@ -305,17 +305,26 @@ export namespace custom {
 // @public
 export class DataController extends EventTarget {
     add(dataId: string, data: DicomData): boolean;
+    addLoadItem(loadId: string, data: DicomData, canWait?: boolean): {
+        dataId: string;
+        isNew: boolean;
+    } | undefined;
+    endLoad(loadId: string): void;
     get(dataId: string): DicomData | undefined;
     getDataIdFromSeriesUid(uid: string): string;
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
+    getLoadDataIds(loadId: string): string[];
+    getLoadItemDataId(loadId: string, data: DicomData): string | undefined;
     getNextDataId(): string;
+    getPendingLoadItems(loadId: string): DicomData[];
     getStashed(dataId: string): DicomData | undefined;
     getStashedDataIds(): string[];
     markDataAsComplete(dataId: string): {
         imageHasChanged: any;
     };
     remove(dataId: string): void;
+    removeLoadData(loadId: string, dataId: string): void;
     reset(): void;
     setImage(dataId: string, image: Image_2): void;
     stash(dataId: string): void;
@@ -387,6 +396,7 @@ export class DicomCode {
     longValue: string | undefined;
     meaning: string;
     schemeDesignator: string | undefined;
+    schemeVersion: string | undefined;
     toString(): string;
     urnValue: string | undefined;
     value: string | undefined;
@@ -448,6 +458,7 @@ export class DrawBrushCommand extends Command {
     getOriginalValuesLists(): any[] | undefined;
     onExecute(_event: CustomEvent): void;
     onUndo(_event: CustomEvent): void;
+    updateSegmentTypes(): void;
 }
 
 // @public
@@ -589,6 +600,7 @@ export class Geometry {
     hasSlicesAtTime(time: number): boolean;
     includesOrigin(point3D: Point3D, tol?: number): boolean;
     indexToWorld(index: Index): Point;
+    intersects(rhs: Geometry, tol?: number): boolean;
     isInBounds(point: Point): boolean;
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
     isSimilar(rhs: Geometry, tol?: number): boolean;
@@ -679,7 +691,7 @@ export function getTouchPoints(event: TouchEvent): Point2D[];
 export function getTypedArray(bitsAllocated: number, pixelRepresentation: number, size: number): IntTypedArray;
 
 // @public
-export function getUID(tagName: string): string;
+export function getUID(): string;
 
 // @public
 export function getURLsFromKeyValueUri(uri: string): string[] | undefined;
@@ -964,7 +976,7 @@ export class MaskFactory {
     checkElements(_dicomElements: Record<string, DataElement>): string | undefined;
     create(dataElements: Record<string, DataElement>, pixelBuffer: Uint8Array, refImage?: Image_2): MaskImage;
     getWarning(): string | undefined;
-    toDicom(image: MaskImage, segments: MaskSegment[], sourceImage: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
+    toDicom(image: MaskImage, segments: MaskSegment[] | undefined, sourceImage: Image_2, extraTags?: SimpleTagValues): Record<string, DataElement>;
 }
 
 // @public
@@ -991,6 +1003,7 @@ export class MaskSegment {
     constructor(number: number, label: string, algorithmType: string);
     algorithmName: string | undefined;
     algorithmType: string;
+    anatomicRegionCodes: DicomCode[] | undefined;
     displayRGBValue: RGB | undefined;
     displayValue: number | undefined;
     interpretedType: string | undefined;
@@ -998,6 +1011,7 @@ export class MaskSegment {
     number: number;
     propertyCategoryCode: DicomCode | undefined;
     propertyTypeCode: DicomCode | undefined;
+    propertyTypeModifierCodes: DicomCode[] | undefined;
     roiInterpreter: string | undefined;
     trackingId: string | undefined;
     trackingUid: string | undefined;
@@ -1365,7 +1379,7 @@ export type SimpleSequenceValue = {
 };
 
 // @public
-export type SimpleTagValue = string | number | string[] | number[];
+export type SimpleTagValue = string | number | string[] | number[] | TypedArray;
 
 // @public
 export type SimpleTagValues = Record<string, SimpleTagValue | SimpleSequenceValue>;

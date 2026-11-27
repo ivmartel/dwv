@@ -40,20 +40,20 @@ function setup() {
     addDates(tags);
     // UID
     if (typeof tags.StudyInstanceUID === 'undefined') {
-      tags.StudyInstanceUID = getUID('StudyInstanceUID');
+      tags.StudyInstanceUID = getUID();
       tags.StudyID = 10000;
     }
     if (typeof tags.StudyDescription === 'undefined') {
       tags.StudyDescription = 'dwv generated study';
     }
     if (typeof tags.SeriesInstanceUID === 'undefined') {
-      tags.SeriesInstanceUID = getUID('SeriesInstanceUID');
+      tags.SeriesInstanceUID = getUID();
       tags.SeriesNumber = tags.StudyID + 10;
     }
     if (typeof tags.SeriesDescription === 'undefined') {
       tags.SeriesDescription = 'dwv generated series';
     }
-    tags.SOPInstanceUID = getUID('SOPInstanceUID');
+    tags.SOPInstanceUID = getUID();
     // write back
     document.getElementById('tags').value = JSON.stringify(tags, null, 2);
   }

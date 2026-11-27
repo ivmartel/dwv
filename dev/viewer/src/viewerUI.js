@@ -433,12 +433,14 @@ export class ViewerUI {
    * data view config and post-load listeners.
    */
   #registerLoadListeners() {
-    this.#dwvAppService.addEventListener('loadstart', (event) => {
+    this.#dwvAppService.addEventListener('loadstart', () => {
       // remove post-load listeners
       const dataCtrl = this.#dwvAppService.getDataController();
       if (dataCtrl.getDataIds().length !== 0) {
         this.#removePostLoadListeners();
       }
+    });
+    this.#dwvAppService.addEventListener('loaddata', (event) => {
       // add new data view config for new data
       this.#addNewDataViewConfig(event.detail.dataid);
     });

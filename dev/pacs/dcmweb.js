@@ -137,8 +137,19 @@ function onSeriesLoad(json) {
   // get instances
   const rootUrl = document.getElementById('rooturl').value;
   for (let i = 0; i < json.length; ++i) {
-    const studyUID = json[i]['0020000D'].Value[0];
-    const seriesUID = json[i]['0020000E'].Value[0];
+    // SeriesInstanceUID is a mandatory Series search key; StudyInstanceUID is
+    // not (PS3.18 Table 10.6.3-4) and is only present when requested via
+    // includefield. Guard both so a conformant server that omits the study UID
+    // does not crash the demo.
+    const studyElem = json[i]['0020000D'];
+    const seriesElem = json[i]['0020000E'];
+    if (typeof studyElem === 'undefined' ||
+      typeof seriesElem === 'undefined') {
+      console.warn('Skipping series without study or series UID', json[i]);
+      continue;
+    }
+    const studyUID = studyElem.Value[0];
+    const seriesUID = seriesElem.Value[0];
     // store
     if (typeof _studiesJson[studyUID] === 'undefined') {
       _studiesJson[studyUID] = [];
@@ -211,6 +222,40 @@ function getThumbInstanceUID(json) {
   }
   // return SOPInstanceUID
   return json[thumbIndex]['00080018'].Value[0];
+}
+
+/**
+ * Modalities that carry no renderable pixel data and therefore have no
+ * `/rendered` thumbnail: Presentation State, Structured Report, Segmentation,
+ * RT objects, Key Object Selection, Registration, Fiducial, Audio, Document.
+ *
+ * @type {string[]}
+ */
+const NON_IMAGE_MODALITIES = [
+  'PR',
+  'SR',
+  'SEG',
+  'RTSTRUCT',
+  'RTPLAN',
+  'RTDOSE',
+  'RTRECORD',
+  'RTTREATMENTRECORD',
+  'KO',
+  'REG',
+  'FID',
+  'AU',
+  'DOC',
+  'ST'
+];
+
+/**
+ * Check if a Modality (0008,0060) carries renderable pixel data.
+ *
+ * @param {string} modality The modality value.
+ * @returns {boolean} True when a rendered thumbnail is expected to exist.
+ */
+function isImageModality(modality) {
+  return !NON_IMAGE_MODALITIES.includes(modality);
 }
 
 /**
@@ -457,9 +502,12 @@ function qidoResponseToTable() {
       const seriesUID = serieJson['0020000E'].Value[0];
       cell.title = seriesUID;
       cell.appendChild(document.createTextNode(seriesUID));
-      // modality
+      // modality (mandatory Series return key, guarded for robustness)
       cell = row.insertCell();
-      const modality = serieJson['00080060'].Value[0];
+      const modalityElem = serieJson['00080060'];
+      const modality = typeof modalityElem !== 'undefined'
+        ? modalityElem.Value[0]
+        : '';
       cell.appendChild(document.createTextNode(modality));
       // action
       cell = row.insertCell();
@@ -477,6 +525,10 @@ function qidoResponseToTable() {
       const multipartLink = document.createElement('a');
       multipartLink.href = viewerUrl + seriesUrl;
       cell.appendChild(multipartLink);
+
+      // token read once per series row: reused by the cookie handlers and the
+      // thumbnail request below
+      const token = getToken();
 
       // store a cookie with accept and token to allow opening in viewer
       // (should be deleted in viewer.js...)
@@ -536,27 +588,38 @@ function qidoResponseToTable() {
       };
 
       // add thumbnail to link
-
-      // no default accept in orthanc (?)
-      const options = {
-        headers: {
-          Accept: 'image/png'
+      // skip non-image series (PR/SR/SEG/RT...): they carry no pixel data, so
+      // there is no rendered thumbnail to fetch
+      if (isImageModality(modality)) {
+        // no default accept in orthanc (?)
+        const options = {
+          headers: {
+            Accept: 'image/png'
+          }
+        };
+        if (typeof token !== 'undefined') {
+          options.headers.Authorization = `Bearer ${token}`;
         }
-      };
-      const token = getToken();
-      if (typeof token !== 'undefined') {
-        options.headers.Authorization = `Bearer ${token}`;
-      }
 
-      fetch(thumbUrl, options)
-        .then(res => res.blob())
-        .then(blob => {
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(blob);
-          // force width in case viewport option is not supported
-          img.width = 64;
-          multipartLink.appendChild(img);
-        });
+        fetch(thumbUrl, options)
+          .then(res => {
+            // a failed render must not produce a broken image
+            if (!res.ok) {
+              throw new Error(`thumbnail error: ${res.status}`);
+            }
+            return res.blob();
+          })
+          .then(blob => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);
+            // force width in case viewport option is not supported
+            img.width = 64;
+            multipartLink.appendChild(img);
+          })
+          .catch(err => {
+            console.warn('Could not load thumbnail', thumbUrl, err);
+          });
+      }
     }
   }
 

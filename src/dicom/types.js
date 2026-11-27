@@ -5,15 +5,17 @@
 // and cannot create circular dependencies.
 
 /**
- * @import {NumberValue} from '../math/types.js';
+ * @import {NumberValue, TypedArray} from '../math/types.js';
  * @import {VolumeId} from '../image/types.js';
  */
 
 /**
  * A simple (non sequence) tag value: either a single primitive
- *   or, for multi-valued VRs, an array of primitives.
+ *   or, for multi-valued VRs, an array of primitives, or a typed
+ *   array (for ex for 'O*' VRs).
  *
- * @typedef {string | number | string[] | number[]} SimpleTagValue
+ * @typedef {string | number | string[] | number[] | TypedArray}
+ *   SimpleTagValue
  */
 
 /**

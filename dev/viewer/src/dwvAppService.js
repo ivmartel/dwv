@@ -7,7 +7,7 @@ import {getSRContent} from '../../../src/dicom/dicomSRContent.js';
 import {custom} from '../../../src/app/custom.js';
 import {logger} from '../../../src/utils/logger.js';
 import {WindowLevel} from '../../../src/image/windowLevel.js';
-import {DicomWriter} from '../../../src/dicom/dicomWriter.js';
+import {DicomWriter, getUID} from '../../../src/dicom/dicomWriter.js';
 import {MaskFactory} from '../../../src/image/maskFactory.js';
 import {RtStructFactory} from '../../../src/image/rtStructFactory.js';
 
@@ -262,18 +262,18 @@ export class DwvAppService extends EventTarget {
       const message = event.detail.error.message;
       const isRenderError = typeof message !== 'undefined' &&
         message.startsWith('Render error');
-      // abort load
+      // abort load, or only the data of the error if any
       if (!isRenderError) {
-        this.#app.abortLoad(event.detail.dataid);
+        this.#app.abortLoad(event.detail.loadid, event.detail.dataid);
       }
     });
     this.#app.addEventListener('loadstart', (event) => {
       // log
       console.log('%c----------------', 'color: teal;');
       console.log(
-        `load source data:${event.detail.dataid}`, event.detail.source);
+        `load source:${event.detail.loadid}`, event.detail.source);
       // timer
-      console.time(`load-data-${event.detail.dataid}`);
+      console.time(`load-${event.detail.loadid}`);
       // update load counters
       if (this.#numberOfDataToLoad === this.#numberOfLoadendData) {
         this.#numberOfDataToLoad = 0;
@@ -289,7 +289,7 @@ export class DwvAppService extends EventTarget {
     });
     this.#app.addEventListener('loadprogress', (event) => {
       if (event.detail.total > 0) {
-        this.#dataLoadProgress[event.detail.dataid] =
+        this.#dataLoadProgress[event.detail.loadid] =
           Math.ceil((event.detail.loaded / event.detail.total) * 100);
         const sumReducer = function (sum, value) {
           return sum + value;
@@ -300,6 +300,11 @@ export class DwvAppService extends EventTarget {
       }
       this.#redispatch(event);
     });
+    this.#app.addEventListener('loaddata', (event) => {
+      console.log(
+        `load ${event.detail.loadid}: new data ${event.detail.dataid}`);
+      this.#redispatch(event);
+    });
     this.#app.addEventListener('loaditem', (event) => {
       if (typeof event.detail.warn !== 'undefined') {
         console.warn('load-warn', event.detail.warn);
@@ -308,17 +313,19 @@ export class DwvAppService extends EventTarget {
     this.#app.addEventListener('loadend', (event) => {
       // update load counter
       ++this.#numberOfLoadendData;
-      console.timeEnd(`load-data-${event.detail.dataid}`);
+      console.timeEnd(`load-${event.detail.loadid}`);
       // remove abort shortcut
       document.removeEventListener('keydown', abortShortcut);
       this.#redispatch(event);
     });
     this.#app.addEventListener('load', (event) => {
-      // log meta data
-      this.#logMetaData(event.detail.dataid);
-      // render if not done yet
-      if (!viewOnFirstLoadItem) {
-        this.#app.getStageController().render(event.detail.dataid);
+      for (const dataId of event.detail.dataids) {
+        // log meta data
+        this.#logMetaData(dataId);
+        // render if not done yet
+        if (!viewOnFirstLoadItem) {
+          this.#app.getStageController().render(dataId);
+        }
       }
       this.#redispatch(event);
     });
@@ -612,15 +619,17 @@ export class DwvAppService extends EventTarget {
     } else {
       fac = new MaskFactory();
     }
+    // new instance and series at each save
+    const sopUID = getUID();
     const dicomElements = fac.toDicom(
       maskImage,
       maskImage.getMeta().custom.segments,
       sourceData.image,
       {
-        MediaStorageSOPInstanceUID: '1.2.3.4.5.6.1000',
-        SeriesInstanceUID: '1.2.3.4.5.6',
+        MediaStorageSOPInstanceUID: sopUID,
+        SeriesInstanceUID: getUID(),
         SeriesNumber: '1',
-        SOPInstanceUID: '1.2.3.4.5.6.1000',
+        SOPInstanceUID: sopUID,
       }
     );
     // create writer with default rules

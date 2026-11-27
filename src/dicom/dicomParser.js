@@ -38,7 +38,7 @@ import {logger} from '../utils/logger.js';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.38.0-beta.0';
+  return '0.38.0-beta.1';
 }
 
 /**
@@ -1151,9 +1151,17 @@ export class DicomParser {
       } else if (vrType === 'Int64') {
         data = reader.readInt64Array(offset, vl);
       } else if (vrType === 'Float32') {
-        data = Array.from(reader.readFloat32Array(offset, vl));
+        data = reader.readFloat32Array(offset, vl);
+        // keep as binary for 'O*' VR
+        if (vr[0] !== 'O') {
+          data = Array.from(data);
+        }
       } else if (vrType === 'Float64') {
-        data = Array.from(reader.readFloat64Array(offset, vl));
+        data = reader.readFloat64Array(offset, vl);
+        // keep as binary for 'O*' VR
+        if (vr[0] !== 'O') {
+          data = Array.from(data);
+        }
       } else if (vrType === 'string') {
         const stream = reader.readUint8Array(offset, vl);
         if (isCharSetStringVR(vr)) {

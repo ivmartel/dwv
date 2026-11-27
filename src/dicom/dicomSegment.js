@@ -23,6 +23,7 @@ import {getDefaultColour} from '../utils/colour.js';
  * Related DICOM tag keys.
  */
 const TagKeys = {
+  AnatomicRegionSequence: '00082218',
   SegmentNumber: '00620004',
   SegmentLabel: '00620005',
   SegmentAlgorithmType: '00620008',
@@ -31,6 +32,7 @@ const TagKeys = {
   RecommendedDisplayCIELabValue: '0062000D',
   SegmentedPropertyCategoryCodeSequence: '00620003',
   SegmentedPropertyTypeCodeSequence: '0062000F',
+  SegmentedPropertyTypeModifierCodeSequence: '00620011',
   TrackingID: '00620020',
   TrackingUID: '00620021'
 };
@@ -84,6 +86,22 @@ export class MaskSegment {
    * @type {DicomCode|undefined}
    */
   propertyTypeCode;
+  /**
+   * Segment property type modifier codes: modifiers of the property
+   * type (0062,0011), stored in the property type code item.
+   *
+   * @type {DicomCode[]|undefined}
+   */
+  propertyTypeModifierCodes;
+  /**
+   * Segment anatomic region codes: anatomic regions of interest
+   * of the segment (0008,2218).
+   *
+   * Ref: {@link https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_10.5.html#table_10-7b}.
+   *
+   * @type {DicomCode[]|undefined}
+   */
+  anatomicRegionCodes;
   /**
    * Segment property category code: general category
    * of the property the segment represents (0062,0003).
@@ -188,10 +206,22 @@ export function getSegment(dataElements) {
   // Segmented Property Type Code Sequence (type1)
   if (typeof dataElements[TagKeys.SegmentedPropertyTypeCodeSequence] !==
     'undefined') {
-    segment.propertyTypeCode =
-      getCode(dataElements[TagKeys.SegmentedPropertyTypeCodeSequence].value[0]);
+    const typeItem =
+      dataElements[TagKeys.SegmentedPropertyTypeCodeSequence].value[0];
+    segment.propertyTypeCode = getCode(typeItem);
+    // Segmented Property Type Modifier Code Sequence (type3, one or more)
+    const modifiers =
+      typeItem[TagKeys.SegmentedPropertyTypeModifierCodeSequence];
+    if (typeof modifiers !== 'undefined') {
+      segment.propertyTypeModifierCodes = modifiers.value.map(getCode);
+    }
   } else {
     throw new Error('Missing Segmented Property Type Code Sequence.');
+  }
+  // Anatomic Region Sequence (type3, one or more)
+  if (typeof dataElements[TagKeys.AnatomicRegionSequence] !== 'undefined') {
+    segment.anatomicRegionCodes =
+      dataElements[TagKeys.AnatomicRegionSequence].value.map(getCode);
   }
   // tracking Id and UID (type1C)
   if (typeof dataElements[TagKeys.TrackingID] !== 'undefined') {
@@ -289,14 +319,35 @@ export function getDicomSegmentItem(segment) {
   if (algoType === undefined) {
     algoType = 'MANUAL';
   }
-  // dicom item (tags are in group/element order)
-  const segmentItem = {
-    SegmentNumber: segment.number,
-    SegmentLabel: segment.label,
-    SegmentAlgorithmType: algoType
-  };
-  // SegmentAlgorithmName
-  if (algoType !== 'MANUAL' && segment.algorithmName !== undefined) {
+  // dicom item (tags are in group/element order: the writer
+  //   does not sort item elements)
+  /** @type {SimpleTagValues} */
+  const segmentItem = {};
+  // AnatomicRegionSequence (0008,2218)
+  if (segment.anatomicRegionCodes?.length > 0) {
+    segmentItem.AnatomicRegionSequence = {
+      value: segment.anatomicRegionCodes.map(getDicomCodeItem)
+    };
+  }
+  // SegmentedPropertyCategoryCodeSequence (0062,0003)
+  if (segment.propertyCategoryCode) {
+    segmentItem.SegmentedPropertyCategoryCodeSequence = {
+      value: [getDicomCodeItem(segment.propertyCategoryCode)]
+    };
+  }
+  segmentItem.SegmentNumber = segment.number;
+  segmentItem.SegmentLabel = segment.label;
+  segmentItem.SegmentAlgorithmType = algoType;
+  // SegmentAlgorithmName (type1C): required if the algorithm type
+  //   is not MANUAL
+  // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.20.2.html
+  if (algoType !== 'MANUAL') {
+    if (typeof segment.algorithmName === 'undefined' ||
+      segment.algorithmName === '') {
+      throw new Error(
+        `Segment ${segment.number}: missing algorithm name ` +
+        `for algorithm type ${algoType}`);
+    }
     segmentItem.SegmentAlgorithmName = segment.algorithmName;
   }
   // RecommendedDisplay value
@@ -310,16 +361,18 @@ export function getDicomSegmentItem(segment) {
   } else {
     segmentItem.RecommendedDisplayGrayscaleValue = segment.displayValue;
   }
-  // SegmentedPropertyCategoryCodeSequence
-  if (segment.propertyCategoryCode) {
-    segmentItem.SegmentedPropertyCategoryCodeSequence = {
-      value: [getDicomCodeItem(segment.propertyCategoryCode)]
-    };
-  }
-  // SegmentedPropertyTypeCodeSequence
+  // SegmentedPropertyTypeCodeSequence (0062,000F)
   if (segment.propertyTypeCode) {
+    const typeItem = getDicomCodeItem(segment.propertyTypeCode);
+    // SegmentedPropertyTypeModifierCodeSequence (0062,0011),
+    //   in the type code item, after the code macro (0008) tags
+    if (segment.propertyTypeModifierCodes?.length > 0) {
+      typeItem.SegmentedPropertyTypeModifierCodeSequence = {
+        value: segment.propertyTypeModifierCodes.map(getDicomCodeItem)
+      };
+    }
     segmentItem.SegmentedPropertyTypeCodeSequence = {
-      value: [getDicomCodeItem(segment.propertyTypeCode)]
+      value: [typeItem]
     };
   }
   // tracking

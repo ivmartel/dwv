@@ -105,6 +105,36 @@ describe('dicom', () => {
     };
     testCode(code03, assert, 'Test #03 (URN)');
 
+    // coding scheme version
+    const code05 = new DicomCode('Prostate');
+    code05.value = '41216001';
+    code05.schemeDesignator = 'SCT';
+    code05.schemeVersion = '2024-03';
+    const item05 = getDicomCodeItem(code05);
+    assert.deepEqual(Object.keys(item05), [
+      'CodeValue',
+      'CodingSchemeDesignator',
+      'CodingSchemeVersion',
+      'CodeMeaning'
+    ], 'Test #05 item keys and order');
+    const code05b = getCode(getElementsFromSimpleTagValues(item05));
+    assert.equal(code05b.schemeVersion, '2024-03',
+      'Test #05 scheme version');
+    // no version without designator
+    const code06 = new DicomCode('HIPAA Privacy Rule');
+    code06.urnValue = 'urn:lex:us:federal';
+    code06.schemeVersion = '1';
+    const item06 = getDicomCodeItem(code06);
+    assert.equal(item06.CodingSchemeVersion, undefined,
+      'Test #06 no scheme version without designator');
+    const code06b = getCode(getElementsFromSimpleTagValues({
+      URNCodeValue: 'urn:lex:us:federal',
+      CodingSchemeVersion: '1',
+      CodeMeaning: 'HIPAA Privacy Rule'
+    }));
+    assert.equal(code06b.schemeVersion, undefined,
+      'Test #06 scheme version not read without designator');
+
     const code04 = new DicomCode('a');
     code04.value = '0';
     code04.schemeDesignator = 'TEST';

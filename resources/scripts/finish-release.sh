@@ -7,9 +7,11 @@ set -e
 # print usage information
 usage() {
   echo ""
-  echo "Usage: $0 -r releaseVersion -n nextVersion"
-  echo -e "  -r The release version, format 'm.n.p'"
-  echo -e "  -n The next version, format 'm.n.p'"
+  echo "Usage: $0 [-r releaseVersion] [-n nextVersion]"
+  echo -e "  -r The release version, format 'm.n.p' (optional when starting"
+  echo -e "     at step 1, defaults to the release branch package.json version)"
+  echo -e "  -n The next version, format 'm.n.p' (optional, defaults"
+  echo -e "     to the release version with an incremented minor)"
   echo -e "  -s The step at which to start (optional, [1,4])"
   echo -e "Example:"
   echo -e "> finish-release -r 0.28.0 -n 0.29.0"
@@ -46,17 +48,27 @@ do
    esac
 done
 
-# check option content
+# run from the root of the repository
+cd "$(git rev-parse --show-toplevel)"
+
+# default versions
 if [ -z "$releaseVersion" ]
 then
-   error "Empty release version";
-   usage
+  if [ "$step" != "1" ]
+  then
+    error "The release version is required when not starting at step 1";
+    usage
+  fi
+  # from package.json, run from the release branch
+  releaseVersion=$(node resources/scripts/update-version.js current --dry-run)
 fi
-if [ -z "$nextVersion" ]
+if [ -z "$nextVersion" ] && [[ "$releaseVersion" =~ ^[0-9]+\.([0-9]+)\. ]]
 then
-   error "Empty next version";
-   usage
+  # increment minor
+  nextVersion="${releaseVersion%%.*}.$((BASH_REMATCH[1] + 1)).0"
 fi
+
+# check option content
 versionRegex="^[0-9]+\.[0-9]+\.[0-9]+$"
 if [[ ! "$releaseVersion" =~ $versionRegex ]]
 then
@@ -75,9 +87,6 @@ then
 fi
 
 info "Finishing release for '$releaseVersion' with next version '$nextVersion'..."
-
-# run from the root of the repository
-cd "$(git rev-parse --show-toplevel)"
 
 # branch name
 releaseBranch="v${releaseVersion}"
@@ -124,12 +133,7 @@ then
   # merge release into develop
   git merge --no-ff $releaseBranch
   # update version number in files
-  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+\","
-  b0="  \"version\": \"${nextVersion}-beta.0\","
-  sed -i -r "s/${a0}/${b0}/g" package.json
-  a1="  return '[0-9]+\.[0-9]+\.[0-9]+';"
-  b1="  return '${nextVersion}-beta.0';"
-  sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
+  node resources/scripts/update-version.js ${nextVersion}-beta.0
   # commit
   git commit -a -m "Bumped version number to v${nextVersion}-beta.0"
   # push develop

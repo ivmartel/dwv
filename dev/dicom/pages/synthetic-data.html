@@ -5,15 +5,63 @@
 <meta charset="UTF-8">
 <link rel="icon" href="../../favicon.ico"/>
 <style>
-body { font-family: Arial, Helvetica, sans-serif; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+}
+/* data lists on the left, viewer on the right */
+.layout {
+  display: flex;
+  height: 100vh;
+}
+.data {
+  flex: 0 0 50%;
+  overflow-y: auto;
+  padding: 0 8px;
+}
+.viewer {
+  flex: 1;
+  min-width: 0;
+  border: none;
+}
+/* draggable bar to resize the data / viewer split */
+.splitter {
+  flex: 0 0 6px;
+  cursor: col-resize;
+  background: #ddd;
+  border-left: 1px solid #aaa;
+  border-right: 1px solid #aaa;
+  touch-action: none;
+}
+.splitter:hover,
+.splitter.dragging {
+  background: #bbb;
+}
+/* let the splitter get the pointer events above the iframe while dragging */
+.layout.resizing .viewer {
+  pointer-events: none;
+}
+.layout.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+/* icon links (download) */
+a.icon {
+  text-decoration: none;
+}
 </style>
 </head>
 
 <body>
 
+<div class="layout">
+
+<div class="data">
+
 <h1>DWV DICOM synthetic data</h1>
 
-<p><b>mf</b>: multi-frame,
+<p><b>ss</b>: single-slice,
+  <b>mf</b>: multi-frame,
   <b>mfms</b>: multi-frame multi-slice,
   <b>mfmv</b>: multi-frame multi-volume,
   <b>mss</b>: multiple single-slice,
@@ -21,7 +69,21 @@ body { font-family: Arial, Helvetica, sans-serif; }
   <b>mmfms</b>: multiple multi-frame multi-slice.
 </p>
 
+<p>Click a data link to open it in the viewer on the right,
+  &#x1F4BE; to download it. SEG and RTSTRUCT data open with their
+  referenced image (single-slice), in a single load.</p>
+
 <div id="content"></div>
+
+</div><!-- /data -->
+
+<div class="splitter" id="splitter" role="separator"
+  aria-orientation="vertical" title="Drag to resize"></div>
+
+<iframe class="viewer" name="dwv-viewer"
+  title="DWV test viewer" src="../../viewer/viewer.html"></iframe>
+
+</div><!-- /layout -->
 
 </body>
 </html>

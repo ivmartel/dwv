@@ -78,6 +78,7 @@ const MetaTagKeys = {
   StudyID: '00200010',
   StudyDescription: '00081030',
   ReferringPhysicianName: '00080090',
+  AccessionNumber: '00080050',
   // general series
   SeriesDate: '00080021',
   SeriesTime: '00080031',
@@ -85,6 +86,7 @@ const MetaTagKeys = {
   SeriesNumber: '00200011',
   // frame of reference
   FrameOfReferenceUID: '00200052',
+  PositionReferenceIndicator: '00201040',
   // general equipment
   Manufacturer: '00080070',
   ManufacturerModelName: '00081090',

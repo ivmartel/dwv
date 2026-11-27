@@ -7,8 +7,11 @@ import {Size} from '../../image/size.js';
 import {Spacing} from '../../image/spacing.js';
 import {Geometry} from '../../image/geometry.js';
 import {ColourMap} from '../../image/luts.js';
-import {getDefaultDicomSegJson} from '../../image/maskFactory.js';
-import {getDwvUIDPrefix} from '../../dicom/dicomParser.js';
+import {
+  getDefaultDicomSegJson,
+  getDicomSegDimensionOrganization
+} from '../../image/maskFactory.js';
+import {getUID} from '../../dicom/dicomWriter.js';
 import {
   getElementsFromSimpleTagValues
 } from '../../dicom/simpleTagValues.js';
@@ -33,6 +36,26 @@ export const BrushMode = {
 };
 
 /**
+ * Patient and General Study module tags copied from the source image
+ *   to the mask.
+ */
+const SourcePatientStudyTags = [
+  // patient
+  'PatientName',
+  'PatientID',
+  'PatientBirthDate',
+  'PatientSex',
+  // general study
+  'StudyInstanceUID',
+  'StudyDate',
+  'StudyTime',
+  'ReferringPhysicianName',
+  'StudyID',
+  'AccessionNumber',
+  'StudyDescription'
+];
+
+/**
  * Get an array sort callback:
  * - f(a,b) > 0 -> b,a,
  * - f(a,b) < 0 -> a,b,
@@ -54,38 +77,83 @@ function getIndexCompareFunction(direction) {
 }
 
 /**
- * Get a dimension organisation used to index a DICOM seg.
+ * Get the meta of a new brush mask: the DICOM SEG tags, the references
+ *   to the source image and the first slice frame info.
  *
- * @returns {object} The indices and organisations.
+ * @param {Image} sourceImage The source image.
+ * @param {number} sliceIndex The source image slice index of
+ *   the first mask slice.
+ * @returns {Record<string, any>} The mask meta.
  */
-function getDimensionOrganization() {
-  // 681051091011101: first 15 of charCode('DimensionOrganizationUID')
-  const organizationUID = `${getDwvUIDPrefix()}681051091011101.1`;
-  return {
-    indices: {
+export function getBrushMaskMeta(sourceImage, sliceIndex) {
+  const index = new Index([0, 0, sliceIndex]);
+  const imagePosPat = sourceImage.getGeometry().getOrigins()[sliceIndex];
+
+  // default tags
+  /** @type {Record<string, any>} */
+  const firstSliceMeta = getDefaultDicomSegJson();
+  // dicom seg dimension
+  const dimension = getDicomSegDimensionOrganization();
+  firstSliceMeta.DimensionOrganizationSequence = dimension.organizations;
+  firstSliceMeta.DimensionIndexSequence = dimension.indices;
+  // local
+  firstSliceMeta.PixelRepresentation = 0;
+  firstSliceMeta.sliceCapacity = 1;
+
+  const tags = sourceImage.getMeta();
+
+  // patient and study: same as the source image (type 2 tags
+  //   missing from the source are written with an empty value)
+  for (const key of SourcePatientStudyTags) {
+    firstSliceMeta[key] = tags[key];
+  }
+  // series: the mask has its own
+  firstSliceMeta.SeriesInstanceUID = getUID();
+  if (typeof tags.FrameOfReferenceUID === 'undefined') {
+    logger.warn('Mask source image has no FrameOfReferenceUID.');
+  }
+  firstSliceMeta.FrameOfReferenceUID = tags.FrameOfReferenceUID;
+  const referencedSOPs = [
+    {
+      referencedSOPClassUID: tags.SOPClassUID,
+      referencedSOPInstanceUID: sourceImage.getImageUid(index)
+    }
+  ];
+  const referenceSeriesTag = [];
+  referenceSeriesTag.push({
+    ReferencedInstanceSequence: {
       value: [
         {
-          DimensionOrganizationUID: organizationUID,
-          DimensionDescriptionLabel: 'ReferencedSegmentNumber',
-          DimensionIndexPointer: '(0062,000B)',
-          FunctionalGroupPointer: '(0062,000A)'
-        },
-        {
-          DimensionOrganizationUID: organizationUID,
-          DimensionDescriptionLabel: 'ImagePositionPatient',
-          DimensionIndexPointer: '(0020,0032)',
-          FunctionalGroupPointer: '(0020,9113)'
+          ReferencedSOPClassUID: tags.SOPClassUID,
+          ReferencedSOPInstanceUID: sourceImage.getImageUid(index)
         }
       ]
     },
-    organizations: {
-      value: [
-        {
-          DimensionOrganizationUID: organizationUID
-        }
-      ]
-    }
+    SeriesInstanceUID: tags.SeriesInstanceUID
+  });
+  firstSliceMeta.ReferencedSeriesSequence = {
+    value: referenceSeriesTag
   };
+  firstSliceMeta.custom = {
+    referencedSeriesUID: tags.SeriesInstanceUID,
+    frameInfos: [
+      {
+        dimIndex: [1, 1],
+        refSegmentNumber: 1,
+        imagePosPat: imagePosPat.getValues(),
+        derivationImages: [
+          {
+            sourceImages: referencedSOPs
+          }
+        ]
+      }
+    ]
+  };
+
+  // get length unit from ref image
+  firstSliceMeta.lengthUnit = sourceImage.getMeta().lengthUnit;
+
+  return firstSliceMeta;
 }
 
 /**
@@ -485,63 +553,8 @@ export class BrushMaskPaint extends EventTarget {
     if (typeof imgK === 'undefined') {
       throw new Error('Z position is undefined');
     }
-    const index = new Index([0, 0, imgK]);
+    const firstSliceMeta = getBrushMaskMeta(sourceImage, imgK);
     const imagePosPat = sourceGeometry.getOrigins()[imgK];
-
-    // default tags
-    /** @type {Record<string, any>} */
-    const firstSliceMeta = getDefaultDicomSegJson();
-    // dicom seg dimension
-    const dimension = getDimensionOrganization();
-    firstSliceMeta.DimensionOrganizationSequence = dimension.organizations;
-    firstSliceMeta.DimensionIndexSequence = dimension.indices;
-    // local
-    firstSliceMeta.PixelRepresentation = 0;
-    firstSliceMeta.sliceCapacity = 1;
-
-    const tags = sourceImage.getMeta();
-
-    firstSliceMeta.PatientID = tags.PatientID;
-    firstSliceMeta.StudyInstanceUID = tags.StudyInstanceUID;
-    firstSliceMeta.SeriesInstanceUID = tags.SeriesInstanceUID;
-    if (typeof tags.FrameOfReferenceUID === 'undefined') {
-      logger.warn('Mask source image has no FrameOfReferenceUID.');
-    }
-    firstSliceMeta.FrameOfReferenceUID = tags.FrameOfReferenceUID;
-    const referencedSOPs = [
-      {
-        referencedSOPClassUID: tags.SOPClassUID,
-        referencedSOPInstanceUID: sourceImage.getImageUid(index)
-      }
-    ];
-    const referenceSeriesTag = [];
-    referenceSeriesTag.push({
-      ReferencedInstanceSequence: {
-        value: referencedSOPs
-      },
-      SeriesInstanceUID: tags.SeriesInstanceUID
-    });
-    firstSliceMeta.ReferencedSeriesSequence = {
-      value: referenceSeriesTag
-    };
-    firstSliceMeta.custom = {
-      referencedSeriesUID: tags.SeriesInstanceUID,
-      frameInfos: [
-        {
-          dimIndex: [1, 1],
-          refSegmentNumber: 1,
-          imagePosPat: imagePosPat.getValues(),
-          derivationImages: [
-            {
-              sourceImages: referencedSOPs
-            }
-          ]
-        }
-      ]
-    };
-
-    // get length unit from ref image
-    firstSliceMeta.lengthUnit = sourceImage.getMeta().lengthUnit;
 
     this.#mask = /** @type {MaskImage} */ (this.#createMaskImage(
       sourceGeometry,
@@ -830,12 +843,16 @@ export class BrushMaskPaint extends EventTarget {
   }
 
   /**
+   * Paint during a stroke: only the mask pixels are changed, the
+   *   undoable command (with its segment changes) is created when
+   *   the stroke is finalized.
+   *
    * @param {number[]} offsets Mask offsets.
    * @returns {unknown|undefined} Original values chunk for undo.
    */
   #applyTemporaryPaint(offsets) {
-    const maskVl = this.#getMaskViewLayer();
-    const srclayerid = maskVl.getId();
+    // check the mask view layer exists
+    this.#getMaskViewLayer();
 
     if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskId);
@@ -847,21 +864,13 @@ export class BrushMaskPaint extends EventTarget {
         formatString(ERROR_MESSAGES.brush.noMaskImage, this.#maskDataId));
     }
 
-    const props = new DrawBrushCommandProperties();
-    props.mask = /** @type {MaskImage} */ (maskData.image);
-    props.dataId = this.#maskDataId;
-    props.offsetsLists = [offsets];
-    props.mode = this.#brushMode;
-    props.segmentNumber = this.#selectedSegmentNumber;
-    props.srclayerid = srclayerid;
-    const command = new DrawBrushCommand(props);
-    command.execute();
-
-    const originalValues = command.getOriginalValuesLists();
-    if (typeof originalValues !== 'undefined') {
-      return originalValues[0];
+    if (typeof this.#selectedSegmentNumber === 'undefined') {
+      return undefined;
     }
-    return undefined;
+    const value = this.#brushMode === BrushMode.Del
+      ? 0 : this.#selectedSegmentNumber;
+    const mask = /** @type {MaskImage} */ (maskData.image);
+    return mask.setAtOffsetsAndGetOriginals([offsets], value)[0];
   }
 
   /**
@@ -944,6 +953,9 @@ export class BrushMaskPaint extends EventTarget {
       this.dispatchEvent(event);
       this.#mask.recalculateLabels();
     };
+    // the stroke pixels are already painted, only update the
+    //   segment types (the command will restore them on undo)
+    command.updateSegmentTypes();
 
     const undoCtrl = this.#app.getUndoController();
     undoCtrl.addToUndoStack(command);

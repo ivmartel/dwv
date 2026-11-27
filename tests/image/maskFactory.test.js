@@ -4,9 +4,20 @@ import {
 } from '../../src/dicom/simpleTagValues.js';
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
-import {safeGetAll} from '../../src/dicom/dataElement.js';
+import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
+import {
+  DicomParser,
+  getDwvVersion,
+  getDwvUIDPrefix
+} from '../../src/dicom/dicomParser.js';
+import {DicomWriter} from '../../src/dicom/dicomWriter.js';
 import {ImageFactory} from '../../src/image/imageFactory.js';
-import {MaskFactory, mergeMaskImages} from '../../src/image/maskFactory.js';
+import {
+  MaskFactory,
+  mergeMaskImages,
+  getDicomSegDimensionOrganization
+} from '../../src/image/maskFactory.js';
+import {Image} from '../../src/image/image.js';
 import {MaskImage} from '../../src/image/maskImage.js';
 import {SegmentCollection} from '../../src/image/segmentCollection.js';
 import {Geometry} from '../../src/image/geometry.js';
@@ -14,10 +25,6 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
-
-/**
- * @import {Image} from '../../src/image/image.js';
- */
 
 import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
 
@@ -353,6 +360,424 @@ describe('MaskFactory', () => {
         );
       }
     });
+
+  test('toDicom: defaults to the image meta segments', () => {
+    const image = buildMaskImage('test-seg-00');
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, buildRefImage());
+    const outSegs = getSegmentsFromElements(outElements);
+    assert.deepEqual(
+      outSegs.map(seg => seg.number),
+      image.getMeta().custom.segments.map(seg => seg.number),
+      'output segments are the meta ones'
+    );
+  });
+
+  test('toDicom: throws without segments', () => {
+    const image = buildMaskImage('test-seg-00');
+    delete image.getMeta().custom.segments;
+    assert.throws(
+      () => new MaskFactory().toDicom(image, undefined, buildRefImage()),
+      'Cannot create DICOM SEG without segments'
+    );
+  });
+
+  test('toDicom: throws without source image', () => {
+    const image = buildMaskImage('test-seg-00');
+    assert.throws(
+      () => new MaskFactory().toDicom(image, undefined, undefined),
+      'Cannot create DICOM SEG without source image'
+    );
+  });
+
+  test('toDicom: does not modify the image meta', () => {
+    const image = buildMaskImage('test-seg-00');
+    const metaBefore = {...image.getMeta()};
+    new MaskFactory().toDicom(
+      image, undefined, buildRefImage(), {SOPInstanceUID: '1.2.3'});
+    const meta = image.getMeta();
+    assert.deepEqual(
+      Object.keys(meta), Object.keys(metaBefore), 'same meta keys');
+    for (const key of Object.keys(metaBefore)) {
+      assert.equal(meta[key], metaBefore[key], `same meta ${key}`);
+    }
+  });
+
+  test('toDicom: one position dimension index per position', () => {
+    // 3 slices, segment 1 on slices 0 and 2, segment 2 on slice 1
+    const geometry = new Geometry(
+      [
+        new Point3D(0, 0, 0),
+        new Point3D(0, 0, 1),
+        new Point3D(0, 0, 2)
+      ],
+      new Size([4, 4, 3]),
+      new Spacing([1, 1, 1])
+    );
+    const sliceSize = 16;
+    const buffer = new Uint8Array(sliceSize * 3);
+    buffer[0] = 1;
+    buffer[sliceSize + 1] = 2;
+    buffer[2 * sliceSize + 2] = 1;
+    const image = new MaskImage(geometry, buffer, ['0', '1', '2']);
+    image.setMeta({Modality: 'SEG'});
+    const segments = [
+      {number: 1, label: 's1', algorithmType: 'MANUAL'},
+      {number: 2, label: 's2', algorithmType: 'MANUAL'}
+    ];
+    // source image with the same geometry
+    const sourceUids = ['1.2.3.0', '1.2.3.1', '1.2.3.2'];
+    const sourceImage = new Image(
+      geometry, new Uint8Array(sliceSize * 3), sourceUids);
+    sourceImage.setMeta({
+      SOPClassUID: '1.2.840.10008.5.1.4.1.1.4',
+      SeriesInstanceUID: '1.2.3',
+      StudyInstanceUID: '1.2'
+    });
+    const outElements =
+      new MaskFactory().toDicom(image, segments, sourceImage);
+
+    const frames = safeGetAll(outElements, '52009230');
+    assert.equal(frames.length, 3, 'number of frames');
+    const zByIndex = new Map();
+    for (const frame of frames) {
+      const index = frame['00209111'].value[0]['00209157'].value[1];
+      const z = Number(frame['00209113'].value[0]['00200032'].value[2]);
+      // DerivationImageSequence > SourceImageSequence
+      const sourceUid = frame['00089124'].value[0]['00082112']
+        .value[0]['00081155'].value[0];
+      assert.equal(sourceUid, sourceUids[z], `source image for z ${z}`);
+      if (zByIndex.has(index)) {
+        assert.equal(z, zByIndex.get(index), `same z for index ${index}`);
+      } else {
+        zByIndex.set(index, z);
+      }
+    }
+    assert.equal(zByIndex.size, 3, 'one index per position');
+    assert.deepEqual(
+      Array.from(zByIndex.keys()).sort(), [1, 2, 3], 'indices from 1 to 3');
+  });
+
+  test('toDicom: slice thickness and lossy image compression', () => {
+    const factory = new MaskFactory();
+    const refImage = buildRefImage();
+    let outElements =
+      factory.toDicom(buildMaskImage('test-seg-00'), undefined, refImage);
+    const measures = safeGetAll(outElements, '52009229')[0]['00289110'];
+    assert.ok(
+      typeof measures.value[0]['00180050'] !== 'undefined',
+      'slice thickness is present'
+    );
+    assert.equal(
+      safeGet(outElements, '00282110'), '00', 'not lossy compressed');
+
+    // source image lossy compressed
+    refImage.getMeta().LossyImageCompression = '01';
+    outElements =
+      factory.toDicom(buildMaskImage('test-seg-00'), undefined, refImage);
+    assert.equal(
+      safeGet(outElements, '00282110'), '01', 'lossy from source');
+  });
+
+  /**
+   * Check the dimension organization and indices of a DICOM SEG.
+   *
+   * @param {Record<string, object>} elements The DICOM SEG elements.
+   * @param {string} orgUID The expected organization UID.
+   * @param {string[]} labels The expected index labels.
+   */
+  function checkDimensions(elements, orgUID, labels) {
+    const orgs = safeGetAll(elements, '00209221');
+    assert.equal(orgs.length, 1, 'one dimension organization');
+    assert.equal(orgs[0]['00209164'].value[0], orgUID, 'organization uid');
+    const indices = safeGetAll(elements, '00209222');
+    assert.deepEqual(
+      indices.map(item => item['00209164'].value[0]),
+      [orgUID, orgUID],
+      'index organization uids'
+    );
+    // segment number then position, with their functional groups
+    assert.deepEqual(
+      indices.map(item => item['00209165'].value[0]),
+      ['(0062,000B)', '(0020,0032)'],
+      'dimension index pointers'
+    );
+    assert.deepEqual(
+      indices.map(item => item['00209167'].value[0]),
+      ['(0062,000A)', '(0020,9113)'],
+      'functional group pointers'
+    );
+    assert.deepEqual(
+      indices.map(item => item['00209421'].value[0]),
+      labels,
+      'dimension description labels'
+    );
+    for (const frame of safeGetAll(elements, '52009230')) {
+      const values = frame['00209111'].value[0]['00209157'].value;
+      assert.equal(values.length, indices.length, 'one value per index');
+    }
+  }
+
+  /**
+   * Write a DICOM SEG and read it back as a mask.
+   *
+   * @param {Record<string, object>} elements The DICOM SEG elements.
+   * @param {Image} refImage The reference image.
+   * @returns {MaskImage} The read mask.
+   */
+  function writeAndRead(elements, refImage) {
+    const buffer = new DicomWriter().getBuffer(elements);
+    const parser = new DicomParser();
+    parser.parse(buffer);
+    const parsed = parser.getDicomElements();
+    return new MaskFactory().create(
+      parsed, parsed['7FE00010'].value[0], refImage);
+  }
+
+  const dwvOrgUID = getDicomSegDimensionOrganization()
+    .organizations.value[0].DimensionOrganizationUID;
+  const dwvLabels = ['ReferencedSegmentNumber', 'ImagePositionPatient'];
+
+  test('getDicomSegDimensionOrganization: valid uid', () => {
+    assert.equal(
+      dwvOrgUID, `${getDwvUIDPrefix()}.681051091011101.1`, 'uid value');
+    // UI: max 64 chars, numeric components without leading zero
+    assert.ok(dwvOrgUID.length <= 64, 'uid length');
+    assert.ok(
+      /^(0|[1-9]\d*)(\.(0|[1-9]\d*))*$/.test(dwvOrgUID), 'uid format');
+  });
+
+  test('toDicom: dwv dimensions without input indices', () => {
+    // test-seg-00 has no DimensionIndexSequence
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    checkDimensions(outElements, dwvOrgUID, dwvLabels);
+
+    const reloaded = writeAndRead(outElements, refImage);
+    assert.deepEqual(
+      Array.from(reloaded.getBuffer()),
+      Array.from(image.getBuffer()),
+      'same label map after reload'
+    );
+  });
+
+  test('toDicom: keeps the input segment and position indices', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const meta = image.getMeta();
+    const orgUID = '1.2.3.99';
+    meta.DimensionOrganizationSequence = {
+      value: [{DimensionOrganizationUID: orgUID}]
+    };
+    // no functional group pointers in input
+    meta.DimensionIndexSequence = {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0062,000B)',
+          DimensionDescriptionLabel: 'Segment'
+        },
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0020,0032)',
+          DimensionDescriptionLabel: 'Position'
+        }
+      ]
+    };
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    checkDimensions(outElements, orgUID, ['Segment', 'Position']);
+
+    // read back: indices are kept, with their functional groups
+    const reloaded = writeAndRead(outElements, refImage);
+    assert.deepEqual(
+      Array.from(reloaded.getBuffer()),
+      Array.from(image.getBuffer()),
+      'same label map after reload'
+    );
+    assert.deepEqual(
+      reloaded.getMeta().DimensionIndexSequence.value.map(
+        item => item.FunctionalGroupPointer),
+      ['(0062,000A)', '(0020,9113)'],
+      'read functional group pointers'
+    );
+  });
+
+  test('toDicom: dwv dimensions for other input indices', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const meta = image.getMeta();
+    const orgUID = '1.2.3.99';
+    meta.DimensionOrganizationSequence = {
+      value: [{DimensionOrganizationUID: orgUID}]
+    };
+    // stack id then position: not written by dwv
+    meta.DimensionIndexSequence = {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0020,9056)'
+        },
+        {
+          DimensionOrganizationUID: orgUID,
+          DimensionIndexPointer: '(0020,0032)'
+        }
+      ]
+    };
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    checkDimensions(outElements, dwvOrgUID, dwvLabels);
+  });
+
+  test('toDicom: default content label and description', () => {
+    // test-seg-00 has no content label or description
+    const outElements = new MaskFactory().toDicom(
+      buildMaskImage('test-seg-00'), undefined, buildRefImage());
+    assert.equal(
+      safeGet(outElements, '00700080'), 'SEGMENTATION', 'content label');
+    // type 2: present, empty
+    assert.ok(
+      typeof outElements['00700081'] !== 'undefined',
+      'content description is present'
+    );
+    assert.equal(
+      safeGet(outElements, '00700081'), '', 'empty description');
+  });
+
+  test('toDicom: instance number and position reference indicator', () => {
+    const refImage = buildRefImage();
+    // test-img-00 has no position reference indicator, remove the
+    //   generator instance number from test-seg-00
+    const noNumberImage = buildMaskImage('test-seg-00');
+    delete noNumberImage.getMeta().InstanceNumber;
+    let outElements =
+      new MaskFactory().toDicom(noNumberImage, undefined, refImage);
+    assert.equal(
+      Number(safeGet(outElements, '00200013')), 1, 'default instance number');
+    // type 2: present, empty
+    assert.equal(
+      safeGet(outElements, '00201040'), '', 'empty position reference');
+
+    // position reference indicator from the source image
+    refImage.getMeta().PositionReferenceIndicator = 'XY';
+    outElements = new MaskFactory().toDicom(
+      buildMaskImage('test-seg-00'), undefined, refImage);
+    assert.equal(
+      safeGet(outElements, '00201040'), 'XY', 'source position reference');
+
+    // mask values win
+    const image = buildMaskImage('test-seg-00');
+    image.getMeta().InstanceNumber = '3';
+    image.getMeta().PositionReferenceIndicator = 'SN';
+    outElements = new MaskFactory().toDicom(image, undefined, refImage);
+    assert.equal(
+      Number(safeGet(outElements, '00200013')), 3, 'mask instance number');
+    assert.equal(
+      safeGet(outElements, '00201040'), 'SN', 'mask position reference');
+  });
+
+  test('toDicom: instance and series identification', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    const meta = image.getMeta();
+    // no input series
+    delete meta.SeriesInstanceUID;
+    delete meta.SeriesNumber;
+
+    const factory = new MaskFactory();
+    const outElements = factory.toDicom(image, undefined, refImage);
+    const sopUID = safeGet(outElements, '00080018');
+    assert.ok(sopUID.startsWith('2.25.'), 'generated sop uid');
+    assert.equal(
+      safeGet(outElements, '00020003'), sopUID, 'media storage uid');
+    const seriesUID = safeGet(outElements, '0020000E');
+    assert.ok(seriesUID.startsWith('2.25.'), 'generated series uid');
+    assert.notEqual(seriesUID, sopUID, 'series and sop uids differ');
+    assert.equal(
+      Number(safeGet(outElements, '00200011')), 1, 'default series number');
+
+    // a new instance at each call
+    const outElements2 = factory.toDicom(image, undefined, refImage);
+    assert.notEqual(
+      safeGet(outElements2, '00080018'), sopUID, 'new sop uid');
+
+    // input series is kept
+    meta.SeriesInstanceUID = '1.2.3.77';
+    meta.SeriesNumber = '5';
+    const outElements3 = factory.toDicom(image, undefined, refImage);
+    assert.equal(
+      safeGet(outElements3, '0020000E'), '1.2.3.77', 'input series uid');
+    assert.equal(
+      Number(safeGet(outElements3, '00200011')), 5, 'input series number');
+
+    // extra tags win, media storage follows the sop instance uid
+    const outElements4 = factory.toDicom(
+      image, undefined, refImage, {SOPInstanceUID: '1.2.3.88'});
+    assert.equal(
+      safeGet(outElements4, '00080018'), '1.2.3.88', 'extra sop uid');
+    assert.equal(
+      safeGet(outElements4, '00020003'), '1.2.3.88', 'extra media uid');
+  });
+
+  test('toDicom: dwv equipment, not the input one', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    // input mask equipment
+    const meta = image.getMeta();
+    meta.Manufacturer = 'other';
+    meta.ManufacturerModelName = 'other model';
+    meta.DeviceSerialNumber = '42';
+    meta.SoftwareVersions = '9.9';
+    let outElements = new MaskFactory().toDicom(image, undefined, refImage);
+    assert.equal(safeGet(outElements, '00080070'), 'dwv', 'manufacturer');
+    assert.equal(safeGet(outElements, '00081090'), 'DWV', 'model name');
+    assert.equal(safeGet(outElements, '00181000'), '1', 'serial number');
+    assert.equal(
+      safeGet(outElements, '00181020'), getDwvVersion(), 'software versions');
+
+    // application equipment via extra tags
+    outElements = new MaskFactory().toDicom(image, undefined, refImage, {
+      Manufacturer: 'app',
+      ManufacturerModelName: 'app model',
+      DeviceSerialNumber: 'A1',
+      SoftwareVersions: '1.0'
+    });
+    assert.equal(safeGet(outElements, '00080070'), 'app', 'app manufacturer');
+    assert.equal(
+      safeGet(outElements, '00081090'), 'app model', 'app model name');
+    assert.equal(safeGet(outElements, '00181000'), 'A1', 'app serial number');
+    assert.equal(
+      safeGet(outElements, '00181020'), '1.0', 'app software versions');
+  });
+
+  test('toDicom: keeps the input content label and description', () => {
+    const refImage = buildRefImage();
+    const image = buildMaskImage('test-seg-00');
+    image.getMeta().ContentLabel = 'LIVER_SEG';
+    image.getMeta().ContentDescription = 'Liver segmentation';
+    const outElements =
+      new MaskFactory().toDicom(image, undefined, refImage);
+    assert.equal(
+      safeGet(outElements, '00700080'), 'LIVER_SEG', 'content label');
+    assert.equal(
+      safeGet(outElements, '00700081'), 'Liver segmentation',
+      'content description');
+
+    // kept when read back
+    const meta = writeAndRead(outElements, refImage).getMeta();
+    assert.equal(meta.ContentLabel, 'LIVER_SEG', 'read content label');
+    assert.equal(
+      meta.ContentDescription, 'Liver segmentation',
+      'read content description');
+
+    // extra tags win
+    const extraElements = new MaskFactory().toDicom(
+      image, undefined, refImage, {ContentLabel: 'OTHER'});
+    assert.equal(
+      safeGet(extraElements, '00700080'), 'OTHER', 'extra content label');
+  });
 
 });
 

@@ -168,7 +168,7 @@ export class Annotation {
    */
   constructor() {
     this.trackingId = guid();
-    this.trackingUid = getUID('TrackingUniqueIdentifier');
+    this.trackingUid = getUID();
   }
 
   /**

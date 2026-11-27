@@ -15,6 +15,8 @@ import {
   getReferencedSeriesUID
 } from '../dicom/dicomImage.js';
 import {Tag} from '../dicom/dicomTag.js';
+import {getDwvUIDPrefix, getDwvVersion} from '../dicom/dicomParser.js';
+import {getUID} from '../dicom/dicomWriter.js';
 import {
   getElementsFromSimpleTagValues,
   mergeTagValues
@@ -76,6 +78,7 @@ const MetaTagKeys = {
   StudyInstanceUID: '0020000D',
   StudyID: '00200010',
   ReferringPhysicianName: '00080090',
+  AccessionNumber: '00080050',
   // general series
   SeriesDate: '00080021',
   SeriesTime: '00080031',
@@ -83,13 +86,18 @@ const MetaTagKeys = {
   SeriesNumber: '00200011',
   // frame of reference
   FrameOfReferenceUID: '00200052',
+  PositionReferenceIndicator: '00201040',
   // general equipment
   Manufacturer: '00080070',
   ManufacturerModelName: '00081090',
   DeviceSerialNumber: '00181000',
   SoftwareVersions: '00181020',
   // general image
-  LossyImageCompression: '00282110'
+  LossyImageCompression: '00282110',
+  // content identification
+  InstanceNumber: '00200013',
+  ContentLabel: '00700080',
+  ContentDescription: '00700081'
 };
 
 /**
@@ -235,6 +243,94 @@ export function getDefaultDicomSegJson() {
     tags[tag.name] = tag.enum[0];
   }
   return tags;
+}
+
+/**
+ * Get the dimension organisation of the DICOM SEG written by dwv:
+ *   frames are indexed by referenced segment number then by
+ *   image position (patient).
+ *
+ * @returns {object} The indices and organisations as
+ *   {indices, organizations}.
+ */
+export function getDicomSegDimensionOrganization() {
+  // 681051091011101: first 15 of charCode('DimensionOrganizationUID')
+  const organizationUID = `${getDwvUIDPrefix()}.681051091011101.1`;
+  return {
+    indices: {
+      value: [
+        {
+          DimensionOrganizationUID: organizationUID,
+          DimensionDescriptionLabel: 'ReferencedSegmentNumber',
+          DimensionIndexPointer: '(0062,000B)',
+          FunctionalGroupPointer: '(0062,000A)'
+        },
+        {
+          DimensionOrganizationUID: organizationUID,
+          DimensionDescriptionLabel: 'ImagePositionPatient',
+          DimensionIndexPointer: '(0020,0032)',
+          FunctionalGroupPointer: '(0020,9113)'
+        }
+      ]
+    },
+    organizations: {
+      value: [
+        {
+          DimensionOrganizationUID: organizationUID
+        }
+      ]
+    }
+  };
+}
+
+/**
+ * Functional group pointers of the dimension index pointers
+ *   that dwv can write.
+ */
+const FunctionalGroupPointers = {
+  // ReferencedSegmentNumber -> SegmentIdentificationSequence
+  '(0062,000B)': '(0062,000A)',
+  // ImagePositionPatient -> PlanePositionSequence
+  '(0020,0032)': '(0020,9113)'
+};
+
+/**
+ * Get the dimension organisation to write for a mask: the input
+ *   one if its indices are the ones dwv writes (referenced segment
+ *   number then image position), the dwv one otherwise.
+ *
+ * @param {Record<string, any>} meta The mask meta.
+ * @returns {object} The indices and organisations as
+ *   {indices, organizations}.
+ */
+function getOutputDimensionOrganization(meta) {
+  const organizations = meta.DimensionOrganizationSequence?.value;
+  const indices = meta.DimensionIndexSequence?.value;
+  const pointers = Object.keys(FunctionalGroupPointers);
+  const isSupported = organizations?.length === 1 &&
+    indices?.length === pointers.length &&
+    indices.every((item, i) => {
+      const orgUID = organizations[0].DimensionOrganizationUID;
+      return item.DimensionIndexPointer === pointers[i] &&
+        item.DimensionOrganizationUID === orgUID;
+    });
+  if (!isSupported) {
+    return getDicomSegDimensionOrganization();
+  }
+  return {
+    indices: {
+      // the functional group pointer is required since
+      //   both index values are in functional groups
+      value: indices.map(item => ({
+        ...item,
+        FunctionalGroupPointer:
+          FunctionalGroupPointers[item.DimensionIndexPointer]
+      }))
+    },
+    organizations: {
+      value: [{...organizations[0]}]
+    }
+  };
 }
 
 /**
@@ -464,10 +560,17 @@ export class MaskFactory {
   /**
    * Convert a mask image into a DICOM segmentation object.
    *
+   * The image meta is not modified.
+   *
    * @param {MaskImage} image The mask image.
-   * @param {MaskSegment[]} segments The mask segments.
-   * @param {Image} sourceImage The source image.
-   * @param {SimpleTagValues} [extraTags] Optional list of extra tags.
+   * @param {MaskSegment[]|undefined} segments The mask segments, defaults
+   *   to the image meta segments if undefined.
+   * @param {Image} sourceImage The source image, used for the references
+   *   to the segmented series and images.
+   * @param {SimpleTagValues} [extraTags] Optional list of extra tags,
+   *   for example the equipment tags (Manufacturer, ManufacturerModelName,
+   *   DeviceSerialNumber, SoftwareVersions) of the embedding application,
+   *   they default to dwv ones.
    * @returns {Record<string, DataElement>} A list of dicom elements.
    */
   toDicom(
@@ -476,12 +579,21 @@ export class MaskFactory {
     sourceImage,
     extraTags
   ) {
-    // original image tags
-    const tags = image.getMeta();
+    // the referenced series is needed to load the result
+    if (sourceImage === undefined) {
+      throw new Error('Cannot create DICOM SEG without source image');
+    }
+
+    // original image tags (shallow copy: only top level tags are set,
+    //   the image meta must not be modified)
+    const tags = {...image.getMeta()};
 
     // use image segments if not provided as input
     if (segments === undefined) {
-      segments = tags.segments;
+      segments = tags.custom?.segments;
+    }
+    if (segments === undefined) {
+      throw new Error('Cannot create DICOM SEG without segments');
     }
 
     const geometry = image.getGeometry();
@@ -496,9 +608,67 @@ export class MaskFactory {
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
 
     // keep source image StudyInstanceUID
-    if (sourceImage !== undefined) {
-      tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
+    tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
+
+    // equipment: the one that produces this instance, not the one
+    //   of an input mask, the embedding application can set its own
+    //   via the extra tags
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.5.2.html
+    tags.Manufacturer = 'dwv';
+    tags.ManufacturerModelName = 'DWV';
+    tags.DeviceSerialNumber = '1';
+    tags.SoftwareVersions = getDwvVersion();
+
+    // frame of reference: shared with the source image,
+    //   position reference indicator is type 2
+    if (typeof tags.PositionReferenceIndicator === 'undefined') {
+      tags.PositionReferenceIndicator =
+        sourceImage.getMeta().PositionReferenceIndicator ?? '';
     }
+
+    // instance: each call creates a new SOP instance
+    tags.SOPInstanceUID = getUID();
+    // series: the mask one (for ex the one of a loaded SEG) or a new one,
+    //   series number is type 1 for a segmentation
+    if (typeof tags.SeriesInstanceUID === 'undefined' ||
+      tags.SeriesInstanceUID === '') {
+      tags.SeriesInstanceUID = getUID();
+    }
+    if (typeof tags.SeriesNumber === 'undefined' ||
+      tags.SeriesNumber === '') {
+      tags.SeriesNumber = '1';
+    }
+
+    // content identification: instance number is type 1
+    if (typeof tags.InstanceNumber === 'undefined' ||
+      tags.InstanceNumber === '') {
+      tags.InstanceNumber = '1';
+    }
+    // content identification: label is type 1 (CS),
+    //   description is type 2 (present, possibly empty)
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_10.9.html
+    if (typeof tags.ContentLabel === 'undefined' || tags.ContentLabel === '') {
+      tags.ContentLabel = 'SEGMENTATION';
+    }
+    if (typeof tags.ContentDescription === 'undefined') {
+      tags.ContentDescription = '';
+    }
+
+    // segmentation is not lossy compression, but a segmentation
+    //   derived from lossy compressed images is marked as such
+    // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.20.2.2.html
+    if (tags.LossyImageCompression !== '01') {
+      const isSourceLossy =
+        sourceImage.getMeta().LossyImageCompression === '01';
+      tags.LossyImageCompression = isSourceLossy ? '01' : '00';
+    }
+
+    // dimension organisation: the frames are written with
+    //   [segment number, position] index values, keep the input
+    //   organisation if it defines these indices
+    const dimension = getOutputDimensionOrganization(tags);
+    tags.DimensionOrganizationSequence = dimension.organizations;
+    tags.DimensionIndexSequence = dimension.indices;
 
     // segments
     const segmentItems = [];
@@ -517,7 +687,12 @@ export class MaskFactory {
             value: [getDicomPlaneOrientationItem(geometry.getOrientation())]
           },
           PixelMeasuresSequence: {
-            value: [getDicomMeasureItem(geometry.getSpacing())]
+            value: [{
+              ...getDicomMeasureItem(geometry.getSpacing()),
+              // required for SEG with a FrameOfReferenceUID
+              // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.7.6.16.2.html#sect_C.7.6.16.2.1
+              SliceThickness: geometry.getSpacing().get(2)
+            }]
           }
         }
       ]
@@ -527,6 +702,20 @@ export class MaskFactory {
     const roiBuffers = image.getSegmentCollection().getSegmentBuffers(segments);
 
     const funcGroups = [];
+
+    // position dimension index: the same position must have the same
+    //   index whatever the segment, so index the slices used by any
+    //   segment (in reverse slice order, as the frames)
+    const usedSlices = new Set();
+    for (const segment of segments) {
+      const segmentBuffers = roiBuffers[segment.number - 1];
+      if (segmentBuffers !== undefined) {
+        for (const key of Object.keys(segmentBuffers)) {
+          usedSlices.add(Number.parseInt(key, 10));
+        }
+      }
+    }
+    const positionSlices = Array.from(usedSlices).sort((a, b) => b - a);
 
     // flatten buffer array
     const finalBuffers = [];
@@ -547,37 +736,35 @@ export class MaskFactory {
         const posPat = image.getGeometry().getOrigins()[key1];
         const posPatArray = [posPat.getX(), posPat.getY(), posPat.getZ()];
         const funcGroup = new DicomFunctionalGroup(
-          [number40, keys1.length - k1],
+          [number40, positionSlices.indexOf(key1) + 1],
           posPatArray,
           undefined,
           number40
         );
         // derivation image info
-        if (sourceImage !== undefined) {
-          const sourceGeometry = sourceImage.getGeometry();
-          const sourceIndex = sourceGeometry.worldToIndex(
-            new Point([posPat.getX(), posPat.getY(), posPat.getZ()])
-          );
-          funcGroup.derivationImages = [
-            {
-              sourceImages: [
-                {
-                  referencedSOPInstanceUID:
-                    sourceImage.getImageUid(sourceIndex),
-                  referencedSOPClassUID:
-                    (sourceImage.getMeta()).SOPClassUID
-                }
-              ]
-            }
-          ];
-          // store as tag
-          referencedSOPs.push({
-            ReferencedSOPInstanceUID:
-              sourceImage.getImageUid(sourceIndex),
-            ReferencedSOPClassUID:
-              (sourceImage.getMeta()).SOPClassUID
-          });
-        }
+        const sourceGeometry = sourceImage.getGeometry();
+        const sourceIndex = sourceGeometry.worldToIndex(
+          new Point([posPat.getX(), posPat.getY(), posPat.getZ()])
+        );
+        funcGroup.derivationImages = [
+          {
+            sourceImages: [
+              {
+                referencedSOPInstanceUID:
+                  sourceImage.getImageUid(sourceIndex),
+                referencedSOPClassUID:
+                  (sourceImage.getMeta()).SOPClassUID
+              }
+            ]
+          }
+        ];
+        // store as tag
+        referencedSOPs.push({
+          ReferencedSOPInstanceUID:
+            sourceImage.getImageUid(sourceIndex),
+          ReferencedSOPClassUID:
+            (sourceImage.getMeta()).SOPClassUID
+        });
         funcGroups.push(funcGroup);
       }
     }
@@ -594,23 +781,23 @@ export class MaskFactory {
     };
 
     // also store referenced SOPs in ReferencedSeriesSequence
-    if (sourceImage !== undefined) {
-      const refSeriesTag = [];
-      refSeriesTag.push({
-        ReferencedInstanceSequence: {
-          value: referencedSOPs
-        },
-        SeriesInstanceUID: (sourceImage.getMeta()).SeriesInstanceUID
-      });
-      tags.ReferencedSeriesSequence = {
-        value: refSeriesTag
-      };
-    }
+    tags.ReferencedSeriesSequence = {
+      value: [
+        {
+          ReferencedInstanceSequence: {
+            value: referencedSOPs
+          },
+          SeriesInstanceUID: (sourceImage.getMeta()).SeriesInstanceUID
+        }
+      ]
+    };
 
     // merge extra tags if provided
     if (extraTags !== undefined) {
       mergeTagValues(tags, extraTags);
     }
+    // file meta: same instance as the dataset
+    tags.MediaStorageSOPInstanceUID = tags.SOPInstanceUID;
 
     // convert JSON to DICOM element object
     const dicomElements = getElementsFromSimpleTagValues(tags);

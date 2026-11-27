@@ -414,12 +414,12 @@ export class AnnotationService {
       throw new Error(`Cannot find annotation group with id ${dataId}`);
     }
     const factory = new AnnotationGroupFactory();
-    const sopUID = getUID('SOPInstanceUID');
+    const sopUID = getUID();
     const extraTags = {
       MediaStorageSOPInstanceUID: sopUID,
       SOPInstanceUID: sopUID,
       InstanceNumber: 123,
-      SeriesInstanceUID: getUID('SeriesInstanceUID'),
+      SeriesInstanceUID: getUID(),
       SeriesNumber: 123,
       SeriesDescription: 'Annnotation made with dwv',
     };
