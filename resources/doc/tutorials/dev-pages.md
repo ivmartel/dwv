@@ -74,7 +74,12 @@ display looks like.
 - `dev/dicom/pages/synthetic-data.html`: lists generated synthetic data
   (images in different structures: single-slice, multi-frame,
   multi-volume..., SEG, RTSTRUCT, KOS) to open in an embedded test viewer
-  or to download.
+  or to download. The page generates the data as closely as possible to
+  the tests: same configs (`tests/data/synthetic-*.json`) and same
+  generation code (`dev/dicom/dataStructures.js`), so the data of a
+  failing test can be opened or downloaded to be checked manually. Tests
+  that use synthetic data should generate it through
+  `getStructureElementsList` or `getStructureBuffers` to keep it that way.
 - `dev/dicom/pages/diff.html`: dumps the tags of two DICOM files as text and
   compares them side by side.
 

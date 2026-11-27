@@ -1,7 +1,4 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
-import {
-  getElementsFromSimpleTagValues
-} from '../../src/dicom/simpleTagValues.js';
 import {getReferencedSeriesUID} from '../../src/dicom/dicomImage.js';
 import {getSegment} from '../../src/dicom/dicomSegment.js';
 import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
@@ -26,7 +23,10 @@ import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
 
-import {generateDataElements} from '../../dev/dicom/dicomGenerator.js';
+import {
+  getStructureElementsList,
+  singleSliceStructure
+} from '../../dev/dicom/dataStructures.js';
 
 import syntheticImgData from '/tests/data/synthetic-img.json';
 import syntheticSegData from '/tests/data/synthetic-seg.json';
@@ -44,13 +44,16 @@ const syntheticData = [...syntheticImgData, ...syntheticSegData];
 // ---------------------------------------------------------------------------
 
 /**
- * Parse synthetic SEG config tags into DICOM data elements.
+ * Generate the DICOM data elements of a synthetic config the way the
+ * synthetic data page does (explicit VR little endian, single slice,
+ * with the default patient, instance ids and date tags).
  *
  * @param {object} config A synthetic-data entry.
  * @returns {Record<string, object>} DICOM data elements.
  */
 function configToElements(config) {
-  return getElementsFromSimpleTagValues(structuredClone(config.tags));
+  return getStructureElementsList(
+    config, '1.2.840.10008.1.2.1', singleSliceStructure)[0];
 }
 
 /**
@@ -60,10 +63,7 @@ function configToElements(config) {
  */
 function buildRefImage() {
   const config = syntheticData.find(c => c.name === 'test-img-00');
-  const tags = config.tags;
-  tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-  const genOptions = {pixelGeneratorName: 'string'};
-  const elements = generateDataElements(tags, genOptions)[0];
+  const elements = configToElements(config);
   const buffer = elements['7FE00010'].value;
   const factory = new ImageFactory();
   return factory.create(elements, buffer, 1);
@@ -77,10 +77,7 @@ function buildRefImage() {
  */
 function buildMaskImage(configName) {
   const config = syntheticData.find(c => c.name === configName);
-  const tags = structuredClone(config.tags);
-  tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-  const genOptions = {segmentSquares: config.segmentSquares};
-  const elements = generateDataElements(tags, genOptions)[0];
+  const elements = configToElements(config);
   const buffer = elements['7FE00010'].value;
   const factory = new MaskFactory();
   return factory.create(elements, buffer, buildRefImage());
@@ -131,10 +128,7 @@ describe('MaskFactory', () => {
 
   test('create: throws for incomplete per-frame functional groups', () => {
     const config = syntheticData.find(c => c.name === 'test-seg-00');
-    const tags = structuredClone(config.tags);
-    tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-    const genOptions = {segmentSquares: config.segmentSquares};
-    const elements = generateDataElements(tags, genOptions)[0];
+    const elements = configToElements(config);
     // remove the FrameContentSequence of the first per-frame item
     const perFrameSq = safeGetAll(elements, '52009230');
     delete perFrameSq[0]['00209111'];

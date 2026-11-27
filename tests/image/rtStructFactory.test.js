@@ -1,7 +1,4 @@
 import {describe, test, assert, vi, afterEach} from 'vitest';
-import {
-  getElementsFromSimpleTagValues
-} from '../../src/dicom/simpleTagValues.js';
 import {getRTStructFromElements} from '../../src/dicom/dicomRTStruct.js';
 import {
   getReferencedSeriesUIDFromRTStruct
@@ -17,6 +14,11 @@ import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
 import {Point3D} from '../../src/math/point.js';
 import * as loggerModule from '../../src/utils/logger.js';
+
+import {
+  getStructureElementsList,
+  singleSliceStructure
+} from '../../dev/dicom/dataStructures.js';
 
 import syntheticImgData from '/tests/data/synthetic-img.json';
 import syntheticRtssData from '/tests/data/synthetic-rtss.json';
@@ -54,13 +56,16 @@ function buildRefImage() {
 }
 
 /**
- * Parse synthetic RTSS config tags into DICOM data elements.
+ * Generate the DICOM data elements of a synthetic config the way the
+ * synthetic data page does (explicit VR little endian, single slice,
+ * with the default patient, instance ids and date tags).
  *
  * @param {object} config A synthetic-data entry.
  * @returns {Record<string, object>} DICOM data elements.
  */
 function configToElements(config) {
-  return getElementsFromSimpleTagValues(structuredClone(config.tags));
+  return getStructureElementsList(
+    config, '1.2.840.10008.1.2.1', singleSliceStructure)[0];
 }
 
 // ---------------------------------------------------------------------------
@@ -112,7 +117,7 @@ describe('RtStructFactory', () => {
     const tags1 = structuredClone(config.tags);
     delete tags1.FrameOfReferenceUID;
     const image1 = factory.create(
-      getElementsFromSimpleTagValues(tags1), buildRefImage());
+      configToElements({tags: tags1}), buildRefImage());
     assert.equal(image1.getMeta().FrameOfReferenceUID, forUid,
       'frame of reference UID from referenced sequence');
 
@@ -123,7 +128,7 @@ describe('RtStructFactory', () => {
     delete tags2.ReferencedFrameOfReferenceSequence.value[0]
       .FrameOfReferenceUID;
     const image2 = factory.create(
-      getElementsFromSimpleTagValues(tags2), buildRefImage());
+      configToElements({tags: tags2}), buildRefImage());
     assert.isUndefined(image2.getMeta().FrameOfReferenceUID,
       'no frame of reference UID');
     assert.ok(
@@ -636,9 +641,24 @@ describe('RtStructFactory', () => {
   });
 
   test('toDicom: type 2 tags are present', () => {
-    // test-rtss-00 and test-img-00 have no patient tags
+    const image = buildMaskImage('test-rtss-00');
+    // remove the generated default patient and study tags
+    // (the reference image has none)
+    const meta = image.getMeta();
+    for (const name of [
+      'PatientName',
+      'PatientID',
+      'PatientBirthDate',
+      'PatientSex',
+      'StudyDate',
+      'StudyTime',
+      'ReferringPhysicianName',
+      'StudyID'
+    ]) {
+      delete meta[name];
+    }
     const outElements = new RtStructFactory().toDicom(
-      buildMaskImage('test-rtss-00'), undefined, buildRefImage());
+      image, undefined, buildRefImage());
     const type2Keys = {
       PatientName: '00100010',
       PatientID: '00100020',

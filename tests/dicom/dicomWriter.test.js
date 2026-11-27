@@ -17,13 +17,11 @@ import {
   dictionary,
   transferSyntaxKeywords
 } from '../../src/dicom/dictionary.js';
+import {generateSliceBuffers} from '../../dev/dicom/dicomGenerator.js';
 import {
-  addDates,
-  addInstanceIds,
-  addPatientInfo,
-  generateDataElements,
-  generateSliceBuffers
-} from '../../dev/dicom/dicomGenerator.js';
+  getStructureElementsList,
+  singleSliceStructure
+} from '../../dev/dicom/dataStructures.js';
 import {b64urlToArrayBuffer} from './utils.js';
 
 /**
@@ -839,18 +837,8 @@ describe('dicom', () => {
         useUnVrForPrivateSq = config.useUnVrForPrivateSq;
       }
     }
-    // pass tags clone to avoid modifications (for ex by padElement)
-    const jsonTags = structuredClone(config.tags);
-    // default patient tags, instance ids and dates (not in the configs)
-    addPatientInfo(jsonTags);
-    addInstanceIds(jsonTags);
-    addDates(jsonTags);
-
-    // generate buffer
-    const genOptions = {};
-    if (typeof config.segmentSquares !== 'undefined') {
-      genOptions.segmentSquares = config.segmentSquares;
-    }
+    // generate the data elements the way the synthetic data page does
+    // (default patient tags, instance ids and dates, not in the configs)
     const writerOptions = {useUnVrForPrivateSq};
     if (typeof writerRules !== 'undefined') {
       writerOptions.writerRules = writerRules;
@@ -859,8 +847,8 @@ describe('dicom', () => {
     let dicomBuffer;
     try {
       // data elements
-      const dataElementsList = generateDataElements(
-        jsonTags, genOptions
+      const dataElementsList = getStructureElementsList(
+        config, config.tags.TransferSyntaxUID, singleSliceStructure
       );
       // buffer (only one)
       dicomBuffer = generateSliceBuffers(
