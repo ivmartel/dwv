@@ -886,6 +886,7 @@ export class RtStructFactory {
 
       // collect contour sequences across all slices
       const contourSeq = [];
+      let hasHole = false;
       const segFrames = allSegmentFrames?.get(segNum);
       for (let z = 0; z < nSlices; z++) {
         const useOverlapFrame = hasOverlap && segFrames?.has(z);
@@ -894,25 +895,21 @@ export class RtStructFactory {
         const outerPolygons = bufferToPolygons(
           sliceBuffer, sliceOffset, width, height, segNum);
         // enclosed background regions are written as their own nested
-        // contours in the same ContourSequence. When there is a hole, tag
-        // the group as CLOSEDPLANAR_XOR so readers combine them via an
-        // explicit XOR/even-odd rule (PS3.3 C.8.8.6) instead of relying on
-        // the older CLOSED_PLANAR containment convention; single/disjoint
-        // contours keep the more broadly supported CLOSED_PLANAR.
+        // contours in the same ContourSequence
         const holePolygons = outerPolygons.length > 0
           ? findHolePolygons(sliceBuffer, sliceOffset, width, height, segNum)
           : [];
         const polygons = outerPolygons.concat(holePolygons);
-        const geometricType = holePolygons.length > 0
-          ? 'CLOSEDPLANAR_XOR'
-          : 'CLOSED_PLANAR';
-        for (const polygon of polygons) {
-          const simplified = simplifyPolygon(polygon, 1.0);
+        for (let i = 0; i < polygons.length; ++i) {
+          const simplified = simplifyPolygon(polygons[i], 1.0);
           if (simplified.length < 3) {
             logger.warn(
               'Saving RT Struct with thin contour, not well supported'
             );
             continue;
+          }
+          if (i >= outerPolygons.length) {
+            hasHole = true;
           }
           // convert 2D pixel coords to 3D patient-space coords
           const points3D = [];
@@ -922,11 +919,23 @@ export class RtStructFactory {
           }
           contourSeq.push({
             ContourImageSequence: {value: [getSourceReference(z)]},
-            ContourGeometricType: geometricType,
+            ContourGeometricType: undefined,
             NumberOfContourPoints: simplified.length,
             ContourData: points3D
           });
         }
+      }
+      // with a hole, tag the contours as CLOSEDPLANAR_XOR so readers
+      // combine them via an explicit XOR rule instead of relying on
+      // the older CLOSED_PLANAR containment convention; without,
+      // keep the more broadly supported CLOSED_PLANAR. The type is
+      // the same for all the contours of an ROI: 'If any of the Contours
+      // within an ROI is of Contour Geometric Type CLOSEDPLANAR_XOR, all
+      // Contours of that ROI shall be of the same type.'
+      // https://dicom.nema.org/medical/dicom/2024a/output/chtml/part03/sect_C.8.8.6.html#sect_C.8.8.6.1
+      const geometricType = hasHole ? 'CLOSEDPLANAR_XOR' : 'CLOSED_PLANAR';
+      for (const contour of contourSeq) {
+        contour.ContourGeometricType = geometricType;
       }
 
       contourItems.push({

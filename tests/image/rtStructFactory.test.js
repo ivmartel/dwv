@@ -10,6 +10,8 @@ import {safeGet, safeGetAll} from '../../src/dicom/dataElement.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {RtStructFactory} from '../../src/image/rtStructFactory.js';
 import {Image} from '../../src/image/image.js';
+import {MaskImage} from '../../src/image/maskImage.js';
+import {MaskSegment} from '../../src/dicom/dicomSegment.js';
 import {Geometry} from '../../src/image/geometry.js';
 import {Size} from '../../src/image/size.js';
 import {Spacing} from '../../src/image/spacing.js';
@@ -405,6 +407,55 @@ describe('RtStructFactory', () => {
       assert.equal(buf[12 * width + 12], 0, 'hole area is background');
       assert.equal(buf[2 * width + 2], 0, 'outside square is background');
     });
+
+  test('toDicom: same contour type for all the contours of an ROI', () => {
+    // two slices: a square with a hole, then a plain square
+    const width = 32;
+    const sliceSize = width * width;
+    const geometry = new Geometry(
+      [new Point3D(0, 0, 0), new Point3D(0, 0, 1)],
+      new Size([width, width, 2]),
+      new Spacing([1, 1, 1])
+    );
+    const refImage = new Image(
+      geometry, new Uint16Array(2 * sliceSize), ['1.2.3.1', '1.2.3.2']);
+    refImage.setMeta({SeriesInstanceUID: '1.2.3'});
+    const buffer = new Uint8Array(2 * sliceSize);
+    for (let y = 4; y <= 14; ++y) {
+      for (let x = 4; x <= 14; ++x) {
+        const isHole = x >= 8 && x <= 10 && y >= 8 && y <= 10;
+        if (!isHole) {
+          buffer[y * width + x] = 1;
+        }
+      }
+    }
+    for (let y = 4; y <= 10; ++y) {
+      for (let x = 4; x <= 10; ++x) {
+        buffer[sliceSize + y * width + x] = 1;
+      }
+    }
+    const image = new MaskImage(geometry, buffer, ['1.2.4.1', '1.2.4.2']);
+    image.setMeta({Modality: 'RTSTRUCT'});
+    const segments = [new MaskSegment(1, 'Ring', 'MANUAL')];
+
+    const outElements =
+      new RtStructFactory().toDicom(image, segments, refImage);
+    const rois = getRTStructFromElements(outElements);
+    assert.equal(rois.length, 1, 'one ROI');
+    const contours = rois[0].contours;
+    assert.equal(contours.length, 3, 'outer and hole, then square contours');
+    for (const c of contours) {
+      assert.equal(c.type, 'CLOSEDPLANAR_XOR', 'all contours are XOR');
+    }
+
+    // read back
+    const reloaded = new RtStructFactory().create(outElements, refImage);
+    const outBuffer = reloaded.getBuffer();
+    assert.equal(outBuffer[6 * width + 6], 1, 'slice 0 ring is segment 1');
+    assert.equal(outBuffer[9 * width + 9], 0, 'slice 0 hole is background');
+    assert.equal(
+      outBuffer[sliceSize + 7 * width + 7], 1, 'slice 1 square is segment 1');
+  });
 
   test('create: accepts CLOSEDPLANAR_XOR contours and punches out the hole',
     () => {
