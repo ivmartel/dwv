@@ -14,6 +14,8 @@ A text editor can be enough to play with javascript, I use [VSCodium](https://vs
 
 ## Debugging
 
+The [dev pages](/tutorials/dev-pages) (launched with `yarn start`) provide a test viewer, visual checks and DICOM tools to try and debug the library.
+
 Browsers do provide very extensive debugging tools:
 
 - Chrome: {Settings Icon} > Tools > Developer tools (or `F12`)
