@@ -19,6 +19,9 @@ export const i18n = {
       const units = {
         mm: 'mm',
         cm2: 'cm²',
+        // projection radiography: size at the detector
+        mmDetector: 'mm (detector)',
+        cm2Detector: 'cm² (detector)',
         ml: 'ml',
         degree: '°',
         pixel: 'pixels',

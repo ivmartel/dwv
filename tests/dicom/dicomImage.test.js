@@ -2,6 +2,7 @@ import {describe, test, expect, vi} from 'vitest';
 import {
   getImage2DSize,
   getPixelSpacing,
+  getLengthUnit,
   getPixelAspectRatio,
   getSpacingFromMeasure,
   getTagPixelUnit,
@@ -143,6 +144,65 @@ describe('dicom', () => {
       ]
     };
     expect(getPixelSpacing(elements31)).toStrictEqual(spacing01);
+  });
+
+  /**
+   * Tests for {@link getLengthUnit}.
+   *
+   * @function module:tests/dicom~getlengthunit
+   */
+  test('getLengthUnit', () => {
+    const TagKeys = {
+      PixelSpacing: '00280030',
+      ImagerPixelSpacing: '00181164',
+      NominalScannedPixelSpacing: '00182010',
+      DistanceSourceToDetector: '00181110',
+      DistanceSourceToPatient: '00181111',
+      EstimatedRadiographicMagnificationFactor: '00181114'
+    };
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const values = [1.2, 1.1];
+
+    // no spacing: pixel
+    expect(getLengthUnit({})).toBe('unit.pixel');
+
+    // PixelSpacing: mm
+    const elements01 = {};
+    elements01[TagKeys.PixelSpacing] = {value: values};
+    expect(getLengthUnit(elements01)).toBe('unit.mm');
+
+    // PixelSpacing and ImagerPixelSpacing: mm (PixelSpacing wins)
+    const elements02 = {};
+    elements02[TagKeys.PixelSpacing] = {value: values};
+    elements02[TagKeys.ImagerPixelSpacing] = {value: values};
+    expect(getLengthUnit(elements02)).toBe('unit.mm');
+
+    // raw ImagerPixelSpacing: mm at detector
+    const elements10 = {};
+    elements10[TagKeys.ImagerPixelSpacing] = {value: values};
+    expect(getLengthUnit(elements10)).toBe('unit.mmDetector');
+
+    // ImagerPixelSpacing corrected by magnification factor: mm
+    const elements11 = {};
+    elements11[TagKeys.ImagerPixelSpacing] = {value: values};
+    elements11[TagKeys.EstimatedRadiographicMagnificationFactor] = {
+      value: [1.5]
+    };
+    expect(getLengthUnit(elements11)).toBe('unit.mm');
+
+    // ImagerPixelSpacing corrected by distances: mm
+    const elements12 = {};
+    elements12[TagKeys.ImagerPixelSpacing] = {value: values};
+    elements12[TagKeys.DistanceSourceToDetector] = {value: [4]};
+    elements12[TagKeys.DistanceSourceToPatient] = {value: [2]};
+    expect(getLengthUnit(elements12)).toBe('unit.mm');
+
+    // NominalScannedPixelSpacing: mm
+    const elements20 = {};
+    elements20[TagKeys.NominalScannedPixelSpacing] = {value: values};
+    expect(getLengthUnit(elements20)).toBe('unit.mm');
+
+    consoleSpy.mockRestore();
   });
 
   /**
